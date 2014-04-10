@@ -25,21 +25,36 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace maa {
+#include <stdlib.h>
+#include "gpio.h"
 
-    struct gpio_t {
-        int pin;
-        int pinMap;
-        char path[32];
-    };
-    typedef char gpio_mode_t[8];
-    typedef char gpio_dir_t[8];
+using namespace maa;
 
-    void gpio_init(gpio_t *gpio, int pin);
-    int gpio_set(int pin);
-    void gpio_mode(gpio_t *gpio, gpio_mode_t mode);
-    void gpio_dir(gpio_t *gpio, gpio_dir_t dir);
-
-    int gpio_read(gpio_t *gpio);
-    void gpio_write(gpio_t *gpio, int value);
+void
+gpio_init(gpio_t *gpio, int pin) {
+    malloc(sizeof(gpio_t));
+    gpio->pin = pin;
 }
+int
+gpio_set(gpio_t *gpio) {
+    //Stuff
+    return 0;
+}
+
+void
+gpio_mode(gpio_t *gpio, gpio_mode_t mode) {
+    //gpio->pin
+}
+void
+gpio_dir(gpio_t *gpio, gpio_dir_t dir) {
+
+}
+int
+gpio_read(gpio_t *gpio) {
+    return 0;
+}
+void
+gpio_write(gpio_t *gpio, int value){
+
+}
+
