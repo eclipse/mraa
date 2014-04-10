@@ -25,6 +25,7 @@
 #pragma once
 
 #include "i2c.h"
+#include "gpio.h"
 
 #define MAA_LIBRARY_VERSION 1
 

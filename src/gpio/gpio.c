@@ -24,17 +24,21 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
+
 #include "gpio.h"
 
-using namespace maa;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void
 gpio_init(gpio_t *gpio, int pin) {
-    malloc(sizeof(gpio_t));
     gpio->pin = pin;
 }
+
 int
-gpio_set(gpio_t *gpio) {
+gpio_set(int pin) {
     //Stuff
     return 0;
 }
@@ -43,16 +47,22 @@ void
 gpio_mode(gpio_t *gpio, gpio_mode_t mode) {
     //gpio->pin
 }
+
 void
 gpio_dir(gpio_t *gpio, gpio_dir_t dir) {
 
 }
+
 int
 gpio_read(gpio_t *gpio) {
     return 0;
 }
+
 void
 gpio_write(gpio_t *gpio, int value){
 
 }
 
+#ifdef __cplusplus
+}
+#endif

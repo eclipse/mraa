@@ -23,21 +23,28 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace maa {
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    struct gpio_t {
-        int pin;
-        int pinMap;
-        char path[32];
-    };
-    typedef char gpio_mode_t[8];
-    typedef char gpio_dir_t[8];
+typedef struct gpio_struct
+{
+    int pin;
+    int pinMap;
+    char path[64];
+} gpio_t;
 
-    void gpio_init(gpio_t *gpio, int pin);
-    int gpio_set(int pin);
-    void gpio_mode(gpio_t *gpio, gpio_mode_t mode);
-    void gpio_dir(gpio_t *gpio, gpio_dir_t dir);
+typedef char gpio_mode_t[16];
+typedef char gpio_dir_t[16];
 
-    int gpio_read(gpio_t *gpio);
-    void gpio_write(gpio_t *gpio, int value);
+void gpio_init(gpio_t *gpio, int pin);
+int gpio_set(int pin);
+void gpio_mode(gpio_t *gpio, gpio_mode_t mode);
+void gpio_dir(gpio_t *gpio, gpio_dir_t dir);
+
+int gpio_read(gpio_t *gpio);
+void gpio_write(gpio_t *gpio, int value);
+
+#ifdef __cplusplus
 }
+#endif
