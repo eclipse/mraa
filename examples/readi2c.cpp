@@ -1,4 +1,4 @@
-#include "../src/maa.h"
+#include "maa.h"
 
 int
 main ()

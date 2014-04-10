@@ -1,6 +1,6 @@
 #include "stdio.h"
 
-#include "../src/maa.h"
+#include "maa.h"
 
 int
 main(int argc, char **argv)
