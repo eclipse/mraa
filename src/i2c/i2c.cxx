@@ -26,11 +26,17 @@
  */
 
 #include "i2c.h"
+#include "smbus.h"
 
 using namespace maa;
 
 I2C::I2C(unsigned int sda, unsigned int scl)
 {
+    // Galileo only has one I2C device which is always /dev/i2c-0
+    // reliability is a fickle friend!
+    if (i2c_handle = open("/dev/i2c-0", O_RDWR) < 1) {
+        fprintf(stderr, "Failed to open requested i2c port");
+    }
 }
 
 void
@@ -48,7 +54,11 @@ I2C::read(int address, char *data, int length, bool repeated)
 int
 I2C::read(int ack)
 {
-    return 0;
+    int byte;
+    if (byte = i2c_smbus_read_byte(i2c_handle) < 0) {
+        return -1;
+    }
+    return byte;
 }
 
 int

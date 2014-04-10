@@ -10,7 +10,6 @@ SET(CMAKE_SWIG_FLAGS "")
 option(test "Build all tests." OFF)
 
 add_subdirectory (src)
-add_subdirectory (api)
 add_subdirectory (examples)
 
 if (test)

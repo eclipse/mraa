@@ -16,7 +16,7 @@ include_directories(
 SET_SOURCE_FILES_PROPERTIES(maajs.i PROPERTIES CPLUSPLUS ON)                                                                                                 
 SET_SOURCE_FILES_PROPERTIES(maajs.i PROPERTIES SWIG_FLAGS "-node")
 
-SWIG_ADD_MODULE(maajs javascript maajs.i ../maa.cxx ../i2c/i2c.cxx)
+SWIG_ADD_MODULE(maajs javascript ${maa_LIB_SRCS})
 SWIG_LINK_LIBRARIES(maajs ${NODE_LIBRARIES})
 
 set_target_properties(maajs PROPERTIES

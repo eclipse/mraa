@@ -1,8 +1,6 @@
 /*
- * Copyright (C) Intel Corporation.
- *
  * Author: Brendan Le Foll
- *                                                                                                                                                             
+ *
  * Copyright © 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -24,6 +22,13 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
+#pragma once
+
+#include <stdio.h>
+#include <fcntl.h>
+
+#include "smbus.hpp"
 
 namespace maa {
 
@@ -133,5 +138,6 @@ public:
 protected:
     void aquire();
     int _hz;
+    int i2c_handle;
 };
 }
