@@ -14,8 +14,6 @@ include_directories(
 )
 
 SET_SOURCE_FILES_PROPERTIES(maajs.i PROPERTIES CPLUSPLUS ON)                                                                                                 
-SET_SOURCE_FILES_PROPERTIES(maajs.i PROPERTIES SWIG_FLAGS "-includeall")
-#SET_SOURCE_FILES_PROPERTIES(../maa.i PROPERTIES SWIG_FLAGS "-no-moduleobject")
 SET_SOURCE_FILES_PROPERTIES(maajs.i PROPERTIES SWIG_FLAGS "-node")
 
 SWIG_ADD_MODULE(maajs javascript maajs.i ../maa.cxx ../i2c/i2c.cxx)

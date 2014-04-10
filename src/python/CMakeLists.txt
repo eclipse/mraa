@@ -7,7 +7,6 @@ include_directories(
 )
 
 SET_SOURCE_FILES_PROPERTIES(pymaa.i PROPERTIES CPLUSPLUS ON)                                                                                                 
-SET_SOURCE_FILES_PROPERTIES(pymaa.i PROPERTIES SWIG_FLAGS "-includeall")
 
 SWIG_ADD_MODULE(pymaa python pymaa.i ../maa.cxx ../i2c/i2c.cxx)
 SWIG_LINK_LIBRARIES(pymaa ${PYTHON_LIBRARIES})

@@ -3,4 +3,4 @@
     #include "maa.h"
 %}
 
-%include ../maa.h
+%include ../maa.i
