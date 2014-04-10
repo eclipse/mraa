@@ -1,6 +1,4 @@
 /*
- * Copyright (C) Intel Corporation.
- *
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  *
  * Copyright © 2014 Intel Corporation
