@@ -32,6 +32,11 @@ make
 Install is currently unsuported. Javascript and python modules will be in
 build/src/{javascript, python}
 
+=== DEVELOPMENT ===
+
+Unit tests for all features must be completed prior to implementations, please
+run `ctest -V` from the build dir in order to see current implementation status
+
 === USING ===
 
 see examples/
