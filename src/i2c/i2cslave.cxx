@@ -47,7 +47,10 @@ I2CSlave::frequency(int hz)
 int
 I2CSlave::read(char *data, int length)
 {
-    return 0;
+    if (this->read(data, length) == length) {
+        return length;
+    }
+    return -1;
 }
 
 int
@@ -81,8 +84,12 @@ I2CSlave::write(int data)
 }
 
 void
-I2CSlave::address(int address)
+I2CSlave::address(int addr)
 {
+    _addr = addr;
+    if (ioctl(i2c_handle, I2C_SLAVE_FORCE, addr) < 0) {
+        fprintf(stderr, "Failed to set slave address %d\n", addr);
+    }
 }
 
 void

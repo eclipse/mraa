@@ -144,6 +144,7 @@ public:
 protected:
     int _hz;
     int i2c_handle;
+    int _addr;
 };
 
 }
