@@ -23,6 +23,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,6 +34,7 @@ typedef struct gpio_struct
     int pin;
     int pinMap;
     char path[64];
+    FILE *value_fp;
 } gpio_t;
 
 typedef char gpio_mode_t[16];
@@ -42,6 +45,7 @@ int gpio_set(int pin);
 void gpio_mode(gpio_t *gpio, gpio_mode_t mode);
 void gpio_dir(gpio_t *gpio, gpio_dir_t dir);
 
+void gpio_close(gpio_t *gpio);
 int gpio_read(gpio_t *gpio);
 void gpio_write(gpio_t *gpio, int value);
 
