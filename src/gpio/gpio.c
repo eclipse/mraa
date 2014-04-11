@@ -63,6 +63,8 @@ gpio_mode(gpio_t *gpio, gpio_mode_t mode) {
 
 void
 gpio_dir(gpio_t *gpio, gpio_dir_t dir) {
+    fclose(gpio->value_fp);
+    gpio->value_fp = NULL;
     char filepath[64];
     snprintf(filepath, 64, "/sys/class/gpio/gpio%d/direction", gpio->pin);
     int fd;
@@ -85,6 +87,7 @@ gpio_read(gpio_t *gpio) {
     fseek(gpio->value_fp, SEEK_SET, 0);
     char buffer[2];
     fread(buffer, 2, 1, gpio->value_fp);
+    fseek(gpio->value_fp, SEEK_SET, 0);
     return atoi(buffer);
 }
 
@@ -95,6 +98,8 @@ gpio_write(gpio_t *gpio, int value) {
     }
     fseek(gpio->value_fp, SEEK_SET, 0);
     fprintf(gpio->value_fp, "%d", value);
+    fseek(gpio->value_fp, SEEK_SET, 0);
+
 }
 
 void
