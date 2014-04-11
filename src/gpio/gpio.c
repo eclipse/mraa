@@ -34,6 +34,9 @@
 extern "C" {
 #endif
 
+int
+gpio_get_valfp(gpio_t *gpio);
+
 void
 gpio_init(gpio_t *gpio, int pin) {
     FILE *export_f;
@@ -43,10 +46,6 @@ gpio_init(gpio_t *gpio, int pin) {
     } else {
         fprintf(export_f, "%d", pin);
         fclose(export_f);
-
-        char bu[64];
-        sprintf(bu, "/sys/class/gpio/gpio%d/value", pin);
-        gpio->value_fp = fopen(bu, "r+b");
     }
     gpio->pin = pin;
 }
@@ -80,6 +79,9 @@ gpio_dir(gpio_t *gpio, gpio_dir_t dir) {
 
 int
 gpio_read(gpio_t *gpio) {
+    if(gpio->value_fp == NULL) {
+        gpio_get_valfp(gpio);
+    }
     fseek(gpio->value_fp, SEEK_SET, 0);
     char buffer[2];
     fread(buffer, 2, 1, gpio->value_fp);
@@ -87,7 +89,10 @@ gpio_read(gpio_t *gpio) {
 }
 
 void
-gpio_write(gpio_t *gpio, int value){
+gpio_write(gpio_t *gpio, int value) {
+    if(gpio->value_fp == NULL) {
+        gpio_get_valfp(gpio);
+    }
     fseek(gpio->value_fp, SEEK_SET, 0);
     fprintf(gpio->value_fp, "%d", value);
 }
@@ -95,6 +100,19 @@ gpio_write(gpio_t *gpio, int value){
 void
 gpio_close(gpio_t *gpio) {
 
+}
+
+int
+gpio_get_valfp(gpio_t *gpio) {
+    char bu[64];
+    sprintf(bu, "/sys/class/gpio/gpio%d/value", gpio->pin);
+
+    if((gpio->value_fp = fopen(bu, "r+b")) == NULL) {
+        return 1;
+    } else {
+        return 0;
+    }
+    return 1;
 }
 
 #ifdef __cplusplus
