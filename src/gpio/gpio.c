@@ -63,19 +63,20 @@ gpio_mode(gpio_t *gpio, gpio_mode_t mode) {
 
 void
 gpio_dir(gpio_t *gpio, gpio_dir_t dir) {
-    fclose(gpio->value_fp);
-    gpio->value_fp = NULL;
+//if(gpio->value_fp != NULL) {
+//      fclose(gpio->value_fp);
+//       gpio->value_fp = NULL;
+//   }
     char filepath[64];
     snprintf(filepath, 64, "/sys/class/gpio/gpio%d/direction", gpio->pin);
-    int fd;
 
-    fd = open(filepath, O_WRONLY);
-    if(fd == -1) {
+    FILE *direction;
+    if((direction = fopen(filepath, "w")) == NULL) {
         fprintf(stderr, "Failed to open direction for writing!\n");
-    } else if(write(fd, dir, 5) == -1) {
-        fprintf(stderr, "Failed to set direction\n");
     } else {
-        close(fd);
+        fprintf(direction, dir);
+        fclose(direction);
+        gpio->value_fp = NULL;
     }
 }
 
