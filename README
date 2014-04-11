@@ -5,7 +5,7 @@ Library for C/C++ to interface with Galileo & other Intel platforms over:
 - I2C
 - SPI
 - GPIO
-- AIO
+- PWM
 
 In a structured and sane API with port nanmes/numbering that match boards.
 
