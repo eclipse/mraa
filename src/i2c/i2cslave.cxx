@@ -45,6 +45,12 @@ I2CSlave::frequency(int hz)
 }
 
 int
+I2CSlave::receive(void)
+{
+    return -1;
+}
+
+int
 I2CSlave::read(char *data, int length)
 {
     if (this->read(data, length) == length) {
