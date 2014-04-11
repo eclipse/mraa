@@ -2,8 +2,9 @@
 
 import pymaa
 
-x = pymaa.I2C(27,28)
+x = pymaa.I2CSlave(27,28)
+x.address(0x62)
 y= "   "
-ret = x.read(0x62, y, 2)
+ret = x.read(y, 2)
 
 print(y)
