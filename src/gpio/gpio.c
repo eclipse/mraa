@@ -24,6 +24,9 @@
  */
 
 #include <stdlib.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
 
 #include "gpio.h"
 
@@ -33,6 +36,18 @@ extern "C" {
 
 void
 gpio_init(gpio_t *gpio, int pin) {
+    FILE *export_f;
+
+    if((export_f = fopen("/sys/class/gpio/export", "w")) == NULL) {
+        fprintf(stderr, "Failed to open export for writing!\n");
+    } else {
+        fprintf(export_f, "%d", pin);
+        fclose(export_f);
+
+        char bu[64];
+        sprintf(bu, "/sys/class/gpio/gpio%d/value", pin);
+        gpio->value_fp = fopen(bu, "r+b");
+    }
     gpio->pin = pin;
 }
 
@@ -49,16 +64,36 @@ gpio_mode(gpio_t *gpio, gpio_mode_t mode) {
 
 void
 gpio_dir(gpio_t *gpio, gpio_dir_t dir) {
+    char filepath[64];
+    snprintf(filepath, 64, "/sys/class/gpio/gpio%d/direction", gpio->pin);
+    int fd;
 
+    fd = open(filepath, O_WRONLY);
+    if(fd == -1) {
+        fprintf(stderr, "Failed to open direction for writing!\n");
+    } else if(write(fd, dir, 5) == -1) {
+        fprintf(stderr, "Failed to set direction\n");
+    } else {
+        close(fd);
+    }
 }
 
 int
 gpio_read(gpio_t *gpio) {
-    return 0;
+    fseek(gpio->value_fp, SEEK_SET, 0);
+    char buffer[2];
+    fread(buffer, 2, 1, gpio->value_fp);
+    return atoi(buffer);
 }
 
 void
 gpio_write(gpio_t *gpio, int value){
+    fseek(gpio->value_fp, SEEK_SET, 0);
+    fprintf(gpio->value_fp, "%d", value);
+}
+
+void
+gpio_close(gpio_t *gpio) {
 
 }
 
