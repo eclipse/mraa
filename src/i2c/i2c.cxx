@@ -26,7 +26,6 @@
  */
 
 #include "i2c.h"
-#include "smbus.h"
 
 using namespace maa;
 
