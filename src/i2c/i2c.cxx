@@ -64,12 +64,21 @@ I2C::read(int ack)
 int
 I2C::write(int address, const char *data, int length, bool repeated)
 {
+    if (i2c_smbus_write_i2c_block_data(i2c_handle, data[0], length, (uint8_t*) data) < 0) {
+        fprintf(stderr, "Failed to write to I2C slave\n");
+	return -1;
+    }
     return 0;
 }
 
 int
 I2C::write(int data)
 {
+    if (i2c_smbus_write_byte(i2c_handle, data) < 0) {
+        fprintf(stderr, "Failed to write to I2C slave\n");
+	return -1;
+    }
+    return 0;
 }
 
 void
