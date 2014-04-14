@@ -43,6 +43,7 @@ PWM::PWM(int chipin, int pinin)
     } else {
         fprintf(export_f, "%d", pin);
         fclose(export_f);
+        setup_duty_fp();
     }
 }
 
@@ -55,7 +56,8 @@ PWM::write(float percentage)
 float
 PWM::read()
 {
-    return get_duty() / get_period();
+    float output = get_duty() / (float) get_period();
+    return output;
 }
 
 void
@@ -153,9 +155,9 @@ PWM::write_duty(int duty)
     if(duty_fp == NULL) {
         setup_duty_fp();
     }
-    fseek(duty_fp, SEEK_SET, 0);
     fprintf(duty_fp, "%d", duty);
-    fseek(duty_fp, SEEK_SET, 0);
+    rewind(duty_fp);
+    fflush(duty_fp);
 }
 
 int
@@ -178,8 +180,8 @@ PWM::get_period()
     FILE *period_f;
     char bu[64];
     char output[16];
-    sprintf(bu, "/sys/class/pwm/pwmchip%d/pwm%d/period", chipid, pin);
 
+    sprintf(bu, "/sys/class/pwm/pwmchip%d/pwm%d/period", chipid, pin);
     if((period_f = fopen(bu, "rb")) == NULL) {
         fprintf(stderr, "Failed to open period for reading!\n");
         return 0;
@@ -197,7 +199,6 @@ PWM::get_duty()
         setup_duty_fp();
     }
     char output[16];
-    fseek(duty_fp, SEEK_SET, 0);
     fgets(output, 16, duty_fp);
     fseek(duty_fp, SEEK_SET, 0);
     return atoi(output);
