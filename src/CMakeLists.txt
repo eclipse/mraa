@@ -9,6 +9,7 @@ set (maa_LIB_SRCS
   ${PROJECT_SOURCE_DIR}/src/i2c/i2cslave.cxx
   ${PROJECT_SOURCE_DIR}/src/i2c/smbus.c
   ${PROJECT_SOURCE_DIR}/src/gpio/gpio.c
+  ${PROJECT_SOURCE_DIR}/src/pwm/pwm.cxx
 )
 
 add_library (maa STATIC ${maa_LIB_SRCS})
