@@ -66,6 +66,8 @@ private:
     void write_period(int period);
     void write_duty(int duty);
     int setup_duty_fp();
+    int get_period();
+    int get_duty();
 
 public:
 
@@ -98,28 +100,28 @@ public:
      */
     void period(float seconds);
 
-    /** Set period. Microseconds.
-     *  @param ms microseconds for period.
+    /** Set period. milli-oseconds.
+     *  @param ms milli-seconds for period.
      */
     void period_ms(int ms);
 
-    /** Set period. Nanoseconds
-     *  @param ns nanoseconds as period.
+    /** Set period. microseconds
+     *  @param ns microseconds as period.
      */
-    void perod_us(int us);
+    void period_us(int us);
 
     /** Set pulsewidth, As represnted by seconds in a (float).
      *  @param seconds The duration of a pulse
      */
     void pulsewidth(float seconds);
 
-     /** Set pulsewidth. Microseconds
-     *  @param ms microseconds for pulsewidth.
+     /** Set pulsewidth. Milliseconds
+     *  @param ms milliseconds for pulsewidth.
      */
     void pulsewidth_ms(int ms);
 
-      /** Set pulsewidth, nanoseconds.
-     *  @param us nanoseconds for pulsewidth.
+      /** Set pulsewidth, microseconds.
+     *  @param us microseconds for pulsewidth.
      */
     void pulsewidth_us(int us);
 

@@ -23,6 +23,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <stdlib.h>
+
 #include "pwm.h"
 
 using namespace maa;
@@ -47,67 +49,102 @@ PWM::PWM(int chipin, int pinin)
 void
 PWM::write(float percentage)
 {
-    //DO some writting
+    write_duty(percentage*get_period());
 }
 
 float
 PWM::read()
 {
-    //Do Something
+    return get_duty() / get_period();
 }
 
 void
 PWM::period(float seconds)
 {
-    //Do Something
+    period_ms(seconds*1000);
 }
 
 void
 PWM::period_ms(int ms)
 {
-    //Do Something
+    period_us(ms*1000);
 }
 
 void
-PWM::perod_us(int us)
+PWM::period_us(int us)
 {
-    //Do Something
+    write_period(us*1000);
 }
 
 void
 PWM::pulsewidth(float seconds)
 {
-    //Do Something
+    pulsewidth_ms(seconds*1000);
 }
 
 void
 PWM::pulsewidth_ms(int ms)
 {
-    //Do Something
+    pulsewidth_us(ms*1000);
 }
 
 void
 PWM::pulsewidth_us(int us)
 {
-    //Do Something
+    write_duty(us*1000);
 }
 
 void
 PWM::enable(int enable)
 {
+    int status;
+    if(enable != 0) {
+        status = 1;
+    } else {
+        status = enable;
+    }
+    FILE *enable_f;
+    char bu[64];
+    sprintf(bu, "/sys/class/pwm/pwmchip%d/pwm%d/enable", chipid, pin);
+
+    if((enable_f = fopen(bu, "w")) == NULL) {
+        fprintf(stderr, "Failed to open export for writing!\n");
+    } else {
+        fprintf(enable_f, "%d", status);
+        fclose(enable_f);
+    }
     //Do Something
 }
 
 void
 PWM::close()
 {
-    //Do Something
+    enable(0);
+    FILE *unexport_f;
+    char buffer[64];
+    snprintf(buffer, 64, "/sys/class/pwm/pwmchip%d/unexport", chipid);
+
+    if((unexport_f = fopen(buffer, "w")) == NULL) {
+        fprintf(stderr, "Failed to open unexport for writing!\n");
+    } else {
+        fprintf(unexport_f, "%d", pin);
+        fclose(unexport_f);
+    }
 }
 
 void
 PWM::write_period(int period)
 {
-    //Impossible
+    FILE *period_f;
+    char bu[64];
+    sprintf(bu, "/sys/class/pwm/pwmchip%d/pwm%d/period", chipid, pin);
+
+    if((period_f = fopen(bu, "r+b")) == NULL) {
+        fprintf(stderr, "Failed to open period for writing!\n");
+    } else {
+        fprintf(period_f, "%d", period);
+        fclose(period_f);
+    }
 }
 
 void
@@ -133,4 +170,35 @@ PWM::setup_duty_fp()
         return 0;
     }
     return 1;
+}
+
+int
+PWM::get_period()
+{
+    FILE *period_f;
+    char bu[64];
+    char output[16];
+    sprintf(bu, "/sys/class/pwm/pwmchip%d/pwm%d/period", chipid, pin);
+
+    if((period_f = fopen(bu, "rb")) == NULL) {
+        fprintf(stderr, "Failed to open period for reading!\n");
+        return 0;
+    } else {
+        fgets(output, 16, period_f);
+        fclose(period_f);
+        return atoi(output);
+    }
+}
+
+int
+PWM::get_duty()
+{
+    if(duty_fp == NULL) {
+        setup_duty_fp();
+    }
+    char output[16];
+    fseek(duty_fp, SEEK_SET, 0);
+    fgets(output, 16, duty_fp);
+    fseek(duty_fp, SEEK_SET, 0);
+    return atoi(output);
 }
