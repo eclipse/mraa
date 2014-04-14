@@ -59,13 +59,22 @@ namespace maa {
  */
 class PWM {
 
+private:
+    int chipid, pin;
+    FILE *duty_fp;
+
+    void write_period(int period);
+    void write_duty(int duty);
+    int setup_duty_fp();
+
 public:
 
     /** Create an PWM object
      *
-     *  @param pin The PWM pin to operate on.
+     *  @param chipid The chip in which the following pin is on.
+     *  @param pin The PWM channel to operate on
      */
-    PWM(int pin);
+    PWM(int chipid, int pin);
 
     /** Set the ouput duty-cycle percentage, as a float
      *
