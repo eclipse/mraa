@@ -63,10 +63,9 @@ gpio_mode(gpio_t *gpio, gpio_mode_t mode) {
 
 void
 gpio_dir(gpio_t *gpio, gpio_dir_t dir) {
-//if(gpio->value_fp != NULL) {
-//      fclose(gpio->value_fp);
-//       gpio->value_fp = NULL;
-//   }
+    if(gpio->value_fp != NULL) {
+         gpio->value_fp = NULL;
+    }
     char filepath[64];
     snprintf(filepath, 64, "/sys/class/gpio/gpio%d/direction", gpio->pin);
 
@@ -105,7 +104,14 @@ gpio_write(gpio_t *gpio, int value) {
 
 void
 gpio_close(gpio_t *gpio) {
+    FILE *unexport_f;
 
+    if((unexport_f = fopen("/sys/class/gpio/unexport", "w")) == NULL) {
+        fprintf(stderr, "Failed to open unexport for writing!\n");
+    } else {
+        fprintf(unexport_f, "%d", gpio->pin);
+        fclose(unexport_f);
+    }
 }
 
 int
