@@ -27,6 +27,7 @@
 #include "i2c.h"
 #include "i2cslave.h"
 #include "gpio.h"
+#include "pwm.h"
 
 #define MAA_LIBRARY_VERSION 1
 
