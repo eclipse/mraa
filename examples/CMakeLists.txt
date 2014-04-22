@@ -1,6 +1,6 @@
-add_executable (i2c_HMC5883L i2c_HMC5883L.cpp)
-add_executable (hellomaa hellomaa.cpp)
-add_executable (cycle-pwm3 cycle-pwm3.cpp)
+add_executable (i2c_HMC5883L i2c_HMC5883L.cxx)
+add_executable (hellomaa hellomaa.cxx)
+add_executable (cycle-pwm3 cycle-pwm3.cxx)
 
 include_directories(${PROJECT_SOURCE_DIR}/api ${PROJECT_SOURCE_DIR}/include)
 
