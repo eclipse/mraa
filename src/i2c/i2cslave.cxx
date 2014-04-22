@@ -28,9 +28,9 @@ using namespace maa;
 
 I2CSlave::I2CSlave(unsigned int sda, unsigned int scl)
 {
-    // Galileo only has one I2CSlave device which is always /dev/i2c-0
+    // Galileo only has one I2C master which should be /dev/i2c-0
     // reliability is a fickle friend!
-    if (i2c_handle = open("/dev/i2c-0", O_RDWR) < 1) {
+    if ((i2c_handle = open("/dev/i2c-0", O_RDWR)) < 1) {
         fprintf(stderr, "Failed to open requested i2c port");
     }
 }
@@ -50,7 +50,8 @@ I2CSlave::receive(void)
 int
 I2CSlave::read(char *data, int length)
 {
-    if (this->read(data, length) == length) {
+    // this is the read(3) syscall not I2CSlave::read()
+    if (::read(i2c_handle, data, length) == length) {
         return length;
     }
     return -1;
@@ -69,7 +70,7 @@ I2CSlave::read(void)
 int
 I2CSlave::write(const char *data, int length)
 {
-    if (i2c_smbus_write_i2c_block_data(i2c_handle, data[0], length, (uint8_t*) data) < 0) {
+    if (i2c_smbus_write_i2c_block_data(i2c_handle, data[0], length-1, (uint8_t*) data+1) < 0) {
         fprintf(stderr, "Failed to write to I2CSlave slave\n");
 	return -1;
     }
