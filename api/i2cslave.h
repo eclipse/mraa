@@ -1,5 +1,7 @@
-/* mbed Microcontroller Library
+/*
+ * Originally from mbed Microcontroller Library
  * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2014 Intel Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

@@ -67,7 +67,7 @@ extern "C" {
  *  Returns \h_ge 0 on success.
  *  Else errno is set appropriately and -1 is returned.
  */
-int i2c_smbus_access(int fd, uint8_t read_write, uint8_t command, 
+int i2c_smbus_access(int fd, uint8_t read_write, uint8_t command,
                       int size, i2c_smbus_data_t *data)
 {
   i2c_smbus_ioctl_data_t args;
@@ -94,7 +94,7 @@ int i2c_smbus_write_quick(int fd, uint8_t value)
 {
   return i2c_smbus_access(fd, value, I2C_NOCMD, I2C_SMBUS_QUICK, NULL);
 }
-  
+
 /*!
  * \brief Read an immediate byte from the SMBus.
  *

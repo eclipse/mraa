@@ -44,7 +44,7 @@ typedef union i2c_smbus_data_union
 {
     uint8_t byte; ///< data byte
     unsigned short word; ///< data short word
-    uint8_t block[I2C_SMBUS_BLOCK_MAX + 2]; 
+    uint8_t block[I2C_SMBUS_BLOCK_MAX + 2];
     ///< block[0] is used for length and one more for PEC
 } i2c_smbus_data_t;
 
@@ -60,11 +60,11 @@ typedef struct i2c_smbus_ioctl_data_struct
 // Prototypes
 // ---------------------------------------------------------------------------
 
-extern int i2c_smbus_access(int fd, uint8_t read_write, uint8_t command, 
+extern int i2c_smbus_access(int fd, uint8_t read_write, uint8_t command,
                       int size, i2c_smbus_data_t *data);
 
 extern int i2c_smbus_write_quick(int fd, uint8_t value);
-  
+
 extern int i2c_smbus_read_byte(int fd);
 
 extern int i2c_smbus_write_byte(int fd, uint8_t value);

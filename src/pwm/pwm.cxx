@@ -1,7 +1,6 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
- *
- * Copyright © 2014 Intel Corporation
+ * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the

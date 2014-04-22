@@ -1,3 +1,27 @@
+/*
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Copyright (c) 2014 Intel Corporation.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 #include "maa.h"
 #include "math.h"
 
@@ -54,41 +78,41 @@
 int
 main ()
 {
-  float direction = 0;
-  int16_t x = 0, y = 0, z = 0;
-  char rx_tx_buf[MAX_BUFFER_LENGTH];
+    float direction = 0;
+    int16_t x = 0, y = 0, z = 0;
+    char rx_tx_buf[MAX_BUFFER_LENGTH];
 
-  maa::I2CSlave i2c(26, 27);
-
-  i2c.address(HMC5883L_I2C_ADDR);
-  rx_tx_buf[0] = HMC5883L_CONF_REG_B;
-  rx_tx_buf[1] = GA_1_3_REG;
-  i2c.write(rx_tx_buf, 2);
-
-  i2c.address(HMC5883L_I2C_ADDR);
-  rx_tx_buf[0] = HMC5883L_MODE_REG;
-  rx_tx_buf[1] = HMC5883L_CONT_MODE;
-  i2c.write(rx_tx_buf, 2);
-
-  for(;;) {
-    i2c.address(HMC5883L_I2C_ADDR);
-    i2c.write(HMC5883L_DATA_REG);
+    maa::I2CSlave i2c(26, 27);
 
     i2c.address(HMC5883L_I2C_ADDR);
-    i2c.read(rx_tx_buf, DATA_REG_SIZE);
+    rx_tx_buf[0] = HMC5883L_CONF_REG_B;
+    rx_tx_buf[1] = GA_1_3_REG;
+    i2c.write(rx_tx_buf, 2);
 
-    x = (rx_tx_buf[HMC5883L_X_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_X_LSB_REG] ;
-    z = (rx_tx_buf[HMC5883L_Z_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_Z_LSB_REG] ;
-    y = (rx_tx_buf[HMC5883L_Y_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_Y_LSB_REG] ;
+    i2c.address(HMC5883L_I2C_ADDR);
+    rx_tx_buf[0] = HMC5883L_MODE_REG;
+    rx_tx_buf[1] = HMC5883L_CONT_MODE;
+    i2c.write(rx_tx_buf, 2);
 
-    //scale and calculate direction
-    direction = atan2(y * SCALE_0_92_MG, x * SCALE_0_92_MG);
+    for(;;) {
+        i2c.address(HMC5883L_I2C_ADDR);
+        i2c.write(HMC5883L_DATA_REG);
 
-    //check if the signs are reversed
-    if (direction < 0)
-      direction += 2 * M_PI;
+        i2c.address(HMC5883L_I2C_ADDR);
+        i2c.read(rx_tx_buf, DATA_REG_SIZE);
 
-    printf("Compass scaled data x : %f, y : %f, z : %f\n", x * SCALE_0_92_MG, y * SCALE_0_92_MG, z * SCALE_0_92_MG) ;
-    printf("Heading : %f\n", direction * 180/M_PI) ;
-  }
+        x = (rx_tx_buf[HMC5883L_X_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_X_LSB_REG] ;
+        z = (rx_tx_buf[HMC5883L_Z_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_Z_LSB_REG] ;
+        y = (rx_tx_buf[HMC5883L_Y_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_Y_LSB_REG] ;
+
+        //scale and calculate direction
+        direction = atan2(y * SCALE_0_92_MG, x * SCALE_0_92_MG);
+
+        //check if the signs are reversed
+        if (direction < 0)
+            direction += 2 * M_PI;
+
+        printf("Compass scaled data x : %f, y : %f, z : %f\n", x * SCALE_0_92_MG, y * SCALE_0_92_MG, z * SCALE_0_92_MG) ;
+        printf("Heading : %f\n", direction * 180/M_PI) ;
+    }
 }
