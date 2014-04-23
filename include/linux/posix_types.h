@@ -18,7 +18,6 @@
  ****************************************************************************/
 #ifndef _LINUX_POSIX_TYPES_H
 #define _LINUX_POSIX_TYPES_H
-#include <linux/stddef.h>
 #undef __FD_SETSIZE
 /* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 #define __FD_SETSIZE 1024
