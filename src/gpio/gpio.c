@@ -33,8 +33,16 @@
 extern "C" {
 #endif
 
-int
-gpio_get_valfp(gpio_t *gpio);
+static int
+gpio_get_valfp(gpio_t *gpio) {
+    char bu[64];
+    sprintf(bu, "/sys/class/gpio/gpio%d/value", gpio->pin);
+
+    if((gpio->value_fp = fopen(bu, "r+b")) == NULL) {
+        return 1;
+    }
+    return 0;
+}
 
 void
 gpio_init(gpio_t *gpio, int pin) {
@@ -111,19 +119,6 @@ gpio_close(gpio_t *gpio) {
         fprintf(unexport_f, "%d", gpio->pin);
         fclose(unexport_f);
     }
-}
-
-int
-gpio_get_valfp(gpio_t *gpio) {
-    char bu[64];
-    sprintf(bu, "/sys/class/gpio/gpio%d/value", gpio->pin);
-
-    if((gpio->value_fp = fopen(bu, "r+b")) == NULL) {
-        return 1;
-    } else {
-        return 0;
-    }
-    return 1;
 }
 
 #ifdef __cplusplus
