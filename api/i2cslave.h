@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include "smbus.hpp"
+#include "gpio.h"
 
 namespace maa {
 
@@ -147,6 +148,7 @@ protected:
     int _hz;
     int i2c_handle;
     int _addr;
+    gpio_t gpio;
 };
 
 }
