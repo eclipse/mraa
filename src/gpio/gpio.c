@@ -34,7 +34,8 @@ extern "C" {
 #endif
 
 static int
-gpio_get_valfp(gpio_t *gpio) {
+gpio_get_valfp(gpio_t *gpio)
+{
     char bu[64];
     sprintf(bu, "/sys/class/gpio/gpio%d/value", gpio->pin);
 
@@ -45,7 +46,8 @@ gpio_get_valfp(gpio_t *gpio) {
 }
 
 void
-gpio_init(gpio_t *gpio, int pin) {
+gpio_init(gpio_t *gpio, int pin)
+{
     FILE *export_f;
 
     if((export_f = fopen("/sys/class/gpio/export", "w")) == NULL) {
@@ -58,18 +60,21 @@ gpio_init(gpio_t *gpio, int pin) {
 }
 
 int
-gpio_set(int pin) {
+gpio_set(int pin)
+{
     //Stuff
     return 0;
 }
 
 void
-gpio_mode(gpio_t *gpio, gpio_mode_t mode) {
+gpio_mode(gpio_t *gpio, gpio_mode_t mode)
+{
     //gpio->pin
 }
 
 void
-gpio_dir(gpio_t *gpio, gpio_dir_t dir) {
+gpio_dir(gpio_t *gpio, gpio_dir_t dir)
+{
     if(gpio->value_fp != NULL) {
          gpio->value_fp = NULL;
     }
@@ -87,7 +92,8 @@ gpio_dir(gpio_t *gpio, gpio_dir_t dir) {
 }
 
 int
-gpio_read(gpio_t *gpio) {
+gpio_read(gpio_t *gpio)
+{
     if(gpio->value_fp == NULL) {
         gpio_get_valfp(gpio);
     }
@@ -99,7 +105,8 @@ gpio_read(gpio_t *gpio) {
 }
 
 void
-gpio_write(gpio_t *gpio, int value) {
+gpio_write(gpio_t *gpio, int value)
+{
     if(gpio->value_fp == NULL) {
         gpio_get_valfp(gpio);
     }
@@ -110,7 +117,8 @@ gpio_write(gpio_t *gpio, int value) {
 }
 
 void
-gpio_close(gpio_t *gpio) {
+gpio_close(gpio_t *gpio)
+{
     FILE *unexport_f;
 
     if((unexport_f = fopen("/sys/class/gpio/unexport", "w")) == NULL) {
