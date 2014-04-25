@@ -26,5 +26,5 @@ import pymaa
 
 x = pymaa.gpio_t()
 print(x.pin)
-gpio_init(x, 20)
+pymaa.gpio_init(x, 20)
 print(x.pin)
