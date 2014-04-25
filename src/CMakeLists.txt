@@ -3,6 +3,23 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/include
 )
 
+set (maa_LIB_HEADERS
+  ${PROJECT_SOURCE_DIR}/api/maa.h
+  ${PROJECT_SOURCE_DIR}/api/i2cslave.h
+  ${PROJECT_SOURCE_DIR}/api/i2c.h
+  ${PROJECT_SOURCE_DIR}/api/pwm.h
+  ${PROJECT_SOURCE_DIR}/api/gpio.h
+  ${PROJECT_SOURCE_DIR}/include/smbus.hpp
+  ${PROJECT_SOURCE_DIR}/include/smbus.h
+)
+
+set (maa_LIB_KERNEL
+  ${PROJECT_SOURCE_DIR}/include/linux/compiler.h
+  ${PROJECT_SOURCE_DIR}/include/linux/i2c-dev.h
+  ${PROJECT_SOURCE_DIR}/include/linux/posix_types.h
+  ${PROJECT_SOURCE_DIR}/include/linux/types.h
+)
+
 set (maa_LIB_SRCS
   ${PROJECT_SOURCE_DIR}/src/maa.cxx
   ${PROJECT_SOURCE_DIR}/src/i2c/i2c.cxx
@@ -21,6 +38,7 @@ set_target_properties(
    VERSION ${maa_VERSION_STRING}
 )
 install (FILES ${maa_LIB_HEADERS} DESTINATION include/maa)
+install (FILES ${maa_LIB_KERNEL} DESTINATION include/maa/linux)
 
 macro(maa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
   configure_file(${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
