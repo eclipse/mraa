@@ -6,16 +6,18 @@ Library for C/C++ to interface with Galileo & other Intel platforms over:
 - SPI
 - GPIO
 - PWM
+- AIO
 
 In a structured and sane API with port nanmes/numbering that match boards.
 
 The intent is to make it easier for developers and sensor manufacturers to map
-their sensors & actuators on top of Intel hardware.
+their sensors & actuators on top of supported hardware and to allow control of
+low level communication protocol by high level languages & constructs.
 
-=== ENV REQUIREMENTS ===
+=== ENV RECOMENDATIONS ===
 
 node.js 0.10.26
-python 3.3.5
+python 3.3.x or 2.7.x
 swig-v8 3.0.1 (if you want node.js to work you need to use swig-v8)
 I'm using f31c1dce7a45c4b8ed7e6ff845f4c74539e056f1 from
 http://github.com:oliver----/swig-v8
