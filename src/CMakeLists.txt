@@ -5,9 +5,9 @@ include_directories(
 
 set (maa_LIB_HEADERS
   ${PROJECT_SOURCE_DIR}/api/maa.h
+  ${PROJECT_SOURCE_DIR}/api/gpio.h
   ${PROJECT_SOURCE_DIR}/api/i2c.h
   ${PROJECT_SOURCE_DIR}/api/pwm.h
-  ${PROJECT_SOURCE_DIR}/api/gpio.h
   ${PROJECT_SOURCE_DIR}/include/smbus.hpp
   ${PROJECT_SOURCE_DIR}/include/smbus.h
 )
@@ -21,9 +21,9 @@ set (maa_LIB_KERNEL
 
 set (maa_LIB_SRCS
   ${PROJECT_SOURCE_DIR}/src/maa.c
+  ${PROJECT_SOURCE_DIR}/src/gpio/gpio.c
   ${PROJECT_SOURCE_DIR}/src/i2c/i2c.c
   ${PROJECT_SOURCE_DIR}/src/i2c/smbus.c
-  ${PROJECT_SOURCE_DIR}/src/gpio/gpio.c
   ${PROJECT_SOURCE_DIR}/src/pwm/pwm.c
 )
 

@@ -24,10 +24,21 @@
 
 #pragma once
 
-#include "i2c.h"
-#include "gpio.h"
-#include "pwm.h"
-
 #define MAA_LIBRARY_VERSION 1
 
-int maa_get_version();
+typedef enum {
+    MAA_SUCCESS                              =  0,
+    MAA_ERROR_FEATURE_NOT_IMPLEMENTED        =  1,
+    MAA_ERROR_FEATURE_NOT_SUPPORTED          =  2,
+    MAA_ERROR_INVALID_VERBOSITY_LEVEL        =  3,
+    MAA_ERROR_INVALID_PARAMETER              =  4,
+    MAA_ERROR_INVALID_HANDLE                 =  5,
+    MAA_ERROR_NO_RESOURCES                   =  6,
+    MAA_ERROR_INVALID_RESOURCE               =  7,
+    MAA_ERROR_INVALID_QUEUE_TYPE             =  8,
+    MAA_ERROR_NO_DATA_AVAILABLE              =  9,
+
+    MAA_ERROR_UNSPECIFIED                    = 99
+} maa_result_t;
+
+maa_result_t maa_get_version();

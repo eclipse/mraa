@@ -25,16 +25,20 @@
 #include "i2c.h"
 #include "smbus.h"
 
-int
+maa_result_t
 maa_i2c_init(i2c_t* dev)
 {
     // maa allocates the memory for *dev
     dev = malloc(sizeof *dev);
+    if (!dev)
+        return MAA_ERROR_NO_RESOURCES;
+
     // Galileo only has one I2C master which should be /dev/i2c-0
     // reliability is a fickle friend!
     if ((dev->fh = open("/dev/i2c-0", O_RDWR)) < 1) {
         fprintf(stderr, "Failed to open requested i2c port");
     }
+    return MAA_SUCCESS;
 }
 
 void

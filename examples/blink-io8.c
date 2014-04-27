@@ -24,20 +24,20 @@
 
 #include "stdio.h"
 
-#include "maa.h"
+#include "gpio.h"
 
 int
 main(int argc, char **argv)
 {
-    fprintf(stdout, "MAA Version: %d\n Starting Blinking on IO8", get_version());
+    fprintf(stdout, "MAA Version: %d\n Starting Blinking on IO8", maa_get_version());
     gpio_t gpio;
-    gpio_init(&gpio, 26);
-    gpio_dir(&gpio, "out");
+    maa_gpio_init(&gpio, 26);
+    maa_gpio_dir(&gpio, "out");
 
     while (1){
-        gpio_write(&gpio, 0);
+        maa_gpio_write(&gpio, 0);
         sleep(1);
-        gpio_write(&gpio, 1);
+        maa_gpio_write(&gpio, 1);
         sleep(1);
     }
     return 0;

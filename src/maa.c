@@ -24,7 +24,7 @@
 
 #include "maa.h"
 
-int
+maa_result_t
 maa_get_version()
 {
     return MAA_LIBRARY_VERSION;

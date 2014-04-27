@@ -21,12 +21,14 @@
 #include <stdio.h>
 #include <fcntl.h>
 
+#include "maa.h"
+
 typedef struct {
     int chipid, pin;
     FILE *duty_fp;
 } pwm_t;
 
-int maa_pwm_init(pwm_t* pwm, int chipin, int pin);
+maa_result_t maa_pwm_init(pwm_t* pwm, int chipin, int pin);
 
 /** Set the ouput duty-cycle percentage, as a float
  *

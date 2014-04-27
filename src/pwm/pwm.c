@@ -91,10 +91,13 @@ maa_pwm_get_duty(pwm_t* dev)
     fseek(dev->duty_fp, SEEK_SET, 0);
     return atoi(output);
 }
-int
+
+maa_result_t
 maa_pwm_init(pwm_t* dev, int chipin, int pin)
 {
     dev = malloc(sizeof *dev);
+    if (!dev)
+        return MAA_ERROR_NO_RESOURCES;
     dev->chipid = chipin;
     dev->pin = pin;
 
@@ -104,13 +107,14 @@ maa_pwm_init(pwm_t* dev, int chipin, int pin)
 
     if ((export_f = fopen(buffer, "w")) == NULL) {
         fprintf(stderr, "Failed to open export for writing!\n");
+	return MAA_ERROR_INVALID_HANDLE;
     } else {
         fprintf(export_f, "%d", dev->pin);
         fclose(export_f);
         maa_pwm_setup_duty_fp(dev);
     }
 
-    return 0;
+    return MAA_SUCCESS;
 }
 
 void

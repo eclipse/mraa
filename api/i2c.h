@@ -21,6 +21,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
+
+#include "maa.h"
 #include "gpio.h"
 
 typedef struct {
@@ -30,7 +32,7 @@ typedef struct {
     gpio_t gpio;
 } i2c_t;
 
-int maa_i2c_init(i2c_t* dev);
+maa_result_t maa_i2c_init(i2c_t* dev);
 
 /** Set the frequency of the I2C interface
  *

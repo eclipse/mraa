@@ -20,8 +20,9 @@
 
 #include <stdio.h>
 
-typedef struct gpio_struct
-{
+#include "maa.h"
+
+typedef struct {
     int pin;
     int pinMap;
     char path[64];
@@ -31,11 +32,11 @@ typedef struct gpio_struct
 typedef char gpio_mode_t[16];
 typedef char gpio_dir_t[16];
 
-void gpio_init(gpio_t *gpio, int pin);
-int gpio_set(int pin);
-void gpio_mode(gpio_t *gpio, gpio_mode_t mode);
-void gpio_dir(gpio_t *gpio, gpio_dir_t dir);
+maa_result_t maa_gpio_init(gpio_t *gpio, int pin);
+int maa_gpio_set(int pin);
+void maa_gpio_mode(gpio_t *gpio, gpio_mode_t mode);
+void maa_gpio_dir(gpio_t *gpio, gpio_dir_t dir);
 
-void gpio_close(gpio_t *gpio);
-int gpio_read(gpio_t *gpio);
-void gpio_write(gpio_t *gpio, int value);
+void maa_gpio_close(gpio_t *gpio);
+int maa_gpio_read(gpio_t *gpio);
+void maa_gpio_write(gpio_t *gpio, int value);
