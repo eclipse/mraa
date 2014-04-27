@@ -67,7 +67,8 @@ int
 maa_i2c_read_byte(i2c_t* dev)
 {
     int byte;
-    if (byte = i2c_smbus_read_byte(dev->fh) < 0) {
+    byte = i2c_smbus_read_byte(dev->fh);
+    if (byte < 0) {
         return -1;
     }
     return byte;
