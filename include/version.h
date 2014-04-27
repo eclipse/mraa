@@ -22,11 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "maa.h"
-#include "version.h"
+#pragma once
 
-const char *
-maa_get_version()
-{
-    return gVERSION;
-}
+const char* gVERSION;
+const char* gVERSION_SHORT;

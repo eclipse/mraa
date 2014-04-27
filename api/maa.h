@@ -24,8 +24,6 @@
 
 #pragma once
 
-#define MAA_LIBRARY_VERSION 1
-
 typedef enum {
     MAA_SUCCESS                              =  0,
     MAA_ERROR_FEATURE_NOT_IMPLEMENTED        =  1,
@@ -41,4 +39,4 @@ typedef enum {
     MAA_ERROR_UNSPECIFIED                    = 99
 } maa_result_t;
 
-maa_result_t maa_get_version();
+const char* maa_get_version();

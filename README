@@ -25,6 +25,9 @@ http://github.com:oliver----/swig-v8
 
 === COMPILING ===
 
+NOTE: The only supported cmake build configuration is to have the build/ dir
+inside of the repo/tarball.
+
 if swig-v8 is not in your default path you can try run cmake with
 "-DCMAKE_PREFIX_PATH="/path/to/swig-v8"
 
