@@ -24,19 +24,8 @@
 
 #include "maa.h"
 
-using namespace maa;
-
 int
-get_version()
+maa_get_version()
 {
     return MAA_LIBRARY_VERSION;
-}
-
-int
-make_a_conn()
-{
-    maa::I2C i2c(28, 27);
-    int addr = 0x62;
-    char data[2];
-    i2c.read(addr, data, 2);
 }

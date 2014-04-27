@@ -82,24 +82,25 @@ main ()
     int16_t x = 0, y = 0, z = 0;
     char rx_tx_buf[MAX_BUFFER_LENGTH];
 
-    maa::I2CSlave i2c(26, 27);
+    i2c_t i2c;
+    maa_i2c_init(&i2c);
 
-    i2c.address(HMC5883L_I2C_ADDR);
+    maa_i2c_address(&i2c, HMC5883L_I2C_ADDR);
     rx_tx_buf[0] = HMC5883L_CONF_REG_B;
     rx_tx_buf[1] = GA_1_3_REG;
-    i2c.write(rx_tx_buf, 2);
+    maa_i2c_write(&i2c, rx_tx_buf, 2);
 
-    i2c.address(HMC5883L_I2C_ADDR);
+    maa_i2c_address(&i2c, HMC5883L_I2C_ADDR);
     rx_tx_buf[0] = HMC5883L_MODE_REG;
     rx_tx_buf[1] = HMC5883L_CONT_MODE;
-    i2c.write(rx_tx_buf, 2);
+    maa_i2c_write(&i2c, rx_tx_buf, 2);
 
     for(;;) {
-        i2c.address(HMC5883L_I2C_ADDR);
-        i2c.write(HMC5883L_DATA_REG);
+        maa_i2c_address(&i2c, HMC5883L_I2C_ADDR);
+        maa_i2c_write_byte(&i2c, HMC5883L_DATA_REG);
 
-        i2c.address(HMC5883L_I2C_ADDR);
-        i2c.read(rx_tx_buf, DATA_REG_SIZE);
+        maa_i2c_address(&i2c, HMC5883L_I2C_ADDR);
+        maa_i2c_read(&i2c, rx_tx_buf, DATA_REG_SIZE);
 
         x = (rx_tx_buf[HMC5883L_X_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_X_LSB_REG] ;
         z = (rx_tx_buf[HMC5883L_Z_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_Z_LSB_REG] ;

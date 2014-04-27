@@ -25,10 +25,9 @@
 #pragma once
 
 #include "i2c.h"
-#include "i2cslave.h"
 #include "gpio.h"
 #include "pwm.h"
 
 #define MAA_LIBRARY_VERSION 1
 
-int get_version();
+int maa_get_version();

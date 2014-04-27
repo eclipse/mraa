@@ -5,7 +5,6 @@ include_directories(
 
 set (maa_LIB_HEADERS
   ${PROJECT_SOURCE_DIR}/api/maa.h
-  ${PROJECT_SOURCE_DIR}/api/i2cslave.h
   ${PROJECT_SOURCE_DIR}/api/i2c.h
   ${PROJECT_SOURCE_DIR}/api/pwm.h
   ${PROJECT_SOURCE_DIR}/api/gpio.h
@@ -21,12 +20,11 @@ set (maa_LIB_KERNEL
 )
 
 set (maa_LIB_SRCS
-  ${PROJECT_SOURCE_DIR}/src/maa.cxx
-  ${PROJECT_SOURCE_DIR}/src/i2c/i2c.cxx
-  ${PROJECT_SOURCE_DIR}/src/i2c/i2cslave.cxx
+  ${PROJECT_SOURCE_DIR}/src/maa.c
+  ${PROJECT_SOURCE_DIR}/src/i2c/i2c.c
   ${PROJECT_SOURCE_DIR}/src/i2c/smbus.c
   ${PROJECT_SOURCE_DIR}/src/gpio/gpio.c
-  ${PROJECT_SOURCE_DIR}/src/pwm/pwm.cxx
+  ${PROJECT_SOURCE_DIR}/src/pwm/pwm.c
 )
 
 add_library (maa SHARED ${maa_LIB_SRCS})

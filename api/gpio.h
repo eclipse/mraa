@@ -20,10 +20,6 @@
 
 #include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct gpio_struct
 {
     int pin;
@@ -43,7 +39,3 @@ void gpio_dir(gpio_t *gpio, gpio_dir_t dir);
 void gpio_close(gpio_t *gpio);
 int gpio_read(gpio_t *gpio);
 void gpio_write(gpio_t *gpio, int value);
-
-#ifdef __cplusplus
-}
-#endif
