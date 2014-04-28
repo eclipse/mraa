@@ -18,6 +18,12 @@
 
 #pragma once
 
+/** @file
+ *
+ * This file defines the gpio interface for libmaa
+ *
+ */
+
 #include <stdio.h>
 
 #include "maa.h"

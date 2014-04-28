@@ -18,6 +18,12 @@
 
 #pragma once
 
+/** @file
+ *
+ * This file defines the pwm interface for libmaa
+ *
+ */
+
 #include <stdio.h>
 #include <fcntl.h>
 

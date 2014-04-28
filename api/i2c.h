@@ -18,6 +18,12 @@
 
 #pragma once
 
+/** @file
+ *
+ * This file defines the i2c interface for libmaa
+ *
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -36,12 +42,14 @@ maa_i2c_context* maa_i2c_init();
 
 /** Set the frequency of the I2C interface
  *
+ *  @param dev the i2c context
  *  @param hz The bus frequency in hertz
  */
 void maa_i2c_frequency(maa_i2c_context* dev, int hz);
 
 /** Checks to see if this I2C Slave has been addressed.
  *
+ *  @param dev the i2c context
  *  @returns
  *  A status indicating if the device has been addressed, and how
  *  - NoData            - the slave has not been addressed
@@ -53,6 +61,7 @@ int maa_i2c_receive(maa_i2c_context* dev);
 
 /** Read from an I2C master.
  *
+ *  @param dev the i2c context
  *  @param data pointer to the byte array to read data in to
  *  @param length maximum number of bytes to read
  *
@@ -64,13 +73,15 @@ int maa_i2c_read(maa_i2c_context* dev, char *data, int length);
 
 /** Read a single byte from an I2C master.
  *
+ *  @param dev the i2c context
  *  @returns
  *    the byte read
  */
 int maa_i2c_read_byte(maa_i2c_context* dev);
 
-/** Write to an I2C master.
+/** Write to an I2C master
  *
+ *  @param dev the i2c context
  *  @param data pointer to the byte array to be transmitted
  *  @param length the number of bytes to transmite
  *
@@ -82,6 +93,7 @@ int maa_i2c_write(maa_i2c_context* dev, const char *data, int length);
 
 /** Write a single byte to an I2C master.
  *
+ *  @param dev the i2c context
  *  @data the byte to write
  *
  *  @returns
@@ -92,6 +104,7 @@ int maa_i2c_write_byte(maa_i2c_context* dev, int data);
 
 /** Sets the I2C slave address.
  *
+ *  @param dev the i2c context
  *  @param address The address to set for the slave (ignoring the least
  *  signifcant bit). If set to 0, the slave will only respond to the
  *  general call address.
@@ -99,5 +112,7 @@ int maa_i2c_write_byte(maa_i2c_context* dev, int data);
 void maa_i2c_address(maa_i2c_context* dev, int address);
 
 /** De-inits an maa_i2c_context device
+ *
+ *  @param dev the i2c context
  */
 void maa_i2c_stop(maa_i2c_context* dev);

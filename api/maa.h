@@ -24,6 +24,12 @@
 
 #pragma once
 
+/** @file
+ *
+ * This file defines the basic shared values for libmaa
+ *
+ */
+
 typedef enum {
     MAA_SUCCESS                              =  0,
     MAA_ERROR_FEATURE_NOT_IMPLEMENTED        =  1,

@@ -1,4 +1,5 @@
 MAA - Low Level Skeleton Library for Communication on Intel platforms
+==============
 
 Library in C/C++ to interface with Galileo & other Intel platforms over:
 
@@ -16,6 +17,7 @@ their sensors & actuators on top of supported hardware and to allow control of
 low level communication protocol by high level languages & constructs.
 
 === ENV RECOMENDATIONS ===
+--------------
 
 node.js 0.10.26
 python 3.3.x or 2.7.x
@@ -24,6 +26,7 @@ I'm using f31c1dce7a45c4b8ed7e6ff845f4c74539e056f1 from
 http://github.com:oliver----/swig-v8
 
 === COMPILING ===
+--------------
 
 NOTE: The only supported cmake build configuration is to have the build/ dir
 inside of the repo/tarball.
@@ -39,11 +42,13 @@ Install is currently unsuported. Javascript and python modules will be in
 build/src/{javascript, python}
 
 === DEVELOPMENT ===
+--------------
 
 Unit tests for all features must be completed prior to implementations, please
 run `ctest -V` from the build dir in order to see current implementation status
 
 === USING ===
+--------------
 
 see examples/
 
