@@ -1,5 +1,5 @@
 /*
- * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -22,23 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "stdio.h"
+#pragma once
 
-#include "maa.h"
-
-int
-main(int argc, char **argv)
-{
-    fprintf(stdout, "MAA Version: %d\n Starting Blinking on IO8", get_version());
-    gpio_t gpio;
-    gpio_init(&gpio, 26);
-    gpio_dir(&gpio, "out");
-
-    while (1){
-        gpio_write(&gpio, 0);
-        sleep(1);
-        gpio_write(&gpio, 1);
-        sleep(1);
-    }
-    return 0;
-}
+const char* gVERSION;
+const char* gVERSION_SHORT;

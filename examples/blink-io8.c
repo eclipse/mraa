@@ -1,5 +1,5 @@
 /*
- * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -22,21 +22,24 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "maa.h"
+#include "stdio.h"
 
-using namespace maa;
-
-int
-get_version()
-{
-    return MAA_LIBRARY_VERSION;
-}
+#include "gpio.h"
 
 int
-make_a_conn()
+main(int argc, char **argv)
 {
-    maa::I2C i2c(28, 27);
-    int addr = 0x62;
-    char data[2];
-    i2c.read(addr, data, 2);
+    fprintf(stdout, "MAA Version: %d\nStarting Blinking on IO8\n",
+            maa_get_version());
+    maa_gpio_context* gpio;
+    gpio = maa_gpio_init(26);
+    maa_gpio_dir(gpio, "out");
+
+    while (1) {
+        maa_gpio_write(gpio, 0);
+        sleep(1);
+        maa_gpio_write(gpio, 1);
+        sleep(1);
+    }
+    return 0;
 }

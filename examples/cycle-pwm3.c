@@ -24,25 +24,29 @@
 
 #include <unistd.h>
 
-#include "maa.h"
+#include "pwm.h"
 
 int
 main ()
 {
-    maa::PWM pwm(0, 3);
-    pwm.period_us(200);
-    pwm.enable(1);
+    maa_pwm_context* pwm;
+    pwm = maa_pwm_init(0, 3);
+    if (pwm == NULL) {
+        return 1;
+    }
+    maa_pwm_period_us(pwm, 200);
+    maa_pwm_enable(pwm, 1);
 
     float value = 0.0f;
 
-    while(1) {
+    while (1) {
         value = value + 0.01f;
-        pwm.write(value);
+        maa_pwm_write(pwm, value);
         usleep(50000);
         if (value >= 1.0f) {
             value = 0.0f;
         }
-        float output = pwm.read();
+        float output = maa_pwm_read(pwm);
     }
     return 0;
 }

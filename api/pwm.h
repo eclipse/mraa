@@ -21,112 +21,68 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-namespace maa {
+#include "maa.h"
 
-/** A PWM object, used for interacting with PWM output.
- *
- * Example:
- * @code
- * // Set up PWM object then cycle percentage 0-100.
- *
- * #include "maa.h"
- *
- * PWM pwm(3);
- *
- * int main() {
- *     pwm.period_us(7968750i); //Max Galileo Rev D
- *     pwm.enable(1);
- *
- *     float value = 0;
- *     while(1) {
- *         pwm.write(value);
- *         sleep(0.5);
- *         if(value == 1.0) {
- *             value = 0;
- *         } else {
- *             value = value +0.1;
- *         }
- *     }
- * }
- * @endcode
- */
-class PWM {
-
-private:
+typedef struct {
     int chipid, pin;
     FILE *duty_fp;
+} maa_pwm_context;
 
-    void write_period(int period);
-    void write_duty(int duty);
-    int setup_duty_fp();
-    int get_period();
-    int get_duty();
+maa_pwm_context* maa_pwm_init(int chipin, int pin);
 
-public:
+/** Set the ouput duty-cycle percentage, as a float
+ *
+ *  @param percentage A floating-point value representing percentage of output.
+ *    The value should lie between 0.0f (representing on 0%) and 1.0f
+ *    Values above or below this range will be set at either 0.0f or 1.0f.
+ */
+void maa_pwm_write(maa_pwm_context* pwm, float percentage);
 
-    /** Create an PWM object
-     *
-     *  @param chipid The chip in which the following pin is on.
-     *  @param pin The PWM channel to operate on
-     */
-    PWM(int chipid, int pin);
+/** Read the ouput duty-cycle percentage, as a float
+ *
+ *  @return percentage A floating-point value representing percentage of output.
+ *    The value should lie between 0.0f (representing on 0%) and 1.0f
+ *    Values above or below this range will be set at either 0.0f or 1.0f.
+ */
+float maa_pwm_read(maa_pwm_context* pwm);
 
-    /** Set the ouput duty-cycle percentage, as a float
-     *
-     *  @param percentage A floating-point value representing percentage of output.
-     *    The value should lie between 0.0f (representing on 0%) and 1.0f
-     *    Values above or below this range will be set at either 0.0f or 1.0f.
-     */
-    void write(float percentage);
+/** Set the PWM period as seconds represented in a float
+ *
+ *  @param seconds Peroid represented as a float in seconds.
+ */
+void maa_pwm_period(maa_pwm_context* pwm, float seconds);
 
-    /** Read the ouput duty-cycle percentage, as a float
-     *
-     *  @return percentage A floating-point value representing percentage of output.
-     *    The value should lie between 0.0f (representing on 0%) and 1.0f
-     *    Values above or below this range will be set at either 0.0f or 1.0f.
-     */
-    float read();
+/** Set period. milli-oseconds.
+ *  @param ms milli-seconds for period.
+ */
+void maa_pwm_period_ms(maa_pwm_context* pwm, int ms);
 
-    /** Set the PWM period as seconds represented in a float
-     *
-     *  @param seconds Peroid represented as a float in seconds.
-     */
-    void period(float seconds);
+/** Set period. microseconds
+ *  @param ns microseconds as period.
+ */
+void maa_pwm_period_us(maa_pwm_context* pwm, int us);
 
-    /** Set period. milli-oseconds.
-     *  @param ms milli-seconds for period.
-     */
-    void period_ms(int ms);
+/** Set pulsewidth, As represnted by seconds in a (float).
+ *  @param seconds The duration of a pulse
+ */
+void maa_pwm_pulsewidth(maa_pwm_context* pwm, float seconds);
 
-    /** Set period. microseconds
-     *  @param ns microseconds as period.
-     */
-    void period_us(int us);
+ /** Set pulsewidth. Milliseconds
+ *  @param ms milliseconds for pulsewidth.
+ */
+void maa_pwm_pulsewidth_ms(maa_pwm_context* pwm, int ms);
 
-    /** Set pulsewidth, As represnted by seconds in a (float).
-     *  @param seconds The duration of a pulse
-     */
-    void pulsewidth(float seconds);
+  /** Set pulsewidth, microseconds.
+ *  @param us microseconds for pulsewidth.
+ */
+void maa_pwm_pulsewidth_us(maa_pwm_context* pwm, int us);
 
-     /** Set pulsewidth. Milliseconds
-     *  @param ms milliseconds for pulsewidth.
-     */
-    void pulsewidth_ms(int ms);
+/** Set the enable status of the PWM pin. None zero will assume on with output being driven.
+ *   and 0 will disable the output.
+ *  @param enable enable status of pin
+ */
+void maa_pwm_enable(maa_pwm_context* pwm, int enable);
 
-      /** Set pulsewidth, microseconds.
-     *  @param us microseconds for pulsewidth.
-     */
-    void pulsewidth_us(int us);
-
-    /** Set the enable status of the PWM pin. None zero will assume on with output being driven.
-     *   and 0 will disable the output.
-     *  @param enable enable status of pin
-     */
-    void enable(int enable);
-
-     /** Close and unexport the PWM pin.
-     */
-    void close();
-
-};
-}
+ /** Close and unexport the PWM pin.
+ */
+void maa_pwm_close(maa_pwm_context* pwm);

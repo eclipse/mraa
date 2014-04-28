@@ -22,13 +22,11 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "stdio.h"
-
 #include "maa.h"
+#include "version.h"
 
-int
-main(int argc, char **argv)
+const char *
+maa_get_version()
 {
-    fprintf(stdout, "hello maa\n Version: %d\n", get_version());
-    return 0;
+    return gVERSION;
 }

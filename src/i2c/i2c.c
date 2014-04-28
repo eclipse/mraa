@@ -22,55 +22,61 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "i2cslave.h"
+#include "i2c.h"
+#include "smbus.h"
 
-using namespace maa;
-
-I2CSlave::I2CSlave(unsigned int sda, unsigned int scl)
+maa_i2c_context*
+maa_i2c_init()
 {
+    maa_i2c_context* dev = (maa_i2c_context*) malloc(sizeof(maa_i2c_context));
+    if (dev == NULL)
+        return NULL;
+
     // Galileo only has one I2C master which should be /dev/i2c-0
     // reliability is a fickle friend!
-    if ((i2c_handle = open("/dev/i2c-0", O_RDWR)) < 1) {
+    if ((dev->fh = open("/dev/i2c-0", O_RDWR)) < 1) {
         fprintf(stderr, "Failed to open requested i2c port");
     }
+    return MAA_SUCCESS;
 }
 
 void
-I2CSlave::frequency(int hz)
+maa_i2c_frequency(maa_i2c_context* dev, int hz)
 {
-    _hz = hz;
+    dev->hz = hz;
 }
 
 int
-I2CSlave::receive(void)
+maa_i2c_receive(maa_i2c_context* dev)
 {
     return -1;
 }
 
 int
-I2CSlave::read(char *data, int length)
+maa_i2c_read(maa_i2c_context* dev, char *data, int length)
 {
-    // this is the read(3) syscall not I2CSlave::read()
-    if (::read(i2c_handle, data, length) == length) {
+    // this is the read(3) syscall not maa_i2c_read()
+    if (read(dev->fh, data, length) == length) {
         return length;
     }
     return -1;
 }
 
 int
-I2CSlave::read(void)
+maa_i2c_read_byte(maa_i2c_context* dev)
 {
     int byte;
-    if (byte = i2c_smbus_read_byte(i2c_handle) < 0) {
+    byte = i2c_smbus_read_byte(dev->fh);
+    if (byte < 0) {
         return -1;
     }
     return byte;
 }
 
 int
-I2CSlave::write(const char *data, int length)
+maa_i2c_write(maa_i2c_context* dev, const char* data, int length)
 {
-    if (i2c_smbus_write_i2c_block_data(i2c_handle, data[0], length-1, (uint8_t*) data+1) < 0) {
+    if (i2c_smbus_write_i2c_block_data(dev->fh, data[0], length-1, (uint8_t*) data+1) < 0) {
         fprintf(stderr, "Failed to write to I2CSlave slave\n");
 	return -1;
     }
@@ -78,9 +84,9 @@ I2CSlave::write(const char *data, int length)
 }
 
 int
-I2CSlave::write(int data)
+maa_i2c_write_byte(maa_i2c_context* dev, int data)
 {
-    if (i2c_smbus_write_byte(i2c_handle, data) < 0) {
+    if (i2c_smbus_write_byte(dev->fh, data) < 0) {
         fprintf(stderr, "Failed to write to I2CSlave slave\n");
 	return -1;
     }
@@ -88,15 +94,16 @@ I2CSlave::write(int data)
 }
 
 void
-I2CSlave::address(int addr)
+maa_i2c_address(maa_i2c_context* dev, int addr)
 {
-    _addr = addr;
-    if (ioctl(i2c_handle, I2C_SLAVE_FORCE, addr) < 0) {
+    dev->addr = addr;
+    if (ioctl(dev->fh, I2C_SLAVE_FORCE, addr) < 0) {
         fprintf(stderr, "Failed to set slave address %d\n", addr);
     }
 }
 
 void
-I2CSlave::stop()
+maa_i2c_stop(maa_i2c_context* dev)
 {
+    free(dev);
 }

@@ -13,7 +13,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-SET_SOURCE_FILES_PROPERTIES(maajs.i PROPERTIES CPLUSPLUS ON)                                                                                                 
 SET_SOURCE_FILES_PROPERTIES(maajs.i PROPERTIES SWIG_FLAGS "-node")
 
 SWIG_ADD_MODULE(maajs javascript ${maa_LIB_SRCS})

@@ -20,30 +20,22 @@
 
 #include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "maa.h"
 
-typedef struct gpio_struct
-{
+typedef struct {
     int pin;
     int pinMap;
     char path[64];
     FILE *value_fp;
-} gpio_t;
+} maa_gpio_context;
 
 typedef char gpio_mode_t[16];
 typedef char gpio_dir_t[16];
 
-void gpio_init(gpio_t *gpio, int pin);
-int gpio_set(int pin);
-void gpio_mode(gpio_t *gpio, gpio_mode_t mode);
-void gpio_dir(gpio_t *gpio, gpio_dir_t dir);
+maa_gpio_context* maa_gpio_init(int pin);
+void maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode);
+void maa_gpio_dir(maa_gpio_context *dev, gpio_dir_t dir);
 
-void gpio_close(gpio_t *gpio);
-int gpio_read(gpio_t *gpio);
-void gpio_write(gpio_t *gpio, int value);
-
-#ifdef __cplusplus
-}
-#endif
+void maa_gpio_close(maa_gpio_context *dev);
+int maa_gpio_read(maa_gpio_context *dev);
+void maa_gpio_write(maa_gpio_context *dev, int value);
