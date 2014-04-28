@@ -29,15 +29,16 @@
 int
 main(int argc, char **argv)
 {
-    fprintf(stdout, "MAA Version: %d\n Starting Blinking on IO8", maa_get_version());
-    gpio_t gpio;
-    maa_gpio_init(&gpio, 26);
-    maa_gpio_dir(&gpio, "out");
+    fprintf(stdout, "MAA Version: %d\nStarting Blinking on IO8\n",
+            maa_get_version());
+    maa_gpio_context* gpio;
+    gpio = maa_gpio_init(26);
+    maa_gpio_dir(gpio, "out");
 
-    while (1){
-        maa_gpio_write(&gpio, 0);
+    while (1) {
+        maa_gpio_write(gpio, 0);
         sleep(1);
-        maa_gpio_write(&gpio, 1);
+        maa_gpio_write(gpio, 1);
         sleep(1);
     }
     return 0;

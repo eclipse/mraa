@@ -27,7 +27,7 @@
 #include "pwm.h"
 
 static int
-maa_pwm_setup_duty_fp(pwm_t* dev)
+maa_pwm_setup_duty_fp(maa_pwm_context* dev)
 {
     char bu[64];
     sprintf(bu, "/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev->chipid, dev->pin);
@@ -39,7 +39,7 @@ maa_pwm_setup_duty_fp(pwm_t* dev)
 }
 
 static void
-maa_pwm_write_period(pwm_t* dev, int period)
+maa_pwm_write_period(maa_pwm_context* dev, int period)
 {
     FILE *period_f;
     char bu[64];
@@ -53,7 +53,7 @@ maa_pwm_write_period(pwm_t* dev, int period)
 }
 
 static void
-maa_pwm_write_duty(pwm_t* dev, int duty)
+maa_pwm_write_duty(maa_pwm_context* dev, int duty)
 {
     if (dev->duty_fp == NULL) {
         maa_pwm_setup_duty_fp(dev);
@@ -64,7 +64,7 @@ maa_pwm_write_duty(pwm_t* dev, int duty)
 }
 
 static int
-maa_pwm_get_period(pwm_t* dev)
+maa_pwm_get_period(maa_pwm_context* dev)
 {
     FILE *period_f;
     char bu[64];
@@ -81,7 +81,7 @@ maa_pwm_get_period(pwm_t* dev)
 }
 
 static int
-maa_pwm_get_duty(pwm_t* dev)
+maa_pwm_get_duty(maa_pwm_context* dev)
 {
     if (dev->duty_fp == NULL) {
         maa_pwm_setup_duty_fp(dev);
@@ -92,12 +92,13 @@ maa_pwm_get_duty(pwm_t* dev)
     return atoi(output);
 }
 
-maa_result_t
-maa_pwm_init(pwm_t* dev, int chipin, int pin)
+maa_pwm_context*
+maa_pwm_init(int chipin, int pin)
 {
-    dev = malloc(sizeof *dev);
-    if (!dev)
-        return MAA_ERROR_NO_RESOURCES;
+    maa_pwm_context* dev = (maa_pwm_context*) malloc(sizeof(maa_pwm_context));
+    if (dev == NULL)
+        return NULL;
+
     dev->chipid = chipin;
     dev->pin = pin;
 
@@ -107,67 +108,67 @@ maa_pwm_init(pwm_t* dev, int chipin, int pin)
 
     if ((export_f = fopen(buffer, "w")) == NULL) {
         fprintf(stderr, "Failed to open export for writing!\n");
-	return MAA_ERROR_INVALID_HANDLE;
+	free(dev);
+	return NULL;
     } else {
         fprintf(export_f, "%d", dev->pin);
         fclose(export_f);
         maa_pwm_setup_duty_fp(dev);
     }
-
-    return MAA_SUCCESS;
+    return dev;
 }
 
 void
-maa_pwm_write(pwm_t* dev, float percentage)
+maa_pwm_write(maa_pwm_context* dev, float percentage)
 {
     maa_pwm_write_duty(dev, percentage * maa_pwm_get_period(dev));
 }
 
 float
-maa_pwm_read(pwm_t* dev)
+maa_pwm_read(maa_pwm_context* dev)
 {
     float output = maa_pwm_get_duty(dev) / (float) maa_pwm_get_period(dev);
     return output;
 }
 
 void
-maa_pwm_period(pwm_t* dev, float seconds)
+maa_pwm_period(maa_pwm_context* dev, float seconds)
 {
     maa_pwm_period_ms(dev, seconds*1000);
 }
 
 void
-maa_pwm_period_ms(pwm_t* dev, int ms)
+maa_pwm_period_ms(maa_pwm_context* dev, int ms)
 {
     maa_pwm_period_us(dev, ms*1000);
 }
 
 void
-maa_pwm_period_us(pwm_t* dev, int us)
+maa_pwm_period_us(maa_pwm_context* dev, int us)
 {
     maa_pwm_write_period(dev, us*1000);
 }
 
 void
-maa_pwm_pulsewidth(pwm_t* dev, float seconds)
+maa_pwm_pulsewidth(maa_pwm_context* dev, float seconds)
 {
     maa_pwm_pulsewidth_ms(dev, seconds*1000);
 }
 
 void
-maa_pwm_pulsewidth_ms(pwm_t* dev, int ms)
+maa_pwm_pulsewidth_ms(maa_pwm_context* dev, int ms)
 {
     maa_pwm_pulsewidth_us(dev, ms*1000);
 }
 
 void
-maa_pwm_pulsewidth_us(pwm_t* dev, int us)
+maa_pwm_pulsewidth_us(maa_pwm_context* dev, int us)
 {
     maa_pwm_write_duty(dev, us*1000);
 }
 
 void
-maa_pwm_enable(pwm_t* dev, int enable)
+maa_pwm_enable(maa_pwm_context* dev, int enable)
 {
     int status;
     if (enable != 0) {
@@ -189,7 +190,7 @@ maa_pwm_enable(pwm_t* dev, int enable)
 }
 
 void
-maa_pwm_close(pwm_t* dev)
+maa_pwm_close(maa_pwm_context* dev)
 {
     maa_pwm_enable(dev, 0);
     FILE *unexport_f;

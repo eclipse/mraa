@@ -26,9 +26,9 @@
 typedef struct {
     int chipid, pin;
     FILE *duty_fp;
-} pwm_t;
+} maa_pwm_context;
 
-maa_result_t maa_pwm_init(pwm_t* pwm, int chipin, int pin);
+maa_pwm_context* maa_pwm_init(int chipin, int pin);
 
 /** Set the ouput duty-cycle percentage, as a float
  *
@@ -36,7 +36,7 @@ maa_result_t maa_pwm_init(pwm_t* pwm, int chipin, int pin);
  *    The value should lie between 0.0f (representing on 0%) and 1.0f
  *    Values above or below this range will be set at either 0.0f or 1.0f.
  */
-void maa_pwm_write(pwm_t* pwm, float percentage);
+void maa_pwm_write(maa_pwm_context* pwm, float percentage);
 
 /** Read the ouput duty-cycle percentage, as a float
  *
@@ -44,45 +44,45 @@ void maa_pwm_write(pwm_t* pwm, float percentage);
  *    The value should lie between 0.0f (representing on 0%) and 1.0f
  *    Values above or below this range will be set at either 0.0f or 1.0f.
  */
-float maa_pwm_read(pwm_t* pwm);
+float maa_pwm_read(maa_pwm_context* pwm);
 
 /** Set the PWM period as seconds represented in a float
  *
  *  @param seconds Peroid represented as a float in seconds.
  */
-void maa_pwm_period(pwm_t* pwm, float seconds);
+void maa_pwm_period(maa_pwm_context* pwm, float seconds);
 
 /** Set period. milli-oseconds.
  *  @param ms milli-seconds for period.
  */
-void maa_pwm_period_ms(pwm_t* pwm, int ms);
+void maa_pwm_period_ms(maa_pwm_context* pwm, int ms);
 
 /** Set period. microseconds
  *  @param ns microseconds as period.
  */
-void maa_pwm_period_us(pwm_t* pwm, int us);
+void maa_pwm_period_us(maa_pwm_context* pwm, int us);
 
 /** Set pulsewidth, As represnted by seconds in a (float).
  *  @param seconds The duration of a pulse
  */
-void maa_pwm_pulsewidth(pwm_t* pwm, float seconds);
+void maa_pwm_pulsewidth(maa_pwm_context* pwm, float seconds);
 
  /** Set pulsewidth. Milliseconds
  *  @param ms milliseconds for pulsewidth.
  */
-void maa_pwm_pulsewidth_ms(pwm_t* pwm, int ms);
+void maa_pwm_pulsewidth_ms(maa_pwm_context* pwm, int ms);
 
   /** Set pulsewidth, microseconds.
  *  @param us microseconds for pulsewidth.
  */
-void maa_pwm_pulsewidth_us(pwm_t* pwm, int us);
+void maa_pwm_pulsewidth_us(maa_pwm_context* pwm, int us);
 
 /** Set the enable status of the PWM pin. None zero will assume on with output being driven.
  *   and 0 will disable the output.
  *  @param enable enable status of pin
  */
-void maa_pwm_enable(pwm_t* pwm, int enable);
+void maa_pwm_enable(maa_pwm_context* pwm, int enable);
 
  /** Close and unexport the PWM pin.
  */
-void maa_pwm_close(pwm_t* pwm);
+void maa_pwm_close(maa_pwm_context* pwm);

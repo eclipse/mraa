@@ -29,16 +29,16 @@ typedef struct {
     int hz;
     int fh;
     int addr;
-    gpio_t gpio;
-} i2c_t;
+    maa_gpio_context gpio;
+} maa_i2c_context;
 
-maa_result_t maa_i2c_init(i2c_t* dev);
+maa_i2c_context* maa_i2c_init();
 
 /** Set the frequency of the I2C interface
  *
  *  @param hz The bus frequency in hertz
  */
-void maa_i2c_frequency(i2c_t* dev, int hz);
+void maa_i2c_frequency(maa_i2c_context* dev, int hz);
 
 /** Checks to see if this I2C Slave has been addressed.
  *
@@ -49,7 +49,7 @@ void maa_i2c_frequency(i2c_t* dev, int hz);
  *  - WriteAddressed    - the master is writing to this slave
  *  - WriteGeneral      - the master is writing to all slave
  */
-int maa_i2c_receive(i2c_t* dev);
+int maa_i2c_receive(maa_i2c_context* dev);
 
 /** Read from an I2C master.
  *
@@ -60,14 +60,14 @@ int maa_i2c_receive(i2c_t* dev);
  *       0 on success,
  *   non-0 otherwise
  */
-int maa_i2c_read(i2c_t* dev, char *data, int length);
+int maa_i2c_read(maa_i2c_context* dev, char *data, int length);
 
 /** Read a single byte from an I2C master.
  *
  *  @returns
  *    the byte read
  */
-int maa_i2c_read_byte(i2c_t* dev);
+int maa_i2c_read_byte(maa_i2c_context* dev);
 
 /** Write to an I2C master.
  *
@@ -78,7 +78,7 @@ int maa_i2c_read_byte(i2c_t* dev);
  *       0 on success,
  *   non-0 otherwise
  */
-int maa_i2c_write(i2c_t* dev, const char *data, int length);
+int maa_i2c_write(maa_i2c_context* dev, const char *data, int length);
 
 /** Write a single byte to an I2C master.
  *
@@ -88,7 +88,7 @@ int maa_i2c_write(i2c_t* dev, const char *data, int length);
  *    '1' if an ACK was received,
  *    '0' otherwise
  */
-int maa_i2c_write_byte(i2c_t* dev, int data);
+int maa_i2c_write_byte(maa_i2c_context* dev, int data);
 
 /** Sets the I2C slave address.
  *
@@ -96,8 +96,8 @@ int maa_i2c_write_byte(i2c_t* dev, int data);
  *  signifcant bit). If set to 0, the slave will only respond to the
  *  general call address.
  */
-void maa_i2c_address(i2c_t* dev, int address);
+void maa_i2c_address(maa_i2c_context* dev, int address);
 
-/** De-inits an i2c_t device
+/** De-inits an maa_i2c_context device
  */
-void maa_i2c_stop(i2c_t* dev);
+void maa_i2c_stop(maa_i2c_context* dev);

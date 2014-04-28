@@ -30,21 +30,22 @@
 #include "gpio.h"
 
 static int
-maa_gpio_get_valfp(gpio_t *gpio)
+maa_gpio_get_valfp(maa_gpio_context *dev)
 {
     char bu[64];
-    sprintf(bu, "/sys/class/gpio/gpio%d/value", gpio->pin);
+    sprintf(bu, "/sys/class/gpio/gpio%d/value", dev->pin);
 
-    if ((gpio->value_fp = fopen(bu, "r+b")) == NULL) {
+    if ((dev->value_fp = fopen(bu, "r+b")) == NULL) {
         return 1;
     }
     return 0;
 }
 
-maa_result_t
-maa_gpio_init(gpio_t *gpio, int pin)
+maa_gpio_context*
+maa_gpio_init(int pin)
 {
     FILE *export_f;
+    maa_gpio_context* dev = (maa_gpio_context*) malloc(sizeof(maa_gpio_context));
 
     if ((export_f = fopen("/sys/class/gpio/export", "w")) == NULL) {
         fprintf(stderr, "Failed to open export for writing!\n");
@@ -52,31 +53,24 @@ maa_gpio_init(gpio_t *gpio, int pin)
         fprintf(export_f, "%d", pin);
         fclose(export_f);
     }
-    gpio->pin = pin;
-    return MAA_SUCCESS;
-}
-
-int
-maa_gpio_set(int pin)
-{
-    //Stuff
-    return 0;
+    dev->pin = pin;
+    return dev;
 }
 
 void
-maa_gpio_mode(gpio_t *gpio, gpio_mode_t mode)
+maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode)
 {
     //gpio->pin
 }
 
 void
-maa_gpio_dir(gpio_t *gpio, gpio_dir_t dir)
+maa_gpio_dir(maa_gpio_context *dev, gpio_dir_t dir)
 {
-    if (gpio->value_fp != NULL) {
-         gpio->value_fp = NULL;
+    if (dev->value_fp != NULL) {
+         dev->value_fp = NULL;
     }
     char filepath[64];
-    snprintf(filepath, 64, "/sys/class/gpio/gpio%d/direction", gpio->pin);
+    snprintf(filepath, 64, "/sys/class/gpio/gpio%d/direction", dev->pin);
 
     FILE *direction;
     if ((direction = fopen(filepath, "w")) == NULL) {
@@ -84,44 +78,44 @@ maa_gpio_dir(gpio_t *gpio, gpio_dir_t dir)
     } else {
         fprintf(direction, dir);
         fclose(direction);
-        gpio->value_fp = NULL;
+        dev->value_fp = NULL;
     }
 }
 
 int
-maa_gpio_read(gpio_t *gpio)
+maa_gpio_read(maa_gpio_context *dev)
 {
-    if (gpio->value_fp == NULL) {
-        maa_gpio_get_valfp(gpio);
+    if (dev->value_fp == NULL) {
+        maa_gpio_get_valfp(dev);
     }
-    fseek(gpio->value_fp, SEEK_SET, 0);
+    fseek(dev->value_fp, SEEK_SET, 0);
     char buffer[2];
-    fread(buffer, 2, 1, gpio->value_fp);
-    fseek(gpio->value_fp, SEEK_SET, 0);
+    fread(buffer, 2, 1, dev->value_fp);
+    fseek(dev->value_fp, SEEK_SET, 0);
     return atoi(buffer);
 }
 
 void
-maa_gpio_write(gpio_t *gpio, int value)
+maa_gpio_write(maa_gpio_context *dev, int value)
 {
-    if (gpio->value_fp == NULL) {
-        maa_gpio_get_valfp(gpio);
+    if (dev->value_fp == NULL) {
+        maa_gpio_get_valfp(dev);
     }
-    fseek(gpio->value_fp, SEEK_SET, 0);
-    fprintf(gpio->value_fp, "%d", value);
-    fseek(gpio->value_fp, SEEK_SET, 0);
+    fseek(dev->value_fp, SEEK_SET, 0);
+    fprintf(dev->value_fp, "%d", value);
+    fseek(dev->value_fp, SEEK_SET, 0);
 
 }
 
 void
-maa_gpio_close(gpio_t *gpio)
+maa_gpio_close(maa_gpio_context *dev)
 {
     FILE *unexport_f;
 
     if ((unexport_f = fopen("/sys/class/gpio/unexport", "w")) == NULL) {
         fprintf(stderr, "Failed to open unexport for writing!\n");
     } else {
-        fprintf(unexport_f, "%d", gpio->pin);
+        fprintf(unexport_f, "%d", dev->pin);
         fclose(unexport_f);
     }
 }

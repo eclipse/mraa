@@ -25,13 +25,12 @@
 #include "i2c.h"
 #include "smbus.h"
 
-maa_result_t
-maa_i2c_init(i2c_t* dev)
+maa_i2c_context*
+maa_i2c_init()
 {
-    // maa allocates the memory for *dev
-    dev = malloc(sizeof *dev);
-    if (!dev)
-        return MAA_ERROR_NO_RESOURCES;
+    maa_i2c_context* dev = (maa_i2c_context*) malloc(sizeof(maa_i2c_context));
+    if (dev == NULL)
+        return NULL;
 
     // Galileo only has one I2C master which should be /dev/i2c-0
     // reliability is a fickle friend!
@@ -42,19 +41,19 @@ maa_i2c_init(i2c_t* dev)
 }
 
 void
-maa_i2c_frequency(i2c_t* dev, int hz)
+maa_i2c_frequency(maa_i2c_context* dev, int hz)
 {
     dev->hz = hz;
 }
 
 int
-maa_i2c_receive(i2c_t* dev)
+maa_i2c_receive(maa_i2c_context* dev)
 {
     return -1;
 }
 
 int
-maa_i2c_read(i2c_t* dev, char *data, int length)
+maa_i2c_read(maa_i2c_context* dev, char *data, int length)
 {
     // this is the read(3) syscall not maa_i2c_read()
     if (read(dev->fh, data, length) == length) {
@@ -64,7 +63,7 @@ maa_i2c_read(i2c_t* dev, char *data, int length)
 }
 
 int
-maa_i2c_read_byte(i2c_t* dev)
+maa_i2c_read_byte(maa_i2c_context* dev)
 {
     int byte;
     byte = i2c_smbus_read_byte(dev->fh);
@@ -75,7 +74,7 @@ maa_i2c_read_byte(i2c_t* dev)
 }
 
 int
-maa_i2c_write(i2c_t* dev, const char* data, int length)
+maa_i2c_write(maa_i2c_context* dev, const char* data, int length)
 {
     if (i2c_smbus_write_i2c_block_data(dev->fh, data[0], length-1, (uint8_t*) data+1) < 0) {
         fprintf(stderr, "Failed to write to I2CSlave slave\n");
@@ -85,7 +84,7 @@ maa_i2c_write(i2c_t* dev, const char* data, int length)
 }
 
 int
-maa_i2c_write_byte(i2c_t* dev, int data)
+maa_i2c_write_byte(maa_i2c_context* dev, int data)
 {
     if (i2c_smbus_write_byte(dev->fh, data) < 0) {
         fprintf(stderr, "Failed to write to I2CSlave slave\n");
@@ -95,7 +94,7 @@ maa_i2c_write_byte(i2c_t* dev, int data)
 }
 
 void
-maa_i2c_address(i2c_t* dev, int addr)
+maa_i2c_address(maa_i2c_context* dev, int addr)
 {
     dev->addr = addr;
     if (ioctl(dev->fh, I2C_SLAVE_FORCE, addr) < 0) {
@@ -104,7 +103,7 @@ maa_i2c_address(i2c_t* dev, int addr)
 }
 
 void
-maa_i2c_stop(i2c_t* dev)
+maa_i2c_stop(maa_i2c_context* dev)
 {
     free(dev);
 }

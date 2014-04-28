@@ -27,16 +27,15 @@ typedef struct {
     int pinMap;
     char path[64];
     FILE *value_fp;
-} gpio_t;
+} maa_gpio_context;
 
 typedef char gpio_mode_t[16];
 typedef char gpio_dir_t[16];
 
-maa_result_t maa_gpio_init(gpio_t *gpio, int pin);
-int maa_gpio_set(int pin);
-void maa_gpio_mode(gpio_t *gpio, gpio_mode_t mode);
-void maa_gpio_dir(gpio_t *gpio, gpio_dir_t dir);
+maa_gpio_context* maa_gpio_init(int pin);
+void maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode);
+void maa_gpio_dir(maa_gpio_context *dev, gpio_dir_t dir);
 
-void maa_gpio_close(gpio_t *gpio);
-int maa_gpio_read(gpio_t *gpio);
-void maa_gpio_write(gpio_t *gpio, int value);
+void maa_gpio_close(maa_gpio_context *dev);
+int maa_gpio_read(maa_gpio_context *dev);
+void maa_gpio_write(maa_gpio_context *dev, int value);
