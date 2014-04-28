@@ -10,6 +10,10 @@ set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_
 # Make a version file containing the current version from git.
 include (GetGitRevisionDescription)
 git_describe (VERSION "--tags")
+if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND")
+  message (WARNING " - Install git to compile a production libmaa!")
+  set (VERSION "v0.2.0-dirty")
+endif ()
 
 message (INFO " - MAA Version ${VERSION}")
 
