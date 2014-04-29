@@ -22,11 +22,45 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <stddef.h>
+
 #include "maa.h"
+#include "gpio.h"
 #include "version.h"
+
+static maa_pininfo* pindata;
 
 const char *
 maa_get_version()
 {
     return gVERSION;
 }
+
+maa_result_t
+maa_init()
+{
+    return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+unsigned int
+maa_check_gpio(int pin){
+
+    if(pindata == NULL) {
+        return -1;
+    }
+    //Check in gpio bounds?
+    if(pindata[pin].mux_total > 0) {
+        int mi;
+        for(mi = 0; mi < pindata[pin].mux_total; mi++) {
+            //Do we want to keep the gpio object around
+            //I dont think so
+            maa_gpio_context* mux_i;
+            //TODO CHANGE TO RAW
+            mux_i = maa_gpio_init(pindata[pin].mux[mi].pin);
+            maa_gpio_dir(mux_i, "out");
+            maa_gpio_write(mux_i, pindata[pin].mux[mi].value);
+        }
+    }
+    return pindata[pin].pin
+}
+
