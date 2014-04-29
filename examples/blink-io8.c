@@ -33,7 +33,7 @@ main(int argc, char **argv)
             maa_get_version());
     maa_gpio_context* gpio;
     gpio = maa_gpio_init(26);
-    maa_gpio_dir(gpio, "out");
+    maa_gpio_dir(gpio, MAA_GPIO_OUT);
 
     while (1) {
         maa_gpio_write(gpio, 0);
