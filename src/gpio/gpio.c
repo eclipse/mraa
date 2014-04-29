@@ -45,7 +45,7 @@ maa_gpio_context*
 maa_gpio_init(int pin)
 {
     //TODO
-    return NULL;
+    return maa_gpio_init_raw(pin);
 }
 
 maa_gpio_context*
@@ -68,7 +68,38 @@ maa_gpio_init_raw(int pin)
 maa_result_t
 maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode)
 {
-    return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    if (dev->value_fp != NULL) {
+         dev->value_fp = NULL;
+    }
+    char filepath[64];
+    snprintf(filepath, 64, "/sys/class/gpio/gpio%d/drive", dev->pin);
+
+    FILE *drive;
+    if ((drive = fopen(filepath, "w")) == NULL) {
+        fprintf(stderr, "Failed to open drive for writing!\n");
+        return MAA_ERROR_INVALID_RESOURCE;
+    }
+    switch(mode) {
+        case MAA_GPIO_STRONG:
+            fprintf(drive, "strong");
+            break;
+        case MAA_GPIO_PULLUP:
+            fprintf(drive, "pullup");
+            break;
+        case MAA_GPIO_PULLDOWN:
+            fprintf(drive, "pulldown");
+            break;
+        case MAA_GPIO_HIZ:
+            fprintf(drive, "hiz");
+            break;
+        default:
+            fclose(drive);
+            return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+            break;
+    }
+    fclose(drive);
+    dev->value_fp = NULL;
+    return MAA_SUCCESS;
 }
 
 maa_result_t
