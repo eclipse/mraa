@@ -37,7 +37,7 @@ maa_i2c_init()
     if ((dev->fh = open("/dev/i2c-0", O_RDWR)) < 1) {
         fprintf(stderr, "Failed to open requested i2c port");
     }
-    return MAA_SUCCESS;
+    return dev;
 }
 
 void
