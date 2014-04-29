@@ -24,6 +24,10 @@
  *
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 
 #include "maa.h"
@@ -116,3 +120,7 @@ int maa_gpio_read(maa_gpio_context *dev);
  * @return maa result type
  */
 maa_result_t maa_gpio_write(maa_gpio_context *dev, int value);
+
+#ifdef __cplusplus
+}
+#endif

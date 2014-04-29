@@ -24,6 +24,10 @@
  *
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <fcntl.h>
 
@@ -92,3 +96,7 @@ void maa_pwm_enable(maa_pwm_context* pwm, int enable);
  /** Close and unexport the PWM pin.
  */
 void maa_pwm_close(maa_pwm_context* pwm);
+
+#ifdef __cplusplus
+}
+#endif

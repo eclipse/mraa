@@ -24,6 +24,10 @@
  *
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -116,3 +120,7 @@ void maa_i2c_address(maa_i2c_context* dev, int address);
  *  @param dev the i2c context
  */
 void maa_i2c_stop(maa_i2c_context* dev);
+
+#ifdef __cplusplus
+}
+#endif

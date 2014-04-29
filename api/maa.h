@@ -30,6 +30,10 @@
  *
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     MAA_SUCCESS                              =  0,
     MAA_ERROR_FEATURE_NOT_IMPLEMENTED        =  1,
@@ -52,3 +56,7 @@ typedef enum {
  * @return version string from version.h
  */
 const char* maa_get_version();
+
+#ifdef __cplusplus
+}
+#endif
