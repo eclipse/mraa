@@ -42,6 +42,18 @@ maa_init()
     return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
+static maa_result_t
+maa_setup_mux_mapped(maa_pininfo meta)
+{
+    int mi;
+    for(mi = 0; mi < meta.mux_total; mi++) {
+        maa_gpio_context* mux_i;
+        mux_i = maa_gpio_init_raw(meta.mux[mi].pin);
+        maa_gpio_dir(mux_i, MAA_GPIO_OUT);
+        maa_gpio_write(mux_i, meta.mux[mi].value);
+    }
+}
+
 unsigned int
 maa_check_gpio(int pin){
 
@@ -49,18 +61,10 @@ maa_check_gpio(int pin){
         return -1;
     }
     //Check in gpio bounds?
-    if(pindata[pin].mux_total > 0) {
-        int mi;
-        for(mi = 0; mi < pindata[pin].mux_total; mi++) {
-            //Do we want to keep the gpio object around
-            //I dont think so
-            maa_gpio_context* mux_i;
-            //TODO CHANGE TO RAW
-            mux_i = maa_gpio_init(pindata[pin].mux[mi].pin);
-            maa_gpio_dir(mux_i, "out");
-            maa_gpio_write(mux_i, pindata[pin].mux[mi].value);
-        }
-    }
-    return pindata[pin].pin
+    if(pindata[pin].mux_total > 0)
+        if(maa_setup_mux_mapped(pindata[pin]) != MAA_SUCCESS)
+            return -1;
+
+    return pindata[pin].pin;
 }
 
