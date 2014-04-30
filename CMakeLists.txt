@@ -33,10 +33,6 @@ set (maa_VERSION_MINOR ${VERSION_MINOR})
 set (maa_VERSION_PATCH ${VERSION_PATCH})
 set (maa_VERSION_STRING ${maa_VERSION_MAJOR}.${maa_VERSION_MINOR}.${maa_VERSION_PATCH})
 
-set (SWIG_EXECUTABLE /usr/bin/swig)
-find_package (SWIG REQUIRED)
-include (${SWIG_USE_FILE})
-
 set (CMAKE_SWIG_FLAGS "")
 
 option (test "Build all tests." OFF)
