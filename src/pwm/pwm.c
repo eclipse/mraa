@@ -38,7 +38,7 @@ maa_pwm_setup_duty_fp(maa_pwm_context* dev)
     return 0;
 }
 
-static void
+static maa_result_t
 maa_pwm_write_period(maa_pwm_context* dev, int period)
 {
     FILE *period_f;
@@ -47,12 +47,16 @@ maa_pwm_write_period(maa_pwm_context* dev, int period)
 
     if ((period_f = fopen(bu, "r+b")) == NULL) {
         fprintf(stderr, "Failed to open period for writing!\n");
+        return MAA_ERROR_INVALID_RESOURCE;
     }
     fprintf(period_f, "%d", period);
     fclose(period_f);
+    if (ferror(period_f) != 0)
+        return MAA_ERROR_INVALID_RESOURCE;
+    return MAA_SUCCESS;
 }
 
-static void
+static maa_result_t
 maa_pwm_write_duty(maa_pwm_context* dev, int duty)
 {
     if (dev->duty_fp == NULL) {
@@ -61,6 +65,9 @@ maa_pwm_write_duty(maa_pwm_context* dev, int duty)
     fprintf(dev->duty_fp, "%d", duty);
     rewind(dev->duty_fp);
     fflush(dev->duty_fp);
+     if (ferror(dev->duty_fp) != 0)
+        return MAA_ERROR_INVALID_RESOURCE;
+    return MAA_SUCCESS;
 }
 
 static int
@@ -93,7 +100,13 @@ maa_pwm_get_duty(maa_pwm_context* dev)
 }
 
 maa_pwm_context*
-maa_pwm_init(int chipin, int pin)
+maa_pwm_init(int pin) {
+    //TODO
+    return maa_pwm_init_raw(0, pin);
+}
+
+maa_pwm_context*
+maa_pwm_init_raw(int chipin, int pin)
 {
     maa_pwm_context* dev = (maa_pwm_context*) malloc(sizeof(maa_pwm_context));
     if (dev == NULL)
@@ -118,10 +131,10 @@ maa_pwm_init(int chipin, int pin)
     return dev;
 }
 
-void
+maa_result_t
 maa_pwm_write(maa_pwm_context* dev, float percentage)
 {
-    maa_pwm_write_duty(dev, percentage * maa_pwm_get_period(dev));
+   return maa_pwm_write_duty(dev, percentage * maa_pwm_get_period(dev));
 }
 
 float
@@ -131,43 +144,43 @@ maa_pwm_read(maa_pwm_context* dev)
     return output;
 }
 
-void
+maa_result_t
 maa_pwm_period(maa_pwm_context* dev, float seconds)
 {
-    maa_pwm_period_ms(dev, seconds*1000);
+    return maa_pwm_period_ms(dev, seconds*1000);
 }
 
-void
+maa_result_t
 maa_pwm_period_ms(maa_pwm_context* dev, int ms)
 {
-    maa_pwm_period_us(dev, ms*1000);
+    return maa_pwm_period_us(dev, ms*1000);
 }
 
-void
+maa_result_t
 maa_pwm_period_us(maa_pwm_context* dev, int us)
 {
-    maa_pwm_write_period(dev, us*1000);
+    return maa_pwm_write_period(dev, us*1000);
 }
 
-void
+maa_result_t
 maa_pwm_pulsewidth(maa_pwm_context* dev, float seconds)
 {
-    maa_pwm_pulsewidth_ms(dev, seconds*1000);
+    return maa_pwm_pulsewidth_ms(dev, seconds*1000);
 }
 
-void
+maa_result_t
 maa_pwm_pulsewidth_ms(maa_pwm_context* dev, int ms)
 {
-    maa_pwm_pulsewidth_us(dev, ms*1000);
+    return maa_pwm_pulsewidth_us(dev, ms*1000);
 }
 
-void
+maa_result_t
 maa_pwm_pulsewidth_us(maa_pwm_context* dev, int us)
 {
-    maa_pwm_write_duty(dev, us*1000);
+    return maa_pwm_write_duty(dev, us*1000);
 }
 
-void
+maa_result_t
 maa_pwm_enable(maa_pwm_context* dev, int enable)
 {
     int status;
@@ -181,15 +194,17 @@ maa_pwm_enable(maa_pwm_context* dev, int enable)
     sprintf(bu, "/sys/class/pwm/pwmchip%d/pwm%d/enable", dev->chipid, dev->pin);
 
     if ((enable_f = fopen(bu, "w")) == NULL) {
-        fprintf(stderr, "Failed to open export for writing!\n");
-    } else {
-        fprintf(enable_f, "%d", status);
-        fclose(enable_f);
+        fprintf(stderr, "Failed to open enable for writing!\n");
+        return MAA_ERROR_INVALID_RESOURCE;
     }
-    //Do Something
+    fprintf(enable_f, "%d", status);
+    fclose(enable_f);
+    if (ferror(enable_f) != 0)
+        return MAA_ERROR_INVALID_RESOURCE;
+    return MAA_SUCCESS;
 }
 
-void
+maa_result_t
 maa_pwm_close(maa_pwm_context* dev)
 {
     maa_pwm_enable(dev, 0);
@@ -199,9 +214,12 @@ maa_pwm_close(maa_pwm_context* dev)
 
     if ((unexport_f = fopen(buffer, "w")) == NULL) {
         fprintf(stderr, "Failed to open unexport for writing!\n");
-    } else {
-        fprintf(unexport_f, "%d", dev->pin);
-        fclose(unexport_f);
+        return MAA_ERROR_INVALID_RESOURCE;
     }
+    fprintf(unexport_f, "%d", dev->pin);
+    fclose(unexport_f);
     free(dev);
+    if (ferror(unexport_f) != 0)
+        return MAA_ERROR_INVALID_RESOURCE;
+    return MAA_SUCCESS;
 }

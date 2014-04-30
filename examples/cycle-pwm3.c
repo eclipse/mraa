@@ -30,7 +30,7 @@ int
 main ()
 {
     maa_pwm_context* pwm;
-    pwm = maa_pwm_init(0, 3);
+    pwm = maa_pwm_init(3);
     if (pwm == NULL) {
         return 1;
     }

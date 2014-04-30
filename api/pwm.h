@@ -33,24 +33,49 @@ extern "C" {
 
 #include "maa.h"
 
+/**
+ * A strucutre representing a PWM pin
+ */
 typedef struct {
-    int chipid, pin;
-    FILE *duty_fp;
+    /*@{*/
+    int pin; /**< the pin number, as known to the os. */
+    int chipid; /**< the chip id, which the pwm resides */
+    FILE *duty_fp; /**< File pointer to duty file */
+    /*@}*/
 } maa_pwm_context;
 
-maa_pwm_context* maa_pwm_init(int chipin, int pin);
+/** Initialise pwm_context, uses board mapping.
+ *
+ * @param pin The PWM PIN.
+ *
+ * @return maa_pwm_context The returned initialised pwm context
+ */
+maa_pwm_context* maa_pwm_init(int pin);
+
+/** Initialise pwm_context, raw mode.
+ *
+ * @param chipid The chip inwhich the PWM is under in SYSFS
+ * @param pin The PWM PIN.
+ *
+ * @return maa_pwm_context The returned initialised pwm context
+ */
+maa_pwm_context* maa_pwm_init_raw(int chipid, int pin);
 
 /** Set the ouput duty-cycle percentage, as a float
  *
- *  @param percentage A floating-point value representing percentage of output.
+ * @param pwm The PWM context to use.
+ * @param percentage A floating-point value representing percentage of output.
  *    The value should lie between 0.0f (representing on 0%) and 1.0f
  *    Values above or below this range will be set at either 0.0f or 1.0f.
+ *
+ * @return maa_result_t the maa result.
  */
-void maa_pwm_write(maa_pwm_context* pwm, float percentage);
+maa_result_t maa_pwm_write(maa_pwm_context* pwm, float percentage);
 
 /** Read the ouput duty-cycle percentage, as a float
  *
- *  @return percentage A floating-point value representing percentage of output.
+ * @param pwm The PWM context to use.
+ * @return percentage A floating-point value representing percentage of output.
  *    The value should lie between 0.0f (representing on 0%) and 1.0f
  *    Values above or below this range will be set at either 0.0f or 1.0f.
  */
@@ -58,44 +83,75 @@ float maa_pwm_read(maa_pwm_context* pwm);
 
 /** Set the PWM period as seconds represented in a float
  *
- *  @param seconds Peroid represented as a float in seconds.
+ * @param pwm The PWM context to use.
+ * @param seconds Peroid represented as a float in seconds.
+ *
+ * @return maa_result_t the maa result.
  */
-void maa_pwm_period(maa_pwm_context* pwm, float seconds);
+maa_result_t maa_pwm_period(maa_pwm_context* pwm, float seconds);
 
 /** Set period. milli-oseconds.
- *  @param ms milli-seconds for period.
+ *
+ * @param pwm The PWM context to use.
+ * @param ms milli-seconds for period.
+ *
+ * @return maa_result_t the maa result.
  */
-void maa_pwm_period_ms(maa_pwm_context* pwm, int ms);
+maa_result_t maa_pwm_period_ms(maa_pwm_context* pwm, int ms);
 
 /** Set period. microseconds
- *  @param ns microseconds as period.
+ *
+ * @param pwm The PWM context to use.
+ * @param ns microseconds as period.
+ *
+ * @return maa_result_t the maa result.
  */
-void maa_pwm_period_us(maa_pwm_context* pwm, int us);
+maa_result_t maa_pwm_period_us(maa_pwm_context* pwm, int us);
 
 /** Set pulsewidth, As represnted by seconds in a (float).
- *  @param seconds The duration of a pulse
+ *
+ * @param pwm The PWM context to use.
+ * @param seconds The duration of a pulse
+ *
+ * @return maa_result_t the maa result.
  */
-void maa_pwm_pulsewidth(maa_pwm_context* pwm, float seconds);
+maa_result_t maa_pwm_pulsewidth(maa_pwm_context* pwm, float seconds);
 
- /** Set pulsewidth. Milliseconds
- *  @param ms milliseconds for pulsewidth.
+/** Set pulsewidth. Milliseconds
+ *
+ * @param pwm The PWM context to use.
+ * @param ms milliseconds for pulsewidth.
+ *
+ * @return maa_result_t the maa result.
  */
-void maa_pwm_pulsewidth_ms(maa_pwm_context* pwm, int ms);
+maa_result_t maa_pwm_pulsewidth_ms(maa_pwm_context* pwm, int ms);
 
-  /** Set pulsewidth, microseconds.
- *  @param us microseconds for pulsewidth.
+/** Set pulsewidth, microseconds.
+ *
+ * @param pwm The PWM context to use.
+ * @param us microseconds for pulsewidth.
+ *
+ * @return maa_result_t the maa result.
  */
-void maa_pwm_pulsewidth_us(maa_pwm_context* pwm, int us);
+maa_result_t maa_pwm_pulsewidth_us(maa_pwm_context* pwm, int us);
 
 /** Set the enable status of the PWM pin. None zero will assume on with output being driven.
  *   and 0 will disable the output.
- *  @param enable enable status of pin
+ *
+ * @param pwm The PWM context to use.
+ * @param enable enable status of pin
+ *
+ * @return maa_result_t the maa result.
  */
-void maa_pwm_enable(maa_pwm_context* pwm, int enable);
+maa_result_t maa_pwm_enable(maa_pwm_context* pwm, int enable);
 
- /** Close and unexport the PWM pin.
+/** Close and unexport the PWM pin.
+ * 
+ * @param pwm The PWM context to use.
+ *
+ * @return maa_result_t the maa result.
  */
-void maa_pwm_close(maa_pwm_context* pwm);
+maa_result_t maa_pwm_close(maa_pwm_context* pwm);
 
 #ifdef __cplusplus
 }
