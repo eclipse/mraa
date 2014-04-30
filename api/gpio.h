@@ -37,7 +37,7 @@ extern "C" {
 typedef struct {
     /*@{*/
     int pin; /**< the pin number, as known to the os. */
-    FILE *value_fp; /**< the file pointer to the value of the gpio /*
+    FILE *value_fp; /**< the file pointer to the value of the gpio */
     /*@}*/
 } maa_gpio_context;
 
