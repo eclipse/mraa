@@ -8,8 +8,8 @@ set (maa_LIB_HEADERS
   ${PROJECT_SOURCE_DIR}/api/gpio.h
   ${PROJECT_SOURCE_DIR}/api/i2c.h
   ${PROJECT_SOURCE_DIR}/api/pwm.h
-  ${PROJECT_SOURCE_DIR}/include/smbus.hpp
   ${PROJECT_SOURCE_DIR}/include/smbus.h
+  ${PROJECT_SOURCE_DIR}/include/version.h
 )
 
 set (maa_LIB_KERNEL
