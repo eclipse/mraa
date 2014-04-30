@@ -15,7 +15,7 @@ if (DOXYGEN_FOUND)
   endforeach ()
 
   add_custom_target (pydoc
-    pydoc -w ${CMAKE_CURRENT_BINARY_DIR}/pymaa ${CMAKE_CURRENT_BINARY_DIR}/
+    pydoc -w ${CMAKE_CURRENT_BINARY_DIR}/pymaa.py ${CMAKE_CURRENT_BINARY_DIR}/
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Generating API documentation with pydoc" VERBATIM
   )
