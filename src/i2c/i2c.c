@@ -49,12 +49,6 @@ maa_i2c_frequency(maa_i2c_context* dev, int hz)
 }
 
 maa_result_t
-maa_i2c_receive(maa_i2c_context* dev)
-{
-    return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
-}
-
-maa_result_t
 maa_i2c_read(maa_i2c_context* dev, char *data, int length)
 {
     // this is the read(3) syscall not maa_i2c_read()

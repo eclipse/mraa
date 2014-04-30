@@ -1,19 +1,25 @@
 /*
- * Originally from mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
- * Copyright (c) 2014 Intel Corporation
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Copyright (c) 2014 Intel Corporation.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #pragma once
@@ -49,7 +55,7 @@ typedef struct {
 
 maa_i2c_context* maa_i2c_init();
 
-/** Set the frequency of the I2C interface
+/** Sets the frequency of the i2c context
  *
  *  @param dev the i2c context
  *  @param hz The bus frequency in hertz
@@ -58,25 +64,17 @@ maa_i2c_context* maa_i2c_init();
  */
 maa_result_t maa_i2c_frequency(maa_i2c_context* dev, int hz);
 
-/** Checks to see if this I2C Slave has been addressed.
- *
- *  @param dev the i2c context
- *
- *  @return maa_result_t the maa result.
- */
-maa_result_t maa_i2c_receive(maa_i2c_context* dev);
-
-/** Read from an I2C master.
+/** Read from an i2c context
  *
  *  @param dev the i2c context
  *  @param data pointer to the byte array to read data in to
- *  @param length maximum number of bytes to read
+ *  @param length max number of bytes to read
  *
  *  @return maa_result_t the maa result.
  */
 maa_result_t maa_i2c_read(maa_i2c_context* dev, char *data, int length);
 
-/** Read a single byte from an I2C master.
+/** Read a single byte from the i2c context
  *
  *  @param dev the i2c context
  *
@@ -84,17 +82,17 @@ maa_result_t maa_i2c_read(maa_i2c_context* dev, char *data, int length);
  */
 int maa_i2c_read_byte(maa_i2c_context* dev);
 
-/** Write to an I2C master
+/** Write to an i2c context
  *
  *  @param dev the i2c context
- *  @param data pointer to the byte array to be transmitted
- *  @param length the number of bytes to transmite
+ *  @param data pointer to the byte array to be written
+ *  @param length the number of bytes to transmit
  *
  *  @return maa_result_t the maa result.
  */
 maa_result_t maa_i2c_write(maa_i2c_context* dev, const char *data, int length);
 
-/** Write a single byte to an I2C master.
+/** Write a single byte to an i2c context
  *
  *  @param dev the i2c context
  *  @data the byte to write
@@ -103,7 +101,7 @@ maa_result_t maa_i2c_write(maa_i2c_context* dev, const char *data, int length);
  */
 maa_result_t maa_i2c_write_byte(maa_i2c_context* dev, int data);
 
-/** Sets the I2C slave address.
+/** Sets the i2c context address.
  *
  *  @param dev the i2c context
  *  @param address The address to set for the slave (ignoring the least
