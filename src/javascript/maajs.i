@@ -5,9 +5,7 @@
 
 %include <node.i>
 
-%rename("%(strip:[maa_])s") "";
-
-%feature("autodoc", "1");
+%feature("autodoc", "3");
 
 #ifdef DOXYGEN
 %include ../maa_doc.i
