@@ -4,6 +4,7 @@
     #include "pwm.h"
     #include "i2c.h"
     #include "spi.h"
+    #include "aio.h"
 %}
 
 %rename(get_version) maa_get_version();
@@ -190,5 +191,30 @@ typedef struct {
   unsigned int write(unsigned int data)
   {
     return maa_spi_write($self, data);
+  }
+}
+
+#### AIO ####
+
+%rename(Aio) maa_aio_context;
+
+typedef struct {
+    unsigned int channel;
+    FILE *adc_in_fp;
+} maa_aio_context;
+
+%nodefault maa_aio_context;
+%extend maa_aio_context {
+  maa_aio_context(unsigned int aio_channel)
+  {
+    return maa_aio_init(aio_channel);
+  }
+  ~maa_aio_context()
+  {
+    maa_aio_close($self);
+  }
+  unsigned int read()
+  {
+    return maa_aio_read_u16($self);
   }
 }

@@ -54,7 +54,7 @@ install (TARGETS maa DESTINATION lib)
 
 if (DOXYGEN_FOUND)
   set (CMAKE_SWIG_FLAGS -DDOXYGEN=${DOXYGEN_FOUND})
-  set (DOCFILES maa pwm i2c gpio)
+  set (DOCFILES maa pwm i2c gpio aio)
   foreach (_file ${DOCFILES})
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_file}_doc.i
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxy2swig.py -n
