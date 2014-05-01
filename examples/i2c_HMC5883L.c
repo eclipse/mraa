@@ -78,6 +78,7 @@
 int
 main(int argc, char **argv)
 {
+    maa_init();
     float direction = 0;
     int16_t x = 0, y = 0, z = 0;
     char rx_tx_buf[MAX_BUFFER_LENGTH];

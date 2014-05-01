@@ -25,8 +25,9 @@
 import pymaa as maa
 import time
 
+maa.maa_init()
 x = maa.gpio_t()
-maa.gpio_init(x, 26)
+maa.gpio_init(x, 8)
 maa.gpio_dir(x, "out")
 
 while True:

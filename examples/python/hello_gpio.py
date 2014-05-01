@@ -24,7 +24,8 @@
 
 import pymaa
 
+pumaa.maa_init()
 x = pymaa.gpio_t()
 print(x.pin)
-pymaa.gpio_init(x, 20)
+pymaa.gpio_init(x, 8)
 print(x.pin)

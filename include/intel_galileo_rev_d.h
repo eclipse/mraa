@@ -1,5 +1,5 @@
 /*
- * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -22,8 +22,11 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var m = require("maajs")
-m.init();
-console.log("maa version: " + m.get_version());
+#pragma once
 
-var r = new m.I2C(20, 21);
+#include "maa.h"
+
+#define MAA_INTEL_GALILEO_REV_D_PINCOUNT 25
+
+maa_board_t*
+maa_intel_galileo_rev_d();

@@ -1,5 +1,6 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -22,11 +23,57 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <stddef.h>
+
 #include "maa.h"
+#include "intel_galileo_rev_d.h"
+#include "gpio.h"
 #include "version.h"
+
+static maa_pininfo_t* pindata;
+static maa_board_t* plat;
 
 const char *
 maa_get_version()
 {
     return gVERSION;
 }
+
+maa_result_t
+maa_init()
+{
+    plat = maa_intel_galileo_rev_d();
+    return MAA_SUCCESS;
+}
+
+static maa_result_t
+maa_setup_mux_mapped(maa_pininfo_t meta)
+{
+    int mi;
+    for(mi = 0; mi < meta.mux_total; mi++) {
+        maa_gpio_context* mux_i;
+        mux_i = maa_gpio_init_raw(meta.mux[mi].pin);
+        if(mux_i == NULL)
+            return MAA_ERROR_INVALID_HANDLE;
+        if(maa_gpio_dir(mux_i, MAA_GPIO_OUT) != MAA_SUCCESS)
+            return MAA_ERROR_INVALID_RESOURCE;
+        if(maa_gpio_write(mux_i, meta.mux[mi].value) != MAA_SUCCESS)
+            return MAA_ERROR_INVALID_RESOURCE;
+    }
+    return MAA_SUCCESS;
+}
+
+unsigned int
+maa_check_gpio(int pin)
+{
+    if(plat == NULL)
+        return -1;
+
+    if(pin < 0 || pin > plat->gpio_count)
+        return -1;
+    if(plat->pins[pin].mux_total > 0)
+        if(maa_setup_mux_mapped(plat->pins[pin]) != MAA_SUCCESS)
+            return -1;
+    return plat->pins[pin].pin;
+}
+

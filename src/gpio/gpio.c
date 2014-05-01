@@ -44,13 +44,17 @@ maa_gpio_get_valfp(maa_gpio_context *dev)
 maa_gpio_context*
 maa_gpio_init(int pin)
 {
-    //TODO
-    return maa_gpio_init_raw(pin);
+    int pinm = maa_check_gpio(pin);
+    if (pinm < 0)
+        return NULL;
+    return maa_gpio_init_raw(pinm);
 }
 
 maa_gpio_context*
 maa_gpio_init_raw(int pin)
 {
+    if(pin < 0)
+        return NULL;
     FILE *export_f;
     maa_gpio_context* dev = (maa_gpio_context*) malloc(sizeof(maa_gpio_context));
 
@@ -105,6 +109,8 @@ maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode)
 maa_result_t
 maa_gpio_dir(maa_gpio_context *dev, gpio_dir_t dir)
 {
+    if (dev == NULL)
+        return MAA_ERROR_INVALID_HANDLE;
     if (dev->value_fp != NULL) {
          dev->value_fp = NULL;
     }
