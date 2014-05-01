@@ -81,6 +81,14 @@ maa_result_t maa_spi_frequency(maa_spi_context* spi, int hz);
  */
 unsigned int maa_spi_write(maa_spi_context* spi, unsigned int data);
 
+/** De-inits an maa_spi_context device
+ *
+ *  @param dev the spi context
+ *
+ *  @return maa_result_t the maa result.
+ */
+maa_result_t maa_spi_stop(maa_spi_context* spi);
+
 #ifdef __cplusplus
 }
 #endif

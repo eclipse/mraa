@@ -49,3 +49,9 @@ maa_spi_write(maa_spi_context* spi, unsigned int data)
 {
     return 0;
 }
+
+maa_result_t
+maa_spi_stop(maa_spi_context* spi)
+{
+    return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
