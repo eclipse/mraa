@@ -29,10 +29,11 @@
 int
 main(int argc, char **argv)
 {
+    maa_init();
     fprintf(stdout, "MAA Version: %d\nStarting Blinking on IO8\n",
             maa_get_version());
     maa_gpio_context* gpio;
-    gpio = maa_gpio_init(26);
+    gpio = maa_gpio_init(8);
     maa_gpio_dir(gpio, MAA_GPIO_OUT);
 
     while (1) {

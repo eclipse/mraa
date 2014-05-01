@@ -29,6 +29,7 @@
 int
 main ()
 {
+    maa_init();
     maa_pwm_context* pwm;
     pwm = maa_pwm_init(0, 3);
     if (pwm == NULL) {
