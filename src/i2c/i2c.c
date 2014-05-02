@@ -26,16 +26,41 @@
 #include "smbus.h"
 
 maa_i2c_context*
-maa_i2c_init()
+maa_i2c_init(int bus)
 {
+    unsigned int checked_pin = maa_check_i2c(bus);
+    if (checked_pin < 0) {
+        switch(checked_pin) {
+            case -1:
+                fprintf(stderr, "No i2c on board\n");
+                return NULL;
+            case -2:
+                fprintf(stderr, "Failed to set-up i2c multiplexer!\n");
+                return NULL;
+            case -3:
+                fprintf(stderr, "Platform Not Initialised");
+                return NULL;
+            default: return NULL;
+        }
+    }
+    return maa_i2c_init_raw(checked_pin);
+}
+
+maa_i2c_context*
+maa_i2c_init_raw(unsigned int bus)
+{
+    if (bus < 0) {
+        fprintf(stderr, "Bus -%u- bellow zero\n", bus);
+        return NULL;
+    }
     maa_i2c_context* dev = (maa_i2c_context*) malloc(sizeof(maa_i2c_context));
     if (dev == NULL)
         return NULL;
 
-    // Galileo only has one I2C master which should be /dev/i2c-0
-    // reliability is a fickle friend!
-    if ((dev->fh = open("/dev/i2c-0", O_RDWR)) < 1) {
-        fprintf(stderr, "Failed to open requested i2c port");
+    char filepath[32];
+    snprintf(filepath, 32, "/dev/i2c-%u", bus);
+    if ((dev->fh = open(filepath, O_RDWR)) < 1) {
+        fprintf(stderr, "Failed to open requested i2c port %s", filepath);
     }
     return dev;
 }
