@@ -101,13 +101,21 @@ maa_result_t maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode);
 maa_result_t maa_gpio_dir(maa_gpio_context *dev, gpio_dir_t dir);
 
 /** Close the GPIO context
- * - Will free the memory for the context.
+ * - Will free the memory for the context and unexport the GPIO
  *
  * @param dev the GPIO context
  *
  * @return maa result type.
  */
 maa_result_t maa_gpio_close(maa_gpio_context *dev);
+
+/** Unexport the GPIO context (maa_gpio_close() will call this function)
+ *
+ * @param dev The GPIO context.
+ *
+ * @return maa result type.
+ */
+maa_result_t maa_gpio_unexport(maa_gpio_context *dev);
 
 /** Read the GPIO value.
  *

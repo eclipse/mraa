@@ -205,8 +205,9 @@ maa_pwm_enable(maa_pwm_context* dev, int enable)
 }
 
 maa_result_t
-maa_pwm_close(maa_pwm_context* dev)
+maa_pwm_unexport(maa_pwm_context* dev)
 {
+    // disable pwm before unexporting
     maa_pwm_enable(dev, 0);
     FILE *unexport_f;
     char buffer[64];
@@ -218,8 +219,14 @@ maa_pwm_close(maa_pwm_context* dev)
     }
     fprintf(unexport_f, "%d", dev->pin);
     fclose(unexport_f);
-    free(dev);
     if (ferror(unexport_f) != 0)
         return MAA_ERROR_INVALID_RESOURCE;
+}
+
+maa_result_t
+maa_pwm_close(maa_pwm_context* dev)
+{
+    maa_pwm_unexport(dev);
+    free(dev);
     return MAA_SUCCESS;
 }
