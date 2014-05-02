@@ -23,6 +23,11 @@
  */
 
 #pragma once
+/** @file
+ *
+ * This file defines the aio (analog in) interface for libmaa
+ *
+ */
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -30,21 +35,8 @@
 #include "maa.h"
 #include "gpio.h"
 
-#define TOTAL_ANALOG_INPUTS_ON_BOARD    (6)
-
-static const unsigned int A0 = 0;
-static const unsigned int A1 = 1;
-static const unsigned int A2 = 2;
-static const unsigned int A3 = 3;
-static const unsigned int A4 = 4;
-static const unsigned int A5 = 5;
-
 #define ADC_RAW_RESOLUTION_BITS         (12)
 #define ADC_SUPPORTED_RESOLUTION_BITS   (10)
-#define ADC_COMMON_GATE_A4_A5           (29)
-
-static const unsigned int
-adc_gate_pins[TOTAL_ANALOG_INPUTS_ON_BOARD] = {37, 36, 23, 22, 21, 20};
 
 typedef struct {
     unsigned int channel;
