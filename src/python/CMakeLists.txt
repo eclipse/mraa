@@ -20,3 +20,5 @@ if (DOXYGEN_FOUND)
     COMMENT "Generating API documentation with pydoc" VERBATIM
   )
 endif ()
+
+add_subdirectory (docs)
