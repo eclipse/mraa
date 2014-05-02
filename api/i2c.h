@@ -49,11 +49,22 @@ typedef struct {
     int hz; /**< frequency of communication */
     int fh; /**< the file handle to the /dev/i2c-* device */
     int addr; /**< the address of the i2c slave */
-    maa_gpio_context gpio;
     /*@}*/
 } maa_i2c_context;
 
-maa_i2c_context* maa_i2c_init();
+/** Initialise i2c context, using board defintions
+ *
+ * @param bus i2c bus to use
+ * @return maa_i2c_context i2c context ready for other calls.
+ */
+maa_i2c_context* maa_i2c_init(int bus);
+
+/** Initialise i2c context, passing in spi bus to use.
+ *
+ * @param bus The i2c bus to use i.e. /dev/i2c-2 would be "2"
+ * @return maa_i2c_context i2c context ready for other calls.
+ */
+maa_i2c_context* maa_i2c_init_raw(unsigned int bus);
 
 /** Sets the frequency of the i2c context
  *
