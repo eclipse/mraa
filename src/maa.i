@@ -12,8 +12,31 @@ const char * maa_get_version();
 
 #### GPIO ####
 
-%rename(Gpio) maa_gpio_context;
+typedef enum {
+    MAA_GPIO_STRONG     = 0, /**< Default. Strong high and low */
+    MAA_GPIO_PULLUP     = 1, /**< Resistive High */
+    MAA_GPIO_PULLDOWN   = 2, /**< Resistive Low */
+    MAA_GPIO_HIZ        = 3  /**< High Z State */
+} gpio_mode_t;
 
+typedef enum {
+    MAA_GPIO_OUT    = 0, /**< Output. A Mode can also be set */
+    MAA_GPIO_IN     = 1  /**< Input. */
+} gpio_dir_t;
+
+%nodefault maa_gpio_context;
+%rename(Gpio) maa_gpio_context;
+%ignore value_fp;
+
+%feature("autodoc") maa_gpio_context "
+Create a Gpio object and export it. Depending on your board the correct GPIO
+value will be used. If raw is true then the pin that will be initialised will
+be the hardcoded pin value in the kernel. Please see your board IO
+documentation to understand exactly what will happen.
+
+Parameters:
+        * pin: pin number read from the board, i.e IO3 is 3
+        * raw: set to True to use real pin value from the kernel";
 typedef struct {
     /*@{*/
     int pin; /**< the pin number, as known to the os. */
@@ -21,7 +44,6 @@ typedef struct {
     /*@}*/
 } maa_gpio_context;
 
-%nodefault maa_gpio_context;
 %extend maa_gpio_context {
   maa_gpio_context(int pin, int raw=0)
   {
@@ -33,18 +55,38 @@ typedef struct {
   {
     maa_gpio_close($self);
   }
+  %feature("autodoc") write "
+  Write a value to a GPIO pin
+
+  Parameters:
+        * value: value to write to GPIO";
   int write(int value)
   {
     return maa_gpio_write($self, value);
   }
+  %feature("autodoc") dir "
+  Set the gpio direction
+
+  Parameters:
+        * dir: GPIO direction";
   int dir(gpio_dir_t dir)
   {
     return maa_gpio_dir($self, dir);
   }
+  %feature("autodoc") read "
+  Read the value of a GPIO
+
+  Returns:
+        * value: GPIO value";
   int read()
   {
     return maa_gpio_read($self);
   }
+  %feature("autodoc") mode "
+  Set the GPIO mode
+
+  Parameters:
+        * mode: GPIO mode to set";
   int mode(gpio_mode_t mode)
   {
     return maa_gpio_mode($self, mode);
@@ -53,8 +95,10 @@ typedef struct {
 
 #### i2c ####
 
+%nodefault maa_i2c_context;
 %rename(I2c) maa_i2c_context;
 
+%ignore fh;
 typedef struct {
     /*@{*/
     int hz; /**< frequency of communication */
@@ -100,6 +144,7 @@ typedef struct {
 
 %rename(Pwm) maa_pwm_context;
 
+%ignore duty_fp;
 typedef struct {
     /*@{*/
     int pin; /**< the pin number, as known to the os. */
@@ -164,6 +209,7 @@ typedef struct {
 
 %rename(Spi) maa_spi_context;
 
+%ignore spifd;
 typedef struct {
     /*@{*/
     int spifd; /**< File descriptor to SPI Device */
@@ -198,6 +244,7 @@ typedef struct {
 
 %rename(Aio) maa_aio_context;
 
+%ignore adc_in_fp;
 typedef struct {
     unsigned int channel;
     FILE *adc_in_fp;
