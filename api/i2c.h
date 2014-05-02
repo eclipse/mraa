@@ -49,7 +49,6 @@ typedef struct {
     int hz; /**< frequency of communication */
     int fh; /**< the file handle to the /dev/i2c-* device */
     int addr; /**< the address of the i2c slave */
-    maa_gpio_context gpio;
     /*@}*/
 } maa_i2c_context;
 
