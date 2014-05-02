@@ -37,6 +37,13 @@ maa_intel_galileo_rev_d()
     b->gpio_count = 14;
     b->aio_count = 6;
     b->pwm_count = 5;
+
+    b->i2c_bus_count = 1;
+    b->i2c_bus[0] = 0;
+
+    b->spi_bus_count = 1;
+    b->spi_bus[0] = 1.0;
+
     b->pins = (maa_pininfo_t*) malloc(sizeof(maa_pininfo_t)*25);
 
     //GPIO
@@ -192,6 +199,28 @@ maa_intel_galileo_rev_d()
     b->pins[19].mux[0].value = 1;
     b->pins[19].mux[1].pin = 20;
     b->pins[19].mux[1].value = 0;
+
+    strncpy(b->pins[20].name, "I2C", 8);
+    b->pins[20].pin = 0;
+    b->pins[20].parent_id = 0;
+    b->pins[20].capabilites = (maa_pincapabilities_t) {1,1,0,0,0,1,1};
+    b->pins[20].mux_total = 1;
+    b->pins[20].mux[0].pin = 29;
+    b->pins[20].mux[0].value = 0;
+
+    strncpy(b->pins[21].name, "SPI-1.0", 8);
+    b->pins[21].pin = 1;
+    b->pins[21].parent_id = 0;
+    b->pins[21].capabilites = (maa_pincapabilities_t) {1,1,0,0,0,1,1};
+    b->pins[21].mux_total = 4;
+    b->pins[21].mux[0].pin = 42;
+    b->pins[21].mux[0].value = 0;
+    b->pins[21].mux[1].pin = 43;
+    b->pins[21].mux[1].value = 0;
+    b->pins[21].mux[2].pin = 54;
+    b->pins[21].mux[2].value = 0;
+    b->pins[21].mux[3].pin = 55;
+    b->pins[21].mux[3].value = 0;
 
     return b;
 }
