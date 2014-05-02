@@ -107,6 +107,10 @@ typedef struct {
     unsigned int gpio_count; /**< GPIO Count */
     unsigned int aio_count;  /**< Analog In Count */
     unsigned int pwm_count;  /**< PWM Count */
+    unsigned int i2c_bus_count; /**< Usable i2c Count */
+    unsigned int i2c_bus[8]; /**< Array of i2c */
+    unsigned int spi_bus_count; /**< Usable spi Count */
+    double spi_bus[8];       /**< Array of spi */
     maa_pininfo_t* pins;     /**< Pointer to pin array */
     /*@}*/
 } maa_board_t;
