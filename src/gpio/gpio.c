@@ -149,7 +149,9 @@ maa_gpio_read(maa_gpio_context *dev)
     char buffer[2];
     fread(buffer, 2, 1, dev->value_fp);
     fseek(dev->value_fp, SEEK_SET, 0);
-    return atoi(buffer);
+    int ret = strtol(buffer, NULL, 10);
+
+    return ret;
 }
 
 maa_result_t
