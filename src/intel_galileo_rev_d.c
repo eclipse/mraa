@@ -37,6 +37,13 @@ maa_intel_galileo_rev_d()
     b->gpio_count = 14;
     b->aio_count = 6;
     b->pwm_count = 5;
+
+    b->i2c_bus_count = 1;
+    b->i2c_bus[0] = 0;
+
+    b->spi_bus_count = 1;
+    b->spi_bus[0] = 1.0;
+
     b->pins = (maa_pininfo_t*) malloc(sizeof(maa_pininfo_t)*25);
 
     //GPIO
