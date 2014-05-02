@@ -28,11 +28,12 @@
 
 int main ()
 {
+    maa_init();
     maa_aio_context* adc_a0;
     unsigned int adc_value = 0;
     int i = 0;
 
-    adc_a0 = maa_aio_init(A0);
+    adc_a0 = maa_aio_init(0);
     if (adc_a0 == NULL) {
         return 1;
     }

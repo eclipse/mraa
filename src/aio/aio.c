@@ -42,62 +42,6 @@ static maa_result_t aio_get_valid_fp(maa_aio_context* dev)
     return MAA_SUCCESS;
 }
 
-/** Configure multiplexer for Analog Input
- *
- * @param aio_channel = Analog input channel to read
- *
- * @return maa_result_t - result type.
- *
- */
-static maa_result_t maa_aio_set_mux(unsigned int aio_channel)
-{
-    maa_result_t result;
-    maa_gpio_context* aio_gate;
-
-    //Initialise VINx multiplexer gate pins
-    aio_gate = maa_gpio_init(adc_gate_pins[aio_channel]);
-
-    if (NULL == aio_gate) {
-        fprintf(stderr, "Failed to initialise first gate pin %d for  ADC "
-            "channel %d !\n", adc_gate_pins[aio_channel], aio_channel);
-        return MAA_ERROR_INVALID_RESOURCE;
-    }
-
-    //Set direction to output for the ADC input gate
-    result = maa_gpio_dir(aio_gate, MAA_GPIO_OUT);
-
-    if (MAA_SUCCESS == result) {
-        // Write gate configuration output value
-        result = maa_gpio_write(aio_gate, 0);
-
-        if (MAA_SUCCESS == result) {
-            //For A4 and A5 Analog common gate pin should be high for the
-            // Galileo board revision D
-            if (A4 == aio_channel || A5 == aio_channel) {
-                aio_gate = maa_gpio_init(ADC_COMMON_GATE_A4_A5);
-
-                //Set direction to output for the gate
-                if (NULL == aio_gate) {
-                    fprintf(stderr, "Failed to initialise second gate pin %d "
-                    "for  ADC channel %d !\n", ADC_COMMON_GATE_A4_A5,
-                    aio_channel);
-                    return(MAA_ERROR_INVALID_RESOURCE);
-                }
-
-                result = maa_gpio_dir(aio_gate, MAA_GPIO_OUT);
-                if (MAA_SUCCESS == result)
-                // Write gate configuration output value
-                result = maa_gpio_write(aio_gate, 1);
-            }
-        }
-    }
-
-    if (NULL != aio_gate)
-        free(aio_gate);
-
-    return (result);
-}
-
 /** Initialise an Analog input, connected to the specified channel
  *
  * @param aio_channel Analog input channel to read
@@ -109,27 +53,32 @@ maa_aio_context* maa_aio_init(unsigned int aio_channel)
 {
     maa_aio_context* dev;
 
-    // Validate input pins 0-5
-    if (aio_channel > TOTAL_ANALOG_INPUTS_ON_BOARD) {
-	    fprintf(stderr, "Invalid Analog  input channel %d specified!\n",
-	    aio_channel);
-        return NULL;
-    }
-
-    //Set-up multiplexer for the Analog input channel
-    if (MAA_SUCCESS != maa_aio_set_mux(aio_channel)) {
-	fprintf(stderr, "Failed to set-up  Analog  input channel %d "
-	    "multiplexer!\n", aio_channel); return NULL;
+    unsigned int checked_pin = maa_check_aio(aio_channel);
+    if (checked_pin < 0) {
+        switch(checked_pin) {
+            case -1:
+                fprintf(stderr, "Invalid Analog  input channel %d specified!\n",
+	                    aio_channel);
+                return NULL;
+            case -2:
+                fprintf(stderr, "Failed to set-up  Analog  input channel %d "
+                        "multiplexer!\n", aio_channel);
+                return NULL;
+            case -3:
+                fprintf(stderr, "Platform Not Initialised");
+                return NULL;
+            default: return NULL;
+        }
     }
 
     //Create ADC device connected to specified channel
     dev = (maa_aio_context*) malloc(sizeof(maa_aio_context));
     if (NULL == dev) {
-	fprintf(stderr, "Insufficient memory for specified Analog input channel "
-	    "%d !\n", aio_channel);
+    fprintf(stderr, "Insufficient memory for specified Analog input channel "
+            "%d !\n", aio_channel);
         return NULL;
     }
-    dev->channel = aio_channel;
+    dev->channel = checked_pin;
 
     //Open valid  analog input file and get the pointer.
     if (MAA_SUCCESS != aio_get_valid_fp(dev)) {
