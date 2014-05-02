@@ -22,10 +22,10 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import pymaa
+import pymaa as maa
 
-pumaa.maa_init()
-x = pymaa.I2CSlave(27,28)
+maa.init()
+x = maa.I2c()
 x.address(0x62)
 y= "  "
 ret = x.read(y, 2)

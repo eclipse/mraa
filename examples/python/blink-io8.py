@@ -25,13 +25,12 @@
 import pymaa as maa
 import time
 
-maa.maa_init()
-x = maa.gpio_t()
-maa.gpio_init(x, 8)
-maa.gpio_dir(x, "out")
+maa.init()
+x = maa.Gpio(8)
+x.dir(maa.MAA_GPIO_OUT)
 
 while True:
-    maa.gpio_write(x,1)
+    x.write(1)
     time.sleep(0.2)
-    maa.gpio_write(x,0)
+    x.write(0)
     time.sleep(0.2)

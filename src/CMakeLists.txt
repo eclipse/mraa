@@ -74,5 +74,5 @@ if (SWIG_FOUND)
   include (${SWIG_USE_FILE})
 
   add_subdirectory (python)
-  add_subdirectory (javascript)
+#  add_subdirectory (javascript)
 endif ()
