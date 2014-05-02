@@ -23,6 +23,7 @@
  */
 
 #include "stdio.h"
+#include "unistd.h"
 
 #include "gpio.h"
 
@@ -30,7 +31,7 @@ int
 main(int argc, char **argv)
 {
     maa_init();
-    fprintf(stdout, "MAA Version: %d\nStarting Blinking on IO8\n",
+    fprintf(stdout, "MAA Version: %s\nStarting Blinking on IO8\n",
             maa_get_version());
     maa_gpio_context* gpio;
     gpio = maa_gpio_init(8);
