@@ -67,7 +67,7 @@ typedef struct {
 %extend maa_i2c_context {
   maa_i2c_context()
   {
-    return maa_i2c_init();
+    return maa_i2c_init(0);
   }
   ~maa_i2c_context()
   {

@@ -97,3 +97,22 @@ maa_check_aio(int aio)
 
     return plat->pins[pin].pin;
 }
+
+unsigned int
+maa_check_i2c(int bus)
+{
+    if (plat == NULL)
+        return -3;
+
+    if (plat->i2c_bus_count >! 0) {
+        fprintf(stderr, "No i2c buses defined in platform");
+        return -1;
+    }
+    int pin = (plat->gpio_count + plat->aio_count) + bus;
+
+    if (plat->pins[pin].mux_total > 0)
+        if (maa_setup_mux_mapped(plat->pins[pin]) != MAA_SUCCESS)
+            return -2;
+
+    return plat->pins[pin].pin;
+}

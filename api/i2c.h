@@ -54,9 +54,10 @@ typedef struct {
 
 /** Initialise i2c context, using board defintions
  *
+ * @param bus i2c bus to use
  * @return maa_i2c_context i2c context ready for other calls.
  */
-maa_i2c_context* maa_i2c_init();
+maa_i2c_context* maa_i2c_init(int bus);
 
 /** Initialise i2c context, passing in spi bus to use.
  *
