@@ -8,7 +8,7 @@
 %}
 
 %rename(get_version) maa_get_version();
-%include "maa.h"
+const char * maa_get_version();
 
 #### GPIO ####
 
