@@ -151,6 +151,14 @@ maa_result_t maa_pwm_pulsewidth_us(maa_pwm_context* pwm, int us);
  */
 maa_result_t maa_pwm_enable(maa_pwm_context* pwm, int enable);
 
+/** Unexport the PWM context (maa_pwm_close() will call this function)
+ *
+ * @param dev The PWM context/
+ *
+ * @return maa result type.
+ */
+maa_result_t maa_pwm_unexport(maa_pwm_context* pwm);
+
 /** Close and unexport the PWM pin.
  * 
  * @param pwm The PWM context to use.

@@ -149,7 +149,9 @@ maa_gpio_read(maa_gpio_context *dev)
     char buffer[2];
     fread(buffer, 2, 1, dev->value_fp);
     fseek(dev->value_fp, SEEK_SET, 0);
-    return atoi(buffer);
+    int ret = strtol(buffer, NULL, 10);
+
+    return ret;
 }
 
 maa_result_t
@@ -158,16 +160,20 @@ maa_gpio_write(maa_gpio_context *dev, int value)
     if (dev->value_fp == NULL) {
         maa_gpio_get_valfp(dev);
     }
-    fseek(dev->value_fp, SEEK_SET, 0);
+    if (fseek(dev->value_fp, SEEK_SET, 0) != 0) {
+        return MAA_ERROR_INVALID_RESOURCE;
+    }
     fprintf(dev->value_fp, "%d", value);
-    fseek(dev->value_fp, SEEK_SET, 0);
+    if (fseek(dev->value_fp, SEEK_SET, 0) != 0) {
+        return MAA_ERROR_INVALID_RESOURCE;
+    }
     if (ferror(dev->value_fp) != 0)
         return MAA_ERROR_INVALID_RESOURCE;
     return MAA_SUCCESS;
 }
 
 maa_result_t
-maa_gpio_close(maa_gpio_context *dev)
+maa_gpio_unexport(maa_gpio_context *dev)
 {
     FILE *unexport_f;
 
@@ -179,6 +185,12 @@ maa_gpio_close(maa_gpio_context *dev)
     fclose(unexport_f);
     if (ferror(dev->value_fp) != 0)
         return MAA_ERROR_INVALID_RESOURCE;
+}
+
+maa_result_t
+maa_gpio_close(maa_gpio_context *dev)
+{
+    maa_gpio_unexport(dev);
     free(dev);
     return MAA_SUCCESS;
 }

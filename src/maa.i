@@ -55,7 +55,7 @@ typedef struct {
   }
   ~maa_gpio_context()
   {
-    maa_gpio_close($self);
+    maa_gpio_unexport($self);
   }
   %feature("autodoc") write "
   Write a value to a GPIO pin
@@ -117,7 +117,6 @@ typedef struct {
   }
   ~maa_i2c_context()
   {
-    maa_i2c_stop($self);
   }
   int frequency(int hz)
   {
@@ -166,7 +165,7 @@ typedef struct {
   }
   ~maa_pwm_context()
   {
-    maa_pwm_close($self);
+    maa_pwm_unexport($self);
   }
   int write(float percentage)
   {
@@ -225,7 +224,6 @@ typedef struct {
   }
   ~maa_spi_context()
   {
-    maa_spi_stop($self);
   }
   int mode(unsigned short mode)
   {
@@ -259,7 +257,6 @@ typedef struct {
   }
   ~maa_aio_context()
   {
-    maa_aio_close($self);
   }
   unsigned int read()
   {
