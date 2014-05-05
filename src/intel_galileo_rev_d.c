@@ -62,7 +62,7 @@ maa_intel_galileo_rev_d()
     b->pins[2].gpio.mux_total = 1;
     b->pins[2].gpio.mux[0].pin = 31;
     b->pins[2].gpio.mux[0].value = 1;
-    
+
     strncpy(b->pins[3].name, "IO3", 8);
     b->pins[3].capabilites = (maa_pincapabilities_t) {1,1,1,1,0,0,0};
     b->pins[3].gpio.pinmap = 18;
@@ -73,7 +73,7 @@ maa_intel_galileo_rev_d()
     b->pins[3].fast_gpio.mux_total = 1;
     b->pins[3].fast_gpio.mux[0].pin = 30;
     b->pins[3].fast_gpio.mux[0].value = 0;
-    
+
     strncpy(b->pins[4].name, "IO4", 8);
     b->pins[4].capabilites = (maa_pincapabilities_t) {1,1,0,0,0,0,0};
     b->pins[4].gpio.pinmap = 28;
@@ -86,7 +86,7 @@ maa_intel_galileo_rev_d()
     b->pins[5].pwm.pinmap = 5;
     b->pins[5].pwm.parent_id = 0;
     b->pins[5].pwm.mux_total = 0;
-    
+
     strncpy(b->pins[6].name, "IO6", 8);
     b->pins[6].gpio.pinmap = 24;
     b->pins[6].capabilites = (maa_pincapabilities_t) {1,1,1,0,0,0,0};
@@ -109,7 +109,6 @@ maa_intel_galileo_rev_d()
     b->pins[9].capabilites = (maa_pincapabilities_t) {1,1,1,0,0,0,0};
     b->pins[9].gpio.pinmap = 19;
     b->pins[9].gpio.mux_total = 0;
-    
 
     strncpy(b->pins[10].name, "IO10", 8);
     b->pins[10].capabilites = (maa_pincapabilities_t) {1,1,1,0,1,0,0};
@@ -210,13 +209,13 @@ maa_intel_galileo_rev_d()
     b->pins[17].aio.mux[0].value = 0;
 
     strncpy(b->pins[18].name, "A4", 8);
-    b->pins[18].capabilites = (maa_pincapabilities_t) {1,1,0,0,0,1,1};    
+    b->pins[18].capabilites = (maa_pincapabilities_t) {1,1,0,0,0,1,1};
     b->pins[18].gpio.pinmap = 48;
     b->pins[18].gpio.mux_total = 2;
     b->pins[18].gpio.mux[0].pin = 29;
     b->pins[18].gpio.mux[0].value = 1;
     b->pins[18].gpio.mux[1].pin = 21;
-    b->pins[18].gpio.mux[1].value = 1;  
+    b->pins[18].gpio.mux[1].value = 1;
     b->pins[18].i2c.pinmap = 1;
     b->pins[18].i2c.mux_total = 1;
     b->pins[18].i2c.mux[0].pin = 29;
@@ -235,7 +234,7 @@ maa_intel_galileo_rev_d()
     b->pins[19].gpio.mux[0].pin = 29;
     b->pins[19].gpio.mux[0].value = 1;
     b->pins[19].gpio.mux[1].pin = 20;
-    b->pins[19].gpio.mux[1].value = 1;  
+    b->pins[19].gpio.mux[1].value = 1;
     b->pins[19].i2c.pinmap = 1;
     b->pins[19].i2c.mux_total = 1;
     b->pins[19].i2c.mux[0].pin = 29;
