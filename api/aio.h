@@ -29,6 +29,10 @@
  *
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <fcntl.h>
 
@@ -72,3 +76,7 @@ unsigned int maa_aio_read_u16(maa_aio_context* dev);
  * @return maa_result_t - result type.
  */
 maa_result_t maa_aio_close(maa_aio_context* dev);
+
+#ifdef __cplusplus
+}
+#endif
