@@ -1,6 +1,6 @@
 /*
- * Author: Brendan Le Foll
- *
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Copyright © 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -82,8 +82,19 @@ typedef struct {
     /*@{*/
     unsigned int pin;   /**< Raw GPIO pin id */
     unsigned int value; /**< Raw GPIO value */
-    /*@}*/
 } maa_mux_t;
+
+/**
+ * A Strucutre representing a singular I/O pin. i.e GPIO/PWM
+ */
+typedef struct {
+    /*@{*/
+    unsigned int pinmap;
+    unsigned int parent_id;
+    unsigned int mux_total;
+    maa_mux_t mux[6];
+    /*@}*/
+} maa_pin_t;
 
 /**
  * A Structure representing a physical Pin.
@@ -91,26 +102,55 @@ typedef struct {
 typedef struct {
     /*@{*/
     char name[8];                      /**< Pin's real world name */
-    unsigned int pin;                  /**< Pin ID */
-    int parent_id;                     /**< IO Parent ID*/
     maa_pincapabilities_t capabilites; /**< Pin Capabiliites */
-    maa_mux_t mux[4];                  /**< Multiplexer array */
-    unsigned int mux_total;            /**< Total Multiplexors required */
+    maa_pin_t gpio; /**< GPIO structure */
+    maa_pin_t pwm;  /**< PWM structure */
+    maa_pin_t aio;  /**< Anaglog Pin */
+    maa_pin_t fast_gpio; /**< Fast GPIO */
+    maa_pin_t i2c;  /**< i2c bus/pin */
+    maa_pin_t spi;  /**< spi bus/pin */
     /*@}*/
 } maa_pininfo_t;
+
+/**
+ * A Structure representing the physical properties of a i2c bus.
+ */
+typedef struct {
+    /*@{*/
+    unsigned int bus_id; /**< ID as exposed in the system */
+    unsigned int scl; /**< i2c SCL */
+    unsigned int sda; /**< i2c SDA */
+    /*@}*/
+} maa_i2c_bus_t;
+
+/**
+ * A Structure representing the physical properties of a spi bus.
+ */
+typedef struct {
+    /*@{*/
+    double bus_id; /**< The Bus ID as exposed to the system. */
+    maa_boolean_t three_wire; /**< Is the bus only a three wire system */
+    unsigned int sclk; /**< Serial Clock */
+    unsigned int mosi; /**< Master Out, Slave In. */
+    unsigned int miso; /**< Master In, Slave Out. */
+    unsigned int cs; /**< Chip Select, used when the board is a spi slave */
+    /*@}*/
+} maa_spi_bus_t;
 
 /**
  * A Structure representing a platform/board.
  */
 typedef struct {
     /*@{*/
+    unsigned int phy_pin_count; /**< The Total IO pins on board */
     unsigned int gpio_count; /**< GPIO Count */
-    unsigned int aio_count;  /**< Analog In Count */
-    unsigned int pwm_count;  /**< PWM Count */
+    unsigned int aio_count;  /**< Analog side Count */
     unsigned int i2c_bus_count; /**< Usable i2c Count */
-    unsigned int i2c_bus[8]; /**< Array of i2c */
+    maa_i2c_bus_t  i2c_bus[6]; /**< Array of i2c */
+    unsigned int def_i2c_bus; /**< Position in array of default i2c bus */
     unsigned int spi_bus_count; /**< Usable spi Count */
-    double spi_bus[8];       /**< Array of spi */
+    maa_spi_bus_t spi_bus[6];       /**< Array of spi */
+    unsigned int def_spi_bus; /**< Position in array of defult spi bus */
     maa_pininfo_t* pins;     /**< Pointer to pin array */
     /*@}*/
 } maa_board_t;
