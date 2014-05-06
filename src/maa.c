@@ -50,7 +50,7 @@ maa_init()
 }
 
 static maa_result_t
-maa_setup_mux_mapped(maa_pininfo_t meta)
+maa_setup_mux_mapped(maa_pin_t meta)
 {
     int mi;
     for (mi = 0; mi < meta.mux_total; mi++) {
@@ -72,12 +72,16 @@ maa_check_gpio(int pin)
     if (plat == NULL)
         return -1;
 
-    if (pin < 0 || pin > plat->gpio_count)
+    if (pin < 0 || pin > plat->phy_pin_count)
         return -1;
-    if (plat->pins[pin].mux_total > 0)
-        if (maa_setup_mux_mapped(plat->pins[pin]) != MAA_SUCCESS)
+
+    if(plat->pins[pin].capabilites.gpio != 1)
+      return -1;
+
+    if (plat->pins[pin].gpio.mux_total > 0)
+       if (maa_setup_mux_mapped(plat->pins[pin].gpio) != MAA_SUCCESS)
             return -1;
-    return plat->pins[pin].pin;
+    return plat->pins[pin].gpio.pinmap;
 }
 
 unsigned int
@@ -91,15 +95,18 @@ maa_check_aio(int aio)
 
     int pin = aio + plat->gpio_count;
 
-    if (plat->pins[pin].mux_total > 0)
-        if (maa_setup_mux_mapped(plat->pins[pin]) != MAA_SUCCESS)
-            return -2;
+    if(plat->pins[pin].capabilites.aio != 1)
+      return -1;
 
-    return plat->pins[pin].pin;
+    if (plat->pins[pin].aio.mux_total > 0)
+       if (maa_setup_mux_mapped(plat->pins[pin].aio) != MAA_SUCCESS)
+            return -1;
+    return plat->pins[pin].aio.pinmap;
+
 }
 
 unsigned int
-maa_check_i2c(int bus)
+maa_check_i2c(int bus_s)
 {
     if (plat == NULL)
         return -3;
@@ -108,11 +115,17 @@ maa_check_i2c(int bus)
         fprintf(stderr, "No i2c buses defined in platform");
         return -1;
     }
-    int pin = (plat->gpio_count + plat->aio_count) + bus;
+    int bus = 0;
 
-    if (plat->pins[pin].mux_total > 0)
-        if (maa_setup_mux_mapped(plat->pins[pin]) != MAA_SUCCESS)
-            return -2;
+    int pos = plat->i2c_bus[bus].sda;
+    if (plat->pins[pos].i2c.mux_total > 0)
+        if (maa_setup_mux_mapped(plat->pins[pos].i2c) != MAA_SUCCESS)
+             return -2;
 
-    return plat->pins[pin].pin;
+    pos = plat->i2c_bus[bus].scl;
+    if (plat->pins[pos].i2c.mux_total > 0)
+        if (maa_setup_mux_mapped(plat->pins[pos].i2c) != MAA_SUCCESS)
+             return -2;
+
+    return plat->i2c_bus[bus].bus_id;
 }
