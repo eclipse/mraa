@@ -24,6 +24,7 @@
  */
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "maa.h"
 #include "intel_galileo_rev_d.h"
@@ -98,14 +99,13 @@ maa_check_aio(int aio)
 
     int pin = aio + plat->gpio_count;
 
-    if(plat->pins[pin].capabilites.aio != 1)
+    if (plat->pins[pin].capabilites.aio != 1)
       return -1;
 
     if (plat->pins[pin].aio.mux_total > 0)
        if (maa_setup_mux_mapped(plat->pins[pin].aio) != MAA_SUCCESS)
             return -1;
     return plat->pins[pin].aio.pinmap;
-
 }
 
 unsigned int
@@ -131,4 +131,38 @@ maa_check_i2c(int bus_s)
              return -2;
 
     return plat->i2c_bus[bus].bus_id;
+}
+
+maa_pin_t*
+maa_check_pwm(int pin)
+{
+    if (plat == NULL)
+        return NULL;
+
+    if (plat->pins[pin].capabilites.pwm != 1)
+      return NULL;
+
+   /** quirk in rev d, this messes with pwm on that pin
+   * if (plat->pins[pin].capabilites.gpio == 1) {
+   *     maa_gpio_context* mux_i;
+   *     mux_i = maa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
+   *     if (mux_i == NULL)
+   *         return NULL;
+   *     if (maa_gpio_dir(mux_i, MAA_GPIO_OUT) != MAA_SUCCESS)
+   *         return NULL;
+   *     if (maa_gpio_write(mux_i, 0) != MAA_SUCCESS)
+   *         return NULL;
+   *     if (maa_gpio_close(mux_i) != MAA_SUCCESS)
+   *         return NULL;
+   * }
+    */
+    if (plat->pins[pin].pwm.mux_total > 0)
+       if (maa_setup_mux_mapped(plat->pins[pin].pwm) != MAA_SUCCESS)
+            return NULL;
+
+    maa_pin_t *ret;
+    ret = (maa_pin_t*) malloc(sizeof(maa_pin_t));
+    ret->pinmap = plat->pins[pin].pwm.pinmap;
+    ret->parent_id = plat->pins[pin].pwm.parent_id;
+    return ret;
 }
