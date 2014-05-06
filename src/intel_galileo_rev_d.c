@@ -31,7 +31,7 @@ maa_board_t*
 maa_intel_galileo_rev_d()
 {
     maa_board_t* b = (maa_board_t*) malloc(sizeof(maa_board_t));
-    if(b == NULL)
+    if (b == NULL)
         return NULL;
 
     b->phy_pin_count = 20;

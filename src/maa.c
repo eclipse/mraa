@@ -31,7 +31,7 @@
 #include "version.h"
 
 static maa_pininfo_t* pindata;
-static maa_board_t* plat;
+static maa_board_t* plat = NULL;
 
 const char *
 maa_get_version()
@@ -45,6 +45,9 @@ maa_init()
     /** Once more board definitions have been added,
      *  A method for detecting them will need to be devised.
      */
+    if (plat != NULL) {
+        return MAA_ERROR_PLATFORM_ALREADY_INITIALISED;
+    }
     plat = maa_intel_galileo_rev_d();
     return MAA_SUCCESS;
 }
