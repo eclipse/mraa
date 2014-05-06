@@ -166,3 +166,53 @@ maa_check_pwm(int pin)
     ret->parent_id = plat->pins[pin].pwm.parent_id;
     return ret;
 }
+
+void
+maa_result_print(maa_result_t result)
+{
+    switch (result) {
+        case MAA_SUCCESS: fprintf(stderr, "MAA: SUCCESS\n");
+                          break;
+        case MAA_ERROR_FEATURE_NOT_IMPLEMENTED:
+                          fprintf(stderr, "MAA: Feature not implemented.\n");
+                          break;
+        case MAA_ERROR_FEATURE_NOT_SUPPORTED:
+                          fprintf(stderr, "MAA: Feature not supported by Hardware.\n");
+                          break;
+        case MAA_ERROR_INVALID_VERBOSITY_LEVEL:
+                          fprintf(stderr, "MAA: Invalid verbosity level.\n");
+                          break;
+        case MAA_ERROR_INVALID_PARAMETER:
+                          fprintf(stderr, "MAA: Invalid parameter.\n");
+                          break;
+        case MAA_ERROR_INVALID_HANDLE:
+                          fprintf(stderr, "MAA: Invalid Handle.\n");
+                          break;
+        case MAA_ERROR_NO_RESOURCES:
+                          fprintf(stderr, "MAA: No resources.\n");
+                          break;
+        case MAA_ERROR_INVALID_RESOURCE:
+                          fprintf(stderr, "MAA: Invalid resource.\n");
+                          break;
+        case MAA_ERROR_INVALID_QUEUE_TYPE:
+                          fprintf(stderr, "MAA: Invalid Queue Type.\n");
+                          break;
+        case MAA_ERROR_NO_DATA_AVAILABLE:
+                          fprintf(stderr, "MAA: No Data available.\n");
+                          break;
+        case MAA_ERROR_INVALID_PLATFORM:
+                          fprintf(stderr, "MAA: Platform not recognised.\n");
+                          break;
+        case MAA_ERROR_PLATFORM_NOT_INITIALISED:
+                          fprintf(stderr, "MAA: Platform not initialised.\n");
+                          break;
+        case MAA_ERROR_PLATFORM_ALREADY_INITIALISED:
+                          fprintf(stderr, "MAA: Platform already initialised.\n");
+                          break;
+        case MAA_ERROR_UNSPECIFIED:
+                          fprintf(stderr, "MAA: Unspecified Error.\n");
+                          break;
+        default:     fprintf(stderr, "MAA: Unrecognised error.\n");
+                          break;
+    }
+}

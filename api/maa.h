@@ -50,7 +50,7 @@ typedef enum {
     MAA_ERROR_NO_DATA_AVAILABLE              =  9, /**< No data available */
     MAA_ERROR_INVALID_PLATFORM               = 10, /**< Platform not recognised */
     MAA_ERROR_PLATFORM_NOT_INITIALISED       = 11, /**< Board information not initialised */
-    MAA_ERROR_PLATFORM_ALREADY_INITIALISED   = 12, /**< Board is already initialised
+    MAA_ERROR_PLATFORM_ALREADY_INITIALISED   = 12, /**< Board is already initialised */
 
     MAA_ERROR_UNSPECIFIED                    = 99 /**< Unknown Error */
 } maa_result_t;
@@ -201,6 +201,12 @@ maa_pin_t* maa_check_pwm(int pin);
  * @return version string from version.h
  */
 const char* maa_get_version();
+
+/** Print a textual representation of the maa_result_t
+ *
+ * @param result the result to print,
+ */
+void maa_result_print(maa_result_t result);
 
 #ifdef __cplusplus
 }
