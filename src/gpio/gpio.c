@@ -1,5 +1,6 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -29,15 +30,19 @@
 
 #include "gpio.h"
 
+#define SYSFS_CLASS_GPIO "/sys/class/gpio"
+#define MAX_SIZE 64
+
 static int
 maa_gpio_get_valfp(maa_gpio_context *dev)
 {
-    char bu[64];
-    sprintf(bu, "/sys/class/gpio/gpio%d/value", dev->pin);
+    char bu[MAX_SIZE];
+    sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
 
     if ((dev->value_fp = fopen(bu, "r+b")) == NULL) {
         return 1;
     }
+
     return 0;
 }
 
@@ -47,25 +52,31 @@ maa_gpio_init(int pin)
     int pinm = maa_check_gpio(pin);
     if (pinm < 0)
         return NULL;
+
     return maa_gpio_init_raw(pinm);
 }
 
 maa_gpio_context*
 maa_gpio_init_raw(int pin)
 {
-    if(pin < 0)
+    if (pin < 0)
         return NULL;
-    FILE *export_f;
-    maa_gpio_context* dev = (maa_gpio_context*) malloc(sizeof(maa_gpio_context));
 
-    if ((export_f = fopen("/sys/class/gpio/export", "w")) == NULL) {
+    FILE *export_f;
+    char bu[MAX_SIZE];
+    int length;
+
+    maa_gpio_context* dev = (maa_gpio_context*) malloc(sizeof(maa_gpio_context));
+    dev->pin = pin;
+
+    if ((export_f = fopen(SYSFS_CLASS_GPIO "/export", "w")) == NULL) {
         fprintf(stderr, "Failed to open export for writing!\n");
         return NULL;
-    } else {
-        fprintf(export_f, "%d", pin);
-        fclose(export_f);
     }
-    dev->pin = pin;
+    length = snprintf(bu, sizeof(bu), "%d", dev->pin);
+    fwrite(bu, sizeof(char), length, export_f);
+
+    fclose(export_f);
     return dev;
 }
 
@@ -75,32 +86,37 @@ maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode)
     if (dev->value_fp != NULL) {
          dev->value_fp = NULL;
     }
-    char filepath[64];
-    snprintf(filepath, 64, "/sys/class/gpio/gpio%d/drive", dev->pin);
+
+    char filepath[MAX_SIZE];
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/drive", dev->pin);
 
     FILE *drive;
     if ((drive = fopen(filepath, "w")) == NULL) {
         fprintf(stderr, "Failed to open drive for writing!\n");
         return MAA_ERROR_INVALID_RESOURCE;
     }
+
+    char bu[MAX_SIZE];
+    int length;
     switch(mode) {
         case MAA_GPIO_STRONG:
-            fprintf(drive, "strong");
+            length = snprintf(bu, sizeof(bu), "strong");
             break;
         case MAA_GPIO_PULLUP:
-            fprintf(drive, "pullup");
+            length = snprintf(bu, sizeof(bu), "pullup");
             break;
         case MAA_GPIO_PULLDOWN:
-            fprintf(drive, "pulldown");
+            length = snprintf(bu, sizeof(bu), "pulldown");
             break;
         case MAA_GPIO_HIZ:
-            fprintf(drive, "hiz");
+            length = snprintf(bu, sizeof(bu), "hiz");
             break;
         default:
             fclose(drive);
             return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
-            break;
     }
+    fwrite(bu, sizeof(char), length, drive);
+
     fclose(drive);
     dev->value_fp = NULL;
     return MAA_SUCCESS;
@@ -114,26 +130,30 @@ maa_gpio_dir(maa_gpio_context *dev, gpio_dir_t dir)
     if (dev->value_fp != NULL) {
          dev->value_fp = NULL;
     }
-    char filepath[64];
-    snprintf(filepath, 64, "/sys/class/gpio/gpio%d/direction", dev->pin);
+    char filepath[MAX_SIZE];
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/direction", dev->pin);
 
     FILE *direction;
     if ((direction = fopen(filepath, "w")) == NULL) {
         fprintf(stderr, "Failed to open direction for writing!\n");
         return MAA_ERROR_INVALID_RESOURCE;
     }
+
+    char bu[MAX_SIZE];
+    int length;
     switch(dir) {
         case MAA_GPIO_OUT:
-            fprintf(direction, "out");
+            length = snprintf(bu, sizeof(bu), "out");
             break;
         case MAA_GPIO_IN:
-            fprintf(direction, "in");
+            length = snprintf(bu, sizeof(bu), "in");
             break;
         default:
             fclose(direction);
             return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
-            break;
     }
+    fwrite(bu, sizeof(char), length, direction);
+
     fclose(direction);
     dev->value_fp = NULL;
     return MAA_SUCCESS;
@@ -146,10 +166,10 @@ maa_gpio_read(maa_gpio_context *dev)
         maa_gpio_get_valfp(dev);
     }
     fseek(dev->value_fp, SEEK_SET, 0);
-    char buffer[2];
-    fread(buffer, 2, 1, dev->value_fp);
+    char bu[2];
+    fread(bu, 2, 1, dev->value_fp);
     fseek(dev->value_fp, SEEK_SET, 0);
-    int ret = strtol(buffer, NULL, 10);
+    int ret = strtol(bu, NULL, 10);
 
     return ret;
 }
@@ -163,7 +183,11 @@ maa_gpio_write(maa_gpio_context *dev, int value)
     if (fseek(dev->value_fp, SEEK_SET, 0) != 0) {
         return MAA_ERROR_INVALID_RESOURCE;
     }
-    fprintf(dev->value_fp, "%d", value);
+
+    char bu[MAX_SIZE];
+    int length = snprintf(bu, sizeof(bu), "%d", value);
+    fwrite(bu, sizeof(char), length, dev->value_fp);
+
     if (fseek(dev->value_fp, SEEK_SET, 0) != 0) {
         return MAA_ERROR_INVALID_RESOURCE;
     }
@@ -177,14 +201,20 @@ maa_gpio_unexport(maa_gpio_context *dev)
 {
     FILE *unexport_f;
 
-    if ((unexport_f = fopen("/sys/class/gpio/unexport", "w")) == NULL) {
+    if ((unexport_f = fopen(SYSFS_CLASS_GPIO "/unexport", "w")) == NULL) {
         fprintf(stderr, "Failed to open unexport for writing!\n");
         return MAA_ERROR_INVALID_RESOURCE;
     }
-    fprintf(unexport_f, "%d", dev->pin);
+
+    char bu[MAX_SIZE];
+    int length = snprintf(bu, sizeof(bu), "%d", dev->pin);
+    fwrite(bu, sizeof(char), length, unexport_f);
     fclose(unexport_f);
-    if (ferror(dev->value_fp) != 0)
+
+    if (ferror(dev->value_fp) != 0) {
         return MAA_ERROR_INVALID_RESOURCE;
+    }
+    return MAA_SUCCESS;
 }
 
 maa_result_t
