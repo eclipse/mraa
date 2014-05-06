@@ -181,7 +181,7 @@ maa_intel_galileo_rev_d()
     b->pins[15].gpio.mux_total = 1;
     b->pins[15].gpio.mux[0].pin = 36;
     b->pins[15].gpio.mux[0].value = 1;
-    b->pins[15].aio.pinmap = 1; 
+    b->pins[15].aio.pinmap = 1;
     b->pins[15].aio.mux_total = 1;
     b->pins[15].aio.mux[0].pin = 36;
     b->pins[15].aio.mux[0].value = 0;
@@ -249,7 +249,7 @@ maa_intel_galileo_rev_d()
     //BUS DEFINITIONS
     b->i2c_bus_count = 1;
     b->def_i2c_bus = 0;
-    b->i2c_bus[0].bus_id = 1;
+    b->i2c_bus[0].bus_id = 0;
     b->i2c_bus[0].sda = 17;
     b->i2c_bus[0].scl = 18;
 
