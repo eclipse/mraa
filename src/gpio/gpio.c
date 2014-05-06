@@ -211,15 +211,16 @@ maa_gpio_unexport(maa_gpio_context *dev)
     fwrite(bu, sizeof(char), length, unexport_f);
     fclose(unexport_f);
 
-    if (ferror(dev->value_fp) != 0) {
-        return MAA_ERROR_INVALID_RESOURCE;
-    }
     return MAA_SUCCESS;
 }
 
 maa_result_t
 maa_gpio_close(maa_gpio_context *dev)
 {
+    if (ferror(dev->value_fp) != 0) {
+        return MAA_ERROR_INVALID_RESOURCE;
+    }
+
     maa_gpio_unexport(dev);
     free(dev);
     return MAA_SUCCESS;
