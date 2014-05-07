@@ -101,8 +101,13 @@ maa_pwm_get_duty(maa_pwm_context* dev)
 
 maa_pwm_context*
 maa_pwm_init(int pin) {
-    //TODO
-    return maa_pwm_init_raw(0, pin);
+    maa_pin_t* pinm = maa_check_pwm(pin);
+    if (pinm == NULL)
+        return NULL;
+    int chip = pinm->parent_id;
+    int pinn = pinm->pinmap;
+    free(pinm);
+    return maa_pwm_init_raw(chip,pinn);
 }
 
 maa_pwm_context*
@@ -121,8 +126,8 @@ maa_pwm_init_raw(int chipin, int pin)
 
     if ((export_f = fopen(buffer, "w")) == NULL) {
         fprintf(stderr, "Failed to open export for writing!\n");
-	free(dev);
-	return NULL;
+        free(dev);
+        return NULL;
     } else {
         fprintf(export_f, "%d", dev->pin);
         fclose(export_f);
