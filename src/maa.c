@@ -142,20 +142,20 @@ maa_check_pwm(int pin)
     if (plat->pins[pin].capabilites.pwm != 1)
       return NULL;
 
-   /** quirk in rev d, this messes with pwm on that pin
-   * if (plat->pins[pin].capabilites.gpio == 1) {
-   *     maa_gpio_context* mux_i;
-   *     mux_i = maa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
-   *     if (mux_i == NULL)
-   *         return NULL;
-   *     if (maa_gpio_dir(mux_i, MAA_GPIO_OUT) != MAA_SUCCESS)
-   *         return NULL;
-   *     if (maa_gpio_write(mux_i, 0) != MAA_SUCCESS)
-   *         return NULL;
-   *     if (maa_gpio_close(mux_i) != MAA_SUCCESS)
-   *         return NULL;
-   * }
-    */
+    if (plat->pins[pin].capabilites.gpio == 1) {
+        maa_gpio_context* mux_i;
+        mux_i = maa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
+        if (mux_i == NULL)
+            return NULL;
+        if (maa_gpio_dir(mux_i, MAA_GPIO_OUT) != MAA_SUCCESS)
+            return NULL;
+        // Current REV D quirk. //TODO GEN 2
+        if (maa_gpio_write(mux_i, 1) != MAA_SUCCESS)
+            return NULL;
+        if (maa_gpio_close(mux_i) != MAA_SUCCESS)
+            return NULL;
+    }
+
     if (plat->pins[pin].pwm.mux_total > 0)
        if (maa_setup_mux_mapped(plat->pins[pin].pwm) != MAA_SUCCESS)
             return NULL;
@@ -215,4 +215,46 @@ maa_result_print(maa_result_t result)
         default:     fprintf(stderr, "MAA: Unrecognised error.\n");
                           break;
     }
+}
+
+maa_boolean_t
+maa_pin_mode_test(int pin, maa_pinmodes_t mode)
+{
+    if (pin > plat->phy_pin_count || pin < 0)
+        return 0;
+
+    switch(mode) {
+        case MAA_PIN_VALID:
+            if (plat->pins[pin].capabilites.valid == 1)
+                return 1;
+            break;
+        case MAA_PIN_GPIO:
+            if (plat->pins[pin].capabilites.gpio ==1)
+                return 1;
+            break;
+        case MAA_PIN_PWM:
+            if (plat->pins[pin].capabilites.pwm ==1)
+                return 1;
+            break;
+        case MAA_PIN_FAST_GPIO:
+            if (plat->pins[pin].capabilites.fast_gpio ==1)
+                return 1;
+            break;
+        case MAA_PIN_SPI:
+            if (plat->pins[pin].capabilites.spi ==1)
+                return 1;
+            break;
+        case MAA_PIN_I2C:
+            if (plat->pins[pin].capabilites.i2c ==1)
+                return 1;
+            break;
+        case MAA_PIN_AIO:
+            if (pin < plat->aio_count)
+                pin = pin + plat->gpio_count;
+            if (plat->pins[pin].capabilites.aio ==1)
+                return 1;
+            break;
+        default: break;
+    }
+    return 0;
 }

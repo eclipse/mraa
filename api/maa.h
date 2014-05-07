@@ -62,6 +62,19 @@ typedef enum {
 typedef unsigned int maa_boolean_t;
 
 /**
+ * Enum representing different possible modes for a pin.
+ */
+typedef enum {
+    MAA_PIN_VALID       = 0, /**< Pin Valid */
+    MAA_PIN_GPIO        = 1, /**< General Purpose IO */
+    MAA_PIN_PWM         = 2, /**< Pulse Width Modulation */
+    MAA_PIN_FAST_GPIO   = 3, /**< Faster GPIO */
+    MAA_PIN_SPI         = 4, /**< SPI */
+    MAA_PIN_I2C         = 5, /**< I2C */
+    MAA_PIN_AIO         = 6  /**< Analog in */
+} maa_pinmodes_t;
+
+/**
  * A bitfield representing the capabilities of a pin.
  */
 typedef struct {
@@ -207,6 +220,14 @@ const char* maa_get_version();
  * @param result the result to print,
  */
 void maa_result_print(maa_result_t result);
+
+/** Checks if a pin is able to use the passed in mode.
+ *
+ * @param pin Physical Pin to be checked.
+ * @param mode the mode to be tested.
+ * @return boolean if the mode is supported, 0=false.
+ */
+maa_boolean_t maa_pin_mode_test(int pin, maa_pinmodes_t mode);
 
 #ifdef __cplusplus
 }
