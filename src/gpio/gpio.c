@@ -187,13 +187,21 @@ maa_result_t
 maa_gpio_isr_exit(maa_gpio_context *dev)
 {
     maa_result_t ret = MAA_SUCCESS;
-    maa_gpio_edge_mode(dev, MAA_GPIO_EDGE_NONE);
+
+    if (dev->thread_id == 0) {
+        return ret;
+    }
 
     if (pthread_kill(dev->thread_id) != 0) {
        ret = MAA_ERROR_INVALID_HANDLE;
     }
     if (close(dev->isr_value_fp) != 0) {
        ret = MAA_ERROR_INVALID_PARAMETER;
+    }
+
+    // this is only required if we had an isr setup
+    if (ret == MAA_SUCCESS) {
+       ret = maa_gpio_edge_mode(dev, MAA_GPIO_EDGE_NONE);
     }
 
     return ret;
