@@ -24,6 +24,7 @@
  */
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "maa.h"
 #include "intel_galileo_rev_d.h"
@@ -98,14 +99,13 @@ maa_check_aio(int aio)
 
     int pin = aio + plat->gpio_count;
 
-    if(plat->pins[pin].capabilites.aio != 1)
+    if (plat->pins[pin].capabilites.aio != 1)
       return -1;
 
     if (plat->pins[pin].aio.mux_total > 0)
        if (maa_setup_mux_mapped(plat->pins[pin].aio) != MAA_SUCCESS)
             return -1;
     return plat->pins[pin].aio.pinmap;
-
 }
 
 unsigned int
@@ -131,4 +131,88 @@ maa_check_i2c(int bus_s)
              return -2;
 
     return plat->i2c_bus[bus].bus_id;
+}
+
+maa_pin_t*
+maa_check_pwm(int pin)
+{
+    if (plat == NULL)
+        return NULL;
+
+    if (plat->pins[pin].capabilites.pwm != 1)
+      return NULL;
+
+   /** quirk in rev d, this messes with pwm on that pin
+   * if (plat->pins[pin].capabilites.gpio == 1) {
+   *     maa_gpio_context* mux_i;
+   *     mux_i = maa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
+   *     if (mux_i == NULL)
+   *         return NULL;
+   *     if (maa_gpio_dir(mux_i, MAA_GPIO_OUT) != MAA_SUCCESS)
+   *         return NULL;
+   *     if (maa_gpio_write(mux_i, 0) != MAA_SUCCESS)
+   *         return NULL;
+   *     if (maa_gpio_close(mux_i) != MAA_SUCCESS)
+   *         return NULL;
+   * }
+    */
+    if (plat->pins[pin].pwm.mux_total > 0)
+       if (maa_setup_mux_mapped(plat->pins[pin].pwm) != MAA_SUCCESS)
+            return NULL;
+
+    maa_pin_t *ret;
+    ret = (maa_pin_t*) malloc(sizeof(maa_pin_t));
+    ret->pinmap = plat->pins[pin].pwm.pinmap;
+    ret->parent_id = plat->pins[pin].pwm.parent_id;
+    return ret;
+}
+
+void
+maa_result_print(maa_result_t result)
+{
+    switch (result) {
+        case MAA_SUCCESS: fprintf(stderr, "MAA: SUCCESS\n");
+                          break;
+        case MAA_ERROR_FEATURE_NOT_IMPLEMENTED:
+                          fprintf(stderr, "MAA: Feature not implemented.\n");
+                          break;
+        case MAA_ERROR_FEATURE_NOT_SUPPORTED:
+                          fprintf(stderr, "MAA: Feature not supported by Hardware.\n");
+                          break;
+        case MAA_ERROR_INVALID_VERBOSITY_LEVEL:
+                          fprintf(stderr, "MAA: Invalid verbosity level.\n");
+                          break;
+        case MAA_ERROR_INVALID_PARAMETER:
+                          fprintf(stderr, "MAA: Invalid parameter.\n");
+                          break;
+        case MAA_ERROR_INVALID_HANDLE:
+                          fprintf(stderr, "MAA: Invalid Handle.\n");
+                          break;
+        case MAA_ERROR_NO_RESOURCES:
+                          fprintf(stderr, "MAA: No resources.\n");
+                          break;
+        case MAA_ERROR_INVALID_RESOURCE:
+                          fprintf(stderr, "MAA: Invalid resource.\n");
+                          break;
+        case MAA_ERROR_INVALID_QUEUE_TYPE:
+                          fprintf(stderr, "MAA: Invalid Queue Type.\n");
+                          break;
+        case MAA_ERROR_NO_DATA_AVAILABLE:
+                          fprintf(stderr, "MAA: No Data available.\n");
+                          break;
+        case MAA_ERROR_INVALID_PLATFORM:
+                          fprintf(stderr, "MAA: Platform not recognised.\n");
+                          break;
+        case MAA_ERROR_PLATFORM_NOT_INITIALISED:
+                          fprintf(stderr, "MAA: Platform not initialised.\n");
+                          break;
+        case MAA_ERROR_PLATFORM_ALREADY_INITIALISED:
+                          fprintf(stderr, "MAA: Platform already initialised.\n");
+                          break;
+        case MAA_ERROR_UNSPECIFIED:
+                          fprintf(stderr, "MAA: Unspecified Error.\n");
+                          break;
+        default:     fprintf(stderr, "MAA: Unrecognised error.\n");
+                          break;
+    }
 }

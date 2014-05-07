@@ -73,6 +73,12 @@ maa_intel_galileo_rev_d()
     b->pins[3].fast_gpio.mux_total = 1;
     b->pins[3].fast_gpio.mux[0].pin = 30;
     b->pins[3].fast_gpio.mux[0].value = 0;
+    b->pins[3].pwm.pinmap = 3;
+    b->pins[3].pwm.parent_id = 0;
+    b->pins[3].pwm.mux_total = 1;
+    b->pins[3].pwm.mux[0].pin = 30;
+    b->pins[3].pwm.mux[0].value = 1;
+
 
     strncpy(b->pins[4].name, "IO4", 8);
     b->pins[4].capabilites = (maa_pincapabilities_t) {1,1,0,0,0,0,0};
