@@ -24,7 +24,6 @@
 
 import pymaa as maa
 
-maa.init()
 x = maa.I2c()
 x.address(0x62)
 y= "  "

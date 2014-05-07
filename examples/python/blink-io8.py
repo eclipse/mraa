@@ -25,7 +25,6 @@
 import pymaa as maa
 import time
 
-maa.init()
 x = maa.Gpio(8)
 x.dir(maa.MAA_GPIO_OUT)
 

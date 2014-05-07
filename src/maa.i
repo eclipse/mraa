@@ -7,10 +7,12 @@
     #include "aio.h"
 %}
 
+%init %{
+    maa_init();
+%}
+
 %rename(get_version) maa_get_version();
 const char * maa_get_version();
-%rename(init) maa_init();
-int maa_init();
 
 #### GPIO ####
 

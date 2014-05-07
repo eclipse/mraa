@@ -25,7 +25,6 @@
 import pymaa as maa
 import time
 
-maa.init()
 x = maa.PWM(0,3)
 x.enable(1);
 x.period_us(20)
