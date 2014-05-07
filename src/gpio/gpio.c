@@ -22,28 +22,29 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+#include "gpio.h"
 
 #include <stdlib.h>
 #include <fcntl.h>
-#include <stdio.h>
+#include <string.h>
 #include <unistd.h>
-
-#include "gpio.h"
+#include <poll.h>
 
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
 #define MAX_SIZE 64
+#define POLL_TIMEOUT
 
-static int
+static maa_result_t
 maa_gpio_get_valfp(maa_gpio_context *dev)
 {
     char bu[MAX_SIZE];
     sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
 
     if ((dev->value_fp = fopen(bu, "r+b")) == NULL) {
-        return 1;
+        return MAA_ERROR_INVALID_RESOURCE;
     }
 
-    return 0;
+    return MAA_SUCCESS;
 }
 
 maa_gpio_context*
@@ -67,6 +68,7 @@ maa_gpio_init_raw(int pin)
     int length;
 
     maa_gpio_context* dev = (maa_gpio_context*) malloc(sizeof(maa_gpio_context));
+    memset(dev, 0, sizeof(maa_gpio_context));
     dev->pin = pin;
 
     if ((export_f = fopen(SYSFS_CLASS_GPIO "/export", "w")) == NULL) {
@@ -78,6 +80,123 @@ maa_gpio_init_raw(int pin)
 
     fclose(export_f);
     return dev;
+}
+
+static maa_result_t
+maa_gpio_wait_interrupt(int fd)
+{
+    unsigned char c;
+    struct pollfd pfd;
+
+    // setup poll on POLLPRI
+    pfd.fd = fd;
+    pfd.events = POLLPRI;
+
+    // do an initial read to clear interupt
+    read (fd, &c, 1);
+
+    if (fd <= 0) {
+        return MAA_ERROR_INVALID_RESOURCE;
+    }
+
+    // Wait for it forever
+    int x = poll (&pfd, 1, -1);
+
+    // do a final read to clear interupt
+    read (fd, &c, 1);
+
+    return MAA_SUCCESS;
+}
+
+static void*
+maa_gpio_interrupt_handler(void* arg)
+{
+    maa_gpio_context* dev = (maa_gpio_context*) arg;
+    maa_result_t ret;
+
+    // open gpio value with open(3)
+    char bu[MAX_SIZE];
+    sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
+    dev->isr_value_fp = open(bu, O_RDONLY);
+
+    for (;;) {
+        ret = maa_gpio_wait_interrupt(dev->isr_value_fp);
+        if (ret == MAA_SUCCESS) {
+            dev->isr();
+        } else {
+	    // we must have got an error code so die nicely
+            close(dev->isr_value_fp);
+	    return;
+        }
+    }
+}
+
+maa_result_t
+maa_gpio_edge_mode(maa_gpio_context *dev, gpio_edge_t mode)
+{
+    if (dev->value_fp != NULL) {
+         dev->value_fp = NULL;
+    }
+
+    char filepath[MAX_SIZE];
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/edge", dev->pin);
+
+    FILE *edge;
+    if ((edge= fopen(filepath, "w")) == NULL) {
+        fprintf(stderr, "Failed to open edge for writing!\n");
+        return MAA_ERROR_INVALID_RESOURCE;
+    }
+
+    char bu[MAX_SIZE];
+    int length;
+    switch(mode) {
+        case MAA_GPIO_EDGE_NONE:
+            length = snprintf(bu, sizeof(bu), "none");
+            break;
+        case MAA_GPIO_EDGE_BOTH:
+            length = snprintf(bu, sizeof(bu), "both");
+            break;
+        case MAA_GPIO_EDGE_RISING:
+            length = snprintf(bu, sizeof(bu), "rising");
+            break;
+        case MAA_GPIO_EDGE_FALLING:
+            length = snprintf(bu, sizeof(bu), "falling");
+            break;
+        default:
+            fclose(edge);
+            return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    }
+    fwrite(bu, sizeof(char), length, edge);
+
+    fclose(edge);
+    dev->value_fp = NULL;
+    return MAA_SUCCESS;
+}
+
+maa_result_t
+maa_gpio_isr(maa_gpio_context *dev, gpio_edge_t mode, void (*fptr)(void))
+{
+    maa_gpio_edge_mode(dev, mode);
+    dev->isr = fptr;
+    pthread_create (&dev->thread_id, NULL, maa_gpio_interrupt_handler, (void *) dev);
+
+    return MAA_SUCCESS;
+}
+
+maa_result_t
+maa_gpio_isr_exit(maa_gpio_context *dev)
+{
+    maa_result_t ret = MAA_SUCCESS;
+    maa_gpio_edge_mode(dev, MAA_GPIO_EDGE_NONE);
+
+    if (pthread_kill(dev->thread_id) != 0) {
+       ret = MAA_ERROR_INVALID_HANDLE;
+    }
+    if (close(dev->isr_value_fp) != 0) {
+       ret = MAA_ERROR_INVALID_PARAMETER;
+    }
+
+    return ret;
 }
 
 maa_result_t
@@ -210,6 +329,8 @@ maa_gpio_unexport(maa_gpio_context *dev)
     int length = snprintf(bu, sizeof(bu), "%d", dev->pin);
     fwrite(bu, sizeof(char), length, unexport_f);
     fclose(unexport_f);
+
+    maa_gpio_isr_exit(dev);
 
     return MAA_SUCCESS;
 }

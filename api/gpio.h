@@ -35,15 +35,20 @@ extern "C" {
 #endif
 
 #include <stdio.h>
+#include <pthread.h>
 
 #include "maa.h"
 /**
  * A strucutre representing a gpio pin.
  */
+
 typedef struct {
     /*@{*/
     int pin; /**< the pin number, as known to the os. */
     FILE *value_fp; /**< the file pointer to the value of the gpio */
+    void (* isr)(); /**< the interupt service request */
+    pthread_t thread_id; /**< the isr handler thread id */
+    int isr_value_fp; /**< the isr file pointer on the value */
     /*@}*/
 } maa_gpio_context;
 
@@ -65,6 +70,13 @@ typedef enum {
     MAA_GPIO_IN     = 1  /**< Input. */
 } gpio_dir_t;
 
+typedef enum {
+    MAA_GPIO_EDGE_NONE    = 0, /**< No interrupt on GPIO */
+    MAA_GPIO_EDGE_BOTH    = 1, /**< Interupt on rising & falling */
+    MAA_GPIO_EDGE_RISING  = 2, /**< Interupt on rising only */
+    MAA_GPIO_EDGE_FALLING = 3  /**< Interupt on falling only */
+} gpio_edge_t;
+
 /** Initialise gpio_context, based on board number
  *
  *  @param pin pin number read from the board, i.e IO3 is 3.
@@ -81,6 +93,37 @@ maa_gpio_context* maa_gpio_init(int pin);
  * @return gpio context
  */
 maa_gpio_context* maa_gpio_init_raw(int gpiopin);
+
+/** Set the edge mode on the gpio
+ *
+ * @param dev The GPIO context
+ * @param mode The edge mode to set the gpio into
+ *
+ * @return maa result type.
+ */
+maa_result_t maa_gpio_edge_mode(maa_gpio_context *dev, gpio_edge_t mode);
+
+/** Set an interupt on pin
+ *
+ * @param dev The GPIO context
+ * @param mode The edge mode to set the gpio into
+ * @param fptr Function pointer to function to be called when interupt is
+ * triggered
+ *
+ * @return maa result type.
+ */
+maa_result_t
+maa_gpio_isr(maa_gpio_context *dev, gpio_edge_t edge, void (*fptr)(void));
+
+/** Stop the current interupt watcher on this GPIO, and set the GPIO edge mode
+ * to MAA_GPIO_EDGE_NONE.
+ *
+ * @param dev The GPIO context.
+ *
+ * @return maa result type.
+ */
+maa_result_t
+maa_gpio_isr_exit(maa_gpio_context *dev);
 
 /** Set GPIO Output Mode,
  *

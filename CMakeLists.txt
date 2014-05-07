@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.8)
 project (maa)
 
+FIND_PACKAGE (Threads)
+
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
 
