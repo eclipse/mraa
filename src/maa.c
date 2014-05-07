@@ -216,3 +216,45 @@ maa_result_print(maa_result_t result)
                           break;
     }
 }
+
+maa_boolean_t
+maa_pin_mode_test(int pin, maa_pinmodes_t mode)
+{
+    if (pin > plat->phy_pin_count || pin < 0)
+        return 0;
+
+    switch(mode) {
+        case MAA_PIN_VALID:
+            if (plat->pins[pin].capabilites.valid == 1)
+                return 1;
+            break;
+        case MAA_PIN_GPIO:
+            if (plat->pins[pin].capabilites.gpio ==1)
+                return 1;
+            break;
+        case MAA_PIN_PWM:
+            if (plat->pins[pin].capabilites.pwm ==1)
+                return 1;
+            break;
+        case MAA_PIN_FAST_GPIO:
+            if (plat->pins[pin].capabilites.fast_gpio ==1)
+                return 1;
+            break;
+        case MAA_PIN_SPI:
+            if (plat->pins[pin].capabilites.spi ==1)
+                return 1;
+            break;
+        case MAA_PIN_I2C:
+            if (plat->pins[pin].capabilites.i2c ==1)
+                return 1;
+            break;
+        case MAA_PIN_AIO:
+            if (pin < plat->aio_count)
+                pin = pin + plat->gpio_count;
+            if (plat->pins[pin].capabilites.aio ==1)
+                return 1;
+            break;
+        default: break;
+    }
+    return 0;
+}
