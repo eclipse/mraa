@@ -220,6 +220,11 @@ maa_result_print(maa_result_t result)
 maa_boolean_t
 maa_pin_mode_test(int pin, maa_pinmodes_t mode)
 {
+    if (plat == NULL) {
+        maa_init();
+        if (plat == NULL)
+            return 0;
+    }
     if (pin > plat->phy_pin_count || pin < 0)
         return 0;
 
