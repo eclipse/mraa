@@ -31,16 +31,15 @@ int main ()
     maa_init();
     maa_aio_context* adc_a0;
     unsigned int adc_value = 0;
-    int i = 0;
 
     adc_a0 = maa_aio_init(0);
     if (adc_a0 == NULL) {
         return 1;
     }
 
-    for(i = 0; i < 10; i++) {
+    for(;;) {
         adc_value = maa_aio_read_u16(adc_a0);
-        fprintf(stdout, "ADC A0 read %X\n", adc_value);
+        fprintf(stdout, "ADC A0 read %X - %d\n", adc_value, adc_value);
     }
 
     maa_aio_close(adc_a0);
