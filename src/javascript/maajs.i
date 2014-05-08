@@ -1,7 +1,4 @@
 %module (docstring="Javascript interface to libmaa") maajs
-%{
-    #include "maa.h"
-%}
 
 %include <node.i>
 

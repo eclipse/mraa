@@ -22,8 +22,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var m = require("maajs")
-m.init();
+var m = require("./maajs")
 console.log("maa version: " + m.get_version());
 
-var r = new m.I2C(20, 21);
+var x = new m.Gpio(8)
+x.dir(m.MAA_GPIO_OUT)
+x.write(1)
