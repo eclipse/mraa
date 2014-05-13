@@ -226,6 +226,7 @@ maa_pwm_unexport(maa_pwm_context* dev)
     fclose(unexport_f);
     if (ferror(unexport_f) != 0)
         return MAA_ERROR_INVALID_RESOURCE;
+    return MAA_SUCCESS;
 }
 
 maa_result_t
