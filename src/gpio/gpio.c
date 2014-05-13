@@ -140,7 +140,7 @@ maa_gpio_interrupt_handler(void* arg)
         } else {
 	    // we must have got an error code so die nicely
             close(dev->isr_value_fp);
-	    return;
+	    return NULL;
         }
     }
 }
