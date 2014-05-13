@@ -53,7 +53,7 @@ maa_aio_context* maa_aio_init(unsigned int aio_channel)
 {
     maa_aio_context* dev;
 
-    unsigned int checked_pin = maa_check_aio(aio_channel);
+    int checked_pin = maa_check_aio(aio_channel);
     if (checked_pin < 0) {
         switch(checked_pin) {
             case -1:
