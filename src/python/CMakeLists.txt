@@ -9,6 +9,8 @@ include_directories(
 swig_add_module (pymaa python pymaa.i ${maa_LIB_SRCS})
 swig_link_libraries (pymaa ${PYTHON_LIBRARIES})
 
+set (CMAKE_C_FLAGS -DSWIG=${SWIG_FOUND})
+
 if (DOXYGEN_FOUND)
   foreach (_file ${DOCFILES})
     add_dependencies (${SWIG_MODULE_pymaa_REAL_NAME} ${_file}doc_i)

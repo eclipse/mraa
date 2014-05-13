@@ -124,7 +124,19 @@ maa_gpio_interrupt_handler(void* arg)
     for (;;) {
         ret = maa_gpio_wait_interrupt(dev->isr_value_fp);
         if (ret == MAA_SUCCESS) {
+#ifdef SWIG
+            // In order to call a python object (all python functions are objects) we
+            // need to aquire the GIL (Global Interpreter Lock). This may not always be
+            // nessecary but especially if doing IO (like print()) python will segfault
+            // if we do not hold a lock on the GIL
+            PyGILState_STATE gilstate = PyGILState_Ensure();
+
+            PyEval_CallObject(dev->isr, NULL);
+
+            PyGILState_Release (gilstate);
+#else
             dev->isr();
+#endif
         } else {
 	    // we must have got an error code so die nicely
             close(dev->isr_value_fp);
@@ -189,6 +201,11 @@ maa_result_t
 maa_gpio_isr_exit(maa_gpio_context *dev)
 {
     maa_result_t ret = MAA_SUCCESS;
+
+#ifdef SWIG
+    // Dereference our Python call back function
+    Py_DECREF(dev->isr);
+#endif
 
     if (dev->thread_id == 0) {
         return ret;

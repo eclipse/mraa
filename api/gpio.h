@@ -34,6 +34,10 @@
 extern "C" {
 #endif
 
+#ifdef SWIG
+#include <Python.h>
+#endif
+
 #include <stdio.h>
 #include <pthread.h>
 
@@ -46,7 +50,11 @@ typedef struct {
     /*@{*/
     int pin; /**< the pin number, as known to the os. */
     int value_fp; /**< the file pointer to the value of the gpio */
+#ifdef SWIG
+    PyObject *isr; /**< the interupt service request */
+#else
     void (* isr)(); /**< the interupt service request */
+#endif
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */
     /*@}*/

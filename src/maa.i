@@ -8,6 +8,7 @@
 %}
 
 %init %{
+    //Adding maa_init() to the module initialisation process
     maa_init();
 %}
 
@@ -45,8 +46,18 @@ typedef struct {
     /*@{*/
     int pin; /**< the pin number, as known to the os. */
     FILE *value_fp; /**< the file pointer to the value of the gpio */
+#if defined(SWIGPYTHON)
+    PyObject *isr; /**< the interupt service request */
+#endif
+    pthread_t thread_id; /**< the isr handler thread id */
+    int isr_value_fp; /**< the isr file pointer on the value */
     /*@}*/
 } maa_gpio_context;
+
+%typemap(check) PyObject *pyfunc {
+  if (!PyCallable_Check($1))
+    SWIG_exception(SWIG_TypeError,"Expected function.");
+}
 
 %extend maa_gpio_context {
   maa_gpio_context(int pin, int raw=0)
@@ -94,6 +105,22 @@ typedef struct {
   int mode(gpio_mode_t mode)
   {
     return maa_gpio_mode($self, mode);
+  }
+#if defined(SWIGPYTHON)
+  //set python method as the isr function
+  int set_isr(PyObject *pyfunc)
+  {
+    Py_INCREF(pyfunc);
+    // do a nasty cast to get away from the warnings
+    maa_gpio_isr(self, MAA_GPIO_EDGE_BOTH, pyfunc);
+    return 0;
+  }
+#else
+  %ignore maa_gpio_isr;
+#endif
+  int isr_exit()
+  {
+    maa_gpio_isr_exit(self);
   }
 }
 

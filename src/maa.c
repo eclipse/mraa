@@ -55,6 +55,12 @@ maa_init()
     if (plat != NULL) {
         return MAA_ERROR_PLATFORM_ALREADY_INITIALISED;
     }
+#ifdef SWIG
+    // Initialise python threads, this allows use to grab the GIL when we are
+    // required to do so
+    Py_InitializeEx(0);
+    PyEval_InitThreads();
+#endif
     plat = maa_intel_galileo_rev_d();
     return MAA_SUCCESS;
 }
