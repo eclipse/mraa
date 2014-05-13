@@ -55,7 +55,7 @@ maa_init()
     if (plat != NULL) {
         return MAA_ERROR_PLATFORM_ALREADY_INITIALISED;
     }
-#ifdef SWIG
+#ifdef SWIGPYTHON
     // Initialise python threads, this allows use to grab the GIL when we are
     // required to do so
     Py_InitializeEx(0);

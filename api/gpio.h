@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-#ifdef SWIG
+#ifdef SWIGPYTHON
 #include <Python.h>
 #endif
 
@@ -50,7 +50,7 @@ typedef struct {
     /*@{*/
     int pin; /**< the pin number, as known to the os. */
     int value_fp; /**< the file pointer to the value of the gpio */
-#ifdef SWIG
+#ifdef SWIGPYTHON
     PyObject *isr; /**< the interupt service request */
 #else
     void (* isr)(); /**< the interupt service request */
