@@ -31,17 +31,21 @@ int
 main(int argc, char **argv)
 {
     maa_init();
-    fprintf(stdout, "MAA Version: %s\nStarting Blinking on IO8\n",
+    fprintf(stdout, "MAA Version: %s\nStarting Read on IO6\n",
             maa_get_version());
-    maa_gpio_context* gpio;
-    gpio = maa_gpio_init(8);
-    maa_gpio_dir(gpio, MAA_GPIO_OUT);
 
-    while (1) {
-        maa_gpio_write(gpio, 0);
-        sleep(1);
-        maa_gpio_write(gpio, 1);
+    maa_gpio_context* gpio;
+
+    gpio = maa_gpio_init(6);
+
+    maa_gpio_dir(gpio, MAA_GPIO_IN);
+
+    for (;;) {
+        fprintf(stdout, "Gpio is %d\n", maa_gpio_read(gpio));
         sleep(1);
     }
+
+    maa_gpio_close(gpio);
+
     return 0;
 }

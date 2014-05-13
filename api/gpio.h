@@ -45,7 +45,7 @@ extern "C" {
 typedef struct {
     /*@{*/
     int pin; /**< the pin number, as known to the os. */
-    FILE *value_fp; /**< the file pointer to the value of the gpio */
+    int value_fp; /**< the file pointer to the value of the gpio */
     void (* isr)(); /**< the interupt service request */
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */

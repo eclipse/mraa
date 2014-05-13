@@ -40,7 +40,8 @@ maa_gpio_get_valfp(maa_gpio_context *dev)
     char bu[MAX_SIZE];
     sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
 
-    if ((dev->value_fp = fopen(bu, "r+b")) == NULL) {
+    dev->value_fp = open(bu, O_RDWR);
+    if (dev->value_fp == -1) {
         return MAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -69,6 +70,7 @@ maa_gpio_init_raw(int pin)
 
     maa_gpio_context* dev = (maa_gpio_context*) malloc(sizeof(maa_gpio_context));
     memset(dev, 0, sizeof(maa_gpio_context));
+    dev->value_fp = -1;
     dev->pin = pin;
 
     if ((export_f = fopen(SYSFS_CLASS_GPIO "/export", "w")) == NULL) {
@@ -134,8 +136,9 @@ maa_gpio_interrupt_handler(void* arg)
 maa_result_t
 maa_gpio_edge_mode(maa_gpio_context *dev, gpio_edge_t mode)
 {
-    if (dev->value_fp != NULL) {
-         dev->value_fp = NULL;
+    if (dev->value_fp != -1) {
+         close(dev->value_fp);
+         dev->value_fp = -1;
     }
 
     char filepath[MAX_SIZE];
@@ -169,7 +172,6 @@ maa_gpio_edge_mode(maa_gpio_context *dev, gpio_edge_t mode)
     fwrite(bu, sizeof(char), length, edge);
 
     fclose(edge);
-    dev->value_fp = NULL;
     return MAA_SUCCESS;
 }
 
@@ -210,8 +212,9 @@ maa_gpio_isr_exit(maa_gpio_context *dev)
 maa_result_t
 maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode)
 {
-    if (dev->value_fp != NULL) {
-         dev->value_fp = NULL;
+    if (dev->value_fp != -1) {
+         close(dev->value_fp);
+         dev->value_fp = -1;
     }
 
     char filepath[MAX_SIZE];
@@ -245,17 +248,18 @@ maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode)
     fwrite(bu, sizeof(char), length, drive);
 
     fclose(drive);
-    dev->value_fp = NULL;
     return MAA_SUCCESS;
 }
 
 maa_result_t
 maa_gpio_dir(maa_gpio_context *dev, gpio_dir_t dir)
 {
-    if (dev == NULL)
+    if (dev == NULL) {
         return MAA_ERROR_INVALID_HANDLE;
-    if (dev->value_fp != NULL) {
-         dev->value_fp = NULL;
+    }
+    if (dev->value_fp != -1) {
+         close(dev->value_fp);
+         dev->value_fp = -1;
     }
     char filepath[MAX_SIZE];
     snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/direction", dev->pin);
@@ -282,20 +286,26 @@ maa_gpio_dir(maa_gpio_context *dev, gpio_dir_t dir)
     fwrite(bu, sizeof(char), length, direction);
 
     fclose(direction);
-    dev->value_fp = NULL;
     return MAA_SUCCESS;
 }
 
 int
 maa_gpio_read(maa_gpio_context *dev)
 {
-    if (dev->value_fp == NULL) {
-        maa_gpio_get_valfp(dev);
+    if (dev->value_fp == -1) {
+        if (maa_gpio_get_valfp(dev) != MAA_SUCCESS) {
+             fprintf(stderr, "Failed to get value file pointer\n");
+        }
     }
-    fseek(dev->value_fp, SEEK_SET, 0);
+    else {
+        // if value_fp is new this is pointless
+        lseek(dev->value_fp, 0, SEEK_SET);
+    }
     char bu[2];
-    fread(bu, 2, 1, dev->value_fp);
-    fseek(dev->value_fp, SEEK_SET, 0);
+    if (read(dev->value_fp, bu, 2*sizeof(char)) != 2) {
+        fprintf(stderr, "Failed to read a sensible value from sysfs");
+    }
+    lseek(dev->value_fp, 0, SEEK_SET);
     int ret = strtol(bu, NULL, 10);
 
     return ret;
@@ -304,22 +314,19 @@ maa_gpio_read(maa_gpio_context *dev)
 maa_result_t
 maa_gpio_write(maa_gpio_context *dev, int value)
 {
-    if (dev->value_fp == NULL) {
+    if (dev->value_fp == -1) {
         maa_gpio_get_valfp(dev);
     }
-    if (fseek(dev->value_fp, SEEK_SET, 0) != 0) {
+    if (lseek(dev->value_fp, 0, SEEK_SET) == -1) {
         return MAA_ERROR_INVALID_RESOURCE;
     }
 
     char bu[MAX_SIZE];
     int length = snprintf(bu, sizeof(bu), "%d", value);
-    fwrite(bu, sizeof(char), length, dev->value_fp);
-
-    if (fseek(dev->value_fp, SEEK_SET, 0) != 0) {
-        return MAA_ERROR_INVALID_RESOURCE;
+    if (write(dev->value_fp, bu, length*sizeof(char)) == -1) {
+        return MAA_ERROR_INVALID_HANDLE;
     }
-    if (ferror(dev->value_fp) != 0)
-        return MAA_ERROR_INVALID_RESOURCE;
+
     return MAA_SUCCESS;
 }
 
@@ -346,10 +353,9 @@ maa_gpio_unexport(maa_gpio_context *dev)
 maa_result_t
 maa_gpio_close(maa_gpio_context *dev)
 {
-    if (ferror(dev->value_fp) != 0) {
-        return MAA_ERROR_INVALID_RESOURCE;
+    if (dev->value_fp != -1) {
+        close(dev->value_fp);
     }
-
     maa_gpio_unexport(dev);
     free(dev);
     return MAA_SUCCESS;
