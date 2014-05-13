@@ -28,7 +28,7 @@
 maa_i2c_context*
 maa_i2c_init(int bus)
 {
-    unsigned int checked_pin = maa_check_i2c(bus);
+    int checked_pin = maa_check_i2c(bus);
     if (checked_pin < 0) {
         switch(checked_pin) {
             case -1:
@@ -43,16 +43,12 @@ maa_i2c_init(int bus)
             default: return NULL;
         }
     }
-    return maa_i2c_init_raw(checked_pin);
+    return maa_i2c_init_raw((unsigned int) checked_pin);
 }
 
 maa_i2c_context*
 maa_i2c_init_raw(unsigned int bus)
 {
-    if (bus < 0) {
-        fprintf(stderr, "Bus -%u- bellow zero\n", bus);
-        return NULL;
-    }
     maa_i2c_context* dev = (maa_i2c_context*) malloc(sizeof(maa_i2c_context));
     if (dev == NULL)
         return NULL;
