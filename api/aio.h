@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 #include <stdio.h>
-#include <fcntl.h>
+#include <unistd.h>
 
 #include "maa.h"
 #include "gpio.h"
@@ -44,7 +44,7 @@ extern "C" {
 
 typedef struct {
     unsigned int channel;
-    FILE *adc_in_fp;
+    int adc_in_fp;
 } maa_aio_context;
 
 /** Initialise an Analog input device, connected to the specified pin

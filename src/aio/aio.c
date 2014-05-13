@@ -23,6 +23,7 @@
  */
 
 #include <stdlib.h>
+#include <fcntl.h>
 
 #include "aio.h"
 
@@ -34,7 +35,8 @@ static maa_result_t aio_get_valid_fp(maa_aio_context* dev)
     snprintf(file_path, 64, "/sys/bus/iio/devices/iio:device0/in_voltage%d_raw",
         dev->channel );
 
-    if (NULL == (dev->adc_in_fp = fopen(file_path, "r"))) {
+    dev->adc_in_fp = open(file_path, O_RDONLY);
+    if (dev->adc_in_fp == -1) {
 	fprintf(stderr, "Failed to open Analog input raw file %s for "
 	    "reading!\n", file_path); return( MAA_ERROR_INVALID_RESOURCE);
     }
@@ -106,13 +108,15 @@ unsigned int maa_aio_read_u16(maa_aio_context* dev)
     unsigned int analog_value=0;
     unsigned int shifter_value=0;
 
-    if (NULL == dev->adc_in_fp) {
+    if (dev->adc_in_fp == -1) {
         aio_get_valid_fp(dev);
     }
 
-    fseek(dev->adc_in_fp, SEEK_SET, 0);
-    fread(buffer, sizeof(buffer), 1, dev->adc_in_fp);
-    fseek(dev->adc_in_fp, SEEK_SET, 0);
+    lseek(dev->adc_in_fp, 0, SEEK_SET);
+    if (read(dev->adc_in_fp, buffer, sizeof(buffer)) < 1) {
+        fprintf(stderr, "Failed to read a sensible value");
+    }
+    lseek(dev->adc_in_fp, 0, SEEK_SET);
 
     raw_value = atoi(buffer);
 
