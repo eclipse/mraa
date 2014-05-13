@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #include "aio.h"
 
@@ -103,10 +104,9 @@ maa_aio_context* maa_aio_init(unsigned int aio_channel)
  */
 unsigned int maa_aio_read_u16(maa_aio_context* dev)
 {
-    char buffer[16] = "";
-    unsigned int raw_value=0;
-    unsigned int analog_value=0;
-    unsigned int shifter_value=0;
+    char buffer[16];
+    unsigned int analog_value = 0;
+    unsigned int shifter_value = 0;
 
     if (dev->adc_in_fp == -1) {
         aio_get_valid_fp(dev);
@@ -114,11 +114,20 @@ unsigned int maa_aio_read_u16(maa_aio_context* dev)
 
     lseek(dev->adc_in_fp, 0, SEEK_SET);
     if (read(dev->adc_in_fp, buffer, sizeof(buffer)) < 1) {
-        fprintf(stderr, "Failed to read a sensible value");
+        fprintf(stderr, "Failed to read a sensible value\n");
     }
     lseek(dev->adc_in_fp, 0, SEEK_SET);
 
-    raw_value = atoi(buffer);
+    errno = 0;
+    char *end;
+    const long value = strtoul(buffer, &end, 10);
+    if (end == &buffer[0]) {
+        fprintf(stderr, "%s is not a decimal number\n", buffer);
+    }
+    else if (errno != 0) {
+        fprintf(stderr, "errno was set\n");
+    }
+    unsigned int raw_value = (unsigned int) value;
 
     /* Adjust the raw analog input reading to supported resolution value*/
     if (ADC_RAW_RESOLUTION_BITS == ADC_SUPPORTED_RESOLUTION_BITS) {
