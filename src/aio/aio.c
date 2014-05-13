@@ -57,15 +57,15 @@ maa_aio_context* maa_aio_init(unsigned int aio_channel)
     if (checked_pin < 0) {
         switch(checked_pin) {
             case -1:
-                fprintf(stderr, "Invalid Analog  input channel %d specified!\n",
+                fprintf(stderr, "Invalid analog input channel %d specified\n",
 	                    aio_channel);
                 return NULL;
             case -2:
-                fprintf(stderr, "Failed to set-up  Analog  input channel %d "
-                        "multiplexer!\n", aio_channel);
+                fprintf(stderr, "Failed to set-up analog input channel %d "
+                        "multiplexer\n", aio_channel);
                 return NULL;
             case -3:
-                fprintf(stderr, "Platform Not Initialised");
+                fprintf(stderr, "Platform not initialised");
                 return NULL;
             default: return NULL;
         }
@@ -73,9 +73,9 @@ maa_aio_context* maa_aio_init(unsigned int aio_channel)
 
     //Create ADC device connected to specified channel
     dev = (maa_aio_context*) malloc(sizeof(maa_aio_context));
-    if (NULL == dev) {
-    fprintf(stderr, "Insufficient memory for specified Analog input channel "
-            "%d !\n", aio_channel);
+    if (dev == NULL) {
+        fprintf(stderr, "Insufficient memory for specified Analog input channel "
+            "%d\n", aio_channel);
         return NULL;
     }
     dev->channel = checked_pin;
