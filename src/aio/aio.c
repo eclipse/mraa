@@ -99,10 +99,10 @@ maa_aio_context* maa_aio_init(unsigned int aio_channel)
  * maa_aio_init()
  *
  * @returns
- *   16-bit unsigned int representing the current input voltage, normalised to
+ *   unsigned 16 bit int representing the current input voltage, normalised to
  *   a 16-bit value
  */
-unsigned int maa_aio_read_u16(maa_aio_context* dev)
+uint16_t maa_aio_read(maa_aio_context* dev)
 {
     char buffer[16];
     unsigned int analog_value = 0;

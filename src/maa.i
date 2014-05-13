@@ -289,6 +289,6 @@ typedef struct {
   }
   unsigned int read()
   {
-    return maa_aio_read_u16($self);
+    return maa_aio_read($self);
   }
 }

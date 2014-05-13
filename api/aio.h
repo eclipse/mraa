@@ -35,6 +35,7 @@ extern "C" {
 
 #include <stdio.h>
 #include <unistd.h>
+#include <stdint.h>
 
 #include "maa.h"
 #include "gpio.h"
@@ -65,7 +66,7 @@ maa_aio_context* maa_aio_init(unsigned int aio_channel);
  * @returns 16-bit unsigned integer representing the current input voltage,
  * normalised to a 16-bit value
  */
-unsigned int maa_aio_read_u16(maa_aio_context* dev);
+uint16_t maa_aio_read(maa_aio_context* dev);
 
 /** Close the analog input context
  * - Will free the memory for the context.
