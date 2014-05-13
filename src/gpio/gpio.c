@@ -29,6 +29,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <poll.h>
+#include <pthread.h>
+#include <signal.h>
 
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
 #define MAX_SIZE 64
@@ -211,7 +213,7 @@ maa_gpio_isr_exit(maa_gpio_context *dev)
         return ret;
     }
 
-    if (pthread_kill(dev->thread_id) != 0) {
+    if (pthread_kill(dev->thread_id, SIGTERM) != 0) {
        ret = MAA_ERROR_INVALID_HANDLE;
     }
     if (close(dev->isr_value_fp) != 0) {
