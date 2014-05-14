@@ -14,7 +14,7 @@ include (GetGitRevisionDescription)
 git_describe (VERSION "--tags")
 if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND")
   message (WARNING " - Install git to compile a production libmaa!")
-  set (VERSION "v0.2.2-dirty")
+  set (VERSION "v0.2.3-dirty")
 endif ()
 
 message (INFO " - MAA Version ${VERSION}")
