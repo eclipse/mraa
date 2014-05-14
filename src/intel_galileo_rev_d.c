@@ -261,7 +261,7 @@ maa_intel_galileo_rev_d()
 
     b->spi_bus_count = 1;
     b->def_spi_bus = 0;
-    b->spi_bus[0].bus_id = 1;
+    b->spi_bus[0].bus_id = 1.0;
     b->spi_bus[0].cs = 10;
     b->spi_bus[0].mosi = 11;
     b->spi_bus[0].miso = 12;
