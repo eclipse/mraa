@@ -143,6 +143,36 @@ maa_check_i2c(int bus_s)
     return plat->i2c_bus[bus].bus_id;
 }
 
+double
+maa_check_spi(int bus_s)
+{
+    if (plat == NULL)
+        return -3;
+
+    if (plat->i2c_bus_count >! 0) {
+        fprintf(stderr, "No spi buses defined in platform");
+        return -1;
+    }
+    int bus = 0;
+
+    int pos = plat->spi_bus[0].sclk;
+    if (plat->pins[pos].spi.mux_total > 0)
+        if (maa_setup_mux_mapped(plat->pins[pos].spi) != MAA_SUCCESS)
+             return -2;
+
+    pos = plat->spi_bus[0].mosi;
+    if (plat->pins[pos].spi.mux_total > 0)
+        if (maa_setup_mux_mapped(plat->pins[pos].spi) != MAA_SUCCESS)
+             return -2;
+
+    pos = plat->spi_bus[0].miso;
+    if (plat->pins[pos].spi.mux_total > 0)
+        if (maa_setup_mux_mapped(plat->pins[pos].spi) != MAA_SUCCESS)
+             return -2;
+
+    return plat->spi_bus[bus].bus_id;
+}
+
 maa_pin_t*
 maa_check_pwm(int pin)
 {
