@@ -62,6 +62,10 @@ main(int argc, char **argv)
 
     maa_gpio_context* gpio;
     gpio = maa_gpio_init(iopin);
+    if (gpio == NULL) {
+        fprintf(stderr, "Are you sure that pin%d you requested is valid on your platform?", iopin);
+	exit(1);
+    }
     printf("Initialised pin%d which is atually pin%d\n", iopin, gpio->pin);
 
     // set direction to OUT
