@@ -9,7 +9,6 @@ set (NODE_INCLUDE_DIRS
 
 include_directories (
   ${NODE_INCLUDE_DIRS}                                                                                                                                                        
-  /usr/include/node
   ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
