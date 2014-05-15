@@ -43,10 +43,10 @@ extern "C" {
 #define ADC_RAW_RESOLUTION_BITS         (12)
 #define ADC_SUPPORTED_RESOLUTION_BITS   (10)
 
-typedef struct {
-    unsigned int channel;
-    int adc_in_fp;
-} maa_aio_context;
+/**
+ * Opaque pointer definition to the internal struct _aio
+ */
+typedef struct _aio* maa_aio_context;
 
 /** Initialise an Analog input device, connected to the specified pin
  *
@@ -55,7 +55,7 @@ typedef struct {
  * @returns pointer to maa_aio_context structure after initialisation of Analog
  * input pin successfully, else returns null.
  */
-maa_aio_context* maa_aio_init(unsigned int aio_channel);
+maa_aio_context maa_aio_init(unsigned int aio_channel);
 
 /** Read the input voltage, represented as an unsigned short in the range [0x0,
  * 0xFFFF]
@@ -66,7 +66,7 @@ maa_aio_context* maa_aio_init(unsigned int aio_channel);
  * @returns 16-bit unsigned integer representing the current input voltage,
  * normalised to a 16-bit value
  */
-uint16_t maa_aio_read(maa_aio_context* dev);
+uint16_t maa_aio_read(maa_aio_context dev);
 
 /** Close the analog input context
  * - Will free the memory for the context.
@@ -76,7 +76,7 @@ uint16_t maa_aio_read(maa_aio_context* dev);
  *
  * @return maa_result_t - result type.
  */
-maa_result_t maa_aio_close(maa_aio_context* dev);
+maa_result_t maa_aio_close(maa_aio_context dev);
 
 #ifdef __cplusplus
 }

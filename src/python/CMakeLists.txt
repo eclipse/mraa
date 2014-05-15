@@ -6,6 +6,7 @@ include_directories(
   ${PYTHON_INCLUDE_DIRS}
 )
 
+set_source_files_properties (pymaa.i PROPERTIES CPLUSPLUS ON)
 swig_add_module (pymaa python pymaa.i ${maa_LIB_SRCS})
 swig_link_libraries (pymaa ${PYTHON_LIBRARIES})
 

@@ -6,7 +6,7 @@ add_executable (analogin_a0 analogin_a0.c)
 add_executable (isr_pin6 isr_pin6.c)
 add_executable (gpio_read6 gpio_read6.c)
 
-include_directories(${PROJECT_SOURCE_DIR}/api ${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/api)
 
 target_link_libraries (hellomaa maa)
 target_link_libraries (i2c_HMC5883L maa m)
@@ -15,3 +15,5 @@ target_link_libraries (blink-io maa)
 target_link_libraries (analogin_a0 maa)
 target_link_libraries (isr_pin6 maa)
 target_link_libraries (gpio_read6 maa)
+
+add_subdirectory (c++)

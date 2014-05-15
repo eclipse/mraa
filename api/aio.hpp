@@ -1,5 +1,5 @@
 /*
- * Author: Nandkishor Sonar
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -22,27 +22,30 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <unistd.h>
+#pragma once
+/** @file
+ *
+ * This file defines the aio C++ interface for libmaa
+ *
+ */
 
 #include "aio.h"
 
-int main ()
-{
-    maa_init();
-    maa_aio_context adc_a0;
-    uint16_t adc_value = 0;
+namespace maa {
 
-    adc_a0 = maa_aio_init(0);
-    if (adc_a0 == NULL) {
-        return 1;
-    }
+class Aio {
+    public:
+        Aio(unsigned int pin) {
+            m_aio = maa_aio_init(pin);
+        }
+        ~Aio() {
+            maa_aio_close(m_aio);
+        }
+        uint16_t read() {
+            return maa_aio_read(m_aio);
+        }
+    private:
+        maa_aio_context m_aio;
+};
 
-    for(;;) {
-        adc_value = maa_aio_read(adc_a0);
-        fprintf(stdout, "ADC A0 read %X - %d\n", adc_value, adc_value);
-    }
-
-    maa_aio_close(adc_a0);
-
-    return MAA_SUCCESS;
 }

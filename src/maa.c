@@ -24,7 +24,6 @@
  */
 
 #include <stddef.h>
-#include <stdlib.h>
 
 #include "maa.h"
 #include "intel_galileo_rev_d.h"

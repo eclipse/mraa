@@ -28,7 +28,12 @@
 
 #include "aio.h"
 
-static maa_result_t aio_get_valid_fp(maa_aio_context* dev)
+struct _aio {
+    unsigned int channel;
+    int adc_in_fp;
+};
+
+static maa_result_t aio_get_valid_fp(maa_aio_context dev)
 {
     char file_path[64]= "";
 
@@ -52,10 +57,8 @@ static maa_result_t aio_get_valid_fp(maa_aio_context* dev)
  * @returns pointer to maa_aio_context structure  after initialisation of
  * Analog input pin connected to the device successfully, else returns NULL.
  */
-maa_aio_context* maa_aio_init(unsigned int aio_channel)
+maa_aio_context maa_aio_init(unsigned int aio_channel)
 {
-    maa_aio_context* dev;
-
     int checked_pin = maa_check_aio(aio_channel);
     if (checked_pin < 0) {
         switch(checked_pin) {
@@ -75,7 +78,7 @@ maa_aio_context* maa_aio_init(unsigned int aio_channel)
     }
 
     //Create ADC device connected to specified channel
-    dev = (maa_aio_context*) malloc(sizeof(maa_aio_context));
+    maa_aio_context dev = malloc(sizeof(struct _aio));
     if (dev == NULL) {
         fprintf(stderr, "Insufficient memory for specified Analog input channel "
             "%d\n", aio_channel);
@@ -102,7 +105,7 @@ maa_aio_context* maa_aio_init(unsigned int aio_channel)
  *   unsigned 16 bit int representing the current input voltage, normalised to
  *   a 16-bit value
  */
-uint16_t maa_aio_read(maa_aio_context* dev)
+uint16_t maa_aio_read(maa_aio_context dev)
 {
     char buffer[16];
     unsigned int analog_value = 0;
@@ -152,7 +155,7 @@ uint16_t maa_aio_read(maa_aio_context* dev)
  *
  * @return maa result type.
  */
-maa_result_t maa_aio_close(maa_aio_context* dev)
+maa_result_t maa_aio_close(maa_aio_context dev)
 {
     if (NULL != dev)
         free(dev);

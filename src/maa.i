@@ -4,7 +4,7 @@
     #include "pwm.h"
     #include "i2c.h"
     #include "spi.h"
-    #include "aio.h"
+    #include "aio.hpp"
 %}
 
 %init %{
@@ -112,7 +112,7 @@ typedef struct {
   {
     Py_INCREF(pyfunc);
     // do a nasty cast to get away from the warnings
-    maa_gpio_isr(self, MAA_GPIO_EDGE_BOTH, pyfunc);
+    maa_gpio_isr(self, MAA_GPIO_EDGE_BOTH, (void (*) ()) pyfunc);
     return 0;
   }
 #else
@@ -270,25 +270,4 @@ typedef struct {
 
 #### AIO ####
 
-%rename(Aio) maa_aio_context;
-
-%ignore adc_in_fp;
-typedef struct {
-    unsigned int channel;
-    FILE *adc_in_fp;
-} maa_aio_context;
-
-%nodefault maa_aio_context;
-%extend maa_aio_context {
-  maa_aio_context(unsigned int aio_channel)
-  {
-    return maa_aio_init(aio_channel);
-  }
-  ~maa_aio_context()
-  {
-  }
-  unsigned int read()
-  {
-    return maa_aio_read($self);
-  }
-}
+%include "aio.hpp"

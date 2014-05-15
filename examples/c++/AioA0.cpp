@@ -1,5 +1,5 @@
 /*
- * Author: Nandkishor Sonar
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -22,27 +22,22 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <unistd.h>
-
-#include "aio.h"
+#include "aio.hpp"
 
 int main ()
 {
-    maa_init();
-    maa_aio_context adc_a0;
-    uint16_t adc_value = 0;
+    uint16_t adc_value;
+    maa::Aio* a0;
 
-    adc_a0 = maa_aio_init(0);
-    if (adc_a0 == NULL) {
-        return 1;
+    a0 = new maa::Aio(0);
+    if (a0 == NULL) {
+        return MAA_ERROR_UNSPECIFIED;
     }
 
     for(;;) {
-        adc_value = maa_aio_read(adc_a0);
+        adc_value = a0->read();
         fprintf(stdout, "ADC A0 read %X - %d\n", adc_value, adc_value);
     }
-
-    maa_aio_close(adc_a0);
 
     return MAA_SUCCESS;
 }
