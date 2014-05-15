@@ -73,6 +73,7 @@ maa_gpio_init_raw(int pin)
     maa_gpio_context* dev = (maa_gpio_context*) malloc(sizeof(maa_gpio_context));
     memset(dev, 0, sizeof(maa_gpio_context));
     dev->value_fp = -1;
+    dev->isr_value_fp = -1;
     dev->pin = pin;
 
     if ((export_f = fopen(SYSFS_CLASS_GPIO "/export", "w")) == NULL) {
@@ -103,7 +104,8 @@ maa_gpio_wait_interrupt(int fd)
         return MAA_ERROR_INVALID_RESOURCE;
     }
 
-    // Wait for it forever
+    // Wait for it forever or until pthread_cancel
+    // poll is a cancelable point like sleep()
     int x = poll (&pfd, 1, -1);
 
     // do a final read to clear interupt
@@ -126,6 +128,7 @@ maa_gpio_interrupt_handler(void* arg)
     for (;;) {
         ret = maa_gpio_wait_interrupt(dev->isr_value_fp);
         if (ret == MAA_SUCCESS) {
+            pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 #ifdef SWIGPYTHON
             // In order to call a python object (all python functions are objects) we
             // need to aquire the GIL (Global Interpreter Lock). This may not always be
@@ -139,9 +142,12 @@ maa_gpio_interrupt_handler(void* arg)
 #else
             dev->isr();
 #endif
+            pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
         } else {
 	    // we must have got an error code so die nicely
+            pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
             close(dev->isr_value_fp);
+            dev->isr_value_fp = -1;
 	    return NULL;
         }
     }
@@ -192,6 +198,11 @@ maa_gpio_edge_mode(maa_gpio_context *dev, gpio_edge_t mode)
 maa_result_t
 maa_gpio_isr(maa_gpio_context *dev, gpio_edge_t mode, void (*fptr)(void))
 {
+    // we only allow one isr per maa_gpio_context
+    if (dev->thread_id != 0) {
+        return MAA_ERROR_NO_RESOURCES;
+    }
+
     maa_gpio_edge_mode(dev, mode);
     dev->isr = fptr;
     pthread_create (&dev->thread_id, NULL, maa_gpio_interrupt_handler, (void *) dev);
@@ -204,26 +215,34 @@ maa_gpio_isr_exit(maa_gpio_context *dev)
 {
     maa_result_t ret = MAA_SUCCESS;
 
+    // wasting our time, there is no isr to exit from
+    if (dev->thread_id == 0 && dev->isr_value_fp == -1) {
+        return ret;
+    }
+
+    // stop isr being useful
+    ret = maa_gpio_edge_mode(dev, MAA_GPIO_EDGE_NONE);
+
+    if ((dev->thread_id != 0) &&
+        (pthread_cancel(dev->thread_id) != 0)) {
+        ret = MAA_ERROR_INVALID_HANDLE;
+    }
+
+    // close the filehandle in case it's still open
+    if (dev->isr_value_fp != -1) {
+          if (close(dev->isr_value_fp) != 0) {
+              ret = MAA_ERROR_INVALID_PARAMETER;
+          }
+    }
+
 #ifdef SWIGPYTHON
     // Dereference our Python call back function
     Py_DECREF(dev->isr);
 #endif
 
-    if (dev->thread_id == 0) {
-        return ret;
-    }
-
-    if (pthread_kill(dev->thread_id, SIGTERM) != 0) {
-       ret = MAA_ERROR_INVALID_HANDLE;
-    }
-    if (close(dev->isr_value_fp) != 0) {
-       ret = MAA_ERROR_INVALID_PARAMETER;
-    }
-
-    // this is only required if we had an isr setup
-    if (ret == MAA_SUCCESS) {
-       ret = maa_gpio_edge_mode(dev, MAA_GPIO_EDGE_NONE);
-    }
+    // assume our thread will exit either way we just lost it's handle
+    dev->thread_id = 0;
+    dev->isr_value_fp = -1;
 
     return ret;
 }
