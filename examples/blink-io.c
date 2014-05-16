@@ -60,13 +60,13 @@ main(int argc, char **argv)
     fprintf(stdout, "MAA Version: %s\nStarting Blinking on IO%d\n",
             maa_get_version(), iopin);
 
-    maa_gpio_context* gpio;
+    maa_gpio_context gpio;
     gpio = maa_gpio_init(iopin);
     if (gpio == NULL) {
         fprintf(stderr, "Are you sure that pin%d you requested is valid on your platform?", iopin);
 	exit(1);
     }
-    printf("Initialised pin%d which is atually pin%d\n", iopin, gpio->pin);
+    printf("Initialised pin%d\n", iopin);
 
     // set direction to OUT
     r = maa_gpio_dir(gpio, MAA_GPIO_OUT);

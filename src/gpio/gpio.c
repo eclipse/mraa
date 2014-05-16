@@ -36,8 +36,26 @@
 #define MAX_SIZE 64
 #define POLL_TIMEOUT
 
+/**
+ * A strucutre representing a gpio pin.
+ */
+
+struct _gpio {
+    /*@{*/
+    int pin; /**< the pin number, as known to the os. */
+    int value_fp; /**< the file pointer to the value of the gpio */
+#ifdef SWIGPYTHON
+    PyObject *isr; /**< the interupt service request */
+#else
+    void (* isr)(); /**< the interupt service request */
+#endif
+    pthread_t thread_id; /**< the isr handler thread id */
+    int isr_value_fp; /**< the isr file pointer on the value */
+    /*@}*/
+};
+
 static maa_result_t
-maa_gpio_get_valfp(maa_gpio_context *dev)
+maa_gpio_get_valfp(maa_gpio_context dev)
 {
     char bu[MAX_SIZE];
     sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
@@ -50,7 +68,7 @@ maa_gpio_get_valfp(maa_gpio_context *dev)
     return MAA_SUCCESS;
 }
 
-maa_gpio_context*
+maa_gpio_context
 maa_gpio_init(int pin)
 {
     int pinm = maa_check_gpio(pin);
@@ -60,7 +78,7 @@ maa_gpio_init(int pin)
     return maa_gpio_init_raw(pinm);
 }
 
-maa_gpio_context*
+maa_gpio_context
 maa_gpio_init_raw(int pin)
 {
     if (pin < 0)
@@ -70,7 +88,7 @@ maa_gpio_init_raw(int pin)
     char bu[MAX_SIZE];
     int length;
 
-    maa_gpio_context* dev = (maa_gpio_context*) malloc(sizeof(maa_gpio_context));
+    maa_gpio_context dev = (maa_gpio_context) malloc(sizeof(struct _gpio));
     memset(dev, 0, sizeof(maa_gpio_context));
     dev->value_fp = -1;
     dev->isr_value_fp = -1;
@@ -117,7 +135,7 @@ maa_gpio_wait_interrupt(int fd)
 static void*
 maa_gpio_interrupt_handler(void* arg)
 {
-    maa_gpio_context* dev = (maa_gpio_context*) arg;
+    maa_gpio_context dev = (maa_gpio_context) arg;
     maa_result_t ret;
 
     // open gpio value with open(3)
@@ -154,7 +172,7 @@ maa_gpio_interrupt_handler(void* arg)
 }
 
 maa_result_t
-maa_gpio_edge_mode(maa_gpio_context *dev, gpio_edge_t mode)
+maa_gpio_edge_mode(maa_gpio_context dev, gpio_edge_t mode)
 {
     if (dev->value_fp != -1) {
          close(dev->value_fp);
@@ -196,7 +214,7 @@ maa_gpio_edge_mode(maa_gpio_context *dev, gpio_edge_t mode)
 }
 
 maa_result_t
-maa_gpio_isr(maa_gpio_context *dev, gpio_edge_t mode, void (*fptr)(void))
+maa_gpio_isr(maa_gpio_context dev, gpio_edge_t mode, void (*fptr)(void))
 {
     // we only allow one isr per maa_gpio_context
     if (dev->thread_id != 0) {
@@ -211,7 +229,7 @@ maa_gpio_isr(maa_gpio_context *dev, gpio_edge_t mode, void (*fptr)(void))
 }
 
 maa_result_t
-maa_gpio_isr_exit(maa_gpio_context *dev)
+maa_gpio_isr_exit(maa_gpio_context dev)
 {
     maa_result_t ret = MAA_SUCCESS;
 
@@ -248,7 +266,7 @@ maa_gpio_isr_exit(maa_gpio_context *dev)
 }
 
 maa_result_t
-maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode)
+maa_gpio_mode(maa_gpio_context dev, gpio_mode_t mode)
 {
     if (dev->value_fp != -1) {
          close(dev->value_fp);
@@ -290,7 +308,7 @@ maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode)
 }
 
 maa_result_t
-maa_gpio_dir(maa_gpio_context *dev, gpio_dir_t dir)
+maa_gpio_dir(maa_gpio_context dev, gpio_dir_t dir)
 {
     if (dev == NULL) {
         return MAA_ERROR_INVALID_HANDLE;
@@ -328,7 +346,7 @@ maa_gpio_dir(maa_gpio_context *dev, gpio_dir_t dir)
 }
 
 int
-maa_gpio_read(maa_gpio_context *dev)
+maa_gpio_read(maa_gpio_context dev)
 {
     if (dev->value_fp == -1) {
         if (maa_gpio_get_valfp(dev) != MAA_SUCCESS) {
@@ -350,7 +368,7 @@ maa_gpio_read(maa_gpio_context *dev)
 }
 
 maa_result_t
-maa_gpio_write(maa_gpio_context *dev, int value)
+maa_gpio_write(maa_gpio_context dev, int value)
 {
     if (dev->value_fp == -1) {
         maa_gpio_get_valfp(dev);
@@ -369,7 +387,7 @@ maa_gpio_write(maa_gpio_context *dev, int value)
 }
 
 maa_result_t
-maa_gpio_unexport(maa_gpio_context *dev)
+maa_gpio_unexport(maa_gpio_context dev)
 {
     FILE *unexport_f;
 
@@ -389,7 +407,7 @@ maa_gpio_unexport(maa_gpio_context *dev)
 }
 
 maa_result_t
-maa_gpio_close(maa_gpio_context *dev)
+maa_gpio_close(maa_gpio_context dev)
 {
     if (dev->value_fp != -1) {
         close(dev->value_fp);

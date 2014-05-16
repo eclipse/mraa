@@ -36,7 +36,7 @@ void interrupt (void) {
 int main ()
 {
     maa_init();
-    maa_gpio_context* x;
+    maa_gpio_context x;
 
     x = maa_gpio_init(6);
     if (x == NULL) {

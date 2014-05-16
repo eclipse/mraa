@@ -46,19 +46,10 @@ extern "C" {
  * A strucutre representing a gpio pin.
  */
 
-typedef struct {
-    /*@{*/
-    int pin; /**< the pin number, as known to the os. */
-    int value_fp; /**< the file pointer to the value of the gpio */
-#ifdef SWIGPYTHON
-    PyObject *isr; /**< the interupt service request */
-#else
-    void (* isr)(); /**< the interupt service request */
-#endif
-    pthread_t thread_id; /**< the isr handler thread id */
-    int isr_value_fp; /**< the isr file pointer on the value */
-    /*@}*/
-} maa_gpio_context;
+/**
+ * Opaque pointer definition to the internal struct _gpio
+ */
+typedef struct _gpio* maa_gpio_context;
 
 /**
  * GPIO Output modes
@@ -91,7 +82,7 @@ typedef enum {
  *
  *  @returns maa_gpio_context based on the IO pin
  */
-maa_gpio_context* maa_gpio_init(int pin);
+maa_gpio_context maa_gpio_init(int pin);
 
 /** Initialise gpio context without any mapping to a pin.
  * - For more expert users
@@ -100,7 +91,7 @@ maa_gpio_context* maa_gpio_init(int pin);
  *
  * @return gpio context
  */
-maa_gpio_context* maa_gpio_init_raw(int gpiopin);
+maa_gpio_context maa_gpio_init_raw(int gpiopin);
 
 /** Set the edge mode on the gpio
  *
@@ -109,7 +100,7 @@ maa_gpio_context* maa_gpio_init_raw(int gpiopin);
  *
  * @return maa result type.
  */
-maa_result_t maa_gpio_edge_mode(maa_gpio_context *dev, gpio_edge_t mode);
+maa_result_t maa_gpio_edge_mode(maa_gpio_context dev, gpio_edge_t mode);
 
 /** Set an interupt on pin
  *
@@ -121,7 +112,7 @@ maa_result_t maa_gpio_edge_mode(maa_gpio_context *dev, gpio_edge_t mode);
  * @return maa result type.
  */
 maa_result_t
-maa_gpio_isr(maa_gpio_context *dev, gpio_edge_t edge, void (*fptr)(void));
+maa_gpio_isr(maa_gpio_context dev, gpio_edge_t edge, void (*fptr)(void));
 
 /** Stop the current interupt watcher on this GPIO, and set the GPIO edge mode
  * to MAA_GPIO_EDGE_NONE.
@@ -131,7 +122,7 @@ maa_gpio_isr(maa_gpio_context *dev, gpio_edge_t edge, void (*fptr)(void));
  * @return maa result type.
  */
 maa_result_t
-maa_gpio_isr_exit(maa_gpio_context *dev);
+maa_gpio_isr_exit(maa_gpio_context dev);
 
 /** Set GPIO Output Mode,
  *
@@ -140,7 +131,7 @@ maa_gpio_isr_exit(maa_gpio_context *dev);
  *
  * @return maa result type.
  */
-maa_result_t maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode);
+maa_result_t maa_gpio_mode(maa_gpio_context dev, gpio_mode_t mode);
 
 /** Set GPIO direction
  *
@@ -149,7 +140,7 @@ maa_result_t maa_gpio_mode(maa_gpio_context *dev, gpio_mode_t mode);
  *
  * @return maa result type.
  */
-maa_result_t maa_gpio_dir(maa_gpio_context *dev, gpio_dir_t dir);
+maa_result_t maa_gpio_dir(maa_gpio_context dev, gpio_dir_t dir);
 
 /** Close the GPIO context
  * - Will free the memory for the context and unexport the GPIO
@@ -158,7 +149,7 @@ maa_result_t maa_gpio_dir(maa_gpio_context *dev, gpio_dir_t dir);
  *
  * @return maa result type.
  */
-maa_result_t maa_gpio_close(maa_gpio_context *dev);
+maa_result_t maa_gpio_close(maa_gpio_context dev);
 
 /** Unexport the GPIO context (maa_gpio_close() will call this function)
  *
@@ -166,7 +157,7 @@ maa_result_t maa_gpio_close(maa_gpio_context *dev);
  *
  * @return maa result type.
  */
-maa_result_t maa_gpio_unexport(maa_gpio_context *dev);
+maa_result_t maa_gpio_unexport(maa_gpio_context dev);
 
 /** Read the GPIO value.
  *
@@ -174,7 +165,7 @@ maa_result_t maa_gpio_unexport(maa_gpio_context *dev);
  *
  * @return the integer value of the GPIO
  */
-int maa_gpio_read(maa_gpio_context *dev);
+int maa_gpio_read(maa_gpio_context dev);
 
 /** Write to the GPIO Value.
  *
@@ -183,7 +174,7 @@ int maa_gpio_read(maa_gpio_context *dev);
  *
  * @return maa result type
  */
-maa_result_t maa_gpio_write(maa_gpio_context *dev, int value);
+maa_result_t maa_gpio_write(maa_gpio_context dev, int value);
 
 #ifdef __cplusplus
 }

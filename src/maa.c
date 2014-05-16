@@ -68,7 +68,7 @@ maa_setup_mux_mapped(maa_pin_t meta)
 {
     int mi;
     for (mi = 0; mi < meta.mux_total; mi++) {
-        maa_gpio_context* mux_i;
+        maa_gpio_context mux_i;
         mux_i = maa_gpio_init_raw(meta.mux[mi].pin);
         if (mux_i == NULL)
             return MAA_ERROR_INVALID_HANDLE;
@@ -150,10 +150,10 @@ maa_check_pwm(int pin)
         return NULL;
 
     if (plat->pins[pin].capabilites.pwm != 1)
-      return NULL;
+        return NULL;
 
     if (plat->pins[pin].capabilites.gpio == 1) {
-        maa_gpio_context* mux_i;
+        maa_gpio_context mux_i;
         mux_i = maa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
         if (mux_i == NULL)
             return NULL;

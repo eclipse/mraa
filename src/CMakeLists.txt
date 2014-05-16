@@ -6,6 +6,7 @@ include_directories(
 set (maa_LIB_HEADERS
   ${PROJECT_SOURCE_DIR}/api/maa.h
   ${PROJECT_SOURCE_DIR}/api/gpio.h
+  ${PROJECT_SOURCE_DIR}/api/gpio.hpp
   ${PROJECT_SOURCE_DIR}/api/i2c.h
   ${PROJECT_SOURCE_DIR}/api/i2c.hpp
   ${PROJECT_SOURCE_DIR}/api/pwm.h
