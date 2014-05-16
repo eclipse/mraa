@@ -1,7 +1,7 @@
 %{
     #include "maa.h"
     #include "gpio.h"
-    #include "pwm.h"
+    #include "pwm.hpp"
     #include "i2c.hpp"
     #include "spi.h"
     #include "aio.hpp"
@@ -130,68 +130,7 @@ typedef struct {
 
 #### PWM ####
 
-%rename(Pwm) maa_pwm_context;
-
-%ignore duty_fp;
-typedef struct {
-    /*@{*/
-    int pin; /**< the pin number, as known to the os. */
-    int chipid; /**< the chip id, which the pwm resides */
-    FILE *duty_fp; /**< File pointer to duty file */
-    /*@}*/
-} maa_pwm_context;
-
-%nodefault maa_pwm_context;
-%extend maa_pwm_context {
-  maa_pwm_context(int pin)
-  {
-    return maa_pwm_init(pin);
-  }
-  maa_pwm_context(int chipid, int pin)
-  {
-    return maa_pwm_init_raw(chipid, pin);
-  }
-  ~maa_pwm_context()
-  {
-    maa_pwm_unexport($self);
-  }
-  int write(float percentage)
-  {
-    return maa_pwm_write($self, percentage);
-  }
-  int read()
-  {
-    return maa_pwm_read($self);
-  }
-  int period(float seconds)
-  {
-    return maa_pwm_period($self, seconds);
-  }
-  int period_ms(int ms)
-  {
-    return maa_pwm_period_ms($self, ms);
-  }
-  int period_us(int us)
-  {
-    return maa_pwm_period_us($self, us);
-  }
-  int pulsewidth(float seconds)
-  {
-    return maa_pwm_pulsewidth($self, seconds);
-  }
-  int pulsewidth_ms(int ms)
-  {
-    return maa_pwm_pulsewidth($self, ms);
-  }
-  int pulsewidth_us(int us)
-  {
-    return maa_pwm_pulsewidth($self, us);
-  }
-  int enable(int enable)
-  {
-    return maa_pwm_enable($self, enable);
-  }
-}
+%include "pwm.hpp"
 
 #### SPI ####
 

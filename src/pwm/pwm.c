@@ -26,8 +26,19 @@
 
 #include "pwm.h"
 
+/**
+ * A strucutre representing a PWM pin
+ */
+struct _pwm {
+    /*@{*/
+    int pin; /**< the pin number, as known to the os. */
+    int chipid; /**< the chip id, which the pwm resides */
+    FILE *duty_fp; /**< File pointer to duty file */
+    /*@}*/
+};
+
 static int
-maa_pwm_setup_duty_fp(maa_pwm_context* dev)
+maa_pwm_setup_duty_fp(maa_pwm_context dev)
 {
     char bu[64];
     sprintf(bu, "/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev->chipid, dev->pin);
@@ -39,7 +50,7 @@ maa_pwm_setup_duty_fp(maa_pwm_context* dev)
 }
 
 static maa_result_t
-maa_pwm_write_period(maa_pwm_context* dev, int period)
+maa_pwm_write_period(maa_pwm_context dev, int period)
 {
     FILE *period_f;
     char bu[64];
@@ -57,7 +68,7 @@ maa_pwm_write_period(maa_pwm_context* dev, int period)
 }
 
 static maa_result_t
-maa_pwm_write_duty(maa_pwm_context* dev, int duty)
+maa_pwm_write_duty(maa_pwm_context dev, int duty)
 {
     if (dev->duty_fp == NULL) {
         maa_pwm_setup_duty_fp(dev);
@@ -71,7 +82,7 @@ maa_pwm_write_duty(maa_pwm_context* dev, int duty)
 }
 
 static int
-maa_pwm_get_period(maa_pwm_context* dev)
+maa_pwm_get_period(maa_pwm_context dev)
 {
     FILE *period_f;
     char bu[64];
@@ -88,7 +99,7 @@ maa_pwm_get_period(maa_pwm_context* dev)
 }
 
 static int
-maa_pwm_get_duty(maa_pwm_context* dev)
+maa_pwm_get_duty(maa_pwm_context dev)
 {
     if (dev->duty_fp == NULL) {
         maa_pwm_setup_duty_fp(dev);
@@ -99,7 +110,7 @@ maa_pwm_get_duty(maa_pwm_context* dev)
     return atoi(output);
 }
 
-maa_pwm_context*
+maa_pwm_context
 maa_pwm_init(int pin) {
     maa_pin_t* pinm = maa_check_pwm(pin);
     if (pinm == NULL)
@@ -110,10 +121,10 @@ maa_pwm_init(int pin) {
     return maa_pwm_init_raw(chip,pinn);
 }
 
-maa_pwm_context*
+maa_pwm_context
 maa_pwm_init_raw(int chipin, int pin)
 {
-    maa_pwm_context* dev = (maa_pwm_context*) malloc(sizeof(maa_pwm_context));
+    maa_pwm_context dev = (maa_pwm_context) malloc(sizeof(struct _pwm));
     if (dev == NULL)
         return NULL;
 
@@ -137,56 +148,56 @@ maa_pwm_init_raw(int chipin, int pin)
 }
 
 maa_result_t
-maa_pwm_write(maa_pwm_context* dev, float percentage)
+maa_pwm_write(maa_pwm_context dev, float percentage)
 {
    return maa_pwm_write_duty(dev, percentage * maa_pwm_get_period(dev));
 }
 
 float
-maa_pwm_read(maa_pwm_context* dev)
+maa_pwm_read(maa_pwm_context dev)
 {
     float output = maa_pwm_get_duty(dev) / (float) maa_pwm_get_period(dev);
     return output;
 }
 
 maa_result_t
-maa_pwm_period(maa_pwm_context* dev, float seconds)
+maa_pwm_period(maa_pwm_context dev, float seconds)
 {
     return maa_pwm_period_ms(dev, seconds*1000);
 }
 
 maa_result_t
-maa_pwm_period_ms(maa_pwm_context* dev, int ms)
+maa_pwm_period_ms(maa_pwm_context dev, int ms)
 {
     return maa_pwm_period_us(dev, ms*1000);
 }
 
 maa_result_t
-maa_pwm_period_us(maa_pwm_context* dev, int us)
+maa_pwm_period_us(maa_pwm_context dev, int us)
 {
     return maa_pwm_write_period(dev, us*1000);
 }
 
 maa_result_t
-maa_pwm_pulsewidth(maa_pwm_context* dev, float seconds)
+maa_pwm_pulsewidth(maa_pwm_context dev, float seconds)
 {
     return maa_pwm_pulsewidth_ms(dev, seconds*1000);
 }
 
 maa_result_t
-maa_pwm_pulsewidth_ms(maa_pwm_context* dev, int ms)
+maa_pwm_pulsewidth_ms(maa_pwm_context dev, int ms)
 {
     return maa_pwm_pulsewidth_us(dev, ms*1000);
 }
 
 maa_result_t
-maa_pwm_pulsewidth_us(maa_pwm_context* dev, int us)
+maa_pwm_pulsewidth_us(maa_pwm_context dev, int us)
 {
     return maa_pwm_write_duty(dev, us*1000);
 }
 
 maa_result_t
-maa_pwm_enable(maa_pwm_context* dev, int enable)
+maa_pwm_enable(maa_pwm_context dev, int enable)
 {
     int status;
     if (enable != 0) {
@@ -210,7 +221,7 @@ maa_pwm_enable(maa_pwm_context* dev, int enable)
 }
 
 maa_result_t
-maa_pwm_unexport(maa_pwm_context* dev)
+maa_pwm_unexport(maa_pwm_context dev)
 {
     // disable pwm before unexporting
     maa_pwm_enable(dev, 0);
@@ -230,7 +241,7 @@ maa_pwm_unexport(maa_pwm_context* dev)
 }
 
 maa_result_t
-maa_pwm_close(maa_pwm_context* dev)
+maa_pwm_close(maa_pwm_context dev)
 {
     maa_pwm_unexport(dev);
     free(dev);

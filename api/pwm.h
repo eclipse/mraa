@@ -39,16 +39,7 @@ extern "C" {
 
 #include "maa.h"
 
-/**
- * A strucutre representing a PWM pin
- */
-typedef struct {
-    /*@{*/
-    int pin; /**< the pin number, as known to the os. */
-    int chipid; /**< the chip id, which the pwm resides */
-    FILE *duty_fp; /**< File pointer to duty file */
-    /*@}*/
-} maa_pwm_context;
+typedef struct _pwm* maa_pwm_context;
 
 /** Initialise pwm_context, uses board mapping.
  *
@@ -56,7 +47,7 @@ typedef struct {
  *
  * @return maa_pwm_context The returned initialised pwm context
  */
-maa_pwm_context* maa_pwm_init(int pin);
+maa_pwm_context maa_pwm_init(int pin);
 
 /** Initialise pwm_context, raw mode.
  *
@@ -65,7 +56,7 @@ maa_pwm_context* maa_pwm_init(int pin);
  *
  * @return maa_pwm_context The returned initialised pwm context
  */
-maa_pwm_context* maa_pwm_init_raw(int chipid, int pin);
+maa_pwm_context maa_pwm_init_raw(int chipid, int pin);
 
 /** Set the ouput duty-cycle percentage, as a float
  *
@@ -76,7 +67,7 @@ maa_pwm_context* maa_pwm_init_raw(int chipid, int pin);
  *
  * @return maa_result_t the maa result.
  */
-maa_result_t maa_pwm_write(maa_pwm_context* pwm, float percentage);
+maa_result_t maa_pwm_write(maa_pwm_context pwm, float percentage);
 
 /** Read the ouput duty-cycle percentage, as a float
  *
@@ -85,7 +76,7 @@ maa_result_t maa_pwm_write(maa_pwm_context* pwm, float percentage);
  *    The value should lie between 0.0f (representing on 0%) and 1.0f
  *    Values above or below this range will be set at either 0.0f or 1.0f.
  */
-float maa_pwm_read(maa_pwm_context* pwm);
+float maa_pwm_read(maa_pwm_context pwm);
 
 /** Set the PWM period as seconds represented in a float
  *
@@ -94,7 +85,7 @@ float maa_pwm_read(maa_pwm_context* pwm);
  *
  * @return maa_result_t the maa result.
  */
-maa_result_t maa_pwm_period(maa_pwm_context* pwm, float seconds);
+maa_result_t maa_pwm_period(maa_pwm_context pwm, float seconds);
 
 /** Set period, milli-oseconds.
  *
@@ -103,7 +94,7 @@ maa_result_t maa_pwm_period(maa_pwm_context* pwm, float seconds);
  *
  * @return maa_result_t the maa result.
  */
-maa_result_t maa_pwm_period_ms(maa_pwm_context* pwm, int ms);
+maa_result_t maa_pwm_period_ms(maa_pwm_context pwm, int ms);
 
 /** Set period, microseconds
  *
@@ -112,7 +103,7 @@ maa_result_t maa_pwm_period_ms(maa_pwm_context* pwm, int ms);
  *
  * @return maa_result_t the maa result.
  */
-maa_result_t maa_pwm_period_us(maa_pwm_context* pwm, int us);
+maa_result_t maa_pwm_period_us(maa_pwm_context pwm, int us);
 
 /** Set pulsewidth, As represnted by seconds in a (float).
  *
@@ -121,7 +112,7 @@ maa_result_t maa_pwm_period_us(maa_pwm_context* pwm, int us);
  *
  * @return maa_result_t the maa result.
  */
-maa_result_t maa_pwm_pulsewidth(maa_pwm_context* pwm, float seconds);
+maa_result_t maa_pwm_pulsewidth(maa_pwm_context pwm, float seconds);
 
 /** Set pulsewidth, milliseconds
  *
@@ -130,7 +121,7 @@ maa_result_t maa_pwm_pulsewidth(maa_pwm_context* pwm, float seconds);
  *
  * @return maa_result_t the maa result.
  */
-maa_result_t maa_pwm_pulsewidth_ms(maa_pwm_context* pwm, int ms);
+maa_result_t maa_pwm_pulsewidth_ms(maa_pwm_context pwm, int ms);
 
 /** Set pulsewidth, microseconds.
  *
@@ -139,7 +130,7 @@ maa_result_t maa_pwm_pulsewidth_ms(maa_pwm_context* pwm, int ms);
  *
  * @return maa_result_t the maa result.
  */
-maa_result_t maa_pwm_pulsewidth_us(maa_pwm_context* pwm, int us);
+maa_result_t maa_pwm_pulsewidth_us(maa_pwm_context pwm, int us);
 
 /** Set the enable status of the PWM pin. None zero will assume on with output being driven.
  *   and 0 will disable the output.
@@ -149,7 +140,7 @@ maa_result_t maa_pwm_pulsewidth_us(maa_pwm_context* pwm, int us);
  *
  * @return maa_result_t the maa result.
  */
-maa_result_t maa_pwm_enable(maa_pwm_context* pwm, int enable);
+maa_result_t maa_pwm_enable(maa_pwm_context pwm, int enable);
 
 /** Unexport the PWM context (maa_pwm_close() will call this function)
  *
@@ -157,7 +148,7 @@ maa_result_t maa_pwm_enable(maa_pwm_context* pwm, int enable);
  *
  * @return maa result type.
  */
-maa_result_t maa_pwm_unexport(maa_pwm_context* pwm);
+maa_result_t maa_pwm_unexport(maa_pwm_context pwm);
 
 /** Close and unexport the PWM pin.
  * 
@@ -165,7 +156,7 @@ maa_result_t maa_pwm_unexport(maa_pwm_context* pwm);
  *
  * @return maa_result_t the maa result.
  */
-maa_result_t maa_pwm_close(maa_pwm_context* pwm);
+maa_result_t maa_pwm_close(maa_pwm_context pwm);
 
 #ifdef __cplusplus
 }
