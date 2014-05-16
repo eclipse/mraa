@@ -89,7 +89,7 @@ maa_gpio_init_raw(int pin)
     int length;
 
     maa_gpio_context dev = (maa_gpio_context) malloc(sizeof(struct _gpio));
-    memset(dev, 0, sizeof(maa_gpio_context));
+    memset(dev, 0, sizeof(struct _gpio));
     dev->value_fp = -1;
     dev->isr_value_fp = -1;
     dev->pin = pin;
