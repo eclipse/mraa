@@ -52,7 +52,7 @@ maa_spi_init()
         return NULL;
     }
     maa_spi_context dev = (maa_spi_context) malloc(sizeof(struct _spi));
-    memset(dev, 0, sizeof(maa_spi_context));
+    memset(dev, 0, sizeof(struct _spi));
 
     char path[MAX_SIZE];
     sprintf(path, "/dev/spidev%.1f", bus);
