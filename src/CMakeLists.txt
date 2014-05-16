@@ -7,7 +7,7 @@ set (maa_LIB_HEADERS
   ${PROJECT_SOURCE_DIR}/api/maa.h
   ${PROJECT_SOURCE_DIR}/api/gpio.h
   ${PROJECT_SOURCE_DIR}/api/i2c.h
-  ${PROJECT_SOURCE_DIR}/api/i2c.pp
+  ${PROJECT_SOURCE_DIR}/api/i2c.hpp
   ${PROJECT_SOURCE_DIR}/api/pwm.h
   ${PROJECT_SOURCE_DIR}/api/spi.h
   ${PROJECT_SOURCE_DIR}/api/aio.h
