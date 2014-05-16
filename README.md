@@ -59,6 +59,15 @@ Python html documentation can be generated with **make pydoc**
 
 When the API breaks in a small way there will be a changelog listed here
 
+**0.2.4**
+  * All maa_ contexts now are pointers to the actual struct which is not
+    delcared in the header. The only end user change is that instead of
+    returning a type maa_gpio_context pointer maa_gpio_init() now returns a
+    maa_gpio_context (which is actually a pointer to struct _gpio internally).
+  * C++ API is available, use the .hpp headers and add stdc++  to the linker
+    flags.
+  * Initial SPI implementation is provided
+
 **0.2.3**
   * maa_aio_read_u16() -> maa_aio_read()
   * maa_aio_read() now returns a uint16_t instead of an unsigned int
