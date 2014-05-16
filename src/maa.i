@@ -2,7 +2,7 @@
     #include "maa.h"
     #include "gpio.h"
     #include "pwm.h"
-    #include "i2c.h"
+    #include "i2c.hpp"
     #include "spi.h"
     #include "aio.hpp"
 %}
@@ -126,48 +126,7 @@ typedef struct {
 
 #### i2c ####
 
-%nodefault maa_i2c_context;
-%rename(I2c) maa_i2c_context;
-
-%ignore fh;
-typedef struct {
-    /*@{*/
-    int hz; /**< frequency of communication */
-    int fh; /**< the file handle to the /dev/i2c-* device */
-    int addr; /**< the address of the i2c slave */
-    /*@}*/
-} maa_i2c_context;
-
-%nodefault maa_i2c_context;
-%extend maa_i2c_context {
-  maa_i2c_context()
-  {
-    return maa_i2c_init(0);
-  }
-  ~maa_i2c_context()
-  {
-  }
-  int frequency(int hz)
-  {
-    return maa_i2c_frequency($self, hz);
-  }
-  int read(char *data, int length)
-  {
-    return maa_i2c_read($self, data, length);
-  }
-  int read()
-  {
-    return maa_i2c_read_byte($self);
-  }
-  int write(char *data, int length)
-  {
-    return maa_i2c_write($self, data, length);
-  }
-  int write(int data)
-  {
-    return maa_i2c_write_byte($self, data);
-  }
-}
+%include "i2c.hpp"
 
 #### PWM ####
 

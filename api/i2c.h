@@ -42,29 +42,23 @@ extern "C" {
 #include "gpio.h"
 
 /**
- * A structure representing an i2c device /dev/i2c-*
+ * Opaque pointer definition to the internal struct _i2c
  */
-typedef struct {
-    /*@{*/
-    int hz; /**< frequency of communication */
-    int fh; /**< the file handle to the /dev/i2c-* device */
-    int addr; /**< the address of the i2c slave */
-    /*@}*/
-} maa_i2c_context;
+typedef struct _i2c* maa_i2c_context;
 
 /** Initialise i2c context, using board defintions
  *
  * @param bus i2c bus to use
  * @return maa_i2c_context i2c context ready for other calls.
  */
-maa_i2c_context* maa_i2c_init(int bus);
+maa_i2c_context maa_i2c_init(int bus);
 
 /** Initialise i2c context, passing in spi bus to use.
  *
  * @param bus The i2c bus to use i.e. /dev/i2c-2 would be "2"
  * @return maa_i2c_context i2c context ready for other calls.
  */
-maa_i2c_context* maa_i2c_init_raw(unsigned int bus);
+maa_i2c_context maa_i2c_init_raw(unsigned int bus);
 
 /** Sets the frequency of the i2c context
  *
@@ -73,7 +67,7 @@ maa_i2c_context* maa_i2c_init_raw(unsigned int bus);
  *
  *  @return maa_result_t the maa result.
  */
-maa_result_t maa_i2c_frequency(maa_i2c_context* dev, int hz);
+maa_result_t maa_i2c_frequency(maa_i2c_context dev, int hz);
 
 /** Read from an i2c context
  *
@@ -83,7 +77,7 @@ maa_result_t maa_i2c_frequency(maa_i2c_context* dev, int hz);
  *
  *  @return maa_result_t the maa result.
  */
-maa_result_t maa_i2c_read(maa_i2c_context* dev, char *data, int length);
+maa_result_t maa_i2c_read(maa_i2c_context dev, const char *data, int length);
 
 /** Read a single byte from the i2c context
  *
@@ -91,7 +85,7 @@ maa_result_t maa_i2c_read(maa_i2c_context* dev, char *data, int length);
  *
  *  @return byte the result of the read or -1 if failed.
  */
-int maa_i2c_read_byte(maa_i2c_context* dev);
+int maa_i2c_read_byte(maa_i2c_context dev);
 
 /** Write to an i2c context
  *
@@ -101,7 +95,7 @@ int maa_i2c_read_byte(maa_i2c_context* dev);
  *
  *  @return maa_result_t the maa result.
  */
-maa_result_t maa_i2c_write(maa_i2c_context* dev, const char *data, int length);
+maa_result_t maa_i2c_write(maa_i2c_context dev, char *data, int length);
 
 /** Write a single byte to an i2c context
  *
@@ -110,7 +104,7 @@ maa_result_t maa_i2c_write(maa_i2c_context* dev, const char *data, int length);
  *
  *  @return maa_result_t the maa result.
  */
-maa_result_t maa_i2c_write_byte(maa_i2c_context* dev, int data);
+maa_result_t maa_i2c_write_byte(maa_i2c_context dev, int data);
 
 /** Sets the i2c context address.
  *
@@ -121,7 +115,7 @@ maa_result_t maa_i2c_write_byte(maa_i2c_context* dev, int data);
  *
  *  @return maa_result_t the maa result.
  */
-maa_result_t maa_i2c_address(maa_i2c_context* dev, int address);
+maa_result_t maa_i2c_address(maa_i2c_context dev, int address);
 
 /** De-inits an maa_i2c_context device
  *
@@ -129,7 +123,7 @@ maa_result_t maa_i2c_address(maa_i2c_context* dev, int address);
  *
  *  @return maa_result_t the maa result.
  */
-maa_result_t maa_i2c_stop(maa_i2c_context* dev);
+maa_result_t maa_i2c_stop(maa_i2c_context dev);
 
 #ifdef __cplusplus
 }

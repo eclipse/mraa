@@ -25,7 +25,15 @@
 #include "i2c.h"
 #include "smbus.h"
 
-maa_i2c_context*
+struct _i2c {
+    /*@{*/
+    int hz; /**< frequency of communication */
+    int fh; /**< the file handle to the /dev/i2c-* device */
+    int addr; /**< the address of the i2c slave */
+    /*@}*/
+}; 
+
+maa_i2c_context
 maa_i2c_init(int bus)
 {
     int checked_pin = maa_check_i2c(bus);
@@ -46,10 +54,10 @@ maa_i2c_init(int bus)
     return maa_i2c_init_raw((unsigned int) checked_pin);
 }
 
-maa_i2c_context*
+maa_i2c_context
 maa_i2c_init_raw(unsigned int bus)
 {
-    maa_i2c_context* dev = (maa_i2c_context*) malloc(sizeof(maa_i2c_context));
+    maa_i2c_context dev = (maa_i2c_context) malloc(sizeof(struct _i2c));
     if (dev == NULL)
         return NULL;
 
@@ -62,7 +70,7 @@ maa_i2c_init_raw(unsigned int bus)
 }
 
 maa_result_t
-maa_i2c_frequency(maa_i2c_context* dev, int hz)
+maa_i2c_frequency(maa_i2c_context dev, int hz)
 {
     dev->hz = hz;
 
@@ -70,7 +78,7 @@ maa_i2c_frequency(maa_i2c_context* dev, int hz)
 }
 
 maa_result_t
-maa_i2c_read(maa_i2c_context* dev, char *data, int length)
+maa_i2c_read(maa_i2c_context dev, const char *data, int length)
 {
     // this is the read(3) syscall not maa_i2c_read()
     if (read(dev->fh, data, length) == length) {
@@ -80,7 +88,7 @@ maa_i2c_read(maa_i2c_context* dev, char *data, int length)
 }
 
 int
-maa_i2c_read_byte(maa_i2c_context* dev)
+maa_i2c_read_byte(maa_i2c_context dev)
 {
     int byte;
     byte = i2c_smbus_read_byte(dev->fh);
@@ -91,7 +99,7 @@ maa_i2c_read_byte(maa_i2c_context* dev)
 }
 
 maa_result_t
-maa_i2c_write(maa_i2c_context* dev, const char* data, int length)
+maa_i2c_write(maa_i2c_context dev, char* data, int length)
 {
     if (i2c_smbus_write_i2c_block_data(dev->fh, data[0], length-1, (uint8_t*) data+1) < 0) {
         fprintf(stderr, "Failed to write to i2c\n");
@@ -101,7 +109,7 @@ maa_i2c_write(maa_i2c_context* dev, const char* data, int length)
 }
 
 maa_result_t
-maa_i2c_write_byte(maa_i2c_context* dev, int data)
+maa_i2c_write_byte(maa_i2c_context dev, int data)
 {
     if (i2c_smbus_write_byte(dev->fh, data) < 0) {
         fprintf(stderr, "Failed to write to i2c\n");
@@ -111,7 +119,7 @@ maa_i2c_write_byte(maa_i2c_context* dev, int data)
 }
 
 maa_result_t
-maa_i2c_address(maa_i2c_context* dev, int addr)
+maa_i2c_address(maa_i2c_context dev, int addr)
 {
     dev->addr = addr;
     if (ioctl(dev->fh, I2C_SLAVE_FORCE, addr) < 0) {
@@ -122,7 +130,7 @@ maa_i2c_address(maa_i2c_context* dev, int addr)
 }
 
 maa_result_t
-maa_i2c_stop(maa_i2c_context* dev)
+maa_i2c_stop(maa_i2c_context dev)
 {
     free(dev);
     return MAA_SUCCESS;

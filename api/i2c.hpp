@@ -26,27 +26,45 @@
 
 /** @file
  *
- * This file defines the aio C++ interface for libmaa
+ * This file defines the i2c C++ interface for libmaa
  *
  */
 
-#include "aio.h"
+#include "i2c.h"
 
 namespace maa {
 
-class Aio {
+class I2c {
     public:
-        Aio(unsigned int pin) {
-            m_aio = maa_aio_init(pin);
+        I2c(int bus, bool raw=false) {
+            if (raw)
+                m_i2c = maa_i2c_init_raw(bus);
+            else
+                m_i2c = maa_i2c_init(bus);
         }
-        ~Aio() {
-            maa_aio_close(m_aio);
+        ~I2c() {
+            maa_i2c_stop(m_i2c);
         }
-        uint16_t read() {
-            return maa_aio_read(m_aio);
+        maa_result_t frequency(int hz) {
+            return maa_i2c_frequency(m_i2c, hz);
+        }
+        maa_result_t address(int address) {
+            return maa_i2c_address(m_i2c, address);
+        }
+        int read_byte() {
+            return maa_i2c_read_byte(m_i2c);
+        }
+        maa_result_t read(const char *data, int length) {
+            return maa_i2c_read(m_i2c, data, length);
+        }
+        maa_result_t write(char *data, int length) {
+            return maa_i2c_write(m_i2c, data, length);
+        }
+        maa_result_t write_byte(int data) {
+            return maa_i2c_write_byte(m_i2c, data);
         }
     private:
-        maa_aio_context m_aio;
+        maa_i2c_context m_i2c;
 };
 
 }

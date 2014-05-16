@@ -83,7 +83,7 @@ main(int argc, char **argv)
     int16_t x = 0, y = 0, z = 0;
     char rx_tx_buf[MAX_BUFFER_LENGTH];
 
-    maa_i2c_context *i2c;
+    maa_i2c_context i2c;
     i2c = maa_i2c_init(0);
 
     maa_i2c_address(i2c, HMC5883L_I2C_ADDR);
