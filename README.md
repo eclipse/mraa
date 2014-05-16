@@ -54,3 +54,14 @@ see examples/
 NODE_PATH=.*
 
 Python html documentation can be generated with **make pydoc**
+
+## API Changelog
+
+When the API breaks in a small way there will be a changelog listed here
+
+**0.2.3**
+  * maa_aio_read_u16() -> maa_aio_read()
+  * maa_aio_read() now returns a uint16_t instead of an unsigned int
+
+**0.2.2**
+  * First version with API considered 'stable'
