@@ -73,8 +73,6 @@ endif ()
 
 find_package (SWIG)
 if (SWIG_FOUND)
-  set (CMAKE_C_FLAGS -DSWIG=${SWIG_FOUND})
-  set (CMAKE_CXX_CFLAGS -DSWIG=${SWIG_FOUND})
   include (${SWIG_USE_FILE})
 
   add_subdirectory (python)

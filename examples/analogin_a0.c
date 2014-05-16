@@ -28,7 +28,6 @@
 
 int main ()
 {
-    maa_init();
     maa_aio_context adc_a0;
     uint16_t adc_value = 0;
 

@@ -39,14 +39,13 @@ maa_get_version()
     return gVERSION;
 }
 
-#ifndef SWIG
-// this sets a compiler attribute (supported by GCC & clang) to have maa_init()
-// be called as a constructor make sure your libc supports this!  uclibc needs
-// to be compiled with UCLIBC_CTOR_DTOR
-maa_result_t maa_init() __attribute__((constructor));
-#endif
+#ifdef SWIG
 maa_result_t
 maa_init()
+#else
+maa_result_t __attribute__((constructor))
+maa_init()
+#endif
 {
     /** Once more board definitions have been added,
      *  A method for detecting them will need to be devised.

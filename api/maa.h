@@ -174,7 +174,14 @@ typedef struct {
  * Detects running platform and attempts to use included pinmap
  * @return maa_result_t maa result
  */
+#ifndef SWIG
+// this sets a compiler attribute (supported by GCC & clang) to have maa_init()
+// be called as a constructor make sure your libc supports this!  uclibc needs
+// to be compiled with UCLIBC_CTOR_DTOR
+maa_result_t maa_init() __attribute__((constructor));
+#else
 maa_result_t maa_init();
+#endif
 
 /** Check GPIO
  *
