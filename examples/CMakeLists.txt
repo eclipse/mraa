@@ -5,6 +5,7 @@ add_executable (blink-io blink-io.c)
 add_executable (analogin_a0 analogin_a0.c)
 add_executable (isr_pin6 isr_pin6.c)
 add_executable (gpio_read6 gpio_read6.c)
+add_executable (spi_mcp4261 spi_mcp4261.c)
 
 include_directories(${PROJECT_SOURCE_DIR}/api)
 
@@ -15,5 +16,6 @@ target_link_libraries (blink-io maa)
 target_link_libraries (analogin_a0 maa)
 target_link_libraries (isr_pin6 maa)
 target_link_libraries (gpio_read6 maa)
+target_link_libraries (spi_mcp4261 maa)
 
 add_subdirectory (c++)
