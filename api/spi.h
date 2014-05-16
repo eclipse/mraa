@@ -36,6 +36,7 @@ extern "C" {
 
 #include <stdio.h>
 #include <fcntl.h>
+#include <stdint.h>
 
 #include "maa.h"
 
@@ -72,14 +73,25 @@ maa_result_t maa_spi_mode(maa_spi_context* spi,unsigned short mode);
  */
 maa_result_t maa_spi_frequency(maa_spi_context* spi, int hz);
 
-/** Write to the SPI device.
+/** Write Single Byte to the SPI device.
  *
  * @param spi the spid device clock frequency
  * @param data to send
  *
- * @return data recevied on the miso line.
+ * @return data received on the miso line.
  */
-unsigned int maa_spi_write(maa_spi_context* spi, unsigned int data);
+uint8_t maa_spi_write(maa_spi_context* spi, uint8_t data);
+
+/** Write Buffer of bytes to the SPI device.
+ *
+ * @param spi the spid device clock frequency
+ * @param data to send
+ * @param length elements within buffer, Max 4096
+ *
+ * @return data received on the miso line. Same length as passed in.
+ */
+uint8_t* maa_spi_write_buf(maa_spi_context* spi, uint8_t data[], int length);
+
 
 /** De-inits an maa_spi_context device
  *
