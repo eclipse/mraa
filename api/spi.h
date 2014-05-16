@@ -40,20 +40,13 @@ extern "C" {
 
 #include "maa.h"
 
-/**
- * A strucutre representing the SPI device
- */
-typedef struct {
-    /*@{*/
-    int spifd; /**< File descriptor to SPI Device */
-    /*@}*/
-} maa_spi_context;
+typedef struct _spi* maa_spi_context;
 
 /** Initialise SPI_context, uses board mapping. Sets the muxes
  *
  * @return maa_spi_context The returned initialised SPI context
  */
-maa_spi_context* maa_spi_init();
+maa_spi_context maa_spi_init();
 
 /** Set the SPI device mode. see spidev
  *
@@ -62,7 +55,7 @@ maa_spi_context* maa_spi_init();
  *
  * @return maa_spi_context The returned initialised SPI context
  */
-maa_result_t maa_spi_mode(maa_spi_context* spi,unsigned short mode);
+maa_result_t maa_spi_mode(maa_spi_context dev,unsigned short mode);
 
 /** Set the SPI device operating clock frequency.
  *
@@ -71,7 +64,7 @@ maa_result_t maa_spi_mode(maa_spi_context* spi,unsigned short mode);
  *
  * @return maa_spi_context The returned initialised SPI context
  */
-maa_result_t maa_spi_frequency(maa_spi_context* spi, int hz);
+maa_result_t maa_spi_frequency(maa_spi_context dev, int hz);
 
 /** Write Single Byte to the SPI device.
  *
@@ -80,7 +73,7 @@ maa_result_t maa_spi_frequency(maa_spi_context* spi, int hz);
  *
  * @return data received on the miso line.
  */
-uint8_t maa_spi_write(maa_spi_context* spi, uint8_t data);
+uint8_t maa_spi_write(maa_spi_context dev, uint8_t data);
 
 /** Write Buffer of bytes to the SPI device.
  *
@@ -90,7 +83,7 @@ uint8_t maa_spi_write(maa_spi_context* spi, uint8_t data);
  *
  * @return data received on the miso line. Same length as passed in.
  */
-uint8_t* maa_spi_write_buf(maa_spi_context* spi, uint8_t data[], int length);
+uint8_t* maa_spi_write_buf(maa_spi_context dev, uint8_t* data, int length);
 
 
 /** De-inits an maa_spi_context device
@@ -99,7 +92,7 @@ uint8_t* maa_spi_write_buf(maa_spi_context* spi, uint8_t data[], int length);
  *
  *  @return maa_result_t the maa result.
  */
-maa_result_t maa_spi_stop(maa_spi_context* spi);
+maa_result_t maa_spi_stop(maa_spi_context dev);
 
 #ifdef __cplusplus
 }

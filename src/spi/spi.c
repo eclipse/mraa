@@ -34,7 +34,16 @@
 #define MAX_SIZE 64
 #define SPI_MAX_LENGTH 4096
 
-maa_spi_context*
+/**
+ * A strucutre representing the SPI device
+ */
+struct _spi {
+    /*@{*/
+    int devfd; /**< File descriptor to SPI Device */
+    /*@}*/
+};
+
+maa_spi_context
 maa_spi_init()
 {
     double bus = maa_check_spi();
@@ -42,14 +51,14 @@ maa_spi_init()
         fprintf(stderr, "Failed. SPI platform Error\n");
         return NULL;
     }
-    maa_spi_context* dev = (maa_spi_context*) malloc(sizeof(maa_spi_context));
+    maa_spi_context dev = (maa_spi_context) malloc(sizeof(struct _spi));
     memset(dev, 0, sizeof(maa_spi_context));
 
     char path[MAX_SIZE];
     sprintf(path, "/dev/spidev%.1f", bus);
 
-    dev->spifd = open(path, O_RDWR);
-    if (dev->spifd < 0) {
+    dev->devfd = open(path, O_RDWR);
+    if (dev->devfd < 0) {
         fprintf(stderr, "Failed opening SPI Device. bus:%s\n", path);
         free(dev);
         return NULL;
@@ -59,19 +68,19 @@ maa_spi_init()
 }
 
 maa_result_t
-maa_spi_mode(maa_spi_context* spi, unsigned short mode)
+maa_spi_mode(maa_spi_context dev, unsigned short mode)
 {
     return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
 maa_result_t
-maa_spi_frequency(maa_spi_context* spi, int hz)
+maa_spi_frequency(maa_spi_context dev, int hz)
 {
     return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
 uint8_t
-maa_spi_write(maa_spi_context* spi, uint8_t data)
+maa_spi_write(maa_spi_context dev, uint8_t data)
 {
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
@@ -85,15 +94,15 @@ maa_spi_write(maa_spi_context* spi, uint8_t data)
     msg.bits_per_word = 8;
     msg.delay_usecs = 0;
     msg.len = length;
-    if(ioctl(spi->spifd, SPI_IOC_MESSAGE(1), &msg) < 0) {
-        fprintf(stderr, "Failed to perform spi transfer\n");
+    if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
+        fprintf(stderr, "Failed to perform dev transfer\n");
         return -1;
     }
     return recv;
 }
 
 uint8_t*
-maa_spi_write_buf(maa_spi_context* spi, uint8_t* data, int length)
+maa_spi_write_buf(maa_spi_context dev, uint8_t* data, int length)
 {
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
@@ -106,15 +115,15 @@ maa_spi_write_buf(maa_spi_context* spi, uint8_t* data, int length)
     msg.bits_per_word = 8;
     msg.delay_usecs = 0;
     msg.len = length;
-    if(ioctl(spi->spifd, SPI_IOC_MESSAGE(1), &msg) < 0) {
-        fprintf(stderr, "Failed to perform spi transfer\n");
+    if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
+        fprintf(stderr, "Failed to perform dev transfer\n");
         return NULL;
     }
     return recv;
 }
 
 maa_result_t
-maa_spi_stop(maa_spi_context* spi)
+maa_spi_stop(maa_spi_context dev)
 {
     return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }

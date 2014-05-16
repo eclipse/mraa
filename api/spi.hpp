@@ -1,5 +1,5 @@
 /*
- * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -22,36 +22,39 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "spi.h"
-#include <unistd.h>
-#include <stdint.h>
+#pragma once
 
-int
-main(int argc, char **argv)
-{
-    maa_init();
-    maa_spi_context spi;
-    spi = maa_spi_init(0);
-    unsigned int response = 0;
-    printf("Hello, SPI initialised\n");
-    uint8_t data[] = {0x00, 100};
-    uint8_t *recv;
-    while(1) {
-        int i;
-        for (i = 90; i < 130; i++) {
-            data[1] = i;
-            recv = maa_spi_write_buf(spi, data, 2);
-            printf("Writing -%i",i);
-            printf("RECIVED-%i-%i\n",recv[0],recv[1]);
-            usleep(100000);
+/** @file
+ *
+ * This file defines the spi C++ interface for libmaa
+ */
+
+#include "spi.h"
+
+namespace maa {
+
+class Spi {
+    public:
+        Spi() {
+            m_spi = maa_spi_init();
         }
-        for (i = 130; i > 90; i--) {
-            data[1] = i;
-            recv = maa_spi_write_buf(spi, data, 2);
-            printf("Writing -%i",i);
-            printf("RECIVED-%i-%i\n",recv[0],recv[1]);
-            usleep(100000);
+        ~Spi() {
+            maa_spi_stop(m_spi);
         }
-    }
+        maa_result_t mode(unsigned short mode) {
+            return maa_spi_mode(m_spi, mode);
+        }
+        maa_result_t frequency(int hz) {
+            return maa_spi_frequency(m_spi, hz);
+        }
+        uint8_t write(uint8_t data) {
+            return maa_spi_write(m_spi, data);
+        }
+        uint8_t* write_buf(uint8_t* data, int length) {
+            return maa_spi_write_buf(m_spi, data, length);
+        }
+    private:
+        maa_spi_context m_spi;
+};
 
 }
