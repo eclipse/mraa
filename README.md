@@ -18,12 +18,18 @@ low level communication protocol by high level languages & constructs.
 
 ### ENV RECOMENDATIONS
 
+All of these are 'optional', however they are recommended. Only a C compiler,
+cmake and default system libraries are technically required to compile.
+
 1. node.js 0.10.26
 2. python 3.3.x or 2.7.x
-3. swig-v8 3.0.1
-4. doxygen 1.8.7
+3. swig-v8 3.0.1 (swig 2.x will work but you will not be able to build node.js
+module so comment out add_directories(javacsript) in src/CmakeLists.txt)
+4. doxygen (needed to generate even python doc)
+5. sphinx
+6. pydoc
 
-To install swig-v8 the swig-v8-git package from AUR is helpful
+To install swig-v8 the swig-v8-git package from AUR is helpful.
 
 ## COMPILING
 
@@ -36,9 +42,6 @@ inside of the repo/tarball.
 mkdir build/
 cmake ..
 make
-
-Install is currently unsuported. Javascript and python modules will be in
-build/src/{javascript, python}
 
 ## DEVELOPMENT
 
@@ -53,11 +56,18 @@ see examples/
 *for node.js make sure that maajs.node is in the current dir and set export
 NODE_PATH=.*
 
-Python html documentation can be generated with **make pydoc**
+Simple python html documentation can be generated with **make pydoc**, this
+does not require the full doxygen/sphinx setup.
 
 ## API Changelog
 
 When the API breaks in a small way there will be a changelog listed here
+
+**0.2.5**
+  * C++/Python/Node Enums/const names now do not contain MAA_GPIO
+  * Enum type declaration for C++ changed
+  * Python/Node get_version() -> GetVersion()
+  * i2c read calls don't use const char* and i2c write calls do
 
 **0.2.4**
   * All maa_ contexts now are pointers to the actual struct which is not
