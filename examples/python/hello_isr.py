@@ -6,5 +6,5 @@ def test():
   print("wooo")
 
 x = maa.Gpio(6)
-x.dir(maa.MAA_GPIO_IN)
-x.isr(maa.MAA_GPIO_EDGE_BOTH, test)
+x.dir(maa.DIR_IN)
+x.isr(maa.EDGE_BOTH, test)

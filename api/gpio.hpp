@@ -34,6 +34,26 @@
 
 namespace maa {
 
+// These enums must match the enums in gpio.h
+typedef enum {
+    MODE_STRONG = 0,
+    MODE_PULLUP = 1,
+    MODE_PULLDOWN = 2,
+    MODE_HIZ = 3
+} Mode;
+
+typedef enum {
+    DIR_OUT = 0,
+    DIR_IN = 1
+} Dir;
+
+typedef enum {
+    EDGE_NONE = 0,
+    EDGE_BOTH = 1,
+    EDGE_RISING = 2,
+    EDGE_FALLING = 3
+} Edge;
+
 class Gpio {
     public:
         Gpio(int pin, bool raw=false) {
@@ -43,28 +63,28 @@ class Gpio {
                 m_gpio = maa_gpio_init(pin);
         }
         ~Gpio() {
-            maa_gpio_close(m_gpio);
+            maa_result_t x = maa_gpio_close(m_gpio);
         }
-        maa_result_t edge(gpio_edge_t mode) {
-            return maa_gpio_edge_mode(m_gpio, mode);
+        maa_result_t edge(Edge mode) {
+            return maa_gpio_edge_mode(m_gpio, (gpio_edge_t) mode);
         }
 #if defined(SWIGPYTHON)
-        maa_result_t isr(gpio_edge_t mode, PyObject *pyfunc) { 
-            return maa_gpio_isr(m_gpio, mode, (void (*) ()) pyfunc);
+        maa_result_t isr(Edge mode, PyObject *pyfunc) {
+            return maa_gpio_isr(m_gpio, (gpio_edge_t) mode, (void (*) ()) pyfunc);
         }
 #else
-        maa_result_t isr(gpio_edge_t mode, void (*fptr)(void)) {
-            return maa_gpio_isr(m_gpio, mode, fptr);
+        maa_result_t isr(Edge mode, void (*fptr)(void)) {
+            return maa_gpio_isr(m_gpio, (gpio_edge_t) mode, fptr);
         }
 #endif
         maa_result_t isr_exit() {
             return maa_gpio_isr_exit(m_gpio);
         }
-        maa_result_t mode(gpio_mode_t mode) {
-            return maa_gpio_mode(m_gpio, mode);
+        maa_result_t mode(Mode mode) {
+            return maa_gpio_mode(m_gpio, (gpio_mode_t) mode);
         }
-        maa_result_t dir(gpio_dir_t dir) {
-            return maa_gpio_dir(m_gpio, dir);
+        maa_result_t dir(Dir dir) {
+            return maa_gpio_dir(m_gpio, (gpio_dir_t) dir);
         }
         int read() {
             return maa_gpio_read(m_gpio);

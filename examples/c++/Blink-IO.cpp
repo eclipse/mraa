@@ -57,7 +57,7 @@ int main (int argc, char **argv)
     if (gpio == NULL) {
         return MAA_ERROR_UNSPECIFIED;
     }
-    int response = gpio->dir(MAA_GPIO_OUT);
+    int response = gpio->dir(maa::DIR_OUT);
     if (response != MAA_SUCCESS)
         maa_result_print((maa_result_t) MAA_SUCCESS);
 

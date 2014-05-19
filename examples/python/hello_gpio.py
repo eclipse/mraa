@@ -25,4 +25,3 @@
 import pymaa
 
 x = pymaa.Gpio(13)
-print(x.pin)
