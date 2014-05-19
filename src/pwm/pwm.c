@@ -27,7 +27,7 @@
 #include "pwm.h"
 
 /**
- * A strucutre representing a PWM pin
+ * A structure representing a PWM pin
  */
 struct _pwm {
     /*@{*/
@@ -95,7 +95,9 @@ maa_pwm_get_period(maa_pwm_context dev)
     }
     fgets(output, 16, period_f);
     fclose(period_f);
-    return atoi(output);
+    int ret = strtol(output, NULL, 10);
+
+    return ret;
 }
 
 static int
@@ -107,7 +109,9 @@ maa_pwm_get_duty(maa_pwm_context dev)
     char output[16];
     fgets(output, 16, dev->duty_fp);
     fseek(dev->duty_fp, SEEK_SET, 0);
-    return atoi(output);
+
+    int ret = strtol(output, NULL, 10);
+    return ret;
 }
 
 maa_pwm_context
@@ -150,7 +154,7 @@ maa_pwm_init_raw(int chipin, int pin)
 maa_result_t
 maa_pwm_write(maa_pwm_context dev, float percentage)
 {
-   return maa_pwm_write_duty(dev, percentage * maa_pwm_get_period(dev));
+    return maa_pwm_write_duty(dev, percentage * maa_pwm_get_period(dev));
 }
 
 float
