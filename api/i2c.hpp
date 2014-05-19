@@ -54,13 +54,13 @@ class I2c {
         int read_byte() {
             return maa_i2c_read_byte(m_i2c);
         }
-        maa_result_t read(const char *data, int length) {
+        maa_result_t read(char *data, int length) {
             return maa_i2c_read(m_i2c, data, length);
         }
-        maa_result_t write(char *data, int length) {
+        maa_result_t write(const char *data, int length) {
             return maa_i2c_write(m_i2c, data, length);
         }
-        maa_result_t write_byte(int data) {
+        maa_result_t write_byte(const int data) {
             return maa_i2c_write_byte(m_i2c, data);
         }
     private:

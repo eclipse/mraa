@@ -77,7 +77,7 @@ maa_result_t maa_i2c_frequency(maa_i2c_context dev, int hz);
  *
  *  @return maa_result_t the maa result.
  */
-maa_result_t maa_i2c_read(maa_i2c_context dev, const char *data, int length);
+maa_result_t maa_i2c_read(maa_i2c_context dev, char *data, int length);
 
 /** Read a single byte from the i2c context
  *
@@ -95,7 +95,7 @@ int maa_i2c_read_byte(maa_i2c_context dev);
  *
  *  @return maa_result_t the maa result.
  */
-maa_result_t maa_i2c_write(maa_i2c_context dev, char *data, int length);
+maa_result_t maa_i2c_write(maa_i2c_context dev, const char *data, int length);
 
 /** Write a single byte to an i2c context
  *
@@ -104,7 +104,7 @@ maa_result_t maa_i2c_write(maa_i2c_context dev, char *data, int length);
  *
  *  @return maa_result_t the maa result.
  */
-maa_result_t maa_i2c_write_byte(maa_i2c_context dev, int data);
+maa_result_t maa_i2c_write_byte(maa_i2c_context dev, const int data);
 
 /** Sets the i2c context address.
  *
