@@ -44,11 +44,7 @@ struct _gpio {
     /*@{*/
     int pin; /**< the pin number, as known to the os. */
     int value_fp; /**< the file pointer to the value of the gpio */
-#ifdef SWIGPYTHON
-    PyObject *isr; /**< the interupt service request */
-#else
     void (* isr)(); /**< the interupt service request */
-#endif
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */
     /*@}*/
@@ -154,7 +150,7 @@ maa_gpio_interrupt_handler(void* arg)
             // if we do not hold a lock on the GIL
             PyGILState_STATE gilstate = PyGILState_Ensure();
 
-            PyEval_CallObject(dev->isr, NULL);
+            PyEval_CallObject((PyObject*)dev->isr, NULL);
 
             PyGILState_Release (gilstate);
 #else
