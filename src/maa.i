@@ -12,7 +12,7 @@
     maa_init();
 %}
 
-%rename(get_version) maa_get_version();
+%rename(getVersion) maa_get_version();
 const char * maa_get_version();
 
 #### GPIO ####
