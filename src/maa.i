@@ -15,8 +15,8 @@
 %rename(getVersion) maa_get_version();
 const char * maa_get_version();
 
-%rename(printError) maa_result_print();
-void maa_result_print(maa_result_t result);
+%rename(printError) maa_result_print(maa_result_t error);
+void maa_result_print(maa_result_t error);
 
 /**
  * MAA return codes
