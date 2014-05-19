@@ -80,7 +80,6 @@ maa_gpio_init_raw(int pin)
     if (pin < 0)
         return NULL;
 
-    FILE *export_f;
     char bu[MAX_SIZE];
     int length;
 
@@ -90,14 +89,17 @@ maa_gpio_init_raw(int pin)
     dev->isr_value_fp = -1;
     dev->pin = pin;
 
-    if ((export_f = fopen(SYSFS_CLASS_GPIO "/export", "w")) == NULL) {
+    int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
+    if (export == -1) {
         fprintf(stderr, "Failed to open export for writing!\n");
         return NULL;
     }
     length = snprintf(bu, sizeof(bu), "%d", dev->pin);
-    fwrite(bu, sizeof(char), length, export_f);
+    if (write(export, bu, length*sizeof(char)) == -1) {
+        fprintf(stderr, "Failed to write to export\n");
+    }
 
-    fclose(export_f);
+    close(export);
     return dev;
 }
 
@@ -178,8 +180,8 @@ maa_gpio_edge_mode(maa_gpio_context dev, gpio_edge_t mode)
     char filepath[MAX_SIZE];
     snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/edge", dev->pin);
 
-    FILE *edge;
-    if ((edge= fopen(filepath, "w")) == NULL) {
+    int edge = open(filepath, O_RDWR);
+    if (edge == -1) {
         fprintf(stderr, "Failed to open edge for writing!\n");
         return MAA_ERROR_INVALID_RESOURCE;
     }
@@ -200,12 +202,16 @@ maa_gpio_edge_mode(maa_gpio_context dev, gpio_edge_t mode)
             length = snprintf(bu, sizeof(bu), "falling");
             break;
         default:
-            fclose(edge);
+            close(edge);
             return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
     }
-    fwrite(bu, sizeof(char), length, edge);
+    if (write(edge, bu, length*sizeof(char)) == -1) {
+        fprintf(stderr, "Failed to write to edge\n");
+        close(edge);
+        return MAA_ERROR_INVALID_RESOURCE;
+    }
 
-    fclose(edge);
+    close(edge);
     return MAA_SUCCESS;
 }
 
@@ -272,8 +278,8 @@ maa_gpio_mode(maa_gpio_context dev, gpio_mode_t mode)
     char filepath[MAX_SIZE];
     snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/drive", dev->pin);
 
-    FILE *drive;
-    if ((drive = fopen(filepath, "w")) == NULL) {
+    int drive = open(filepath, O_WRONLY);
+    if (drive == -1) {
         fprintf(stderr, "Failed to open drive for writing!\n");
         return MAA_ERROR_INVALID_RESOURCE;
     }
@@ -294,12 +300,17 @@ maa_gpio_mode(maa_gpio_context dev, gpio_mode_t mode)
             length = snprintf(bu, sizeof(bu), "hiz");
             break;
         default:
-            fclose(drive);
+            close(drive);
             return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
     }
-    fwrite(bu, sizeof(char), length, drive);
+    if (write(drive, bu, length*sizeof(char)) == -1) {
+        fprintf(stderr, "Failed to write to drive mode!\n");
+        close(drive);
+        return MAA_ERROR_INVALID_RESOURCE;
 
-    fclose(drive);
+    }
+
+    close(drive);
     return MAA_SUCCESS;
 }
 
@@ -316,8 +327,9 @@ maa_gpio_dir(maa_gpio_context dev, gpio_dir_t dir)
     char filepath[MAX_SIZE];
     snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/direction", dev->pin);
 
-    FILE *direction;
-    if ((direction = fopen(filepath, "w")) == NULL) {
+    int direction = open(filepath, O_RDWR);
+
+    if (direction == -1) {
         fprintf(stderr, "Failed to open direction for writing!\n");
         return MAA_ERROR_INVALID_RESOURCE;
     }
@@ -332,12 +344,17 @@ maa_gpio_dir(maa_gpio_context dev, gpio_dir_t dir)
             length = snprintf(bu, sizeof(bu), "in");
             break;
         default:
-            fclose(direction);
+            close(direction);
             return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
     }
-    fwrite(bu, sizeof(char), length, direction);
 
-    fclose(direction);
+    if (write(direction, bu, length*sizeof(char)) == -1) {
+        fprintf(stderr, "Failed to write to direction\n");
+        close(direction);
+        return MAA_ERROR_INVALID_RESOURCE;
+    }
+
+    close(direction);
     return MAA_SUCCESS;
 }
 
@@ -385,20 +402,22 @@ maa_gpio_write(maa_gpio_context dev, int value)
 maa_result_t
 maa_gpio_unexport(maa_gpio_context dev)
 {
-    FILE *unexport_f;
-
-    if ((unexport_f = fopen(SYSFS_CLASS_GPIO "/unexport", "w")) == NULL) {
+    int unexport = open(SYSFS_CLASS_GPIO "/unexport", O_WRONLY);
+    if (unexport == -1) {
         fprintf(stderr, "Failed to open unexport for writing!\n");
         return MAA_ERROR_INVALID_RESOURCE;
     }
 
     char bu[MAX_SIZE];
     int length = snprintf(bu, sizeof(bu), "%d", dev->pin);
-    fwrite(bu, sizeof(char), length, unexport_f);
-    fclose(unexport_f);
+    if (write(unexport, bu, length*sizeof(char)) == -1) {
+        fprintf(stderr, "Failed to write to unexport\n");
+        close(unexport);
+        return MAA_ERROR_INVALID_RESOURCE;
+    }
 
+    close(unexport);
     maa_gpio_isr_exit(dev);
-
     return MAA_SUCCESS;
 }
 
