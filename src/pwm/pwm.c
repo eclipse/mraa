@@ -223,8 +223,6 @@ maa_pwm_enable(maa_pwm_context dev, int enable)
 maa_result_t
 maa_pwm_unexport(maa_pwm_context dev)
 {
-    // disable pwm before unexporting
-    maa_pwm_enable(dev, 0);
     FILE *unexport_f;
     char buffer[64];
     snprintf(buffer, 64, "/sys/class/pwm/pwmchip%d/unexport", dev->chipid);
