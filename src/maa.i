@@ -15,7 +15,8 @@
 %rename(getVersion) maa_get_version();
 const char * maa_get_version();
 
-#### GPIO ####
+%rename(printError) maa_result_print();
+void maa_result_print(maa_result_t result);
 
 #### GPIO ####
 
