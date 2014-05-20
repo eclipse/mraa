@@ -24,4 +24,7 @@
 
 import pymaa
 
+print (pymaa.getVersion())
 x = pymaa.Gpio(13)
+x.dir(pymaa.DIR_OUT)
+x.write(1)

@@ -9,9 +9,10 @@ Welcome to Pymaa's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    pymaa
+   example
 
 
 Indices and tables
