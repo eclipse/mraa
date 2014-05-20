@@ -15,7 +15,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND/
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
@@ -26,6 +26,8 @@
 
 #include "pwm.h"
 
+#define MAX_SIZE 64
+
 /**
  * A structure representing a PWM pin
  */
@@ -33,17 +35,18 @@ struct _pwm {
     /*@{*/
     int pin; /**< the pin number, as known to the os. */
     int chipid; /**< the chip id, which the pwm resides */
-    FILE *duty_fp; /**< File pointer to duty file */
+    int duty_fp; /**< File pointer to duty file */
     /*@}*/
 };
 
 static int
 maa_pwm_setup_duty_fp(maa_pwm_context dev)
 {
-    char bu[64];
-    sprintf(bu, "/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev->chipid, dev->pin);
+    char bu[MAX_SIZE];
+    snprintf(bu,MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev->chipid, dev->pin);
 
-    if ((dev->duty_fp = fopen(bu, "r+b")) == NULL) {
+    dev->duty_fp = open(bu, O_RDWR);
+    if (dev->duty_fp == -1) {
         return 1;
     }
     return 0;
@@ -52,31 +55,34 @@ maa_pwm_setup_duty_fp(maa_pwm_context dev)
 static maa_result_t
 maa_pwm_write_period(maa_pwm_context dev, int period)
 {
-    FILE *period_f;
-    char bu[64];
-    sprintf(bu, "/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
+    char bu[MAX_SIZE];
+    snprintf(bu,MAX_SIZE ,"/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
 
-    if ((period_f = fopen(bu, "r+b")) == NULL) {
+    int period_f = open(bu, O_RDWR);
+    if (period_f == -1) {
         fprintf(stderr, "Failed to open period for writing!\n");
         return MAA_ERROR_INVALID_RESOURCE;
     }
-    fprintf(period_f, "%d", period);
-    fclose(period_f);
-    if (ferror(period_f) != 0)
+    char out[MAX_SIZE];
+    int length = snprintf(out, MAX_SIZE, "%d", dev->pin);
+    if (write(period_f, out, length*sizeof(char)) == -1) {
+        close(period_f);
         return MAA_ERROR_INVALID_RESOURCE;
+    }
+
+    close(period_f);
     return MAA_SUCCESS;
 }
 
 static maa_result_t
 maa_pwm_write_duty(maa_pwm_context dev, int duty)
 {
-    if (dev->duty_fp == NULL) {
+    if (dev->duty_fp == -1) {
         maa_pwm_setup_duty_fp(dev);
     }
-    fprintf(dev->duty_fp, "%d", duty);
-    rewind(dev->duty_fp);
-    fflush(dev->duty_fp);
-     if (ferror(dev->duty_fp) != 0)
+    char bu[64];
+    int length = sprintf(bu, "%d", duty);
+    if (write(dev->duty_fp, bu, length * sizeof(char)) == -1)
         return MAA_ERROR_INVALID_RESOURCE;
     return MAA_SUCCESS;
 }
@@ -84,17 +90,20 @@ maa_pwm_write_duty(maa_pwm_context dev, int duty)
 static int
 maa_pwm_get_period(maa_pwm_context dev)
 {
-    FILE *period_f;
-    char bu[64];
-    char output[16];
+    char bu[MAX_SIZE];
+    char output[MAX_SIZE];
+    snprintf(bu,MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
 
-    sprintf(bu, "/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
-    if ((period_f = fopen(bu, "rb")) == NULL) {
+    int period_f = open(bu, O_RDWR);
+    if (period_f == -1) {
         fprintf(stderr, "Failed to open period for reading!\n");
         return 0;
     }
-    fgets(output, 16, period_f);
-    fclose(period_f);
+    off_t size = lseek(period_f, 0, SEEK_END);
+    lseek(period_f, 0, SEEK_SET);
+
+    read(period_f, output, size + 1);
+    close(period_f);
     int ret = strtol(output, NULL, 10);
 
     return ret;
@@ -103,12 +112,15 @@ maa_pwm_get_period(maa_pwm_context dev)
 static int
 maa_pwm_get_duty(maa_pwm_context dev)
 {
-    if (dev->duty_fp == NULL) {
+    if (dev->duty_fp == -1) {
         maa_pwm_setup_duty_fp(dev);
+    } else {
+        lseek(dev->duty_fp, 0, SEEK_SET);
     }
-    char output[16];
-    fgets(output, 16, dev->duty_fp);
-    fseek(dev->duty_fp, SEEK_SET, 0);
+    off_t size = lseek(dev->duty_fp, 0, SEEK_END);
+    lseek(dev->duty_fp, 0, SEEK_SET);
+    char output[MAX_SIZE];
+    read(dev->duty_fp, output, size+1);
 
     int ret = strtol(output, NULL, 10);
     return ret;
@@ -131,23 +143,27 @@ maa_pwm_init_raw(int chipin, int pin)
     maa_pwm_context dev = (maa_pwm_context) malloc(sizeof(struct _pwm));
     if (dev == NULL)
         return NULL;
-
+    dev->duty_fp == -1;
     dev->chipid = chipin;
     dev->pin = pin;
 
-    FILE *export_f;
-    char buffer[64];
-    snprintf(buffer, 64, "/sys/class/pwm/pwmchip%d/export", dev->chipid);
-
-    if ((export_f = fopen(buffer, "w")) == NULL) {
+    char buffer[MAX_SIZE];
+    snprintf(buffer, MAX_SIZE, "/sys/class/pwm/pwmchip%d/export", dev->chipid);
+    int export_f = open(buffer, O_WRONLY);
+    if (export_f == -1) {
         fprintf(stderr, "Failed to open export for writing!\n");
         free(dev);
         return NULL;
-    } else {
-        fprintf(export_f, "%d", dev->pin);
-        fclose(export_f);
-        maa_pwm_setup_duty_fp(dev);
     }
+
+    char out[MAX_SIZE];
+    int size = snprintf(out, MAX_SIZE, "%d", dev->pin);
+    if (write(export_f, out, size*sizeof(char)) == -1) {
+        fprintf(stderr, "Failed to write to export! Potentially already enabled\n");
+    }
+    close(export_f);
+    maa_pwm_setup_duty_fp(dev);
+
     return dev;
 }
 
@@ -209,36 +225,47 @@ maa_pwm_enable(maa_pwm_context dev, int enable)
     } else {
         status = enable;
     }
-    FILE *enable_f;
-    char bu[64];
-    sprintf(bu, "/sys/class/pwm/pwmchip%d/pwm%d/enable", dev->chipid, dev->pin);
+    char bu[MAX_SIZE];
+    snprintf(bu,MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/enable", dev->chipid, dev->pin);
 
-    if ((enable_f = fopen(bu, "w")) == NULL) {
+    int enable_f = open(bu, O_RDWR);
+
+    if (enable_f == -1) {
         fprintf(stderr, "Failed to open enable for writing!\n");
         return MAA_ERROR_INVALID_RESOURCE;
     }
-    fprintf(enable_f, "%d", status);
-    fclose(enable_f);
-    if (ferror(enable_f) != 0)
+    char out[2];
+    int size = snprintf(out, sizeof(out), "%d", enable);
+    if (write(enable_f, out, size * sizeof(char)) == -1) {
+        fprintf(stderr, "Failed to write to enable!\n");
+        close(enable_f);
         return MAA_ERROR_INVALID_RESOURCE;
+    }
+    close(enable_f);
     return MAA_SUCCESS;
 }
 
 maa_result_t
 maa_pwm_unexport(maa_pwm_context dev)
 {
-    FILE *unexport_f;
-    char buffer[64];
-    snprintf(buffer, 64, "/sys/class/pwm/pwmchip%d/unexport", dev->chipid);
+    char filepath[MAX_SIZE];
+    snprintf(filepath, MAX_SIZE, "/sys/class/pwm/pwmchip%d/unexport", dev->chipid);
 
-    if ((unexport_f = fopen(buffer, "w")) == NULL) {
+    int unexport_f = open(filepath, O_WRONLY);
+    if (unexport_f == -1) {
         fprintf(stderr, "Failed to open unexport for writing!\n");
         return MAA_ERROR_INVALID_RESOURCE;
     }
-    fprintf(unexport_f, "%d", dev->pin);
-    fclose(unexport_f);
-    if (ferror(unexport_f) != 0)
+
+    char out[MAX_SIZE];
+    int size = snprintf(out, MAX_SIZE, "%d", dev->pin);
+    if (write(unexport_f, out, size*sizeof(char)) == -1) {
+        fprintf(stderr, "Failed to write to unexport!\n");
+        close(unexport_f);
         return MAA_ERROR_INVALID_RESOURCE;
+    }
+
+    close(unexport_f);
     return MAA_SUCCESS;
 }
 
