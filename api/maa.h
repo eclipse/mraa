@@ -142,7 +142,8 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
-    double bus_id; /**< The Bus ID as exposed to the system. */
+    unsigned int bus_id; /**< The Bus ID as exposed to the system. */
+    unsigned int slave_s; /**< Slave select */
     maa_boolean_t three_wire; /**< Is the bus only a three wire system */
     unsigned int sclk; /**< Serial Clock */
     unsigned int mosi; /**< Master Out, Slave In. */
