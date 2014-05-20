@@ -15,7 +15,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND/
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
@@ -23,10 +23,12 @@
  */
 
 #include <stdlib.h>
+#include <sys/stat.h>
 
 #include "pwm.h"
 
 #define MAX_SIZE 64
+#define SYSFS_PWM "/sys/class/pwm"
 
 /**
  * A structure representing a PWM pin
@@ -36,6 +38,7 @@ struct _pwm {
     int pin; /**< the pin number, as known to the os. */
     int chipid; /**< the chip id, which the pwm resides */
     int duty_fp; /**< File pointer to duty file */
+    maa_boolean_t owner; /**< Owner of pwm context*/
     /*@}*/
 };
 
@@ -147,23 +150,33 @@ maa_pwm_init_raw(int chipin, int pin)
     dev->chipid = chipin;
     dev->pin = pin;
 
-    char buffer[MAX_SIZE];
-    snprintf(buffer, MAX_SIZE, "/sys/class/pwm/pwmchip%d/export", dev->chipid);
-    int export_f = open(buffer, O_WRONLY);
-    if (export_f == -1) {
-        fprintf(stderr, "Failed to open export for writing!\n");
-        free(dev);
-        return NULL;
-    }
+    char directory[MAX_SIZE];
+    snprintf(directory, MAX_SIZE, SYSFS_PWM "/pwmchip%d/pwm%d", dev->chipid, dev->pin);
+    struct stat dir;
+    if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
+        fprintf(stderr, "PWM Pin already exporting, continuing.\n");
+        dev->owner = 0; // Not Owner
+    } else {
+        char buffer[MAX_SIZE];
+        snprintf(buffer, MAX_SIZE, "/sys/class/pwm/pwmchip%d/export", dev->chipid);
+        int export_f = open(buffer, O_WRONLY);
+        if (export_f == -1) {
+            fprintf(stderr, "Failed to open export for writing!\n");
+            free(dev);
+            return NULL;
+        }
 
-    char out[MAX_SIZE];
-    int size = snprintf(out, MAX_SIZE, "%d", dev->pin);
-    if (write(export_f, out, size*sizeof(char)) == -1) {
-        fprintf(stderr, "Failed to write to export! Potentially already enabled\n");
+        char out[MAX_SIZE];
+        int size = snprintf(out, MAX_SIZE, "%d", dev->pin);
+        if (write(export_f, out, size*sizeof(char)) == -1) {
+            fprintf(stderr, "Failed to write to export! Potentially already enabled\n");
+            close(export_f);
+            return NULL;
+        }
+        dev->owner = 1;
+        close(export_f);
     }
-    close(export_f);
     maa_pwm_setup_duty_fp(dev);
-
     return dev;
 }
 
@@ -248,6 +261,15 @@ maa_pwm_enable(maa_pwm_context dev, int enable)
 maa_result_t
 maa_pwm_unexport(maa_pwm_context dev)
 {
+    if (dev->owner) {
+        return maa_pwm_unexport_force(dev);
+    }
+    return MAA_ERROR_INVALID_RESOURCE;
+}
+
+maa_result_t
+maa_pwm_unexport_force(maa_pwm_context dev)
+{
     char filepath[MAX_SIZE];
     snprintf(filepath, MAX_SIZE, "/sys/class/pwm/pwmchip%d/unexport", dev->chipid);
 
@@ -274,5 +296,14 @@ maa_pwm_close(maa_pwm_context dev)
 {
     maa_pwm_unexport(dev);
     free(dev);
+    return MAA_SUCCESS;
+}
+
+maa_result_t
+maa_pwm_owner(maa_pwm_context dev, maa_boolean_t owner_new)
+{
+    if (dev == NULL)
+        return MAA_ERROR_INVALID_RESOURCE;
+    dev->owner = owner_new;
     return MAA_SUCCESS;
 }

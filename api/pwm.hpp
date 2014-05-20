@@ -36,11 +36,13 @@ namespace maa {
 
 class Pwm {
     public:
-        Pwm(int pin, int chipid=-1) {
+        Pwm(int pin, int chipid=-1, bool owner = true) {
             if (chipid == -1)
                 m_pwm = maa_pwm_init(pin);
             else
                 m_pwm = maa_pwm_init_raw(pin, chipid);
+            if (!owner)
+                maa_pwm_owner(m_pwm, 0);
         }
         ~Pwm() {
             maa_pwm_close(m_pwm);
