@@ -44,12 +44,13 @@ typedef struct _spi* maa_spi_context;
 
 /** Initialise SPI_context, uses board mapping. Sets the muxes
  *
+ * @param bus to use, as listed in platform definition. Normally 0
  * @return maa_spi_context The returned initialised SPI context
  */
-maa_spi_context maa_spi_init();
+maa_spi_context maa_spi_init(int bus);
 
 /** Set the SPI device mode. see spidev
- *
+ * 0-3.
  * @param spi the spi device context
  * @param mode the mode. See Linux spidev
  *
@@ -85,6 +86,26 @@ uint8_t maa_spi_write(maa_spi_context dev, uint8_t data);
  */
 uint8_t* maa_spi_write_buf(maa_spi_context dev, uint8_t* data, int length);
 
+/**
+ *
+ * @param dev spi context
+ * @param lsb. Use least significant bit transmission. 0 for msbi
+ *
+ * @return maa result of operation
+ */
+maa_result_t
+maa_spi_lsbmode(maa_spi_context dev, maa_boolean_t lsb)
+
+/** Set bits per mode on transaction
+ * Defaults at 8.
+ *
+ * @param dev spi context
+ * @param bits bits per word
+ *
+ * @return Result of operation
+ */
+maa_result_t
+maa_spi_bit_per_word(maa_spi_context dev, unsigned int bits)
 
 /** De-inits an maa_spi_context device
  *

@@ -40,6 +40,10 @@
 struct _spi {
     /*@{*/
     int devfd; /**< File descriptor to SPI Device */
+    int mode; /**< Spi mode see spidev.h */
+    int clock; /**< clock to run transactions at */
+    maa_boolean_t lsb; /**< least significant bit mode */
+    unsigned int bpw; /**< Bits per word */
     /*@}*/
 };
 
@@ -63,6 +67,10 @@ maa_spi_init(int bus)
         free(dev);
         return NULL;
     }
+    dev->bpw = 8;
+    dev->clock = 4000000;
+    dev->lsb = 0;
+    dev->mode = 0;
 
     return dev;
 }
@@ -70,13 +78,37 @@ maa_spi_init(int bus)
 maa_result_t
 maa_spi_mode(maa_spi_context dev, unsigned short mode)
 {
-    return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    dev->mode = mode;
+    return MAA_SUCCESS;
 }
 
 maa_result_t
 maa_spi_frequency(maa_spi_context dev, int hz)
 {
-    return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    dev->clock = hz;
+    return MAA_SUCCESS;
+}
+
+maa_result_t
+maa_spi_lsbmode(maa_spi_context dev, maa_boolean_t lsb)
+{
+    uint8_t lsb_mode = 0;
+    if (lsb == 1) {
+        lsb_mode = 1;
+    }
+    if (ioctl (dev->devfd, SPI_IOC_WR_LSB_FIRST, &lsb_mode) < 0) {
+        fprintf(stderr, "Failed to set bit order\n");
+        return MAA_ERROR_INVALID_RESOURCE;
+    }
+    dev->lsb = lsb;
+    return MAA_SUCCESS;
+}
+
+maa_result_t
+maa_spi_bit_per_word(maa_spi_context dev, unsigned int bits)
+{
+    dev->bpw = bits;
+    return MAA_SUCCESS;
 }
 
 uint8_t
@@ -90,8 +122,8 @@ maa_spi_write(maa_spi_context dev, uint8_t data)
     uint8_t recv = 0;
     msg.tx_buf = (unsigned long) &data;
     msg.rx_buf = (unsigned long) &recv;
-    msg.speed_hz = 100000;
-    msg.bits_per_word = 8;
+    msg.speed_hz = dev->clock;
+    msg.bits_per_word = dev->bpw;
     msg.delay_usecs = 0;
     msg.len = length;
     if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
@@ -111,8 +143,8 @@ maa_spi_write_buf(maa_spi_context dev, uint8_t* data, int length)
 
     msg.tx_buf = (unsigned long) data;
     msg.rx_buf = (unsigned long) recv;
-    msg.speed_hz = 100000;
-    msg.bits_per_word = 8;
+    msg.speed_hz = dev->clock;
+    msg.bits_per_word = dev->bpw;
     msg.delay_usecs = 0;
     msg.len = length;
     if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
@@ -125,5 +157,6 @@ maa_spi_write_buf(maa_spi_context dev, uint8_t* data, int length)
 maa_result_t
 maa_spi_stop(maa_spi_context dev)
 {
-    return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    close(dev->devfd);
+    return MAA_SUCCESS;
 }
