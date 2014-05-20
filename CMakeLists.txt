@@ -37,7 +37,7 @@ set (maa_VERSION_STRING ${maa_VERSION_MAJOR}.${maa_VERSION_MINOR}.${maa_VERSION_
 
 set (CMAKE_SWIG_FLAGS "")
 
-option (test "Build all tests." OFF)
+option (GTEST "Build all gtests." OFF)
 
 if (test)
   enable_testing ()
