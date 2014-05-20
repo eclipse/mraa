@@ -31,13 +31,14 @@
 #include <poll.h>
 #include <pthread.h>
 #include <signal.h>
+#include <sys/stat.h>
 
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
 #define MAX_SIZE 64
 #define POLL_TIMEOUT
 
 /**
- * A strucutre representing a gpio pin.
+ * A structure representing a gpio pin.
  */
 
 struct _gpio {
@@ -47,6 +48,7 @@ struct _gpio {
     void (* isr)(); /**< the interupt service request */
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */
+    maa_boolean_t owner; /**< If this context originally exported the pin */
     /*@}*/
 };
 
@@ -55,7 +57,6 @@ maa_gpio_get_valfp(maa_gpio_context dev)
 {
     char bu[MAX_SIZE];
     sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
-
     dev->value_fp = open(bu, O_RDWR);
     if (dev->value_fp == -1) {
         return MAA_ERROR_INVALID_RESOURCE;
@@ -89,17 +90,27 @@ maa_gpio_init_raw(int pin)
     dev->isr_value_fp = -1;
     dev->pin = pin;
 
-    int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
-    if (export == -1) {
-        fprintf(stderr, "Failed to open export for writing!\n");
-        return NULL;
+    char directory[MAX_SIZE];
+    snprintf(directory, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/", dev->pin);
+    struct stat dir;
+    if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
+        fprintf(stderr, "GPIO Pin already exporting, continuing.\n");
+        dev->owner = 0; // Not Owner
+    } else {
+        int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
+        if (export == -1) {
+            fprintf(stderr, "Failed to open export for writing!\n");
+            return NULL;
+        }
+        length = snprintf(bu, sizeof(bu), "%d", dev->pin);
+        if (write(export, bu, length*sizeof(char)) == -1) {
+            fprintf(stderr, "Failed to write to export\n");
+            close(export);
+            return NULL;
+        }
+        dev->owner = 1;
+        close(export);
     }
-    length = snprintf(bu, sizeof(bu), "%d", dev->pin);
-    if (write(export, bu, length*sizeof(char)) == -1) {
-        fprintf(stderr, "Failed to write to export\n");
-    }
-
-    close(export);
     return dev;
 }
 
@@ -160,11 +171,11 @@ maa_gpio_interrupt_handler(void* arg)
 #endif
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
         } else {
-	    // we must have got an error code so die nicely
+        // we must have got an error code so die nicely
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
             close(dev->isr_value_fp);
             dev->isr_value_fp = -1;
-	    return NULL;
+        return NULL;
         }
     }
 }
@@ -402,6 +413,15 @@ maa_gpio_write(maa_gpio_context dev, int value)
 maa_result_t
 maa_gpio_unexport(maa_gpio_context dev)
 {
+    if(dev->owner) {
+        return maa_gpio_unexport_force(dev);
+    }
+    return MAA_ERROR_INVALID_RESOURCE;
+}
+
+maa_result_t
+maa_gpio_unexport_force(maa_gpio_context dev)
+{
     int unexport = open(SYSFS_CLASS_GPIO "/unexport", O_WRONLY);
     if (unexport == -1) {
         fprintf(stderr, "Failed to open unexport for writing!\n");
@@ -431,3 +451,13 @@ maa_gpio_close(maa_gpio_context dev)
     free(dev);
     return MAA_SUCCESS;
 }
+
+maa_result_t
+maa_gpio_owner(maa_gpio_context dev, maa_boolean_t own)
+{
+    if (dev == NULL)
+        return MAA_ERROR_INVALID_RESOURCE;
+    dev->owner = own;
+    return MAA_SUCCESS;
+}
+

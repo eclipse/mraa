@@ -56,11 +56,13 @@ typedef enum {
 
 class Gpio {
     public:
-        Gpio(int pin, bool raw=false) {
+        Gpio(int pin, bool owner=true, bool raw=false) {
             if (raw)
                 m_gpio = maa_gpio_init_raw(pin);
             else
                 m_gpio = maa_gpio_init(pin);
+            if (!owner)
+                maa_gpio_owner(m_gpio, 0);
         }
         ~Gpio() {
             maa_result_t x = maa_gpio_close(m_gpio);
