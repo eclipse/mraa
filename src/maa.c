@@ -31,7 +31,7 @@
 #include "gpio.h"
 #include "version.h"
 
-static maa_pininfo_t* pindata;
+//static maa_pininfo_t* pindata;
 static maa_board_t* plat = NULL;
 
 const char *
@@ -144,34 +144,38 @@ maa_check_i2c(int bus_s)
     return plat->i2c_bus[bus].bus_id;
 }
 
-double
-maa_check_spi(int bus_s)
+maa_spi_bus_t*
+maa_check_spi(int bus)
 {
     if (plat == NULL)
-        return -3;
+        return NULL;
 
-    if (plat->i2c_bus_count >! 0) {
+    if (plat->spi_bus_count >! 0) {
         fprintf(stderr, "No spi buses defined in platform");
-        return -1;
+        return NULL;
     }
-    int bus = 0;
+    if (bus >= plat->spi_bus_count) {
+        fprintf(stderr, "Above spi bus count");
+        return NULL;
+    }
 
-    int pos = plat->spi_bus[0].sclk;
+    int pos = plat->spi_bus[bus].sclk;
     if (plat->pins[pos].spi.mux_total > 0)
         if (maa_setup_mux_mapped(plat->pins[pos].spi) != MAA_SUCCESS)
-             return -2;
+             return NULL;
 
-    pos = plat->spi_bus[0].mosi;
+    pos = plat->spi_bus[bus].mosi;
     if (plat->pins[pos].spi.mux_total > 0)
         if (maa_setup_mux_mapped(plat->pins[pos].spi) != MAA_SUCCESS)
-             return -2;
+             return NULL;
 
-    pos = plat->spi_bus[0].miso;
+    pos = plat->spi_bus[bus].miso;
     if (plat->pins[pos].spi.mux_total > 0)
         if (maa_setup_mux_mapped(plat->pins[pos].spi) != MAA_SUCCESS)
-             return -2;
+             return NULL;
 
-    return plat->spi_bus[bus].bus_id;
+    maa_spi_bus_t *spi = &(plat->spi_bus[bus]);
+    return spi;
 }
 
 maa_pin_t*

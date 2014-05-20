@@ -208,9 +208,9 @@ unsigned int maa_check_i2c();
 
 /** Check spi interface, sets up multiplexer on device.
  *
- * @return unsigned int if using /dev/spi-1.0 returned would be 1.0
+ * @return spi bus type
  */
-double maa_check_spi();
+maa_spi_bus_t* maa_check_spi(int bus);
 
 /** Check PWM
  *

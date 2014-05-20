@@ -44,9 +44,9 @@ struct _spi {
 };
 
 maa_spi_context
-maa_spi_init()
+maa_spi_init(int bus)
 {
-    double bus = maa_check_spi();
+    maa_spi_bus_t *spi = maa_check_spi(bus);
     if(bus < 0) {
         fprintf(stderr, "Failed. SPI platform Error\n");
         return NULL;
@@ -55,7 +55,7 @@ maa_spi_init()
     memset(dev, 0, sizeof(struct _spi));
 
     char path[MAX_SIZE];
-    sprintf(path, "/dev/spidev%.1f", bus);
+    sprintf(path, "/dev/spidev%u.%u", spi->bus_id, spi->slave_s);
 
     dev->devfd = open(path, O_RDWR);
     if (dev->devfd < 0) {
