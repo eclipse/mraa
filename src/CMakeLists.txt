@@ -18,6 +18,7 @@ set (maa_LIB_HEADERS
   ${PROJECT_SOURCE_DIR}/include/smbus.h
   ${PROJECT_SOURCE_DIR}/include/version.h
   ${PROJECT_SOURCE_DIR}/include/intel_galileo_rev_d.h
+  ${PROJECT_SOURCE_DIR}/include/maa_internal.h
 )
 
 set (maa_LIB_KERNEL
