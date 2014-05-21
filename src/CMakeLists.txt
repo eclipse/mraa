@@ -43,7 +43,7 @@ set (maa_LIB_SRCS
 add_library (maa SHARED ${maa_LIB_SRCS})
 target_link_libraries (maa ${CMAKE_THREAD_LIBS_INIT})
 
-set_target_properties(                                                                                                                                         
+set_target_properties(
    maa
    PROPERTIES
    SOVERSION ${maa_VERSION_MAJOR}
