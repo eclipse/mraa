@@ -30,12 +30,13 @@
 #include <fcntl.h>
 
 #include "spi.h"
+#include "maa_internal.h"
 
 #define MAX_SIZE 64
 #define SPI_MAX_LENGTH 4096
 
 /**
- * A strucutre representing the SPI device
+ * A structure representing the SPI device
  */
 struct _spi {
     /*@{*/
@@ -50,7 +51,7 @@ struct _spi {
 maa_spi_context
 maa_spi_init(int bus)
 {
-    maa_spi_bus_t *spi = maa_check_spi(bus);
+    maa_spi_bus_t *spi = maa_setup_spi(bus);
     if(bus < 0) {
         fprintf(stderr, "Failed. SPI platform Error\n");
         return NULL;

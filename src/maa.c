@@ -27,6 +27,7 @@
 #include <stdlib.h>
 
 #include "maa.h"
+#include "maa_internal.h"
 #include "intel_galileo_rev_d.h"
 #include "gpio.h"
 #include "version.h"
@@ -82,7 +83,7 @@ maa_setup_mux_mapped(maa_pin_t meta)
 }
 
 unsigned int
-maa_check_gpio(int pin)
+maa_setup_gpio(int pin)
 {
     if (plat == NULL)
         return -1;
@@ -100,7 +101,7 @@ maa_check_gpio(int pin)
 }
 
 unsigned int
-maa_check_aio(int aio)
+maa_setup_aio(int aio)
 {
     if (plat == NULL)
         return -3;
@@ -120,7 +121,7 @@ maa_check_aio(int aio)
 }
 
 unsigned int
-maa_check_i2c(int bus_s)
+maa_setup_i2c(int bus_s)
 {
     if (plat == NULL)
         return -3;
@@ -145,7 +146,7 @@ maa_check_i2c(int bus_s)
 }
 
 maa_spi_bus_t*
-maa_check_spi(int bus)
+maa_setup_spi(int bus)
 {
     if (plat == NULL)
         return NULL;
@@ -179,7 +180,7 @@ maa_check_spi(int bus)
 }
 
 maa_pin_t*
-maa_check_pwm(int pin)
+maa_setup_pwm(int pin)
 {
     if (plat == NULL)
         return NULL;

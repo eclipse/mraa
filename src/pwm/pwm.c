@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 
 #include "pwm.h"
+#include "maa_internal.h"
 
 #define MAX_SIZE 64
 #define SYSFS_PWM "/sys/class/pwm"
@@ -131,7 +132,7 @@ maa_pwm_get_duty(maa_pwm_context dev)
 
 maa_pwm_context
 maa_pwm_init(int pin) {
-    maa_pin_t* pinm = maa_check_pwm(pin);
+    maa_pin_t* pinm = maa_setup_pwm(pin);
     if (pinm == NULL)
         return NULL;
     int chip = pinm->parent_id;

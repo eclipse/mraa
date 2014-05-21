@@ -24,6 +24,7 @@
 
 #include "i2c.h"
 #include "smbus.h"
+#include "maa_internal.h"
 
 struct _i2c {
     /*@{*/
@@ -31,12 +32,12 @@ struct _i2c {
     int fh; /**< the file handle to the /dev/i2c-* device */
     int addr; /**< the address of the i2c slave */
     /*@}*/
-}; 
+};
 
 maa_i2c_context
 maa_i2c_init(int bus)
 {
-    int checked_pin = maa_check_i2c(bus);
+    int checked_pin = maa_setup_i2c(bus);
     if (checked_pin < 0) {
         switch(checked_pin) {
             case -1:

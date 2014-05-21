@@ -23,6 +23,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 #include "gpio.h"
+#include "maa_internal.h"
 
 #include <stdlib.h>
 #include <fcntl.h>
@@ -68,7 +69,7 @@ maa_gpio_get_valfp(maa_gpio_context dev)
 maa_gpio_context
 maa_gpio_init(int pin)
 {
-    int pinm = maa_check_gpio(pin);
+    int pinm = maa_setup_gpio(pin);
     if (pinm < 0)
         return NULL;
 

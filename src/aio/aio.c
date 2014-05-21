@@ -27,6 +27,7 @@
 #include <errno.h>
 
 #include "aio.h"
+#include "maa_internal.h"
 
 struct _aio {
     unsigned int channel;
@@ -59,7 +60,7 @@ static maa_result_t aio_get_valid_fp(maa_aio_context dev)
  */
 maa_aio_context maa_aio_init(unsigned int aio_channel)
 {
-    int checked_pin = maa_check_aio(aio_channel);
+    int checked_pin = maa_setup_aio(aio_channel);
     if (checked_pin < 0) {
         switch(checked_pin) {
             case -1:
