@@ -121,7 +121,7 @@ maa_setup_aio(int aio)
 }
 
 unsigned int
-maa_setup_i2c(int bus_s)
+maa_setup_i2c(int bus)
 {
     if (plat == NULL)
         return -3;
@@ -130,7 +130,10 @@ maa_setup_i2c(int bus_s)
         fprintf(stderr, "No i2c buses defined in platform");
         return -1;
     }
-    int bus = 0;
+    if (bus >= plat->i2c_bus_count) {
+        fprintf(stderr, "Above i2c bus count");
+        return -1;
+    }
 
     int pos = plat->i2c_bus[bus].sda;
     if (plat->pins[pos].i2c.mux_total > 0)
