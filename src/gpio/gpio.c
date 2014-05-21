@@ -411,16 +411,7 @@ maa_gpio_write(maa_gpio_context dev, int value)
     return MAA_SUCCESS;
 }
 
-maa_result_t
-maa_gpio_unexport(maa_gpio_context dev)
-{
-    if(dev->owner) {
-        return maa_gpio_unexport_force(dev);
-    }
-    return MAA_ERROR_INVALID_RESOURCE;
-}
-
-maa_result_t
+static maa_result_t
 maa_gpio_unexport_force(maa_gpio_context dev)
 {
     int unexport = open(SYSFS_CLASS_GPIO "/unexport", O_WRONLY);
@@ -440,6 +431,14 @@ maa_gpio_unexport_force(maa_gpio_context dev)
     close(unexport);
     maa_gpio_isr_exit(dev);
     return MAA_SUCCESS;
+}
+static maa_result_t
+maa_gpio_unexport(maa_gpio_context dev)
+{
+    if(dev->owner) {
+        return maa_gpio_unexport_force(dev);
+    }
+    return MAA_ERROR_INVALID_RESOURCE;
 }
 
 maa_result_t

@@ -151,23 +151,6 @@ maa_result_t maa_gpio_dir(maa_gpio_context dev, gpio_dir_t dir);
  */
 maa_result_t maa_gpio_close(maa_gpio_context dev);
 
-/** Unexport the GPIO context (maa_gpio_close() will call this function)
- *
- * @param dev The GPIO context.
- *
- * @return maa result type.
- */
-maa_result_t maa_gpio_unexport(maa_gpio_context dev);
-
-/** Unexport the GPIO context (maa_gpio_close() will call this function)
- *  Forces regardless to to ownership.
- *
- * @param dev The GPIO context.
- *
- * @return maa result type.
- */
-maa_result_t maa_gpio_unexport_force(maa_gpio_context dev);
-
 /** Read the GPIO value.
  *
  * @param dev The GPIO context.
