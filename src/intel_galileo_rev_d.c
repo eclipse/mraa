@@ -259,8 +259,8 @@ maa_intel_galileo_rev_d()
     b->i2c_bus_count = 1;
     b->def_i2c_bus = 0;
     b->i2c_bus[0].bus_id = 0;
-    b->i2c_bus[0].sda = 17;
-    b->i2c_bus[0].scl = 18;
+    b->i2c_bus[0].sda = 18;
+    b->i2c_bus[0].scl = 19;
 
     b->spi_bus_count = 1;
     b->def_spi_bus = 0;
