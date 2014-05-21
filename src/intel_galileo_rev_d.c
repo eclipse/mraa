@@ -115,6 +115,9 @@ maa_intel_galileo_rev_d()
     b->pins[9].capabilites = (maa_pincapabilities_t) {1,1,1,0,0,0,0};
     b->pins[9].gpio.pinmap = 19;
     b->pins[9].gpio.mux_total = 0;
+    b->pins[9].pwm.pinmap = 1;
+    b->pins[9].pwm.parent_id = 0;
+    b->pins[9].pwm.mux_total = 0;
 
     strncpy(b->pins[10].name, "IO10", 8);
     b->pins[10].capabilites = (maa_pincapabilities_t) {1,1,1,0,1,0,0};
@@ -142,7 +145,7 @@ maa_intel_galileo_rev_d()
     b->pins[11].pwm.parent_id = 0;
     b->pins[11].pwm.mux_total = 1;
     b->pins[11].pwm.mux[0].pin = 43;
-    b->pins[11].gpio.mux[0].value = 1;
+    b->pins[11].pwm.mux[0].value = 1;
     b->pins[11].spi.pinmap = 1;
     b->pins[11].spi.mux_total = 1;
     b->pins[11].spi.mux[0].pin = 43;
