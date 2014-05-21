@@ -260,15 +260,6 @@ maa_pwm_enable(maa_pwm_context dev, int enable)
 }
 
 maa_result_t
-maa_pwm_unexport(maa_pwm_context dev)
-{
-    if (dev->owner) {
-        return maa_pwm_unexport_force(dev);
-    }
-    return MAA_ERROR_INVALID_RESOURCE;
-}
-
-maa_result_t
 maa_pwm_unexport_force(maa_pwm_context dev)
 {
     char filepath[MAX_SIZE];
@@ -290,6 +281,15 @@ maa_pwm_unexport_force(maa_pwm_context dev)
 
     close(unexport_f);
     return MAA_SUCCESS;
+}
+
+maa_result_t
+maa_pwm_unexport(maa_pwm_context dev)
+{
+    if (dev->owner) {
+        return maa_pwm_unexport_force(dev);
+    }
+    return MAA_ERROR_INVALID_RESOURCE;
 }
 
 maa_result_t
