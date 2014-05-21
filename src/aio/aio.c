@@ -64,7 +64,7 @@ maa_aio_context maa_aio_init(unsigned int aio_channel)
         switch(checked_pin) {
             case -1:
                 fprintf(stderr, "Invalid analog input channel %d specified\n",
-	                    aio_channel);
+                        aio_channel);
                 return NULL;
             case -2:
                 fprintf(stderr, "Failed to set-up analog input channel %d "
