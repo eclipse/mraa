@@ -94,7 +94,7 @@ uint8_t* maa_spi_write_buf(maa_spi_context dev, uint8_t* data, int length);
  * @return maa result of operation
  */
 maa_result_t
-maa_spi_lsbmode(maa_spi_context dev, maa_boolean_t lsb)
+maa_spi_lsbmode(maa_spi_context dev, maa_boolean_t lsb);
 
 /** Set bits per mode on transaction
  * Defaults at 8.
@@ -105,7 +105,7 @@ maa_spi_lsbmode(maa_spi_context dev, maa_boolean_t lsb)
  * @return Result of operation
  */
 maa_result_t
-maa_spi_bit_per_word(maa_spi_context dev, unsigned int bits)
+maa_spi_bit_per_word(maa_spi_context dev, unsigned int bits);
 
 /** De-inits an maa_spi_context device
  *

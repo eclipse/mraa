@@ -35,8 +35,8 @@ namespace maa {
 
 class Spi {
     public:
-        Spi() {
-            m_spi = maa_spi_init();
+        Spi(int bus) {
+            m_spi = maa_spi_init(bus);
         }
         ~Spi() {
             maa_spi_stop(m_spi);
