@@ -68,7 +68,7 @@ maa_pwm_write_period(maa_pwm_context dev, int period)
         return MAA_ERROR_INVALID_RESOURCE;
     }
     char out[MAX_SIZE];
-    int length = snprintf(out, MAX_SIZE, "%d", dev->pin);
+    int length = snprintf(out, MAX_SIZE, "%d", period);
     if (write(period_f, out, length*sizeof(char)) == -1) {
         close(period_f);
         return MAA_ERROR_INVALID_RESOURCE;
