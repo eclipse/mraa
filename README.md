@@ -62,6 +62,19 @@ does not require the full doxygen/sphinx setup.
 
 When the API breaks in a small way there will be a changelog listed here
 
+**0.2.6**
+  * C++ examples added, using c++ headers/api.
+  * moved to open instead of fopen in all modules
+  * rename maa_check functions and made them internal to maa only.
+  * removed "export" functions from api
+  * Intel Galileo Gen 1 (rev d) fixes, incorrect definition of some items
+  * SPI, implementation completed.
+  * I2C internal function, completed.
+  * PWM fix bug in period set method.
+  * Swig upstream can be used for building.
+  * No longer builds docs on default cmake, needs flag
+  * GPIO/PWM ownership guard prevents closing on existing pins, still can be forced.
+
 **0.2.5**
   * C++/Python/Node Enums/const names now do not contain MAA_GPIO
   * Enum type declaration for C++ changed
