@@ -23,14 +23,12 @@ cmake and default system libraries are technically required to compile.
 
 1. node.js 0.10.26
 2. python 3.3.x or 2.7.x
-3. swig-v8 3.0.1 (swig 2.x will work but you will not be able to build node.js
+3. swig 3.0.1 (swig 2.x will work but you will not be able to build node.js
 module so comment out add_directories(javacsript) in src/CmakeLists.txt)
 4. doxygen (needed to generate even python doc)
 5. sphinx
 6. pygments
 7. pydoc
-
-To install swig-v8 the swig-v8-git package from AUR is helpful.
 
 ## COMPILING
 

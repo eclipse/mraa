@@ -1,7 +1,5 @@
 %module (docstring="Javascript interface to libmaa") maajs
 
-%include <node.i>
-
 %feature("autodoc", "3");
 
 #ifdef DOXYGEN
