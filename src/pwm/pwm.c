@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "pwm.h"
 #include "maa_internal.h"

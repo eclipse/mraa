@@ -28,6 +28,7 @@
 #include <linux/spi/spidev.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #include "spi.h"
 #include "maa_internal.h"
