@@ -147,7 +147,7 @@ maa_pwm_init_raw(int chipin, int pin)
     maa_pwm_context dev = (maa_pwm_context) malloc(sizeof(struct _pwm));
     if (dev == NULL)
         return NULL;
-    dev->duty_fp == -1;
+    dev->duty_fp = -1;
     dev->chipid = chipin;
     dev->pin = pin;
 
