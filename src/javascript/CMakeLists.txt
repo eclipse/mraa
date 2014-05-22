@@ -12,6 +12,7 @@ include_directories (
   ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
+set (CMAKE_CXX_FLAGS -DBUILDING_NODE_EXTENSION)
 set_source_files_properties (maajs.i PROPERTIES SWIG_FLAGS "-node")
 set_source_files_properties (maajs.i PROPERTIES CPLUSPLUS ON)
 
