@@ -19,3 +19,5 @@ target_link_libraries (gpio_read6 maa)
 target_link_libraries (spi_mcp4261 maa)
 
 add_subdirectory (c++)
+
+install (DIRECTORY ${PROJECT_SOURCE_DIR}/examples/ DESTINATION share/maa/examples)
