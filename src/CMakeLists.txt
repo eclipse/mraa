@@ -3,31 +3,6 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/include
 )
 
-set (maa_LIB_HEADERS
-  ${PROJECT_SOURCE_DIR}/api/maa.h
-  ${PROJECT_SOURCE_DIR}/api/gpio.h
-  ${PROJECT_SOURCE_DIR}/api/gpio.hpp
-  ${PROJECT_SOURCE_DIR}/api/i2c.h
-  ${PROJECT_SOURCE_DIR}/api/i2c.hpp
-  ${PROJECT_SOURCE_DIR}/api/pwm.h
-  ${PROJECT_SOURCE_DIR}/api/pwm.hpp
-  ${PROJECT_SOURCE_DIR}/api/spi.h
-  ${PROJECT_SOURCE_DIR}/api/spi.hpp
-  ${PROJECT_SOURCE_DIR}/api/aio.h
-  ${PROJECT_SOURCE_DIR}/api/aio.hpp
-  ${PROJECT_SOURCE_DIR}/include/smbus.h
-  ${PROJECT_SOURCE_DIR}/include/version.h
-  ${PROJECT_SOURCE_DIR}/include/intel_galileo_rev_d.h
-  ${PROJECT_SOURCE_DIR}/include/maa_internal.h
-)
-
-set (maa_LIB_KERNEL
-  ${PROJECT_SOURCE_DIR}/include/linux/compiler.h
-  ${PROJECT_SOURCE_DIR}/include/linux/i2c-dev.h
-  ${PROJECT_SOURCE_DIR}/include/linux/posix_types.h
-  ${PROJECT_SOURCE_DIR}/include/linux/types.h
-)
-
 set (maa_LIB_SRCS
   ${PROJECT_SOURCE_DIR}/src/maa.c
   ${PROJECT_SOURCE_DIR}/src/gpio/gpio.c
@@ -50,8 +25,7 @@ set_target_properties(
    SOVERSION ${maa_VERSION_MAJOR}
    VERSION ${maa_VERSION_STRING}
 )
-install (FILES ${maa_LIB_HEADERS} DESTINATION include/maa)
-install (FILES ${maa_LIB_KERNEL} DESTINATION include/maa/linux)
+install (DIRECTORY ${PROJECT_SOURCE_DIR}/api DESTINATION include/maa)
 
 macro (maa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
   configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
