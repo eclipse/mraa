@@ -97,7 +97,7 @@ int main ()
     i2c = new maa::I2c(0);
     float direction = 0;
     int16_t x = 0, y = 0, z = 0;
-    char rx_tx_buf[MAX_BUFFER_LENGTH];
+    uint8_t rx_tx_buf[MAX_BUFFER_LENGTH];
 
     i2c->address(HMC5883L_I2C_ADDR);
     rx_tx_buf[0] = HMC5883L_CONF_REG_B;

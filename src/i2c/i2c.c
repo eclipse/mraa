@@ -79,7 +79,7 @@ maa_i2c_frequency(maa_i2c_context dev, int hz)
 }
 
 maa_result_t
-maa_i2c_read(maa_i2c_context dev, char *data, int length)
+maa_i2c_read(maa_i2c_context dev, uint8_t* data, int length)
 {
     // this is the read(3) syscall not maa_i2c_read()
     if (read(dev->fh, data, length) == length) {
@@ -88,11 +88,10 @@ maa_i2c_read(maa_i2c_context dev, char *data, int length)
     return MAA_ERROR_NO_DATA_AVAILABLE;
 }
 
-int
+uint8_t
 maa_i2c_read_byte(maa_i2c_context dev)
 {
-    int byte;
-    byte = i2c_smbus_read_byte(dev->fh);
+    uint8_t byte = i2c_smbus_read_byte(dev->fh);
     if (byte < 0) {
         return -1;
     }
@@ -100,7 +99,7 @@ maa_i2c_read_byte(maa_i2c_context dev)
 }
 
 maa_result_t
-maa_i2c_write(maa_i2c_context dev, const char* data, int length)
+maa_i2c_write(maa_i2c_context dev, const uint8_t* data, int length)
 {
     if (i2c_smbus_write_i2c_block_data(dev->fh, data[0], length-1, (uint8_t*) data+1) < 0) {
         fprintf(stderr, "Failed to write to i2c\n");
@@ -110,7 +109,7 @@ maa_i2c_write(maa_i2c_context dev, const char* data, int length)
 }
 
 maa_result_t
-maa_i2c_write_byte(maa_i2c_context dev, const int data)
+maa_i2c_write_byte(maa_i2c_context dev, const uint8_t data)
 {
     if (i2c_smbus_write_byte(dev->fh, data) < 0) {
         fprintf(stderr, "Failed to write to i2c\n");
