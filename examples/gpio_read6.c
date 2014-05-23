@@ -34,6 +34,7 @@ main(int argc, char **argv)
     fprintf(stdout, "MAA Version: %s\nStarting Read on IO6\n",
             maa_get_version());
 
+//! [Interesting]
     maa_gpio_context gpio;
 
     gpio = maa_gpio_init(6);
@@ -46,6 +47,7 @@ main(int argc, char **argv)
     }
 
     maa_gpio_close(gpio);
+//! [Interesting]
 
     return 0;
 }

@@ -1,45 +1,51 @@
 MAA - Low Level Skeleton Library for Communication on Intel platforms
 ==============
 
-Library in C/C++ to interface with Galileo & other Intel platforms over:
-
-- I2C
-- SPI
-- GPIO
-- PWM
-- AIO
-
-In a structured and sane API with port nanmes/numbering that match boards &
-with bindings to javascript & python.
+Library in C/C++ to interface with Galileo & other Intel platforms, in a
+structured and sane API with port nanmes/numbering that match boards & with
+bindings to javascript & python.
 
 The intent is to make it easier for developers and sensor manufacturers to map
 their sensors & actuators on top of supported hardware and to allow control of
 low level communication protocol by high level languages & constructs.
 
+## API
+
+These interfaces allow you to interact with all libmaa functionality. The C++
+classes directly wrap the C API and provide a near 1:1 mapping of
+functionality.
+
+<center>
+C API Modules        | C++ API Classes
+:-------------------:|:-------------------:
+ @ref gpio.h "gpio"  | @ref maa::Gpio "Gpio class"
+ @ref i2c.h "i2c"    | @ref maa::I2c "I2c class"
+ @ref aio.h "aio"    | @ref maa::Aio "Aio class"
+ @ref pwm.h "pwm"    | @ref maa::Pwm "Pwm class"
+ @ref spi.h "spi"    | @ref maa::Spi "Spi class"
+ @ref maa.h "maa"    | @ref maa.h "maa"
+</center>
+
+@snippet gpio_read6.c Interesting
+
+## Supported platforms
+
+- Galileo (Fab D)
+
 ### ENV RECOMENDATIONS
 
 All of these are 'optional', however they are recommended. Only a C compiler,
-cmake and default system libraries are technically required to compile.
+cmake, libm and pthreads are technically required to compile.
 
-1. node.js 0.10.26
-2. python 3.3.x or 2.7.x
-3. swig 3.0.1 (swig 2.x will work but you will not be able to build node.js
-module so comment out add_directories(javacsript) in src/CmakeLists.txt)
-4. doxygen (needed to generate even python doc)
-5. sphinx
-6. pygments
-7. pydoc
+- Swig 3.0.1+ built with node.js & python support (0.10.x)
+- doxygen
+- sphinx (requires doxygen)
+- pygments
 
 ## COMPILING
 
-NOTE: The **only** supported cmake build configuration is to have the build/ dir
-inside of the repo/tarball.
-
-*if swig-v8 is not in your default path you can try run cmake with
-"-DCMAKE_PREFIX_PATH="/path/to/swig-v8"*
-
 mkdir build/
-cmake ..
+cmake -i ..
 make
 
 ## DEVELOPMENT
@@ -47,16 +53,6 @@ make
 Please fork the code on github and then send pull requests. Please avoid merges
 in your forks. I will also accept patches sent in git style with signoffs to
 brendan.le.foll@intel.com
-
-## USING
-
-see examples/
-
-*for node.js make sure that maajs.node is in the current dir and set export
-NODE_PATH=.*
-
-Simple python html documentation can be generated with **make pydoc**, this
-does not require the full doxygen/sphinx setup.
 
 ## API Changelog
 
