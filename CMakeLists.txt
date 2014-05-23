@@ -39,6 +39,9 @@ set (CMAKE_SWIG_FLAGS "")
 
 option (GTEST "Build all gtests." OFF)
 option (BUILDDOC "Build all doc." OFF)
+option (BUILDSWIG "Build swig modules." ON)
+option (BUILDSWIGPYTHON "Build swig python modules." ON)
+option (BUILDSWIGNODE "Build swig node modules." ON)
 
 if (GTEST)
   enable_testing ()
