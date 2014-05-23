@@ -25,7 +25,7 @@ set_target_properties(
    SOVERSION ${maa_VERSION_MAJOR}
    VERSION ${maa_VERSION_STRING}
 )
-install (DIRECTORY ${PROJECT_SOURCE_DIR}/api DESTINATION include/maa)
+install (DIRECTORY ${PROJECT_SOURCE_DIR}/api/ DESTINATION include/maa)
 
 macro (maa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
   configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
