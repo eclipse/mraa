@@ -109,7 +109,6 @@ maa_aio_context maa_aio_init(unsigned int aio_channel)
 uint16_t maa_aio_read(maa_aio_context dev)
 {
     char buffer[16];
-    unsigned int analog_value = 0;
     unsigned int shifter_value = 0;
 
     if (dev->adc_in_fp == -1) {
@@ -124,27 +123,21 @@ uint16_t maa_aio_read(maa_aio_context dev)
 
     errno = 0;
     char *end;
-    const long value = strtoul(buffer, &end, 10);
+    uint16_t analog_value = (uint16_t) strtoul(buffer, &end, 10);
     if (end == &buffer[0]) {
         fprintf(stderr, "%s is not a decimal number\n", buffer);
     }
     else if (errno != 0) {
         fprintf(stderr, "errno was set\n");
     }
-    unsigned int raw_value = (unsigned int) value;
 
     /* Adjust the raw analog input reading to supported resolution value*/
-    if (ADC_RAW_RESOLUTION_BITS == ADC_SUPPORTED_RESOLUTION_BITS) {
-        analog_value = raw_value;
-    }
-    else {
-        if (ADC_RAW_RESOLUTION_BITS > ADC_SUPPORTED_RESOLUTION_BITS) {
-            shifter_value = ADC_RAW_RESOLUTION_BITS - ADC_SUPPORTED_RESOLUTION_BITS;
-            analog_value =  raw_value >> shifter_value;
-        } else {
-            shifter_value = ADC_SUPPORTED_RESOLUTION_BITS - ADC_RAW_RESOLUTION_BITS;
-            analog_value = raw_value << shifter_value;
-        }
+    if (ADC_RAW_RESOLUTION_BITS > ADC_SUPPORTED_RESOLUTION_BITS) {
+        shifter_value = ADC_RAW_RESOLUTION_BITS - ADC_SUPPORTED_RESOLUTION_BITS;
+        analog_value =  analog_value >> shifter_value;
+    } else {
+        shifter_value = ADC_SUPPORTED_RESOLUTION_BITS - ADC_RAW_RESOLUTION_BITS;
+        analog_value = analog_value << shifter_value;
     }
 
     return analog_value;
