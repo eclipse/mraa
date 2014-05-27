@@ -42,8 +42,9 @@ class Aio {
         ~Aio() {
             maa_aio_close(m_aio);
         }
-        uint16_t read() {
-            return maa_aio_read(m_aio);
+        int read() {
+	    // Use basic types to make swig code generation simpler
+	    return (int) maa_aio_read(m_aio);
         }
     private:
         maa_aio_context m_aio;
