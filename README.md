@@ -74,6 +74,10 @@ brendan.le.foll@intel.com
 
 When the API breaks in a small way there will be a changelog listed here
 
+**0.2.7**
+  * C++ API now uses basic types and not unistd types as C
+  * Clearer and consistent use of unistd tpyes in C api
+
 **0.2.6**
   * C++ examples added, using c++ headers/api.
   * moved to open instead of fopen in all modules
