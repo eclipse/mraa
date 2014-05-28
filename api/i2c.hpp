@@ -51,16 +51,16 @@ class I2c {
         maa_result_t address(int address) {
             return maa_i2c_address(m_i2c, address);
         }
-        uint8_t read_byte() {
-            return maa_i2c_read_byte(m_i2c);
+        unsigned char read_byte() {
+            return (unsigned char) maa_i2c_read_byte(m_i2c);
         }
-        maa_result_t read(uint8_t* data, int length) {
+        maa_result_t read(unsigned char * data, int length) {
             return maa_i2c_read(m_i2c, data, length);
         }
-        maa_result_t write(const uint8_t* data, int length) {
+        maa_result_t write(const unsigned char* data, int length) {
             return maa_i2c_write(m_i2c, data, length);
         }
-        maa_result_t write_byte(const uint8_t data) {
+        maa_result_t write_byte(const unsigned char data) {
             return maa_i2c_write_byte(m_i2c, data);
         }
     private:

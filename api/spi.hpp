@@ -47,11 +47,11 @@ class Spi {
         maa_result_t frequency(int hz) {
             return maa_spi_frequency(m_spi, hz);
         }
-        uint8_t write(uint8_t data) {
-            return maa_spi_write(m_spi, data);
+        unsigned char write(uint8_t data) {
+            return (unsigned char) maa_spi_write(m_spi, data);
         }
-        uint8_t* write_buf(uint8_t* data, int length) {
-            return maa_spi_write_buf(m_spi, data, length);
+        unsigned char* write_buf(uint8_t* data, int length) {
+            return (unsigned char*) maa_spi_write_buf(m_spi, data, length);
         }
     private:
         maa_spi_context m_spi;
