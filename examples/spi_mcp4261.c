@@ -30,6 +30,7 @@ int
 main(int argc, char **argv)
 {
     maa_init();
+//! [Interesting]
     maa_spi_context spi;
     spi = maa_spi_init(0);
     unsigned int response = 0;
@@ -53,5 +54,5 @@ main(int argc, char **argv)
             usleep(100000);
         }
     }
-
+//! [Interesting]
 }

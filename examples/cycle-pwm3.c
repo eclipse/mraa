@@ -30,6 +30,7 @@ int
 main ()
 {
     maa_init();
+//! [Interesting]
     maa_pwm_context pwm;
     pwm = maa_pwm_init(3);
     if (pwm == NULL) {
@@ -49,5 +50,6 @@ main ()
         }
         float output = maa_pwm_read(pwm);
     }
+//! [Interesting]
     return 0;
 }

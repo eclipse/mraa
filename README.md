@@ -26,7 +26,23 @@ C API Modules        | C++ API Classes
  @ref maa.h "maa"    | @ref maa.h "maa"
 </center>
 
+### Hello Maa
+@snippet hellomaa.c Interesting
+
+### Basic GPIO
 @snippet gpio_read6.c Interesting
+
+### Basic PWM
+@snippet cycle-pwm3.c Interesting
+
+### Basic I2C
+@snippet analogin_a0.c Interesting
+
+### Basic AIO
+@snippet analogin_a0.c Interesting
+
+### Basic SPI
+@snippet spi_mcp4261.c Interesting
 
 ## Supported platforms
 

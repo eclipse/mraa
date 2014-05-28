@@ -29,6 +29,8 @@
 int
 main(int argc, char **argv)
 {
+//! [Interesting]
     fprintf(stdout, "hello maa\n Version: %s\n", maa_get_version());
     return 0;
+//! [Interesting]
 }
