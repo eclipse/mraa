@@ -26,8 +26,15 @@
 
 /** @file
  *
- * This file defines the i2c interface for libmaa
+ * @brief Inter-Integrated Circuit
  *
+ * This file defines the i2c/Iic interface for libmaa. A context represents a
+ * bus and that bus may contain multiple addresses or i2c slaves. It is
+ * considered best practice to make sure the address is correct before doing
+ * any calls on i2c, in case another application or even thread changed the
+ * addres on that bus. Multiple instances of the same bus can exist.
+ *
+ * @snippet i2c_HMC5883L.c Interesting
  */
 
 #ifdef __cplusplus

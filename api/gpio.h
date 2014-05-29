@@ -26,8 +26,15 @@
 
 /** @file
  *
- * This file defines the gpio interface for libmaa
+ * @brief General Purpose IO
  *
+ * GPIO is the General Purpose IO interface to libmaa. It's features depends on
+ * the board type used, it can use gpiolibs (exported via a kernel module
+ * through sysfs), or memory mapped IO via a /dev/uio device or /dev/mem
+ * depending again on the board configuratio, or memory mapped IO via a
+ * /dev/uio device or /dev/mem depending again on the board configuration.
+ *
+ * @snippet gpio_read6.c Interesting
  */
 
 #ifdef __cplusplus

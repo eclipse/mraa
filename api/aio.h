@@ -25,8 +25,12 @@
 #pragma once
 /** @file
  *
- * This file defines the aio (analog in) interface for libmaa
+ * @brief Analog input/output
  *
+ * AIO is the anlog input & output interface to libmaa. It is used to read or
+ * set the voltage applied to an AIO pin.
+ *
+ * @snippet analogin_a0.c Interesting
  */
 
 #ifdef __cplusplus
@@ -44,7 +48,8 @@ extern "C" {
 #define ADC_SUPPORTED_RESOLUTION_BITS   (10)
 
 /**
- * Opaque pointer definition to the internal struct _aio
+ * Opaque pointer definition to the internal struct _aio. This context refers
+ * to one single AIO pin on the board.
  */
 typedef struct _aio* maa_aio_context;
 

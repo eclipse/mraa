@@ -26,8 +26,11 @@
 
 /** @file
  *
+ * @brief System Packet Interface
+ *
  * This file defines the spi interface for libmaa
  *
+ * @snippet spi_mcp4261.c Interesting
  */
 
 #ifdef __cplusplus

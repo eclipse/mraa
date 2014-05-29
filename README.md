@@ -16,37 +16,24 @@ classes directly wrap the C API and provide a near 1:1 mapping of
 functionality.
 
 <center>
-C API Modules        | C++ API Classes
-:-------------------:|:-------------------:
- @ref gpio.h "gpio"  | @ref maa::Gpio "Gpio class"
- @ref i2c.h "i2c"    | @ref maa::I2c "I2c class"
- @ref aio.h "aio"    | @ref maa::Aio "Aio class"
- @ref pwm.h "pwm"    | @ref maa::Pwm "Pwm class"
- @ref spi.h "spi"    | @ref maa::Spi "Spi class"
- @ref maa.h "maa"    | @ref maa.h "maa"
+| C API Modules       | C++ API Classes             |
+|:-------------------:|:---------------------------:|
+| @ref gpio.h "gpio"  | @ref maa::Gpio "Gpio class" |
+| @ref i2c.h "i2c"    | @ref maa::I2c "I2c class"   |
+| @ref aio.h "aio"    | @ref maa::Aio "Aio class"   |
+| @ref pwm.h "pwm"    | @ref maa::Pwm "Pwm class"   |
+| @ref spi.h "spi"    | @ref maa::Spi "Spi class"   |
+| @ref maa.h "maa"    | @ref maa.h "maa"            |
 </center>
 
 ### Hello Maa
 @snippet hellomaa.c Interesting
 
-### Basic GPIO
-@snippet gpio_read6.c Interesting
-
-### Basic PWM
-@snippet cycle-pwm3.c Interesting
-
-### Basic I2C
-@snippet analogin_a0.c Interesting
-
-### Basic AIO
-@snippet analogin_a0.c Interesting
-
-### Basic SPI
-@snippet spi_mcp4261.c Interesting
-
 ## Supported platforms
 
-- Galileo (Fab D)
+Specific platform information for supported platforms is documented here:
+
+- @ref galileorevd
 
 ### ENV RECOMENDATIONS
 
@@ -60,15 +47,11 @@ cmake, libm and pthreads are technically required to compile.
 
 ## COMPILING
 
-mkdir build/
-cmake -i ..
-make
+More information on compiling is @ref building page
 
-## DEVELOPMENT
+## CONTRIBUTING
 
-Please fork the code on github and then send pull requests. Please avoid merges
-in your forks. I will also accept patches sent in git style with signoffs to
-brendan.le.foll@intel.com
+Please see the @ref contributing page
 
 ## API Changelog
 

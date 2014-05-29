@@ -23,7 +23,7 @@
  */
 
 #include <unistd.h>
-
+//! [Interesting]
 #include "aio.h"
 
 int main ()
@@ -31,7 +31,6 @@ int main ()
     maa_aio_context adc_a0;
     uint16_t adc_value = 0;
 
-//! [Interesting]
     adc_a0 = maa_aio_init(0);
     if (adc_a0 == NULL) {
         return 1;
@@ -43,7 +42,7 @@ int main ()
     }
 
     maa_aio_close(adc_a0);
-//! [Interesting]
 
     return MAA_SUCCESS;
 }
+//! [Interesting]

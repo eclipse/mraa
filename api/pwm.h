@@ -26,8 +26,14 @@
 
 /** @file
  *
- * This file defines the pwm interface for libmaa
+ * @brief Pulse Width Modulation module
  *
+ * PWM is the Pulse Width Modulation interface to libmaa. It allows the
+ * generation of a signal on a pin. Some boards may have higher or lower levels
+ * of resolution so make sure you check the board & pin you are using before
+ * hand.
+ *
+ * @snippet cycle-pwm3.c Interesting
  */
 
 #ifdef __cplusplus
