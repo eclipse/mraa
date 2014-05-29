@@ -182,6 +182,14 @@ maa_result_t maa_gpio_write(maa_gpio_context dev, int value);
  */
 maa_result_t maa_gpio_owner(maa_gpio_context dev, maa_boolean_t owner);
 
+/** Enable using memory mapped io instead of sysfs
+ *
+ * @param dev gpio context
+ * @param mmap use mmap instead of sysfs
+ * @return maa_result type
+ */
+maa_result_t maa_gpio_use_mmaped(maa_gpio_context dev, maa_boolean_t mmap);
+
 #ifdef __cplusplus
 }
 #endif

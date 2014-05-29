@@ -62,3 +62,10 @@ maa_spi_bus_t* maa_setup_spi(int bus);
  * @return the pwm pin_info_t of that IO pin
  */
 maa_pin_t* maa_setup_pwm(int pin);
+
+/** Setup gpio mux to go straight to SoC, galileo.
+ *
+ * @param pin physical pin to use
+ * @return maa_mmap_pin_t
+ */
+maa_mmap_pin_t* maa_setup_mmap_gpio(int pin);
