@@ -103,12 +103,21 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
-    unsigned int pinmap;
-    unsigned int parent_id;
-    unsigned int mux_total;
-    maa_mux_t mux[6];
+    unsigned int pinmap; /**< sysfs pin */
+    unsigned int parent_id; /** parent chip id */
+    unsigned int mux_total; /** Numfer of muxes needed for operation of pin */
+    maa_mux_t mux[6]; /** Array holding information about mux */
     /*@}*/
 } maa_pin_t;
+
+typedef struct {
+    /*@{*/
+    char mem_dev[32]; /**< Memory device to use /dev/uio0 etc */
+    unsigned int mem_sz; /** Size of memory to map */
+    unsigned int bit_pos; /** Position of value bit */
+    maa_pin_t gpio; /** GPio context containing none mmap info */
+    /*@}*/
+} maa_mmap_pin_t;
 
 /**
  * A Structure representing a physical Pin.
@@ -120,7 +129,7 @@ typedef struct {
     maa_pin_t gpio; /**< GPIO structure */
     maa_pin_t pwm;  /**< PWM structure */
     maa_pin_t aio;  /**< Anaglog Pin */
-    maa_pin_t fast_gpio; /**< Fast GPIO */
+    maa_mmap_pin_t mmap; /**< GPIO through memory */
     maa_pin_t i2c;  /**< i2c bus/pin */
     maa_pin_t spi;  /**< spi bus/pin */
     /*@}*/

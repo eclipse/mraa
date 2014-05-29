@@ -33,6 +33,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
 #define MAX_SIZE 64
@@ -45,11 +46,16 @@
 struct _gpio {
     /*@{*/
     int pin; /**< the pin number, as known to the os. */
+    int phy_pin; /**< pin passed to clean init. -1 none and raw*/
     int value_fp; /**< the file pointer to the value of the gpio */
     void (* isr)(); /**< the interupt service request */
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */
     maa_boolean_t owner; /**< If this context originally exported the pin */
+    maa_boolean_t mmap;
+    void *reg;
+    unsigned int reg_sz;
+    unsigned int reg_bit_pos;
     /*@}*/
 };
 
@@ -73,7 +79,9 @@ maa_gpio_init(int pin)
     if (pinm < 0)
         return NULL;
 
-    return maa_gpio_init_raw(pinm);
+    maa_gpio_context r = maa_gpio_init_raw(pinm);
+    r->phy_pin = pin;
+    return r;
 }
 
 maa_gpio_context
@@ -90,12 +98,13 @@ maa_gpio_init_raw(int pin)
     dev->value_fp = -1;
     dev->isr_value_fp = -1;
     dev->pin = pin;
+    dev->phy_pin = -1;
 
     char directory[MAX_SIZE];
     snprintf(directory, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/", dev->pin);
     struct stat dir;
     if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
-        fprintf(stderr, "GPIO Pin already exporting, continuing.\n");
+        //fprintf(stderr, "GPIO Pin already exporting, continuing.\n");
         dev->owner = 0; // Not Owner
     } else {
         int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
@@ -113,6 +122,17 @@ maa_gpio_init_raw(int pin)
         close(export);
     }
     return dev;
+}
+
+static maa_result_t
+maa_gpio_write_register(maa_gpio_context dev,int value)
+{
+    if (value == 1) {
+        *((unsigned *)dev->reg) |= (1<<dev->reg_bit_pos);
+        return MAA_SUCCESS;
+    }
+    *((unsigned *)dev->reg) &= ~(1<<dev->reg_bit_pos);
+    return MAA_SUCCESS;
 }
 
 static maa_result_t
@@ -395,6 +415,9 @@ maa_gpio_read(maa_gpio_context dev)
 maa_result_t
 maa_gpio_write(maa_gpio_context dev, int value)
 {
+    if (dev->mmap == 1)
+        return maa_gpio_write_register(dev,value);
+
     if (dev->value_fp == -1) {
         maa_gpio_get_valfp(dev);
     }
@@ -461,3 +484,45 @@ maa_gpio_owner(maa_gpio_context dev, maa_boolean_t own)
     return MAA_SUCCESS;
 }
 
+maa_result_t
+maa_gpio_use_mmaped(maa_gpio_context dev, maa_boolean_t mmap_en)
+{
+    if (dev ==  NULL) {
+        return MAA_ERROR_INVALID_RESOURCE;
+    }
+
+    if (maa_pin_mode_test(dev->phy_pin, MAA_PIN_FAST_GPIO) == 0)
+        return MAA_ERROR_NO_RESOURCES;
+
+    maa_mmap_pin_t *mmp = maa_setup_mmap_gpio(dev->phy_pin);
+    if (mmp == NULL)
+        return MAA_ERROR_INVALID_RESOURCE;
+
+    if (mmap_en == 1) {
+        if (dev->mmap == 0) {
+            close(dev->value_fp);
+            int fd;
+            fd = open(mmp->mem_dev, O_RDWR);
+            if (fd < 1) {
+                fprintf(stderr, "Unable to open memory device\n");
+                return MAA_ERROR_INVALID_RESOURCE;
+            }
+            dev->reg_sz = mmp->mem_sz;
+            dev->reg = mmap(NULL, dev->reg_sz, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+            dev->reg_bit_pos = mmp->bit_pos;
+            dev->mmap = 1;
+            return MAA_SUCCESS;
+        }
+        return MAA_ERROR_INVALID_PARAMETER;
+    }
+
+    if (mmap_en == 0) {
+        if (dev ->mmap == 1) {
+            munmap(dev->reg, dev->reg_sz);
+            dev->mmap = 0;
+        }
+        return MAA_ERROR_INVALID_PARAMETER;
+    }
+
+    return MAA_SUCCESS;
+}

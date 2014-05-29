@@ -312,3 +312,22 @@ maa_pin_mode_test(int pin, maa_pinmodes_t mode)
     }
     return 0;
 }
+
+maa_mmap_pin_t*
+maa_setup_mmap_gpio(int pin)
+{
+    if (plat == NULL)
+        return NULL;
+
+    if (plat->pins[pin].capabilites.fast_gpio != 1)
+        return NULL;
+
+    if (plat->pins[pin].mmap.gpio.mux_total > 0)
+       if (maa_setup_mux_mapped(plat->pins[pin].mmap.gpio) != MAA_SUCCESS)
+            return NULL;
+
+    if (maa_setup_mux_mapped(plat->pins[pin].mmap.gpio) != MAA_SUCCESS)
+            return NULL;
+    maa_mmap_pin_t *ret = &(plat->pins[pin].mmap);
+    return ret;
+}
