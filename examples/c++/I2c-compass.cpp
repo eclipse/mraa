@@ -93,6 +93,7 @@ sig_handler(int signo)
 
 int main ()
 {
+//! [Interesting]
     maa::I2c* i2c;
     i2c = new maa::I2c(0);
     float direction = 0;
@@ -103,7 +104,7 @@ int main ()
     rx_tx_buf[0] = HMC5883L_CONF_REG_B;
     rx_tx_buf[1] = GA_1_3_REG;
     i2c->write(rx_tx_buf, 2);
-
+//! [Interesting]
     signal(SIGINT, sig_handler);
 
     while (running == 0) {

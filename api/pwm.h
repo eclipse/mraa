@@ -24,8 +24,8 @@
 
 #pragma once
 
-/** @file
- *
+/**
+ * @file
  * @brief Pulse Width Modulation module
  *
  * PWM is the Pulse Width Modulation interface to libmaa. It allows the
@@ -47,121 +47,124 @@ extern "C" {
 
 typedef struct _pwm* maa_pwm_context;
 
-/** Initialise pwm_context, uses board mapping.
+/**
+ * Initialise pwm_context, uses board mapping
  *
- * @param pin The PWM PIN.
- *
- * @return maa_pwm_context The returned initialised pwm context
+ * @param pin The PWM PIN
+ * @return pwm context or NULL
  */
 maa_pwm_context maa_pwm_init(int pin);
 
-/** Initialise pwm_context, raw mode.
+/**
+ * Initialise pwm_context, raw mode
  *
  * @param chipid The chip inwhich the PWM is under in SYSFS
  * @param pin The PWM PIN.
- *
- * @return maa_pwm_context The returned initialised pwm context
+ * @return pwm context or NULL
  */
 maa_pwm_context maa_pwm_init_raw(int chipid, int pin);
 
-/** Set the ouput duty-cycle percentage, as a float
+/**
+ * Set the ouput duty-cycle percentage, as a float
  *
- * @param pwm The PWM context to use.
+ * @param dev The Pwm context to use
  * @param percentage A floating-point value representing percentage of output.
  *    The value should lie between 0.0f (representing on 0%) and 1.0f
- *    Values above or below this range will be set at either 0.0f or 1.0f.
- *
- * @return maa_result_t the maa result.
+ *    Values above or below this range will be set at either 0.0f or 1.0f
+ * @return Result of operation
  */
-maa_result_t maa_pwm_write(maa_pwm_context pwm, float percentage);
+maa_result_t maa_pwm_write(maa_pwm_context dev, float percentage);
 
-/** Read the ouput duty-cycle percentage, as a float
+/**
+ * Read the ouput duty-cycle percentage, as a float
  *
- * @param pwm The PWM context to use.
+ * @param dev The Pwm context to use
  * @return percentage A floating-point value representing percentage of output.
  *    The value should lie between 0.0f (representing on 0%) and 1.0f
- *    Values above or below this range will be set at either 0.0f or 1.0f.
+ *    Values above or below this range will be set at either 0.0f or 1.0f
  */
-float maa_pwm_read(maa_pwm_context pwm);
+float maa_pwm_read(maa_pwm_context dev);
 
-/** Set the PWM period as seconds represented in a float
+/**
+ * Set the PWM period as seconds represented in a float
  *
- * @param pwm The PWM context to use.
- * @param seconds Peroid represented as a float in seconds.
- *
- * @return maa_result_t the maa result.
+ * @param dev The Pwm context to use
+ * @param seconds Period represented as a float in seconds
+ * @return Result of operation
  */
-maa_result_t maa_pwm_period(maa_pwm_context pwm, float seconds);
+maa_result_t maa_pwm_period(maa_pwm_context dev, float seconds);
 
-/** Set period, milli-oseconds.
+/**
+ * Set period, milliseconds.
  *
- * @param pwm The PWM context to use.
- * @param ms milli-seconds for period.
- *
- * @return maa_result_t the maa result.
+ * @param dev The Pwm context to use
+ * @param ms Milliseconds for period
+ * @return Result of operation
  */
-maa_result_t maa_pwm_period_ms(maa_pwm_context pwm, int ms);
+maa_result_t maa_pwm_period_ms(maa_pwm_context dev, int ms);
 
-/** Set period, microseconds
+/**
+ * Set period, microseconds
  *
- * @param pwm The PWM context to use.
- * @param ns microseconds as period.
- *
- * @return maa_result_t the maa result.
+ * @param dev The Pwm context to use
+ * @param us Microseconds as period
+ * @return Result of operation
  */
-maa_result_t maa_pwm_period_us(maa_pwm_context pwm, int us);
+maa_result_t maa_pwm_period_us(maa_pwm_context dev, int us);
 
-/** Set pulsewidth, As represnted by seconds in a (float).
+/**
+ * Set pulsewidth, As represnted by seconds in a (float)
  *
- * @param pwm The PWM context to use.
+ * @param dev The Pwm context to use
  * @param seconds The duration of a pulse
- *
- * @return maa_result_t the maa result.
+ * @return Result of operation
  */
-maa_result_t maa_pwm_pulsewidth(maa_pwm_context pwm, float seconds);
+maa_result_t maa_pwm_pulsewidth(maa_pwm_context dev, float seconds);
 
-/** Set pulsewidth, milliseconds
+/**
+ * Set pulsewidth, milliseconds
  *
- * @param pwm The PWM context to use.
- * @param ms milliseconds for pulsewidth.
- *
- * @return maa_result_t the maa result.
+ * @param dev The Pwm context to use
+ * @param ms Milliseconds for pulsewidth
+ * @return Result of operation
  */
-maa_result_t maa_pwm_pulsewidth_ms(maa_pwm_context pwm, int ms);
+maa_result_t maa_pwm_pulsewidth_ms(maa_pwm_context dev, int ms);
 
-/** Set pulsewidth, microseconds.
+/**
+ * Set pulsewidth, microseconds
  *
- * @param pwm The PWM context to use.
- * @param us microseconds for pulsewidth.
- *
- * @return maa_result_t the maa result.
+ * @param dev The Pwm context to use
+ * @param us Microseconds for pulsewidth
+ * @return Result of operation
  */
-maa_result_t maa_pwm_pulsewidth_us(maa_pwm_context pwm, int us);
+maa_result_t maa_pwm_pulsewidth_us(maa_pwm_context dev, int us);
 
-/** Set the enable status of the PWM pin. None zero will assume on with output being driven.
+/**
+ * Set the enable status of the PWM pin. None zero will assume on with output being driven.
  *   and 0 will disable the output.
  *
- * @param pwm The PWM context to use.
- * @param enable enable status of pin
- *
- * @return maa_result_t the maa result.
+ * @param dev The pwm context to use
+ * @param enable Toggle status of pin
+ * @return Result of operation.
  */
-maa_result_t maa_pwm_enable(maa_pwm_context pwm, int enable);
+maa_result_t maa_pwm_enable(maa_pwm_context dev, int enable);
 
-/** Change ownership of context
+/**
+ * Change ownership of context
  *
- * @param pwm the context
- * @param owner ownership , 1 to own
+ * @param dev the context
+ * @param owner Ownership boolean
+ * @return Result of operation
  */
-maa_result_t maa_pwm_owner(maa_pwm_context pwm, maa_boolean_t owner);
+maa_result_t maa_pwm_owner(maa_pwm_context dev, maa_boolean_t owner);
 
-/** Close and unexport the PWM pin.
+/**
+ * Close and unexport the PWM pin
  *
- * @param pwm The PWM context to use.
- *
- * @return maa_result_t the maa result.
+ * @param dev The pwm context to use
+ * @return Result of operation
  */
-maa_result_t maa_pwm_close(maa_pwm_context pwm);
+maa_result_t maa_pwm_close(maa_pwm_context dev);
 
 #ifdef __cplusplus
 }

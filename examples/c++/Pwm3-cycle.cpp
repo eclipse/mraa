@@ -40,6 +40,8 @@ sig_handler(int signo)
 
 int main ()
 {
+    signal(SIGINT, sig_handler);
+//! [Interesting]
     maa::Pwm* pwm;
 
     pwm = new maa::Pwm(3);
@@ -47,8 +49,6 @@ int main ()
         return MAA_ERROR_UNSPECIFIED;
     }
     fprintf(stdout, "Cycling PWM on IO3 (pwm3) \n");
-
-    signal(SIGINT, sig_handler);
 
     float value = 0.0f;
     while (running == 0) {
@@ -60,6 +60,7 @@ int main ()
         }
     }
     delete pwm;
+//! [Interesting]
 
     return MAA_SUCCESS;
 }

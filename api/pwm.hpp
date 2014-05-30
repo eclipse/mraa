@@ -24,18 +24,28 @@
 
 #pragma once
 
-/** @file
- *
- * This file defines the pwm C++ interface for libmaa
- *
- */
-
 #include "pwm.h"
 
 namespace maa {
 
+/**
+ * @brief C++ API to Pulse Width Modulation
+ *
+ * This file defines the PWM C++ interface for libmaa
+ *
+ * @snippet Pwm3-cycle.cpp Interesting
+ */
 class Pwm {
     public:
+        /**
+         * instanciates a PWM object on a pin
+         *
+         * @param pin the pin number used on your board
+         * @param chipid the pwmchip to use, use only in raw mode
+         * @param owner if you are the owner of the pin the destructor will
+         * unexport the pin from sysfs, default behaviour is you are the owner
+         * if the pinmapper exported it
+         */
         Pwm(int pin, int chipid=-1, bool owner = true) {
             if (chipid == -1)
                 m_pwm = maa_pwm_init(pin);
@@ -44,33 +54,96 @@ class Pwm {
             if (!owner)
                 maa_pwm_owner(m_pwm, 0);
         }
+        /**
+         * Pwm destructor
+         */
         ~Pwm() {
             maa_pwm_close(m_pwm);
         }
+        /**
+         * Set the output duty-cycle percentage, as a float
+         *
+         * @param percentage A floating-point value representing percentage of
+         * output. The value should lie between 0.0f (representing on 0%) and
+         * 1.0f Values above or below this range will be set at either 0.0f or
+         * 1.0f
+         * @return Result of operation
+         */
         maa_result_t write(float percentage) {
             return maa_pwm_write(m_pwm, percentage);
         }
+        /**
+         * Read the ouput duty-cycle percentage, as a float
+         *
+         * @return A floating-point value representing percentage of
+         * output. The value should lie between 0.0f (representing on 0%) and
+         * 1.0f Values above or below this range will be set at either 0.0f or
+         * 1.0f
+         */
         float read() {
             return maa_pwm_read(m_pwm);
         }
+        /**
+         * Set the PWM period as seconds represented in a float
+         *
+         * @param period Period represented as a float in seconds
+         * @return Result of operation
+         */
         maa_result_t period(float period) {
             return maa_pwm_period(m_pwm, period);
         }
+        /**
+         * Set period, milliseconds
+         *
+         * @param ms milliseconds for period
+         * @return Result of operation
+         */
         maa_result_t period_ms(int ms) {
             return maa_pwm_period_ms(m_pwm, ms);
         }
+        /**
+         * Set period, microseconds
+         *
+         * @param us microseconds as period
+         * @return Result of operation
+         */
         maa_result_t period_us(int us) {
             return maa_pwm_period_us(m_pwm, us);
         }
+        /**
+         * Set pulsewidth, As represnted by seconds in a (float)
+         *
+         * @param seconds The duration of a pulse
+         * @return Result of operation
+         */
         maa_result_t pulsewidth(float seconds) {
             return maa_pwm_pulsewidth(m_pwm, seconds);
         }
+        /**
+         * Set pulsewidth, milliseconds
+         *
+         * @param ms milliseconds for pulsewidth
+         * @return Result of operation
+         */
         maa_result_t pulsewidth_ms(int ms) {
             return maa_pwm_pulsewidth_ms(m_pwm, ms);
         }
+        /**
+         * The pulsewidth, microseconds
+         *
+         * @param us microseconds for pulsewidth
+         * @return Result of operation
+         */
         maa_result_t pulsewidth_us(int us) {
             return maa_pwm_pulsewidth_us(m_pwm, us);
         }
+        /**
+         * Set the enable status of the PWM pin. None zero will assume on with
+         * output being driven and 0 will disable the output
+         *
+         * @param enable enable status of pin
+         * @return Result of operation
+         */
         maa_result_t enable(bool enable) {
             if (enable)
                 return maa_pwm_enable(m_pwm, 1);

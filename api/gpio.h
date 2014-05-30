@@ -24,15 +24,15 @@
 
 #pragma once
 
-/** @file
- *
+/**
+ * @file
  * @brief General Purpose IO
  *
- * GPIO is the General Purpose IO interface to libmaa. It's features depends on
+ * Gpio is the General Purpose IO interface to libmaa. It's features depends on
  * the board type used, it can use gpiolibs (exported via a kernel module
  * through sysfs), or memory mapped IO via a /dev/uio device or /dev/mem
  * depending again on the board configuratio, or memory mapped IO via a
- * /dev/uio device or /dev/mem depending again on the board configuration.
+ * /dev/uio device or /dev/mem depending again on the board configuration
  *
  * @snippet gpio_read6.c Interesting
  */
@@ -49,9 +49,6 @@ extern "C" {
 #include <pthread.h>
 
 #include "maa.h"
-/**
- * A strucutre representing a gpio pin.
- */
 
 /**
  * Opaque pointer definition to the internal struct _gpio
@@ -59,7 +56,7 @@ extern "C" {
 typedef struct _gpio* maa_gpio_context;
 
 /**
- * GPIO Output modes
+ * Gpio Output modes
  */
 typedef enum {
     MAA_GPIO_STRONG     = 0, /**< Default. Strong high and low */
@@ -69,124 +66,127 @@ typedef enum {
 } gpio_mode_t;
 
 /**
- * GPIO Direction options.
+ * Gpio Direction options
  */
 typedef enum {
     MAA_GPIO_OUT    = 0, /**< Output. A Mode can also be set */
-    MAA_GPIO_IN     = 1  /**< Input. */
+    MAA_GPIO_IN     = 1  /**< Input */
 } gpio_dir_t;
 
+/**
+ * Gpio Edge types for interupts
+ */
 typedef enum {
-    MAA_GPIO_EDGE_NONE    = 0, /**< No interrupt on GPIO */
+    MAA_GPIO_EDGE_NONE    = 0, /**< No interrupt on Gpio */
     MAA_GPIO_EDGE_BOTH    = 1, /**< Interupt on rising & falling */
     MAA_GPIO_EDGE_RISING  = 2, /**< Interupt on rising only */
     MAA_GPIO_EDGE_FALLING = 3  /**< Interupt on falling only */
 } gpio_edge_t;
 
-/** Initialise gpio_context, based on board number
+/**
+ * Initialise gpio_context, based on board number
  *
- *  @param pin pin number read from the board, i.e IO3 is 3.
- *
- *  @returns maa_gpio_context based on the IO pin
+ *  @param pin Pin number read from the board, i.e IO3 is 3
+ *  @returns gpio context or NULL
  */
 maa_gpio_context maa_gpio_init(int pin);
 
-/** Initialise gpio context without any mapping to a pin.
- * - For more expert users
+/**
+ * Initialise gpio context without any mapping to a pin
  *
  * @param gpiopin gpio pin as listed in SYSFS
- *
- * @return gpio context
+ * @return gpio context or NULL
  */
 maa_gpio_context maa_gpio_init_raw(int gpiopin);
 
-/** Set the edge mode on the gpio
+/**
+ * Set the edge mode on the gpio
  *
- * @param dev The GPIO context
+ * @param dev The Gpio context
  * @param mode The edge mode to set the gpio into
- *
- * @return maa result type.
+ * @return Result of operation
  */
 maa_result_t maa_gpio_edge_mode(maa_gpio_context dev, gpio_edge_t mode);
 
-/** Set an interupt on pin
+/**
+ * Set an interupt on pin
  *
- * @param dev The GPIO context
- * @param mode The edge mode to set the gpio into
+ * @param dev The Gpio context
+ * @param edge The edge mode to set the gpio into
  * @param fptr Function pointer to function to be called when interupt is
  * triggered
- *
- * @return maa result type.
+ * @return Result of operation
  */
-maa_result_t
-maa_gpio_isr(maa_gpio_context dev, gpio_edge_t edge, void (*fptr)(void));
+maa_result_t maa_gpio_isr(maa_gpio_context dev, gpio_edge_t edge, void (*fptr)(void));
 
-/** Stop the current interupt watcher on this GPIO, and set the GPIO edge mode
- * to MAA_GPIO_EDGE_NONE.
+/**
+ * Stop the current interupt watcher on this Gpio, and set the Gpio edge mode
+ * to MAA_GPIO_EDGE_NONE
  *
- * @param dev The GPIO context.
- *
- * @return maa result type.
+ * @param dev The Gpio context
+ * @return Result of operation
  */
-maa_result_t
-maa_gpio_isr_exit(maa_gpio_context dev);
+maa_result_t maa_gpio_isr_exit(maa_gpio_context dev);
 
-/** Set GPIO Output Mode,
+/**
+ * Set Gpio Output Mode,
  *
- * @param dev The GPIO context
- * @param mode The GPIO Output Mode.
- *
- * @return maa result type.
+ * @param dev The Gpio context
+ * @param mode The Gpio Output Mode
+ * @return Result of operation
  */
 maa_result_t maa_gpio_mode(maa_gpio_context dev, gpio_mode_t mode);
 
-/** Set GPIO direction
+/**
+ * Set Gpio direction
  *
- * @param dev The GPIO context.
- * @param dir The direction of the GPIO.
- *
- * @return maa result type.
+ * @param dev The Gpio context
+ * @param dir The direction of the Gpio
+ * @return Result of operation
  */
 maa_result_t maa_gpio_dir(maa_gpio_context dev, gpio_dir_t dir);
 
-/** Close the GPIO context
- * - Will free the memory for the context and unexport the GPIO
+/**
+ * Close the Gpio context
+ * - Will free the memory for the context and unexport the Gpio
  *
- * @param dev the GPIO context
- *
- * @return maa result type.
+ * @param dev The Gpio context
+ * @return Result of operation
  */
 maa_result_t maa_gpio_close(maa_gpio_context dev);
 
-/** Read the GPIO value.
+/**
+ * Read the Gpio value.
  *
- * @param dev The GPIO context.
- *
- * @return the integer value of the GPIO
+ * @param dev The Gpio context
+ * @return Result of operation
  */
 int maa_gpio_read(maa_gpio_context dev);
 
-/** Write to the GPIO Value.
+/**
+ * Write to the Gpio Value.
  *
- * @param dev The GPIO context.
- * @param value Integer value to write.
- *
- * @return maa result type
+ * @param dev The Gpio context
+ * @param value Integer value to write
+ * @return Result of operation
  */
 maa_result_t maa_gpio_write(maa_gpio_context dev, int value);
 
-/** Change ownership of the context.
+/**
+ * Change ownership of the context.
  *
- * @param dev gpio context
- * @param owner does this context own the pin.
+ * @param dev The Gpio context
+ * @param owner Does this context own the pin
+ * @return Result of operation
  */
 maa_result_t maa_gpio_owner(maa_gpio_context dev, maa_boolean_t owner);
 
-/** Enable using memory mapped io instead of sysfs
+/**
+ * Enable using memory mapped io instead of sysfs
  *
- * @param dev gpio context
- * @param mmap use mmap instead of sysfs
- * @return maa_result type
+ * @param dev The Gpio context
+ * @param mmap Use mmap instead of sysfs
+ * @return Result of operation
  */
 maa_result_t maa_gpio_use_mmaped(maa_gpio_context dev, maa_boolean_t mmap);
 

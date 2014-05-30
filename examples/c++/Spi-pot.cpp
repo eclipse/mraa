@@ -41,11 +41,12 @@ sig_handler(int signo)
 
 int main ()
 {
+    signal(SIGINT, sig_handler);
+
+//! [Interesting]
     maa::Spi* spi;
 
     spi = new maa::Spi(0);
-
-    signal(SIGINT, sig_handler);
 
     uint8_t data[] = {0x00, 100};
     uint8_t *recv;
@@ -68,6 +69,7 @@ int main ()
 
     }
     delete spi;
+//! [Interesting]
 
     return MAA_SUCCESS;
 }

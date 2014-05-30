@@ -24,8 +24,8 @@
 
 #pragma once
 
-/** @file
- *
+/**
+ * @file
  * @brief System Packet Interface
  *
  * This file defines the spi interface for libmaa
@@ -43,78 +43,76 @@ extern "C" {
 
 #include "maa.h"
 
+/**
+ * Opaque pointer definition to the internal struct _spi
+ */
 typedef struct _spi* maa_spi_context;
 
-/** Initialise SPI_context, uses board mapping. Sets the muxes
+/**
+ * Initialise SPI_context, uses board mapping. Sets the muxes
  *
- * @param bus to use, as listed in platform definition. Normally 0
- * @return maa_spi_context The returned initialised SPI context
+ * @param bus Bus to use, as listed in platform definition, normally 0
+ * @return Spi context or NULL
  */
 maa_spi_context maa_spi_init(int bus);
 
-/** Set the SPI device mode. see spidev
- * 0-3.
- * @param spi the spi device context
- * @param mode the mode. See Linux spidev
+/**
+ * Set the SPI device mode. see spidev 0-3.
  *
- * @return maa_spi_context The returned initialised SPI context
+ * @param dev The Spi context
+ * @param mode The SPI mode, See Linux spidev
+ * @return Spi context or NULL
  */
 maa_result_t maa_spi_mode(maa_spi_context dev,unsigned short mode);
 
 /** Set the SPI device operating clock frequency.
  *
- * @param spi the spid device clock frequency
+ * @param dev the Spi context
  * @param hz the frequency in hz
- *
  * @return maa_spi_context The returned initialised SPI context
  */
 maa_result_t maa_spi_frequency(maa_spi_context dev, int hz);
 
 /** Write Single Byte to the SPI device.
  *
- * @param spi the spid device clock frequency
- * @param data to send
- *
- * @return data received on the miso line.
+ * @param dev The Spi context
+ * @param data Data to send
+ * @return Data received on the miso line
  */
 uint8_t maa_spi_write(maa_spi_context dev, uint8_t data);
 
 /** Write Buffer of bytes to the SPI device.
  *
- * @param spi the spid device clock frequency
+ * @param dev The Spi context
  * @param data to send
  * @param length elements within buffer, Max 4096
- *
- * @return data received on the miso line. Same length as passed in.
+ * @return Data received on the miso line, same length as passed in
  */
 uint8_t* maa_spi_write_buf(maa_spi_context dev, uint8_t* data, int length);
 
 /**
+ * Change the SPI lsb mode
  *
- * @param dev spi context
- * @param lsb. Use least significant bit transmission. 0 for msbi
- *
- * @return maa result of operation
- */
-maa_result_t
-maa_spi_lsbmode(maa_spi_context dev, maa_boolean_t lsb);
-
-/** Set bits per mode on transaction
- * Defaults at 8.
- *
- * @param dev spi context
- * @param bits bits per word
- *
+ * @param dev The Spi context
+ * @param lsb Use least significant bit transmission. 0 for msbi
  * @return Result of operation
  */
-maa_result_t
-maa_spi_bit_per_word(maa_spi_context dev, unsigned int bits);
+maa_result_t maa_spi_lsbmode(maa_spi_context dev, maa_boolean_t lsb);
 
-/** De-inits an maa_spi_context device
+/**
+ * Set bits per mode on transaction, defaults at 8
  *
- *  @param dev the spi context
+ * @param dev The Spi context
+ * @param bits bits per word
+ * @return Result of operation
+ */
+maa_result_t maa_spi_bit_per_word(maa_spi_context dev, unsigned int bits);
+
+/**
+ * De-inits an maa_spi_context device
  *
- *  @return maa_result_t the maa result.
+ * @param dev The Spi context
+ * @return Result of operation
  */
 maa_result_t maa_spi_stop(maa_spi_context dev);
 

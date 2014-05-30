@@ -24,27 +24,43 @@
 
 #pragma once
 
-/** @file
- *
- * This file defines the aio C++ interface for libmaa
- *
- */
-
 #include "aio.h"
 
 namespace maa {
 
+/**
+ * @brief C++ API to Analog IO
+ *
+ * This file defines the aio C++ interface for libmaa
+ *
+ * @snippet examples/c++/AioA0.cpp Interesting
+ */
 class Aio {
     public:
+        /**
+         * Aio Constructor, takes a pin number which will map directly to the
+         * board number
+         *
+         * @param pin channel number to read ADC inputs
+         */
         Aio(unsigned int pin) {
             m_aio = maa_aio_init(pin);
         }
+        /**
+         * Aio destructor
+         */
         ~Aio() {
             maa_aio_close(m_aio);
         }
+        /**
+         * Read a value from the AIO pin. Note this value can never be outside
+         * of the bounds of an unsigned short
+         *
+         * @returns The current input voltage, normalised to a 16-bit value
+         */
         int read() {
-	    // Use basic types to make swig code generation simpler
-	    return (int) maa_aio_read(m_aio);
+            // Use basic types to make swig code generation simpler
+            return (int) maa_aio_read(m_aio);
         }
     private:
         maa_aio_context m_aio;

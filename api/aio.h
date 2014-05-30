@@ -23,8 +23,8 @@
  */
 
 #pragma once
-/** @file
- *
+/**
+ * @file
  * @brief Analog input/output
  *
  * AIO is the anlog input & output interface to libmaa. It is used to read or
@@ -53,33 +53,27 @@ extern "C" {
  */
 typedef struct _aio* maa_aio_context;
 
-/** Initialise an Analog input device, connected to the specified pin
+/**
+ * Initialise an Analog input device, connected to the specified pin
  *
- * @param aio_channel channel number to read ADC inputs
- *
- * @returns pointer to maa_aio_context structure after initialisation of Analog
- * input pin successfully, else returns null.
+ * @param pin Channel number to read ADC inputs
+ * @returns aio context or NULL
  */
-maa_aio_context maa_aio_init(unsigned int aio_channel);
+maa_aio_context maa_aio_init(unsigned int pin);
 
-/** Read the input voltage, represented as an unsigned short in the range [0x0,
- * 0xFFFF]
+/**
+ * Read the input voltage
  *
- * @param dev -  pointer to maa_aio_context structure  initialised by
- * maa_aio_init()
- *
- * @returns 16-bit unsigned integer representing the current input voltage,
- * normalised to a 16-bit value
+ * @param dev The AIO context
+ * @returns The current input voltage, normalised to a 16-bit value
  */
 uint16_t maa_aio_read(maa_aio_context dev);
 
-/** Close the analog input context
- * - Will free the memory for the context.
+/**
+ * Close the analog input context, this will free the memory for the context
  *
- * @param dev -  pointer to maa_aio_context structure  initialised by
- * maa_aio_init()
- *
- * @return maa_result_t - result type.
+ * @param dev The AIO context
+ * @return Result of operation
  */
 maa_result_t maa_aio_close(maa_aio_context dev);
 

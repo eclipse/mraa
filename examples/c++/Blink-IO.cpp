@@ -30,7 +30,6 @@
 #include <unistd.h>
 
 #include "gpio.hpp"
-
 #define DEFAULT_IOPIN 8
 
 static int iopin;
@@ -44,7 +43,6 @@ sig_handler(int signo)
         running = -1;
     }
 }
-
 int main (int argc, char **argv)
 {
     if (argc < 2) {
@@ -53,6 +51,10 @@ int main (int argc, char **argv)
     } else {
         iopin = strtol(argv[1], NULL, 10);
     }
+
+    signal(SIGINT, sig_handler);
+
+//! [Interesting]
     maa::Gpio* gpio = new maa::Gpio(iopin);
     if (gpio == NULL) {
         return MAA_ERROR_UNSPECIFIED;
@@ -60,8 +62,6 @@ int main (int argc, char **argv)
     int response = gpio->dir(maa::DIR_OUT);
     if (response != MAA_SUCCESS)
         maa_result_print((maa_result_t) MAA_SUCCESS);
-
-    signal(SIGINT, sig_handler);
 
     while (running == 0) {
         response = gpio->write(1);
@@ -71,4 +71,5 @@ int main (int argc, char **argv)
     }
     delete gpio;
     return response;
+//! [Interesting]
 }

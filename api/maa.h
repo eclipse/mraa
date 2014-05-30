@@ -27,7 +27,6 @@
 /** @file
  *
  * This file defines the basic shared values for libmaa
- *
  */
 
 #ifdef __cplusplus
@@ -96,6 +95,7 @@ typedef struct {
     /*@{*/
     unsigned int pin;   /**< Raw GPIO pin id */
     unsigned int value; /**< Raw GPIO value */
+    /*@}*/
 } maa_mux_t;
 
 /**
@@ -179,10 +179,12 @@ typedef struct {
     /*@}*/
 } maa_board_t;
 
-/** Initialise MAA
+/**
+ * Initialise MAA
  *
  * Detects running platform and attempts to use included pinmap
- * @return maa_result_t maa result
+ *
+ * @return Result of operation
  */
 #ifndef SWIG
 // this sets a compiler attribute (supported by GCC & clang) to have maa_init()
@@ -197,17 +199,20 @@ maa_result_t maa_init();
  *
  * The version returned may not be what is expected however it is a reliable
  * number associated with the git tag closest to that version at build time
+ *
  * @return version string from version.h
  */
 const char* maa_get_version();
 
-/** Print a textual representation of the maa_result_t
+/**
+ * Print a textual representation of the maa_result_t
  *
- * @param result the result to print,
+ * @param result the result to print
  */
 void maa_result_print(maa_result_t result);
 
-/** Checks if a pin is able to use the passed in mode.
+/**
+ * Checks if a pin is able to use the passed in mode.
  *
  * @param pin Physical Pin to be checked.
  * @param mode the mode to be tested.
