@@ -757,7 +757,6 @@ WARN_LOGFILE           =
 
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/api/ \
                          @CMAKE_CURRENT_SOURCE_DIR@/README.md \
-                         @CMAKE_CURRENT_SOURCE_DIR@/include/ \
                          @CMAKE_CURRENT_SOURCE_DIR@/docs/
 
 # This tag can be used to specify the character encoding of the source files
