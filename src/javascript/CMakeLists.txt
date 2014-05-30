@@ -13,7 +13,8 @@ include_directories (
 )
 
 set (CMAKE_CXX_FLAGS -DBUILDING_NODE_EXTENSION)
-set_source_files_properties (maajs.i PROPERTIES SWIG_FLAGS "-node")
+# SWIG treats SWIG_FLAGS as a list and not a string so semicolon seperation is required
+set_source_files_properties (maajs.i PROPERTIES SWIG_FLAGS "-node;-I${CMAKE_BINARY_DIR}/src")
 set_source_files_properties (maajs.i PROPERTIES CPLUSPLUS ON)
 
 swig_add_module (maajs javascript maajs.i ${maa_LIB_SRCS})

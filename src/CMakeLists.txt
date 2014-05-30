@@ -37,7 +37,18 @@ install (TARGETS maa DESTINATION lib)
 
 if (DOXYGEN_FOUND)
   set (CMAKE_SWIG_FLAGS -DDOXYGEN=${DOXYGEN_FOUND})
-  set (DOCFILES maa pwm i2c gpio aio spi)
+  set (DOCCLASSES aio gpio i2c pwm spi)
+  foreach (_file ${DOCCLASSES})
+    add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_file}_class_doc.i
+      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxy2swig.py -n
+        ${CMAKE_BINARY_DIR}/xml/classmaa_1_1_${_file}.xml
+        ${CMAKE_CURRENT_BINARY_DIR}/${_file}_class_doc.i
+      DEPENDS ${CMAKE_BINARY_DIR}/xml/classmaa_1_1_${_file}.xml
+    )
+    add_custom_target (${_file}class_doc_i DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_file}_class_doc.i)
+    add_dependencies (${_file}class_doc_i doc)
+  endforeach ()
+  set (DOCFILES maa ${DOCCLASSES})
   foreach (_file ${DOCFILES})
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_file}_doc.i
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxy2swig.py -n
@@ -54,6 +65,7 @@ if (BUILDSWIG)
   find_package (SWIG)
   if (SWIG_FOUND)
     include (${SWIG_USE_FILE})
+    set_source_files_properties (maa.i PROPERTIES SWIG_FLAGS "-I${CMAKE_BINARY_DIR}/src")
 
     if (BUILDSWIGPYTHON)
       add_subdirectory (python)
