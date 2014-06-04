@@ -24,6 +24,9 @@
 %rename(getVersion) maa_get_version();
 const char * maa_get_version();
 
+%rename(setPriority) maa_set_priority;
+int maa_set_priority(const unsigned int);
+
 %rename(printError) maa_result_print(maa_result_t error);
 void maa_result_print(maa_result_t error);
 

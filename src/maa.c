@@ -25,6 +25,8 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <sched.h>
+#include <string.h>
 
 #include "maa.h"
 #include "maa_internal.h"
@@ -63,6 +65,22 @@ maa_init()
 #endif
     plat = maa_intel_galileo_rev_d();
     return MAA_SUCCESS;
+}
+
+int
+maa_set_priority(const unsigned int priority)
+{
+    struct sched_param sched_s;
+
+    memset(&sched_s, 0, sizeof(struct sched_param));
+    if (priority > sched_get_priority_max(SCHED_RR)) {
+        sched_s.sched_priority = sched_get_priority_max(SCHED_RR);
+    }
+    else {
+        sched_s.sched_priority = priority;
+    }
+
+    return sched_setscheduler(0, SCHED_RR, &sched_s);
 }
 
 static maa_result_t
