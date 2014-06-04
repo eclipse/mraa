@@ -1,2 +1,8 @@
-{ "name" : "maajs",
-  "main" : "./maajs.node" }
+{
+  "name" : "maajs",
+  "main" : "./maajs.node",
+  "engines": {
+    "node": ">= 1.0.x"
+  },
+  "license": "MIT"
+}
