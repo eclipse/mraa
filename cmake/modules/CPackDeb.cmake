@@ -177,9 +177,9 @@ ENDIF(NOT CPACK_DEBIAN_PACKAGE_PRIORITY )
 #endif(NOT CPACK_SECTION)
 
 # Package for opkg
-FIND_PROGRAM(OPKG_CMD ipkg-build)
+FIND_PROGRAM(OPKG_CMD opkg-build)
 if( ${OPKG_CMD} STREQUAL "OPKG_CMD-NOTFOUND" )
-  message("CPack: ipkg-build not found. Skipping packaging")
+  message("CPack: opkg-build not found. Skipping packaging")
 else( ${OPKG_CMD} STREQUAL "OPKG_CMD-NOTFOUND" )
   SET(CPACK_OPKG_ROOTDIR "${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}")
   FILE(MAKE_DIRECTORY ${CPACK_OPKG_ROOTDIR}/CONTROL)
