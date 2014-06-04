@@ -26,4 +26,13 @@ if (DOXYGEN_FOUND)
   )
 endif ()
 
+# Essentially do seperate_arguments but with "." instead of " "
+string (REPLACE "." ";" PYTHON_VERSION_LIST ${PYTHONLIBS_VERSION_STRING})
+list (GET PYTHON_VERSION_LIST 0 PYTHON_VERSION_MAJOR)
+list (GET PYTHON_VERSION_LIST 1 PYTHON_VERSION_MINOR)
+
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/_pymaa.so
+         ${CMAKE_CURRENT_BINARY_DIR}/pymaa.py
+         DESTINATION lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/)
+
 add_subdirectory (docs)

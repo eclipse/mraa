@@ -30,3 +30,7 @@ set_target_properties (maajs PROPERTIES
   PREFIX ""
   SUFFIX ".node"                                                                                                                                                                  
 )
+
+install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/package.json
+         ${CMAKE_CURRENT_BINARY_DIR}/maajs.node
+         DESTINATION lib/node_modules/maajs)
