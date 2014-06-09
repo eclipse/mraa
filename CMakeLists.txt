@@ -27,6 +27,10 @@ string (REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+\\-([0-9]+).*" "\\1" VERSION_CO
 string (REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+\\-(.*)" "\\1" VERSION_SHA1 "${VERSION}")
 set (VERSION_SHORT "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
+if ("${VERSION_COMMIT}" MATCHES "^v.*")
+  set (VERSION_COMMIT "")
+endif()
+
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/version.c.in
                 ${CMAKE_CURRENT_BINARY_DIR}/src/version.c)
 
@@ -72,14 +76,19 @@ if (IPK)
   set(OPKG_ARCH ${DETECTED_ARCH})
   set(CPACK_BINARY_DIR ${CMAKE_BINARY_DIR})
   set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Intel IoT-Devkit") #required
-  set(CPACK_PACKAGE_VERSION ${maa_VERSION_MAJOR}.${maa_VERSION_MINOR}.${maa_VERSION_PATCH}.${VERSION_COMMIT})
+  set(maa_PACKAGE_ON_TAG ".")
+  if ("${VERSION_COMMIT}" STREQUAL "")
+    set(maa_PACKAGE_ON_TAG "")
+  endif()
+  set(CPACK_PACKAGE_VERSION 
+      "${maa_VERSION_MAJOR}.${maa_VERSION_MINOR}.${maa_VERSION_PATCH}${maa_PACKAGE_ON_TAG}${VERSION_COMMIT}")
   set(CPACK_PACKAGE_NAME "libmaa${maa_VERSION_MAJOR}")
   set(CPACK_DEBIAN_PACKAGE_SECTION "libs")
   set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${DETECTED_ARCH})
   set(CPACK_SYSTEM_NAME ${DETECTED_ARCH})
   set(CPACK_DEBIAN_PACKAGE_PROVIDES "libmaa-dev, libmaa-dbg, libmaa-doc")
-  set(CPACK_DEBIAN_PACKAGE_REPLACES "libmaa-dev, libmaa-dbg, libmaa-doc")
-  set(CPACK_DEBIAN_PACKAGE_CONFLICTS "libmaa-dev, libmaa-dbg, libmaa-doc")
+  set(CPACK_DEBIAN_PACKAGE_REPLACES ${CPACK_DEBIAN_PACKAGE_PROVIDES})
+  set(CPACK_DEBIAN_PACKAGE_CONFLICTS ${CPACK_DEBIAN_PACKAGE_PROVIDES})
   set(WDIR "${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}")
   include (CPack)
 endif()
