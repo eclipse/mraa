@@ -55,7 +55,13 @@ Please see the @ref contributing page
 
 ## API Changelog
 
-When the API breaks in a small way there will be a changelog listed here
+This changelog is meant as a quick & rough guide to what has changed between
+versions. The API is now fairly stable but when new calls/features are added
+they are listed here. Anything pre 0.2.x is ignored.
+
+**0.2.8**
+  * Added maa_set_priority call
+  * Added mmap gpio call maa_gpio_use_mmaped
 
 **0.2.7**
   * C++ API now uses basic types and not unistd types as C
