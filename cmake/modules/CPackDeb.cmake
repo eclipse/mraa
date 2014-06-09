@@ -195,6 +195,8 @@ Priority: optional
 Maintainer: ${CPACK_DEBIAN_PACKAGE_MAINTAINER}
 Depends:
 Provides: ${CPACK_DEBIAN_PACKAGE_PROVIDES}
+Replaces: ${CPACK_DEBIAN_PACKAGE_REPLACES}
+Conflicts: ${CPACK_DEBIAN_PACKAGE_CONFLICTS}
 Source: https://github.com/intel-iot-devkit/maa
 #Essential: no
 ")
