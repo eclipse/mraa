@@ -1,5 +1,6 @@
 include_directories(
   ${PROJECT_SOURCE_DIR}/api
+  ${PROJECT_SOURCE_DIR}/api/maa
   ${PROJECT_SOURCE_DIR}/include
 )
 
@@ -16,6 +17,11 @@ set (maa_LIB_SRCS
   ${CMAKE_CURRENT_BINARY_DIR}/version.c
 )
 
+set (maa_LIB_GLOB_HEADERS
+  ${PROJECT_SOURCE_DIR}/api/maa.h
+  ${PROJECT_SOURCE_DIR}/api/maa.hpp
+)
+
 add_library (maa SHARED ${maa_LIB_SRCS})
 target_link_libraries (maa ${CMAKE_THREAD_LIBS_INIT})
 
@@ -25,7 +31,8 @@ set_target_properties(
    SOVERSION ${maa_VERSION_MAJOR}
    VERSION ${maa_VERSION_STRING}
 )
-install (DIRECTORY ${PROJECT_SOURCE_DIR}/api/ DESTINATION include/maa)
+install (FILES ${maa_LIB_GLOB_HEADERS} DESTINATION include/)
+install (DIRECTORY ${PROJECT_SOURCE_DIR}/api/maa DESTINATION include/maa)
 
 macro (maa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
   configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)

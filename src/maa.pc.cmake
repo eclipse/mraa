@@ -8,4 +8,4 @@ Description: Low Level Skeleton Library for Communication
 Version: @maa_VERSION_STRING@
 
 Libs: -L${libdir} -lmaa
-Cflags: -I${includedir}/maa
+Cflags: -I${includedir}

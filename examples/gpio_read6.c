@@ -25,7 +25,7 @@
 #include "stdio.h"
 #include "unistd.h"
 
-#include "gpio.h"
+#include "maa.h"
 
 int
 main(int argc, char **argv)

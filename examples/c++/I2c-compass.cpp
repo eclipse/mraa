@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-#include "i2c.hpp"
+#include "maa.hpp"
 #include "math.h"
 
 #define MAX_BUFFER_LENGTH 6

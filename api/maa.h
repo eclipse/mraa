@@ -231,6 +231,12 @@ void maa_result_print(maa_result_t result);
  */
 maa_boolean_t maa_pin_mode_test(int pin, maa_pinmodes_t mode);
 
+#include "maa/pwm.h"
+#include "maa/aio.h"
+#include "maa/gpio.h"
+#include "maa/spi.h"
+#include "maa/i2c.h"
+
 #ifdef __cplusplus
 }
 #endif

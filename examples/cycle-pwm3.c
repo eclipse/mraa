@@ -24,7 +24,7 @@
 
 #include <unistd.h>
 
-#include "pwm.h"
+#include "maa.h"
 
 int
 main ()

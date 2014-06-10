@@ -26,7 +26,7 @@
 #include <signal.h>
 #include <stdint.h>
 
-#include "spi.hpp"
+#include "maa.hpp"
 
 int running = 0;
 

@@ -25,7 +25,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-#include "pwm.hpp"
+#include "maa.hpp"
 
 int running = 0;
 

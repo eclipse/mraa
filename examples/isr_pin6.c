@@ -24,7 +24,7 @@
 
 #include <unistd.h>
 
-#include "gpio.h"
+#include "maa.h"
 
 static volatile int counter = 0;
 static volatile int oldcounter = 0;

@@ -28,7 +28,7 @@
 #include <signal.h>
 #include <stdlib.h>
 
-#include "gpio.h"
+#include "maa.h"
 
 #define DEFAULT_IOPIN 8
 

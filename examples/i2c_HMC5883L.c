@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "i2c.h"
+#include "maa.h"
 #include "math.h"
 
 #define MAX_BUFFER_LENGTH 6

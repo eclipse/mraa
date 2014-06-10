@@ -1,5 +1,5 @@
 /*
- * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -22,37 +22,11 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "maa.h"
-#include <unistd.h>
-#include <stdint.h>
+#pragma once
 
-int
-main(int argc, char **argv)
-{
-    maa_init();
-//! [Interesting]
-    maa_spi_context spi;
-    spi = maa_spi_init(0);
-    unsigned int response = 0;
-    printf("Hello, SPI initialised\n");
-    uint8_t data[] = {0x00, 100};
-    uint8_t *recv;
-    while(1) {
-        int i;
-        for (i = 90; i < 130; i++) {
-            data[1] = i;
-            recv = maa_spi_write_buf(spi, data, 2);
-            printf("Writing -%i",i);
-            printf("RECIVED-%i-%i\n",recv[0],recv[1]);
-            usleep(100000);
-        }
-        for (i = 130; i > 90; i--) {
-            data[1] = i;
-            recv = maa_spi_write_buf(spi, data, 2);
-            printf("Writing -%i",i);
-            printf("RECIVED-%i-%i\n",recv[0],recv[1]);
-            usleep(100000);
-        }
-    }
-//! [Interesting]
-}
+#include "maa.h"
+#include "maa/pwm.hpp"
+#include "maa/aio.hpp"
+#include "maa/gpio.hpp"
+#include "maa/i2c.hpp"
+#include "maa/spi.hpp"
