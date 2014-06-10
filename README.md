@@ -59,6 +59,11 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.2.9**
+  * Add global maa.h & maa.hpp headers
+  * usage of "gpio.h" is not legal you need to use "maa/gpio.h" unless adding
+    -L/usr/include/maa
+
 **0.2.8**
   * Added maa_set_priority call
   * Added mmap gpio call maa_gpio_use_mmaped
