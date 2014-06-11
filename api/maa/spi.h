@@ -41,7 +41,7 @@ extern "C" {
 #include <fcntl.h>
 #include <stdint.h>
 
-#include "maa.h"
+#include "common.h"
 
 /**
  * Opaque pointer definition to the internal struct _spi

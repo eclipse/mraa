@@ -28,7 +28,6 @@
 #include <sched.h>
 #include <string.h>
 
-#include "maa.h"
 #include "maa_internal.h"
 #include "intel_galileo_rev_d.h"
 #include "gpio.h"

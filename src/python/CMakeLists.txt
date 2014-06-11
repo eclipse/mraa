@@ -17,7 +17,7 @@ if (DOXYGEN_FOUND)
   foreach (_file ${DOCCLASSES})
     add_dependencies (${SWIG_MODULE_pymaa_REAL_NAME} ${_file}class_doc_i)
   endforeach ()
-  add_dependencies (${SWIG_MODULE_pymaa_REAL_NAME} maadoc_i)
+  add_dependencies (${SWIG_MODULE_pymaa_REAL_NAME} commondoc_i)
 
   add_custom_target (pydoc
     pydoc -w ${CMAKE_CURRENT_BINARY_DIR}/pymaa.py ${CMAKE_CURRENT_BINARY_DIR}/

@@ -43,7 +43,7 @@ extern "C" {
 #include <stdio.h>
 #include <fcntl.h>
 
-#include "maa.h"
+#include "common.h"
 
 typedef struct _pwm* maa_pwm_context;
 

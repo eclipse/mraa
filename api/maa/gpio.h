@@ -48,7 +48,7 @@ extern "C" {
 #include <stdio.h>
 #include <pthread.h>
 
-#include "maa.h"
+#include "common.h"
 
 /**
  * Opaque pointer definition to the internal struct _gpio

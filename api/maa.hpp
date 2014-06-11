@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "maa.h"
+#include "maa/common.h"
 #include "maa/pwm.hpp"
 #include "maa/aio.hpp"
 #include "maa/gpio.hpp"

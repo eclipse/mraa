@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "maa.h"
+#include "common.h"
 
 maa_board_t*
 maa_intel_galileo_rev_d()

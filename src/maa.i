@@ -1,5 +1,5 @@
 #ifdef DOXYGEN
-    %include maa_doc.i
+    %include common_doc.i
     %include gpio_class_doc.i
     %include i2c_class_doc.i
     %include pwm_class_doc.i
@@ -8,7 +8,7 @@
 #endif
 
 %{
-    #include "maa.h"
+    #include "common.h"
     #include "gpio.hpp"
     #include "pwm.hpp"
     #include "i2c.hpp"

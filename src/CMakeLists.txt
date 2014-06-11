@@ -55,7 +55,7 @@ if (DOXYGEN_FOUND)
     add_custom_target (${_file}class_doc_i DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_file}_class_doc.i)
     add_dependencies (${_file}class_doc_i doc)
   endforeach ()
-  set (DOCFILES maa ${DOCCLASSES})
+  set (DOCFILES common ${DOCCLASSES})
   foreach (_file ${DOCFILES})
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_file}_doc.i
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxy2swig.py -n

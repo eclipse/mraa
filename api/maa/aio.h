@@ -41,7 +41,7 @@ extern "C" {
 #include <unistd.h>
 #include <stdint.h>
 
-#include "maa.h"
+#include "common.h"
 #include "gpio.h"
 
 #define ADC_RAW_RESOLUTION_BITS         (12)
