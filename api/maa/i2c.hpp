@@ -93,9 +93,9 @@ class I2c {
          *
          * @param data Buffer to write into
          * @param length Size of read
-         * @return Result of operation
+         * @return length of the read or 0 if failed
          */
-        maa_result_t read(unsigned char * data, int length) {
+        int read(unsigned char * data, int length) {
             return maa_i2c_read(m_i2c, data, length);
         }
         /**

@@ -85,9 +85,9 @@ maa_result_t maa_i2c_frequency(maa_i2c_context dev, int hz);
  * @param dev The i2c context
  * @param data pointer to the byte array to read data in to
  * @param length max number of bytes to read
- * @return Result of operation
+ * @return length of the read in bytes or 0
  */
-maa_result_t maa_i2c_read(maa_i2c_context dev, uint8_t *data, int length);
+int maa_i2c_read(maa_i2c_context dev, uint8_t *data, int length);
 
 /**
  * Read a single byte from the i2c context

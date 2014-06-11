@@ -78,14 +78,14 @@ maa_i2c_frequency(maa_i2c_context dev, int hz)
     return MAA_SUCCESS;
 }
 
-maa_result_t
+int
 maa_i2c_read(maa_i2c_context dev, uint8_t* data, int length)
 {
     // this is the read(3) syscall not maa_i2c_read()
     if (read(dev->fh, data, length) == length) {
         return length;
     }
-    return MAA_ERROR_NO_DATA_AVAILABLE;
+    return 0;
 }
 
 uint8_t
