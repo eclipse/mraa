@@ -23,8 +23,8 @@
  */
 
 var m = require("./maajs")
-console.log("maa version: " + m.get_version());
+console.log("maa version: " + m.getVersion());
 
 var x = new m.Gpio(8)
-x.dir(m.MAA_GPIO_OUT)
+x.dir(m.DIR_OUT)
 x.write(1)
