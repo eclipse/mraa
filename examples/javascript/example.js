@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var m = require("./maajs")
+var m = require("maajs")
 console.log("maa version: " + m.getVersion());
 
 var x = new m.Gpio(8)
