@@ -32,7 +32,7 @@ set_target_properties(
    VERSION ${maa_VERSION_STRING}
 )
 install (FILES ${maa_LIB_GLOB_HEADERS} DESTINATION include/)
-install (DIRECTORY ${PROJECT_SOURCE_DIR}/api/maa DESTINATION include/maa)
+install (DIRECTORY ${PROJECT_SOURCE_DIR}/api/maa/ DESTINATION include/maa)
 
 macro (maa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
   configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
