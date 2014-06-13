@@ -52,6 +52,8 @@ typedef enum {
 } maa_result_t;
 
 %typemap(in) unsigned char* = char*;
+%typemap(in) uint8_t* = char*;
+%typemap(in) uint8_t = char;
 
 #### GPIO ####
 
