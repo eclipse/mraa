@@ -51,6 +51,8 @@ typedef enum {
     MAA_ERROR_UNSPECIFIED                    = 99 /**< Unknown Error */
 } maa_result_t;
 
+%typemap(in) unsigned char* = char*;
+
 #### GPIO ####
 
 %include "gpio.hpp"
