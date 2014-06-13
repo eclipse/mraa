@@ -81,7 +81,8 @@ maa_result_t maa_spi_frequency(maa_spi_context dev, int hz);
  */
 uint8_t maa_spi_write(maa_spi_context dev, uint8_t data);
 
-/** Write Buffer of bytes to the SPI device.
+/** Write Buffer of bytes to the SPI device. The pointer return has to be
+ * free'd by the caller.
  *
  * @param dev The Spi context
  * @param data to send
