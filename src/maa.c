@@ -30,6 +30,7 @@
 
 #include "maa_internal.h"
 #include "intel_galileo_rev_d.h"
+#include "intel_galileo_gen2.h"
 #include "gpio.h"
 #include "version.h"
 
@@ -62,7 +63,33 @@ maa_init()
     Py_InitializeEx(0);
     PyEval_InitThreads();
 #endif
-    plat = maa_intel_galileo_rev_d();
+    maa_platform_t platform_type = MAA_UNKNOWN_PLATFORM;
+
+    // detect a galileo gen2 board
+    char *line = NULL;
+    // let getline allocate memory for *line
+    size_t len = 0;
+    FILE *fh = fopen("/sys/devices/virtual/dmi/id/board_name", "r");
+    if (fh != NULL) {
+        if (getline(&line, &len, fh) != -1) {
+            if (strncmp(line, "GalileoGen2", 10) == 0) {
+                platform_type = MAA_INTEL_GALILEO_GEN2;
+            } else {
+                platform_type = MAA_INTEL_GALILEO_GEN1;
+            }
+        }
+    }
+    free(line);
+    fclose(fh);
+
+    switch(platform_type) {
+        case MAA_INTEL_GALILEO_GEN2:
+            plat = maa_intel_galileo_gen2();
+            break;
+        default:
+            plat = maa_intel_galileo_rev_d();
+    }
+
     return MAA_SUCCESS;
 }
 

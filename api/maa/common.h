@@ -34,6 +34,16 @@ extern "C" {
 #endif
 
 /**
+ * MAA supported platform types
+ */
+typedef enum {
+    MAA_INTEL_GALILEO_GEN1 = 0, /**< The Generation 1 Galileo platform (RevD) */
+    MAA_INTEL_GALILEO_GEN2 = 1, /**< The Generation 2 Galileo platform (RevG/H) */
+
+    MAA_UNKNOWN_PLATFORM = 99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
+} maa_platform_t;
+
+/**
  * MAA return codes
  */
 typedef enum {
