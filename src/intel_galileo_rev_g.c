@@ -1,5 +1,6 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -26,7 +27,7 @@
 #include <string.h>
 
 #include "common.h"
-#include "intel_galileo_gen2.h"
+#include "intel_galileo_rev_g.h"
 
 maa_board_t*
 maa_intel_galileo_gen2()

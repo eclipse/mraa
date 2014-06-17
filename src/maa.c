@@ -30,7 +30,7 @@
 
 #include "maa_internal.h"
 #include "intel_galileo_rev_d.h"
-#include "intel_galileo_gen2.h"
+#include "intel_galileo_rev_g.h"
 #include "gpio.h"
 #include "version.h"
 
