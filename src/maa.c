@@ -36,6 +36,7 @@
 
 //static maa_pininfo_t* pindata;
 static maa_board_t* plat = NULL;
+static maa_platform_t platform_type = 99;
 
 const char *
 maa_get_version()
@@ -63,7 +64,7 @@ maa_init()
     Py_InitializeEx(0);
     PyEval_InitThreads();
 #endif
-    maa_platform_t platform_type = MAA_UNKNOWN_PLATFORM;
+    platform_type = MAA_UNKNOWN_PLATFORM;
 
     // detect a galileo gen2 board
     char *line = NULL;
@@ -374,4 +375,45 @@ maa_setup_mmap_gpio(int pin)
             return NULL;
     maa_mmap_pin_t *ret = &(plat->pins[pin].mmap);
     return ret;
+}
+
+maa_result_t
+maa_swap_complex_gpio(int pin, int out)
+{
+    if (plat == NULL)
+        return MAA_ERROR_INVALID_PLATFORM;
+
+    printf("SWAP CALLED on %i with bool as %i", pin,out);
+
+    switch (platform_type) {
+        case MAA_INTEL_GALILEO_GEN2:
+            printf("Intel Galileo Gen 2\n");
+            if (plat->pins[pin].gpio.complex_cap.complex_pin != 1)
+                return MAA_SUCCESS;
+            if (plat->pins[pin].gpio.complex_cap.output_en == 1) {
+                maa_gpio_context output_e;
+                printf("Doing stuff here with %i", plat->pins[pin].gpio.output_enable);
+                output_e = maa_gpio_init_raw(plat->pins[pin].gpio.output_enable);
+                if (maa_gpio_dir(output_e, MAA_GPIO_OUT) != MAA_SUCCESS)
+                    return MAA_ERROR_INVALID_RESOURCE;
+                int output_val;
+                if (plat->pins[pin].gpio.complex_cap.output_en_high == 1)
+                    output_val = out;
+                else
+                    if (out == 1)
+                        output_val = 0;
+                    else
+                        output_val = 1;
+                if (maa_gpio_write(output_e, output_val) != MAA_SUCCESS)
+                    return MAA_ERROR_INVALID_RESOURCE;
+            }
+            //if (plat->pins[pin].gpio.complex_cap.pullup_en == 1) {
+            //    maa_gpio_context pullup_e;
+            //    pullup_e = maa_gpio_init_raw(plat->pins[pin].gpio.pullup_enable);
+            //    if (maa_gpio_mode(pullup_e, MAA_GPIO_HIZ) != MAA_SUCCESS)
+            //        return MAA_ERROR_INVALID_RESOURCE;
+            //}
+            break;
+        default: return MAA_SUCCESS;
+    }
 }

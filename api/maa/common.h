@@ -108,15 +108,23 @@ typedef struct {
     /*@}*/
 } maa_mux_t;
 
-/**
- * A Strucutre representing a singular I/O pin. i.e GPIO/PWM
- */
+typedef struct {
+    maa_boolean_t complex_pin:1;
+    maa_boolean_t output_en:1;
+    maa_boolean_t output_en_high:1;
+    maa_boolean_t pullup_en:1;
+    maa_boolean_t pullup_en_hiz:1;
+} maa_pin_cap_complex_t;
+
 typedef struct {
     /*@{*/
     unsigned int pinmap; /**< sysfs pin */
     unsigned int parent_id; /** parent chip id */
     unsigned int mux_total; /** Numfer of muxes needed for operation of pin */
     maa_mux_t mux[6]; /** Array holding information about mux */
+    unsigned int output_enable; /** Output Enable GPIO, for level shifting */
+    unsigned int pullup_enable; /** Pull-Up enable GPIO, inputs */
+    maa_pin_cap_complex_t complex_cap;
     /*@}*/
 } maa_pin_t;
 

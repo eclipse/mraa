@@ -69,3 +69,10 @@ maa_pin_t* maa_setup_pwm(int pin);
  * @return maa_mmap_pin_t
  */
 maa_mmap_pin_t* maa_setup_mmap_gpio(int pin);
+
+/** Swap Directional mode.
+ *
+ * @param pin physical pin to operate on
+ * @return out direction to setup. 1 for output 0 for input
+ */
+maa_result_t maa_swap_complex_gpio(int pin, int out);
