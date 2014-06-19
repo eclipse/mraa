@@ -119,8 +119,7 @@ maa_setup_mux_mapped(maa_pin_t meta)
         mux_i = maa_gpio_init_raw(meta.mux[mi].pin);
         if (mux_i == NULL)
             return MAA_ERROR_INVALID_HANDLE;
-        if (maa_gpio_dir(mux_i, MAA_GPIO_OUT) != MAA_SUCCESS)
-            return MAA_ERROR_INVALID_RESOURCE;
+        maa_gpio_dir(mux_i, MAA_GPIO_OUT);
         if (maa_gpio_write(mux_i, meta.mux[mi].value) != MAA_SUCCESS)
             return MAA_ERROR_INVALID_RESOURCE;
     }
