@@ -115,9 +115,10 @@ maa_result_t maa_gpio_edge_mode(maa_gpio_context dev, gpio_edge_t mode);
  * @param edge The edge mode to set the gpio into
  * @param fptr Function pointer to function to be called when interupt is
  * triggered
+ * @param args Arguments passed to the interrupt handler (fptr)
  * @return Result of operation
  */
-maa_result_t maa_gpio_isr(maa_gpio_context dev, gpio_edge_t edge, void (*fptr)(void));
+maa_result_t maa_gpio_isr(maa_gpio_context dev, gpio_edge_t edge, void (*fptr)(void *), void * args);
 
 /**
  * Stop the current interupt watcher on this Gpio, and set the Gpio edge mode

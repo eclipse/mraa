@@ -48,7 +48,8 @@ struct _gpio {
     int pin; /**< the pin number, as known to the os. */
     int phy_pin; /**< pin passed to clean init. -1 none and raw*/
     int value_fp; /**< the file pointer to the value of the gpio */
-    void (* isr)(); /**< the interupt service request */
+    void (* isr)(void *); /**< the interupt service request */
+    void *isr_args; /**< args return when interupt service request triggered */
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */
     maa_boolean_t owner; /**< If this context originally exported the pin */
@@ -183,12 +184,24 @@ maa_gpio_interrupt_handler(void* arg)
             // nessecary but especially if doing IO (like print()) python will segfault
             // if we do not hold a lock on the GIL
             PyGILState_STATE gilstate = PyGILState_Ensure();
-
-            PyEval_CallObject((PyObject*)dev->isr, NULL);
+            PyObject *arglist;
+            PyObject *ret;
+            arglist = Py_BuildValue("(i)", dev->isr_args);
+			if (arglist == NULL) {
+				fprintf(stdout, "Py_BuildValue NULL\n");
+			} else {
+                ret = PyEval_CallObject((PyObject*)dev->isr, arglist);
+                if (ret == NULL) {
+                    fprintf(stdout, "PyEval_CallObject failed\n");
+                } else {
+                    Py_DECREF(ret);
+                }
+                Py_DECREF(arglist);
+            }
 
             PyGILState_Release (gilstate);
 #else
-            dev->isr();
+            dev->isr(dev->isr_args);
 #endif
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
         } else {
@@ -196,7 +209,7 @@ maa_gpio_interrupt_handler(void* arg)
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
             close(dev->isr_value_fp);
             dev->isr_value_fp = -1;
-        return NULL;
+            return NULL;
         }
     }
 }
@@ -248,15 +261,19 @@ maa_gpio_edge_mode(maa_gpio_context dev, gpio_edge_t mode)
 }
 
 maa_result_t
-maa_gpio_isr(maa_gpio_context dev, gpio_edge_t mode, void (*fptr)(void))
+maa_gpio_isr(maa_gpio_context dev, gpio_edge_t mode, void (*fptr)(void *), void * args)
 {
     // we only allow one isr per maa_gpio_context
     if (dev->thread_id != 0) {
         return MAA_ERROR_NO_RESOURCES;
     }
 
-    maa_gpio_edge_mode(dev, mode);
+    if (MAA_SUCCESS != maa_gpio_edge_mode(dev, mode)) {
+        return MAA_ERROR_UNSPECIFIED;
+    }
+        
     dev->isr = fptr;
+    dev->isr_args = args;
     pthread_create (&dev->thread_id, NULL, maa_gpio_interrupt_handler, (void *) dev);
 
     return MAA_SUCCESS;

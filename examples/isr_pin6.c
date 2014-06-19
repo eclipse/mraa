@@ -29,7 +29,7 @@
 static volatile int counter = 0;
 static volatile int oldcounter = 0;
 
-void interrupt (void) {
+void interrupt (void * args) {
     ++counter;
 }
 
@@ -47,7 +47,7 @@ int main ()
 
     gpio_edge_t edge = MAA_GPIO_EDGE_BOTH;
    
-    maa_gpio_isr(x, edge, &interrupt);
+    maa_gpio_isr(x, edge, &interrupt, NULL);
 
     for(;;) {
         if(counter != oldcounter) {

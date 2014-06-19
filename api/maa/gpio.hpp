@@ -104,17 +104,21 @@ class Gpio {
             return maa_gpio_edge_mode(m_gpio, (gpio_edge_t) mode);
         }
 #if defined(SWIGPYTHON)
-        maa_result_t isr(Edge mode, PyObject *pyfunc) {
-            return maa_gpio_isr(m_gpio, (gpio_edge_t) mode, (void (*) ()) pyfunc);
+        maa_result_t isr(Edge mode, PyObject *pyfunc, PyObject* args) {
+            return maa_gpio_isr(m_gpio, (gpio_edge_t) mode, (void (*) (void *)) pyfunc, (void *) args);
         }
 #else
         /**
          * Sets a callback to be called when pin value changes
          *
+         * @param mode The edge mode to set
+         * @param fptr Function pointer to function to be called when interupt is
+         * triggered
+         * @param args Arguments passed to the interrupt handler (fptr)
          * @return Result of operation
          */
-        maa_result_t isr(Edge mode, void (*fptr)(void)) {
-            return maa_gpio_isr(m_gpio, (gpio_edge_t) mode, fptr);
+        maa_result_t isr(Edge mode, void (*fptr)(void *), void * args) {
+            return maa_gpio_isr(m_gpio, (gpio_edge_t) mode, fptr, args);
         }
 #endif
         /**
