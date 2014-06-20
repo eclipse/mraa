@@ -87,8 +87,12 @@ maa_init()
         case MAA_INTEL_GALILEO_GEN2:
             plat = maa_intel_galileo_gen2();
             break;
+        case MAA_INTEL_GALILEO_GEN1:
+            plat = maa_intel_galileo_rev_d();
+            break;
         default:
             plat = maa_intel_galileo_rev_d();
+            fprintf(stderr, "Platform not found, initialising MAA_INTEL_GALILEO_GEN1\n");
     }
 
     return MAA_SUCCESS;
