@@ -287,6 +287,7 @@ maa_pwm_unexport_force(maa_pwm_context dev)
 maa_result_t
 maa_pwm_unexport(maa_pwm_context dev)
 {
+    maa_pwm_enable(dev, 0);
     if (dev->owner) {
         return maa_pwm_unexport_force(dev);
     }
