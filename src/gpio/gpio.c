@@ -389,7 +389,6 @@ maa_gpio_dir(maa_gpio_context dev, gpio_dir_t dir)
     }
 
     if (write(direction, bu, length*sizeof(char)) == -1) {
-        fprintf(stderr, "Failed to write to direction\n");
         close(direction);
         return MAA_ERROR_INVALID_RESOURCE;
     }
