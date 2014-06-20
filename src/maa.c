@@ -384,8 +384,6 @@ maa_swap_complex_gpio(int pin, int out)
     if (plat == NULL)
         return MAA_ERROR_INVALID_PLATFORM;
 
-    printf("SWAP CALLED on %i with bool as %i", pin,out);
-
     switch (platform_type) {
         case MAA_INTEL_GALILEO_GEN2:
             printf("Intel Galileo Gen 2\n");
@@ -393,7 +391,6 @@ maa_swap_complex_gpio(int pin, int out)
                 return MAA_SUCCESS;
             if (plat->pins[pin].gpio.complex_cap.output_en == 1) {
                 maa_gpio_context output_e;
-                printf("Doing stuff here with %i", plat->pins[pin].gpio.output_enable);
                 output_e = maa_gpio_init_raw(plat->pins[pin].gpio.output_enable);
                 if (maa_gpio_dir(output_e, MAA_GPIO_OUT) != MAA_SUCCESS)
                     return MAA_ERROR_INVALID_RESOURCE;
