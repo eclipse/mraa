@@ -86,25 +86,32 @@ void
 sig_handler(int signo)
 {
     if (signo == SIGINT) {
-        printf("closing PWM nicely\n");
+        printf("closing nicely\n");
         running = -1;
     }
 }
 
 int main ()
 {
-//! [Interesting]
-    maa::I2c* i2c;
-    i2c = new maa::I2c(0);
     float direction = 0;
     int16_t x = 0, y = 0, z = 0;
     uint8_t rx_tx_buf[MAX_BUFFER_LENGTH];
+
+//! [Interesting]
+    maa::I2c* i2c;
+    i2c = new maa::I2c(0);
 
     i2c->address(HMC5883L_I2C_ADDR);
     rx_tx_buf[0] = HMC5883L_CONF_REG_B;
     rx_tx_buf[1] = GA_1_3_REG;
     i2c->write(rx_tx_buf, 2);
 //! [Interesting]
+
+    i2c->address(HMC5883L_I2C_ADDR);
+    rx_tx_buf[0] = HMC5883L_MODE_REG;
+    rx_tx_buf[1] = HMC5883L_CONT_MODE;
+    i2c->write(rx_tx_buf, 2);
+
     signal(SIGINT, sig_handler);
 
     while (running == 0) {

@@ -385,9 +385,11 @@ maa_gpio_dir(maa_gpio_context dev, gpio_dir_t dir)
 
     char bu[MAX_SIZE];
     int length;
+    int out_switch = 0;
     switch(dir) {
         case MAA_GPIO_OUT:
             length = snprintf(bu, sizeof(bu), "out");
+            out_switch = 1;
             break;
         case MAA_GPIO_IN:
             length = snprintf(bu, sizeof(bu), "in");
@@ -397,8 +399,13 @@ maa_gpio_dir(maa_gpio_context dev, gpio_dir_t dir)
             return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
     }
 
+    if (dev->phy_pin >= 0) {
+        maa_result_t swap_res = maa_swap_complex_gpio(dev->phy_pin, out_switch);
+        if (swap_res != MAA_SUCCESS)
+            return swap_res;
+    }
+
     if (write(direction, bu, length*sizeof(char)) == -1) {
-        fprintf(stderr, "Failed to write to direction\n");
         close(direction);
         return MAA_ERROR_INVALID_RESOURCE;
     }

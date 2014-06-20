@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "common.h"
+#include "intel_galileo_rev_d.h"
 
 maa_board_t*
 maa_intel_galileo_rev_d()
@@ -38,7 +39,7 @@ maa_intel_galileo_rev_d()
     b->gpio_count = 14;
     b->aio_count = 6;
 
-    b->pins = (maa_pininfo_t*) malloc(sizeof(maa_pininfo_t)*25);
+    b->pins = (maa_pininfo_t*) malloc(sizeof(maa_pininfo_t)*MAA_INTEL_GALILEO_REV_D_PINCOUNT);
 
     //GPIO IO0 - IO10
     strncpy(b->pins[0].name, "IO0", 8);
