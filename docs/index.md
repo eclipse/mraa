@@ -59,6 +59,11 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.3.1**
+  * Initial Intel Galileo Gen 2 support
+  * maa_gpio_isr parameters added.
+  * Detection of different supported platforms added.
+
 **0.3.0**
   * maa_i2c_read now returns length of read
 
