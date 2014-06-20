@@ -36,7 +36,7 @@
 
 //static maa_pininfo_t* pindata;
 static maa_board_t* plat = NULL;
-static maa_platform_t platform_type = 99;
+static maa_platform_t platform_type = MAA_UNKNOWN_PLATFORM;
 
 const char *
 maa_get_version()
@@ -64,8 +64,6 @@ maa_init()
     Py_InitializeEx(0);
     PyEval_InitThreads();
 #endif
-    platform_type = MAA_UNKNOWN_PLATFORM;
-
     // detect a galileo gen2 board
     char *line = NULL;
     // let getline allocate memory for *line
@@ -419,4 +417,9 @@ maa_swap_complex_gpio(int pin, int out)
             break;
         default: return MAA_SUCCESS;
     }
+}
+
+maa_platform_t maa_get_platform_type()
+{
+    return platform_type;
 }
