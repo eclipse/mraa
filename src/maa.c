@@ -386,7 +386,6 @@ maa_swap_complex_gpio(int pin, int out)
 
     switch (platform_type) {
         case MAA_INTEL_GALILEO_GEN2:
-            printf("Intel Galileo Gen 2\n");
             if (plat->pins[pin].gpio.complex_cap.complex_pin != 1)
                 return MAA_SUCCESS;
             if (plat->pins[pin].gpio.complex_cap.output_en == 1) {
