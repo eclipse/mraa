@@ -22,11 +22,11 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import pymaa as maa
+import pymraa as mraa
 import time
 
-x = maa.Gpio(8)
-x.dir(maa.DIR_OUT)
+x = mraa.Gpio(8)
+x.dir(mraa.DIR_OUT)
 
 while True:
     x.write(1)

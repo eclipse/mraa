@@ -23,7 +23,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 #include "gpio.h"
-#include "maa_internal.h"
+#include "mraa_internal.h"
 
 #include <stdlib.h>
 #include <fcntl.h>
@@ -52,41 +52,41 @@ struct _gpio {
     void *isr_args; /**< args return when interupt service request triggered */
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */
-    maa_boolean_t owner; /**< If this context originally exported the pin */
-    maa_boolean_t mmap;
+    mraa_boolean_t owner; /**< If this context originally exported the pin */
+    mraa_boolean_t mmap;
     void *reg;
     unsigned int reg_sz;
     unsigned int reg_bit_pos;
     /*@}*/
 };
 
-static maa_result_t
-maa_gpio_get_valfp(maa_gpio_context dev)
+static mraa_result_t
+mraa_gpio_get_valfp(mraa_gpio_context dev)
 {
     char bu[MAX_SIZE];
     sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
     dev->value_fp = open(bu, O_RDWR);
     if (dev->value_fp == -1) {
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-maa_gpio_context
-maa_gpio_init(int pin)
+mraa_gpio_context
+mraa_gpio_init(int pin)
 {
-    int pinm = maa_setup_gpio(pin);
+    int pinm = mraa_setup_gpio(pin);
     if (pinm < 0)
         return NULL;
 
-    maa_gpio_context r = maa_gpio_init_raw(pinm);
+    mraa_gpio_context r = mraa_gpio_init_raw(pinm);
     r->phy_pin = pin;
     return r;
 }
 
-maa_gpio_context
-maa_gpio_init_raw(int pin)
+mraa_gpio_context
+mraa_gpio_init_raw(int pin)
 {
     if (pin < 0)
         return NULL;
@@ -94,7 +94,7 @@ maa_gpio_init_raw(int pin)
     char bu[MAX_SIZE];
     int length;
 
-    maa_gpio_context dev = (maa_gpio_context) malloc(sizeof(struct _gpio));
+    mraa_gpio_context dev = (mraa_gpio_context) malloc(sizeof(struct _gpio));
     memset(dev, 0, sizeof(struct _gpio));
     dev->value_fp = -1;
     dev->isr_value_fp = -1;
@@ -125,19 +125,19 @@ maa_gpio_init_raw(int pin)
     return dev;
 }
 
-static maa_result_t
-maa_gpio_write_register(maa_gpio_context dev,int value)
+static mraa_result_t
+mraa_gpio_write_register(mraa_gpio_context dev,int value)
 {
     if (value == 1) {
         *((unsigned *)dev->reg) |= (1<<dev->reg_bit_pos);
-        return MAA_SUCCESS;
+        return MRAA_SUCCESS;
     }
     *((unsigned *)dev->reg) &= ~(1<<dev->reg_bit_pos);
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-static maa_result_t
-maa_gpio_wait_interrupt(int fd)
+static mraa_result_t
+mraa_gpio_wait_interrupt(int fd)
 {
     unsigned char c;
     struct pollfd pfd;
@@ -150,7 +150,7 @@ maa_gpio_wait_interrupt(int fd)
     read (fd, &c, 1);
 
     if (fd <= 0) {
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     // Wait for it forever or until pthread_cancel
@@ -160,14 +160,14 @@ maa_gpio_wait_interrupt(int fd)
     // do a final read to clear interupt
     read (fd, &c, 1);
 
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
 static void*
-maa_gpio_interrupt_handler(void* arg)
+mraa_gpio_interrupt_handler(void* arg)
 {
-    maa_gpio_context dev = (maa_gpio_context) arg;
-    maa_result_t ret;
+    mraa_gpio_context dev = (mraa_gpio_context) arg;
+    mraa_result_t ret;
 
     // open gpio value with open(3)
     char bu[MAX_SIZE];
@@ -175,8 +175,8 @@ maa_gpio_interrupt_handler(void* arg)
     dev->isr_value_fp = open(bu, O_RDONLY);
 
     for (;;) {
-        ret = maa_gpio_wait_interrupt(dev->isr_value_fp);
-        if (ret == MAA_SUCCESS) {
+        ret = mraa_gpio_wait_interrupt(dev->isr_value_fp);
+        if (ret == MRAA_SUCCESS) {
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 #ifdef SWIGPYTHON
             // In order to call a python object (all python functions are objects) we
@@ -214,8 +214,8 @@ maa_gpio_interrupt_handler(void* arg)
     }
 }
 
-maa_result_t
-maa_gpio_edge_mode(maa_gpio_context dev, gpio_edge_t mode)
+mraa_result_t
+mraa_gpio_edge_mode(mraa_gpio_context dev, gpio_edge_t mode)
 {
     if (dev->value_fp != -1) {
          close(dev->value_fp);
@@ -228,61 +228,61 @@ maa_gpio_edge_mode(maa_gpio_context dev, gpio_edge_t mode)
     int edge = open(filepath, O_RDWR);
     if (edge == -1) {
         fprintf(stderr, "Failed to open edge for writing!\n");
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     char bu[MAX_SIZE];
     int length;
     switch(mode) {
-        case MAA_GPIO_EDGE_NONE:
+        case MRAA_GPIO_EDGE_NONE:
             length = snprintf(bu, sizeof(bu), "none");
             break;
-        case MAA_GPIO_EDGE_BOTH:
+        case MRAA_GPIO_EDGE_BOTH:
             length = snprintf(bu, sizeof(bu), "both");
             break;
-        case MAA_GPIO_EDGE_RISING:
+        case MRAA_GPIO_EDGE_RISING:
             length = snprintf(bu, sizeof(bu), "rising");
             break;
-        case MAA_GPIO_EDGE_FALLING:
+        case MRAA_GPIO_EDGE_FALLING:
             length = snprintf(bu, sizeof(bu), "falling");
             break;
         default:
             close(edge);
-            return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+            return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
     }
     if (write(edge, bu, length*sizeof(char)) == -1) {
         fprintf(stderr, "Failed to write to edge\n");
         close(edge);
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     close(edge);
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-maa_result_t
-maa_gpio_isr(maa_gpio_context dev, gpio_edge_t mode, void (*fptr)(void *), void * args)
+mraa_result_t
+mraa_gpio_isr(mraa_gpio_context dev, gpio_edge_t mode, void (*fptr)(void *), void * args)
 {
-    // we only allow one isr per maa_gpio_context
+    // we only allow one isr per mraa_gpio_context
     if (dev->thread_id != 0) {
-        return MAA_ERROR_NO_RESOURCES;
+        return MRAA_ERROR_NO_RESOURCES;
     }
 
-    if (MAA_SUCCESS != maa_gpio_edge_mode(dev, mode)) {
-        return MAA_ERROR_UNSPECIFIED;
+    if (MRAA_SUCCESS != mraa_gpio_edge_mode(dev, mode)) {
+        return MRAA_ERROR_UNSPECIFIED;
     }
         
     dev->isr = fptr;
     dev->isr_args = args;
-    pthread_create (&dev->thread_id, NULL, maa_gpio_interrupt_handler, (void *) dev);
+    pthread_create (&dev->thread_id, NULL, mraa_gpio_interrupt_handler, (void *) dev);
 
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-maa_result_t
-maa_gpio_isr_exit(maa_gpio_context dev)
+mraa_result_t
+mraa_gpio_isr_exit(mraa_gpio_context dev)
 {
-    maa_result_t ret = MAA_SUCCESS;
+    mraa_result_t ret = MRAA_SUCCESS;
 
     // wasting our time, there is no isr to exit from
     if (dev->thread_id == 0 && dev->isr_value_fp == -1) {
@@ -290,17 +290,17 @@ maa_gpio_isr_exit(maa_gpio_context dev)
     }
 
     // stop isr being useful
-    ret = maa_gpio_edge_mode(dev, MAA_GPIO_EDGE_NONE);
+    ret = mraa_gpio_edge_mode(dev, MRAA_GPIO_EDGE_NONE);
 
     if ((dev->thread_id != 0) &&
         (pthread_cancel(dev->thread_id) != 0)) {
-        ret = MAA_ERROR_INVALID_HANDLE;
+        ret = MRAA_ERROR_INVALID_HANDLE;
     }
 
     // close the filehandle in case it's still open
     if (dev->isr_value_fp != -1) {
           if (close(dev->isr_value_fp) != 0) {
-              ret = MAA_ERROR_INVALID_PARAMETER;
+              ret = MRAA_ERROR_INVALID_PARAMETER;
           }
     }
 
@@ -316,8 +316,8 @@ maa_gpio_isr_exit(maa_gpio_context dev)
     return ret;
 }
 
-maa_result_t
-maa_gpio_mode(maa_gpio_context dev, gpio_mode_t mode)
+mraa_result_t
+mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
 {
     if (dev->value_fp != -1) {
          close(dev->value_fp);
@@ -330,44 +330,44 @@ maa_gpio_mode(maa_gpio_context dev, gpio_mode_t mode)
     int drive = open(filepath, O_WRONLY);
     if (drive == -1) {
         fprintf(stderr, "Failed to open drive for writing!\n");
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     char bu[MAX_SIZE];
     int length;
     switch(mode) {
-        case MAA_GPIO_STRONG:
+        case MRAA_GPIO_STRONG:
             length = snprintf(bu, sizeof(bu), "strong");
             break;
-        case MAA_GPIO_PULLUP:
+        case MRAA_GPIO_PULLUP:
             length = snprintf(bu, sizeof(bu), "pullup");
             break;
-        case MAA_GPIO_PULLDOWN:
+        case MRAA_GPIO_PULLDOWN:
             length = snprintf(bu, sizeof(bu), "pulldown");
             break;
-        case MAA_GPIO_HIZ:
+        case MRAA_GPIO_HIZ:
             length = snprintf(bu, sizeof(bu), "hiz");
             break;
         default:
             close(drive);
-            return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+            return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
     }
     if (write(drive, bu, length*sizeof(char)) == -1) {
         fprintf(stderr, "Failed to write to drive mode!\n");
         close(drive);
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
 
     }
 
     close(drive);
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-maa_result_t
-maa_gpio_dir(maa_gpio_context dev, gpio_dir_t dir)
+mraa_result_t
+mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
 {
     if (dev == NULL) {
-        return MAA_ERROR_INVALID_HANDLE;
+        return MRAA_ERROR_INVALID_HANDLE;
     }
     if (dev->value_fp != -1) {
          close(dev->value_fp);
@@ -380,45 +380,45 @@ maa_gpio_dir(maa_gpio_context dev, gpio_dir_t dir)
 
     if (direction == -1) {
         fprintf(stderr, "Failed to open direction for writing!\n");
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     char bu[MAX_SIZE];
     int length;
     int out_switch = 0;
     switch(dir) {
-        case MAA_GPIO_OUT:
+        case MRAA_GPIO_OUT:
             length = snprintf(bu, sizeof(bu), "out");
             out_switch = 1;
             break;
-        case MAA_GPIO_IN:
+        case MRAA_GPIO_IN:
             length = snprintf(bu, sizeof(bu), "in");
             break;
         default:
             close(direction);
-            return MAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+            return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
     }
 
     if (dev->phy_pin >= 0) {
-        maa_result_t swap_res = maa_swap_complex_gpio(dev->phy_pin, out_switch);
-        if (swap_res != MAA_SUCCESS)
+        mraa_result_t swap_res = mraa_swap_complex_gpio(dev->phy_pin, out_switch);
+        if (swap_res != MRAA_SUCCESS)
             return swap_res;
     }
 
     if (write(direction, bu, length*sizeof(char)) == -1) {
         close(direction);
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     close(direction);
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
 int
-maa_gpio_read(maa_gpio_context dev)
+mraa_gpio_read(mraa_gpio_context dev)
 {
     if (dev->value_fp == -1) {
-        if (maa_gpio_get_valfp(dev) != MAA_SUCCESS) {
+        if (mraa_gpio_get_valfp(dev) != MRAA_SUCCESS) {
              fprintf(stderr, "Failed to get value file pointer\n");
         }
     }
@@ -436,35 +436,35 @@ maa_gpio_read(maa_gpio_context dev)
     return ret;
 }
 
-maa_result_t
-maa_gpio_write(maa_gpio_context dev, int value)
+mraa_result_t
+mraa_gpio_write(mraa_gpio_context dev, int value)
 {
     if (dev->mmap == 1)
-        return maa_gpio_write_register(dev,value);
+        return mraa_gpio_write_register(dev,value);
 
     if (dev->value_fp == -1) {
-        maa_gpio_get_valfp(dev);
+        mraa_gpio_get_valfp(dev);
     }
     if (lseek(dev->value_fp, 0, SEEK_SET) == -1) {
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     char bu[MAX_SIZE];
     int length = snprintf(bu, sizeof(bu), "%d", value);
     if (write(dev->value_fp, bu, length*sizeof(char)) == -1) {
-        return MAA_ERROR_INVALID_HANDLE;
+        return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-static maa_result_t
-maa_gpio_unexport_force(maa_gpio_context dev)
+static mraa_result_t
+mraa_gpio_unexport_force(mraa_gpio_context dev)
 {
     int unexport = open(SYSFS_CLASS_GPIO "/unexport", O_WRONLY);
     if (unexport == -1) {
         fprintf(stderr, "Failed to open unexport for writing!\n");
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     char bu[MAX_SIZE];
@@ -472,55 +472,55 @@ maa_gpio_unexport_force(maa_gpio_context dev)
     if (write(unexport, bu, length*sizeof(char)) == -1) {
         fprintf(stderr, "Failed to write to unexport\n");
         close(unexport);
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     close(unexport);
-    maa_gpio_isr_exit(dev);
-    return MAA_SUCCESS;
+    mraa_gpio_isr_exit(dev);
+    return MRAA_SUCCESS;
 }
-static maa_result_t
-maa_gpio_unexport(maa_gpio_context dev)
+static mraa_result_t
+mraa_gpio_unexport(mraa_gpio_context dev)
 {
     if(dev->owner) {
-        return maa_gpio_unexport_force(dev);
+        return mraa_gpio_unexport_force(dev);
     }
-    return MAA_ERROR_INVALID_RESOURCE;
+    return MRAA_ERROR_INVALID_RESOURCE;
 }
 
-maa_result_t
-maa_gpio_close(maa_gpio_context dev)
+mraa_result_t
+mraa_gpio_close(mraa_gpio_context dev)
 {
     if (dev->value_fp != -1) {
         close(dev->value_fp);
     }
-    maa_gpio_unexport(dev);
+    mraa_gpio_unexport(dev);
     free(dev);
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-maa_result_t
-maa_gpio_owner(maa_gpio_context dev, maa_boolean_t own)
+mraa_result_t
+mraa_gpio_owner(mraa_gpio_context dev, mraa_boolean_t own)
 {
     if (dev == NULL)
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     dev->owner = own;
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-maa_result_t
-maa_gpio_use_mmaped(maa_gpio_context dev, maa_boolean_t mmap_en)
+mraa_result_t
+mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap_en)
 {
     if (dev ==  NULL) {
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
-    if (maa_pin_mode_test(dev->phy_pin, MAA_PIN_FAST_GPIO) == 0)
-        return MAA_ERROR_NO_RESOURCES;
+    if (mraa_pin_mode_test(dev->phy_pin, MRAA_PIN_FAST_GPIO) == 0)
+        return MRAA_ERROR_NO_RESOURCES;
 
-    maa_mmap_pin_t *mmp = maa_setup_mmap_gpio(dev->phy_pin);
+    mraa_mmap_pin_t *mmp = mraa_setup_mmap_gpio(dev->phy_pin);
     if (mmp == NULL)
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
 
     if (mmap_en == 1) {
         if (dev->mmap == 0) {
@@ -529,15 +529,15 @@ maa_gpio_use_mmaped(maa_gpio_context dev, maa_boolean_t mmap_en)
             fd = open(mmp->mem_dev, O_RDWR);
             if (fd < 1) {
                 fprintf(stderr, "Unable to open memory device\n");
-                return MAA_ERROR_INVALID_RESOURCE;
+                return MRAA_ERROR_INVALID_RESOURCE;
             }
             dev->reg_sz = mmp->mem_sz;
             dev->reg = mmap(NULL, dev->reg_sz, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
             dev->reg_bit_pos = mmp->bit_pos;
             dev->mmap = 1;
-            return MAA_SUCCESS;
+            return MRAA_SUCCESS;
         }
-        return MAA_ERROR_INVALID_PARAMETER;
+        return MRAA_ERROR_INVALID_PARAMETER;
     }
 
     if (mmap_en == 0) {
@@ -545,8 +545,8 @@ maa_gpio_use_mmaped(maa_gpio_context dev, maa_boolean_t mmap_en)
             munmap(dev->reg, dev->reg_sz);
             dev->mmap = 0;
         }
-        return MAA_ERROR_INVALID_PARAMETER;
+        return MRAA_ERROR_INVALID_PARAMETER;
     }
 
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }

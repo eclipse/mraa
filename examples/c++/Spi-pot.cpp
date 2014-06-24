@@ -26,7 +26,7 @@
 #include <signal.h>
 #include <stdint.h>
 
-#include "maa.hpp"
+#include "mraa.hpp"
 
 int running = 0;
 
@@ -44,9 +44,9 @@ int main ()
     signal(SIGINT, sig_handler);
 
 //! [Interesting]
-    maa::Spi* spi;
+    mraa::Spi* spi;
 
-    spi = new maa::Spi(0);
+    spi = new mraa::Spi(0);
 
     uint8_t data[] = {0x00, 100};
     uint8_t *recv;
@@ -71,5 +71,5 @@ int main ()
     delete spi;
 //! [Interesting]
 
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }

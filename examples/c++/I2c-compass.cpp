@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-#include "maa.hpp"
+#include "mraa.hpp"
 #include "math.h"
 
 #define MAX_BUFFER_LENGTH 6
@@ -98,8 +98,8 @@ int main ()
     uint8_t rx_tx_buf[MAX_BUFFER_LENGTH];
 
 //! [Interesting]
-    maa::I2c* i2c;
-    i2c = new maa::I2c(0);
+    mraa::I2c* i2c;
+    i2c = new mraa::I2c(0);
 
     i2c->address(HMC5883L_I2C_ADDR);
     rx_tx_buf[0] = HMC5883L_CONF_REG_B;
@@ -138,5 +138,5 @@ int main ()
     }
     delete i2c;
 
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }

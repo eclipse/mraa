@@ -24,7 +24,7 @@
 
 #include <unistd.h>
 
-#include "maa.h"
+#include "mraa.h"
 
 static volatile int counter = 0;
 static volatile int oldcounter = 0;
@@ -35,19 +35,19 @@ void interrupt (void * args) {
 
 int main ()
 {
-    maa_init();
-    maa_gpio_context x;
+    mraa_init();
+    mraa_gpio_context x;
 
-    x = maa_gpio_init(6);
+    x = mraa_gpio_init(6);
     if (x == NULL) {
         return 1;
     }
 
-    maa_gpio_dir(x, MAA_GPIO_IN);
+    mraa_gpio_dir(x, MRAA_GPIO_IN);
 
-    gpio_edge_t edge = MAA_GPIO_EDGE_BOTH;
+    gpio_edge_t edge = MRAA_GPIO_EDGE_BOTH;
    
-    maa_gpio_isr(x, edge, &interrupt, NULL);
+    mraa_gpio_isr(x, edge, &interrupt, NULL);
 
     for(;;) {
         if(counter != oldcounter) {
@@ -58,7 +58,7 @@ int main ()
         sleep(1);
     }
 
-    maa_gpio_close(x);
+    mraa_gpio_close(x);
 
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }

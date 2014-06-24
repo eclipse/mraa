@@ -24,7 +24,7 @@
 
 #pragma once
 
-#define MAA_INTEL_GALILEO_GEN_2_PINCOUNT 25
+#define MRAA_INTEL_GALILEO_GEN_2_PINCOUNT 25
 
-maa_board_t*
-maa_intel_galileo_gen2();
+mraa_board_t*
+mraa_intel_galileo_gen2();

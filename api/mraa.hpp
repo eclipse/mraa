@@ -22,14 +22,11 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "stdio.h"
-//! [Interesting]
-#include "maa.h"
+#pragma once
 
-int
-main(int argc, char **argv)
-{
-    fprintf(stdout, "hello maa\n Version: %s\n", maa_get_version());
-    return 0;
-}
-//! [Interesting]
+#include "mraa/common.h"
+#include "mraa/pwm.hpp"
+#include "mraa/aio.hpp"
+#include "mraa/gpio.hpp"
+#include "mraa/i2c.hpp"
+#include "mraa/spi.hpp"

@@ -27,7 +27,7 @@
 #include <unistd.h>
 
 #include "pwm.h"
-#include "maa_internal.h"
+#include "mraa_internal.h"
 
 #define MAX_SIZE 64
 #define SYSFS_PWM "/sys/class/pwm"
@@ -40,12 +40,12 @@ struct _pwm {
     int pin; /**< the pin number, as known to the os. */
     int chipid; /**< the chip id, which the pwm resides */
     int duty_fp; /**< File pointer to duty file */
-    maa_boolean_t owner; /**< Owner of pwm context*/
+    mraa_boolean_t owner; /**< Owner of pwm context*/
     /*@}*/
 };
 
 static int
-maa_pwm_setup_duty_fp(maa_pwm_context dev)
+mraa_pwm_setup_duty_fp(mraa_pwm_context dev)
 {
     char bu[MAX_SIZE];
     snprintf(bu,MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev->chipid, dev->pin);
@@ -57,8 +57,8 @@ maa_pwm_setup_duty_fp(maa_pwm_context dev)
     return 0;
 }
 
-static maa_result_t
-maa_pwm_write_period(maa_pwm_context dev, int period)
+static mraa_result_t
+mraa_pwm_write_period(mraa_pwm_context dev, int period)
 {
     char bu[MAX_SIZE];
     snprintf(bu,MAX_SIZE ,"/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
@@ -66,34 +66,34 @@ maa_pwm_write_period(maa_pwm_context dev, int period)
     int period_f = open(bu, O_RDWR);
     if (period_f == -1) {
         fprintf(stderr, "Failed to open period for writing!\n");
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
     char out[MAX_SIZE];
     int length = snprintf(out, MAX_SIZE, "%d", period);
     if (write(period_f, out, length*sizeof(char)) == -1) {
         close(period_f);
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     close(period_f);
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-static maa_result_t
-maa_pwm_write_duty(maa_pwm_context dev, int duty)
+static mraa_result_t
+mraa_pwm_write_duty(mraa_pwm_context dev, int duty)
 {
     if (dev->duty_fp == -1) {
-        maa_pwm_setup_duty_fp(dev);
+        mraa_pwm_setup_duty_fp(dev);
     }
     char bu[64];
     int length = sprintf(bu, "%d", duty);
     if (write(dev->duty_fp, bu, length * sizeof(char)) == -1)
-        return MAA_ERROR_INVALID_RESOURCE;
-    return MAA_SUCCESS;
+        return MRAA_ERROR_INVALID_RESOURCE;
+    return MRAA_SUCCESS;
 }
 
 static int
-maa_pwm_get_period(maa_pwm_context dev)
+mraa_pwm_get_period(mraa_pwm_context dev)
 {
     char bu[MAX_SIZE];
     char output[MAX_SIZE];
@@ -115,10 +115,10 @@ maa_pwm_get_period(maa_pwm_context dev)
 }
 
 static int
-maa_pwm_get_duty(maa_pwm_context dev)
+mraa_pwm_get_duty(mraa_pwm_context dev)
 {
     if (dev->duty_fp == -1) {
-        maa_pwm_setup_duty_fp(dev);
+        mraa_pwm_setup_duty_fp(dev);
     } else {
         lseek(dev->duty_fp, 0, SEEK_SET);
     }
@@ -131,21 +131,21 @@ maa_pwm_get_duty(maa_pwm_context dev)
     return ret;
 }
 
-maa_pwm_context
-maa_pwm_init(int pin) {
-    maa_pin_t* pinm = maa_setup_pwm(pin);
+mraa_pwm_context
+mraa_pwm_init(int pin) {
+    mraa_pin_t* pinm = mraa_setup_pwm(pin);
     if (pinm == NULL)
         return NULL;
     int chip = pinm->parent_id;
     int pinn = pinm->pinmap;
     free(pinm);
-    return maa_pwm_init_raw(chip,pinn);
+    return mraa_pwm_init_raw(chip,pinn);
 }
 
-maa_pwm_context
-maa_pwm_init_raw(int chipin, int pin)
+mraa_pwm_context
+mraa_pwm_init_raw(int chipin, int pin)
 {
-    maa_pwm_context dev = (maa_pwm_context) malloc(sizeof(struct _pwm));
+    mraa_pwm_context dev = (mraa_pwm_context) malloc(sizeof(struct _pwm));
     if (dev == NULL)
         return NULL;
     dev->duty_fp = -1;
@@ -178,61 +178,61 @@ maa_pwm_init_raw(int chipin, int pin)
         dev->owner = 1;
         close(export_f);
     }
-    maa_pwm_setup_duty_fp(dev);
+    mraa_pwm_setup_duty_fp(dev);
     return dev;
 }
 
-maa_result_t
-maa_pwm_write(maa_pwm_context dev, float percentage)
+mraa_result_t
+mraa_pwm_write(mraa_pwm_context dev, float percentage)
 {
-    return maa_pwm_write_duty(dev, percentage * maa_pwm_get_period(dev));
+    return mraa_pwm_write_duty(dev, percentage * mraa_pwm_get_period(dev));
 }
 
 float
-maa_pwm_read(maa_pwm_context dev)
+mraa_pwm_read(mraa_pwm_context dev)
 {
-    float output = maa_pwm_get_duty(dev) / (float) maa_pwm_get_period(dev);
+    float output = mraa_pwm_get_duty(dev) / (float) mraa_pwm_get_period(dev);
     return output;
 }
 
-maa_result_t
-maa_pwm_period(maa_pwm_context dev, float seconds)
+mraa_result_t
+mraa_pwm_period(mraa_pwm_context dev, float seconds)
 {
-    return maa_pwm_period_ms(dev, seconds*1000);
+    return mraa_pwm_period_ms(dev, seconds*1000);
 }
 
-maa_result_t
-maa_pwm_period_ms(maa_pwm_context dev, int ms)
+mraa_result_t
+mraa_pwm_period_ms(mraa_pwm_context dev, int ms)
 {
-    return maa_pwm_period_us(dev, ms*1000);
+    return mraa_pwm_period_us(dev, ms*1000);
 }
 
-maa_result_t
-maa_pwm_period_us(maa_pwm_context dev, int us)
+mraa_result_t
+mraa_pwm_period_us(mraa_pwm_context dev, int us)
 {
-    return maa_pwm_write_period(dev, us*1000);
+    return mraa_pwm_write_period(dev, us*1000);
 }
 
-maa_result_t
-maa_pwm_pulsewidth(maa_pwm_context dev, float seconds)
+mraa_result_t
+mraa_pwm_pulsewidth(mraa_pwm_context dev, float seconds)
 {
-    return maa_pwm_pulsewidth_ms(dev, seconds*1000);
+    return mraa_pwm_pulsewidth_ms(dev, seconds*1000);
 }
 
-maa_result_t
-maa_pwm_pulsewidth_ms(maa_pwm_context dev, int ms)
+mraa_result_t
+mraa_pwm_pulsewidth_ms(mraa_pwm_context dev, int ms)
 {
-    return maa_pwm_pulsewidth_us(dev, ms*1000);
+    return mraa_pwm_pulsewidth_us(dev, ms*1000);
 }
 
-maa_result_t
-maa_pwm_pulsewidth_us(maa_pwm_context dev, int us)
+mraa_result_t
+mraa_pwm_pulsewidth_us(mraa_pwm_context dev, int us)
 {
-    return maa_pwm_write_duty(dev, us*1000);
+    return mraa_pwm_write_duty(dev, us*1000);
 }
 
-maa_result_t
-maa_pwm_enable(maa_pwm_context dev, int enable)
+mraa_result_t
+mraa_pwm_enable(mraa_pwm_context dev, int enable)
 {
     int status;
     if (enable != 0) {
@@ -247,21 +247,21 @@ maa_pwm_enable(maa_pwm_context dev, int enable)
 
     if (enable_f == -1) {
         fprintf(stderr, "Failed to open enable for writing!\n");
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
     char out[2];
     int size = snprintf(out, sizeof(out), "%d", enable);
     if (write(enable_f, out, size * sizeof(char)) == -1) {
         fprintf(stderr, "Failed to write to enable!\n");
         close(enable_f);
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
     close(enable_f);
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-maa_result_t
-maa_pwm_unexport_force(maa_pwm_context dev)
+mraa_result_t
+mraa_pwm_unexport_force(mraa_pwm_context dev)
 {
     char filepath[MAX_SIZE];
     snprintf(filepath, MAX_SIZE, "/sys/class/pwm/pwmchip%d/unexport", dev->chipid);
@@ -269,7 +269,7 @@ maa_pwm_unexport_force(maa_pwm_context dev)
     int unexport_f = open(filepath, O_WRONLY);
     if (unexport_f == -1) {
         fprintf(stderr, "Failed to open unexport for writing!\n");
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     char out[MAX_SIZE];
@@ -277,36 +277,36 @@ maa_pwm_unexport_force(maa_pwm_context dev)
     if (write(unexport_f, out, size*sizeof(char)) == -1) {
         fprintf(stderr, "Failed to write to unexport!\n");
         close(unexport_f);
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     close(unexport_f);
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-maa_result_t
-maa_pwm_unexport(maa_pwm_context dev)
+mraa_result_t
+mraa_pwm_unexport(mraa_pwm_context dev)
 {
-    maa_pwm_enable(dev, 0);
+    mraa_pwm_enable(dev, 0);
     if (dev->owner) {
-        return maa_pwm_unexport_force(dev);
+        return mraa_pwm_unexport_force(dev);
     }
-    return MAA_ERROR_INVALID_RESOURCE;
+    return MRAA_ERROR_INVALID_RESOURCE;
 }
 
-maa_result_t
-maa_pwm_close(maa_pwm_context dev)
+mraa_result_t
+mraa_pwm_close(mraa_pwm_context dev)
 {
-    maa_pwm_unexport(dev);
+    mraa_pwm_unexport(dev);
     free(dev);
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-maa_result_t
-maa_pwm_owner(maa_pwm_context dev, maa_boolean_t owner_new)
+mraa_result_t
+mraa_pwm_owner(mraa_pwm_context dev, mraa_boolean_t owner_new)
 {
     if (dev == NULL)
-        return MAA_ERROR_INVALID_RESOURCE;
+        return MRAA_ERROR_INVALID_RESOURCE;
     dev->owner = owner_new;
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }

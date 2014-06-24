@@ -1,7 +1,7 @@
-pymaa module
+pymraa module
 ============
 
-.. automodule:: pymaa
+.. automodule:: pymraa
     :members:
     :undoc-members:
     :show-inheritance:

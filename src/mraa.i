@@ -19,17 +19,17 @@
 %}
 
 %init %{
-    //Adding maa_init() to the module initialisation process
-    maa_init();
+    //Adding mraa_init() to the module initialisation process
+    mraa_init();
 %}
 
-%rename(getVersion) maa_get_version;
+%rename(getVersion) mraa_get_version;
 
-%rename(setPriority) maa_set_priority;
+%rename(setPriority) mraa_set_priority;
 
-%rename(printError) maa_result_print(maa_result_t error);
+%rename(printError) mraa_result_print(mraa_result_t error);
 
-%rename(getPlatform) maa_get_platform_type;
+%rename(getPlatform) mraa_get_platform_type;
 
 %typemap(in) uint8_t = char;
 

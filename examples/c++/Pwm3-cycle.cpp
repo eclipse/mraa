@@ -25,7 +25,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-#include "maa.hpp"
+#include "mraa.hpp"
 
 int running = 0;
 
@@ -42,11 +42,11 @@ int main ()
 {
     signal(SIGINT, sig_handler);
 //! [Interesting]
-    maa::Pwm* pwm;
+    mraa::Pwm* pwm;
 
-    pwm = new maa::Pwm(3);
+    pwm = new mraa::Pwm(3);
     if (pwm == NULL) {
-        return MAA_ERROR_UNSPECIFIED;
+        return MRAA_ERROR_UNSPECIFIED;
     }
     fprintf(stdout, "Cycling PWM on IO3 (pwm3) \n");
 
@@ -62,5 +62,5 @@ int main ()
     delete pwm;
 //! [Interesting]
 
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }

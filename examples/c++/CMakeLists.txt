@@ -6,8 +6,8 @@ add_executable (Spi-pot Spi-pot.cpp)
 
 include_directories(${PROJECT_SOURCE_DIR}/api)
 
-target_link_libraries (AioA0 maa stdc++)
-target_link_libraries (blink-io-cpp maa stdc++)
-target_link_libraries (Pwm3-cycle maa stdc++)
-target_link_libraries (I2c-compass maa stdc++ m)
-target_link_libraries (Spi-pot maa stdc++)
+target_link_libraries (AioA0 mraa stdc++)
+target_link_libraries (blink-io-cpp mraa stdc++)
+target_link_libraries (Pwm3-cycle mraa stdc++)
+target_link_libraries (I2c-compass mraa stdc++ m)
+target_link_libraries (Spi-pot mraa stdc++)

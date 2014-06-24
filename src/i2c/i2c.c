@@ -24,7 +24,7 @@
 
 #include "i2c.h"
 #include "smbus.h"
-#include "maa_internal.h"
+#include "mraa_internal.h"
 
 struct _i2c {
     /*@{*/
@@ -34,10 +34,10 @@ struct _i2c {
     /*@}*/
 };
 
-maa_i2c_context
-maa_i2c_init(int bus)
+mraa_i2c_context
+mraa_i2c_init(int bus)
 {
-    int checked_pin = maa_setup_i2c(bus);
+    int checked_pin = mraa_setup_i2c(bus);
     if (checked_pin < 0) {
         switch(checked_pin) {
             case -1:
@@ -52,13 +52,13 @@ maa_i2c_init(int bus)
             default: return NULL;
         }
     }
-    return maa_i2c_init_raw((unsigned int) checked_pin);
+    return mraa_i2c_init_raw((unsigned int) checked_pin);
 }
 
-maa_i2c_context
-maa_i2c_init_raw(unsigned int bus)
+mraa_i2c_context
+mraa_i2c_init_raw(unsigned int bus)
 {
-    maa_i2c_context dev = (maa_i2c_context) malloc(sizeof(struct _i2c));
+    mraa_i2c_context dev = (mraa_i2c_context) malloc(sizeof(struct _i2c));
     if (dev == NULL)
         return NULL;
 
@@ -70,18 +70,18 @@ maa_i2c_init_raw(unsigned int bus)
     return dev;
 }
 
-maa_result_t
-maa_i2c_frequency(maa_i2c_context dev, int hz)
+mraa_result_t
+mraa_i2c_frequency(mraa_i2c_context dev, int hz)
 {
     dev->hz = hz;
 
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
 int
-maa_i2c_read(maa_i2c_context dev, uint8_t* data, int length)
+mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 {
-    // this is the read(3) syscall not maa_i2c_read()
+    // this is the read(3) syscall not mraa_i2c_read()
     if (read(dev->fh, data, length) == length) {
         return length;
     }
@@ -89,7 +89,7 @@ maa_i2c_read(maa_i2c_context dev, uint8_t* data, int length)
 }
 
 uint8_t
-maa_i2c_read_byte(maa_i2c_context dev)
+mraa_i2c_read_byte(mraa_i2c_context dev)
 {
     uint8_t byte = i2c_smbus_read_byte(dev->fh);
     if (byte < 0) {
@@ -98,40 +98,40 @@ maa_i2c_read_byte(maa_i2c_context dev)
     return byte;
 }
 
-maa_result_t
-maa_i2c_write(maa_i2c_context dev, const uint8_t* data, int length)
+mraa_result_t
+mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length)
 {
     if (i2c_smbus_write_i2c_block_data(dev->fh, data[0], length-1, (uint8_t*) data+1) < 0) {
         fprintf(stderr, "Failed to write to i2c\n");
-	return MAA_ERROR_INVALID_HANDLE;
+	return MRAA_ERROR_INVALID_HANDLE;
     }
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-maa_result_t
-maa_i2c_write_byte(maa_i2c_context dev, const uint8_t data)
+mraa_result_t
+mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data)
 {
     if (i2c_smbus_write_byte(dev->fh, data) < 0) {
         fprintf(stderr, "Failed to write to i2c\n");
-	return MAA_ERROR_INVALID_HANDLE;
+	return MRAA_ERROR_INVALID_HANDLE;
     }
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-maa_result_t
-maa_i2c_address(maa_i2c_context dev, int addr)
+mraa_result_t
+mraa_i2c_address(mraa_i2c_context dev, int addr)
 {
     dev->addr = addr;
     if (ioctl(dev->fh, I2C_SLAVE_FORCE, addr) < 0) {
         fprintf(stderr, "Failed to set slave address %d\n", addr);
-	return MAA_ERROR_INVALID_HANDLE;
+	return MRAA_ERROR_INVALID_HANDLE;
     }
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
-maa_result_t
-maa_i2c_stop(maa_i2c_context dev)
+mraa_result_t
+mraa_i2c_stop(mraa_i2c_context dev)
 {
     free(dev);
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }

@@ -26,7 +26,7 @@
 
 #include "gpio.h"
 
-namespace maa {
+namespace mraa {
 
 // These enums must match the enums in gpio.h
 
@@ -61,7 +61,7 @@ typedef enum {
 /**
  * @brief C++ API to General Purpose IO
  *
- * This file defines the gpio C++ interface for libmaa
+ * This file defines the gpio C++ interface for libmraa
  *
  * @snippet Blink-IO.cpp Interesting
  */
@@ -81,18 +81,18 @@ class Gpio {
          */
         Gpio(int pin, bool owner=true, bool raw=false) {
             if (raw)
-                m_gpio = maa_gpio_init_raw(pin);
+                m_gpio = mraa_gpio_init_raw(pin);
             else
-                m_gpio = maa_gpio_init(pin);
+                m_gpio = mraa_gpio_init(pin);
             if (!owner)
-                maa_gpio_owner(m_gpio, 0);
+                mraa_gpio_owner(m_gpio, 0);
         }
         /**
          * Gpio object destructor, this will only unexport the gpio if we where
          * the owner
          */
         ~Gpio() {
-            maa_gpio_close(m_gpio);
+            mraa_gpio_close(m_gpio);
         }
         /**
          * Set the edge mode for ISR
@@ -100,12 +100,12 @@ class Gpio {
          * @param mode The edge mode to set
          * @return Result of operation
          */
-        maa_result_t edge(Edge mode) {
-            return maa_gpio_edge_mode(m_gpio, (gpio_edge_t) mode);
+        mraa_result_t edge(Edge mode) {
+            return mraa_gpio_edge_mode(m_gpio, (gpio_edge_t) mode);
         }
 #if defined(SWIGPYTHON)
-        maa_result_t isr(Edge mode, PyObject *pyfunc, PyObject* args) {
-            return maa_gpio_isr(m_gpio, (gpio_edge_t) mode, (void (*) (void *)) pyfunc, (void *) args);
+        mraa_result_t isr(Edge mode, PyObject *pyfunc, PyObject* args) {
+            return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, (void (*) (void *)) pyfunc, (void *) args);
         }
 #else
         /**
@@ -117,8 +117,8 @@ class Gpio {
          * @param args Arguments passed to the interrupt handler (fptr)
          * @return Result of operation
          */
-        maa_result_t isr(Edge mode, void (*fptr)(void *), void * args) {
-            return maa_gpio_isr(m_gpio, (gpio_edge_t) mode, fptr, args);
+        mraa_result_t isr(Edge mode, void (*fptr)(void *), void * args) {
+            return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, fptr, args);
         }
 #endif
         /**
@@ -127,8 +127,8 @@ class Gpio {
          *
          * @return Result of operation
          */
-        maa_result_t isrExit() {
-            return maa_gpio_isr_exit(m_gpio);
+        mraa_result_t isrExit() {
+            return mraa_gpio_isr_exit(m_gpio);
         }
         /**
          * Change Gpio mode
@@ -136,8 +136,8 @@ class Gpio {
          * @param mode The mode to change the gpio into
          * @return Result of operation
          */
-        maa_result_t mode(Mode mode) {
-            return maa_gpio_mode(m_gpio, (gpio_mode_t) mode);
+        mraa_result_t mode(Mode mode) {
+            return mraa_gpio_mode(m_gpio, (gpio_mode_t) mode);
         }
         /**
          * Change Gpio direction
@@ -145,8 +145,8 @@ class Gpio {
          * @param dir The direction to change the gpio into
          * @return Result of operation
          */
-        maa_result_t dir(Dir dir) {
-            return maa_gpio_dir(m_gpio, (gpio_dir_t) dir);
+        mraa_result_t dir(Dir dir) {
+            return mraa_gpio_dir(m_gpio, (gpio_dir_t) dir);
         }
         /**
          * Read value from Gpio
@@ -154,7 +154,7 @@ class Gpio {
          * @return Gpio value
          */
         int read() {
-            return maa_gpio_read(m_gpio);
+            return mraa_gpio_read(m_gpio);
         }
         /**
          * Write value to Gpio
@@ -162,11 +162,11 @@ class Gpio {
          * @param value Value to write to Gpio
          * @return Result of operation
          */
-        maa_result_t write(int value) {
-            return maa_gpio_write(m_gpio, value);
+        mraa_result_t write(int value) {
+            return mraa_gpio_write(m_gpio, value);
         }
     private:
-        maa_gpio_context m_gpio;
+        mraa_gpio_context m_gpio;
 };
 
 }

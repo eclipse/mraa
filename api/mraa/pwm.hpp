@@ -26,12 +26,12 @@
 
 #include "pwm.h"
 
-namespace maa {
+namespace mraa {
 
 /**
  * @brief C++ API to Pulse Width Modulation
  *
- * This file defines the PWM C++ interface for libmaa
+ * This file defines the PWM C++ interface for libmraa
  *
  * @snippet Pwm3-cycle.cpp Interesting
  */
@@ -48,17 +48,17 @@ class Pwm {
          */
         Pwm(int pin, int chipid=-1, bool owner = true) {
             if (chipid == -1)
-                m_pwm = maa_pwm_init(pin);
+                m_pwm = mraa_pwm_init(pin);
             else
-                m_pwm = maa_pwm_init_raw(pin, chipid);
+                m_pwm = mraa_pwm_init_raw(pin, chipid);
             if (!owner)
-                maa_pwm_owner(m_pwm, 0);
+                mraa_pwm_owner(m_pwm, 0);
         }
         /**
          * Pwm destructor
          */
         ~Pwm() {
-            maa_pwm_close(m_pwm);
+            mraa_pwm_close(m_pwm);
         }
         /**
          * Set the output duty-cycle percentage, as a float
@@ -69,8 +69,8 @@ class Pwm {
          * 1.0f
          * @return Result of operation
          */
-        maa_result_t write(float percentage) {
-            return maa_pwm_write(m_pwm, percentage);
+        mraa_result_t write(float percentage) {
+            return mraa_pwm_write(m_pwm, percentage);
         }
         /**
          * Read the ouput duty-cycle percentage, as a float
@@ -81,7 +81,7 @@ class Pwm {
          * 1.0f
          */
         float read() {
-            return maa_pwm_read(m_pwm);
+            return mraa_pwm_read(m_pwm);
         }
         /**
          * Set the PWM period as seconds represented in a float
@@ -89,8 +89,8 @@ class Pwm {
          * @param period Period represented as a float in seconds
          * @return Result of operation
          */
-        maa_result_t period(float period) {
-            return maa_pwm_period(m_pwm, period);
+        mraa_result_t period(float period) {
+            return mraa_pwm_period(m_pwm, period);
         }
         /**
          * Set period, milliseconds
@@ -98,8 +98,8 @@ class Pwm {
          * @param ms milliseconds for period
          * @return Result of operation
          */
-        maa_result_t period_ms(int ms) {
-            return maa_pwm_period_ms(m_pwm, ms);
+        mraa_result_t period_ms(int ms) {
+            return mraa_pwm_period_ms(m_pwm, ms);
         }
         /**
          * Set period, microseconds
@@ -107,8 +107,8 @@ class Pwm {
          * @param us microseconds as period
          * @return Result of operation
          */
-        maa_result_t period_us(int us) {
-            return maa_pwm_period_us(m_pwm, us);
+        mraa_result_t period_us(int us) {
+            return mraa_pwm_period_us(m_pwm, us);
         }
         /**
          * Set pulsewidth, As represnted by seconds in a (float)
@@ -116,8 +116,8 @@ class Pwm {
          * @param seconds The duration of a pulse
          * @return Result of operation
          */
-        maa_result_t pulsewidth(float seconds) {
-            return maa_pwm_pulsewidth(m_pwm, seconds);
+        mraa_result_t pulsewidth(float seconds) {
+            return mraa_pwm_pulsewidth(m_pwm, seconds);
         }
         /**
          * Set pulsewidth, milliseconds
@@ -125,8 +125,8 @@ class Pwm {
          * @param ms milliseconds for pulsewidth
          * @return Result of operation
          */
-        maa_result_t pulsewidth_ms(int ms) {
-            return maa_pwm_pulsewidth_ms(m_pwm, ms);
+        mraa_result_t pulsewidth_ms(int ms) {
+            return mraa_pwm_pulsewidth_ms(m_pwm, ms);
         }
         /**
          * The pulsewidth, microseconds
@@ -134,8 +134,8 @@ class Pwm {
          * @param us microseconds for pulsewidth
          * @return Result of operation
          */
-        maa_result_t pulsewidth_us(int us) {
-            return maa_pwm_pulsewidth_us(m_pwm, us);
+        mraa_result_t pulsewidth_us(int us) {
+            return mraa_pwm_pulsewidth_us(m_pwm, us);
         }
         /**
          * Set the enable status of the PWM pin. None zero will assume on with
@@ -144,14 +144,14 @@ class Pwm {
          * @param enable enable status of pin
          * @return Result of operation
          */
-        maa_result_t enable(bool enable) {
+        mraa_result_t enable(bool enable) {
             if (enable)
-                return maa_pwm_enable(m_pwm, 1);
+                return mraa_pwm_enable(m_pwm, 1);
             else
-                return maa_pwm_enable(m_pwm, 0);
+                return mraa_pwm_enable(m_pwm, 0);
         }
     private:
-        maa_pwm_context m_pwm;
+        mraa_pwm_context m_pwm;
 };
 
 }

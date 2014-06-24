@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "maa.hpp"
+#include "mraa.hpp"
 #define DEFAULT_IOPIN 8
 
 static int iopin;
@@ -55,13 +55,13 @@ int main (int argc, char **argv)
     signal(SIGINT, sig_handler);
 
 //! [Interesting]
-    maa::Gpio* gpio = new maa::Gpio(iopin);
+    mraa::Gpio* gpio = new mraa::Gpio(iopin);
     if (gpio == NULL) {
-        return MAA_ERROR_UNSPECIFIED;
+        return MRAA_ERROR_UNSPECIFIED;
     }
-    int response = gpio->dir(maa::DIR_OUT);
-    if (response != MAA_SUCCESS)
-        maa_result_print((maa_result_t) MAA_SUCCESS);
+    int response = gpio->dir(mraa::DIR_OUT);
+    if (response != MRAA_SUCCESS)
+        mraa_result_print((mraa_result_t) MRAA_SUCCESS);
 
     while (running == 0) {
         response = gpio->write(1);

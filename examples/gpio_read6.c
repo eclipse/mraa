@@ -25,28 +25,28 @@
 #include "stdio.h"
 #include "unistd.h"
 
-#include "maa.h"
+#include "mraa.h"
 
 int
 main(int argc, char **argv)
 {
-    maa_init();
-    fprintf(stdout, "MAA Version: %s\nStarting Read on IO6\n",
-            maa_get_version());
+    mraa_init();
+    fprintf(stdout, "MRAA Version: %s\nStarting Read on IO6\n",
+            mraa_get_version());
 
 //! [Interesting]
-    maa_gpio_context gpio;
+    mraa_gpio_context gpio;
 
-    gpio = maa_gpio_init(6);
+    gpio = mraa_gpio_init(6);
 
-    maa_gpio_dir(gpio, MAA_GPIO_IN);
+    mraa_gpio_dir(gpio, MRAA_GPIO_IN);
 
     for (;;) {
-        fprintf(stdout, "Gpio is %d\n", maa_gpio_read(gpio));
+        fprintf(stdout, "Gpio is %d\n", mraa_gpio_read(gpio));
         sleep(1);
     }
 
-    maa_gpio_close(gpio);
+    mraa_gpio_close(gpio);
 //! [Interesting]
 
     return 0;

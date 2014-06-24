@@ -27,7 +27,7 @@
  * @file
  * @brief Analog input/output
  *
- * AIO is the anlog input & output interface to libmaa. It is used to read or
+ * AIO is the anlog input & output interface to libmraa. It is used to read or
  * set the voltage applied to an AIO pin.
  *
  * @snippet analogin_a0.c Interesting
@@ -51,7 +51,7 @@ extern "C" {
  * Opaque pointer definition to the internal struct _aio. This context refers
  * to one single AIO pin on the board.
  */
-typedef struct _aio* maa_aio_context;
+typedef struct _aio* mraa_aio_context;
 
 /**
  * Initialise an Analog input device, connected to the specified pin
@@ -59,7 +59,7 @@ typedef struct _aio* maa_aio_context;
  * @param pin Channel number to read ADC inputs
  * @returns aio context or NULL
  */
-maa_aio_context maa_aio_init(unsigned int pin);
+mraa_aio_context mraa_aio_init(unsigned int pin);
 
 /**
  * Read the input voltage
@@ -67,7 +67,7 @@ maa_aio_context maa_aio_init(unsigned int pin);
  * @param dev The AIO context
  * @returns The current input voltage, normalised to a 16-bit value
  */
-uint16_t maa_aio_read(maa_aio_context dev);
+uint16_t mraa_aio_read(mraa_aio_context dev);
 
 /**
  * Close the analog input context, this will free the memory for the context
@@ -75,7 +75,7 @@ uint16_t maa_aio_read(maa_aio_context dev);
  * @param dev The AIO context
  * @return Result of operation
  */
-maa_result_t maa_aio_close(maa_aio_context dev);
+mraa_result_t mraa_aio_close(mraa_aio_context dev);
 
 #ifdef __cplusplus
 }

@@ -1,7 +1,7 @@
-Contributing to libmaa                           {#contributing} 
+Contributing to libmraa                           {#contributing} 
 ======================
 
-libmaa is an opensource project and we are actively looking for people to help
+libmraa is an opensource project and we are actively looking for people to help
 with:
 
 - Writing platform supports for all types of embedded boards running linux

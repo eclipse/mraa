@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "maa.h"
+#include "mraa.h"
 #include "math.h"
 
 #define MAX_BUFFER_LENGTH 6
@@ -78,32 +78,32 @@
 int
 main(int argc, char **argv)
 {
-    maa_init();
+    mraa_init();
     float direction = 0;
     int16_t x = 0, y = 0, z = 0;
     char rx_tx_buf[MAX_BUFFER_LENGTH];
 
 //! [Interesting]
-    maa_i2c_context i2c;
-    i2c = maa_i2c_init(0);
+    mraa_i2c_context i2c;
+    i2c = mraa_i2c_init(0);
 
-    maa_i2c_address(i2c, HMC5883L_I2C_ADDR);
+    mraa_i2c_address(i2c, HMC5883L_I2C_ADDR);
     rx_tx_buf[0] = HMC5883L_CONF_REG_B;
     rx_tx_buf[1] = GA_1_3_REG;
-    maa_i2c_write(i2c, rx_tx_buf, 2);
+    mraa_i2c_write(i2c, rx_tx_buf, 2);
 //! [Interesting]
 
-    maa_i2c_address(i2c, HMC5883L_I2C_ADDR);
+    mraa_i2c_address(i2c, HMC5883L_I2C_ADDR);
     rx_tx_buf[0] = HMC5883L_MODE_REG;
     rx_tx_buf[1] = HMC5883L_CONT_MODE;
-    maa_i2c_write(i2c, rx_tx_buf, 2);
+    mraa_i2c_write(i2c, rx_tx_buf, 2);
 
     for(;;) {
-        maa_i2c_address(i2c, HMC5883L_I2C_ADDR);
-        maa_i2c_write_byte(i2c, HMC5883L_DATA_REG);
+        mraa_i2c_address(i2c, HMC5883L_I2C_ADDR);
+        mraa_i2c_write_byte(i2c, HMC5883L_DATA_REG);
 
-        maa_i2c_address(i2c, HMC5883L_I2C_ADDR);
-        maa_i2c_read(i2c, rx_tx_buf, DATA_REG_SIZE);
+        mraa_i2c_address(i2c, HMC5883L_I2C_ADDR);
+        mraa_i2c_read(i2c, rx_tx_buf, DATA_REG_SIZE);
 
         x = (rx_tx_buf[HMC5883L_X_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_X_LSB_REG] ;
         z = (rx_tx_buf[HMC5883L_Z_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_Z_LSB_REG] ;

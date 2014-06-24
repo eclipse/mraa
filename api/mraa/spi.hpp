@@ -26,12 +26,12 @@
 
 #include "spi.h"
 
-namespace maa {
+namespace mraa {
 
 /**
  * @brief C++ API to System Packet Interface
  *
- * This file defines the SPI C++ interface for libmaa
+ * This file defines the SPI C++ interface for libmraa
  *
  * @snippet Spi-pot.cpp Interesting
  */
@@ -43,13 +43,13 @@ class Spi {
          * @param bus to use, as listed in the platform definition, normally 0
          */
         Spi(int bus) {
-            m_spi = maa_spi_init(bus);
+            m_spi = mraa_spi_init(bus);
         }
         /**
          * Closes spi bus
          */
         ~Spi() {
-            maa_spi_stop(m_spi);
+            mraa_spi_stop(m_spi);
         }
         /**
          * Set the SPI device mode. see spidev0-3
@@ -57,8 +57,8 @@ class Spi {
          * @param mode the mode. See Linux spidev doc
          * @return Result of operation
          */
-        maa_result_t mode(unsigned short mode) {
-            return maa_spi_mode(m_spi, mode);
+        mraa_result_t mode(unsigned short mode) {
+            return mraa_spi_mode(m_spi, mode);
         }
         /**
          * Set the SPI device operating clock frequency
@@ -66,8 +66,8 @@ class Spi {
          * @param hz the frequency to set in hz
          * @return Result of operation
          */
-        maa_result_t frequency(int hz) {
-            return maa_spi_frequency(m_spi, hz);
+        mraa_result_t frequency(int hz) {
+            return mraa_spi_frequency(m_spi, hz);
         }
         /**
          * Write single byte to the SPI device
@@ -76,7 +76,7 @@ class Spi {
          * @return data received on the miso line
          */
         unsigned char write(uint8_t data) {
-            return (unsigned char) maa_spi_write(m_spi, data);
+            return (unsigned char) mraa_spi_write(m_spi, data);
         }
         /**
          * Write buffer of bytes to SPI device
@@ -86,7 +86,7 @@ class Spi {
          * @return char* data received on the miso line. Same length as passed in
          */
         unsigned char* write(uint8_t* data, int length) {
-            return (unsigned char*) maa_spi_write_buf(m_spi, data, length);
+            return (unsigned char*) mraa_spi_write_buf(m_spi, data, length);
         }
         /**
          * Change the SPI lsb mode
@@ -94,8 +94,8 @@ class Spi {
          * @param lsb Use least significant bit transmission - 0 for msbi
          * @return Result of operation
          */
-        maa_result_t lsbmode(bool lsb) {
-            return maa_spi_lsbmode(m_spi, (maa_boolean_t) lsb);
+        mraa_result_t lsbmode(bool lsb) {
+            return mraa_spi_lsbmode(m_spi, (mraa_boolean_t) lsb);
         }
         /**
          * Set bits per mode on transaction, default is 8
@@ -103,10 +103,10 @@ class Spi {
          * @param bits bits per word
          * @return Result of operation
          */
-        maa_result_t bitPerWord(unsigned int bits) {
-            return maa_spi_bit_per_word(m_spi, bits);
+        mraa_result_t bitPerWord(unsigned int bits) {
+            return mraa_spi_bit_per_word(m_spi, bits);
         }
             private:
-                maa_spi_context m_spi;
+                mraa_spi_context m_spi;
         };
 }

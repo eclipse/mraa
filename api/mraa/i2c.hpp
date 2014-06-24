@@ -26,12 +26,12 @@
 
 #include "i2c.h"
 
-namespace maa {
+namespace mraa {
 
 /**
  * @brief C++ API to Inter-Integrated Circuit
  *
- * This file defines the I2c C++ interface for libmaa
+ * This file defines the I2c C++ interface for libmraa
  *
  * @snippet I2c-compass.cpp Interesting
  */
@@ -47,9 +47,9 @@ class I2c {
          */
         I2c(int bus, bool raw=false) {
             if (raw)
-                m_i2c = maa_i2c_init_raw(bus);
+                m_i2c = mraa_i2c_init_raw(bus);
             else
-                m_i2c = maa_i2c_init(bus);
+                m_i2c = mraa_i2c_init(bus);
         }
         /**
          * Closes the I2c Bus used. This does not guarrantee the bus will not
@@ -57,7 +57,7 @@ class I2c {
          * slaves.
          */
         ~I2c() {
-            maa_i2c_stop(m_i2c);
+            mraa_i2c_stop(m_i2c);
         }
         /**
          * Sets the i2c Frequency for communication. Your board may not support
@@ -67,8 +67,8 @@ class I2c {
          * @param hz Frequency to set the bus to in hz
          * @return Result of operation
          */
-        maa_result_t frequency(int hz) {
-            return maa_i2c_frequency(m_i2c, hz);
+        mraa_result_t frequency(int hz) {
+            return mraa_i2c_frequency(m_i2c, hz);
         }
         /**
          * Set the slave to talk to, typically called before every read/write
@@ -77,8 +77,8 @@ class I2c {
          * @param address Communicate to the i2c slave on this address
          * @return Result of operation
          */
-        maa_result_t address(int address) {
-            return maa_i2c_address(m_i2c, address);
+        mraa_result_t address(int address) {
+            return mraa_i2c_address(m_i2c, address);
         }
         /**
          * Read exactly one byte from the bus
@@ -86,7 +86,7 @@ class I2c {
          * @return Char read from the bus
          */
         unsigned char readByte() {
-            return (unsigned char) maa_i2c_read_byte(m_i2c);
+            return (unsigned char) mraa_i2c_read_byte(m_i2c);
         }
         /**
          * Read mutliple bytes from the bus
@@ -96,7 +96,7 @@ class I2c {
          * @return length of the read or 0 if failed
          */
         int read(unsigned char * data, int length) {
-            return maa_i2c_read(m_i2c, data, length);
+            return mraa_i2c_read(m_i2c, data, length);
         }
         /**
          * Write one byte to the bus
@@ -105,8 +105,8 @@ class I2c {
          * @param length Size of buffer to send
          * @return Result of operation
          */
-        maa_result_t write(const unsigned char* data, int length) {
-            return maa_i2c_write(m_i2c, data, length);
+        mraa_result_t write(const unsigned char* data, int length) {
+            return mraa_i2c_write(m_i2c, data, length);
         }
 
         /**
@@ -116,9 +116,9 @@ class I2c {
          * @param data Value to write to register
          * @return Result of operation
          */
-        maa_result_t writeReg(const unsigned char reg, const unsigned char data) {
+        mraa_result_t writeReg(const unsigned char reg, const unsigned char data) {
             const unsigned char buf[2] = {reg, data};
-            return maa_i2c_write(m_i2c, buf, 2);
+            return mraa_i2c_write(m_i2c, buf, 2);
         }
 
         /**
@@ -127,11 +127,11 @@ class I2c {
          * @param data The byte to send on the bus
          * @return Result of operation
          */
-        maa_result_t write(const unsigned char data) {
-            return maa_i2c_write_byte(m_i2c, data);
+        mraa_result_t write(const unsigned char data) {
+            return mraa_i2c_write_byte(m_i2c, data);
         }
     private:
-        maa_i2c_context m_i2c;
+        mraa_i2c_context m_i2c;
 };
 
 }

@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8)
-project (maa)
+project (mraa)
 
 FIND_PACKAGE (Threads)
 
@@ -13,11 +13,11 @@ set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_
 include (GetGitRevisionDescription)
 git_describe (VERSION "--tags")
 if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND")
-  message (WARNING " - Install git to compile a production libmaa!")
+  message (WARNING " - Install git to compile a production libmraa!")
   set (VERSION "v0.3.1-dirty")
 endif ()
 
-message (INFO " - MAA Version ${VERSION}")
+message (INFO " - MRAA Version ${VERSION}")
 
 #parse the version information into pieces.
 string (REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${VERSION}")
@@ -35,10 +35,10 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/version.c.in
                 ${CMAKE_CURRENT_BINARY_DIR}/src/version.c)
 
 # this is the library version, independant of git revision
-set (maa_VERSION_MAJOR ${VERSION_MAJOR})
-set (maa_VERSION_MINOR ${VERSION_MINOR})
-set (maa_VERSION_PATCH ${VERSION_PATCH})
-set (maa_VERSION_STRING ${maa_VERSION_MAJOR}.${maa_VERSION_MINOR}.${maa_VERSION_PATCH})
+set (mraa_VERSION_MAJOR ${VERSION_MAJOR})
+set (mraa_VERSION_MINOR ${VERSION_MINOR})
+set (mraa_VERSION_PATCH ${VERSION_PATCH})
+set (mraa_VERSION_STRING ${mraa_VERSION_MAJOR}.${mraa_VERSION_MINOR}.${mraa_VERSION_PATCH})
 
 set (CMAKE_SWIG_FLAGS "")
 
@@ -76,17 +76,17 @@ if (IPK)
   set(OPKG_ARCH ${DETECTED_ARCH})
   set(CPACK_BINARY_DIR ${CMAKE_BINARY_DIR})
   set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Intel IoT-Devkit") #required
-  set(maa_PACKAGE_ON_TAG ".")
+  set(mraa_PACKAGE_ON_TAG ".")
   if ("${VERSION_COMMIT}" STREQUAL "")
-    set(maa_PACKAGE_ON_TAG "")
+    set(mraa_PACKAGE_ON_TAG "")
   endif()
   set(CPACK_PACKAGE_VERSION 
-      "${maa_VERSION_MAJOR}.${maa_VERSION_MINOR}.${maa_VERSION_PATCH}${maa_PACKAGE_ON_TAG}${VERSION_COMMIT}")
-  set(CPACK_PACKAGE_NAME "libmaa${maa_VERSION_MAJOR}")
+      "${mraa_VERSION_MAJOR}.${mraa_VERSION_MINOR}.${mraa_VERSION_PATCH}${mraa_PACKAGE_ON_TAG}${VERSION_COMMIT}")
+  set(CPACK_PACKAGE_NAME "libmraa${mraa_VERSION_MAJOR}")
   set(CPACK_DEBIAN_PACKAGE_SECTION "libs")
   set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${DETECTED_ARCH})
   set(CPACK_SYSTEM_NAME ${DETECTED_ARCH})
-  set(CPACK_DEBIAN_PACKAGE_PROVIDES "libmaa-dev, libmaa-dbg, libmaa-doc")
+  set(CPACK_DEBIAN_PACKAGE_PROVIDES "libmraa-dev, libmraa-dbg, libmraa-doc")
   set(CPACK_DEBIAN_PACKAGE_REPLACES ${CPACK_DEBIAN_PACKAGE_PROVIDES})
   set(CPACK_DEBIAN_PACKAGE_CONFLICTS ${CPACK_DEBIAN_PACKAGE_PROVIDES})
   set(WDIR "${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}")

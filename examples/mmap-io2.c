@@ -25,22 +25,22 @@
 #include "stdio.h"
 #include <unistd.h>
 
-#include "maa.h"
+#include "mraa.h"
 
 int
 main(int argc, char **argv)
 {
 //! [Interesting]
-    fprintf(stdout, "hello maa\n Version: %s\n", maa_get_version());
-    maa_gpio_context gpio;
-    gpio = maa_gpio_init(2);
+    fprintf(stdout, "hello mraa\n Version: %s\n", mraa_get_version());
+    mraa_gpio_context gpio;
+    gpio = mraa_gpio_init(2);
 
-    maa_gpio_use_mmaped(gpio, 1);
+    mraa_gpio_use_mmaped(gpio, 1);
 
     for (;;) {
-        maa_gpio_write(gpio , 1);
+        mraa_gpio_write(gpio , 1);
         usleep(50000);
-        maa_gpio_write(gpio, 0);
+        mraa_gpio_write(gpio, 0);
         usleep(50000);
     }
 //! [Interesting]

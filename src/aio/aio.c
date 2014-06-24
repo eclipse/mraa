@@ -27,14 +27,14 @@
 #include <errno.h>
 
 #include "aio.h"
-#include "maa_internal.h"
+#include "mraa_internal.h"
 
 struct _aio {
     unsigned int channel;
     int adc_in_fp;
 };
 
-static maa_result_t aio_get_valid_fp(maa_aio_context dev)
+static mraa_result_t aio_get_valid_fp(mraa_aio_context dev)
 {
     char file_path[64]= "";
 
@@ -45,22 +45,22 @@ static maa_result_t aio_get_valid_fp(maa_aio_context dev)
     dev->adc_in_fp = open(file_path, O_RDONLY);
     if (dev->adc_in_fp == -1) {
 	fprintf(stderr, "Failed to open Analog input raw file %s for "
-	    "reading!\n", file_path); return( MAA_ERROR_INVALID_RESOURCE);
+	    "reading!\n", file_path); return( MRAA_ERROR_INVALID_RESOURCE);
     }
 
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
 /** Initialise an Analog input, connected to the specified channel
  *
  * @param aio_channel Analog input channel to read
  *
- * @returns pointer to maa_aio_context structure  after initialisation of
+ * @returns pointer to mraa_aio_context structure  after initialisation of
  * Analog input pin connected to the device successfully, else returns NULL.
  */
-maa_aio_context maa_aio_init(unsigned int aio_channel)
+mraa_aio_context mraa_aio_init(unsigned int aio_channel)
 {
-    int checked_pin = maa_setup_aio(aio_channel);
+    int checked_pin = mraa_setup_aio(aio_channel);
     if (checked_pin < 0) {
         switch(checked_pin) {
             case -1:
@@ -79,7 +79,7 @@ maa_aio_context maa_aio_init(unsigned int aio_channel)
     }
 
     //Create ADC device connected to specified channel
-    maa_aio_context dev = malloc(sizeof(struct _aio));
+    mraa_aio_context dev = malloc(sizeof(struct _aio));
     if (dev == NULL) {
         fprintf(stderr, "Insufficient memory for specified Analog input channel "
             "%d\n", aio_channel);
@@ -88,7 +88,7 @@ maa_aio_context maa_aio_init(unsigned int aio_channel)
     dev->channel = checked_pin;
 
     //Open valid  analog input file and get the pointer.
-    if (MAA_SUCCESS != aio_get_valid_fp(dev)) {
+    if (MRAA_SUCCESS != aio_get_valid_fp(dev)) {
         free(dev);
         return NULL;
     }
@@ -99,14 +99,14 @@ maa_aio_context maa_aio_init(unsigned int aio_channel)
 /** Read the input voltage, represented as an unsigned short in the range [0x0,
  * 0xFFFF]
  *
- * @param pointer to maa_aio_context structure  initialised by
- * maa_aio_init()
+ * @param pointer to mraa_aio_context structure  initialised by
+ * mraa_aio_init()
  *
  * @returns
  *   unsigned 16 bit int representing the current input voltage, normalised to
  *   a 16-bit value
  */
-uint16_t maa_aio_read(maa_aio_context dev)
+uint16_t mraa_aio_read(mraa_aio_context dev)
 {
     char buffer[16];
     unsigned int shifter_value = 0;
@@ -147,12 +147,12 @@ uint16_t maa_aio_read(maa_aio_context dev)
  *
  * @param dev - the analog input context
  *
- * @return maa result type.
+ * @return mraa result type.
  */
-maa_result_t maa_aio_close(maa_aio_context dev)
+mraa_result_t mraa_aio_close(mraa_aio_context dev)
 {
     if (NULL != dev)
         free(dev);
 
-    return(MAA_SUCCESS);
+    return(MRAA_SUCCESS);
 }

@@ -28,7 +28,7 @@
  * @file
  * @brief Inter-Integrated Circuit
  *
- * This file defines the i2c/Iic interface for libmaa. A context represents a
+ * This file defines the i2c/Iic interface for libmraa. A context represents a
  * bus and that bus may contain multiple addresses or i2c slaves. It is
  * considered best practice to make sure the address is correct before doing
  * any calls on i2c, in case another application or even thread changed the
@@ -52,7 +52,7 @@ extern "C" {
 /**
  * Opaque pointer definition to the internal struct _i2c
  */
-typedef struct _i2c* maa_i2c_context;
+typedef struct _i2c* mraa_i2c_context;
 
 /**
  * Initialise i2c context, using board defintions
@@ -60,7 +60,7 @@ typedef struct _i2c* maa_i2c_context;
  * @param bus i2c bus to use
  * @return i2c context or NULL
  */
-maa_i2c_context maa_i2c_init(int bus);
+mraa_i2c_context mraa_i2c_init(int bus);
 
 /**
  * Initialise i2c context, passing in spi bus to use.
@@ -68,7 +68,7 @@ maa_i2c_context maa_i2c_init(int bus);
  * @param bus The i2c bus to use i.e. /dev/i2c-2 would be "2"
  * @return i2c context or NULL
  */
-maa_i2c_context maa_i2c_init_raw(unsigned int bus);
+mraa_i2c_context mraa_i2c_init_raw(unsigned int bus);
 
 /**
  * Sets the frequency of the i2c context
@@ -77,7 +77,7 @@ maa_i2c_context maa_i2c_init_raw(unsigned int bus);
  * @param hz The bus frequency in hertz
  * @return Result of operation
  */
-maa_result_t maa_i2c_frequency(maa_i2c_context dev, int hz);
+mraa_result_t mraa_i2c_frequency(mraa_i2c_context dev, int hz);
 
 /**
  * Read from an i2c context
@@ -87,7 +87,7 @@ maa_result_t maa_i2c_frequency(maa_i2c_context dev, int hz);
  * @param length max number of bytes to read
  * @return length of the read in bytes or 0
  */
-int maa_i2c_read(maa_i2c_context dev, uint8_t *data, int length);
+int mraa_i2c_read(mraa_i2c_context dev, uint8_t *data, int length);
 
 /**
  * Read a single byte from the i2c context
@@ -95,7 +95,7 @@ int maa_i2c_read(maa_i2c_context dev, uint8_t *data, int length);
  * @param dev The i2c context
  * @return The result of the read or -1 if failed
  */
-uint8_t maa_i2c_read_byte(maa_i2c_context dev);
+uint8_t mraa_i2c_read_byte(mraa_i2c_context dev);
 
 /**
  * Write to an i2c context
@@ -105,7 +105,7 @@ uint8_t maa_i2c_read_byte(maa_i2c_context dev);
  * @param length the number of bytes to transmit
  * @return Result of operation
  */
-maa_result_t maa_i2c_write(maa_i2c_context dev, const uint8_t *data, int length);
+mraa_result_t mraa_i2c_write(mraa_i2c_context dev, const uint8_t *data, int length);
 
 /**
  * Write a single byte to an i2c context
@@ -114,7 +114,7 @@ maa_result_t maa_i2c_write(maa_i2c_context dev, const uint8_t *data, int length)
  * @param data The byte to write
  * @return Result of operation
  */
-maa_result_t maa_i2c_write_byte(maa_i2c_context dev, const uint8_t data);
+mraa_result_t mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data);
 
 /**
  * Sets the i2c context address.
@@ -125,15 +125,15 @@ maa_result_t maa_i2c_write_byte(maa_i2c_context dev, const uint8_t data);
  *   general call address.
  * @return Result of operation
  */
-maa_result_t maa_i2c_address(maa_i2c_context dev, int address);
+mraa_result_t mraa_i2c_address(mraa_i2c_context dev, int address);
 
 /**
- * De-inits an maa_i2c_context device
+ * De-inits an mraa_i2c_context device
  *
  * @param dev The i2c context
  * @return Result of operation
  */
-maa_result_t maa_i2c_stop(maa_i2c_context dev);
+mraa_result_t mraa_i2c_stop(mraa_i2c_context dev);
 
 #ifdef __cplusplus
 }

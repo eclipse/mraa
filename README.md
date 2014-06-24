@@ -1,4 +1,4 @@
-MAA - Low Level Skeleton Library for Communication on Intel platforms
+MRAA - Low Level Skeleton Library for Communication on Intel platforms
 ==============
 
 Library in C/C++ to interface with Galileo & other Intel platforms, in a

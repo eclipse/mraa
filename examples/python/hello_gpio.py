@@ -22,9 +22,9 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import pymaa
+import pymraa
 
-print (pymaa.getVersion())
-x = pymaa.Gpio(13)
-x.dir(pymaa.DIR_OUT)
+print (pymraa.getVersion())
+x = pymraa.Gpio(13)
+x.dir(pymraa.DIR_OUT)
 x.write(1)

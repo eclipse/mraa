@@ -1,7 +1,7 @@
-Building libmaa                         {#building}
+Building libmraa                         {#building}
 ===============
 
-libmaa uses cmake in order to make compilation relatively painless. Cmake runs
+libmraa uses cmake in order to make compilation relatively painless. Cmake runs
 build out of tree so the recommended way is to clone from git and make a build/ directory.
 
 ~~~~~~~~~~~~~{.sh}

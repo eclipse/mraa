@@ -1,11 +1,11 @@
 include_directories(
   ${PROJECT_SOURCE_DIR}/api
-  ${PROJECT_SOURCE_DIR}/api/maa
+  ${PROJECT_SOURCE_DIR}/api/mraa
   ${PROJECT_SOURCE_DIR}/include
 )
 
-set (maa_LIB_SRCS
-  ${PROJECT_SOURCE_DIR}/src/maa.c
+set (mraa_LIB_SRCS
+  ${PROJECT_SOURCE_DIR}/src/mraa.c
   ${PROJECT_SOURCE_DIR}/src/gpio/gpio.c
   ${PROJECT_SOURCE_DIR}/src/i2c/i2c.c
   ${PROJECT_SOURCE_DIR}/src/i2c/smbus.c
@@ -18,30 +18,30 @@ set (maa_LIB_SRCS
   ${CMAKE_CURRENT_BINARY_DIR}/version.c
 )
 
-set (maa_LIB_GLOB_HEADERS
-  ${PROJECT_SOURCE_DIR}/api/maa.h
-  ${PROJECT_SOURCE_DIR}/api/maa.hpp
+set (mraa_LIB_GLOB_HEADERS
+  ${PROJECT_SOURCE_DIR}/api/mraa.h
+  ${PROJECT_SOURCE_DIR}/api/mraa.hpp
 )
 
-add_library (maa SHARED ${maa_LIB_SRCS})
-target_link_libraries (maa ${CMAKE_THREAD_LIBS_INIT})
+add_library (mraa SHARED ${mraa_LIB_SRCS})
+target_link_libraries (mraa ${CMAKE_THREAD_LIBS_INIT})
 
 set_target_properties(
-   maa
+   mraa
    PROPERTIES
-   SOVERSION ${maa_VERSION_MAJOR}
-   VERSION ${maa_VERSION_STRING}
+   SOVERSION ${mraa_VERSION_MAJOR}
+   VERSION ${mraa_VERSION_STRING}
 )
-install (FILES ${maa_LIB_GLOB_HEADERS} DESTINATION include/)
-install (DIRECTORY ${PROJECT_SOURCE_DIR}/api/maa/ DESTINATION include/maa)
+install (FILES ${mraa_LIB_GLOB_HEADERS} DESTINATION include/)
+install (DIRECTORY ${PROJECT_SOURCE_DIR}/api/mraa/ DESTINATION include/mraa)
 
-macro (maa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
+macro (mraa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
   configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
   install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} DESTINATION ${install_location})
-endmacro (maa_CREATE_INSTALL_PKGCONFIG)
-maa_create_install_pkgconfig (maa.pc lib${LIB_SUFFIX}/pkgconfig)
+endmacro (mraa_CREATE_INSTALL_PKGCONFIG)
+mraa_create_install_pkgconfig (mraa.pc lib${LIB_SUFFIX}/pkgconfig)
 
-install (TARGETS maa DESTINATION lib)
+install (TARGETS mraa DESTINATION lib)
 
 if (DOXYGEN_FOUND)
   set (CMAKE_SWIG_FLAGS -DDOXYGEN=${DOXYGEN_FOUND})
@@ -49,9 +49,9 @@ if (DOXYGEN_FOUND)
   foreach (_file ${DOCCLASSES})
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_file}_class_doc.i
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxy2swig.py -n
-        ${CMAKE_BINARY_DIR}/xml/classmaa_1_1_${_file}.xml
+        ${CMAKE_BINARY_DIR}/xml/classmraa_1_1_${_file}.xml
         ${CMAKE_CURRENT_BINARY_DIR}/${_file}_class_doc.i
-      DEPENDS ${CMAKE_BINARY_DIR}/xml/classmaa_1_1_${_file}.xml
+      DEPENDS ${CMAKE_BINARY_DIR}/xml/classmraa_1_1_${_file}.xml
     )
     add_custom_target (${_file}class_doc_i DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_file}_class_doc.i)
     add_dependencies (${_file}class_doc_i doc)
@@ -73,7 +73,7 @@ if (BUILDSWIG)
   find_package (SWIG)
   if (SWIG_FOUND)
     include (${SWIG_USE_FILE})
-    set_source_files_properties (maa.i PROPERTIES SWIG_FLAGS "-I${CMAKE_BINARY_DIR}/src")
+    set_source_files_properties (mraa.i PROPERTIES SWIG_FLAGS "-I${CMAKE_BINARY_DIR}/src")
 
     if (BUILDSWIGPYTHON)
       add_subdirectory (python)

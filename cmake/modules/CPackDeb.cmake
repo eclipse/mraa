@@ -197,7 +197,7 @@ Depends:
 Provides: ${CPACK_DEBIAN_PACKAGE_PROVIDES}
 Replaces: ${CPACK_DEBIAN_PACKAGE_REPLACES}
 Conflicts: ${CPACK_DEBIAN_PACKAGE_CONFLICTS}
-Source: https://github.com/intel-iot-devkit/maa
+Source: https://github.com/intel-iot-devkit/mraa
 #Essential: no
 ")
 

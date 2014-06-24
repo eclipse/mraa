@@ -27,11 +27,11 @@
 extern "C" {
 #endif
 
-#include "maa/pwm.h"
-#include "maa/aio.h"
-#include "maa/gpio.h"
-#include "maa/spi.h"
-#include "maa/i2c.h"
+#include "mraa/pwm.h"
+#include "mraa/aio.h"
+#include "mraa/gpio.h"
+#include "mraa/spi.h"
+#include "mraa/i2c.h"
 
 #ifdef __cplusplus
 }

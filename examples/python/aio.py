@@ -22,8 +22,8 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import pymaa as maa
+import pymraa as mraa
 
-print (maa.getVersion())
-x = maa.Aio(0)
+print (mraa.getVersion())
+x = mraa.Aio(0)
 print (x.read())

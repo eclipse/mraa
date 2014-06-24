@@ -28,35 +28,35 @@
 #include <sched.h>
 #include <string.h>
 
-#include "maa_internal.h"
+#include "mraa_internal.h"
 #include "intel_galileo_rev_d.h"
 #include "intel_galileo_rev_g.h"
 #include "gpio.h"
 #include "version.h"
 
-//static maa_pininfo_t* pindata;
-static maa_board_t* plat = NULL;
-static maa_platform_t platform_type = MAA_UNKNOWN_PLATFORM;
+//static mraa_pininfo_t* pindata;
+static mraa_board_t* plat = NULL;
+static mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
 
 const char *
-maa_get_version()
+mraa_get_version()
 {
     return gVERSION;
 }
 
 #ifdef SWIG
-maa_result_t
-maa_init()
+mraa_result_t
+mraa_init()
 #else
-maa_result_t __attribute__((constructor))
-maa_init()
+mraa_result_t __attribute__((constructor))
+mraa_init()
 #endif
 {
     /** Once more board definitions have been added,
      *  A method for detecting them will need to be devised.
      */
     if (plat != NULL) {
-        return MAA_ERROR_PLATFORM_ALREADY_INITIALISED;
+        return MRAA_ERROR_PLATFORM_ALREADY_INITIALISED;
     }
 #ifdef SWIGPYTHON
     // Initialise python threads, this allows use to grab the GIL when we are
@@ -72,9 +72,9 @@ maa_init()
     if (fh != NULL) {
         if (getline(&line, &len, fh) != -1) {
             if (strncmp(line, "GalileoGen2", 10) == 0) {
-                platform_type = MAA_INTEL_GALILEO_GEN2;
+                platform_type = MRAA_INTEL_GALILEO_GEN2;
             } else {
-                platform_type = MAA_INTEL_GALILEO_GEN1;
+                platform_type = MRAA_INTEL_GALILEO_GEN1;
             }
         }
     }
@@ -82,22 +82,22 @@ maa_init()
     fclose(fh);
 
     switch(platform_type) {
-        case MAA_INTEL_GALILEO_GEN2:
-            plat = maa_intel_galileo_gen2();
+        case MRAA_INTEL_GALILEO_GEN2:
+            plat = mraa_intel_galileo_gen2();
             break;
-        case MAA_INTEL_GALILEO_GEN1:
-            plat = maa_intel_galileo_rev_d();
+        case MRAA_INTEL_GALILEO_GEN1:
+            plat = mraa_intel_galileo_rev_d();
             break;
         default:
-            plat = maa_intel_galileo_rev_d();
-            fprintf(stderr, "Platform not found, initialising MAA_INTEL_GALILEO_GEN1\n");
+            plat = mraa_intel_galileo_rev_d();
+            fprintf(stderr, "Platform not found, initialising MRAA_INTEL_GALILEO_GEN1\n");
     }
 
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
 int
-maa_set_priority(const unsigned int priority)
+mraa_set_priority(const unsigned int priority)
 {
     struct sched_param sched_s;
 
@@ -112,24 +112,24 @@ maa_set_priority(const unsigned int priority)
     return sched_setscheduler(0, SCHED_RR, &sched_s);
 }
 
-static maa_result_t
-maa_setup_mux_mapped(maa_pin_t meta)
+static mraa_result_t
+mraa_setup_mux_mapped(mraa_pin_t meta)
 {
     int mi;
     for (mi = 0; mi < meta.mux_total; mi++) {
-        maa_gpio_context mux_i;
-        mux_i = maa_gpio_init_raw(meta.mux[mi].pin);
+        mraa_gpio_context mux_i;
+        mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
         if (mux_i == NULL)
-            return MAA_ERROR_INVALID_HANDLE;
-        maa_gpio_dir(mux_i, MAA_GPIO_OUT);
-        if (maa_gpio_write(mux_i, meta.mux[mi].value) != MAA_SUCCESS)
-            return MAA_ERROR_INVALID_RESOURCE;
+            return MRAA_ERROR_INVALID_HANDLE;
+        mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
+        if (mraa_gpio_write(mux_i, meta.mux[mi].value) != MRAA_SUCCESS)
+            return MRAA_ERROR_INVALID_RESOURCE;
     }
-    return MAA_SUCCESS;
+    return MRAA_SUCCESS;
 }
 
 unsigned int
-maa_setup_gpio(int pin)
+mraa_setup_gpio(int pin)
 {
     if (plat == NULL)
         return -1;
@@ -141,13 +141,13 @@ maa_setup_gpio(int pin)
       return -1;
 
     if (plat->pins[pin].gpio.mux_total > 0)
-       if (maa_setup_mux_mapped(plat->pins[pin].gpio) != MAA_SUCCESS)
+       if (mraa_setup_mux_mapped(plat->pins[pin].gpio) != MRAA_SUCCESS)
             return -1;
     return plat->pins[pin].gpio.pinmap;
 }
 
 unsigned int
-maa_setup_aio(int aio)
+mraa_setup_aio(int aio)
 {
     if (plat == NULL)
         return -3;
@@ -161,13 +161,13 @@ maa_setup_aio(int aio)
       return -1;
 
     if (plat->pins[pin].aio.mux_total > 0)
-       if (maa_setup_mux_mapped(plat->pins[pin].aio) != MAA_SUCCESS)
+       if (mraa_setup_mux_mapped(plat->pins[pin].aio) != MRAA_SUCCESS)
             return -1;
     return plat->pins[pin].aio.pinmap;
 }
 
 unsigned int
-maa_setup_i2c(int bus)
+mraa_setup_i2c(int bus)
 {
     if (plat == NULL)
         return -3;
@@ -183,19 +183,19 @@ maa_setup_i2c(int bus)
 
     int pos = plat->i2c_bus[bus].sda;
     if (plat->pins[pos].i2c.mux_total > 0)
-        if (maa_setup_mux_mapped(plat->pins[pos].i2c) != MAA_SUCCESS)
+        if (mraa_setup_mux_mapped(plat->pins[pos].i2c) != MRAA_SUCCESS)
              return -2;
 
     pos = plat->i2c_bus[bus].scl;
     if (plat->pins[pos].i2c.mux_total > 0)
-        if (maa_setup_mux_mapped(plat->pins[pos].i2c) != MAA_SUCCESS)
+        if (mraa_setup_mux_mapped(plat->pins[pos].i2c) != MRAA_SUCCESS)
              return -2;
 
     return plat->i2c_bus[bus].bus_id;
 }
 
-maa_spi_bus_t*
-maa_setup_spi(int bus)
+mraa_spi_bus_t*
+mraa_setup_spi(int bus)
 {
     if (plat == NULL)
         return NULL;
@@ -211,25 +211,25 @@ maa_setup_spi(int bus)
 
     int pos = plat->spi_bus[bus].sclk;
     if (plat->pins[pos].spi.mux_total > 0)
-        if (maa_setup_mux_mapped(plat->pins[pos].spi) != MAA_SUCCESS)
+        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS)
              return NULL;
 
     pos = plat->spi_bus[bus].mosi;
     if (plat->pins[pos].spi.mux_total > 0)
-        if (maa_setup_mux_mapped(plat->pins[pos].spi) != MAA_SUCCESS)
+        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS)
              return NULL;
 
     pos = plat->spi_bus[bus].miso;
     if (plat->pins[pos].spi.mux_total > 0)
-        if (maa_setup_mux_mapped(plat->pins[pos].spi) != MAA_SUCCESS)
+        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS)
              return NULL;
 
-    maa_spi_bus_t *spi = &(plat->spi_bus[bus]);
+    mraa_spi_bus_t *spi = &(plat->spi_bus[bus]);
     return spi;
 }
 
-maa_pin_t*
-maa_setup_pwm(int pin)
+mraa_pin_t*
+mraa_setup_pwm(int pin)
 {
     if (plat == NULL)
         return NULL;
@@ -238,85 +238,85 @@ maa_setup_pwm(int pin)
         return NULL;
 
     if (plat->pins[pin].capabilites.gpio == 1) {
-        maa_gpio_context mux_i;
-        mux_i = maa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
+        mraa_gpio_context mux_i;
+        mux_i = mraa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
         if (mux_i == NULL)
             return NULL;
-        if (maa_gpio_dir(mux_i, MAA_GPIO_OUT) != MAA_SUCCESS)
+        if (mraa_gpio_dir(mux_i, MRAA_GPIO_OUT) != MRAA_SUCCESS)
             return NULL;
         // Current REV D quirk. //TODO GEN 2
-        if (maa_gpio_write(mux_i, 1) != MAA_SUCCESS)
+        if (mraa_gpio_write(mux_i, 1) != MRAA_SUCCESS)
             return NULL;
-        if (maa_gpio_close(mux_i) != MAA_SUCCESS)
+        if (mraa_gpio_close(mux_i) != MRAA_SUCCESS)
             return NULL;
     }
 
     if (plat->pins[pin].pwm.mux_total > 0)
-       if (maa_setup_mux_mapped(plat->pins[pin].pwm) != MAA_SUCCESS)
+       if (mraa_setup_mux_mapped(plat->pins[pin].pwm) != MRAA_SUCCESS)
             return NULL;
 
-    maa_pin_t *ret;
-    ret = (maa_pin_t*) malloc(sizeof(maa_pin_t));
+    mraa_pin_t *ret;
+    ret = (mraa_pin_t*) malloc(sizeof(mraa_pin_t));
     ret->pinmap = plat->pins[pin].pwm.pinmap;
     ret->parent_id = plat->pins[pin].pwm.parent_id;
     return ret;
 }
 
 void
-maa_result_print(maa_result_t result)
+mraa_result_print(mraa_result_t result)
 {
     switch (result) {
-        case MAA_SUCCESS: fprintf(stderr, "MAA: SUCCESS\n");
+        case MRAA_SUCCESS: fprintf(stderr, "MRAA: SUCCESS\n");
                           break;
-        case MAA_ERROR_FEATURE_NOT_IMPLEMENTED:
-                          fprintf(stderr, "MAA: Feature not implemented.\n");
+        case MRAA_ERROR_FEATURE_NOT_IMPLEMENTED:
+                          fprintf(stderr, "MRAA: Feature not implemented.\n");
                           break;
-        case MAA_ERROR_FEATURE_NOT_SUPPORTED:
-                          fprintf(stderr, "MAA: Feature not supported by Hardware.\n");
+        case MRAA_ERROR_FEATURE_NOT_SUPPORTED:
+                          fprintf(stderr, "MRAA: Feature not supported by Hardware.\n");
                           break;
-        case MAA_ERROR_INVALID_VERBOSITY_LEVEL:
-                          fprintf(stderr, "MAA: Invalid verbosity level.\n");
+        case MRAA_ERROR_INVALID_VERBOSITY_LEVEL:
+                          fprintf(stderr, "MRAA: Invalid verbosity level.\n");
                           break;
-        case MAA_ERROR_INVALID_PARAMETER:
-                          fprintf(stderr, "MAA: Invalid parameter.\n");
+        case MRAA_ERROR_INVALID_PARAMETER:
+                          fprintf(stderr, "MRAA: Invalid parameter.\n");
                           break;
-        case MAA_ERROR_INVALID_HANDLE:
-                          fprintf(stderr, "MAA: Invalid Handle.\n");
+        case MRAA_ERROR_INVALID_HANDLE:
+                          fprintf(stderr, "MRAA: Invalid Handle.\n");
                           break;
-        case MAA_ERROR_NO_RESOURCES:
-                          fprintf(stderr, "MAA: No resources.\n");
+        case MRAA_ERROR_NO_RESOURCES:
+                          fprintf(stderr, "MRAA: No resources.\n");
                           break;
-        case MAA_ERROR_INVALID_RESOURCE:
-                          fprintf(stderr, "MAA: Invalid resource.\n");
+        case MRAA_ERROR_INVALID_RESOURCE:
+                          fprintf(stderr, "MRAA: Invalid resource.\n");
                           break;
-        case MAA_ERROR_INVALID_QUEUE_TYPE:
-                          fprintf(stderr, "MAA: Invalid Queue Type.\n");
+        case MRAA_ERROR_INVALID_QUEUE_TYPE:
+                          fprintf(stderr, "MRAA: Invalid Queue Type.\n");
                           break;
-        case MAA_ERROR_NO_DATA_AVAILABLE:
-                          fprintf(stderr, "MAA: No Data available.\n");
+        case MRAA_ERROR_NO_DATA_AVAILABLE:
+                          fprintf(stderr, "MRAA: No Data available.\n");
                           break;
-        case MAA_ERROR_INVALID_PLATFORM:
-                          fprintf(stderr, "MAA: Platform not recognised.\n");
+        case MRAA_ERROR_INVALID_PLATFORM:
+                          fprintf(stderr, "MRAA: Platform not recognised.\n");
                           break;
-        case MAA_ERROR_PLATFORM_NOT_INITIALISED:
-                          fprintf(stderr, "MAA: Platform not initialised.\n");
+        case MRAA_ERROR_PLATFORM_NOT_INITIALISED:
+                          fprintf(stderr, "MRAA: Platform not initialised.\n");
                           break;
-        case MAA_ERROR_PLATFORM_ALREADY_INITIALISED:
-                          fprintf(stderr, "MAA: Platform already initialised.\n");
+        case MRAA_ERROR_PLATFORM_ALREADY_INITIALISED:
+                          fprintf(stderr, "MRAA: Platform already initialised.\n");
                           break;
-        case MAA_ERROR_UNSPECIFIED:
-                          fprintf(stderr, "MAA: Unspecified Error.\n");
+        case MRAA_ERROR_UNSPECIFIED:
+                          fprintf(stderr, "MRAA: Unspecified Error.\n");
                           break;
-        default:     fprintf(stderr, "MAA: Unrecognised error.\n");
+        default:     fprintf(stderr, "MRAA: Unrecognised error.\n");
                           break;
     }
 }
 
-maa_boolean_t
-maa_pin_mode_test(int pin, maa_pinmodes_t mode)
+mraa_boolean_t
+mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
 {
     if (plat == NULL) {
-        maa_init();
+        mraa_init();
         if (plat == NULL)
             return 0;
     }
@@ -324,31 +324,31 @@ maa_pin_mode_test(int pin, maa_pinmodes_t mode)
         return 0;
 
     switch(mode) {
-        case MAA_PIN_VALID:
+        case MRAA_PIN_VALID:
             if (plat->pins[pin].capabilites.valid == 1)
                 return 1;
             break;
-        case MAA_PIN_GPIO:
+        case MRAA_PIN_GPIO:
             if (plat->pins[pin].capabilites.gpio ==1)
                 return 1;
             break;
-        case MAA_PIN_PWM:
+        case MRAA_PIN_PWM:
             if (plat->pins[pin].capabilites.pwm ==1)
                 return 1;
             break;
-        case MAA_PIN_FAST_GPIO:
+        case MRAA_PIN_FAST_GPIO:
             if (plat->pins[pin].capabilites.fast_gpio ==1)
                 return 1;
             break;
-        case MAA_PIN_SPI:
+        case MRAA_PIN_SPI:
             if (plat->pins[pin].capabilites.spi ==1)
                 return 1;
             break;
-        case MAA_PIN_I2C:
+        case MRAA_PIN_I2C:
             if (plat->pins[pin].capabilites.i2c ==1)
                 return 1;
             break;
-        case MAA_PIN_AIO:
+        case MRAA_PIN_AIO:
             if (pin < plat->aio_count)
                 pin = pin + plat->gpio_count;
             if (plat->pins[pin].capabilites.aio ==1)
@@ -359,8 +359,8 @@ maa_pin_mode_test(int pin, maa_pinmodes_t mode)
     return 0;
 }
 
-maa_mmap_pin_t*
-maa_setup_mmap_gpio(int pin)
+mraa_mmap_pin_t*
+mraa_setup_mmap_gpio(int pin)
 {
     if (plat == NULL)
         return NULL;
@@ -369,30 +369,30 @@ maa_setup_mmap_gpio(int pin)
         return NULL;
 
     if (plat->pins[pin].mmap.gpio.mux_total > 0)
-       if (maa_setup_mux_mapped(plat->pins[pin].mmap.gpio) != MAA_SUCCESS)
+       if (mraa_setup_mux_mapped(plat->pins[pin].mmap.gpio) != MRAA_SUCCESS)
             return NULL;
 
-    if (maa_setup_mux_mapped(plat->pins[pin].mmap.gpio) != MAA_SUCCESS)
+    if (mraa_setup_mux_mapped(plat->pins[pin].mmap.gpio) != MRAA_SUCCESS)
             return NULL;
-    maa_mmap_pin_t *ret = &(plat->pins[pin].mmap);
+    mraa_mmap_pin_t *ret = &(plat->pins[pin].mmap);
     return ret;
 }
 
-maa_result_t
-maa_swap_complex_gpio(int pin, int out)
+mraa_result_t
+mraa_swap_complex_gpio(int pin, int out)
 {
     if (plat == NULL)
-        return MAA_ERROR_INVALID_PLATFORM;
+        return MRAA_ERROR_INVALID_PLATFORM;
 
     switch (platform_type) {
-        case MAA_INTEL_GALILEO_GEN2:
+        case MRAA_INTEL_GALILEO_GEN2:
             if (plat->pins[pin].gpio.complex_cap.complex_pin != 1)
-                return MAA_SUCCESS;
+                return MRAA_SUCCESS;
             if (plat->pins[pin].gpio.complex_cap.output_en == 1) {
-                maa_gpio_context output_e;
-                output_e = maa_gpio_init_raw(plat->pins[pin].gpio.output_enable);
-                if (maa_gpio_dir(output_e, MAA_GPIO_OUT) != MAA_SUCCESS)
-                    return MAA_ERROR_INVALID_RESOURCE;
+                mraa_gpio_context output_e;
+                output_e = mraa_gpio_init_raw(plat->pins[pin].gpio.output_enable);
+                if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS)
+                    return MRAA_ERROR_INVALID_RESOURCE;
                 int output_val;
                 if (plat->pins[pin].gpio.complex_cap.output_en_high == 1)
                     output_val = out;
@@ -401,21 +401,21 @@ maa_swap_complex_gpio(int pin, int out)
                         output_val = 0;
                     else
                         output_val = 1;
-                if (maa_gpio_write(output_e, output_val) != MAA_SUCCESS)
-                    return MAA_ERROR_INVALID_RESOURCE;
+                if (mraa_gpio_write(output_e, output_val) != MRAA_SUCCESS)
+                    return MRAA_ERROR_INVALID_RESOURCE;
             }
             //if (plat->pins[pin].gpio.complex_cap.pullup_en == 1) {
-            //    maa_gpio_context pullup_e;
-            //    pullup_e = maa_gpio_init_raw(plat->pins[pin].gpio.pullup_enable);
-            //    if (maa_gpio_mode(pullup_e, MAA_GPIO_HIZ) != MAA_SUCCESS)
-            //        return MAA_ERROR_INVALID_RESOURCE;
+            //    mraa_gpio_context pullup_e;
+            //    pullup_e = mraa_gpio_init_raw(plat->pins[pin].gpio.pullup_enable);
+            //    if (mraa_gpio_mode(pullup_e, MRAA_GPIO_HIZ) != MRAA_SUCCESS)
+            //        return MRAA_ERROR_INVALID_RESOURCE;
             //}
             break;
-        default: return MAA_SUCCESS;
+        default: return MRAA_SUCCESS;
     }
 }
 
-maa_platform_t maa_get_platform_type()
+mraa_platform_t mraa_get_platform_type()
 {
     return platform_type;
 }

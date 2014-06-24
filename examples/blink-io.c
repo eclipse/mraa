@@ -28,7 +28,7 @@
 #include <signal.h>
 #include <stdlib.h>
 
-#include "maa.h"
+#include "mraa.h"
 
 #define DEFAULT_IOPIN 8
 
@@ -47,7 +47,7 @@ sig_handler(int signo)
 int
 main(int argc, char **argv)
 {
-    maa_result_t r = MAA_SUCCESS;
+    mraa_result_t r = MRAA_SUCCESS;
     iopin = DEFAULT_IOPIN;
 
     if (argc < 2) {
@@ -56,12 +56,12 @@ main(int argc, char **argv)
         iopin = strtol(argv[1], NULL, 10);
     }
 
-    maa_init();
-    fprintf(stdout, "MAA Version: %s\nStarting Blinking on IO%d\n",
-            maa_get_version(), iopin);
+    mraa_init();
+    fprintf(stdout, "MRAA Version: %s\nStarting Blinking on IO%d\n",
+            mraa_get_version(), iopin);
 
-    maa_gpio_context gpio;
-    gpio = maa_gpio_init(iopin);
+    mraa_gpio_context gpio;
+    gpio = mraa_gpio_init(iopin);
     if (gpio == NULL) {
         fprintf(stderr, "Are you sure that pin%d you requested is valid on your platform?", iopin);
 	exit(1);
@@ -69,26 +69,26 @@ main(int argc, char **argv)
     printf("Initialised pin%d\n", iopin);
 
     // set direction to OUT
-    r = maa_gpio_dir(gpio, MAA_GPIO_OUT);
-    if (r != MAA_SUCCESS) {
-        maa_result_print(r);
+    r = mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
+    if (r != MRAA_SUCCESS) {
+        mraa_result_print(r);
     }
 
     signal(SIGINT, sig_handler);
 
     while (running == 0) {
-        r = maa_gpio_write(gpio, 0);
-        if (r != MAA_SUCCESS) {
-            maa_result_print(r);
+        r = mraa_gpio_write(gpio, 0);
+        if (r != MRAA_SUCCESS) {
+            mraa_result_print(r);
         } else {
             printf("off\n");
         }
 
         sleep(1);
 
-        r = maa_gpio_write(gpio, 1);
-        if (r != MAA_SUCCESS) {
-            maa_result_print(r);
+        r = mraa_gpio_write(gpio, 1);
+        if (r != MRAA_SUCCESS) {
+            mraa_result_print(r);
         } else {
             printf("on\n");
         }
@@ -96,9 +96,9 @@ main(int argc, char **argv)
         sleep(1);
     }
 
-    r = maa_gpio_close(gpio);
-    if (r != MAA_SUCCESS) {
-        maa_result_print(r);
+    r = mraa_gpio_close(gpio);
+    if (r != MRAA_SUCCESS) {
+        mraa_result_print(r);
     }
 
     return r;

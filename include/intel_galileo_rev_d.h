@@ -24,9 +24,9 @@
 
 #pragma once
 
-#include "maa.h"
+#include "mraa.h"
 
-#define MAA_INTEL_GALILEO_REV_D_PINCOUNT 25
+#define MRAA_INTEL_GALILEO_REV_D_PINCOUNT 25
 
-maa_board_t*
-maa_intel_galileo_rev_d();
+mraa_board_t*
+mraa_intel_galileo_rev_d();

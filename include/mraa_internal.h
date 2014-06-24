@@ -32,7 +32,7 @@
  * @param pin the pin as read from the board surface. i.e IO3 would be 3/
  * @return the pin as found in the pinmap
  */
-unsigned int maa_setup_gpio(int pin);
+unsigned int mraa_setup_gpio(int pin);
 
 /** Setup Analog interface
  *
@@ -40,19 +40,19 @@ unsigned int maa_setup_gpio(int pin);
  * @param pin the pin as read from the board surface. i.e A3 would be 3/
  * @return the pin as found in the pinmap
  */
-unsigned int maa_setup_aio(int pin);
+unsigned int mraa_setup_aio(int pin);
 
 /** Setup i2c interface, sets up multiplexer on device.
  *
  * @return unsigned int if using /dev/i2c-2 returned would be 2
  */
-unsigned int maa_setup_i2c(int bus);
+unsigned int mraa_setup_i2c(int bus);
 
 /** Setup spi interface, sets up multiplexer on device.
  *
  * @return spi bus type
  */
-maa_spi_bus_t* maa_setup_spi(int bus);
+mraa_spi_bus_t* mraa_setup_spi(int bus);
 
 /** Setup PWM
  *
@@ -61,18 +61,18 @@ maa_spi_bus_t* maa_setup_spi(int bus);
  * @param pin the pin as read from the board surface.
  * @return the pwm pin_info_t of that IO pin
  */
-maa_pin_t* maa_setup_pwm(int pin);
+mraa_pin_t* mraa_setup_pwm(int pin);
 
 /** Setup gpio mux to go straight to SoC, galileo.
  *
  * @param pin physical pin to use
- * @return maa_mmap_pin_t
+ * @return mraa_mmap_pin_t
  */
-maa_mmap_pin_t* maa_setup_mmap_gpio(int pin);
+mraa_mmap_pin_t* mraa_setup_mmap_gpio(int pin);
 
 /** Swap Directional mode.
  *
  * @param pin physical pin to operate on
  * @return out direction to setup. 1 for output 0 for input
  */
-maa_result_t maa_swap_complex_gpio(int pin, int out);
+mraa_result_t mraa_swap_complex_gpio(int pin, int out);

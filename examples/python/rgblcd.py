@@ -22,11 +22,11 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 
-import pymaa as maa
+import pymraa as mraa
 
 # This example will change the LCD backlight on the Grove-LCD RGB backlight
 # to a nice shade of purple
-x = maa.I2c(0)
+x = mraa.I2c(0)
 x.address(0x62)
 x.writeReg(0,0)
 x.writeReg(1,0)

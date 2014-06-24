@@ -28,7 +28,7 @@
  * @file
  * @brief System Packet Interface
  *
- * This file defines the spi interface for libmaa
+ * This file defines the spi interface for libmraa
  *
  * @snippet spi_mcp4261.c Interesting
  */
@@ -46,7 +46,7 @@ extern "C" {
 /**
  * Opaque pointer definition to the internal struct _spi
  */
-typedef struct _spi* maa_spi_context;
+typedef struct _spi* mraa_spi_context;
 
 /**
  * Initialise SPI_context, uses board mapping. Sets the muxes
@@ -54,7 +54,7 @@ typedef struct _spi* maa_spi_context;
  * @param bus Bus to use, as listed in platform definition, normally 0
  * @return Spi context or NULL
  */
-maa_spi_context maa_spi_init(int bus);
+mraa_spi_context mraa_spi_init(int bus);
 
 /**
  * Set the SPI device mode. see spidev 0-3.
@@ -63,15 +63,15 @@ maa_spi_context maa_spi_init(int bus);
  * @param mode The SPI mode, See Linux spidev
  * @return Spi context or NULL
  */
-maa_result_t maa_spi_mode(maa_spi_context dev,unsigned short mode);
+mraa_result_t mraa_spi_mode(mraa_spi_context dev,unsigned short mode);
 
 /** Set the SPI device operating clock frequency.
  *
  * @param dev the Spi context
  * @param hz the frequency in hz
- * @return maa_spi_context The returned initialised SPI context
+ * @return mraa_spi_context The returned initialised SPI context
  */
-maa_result_t maa_spi_frequency(maa_spi_context dev, int hz);
+mraa_result_t mraa_spi_frequency(mraa_spi_context dev, int hz);
 
 /** Write Single Byte to the SPI device.
  *
@@ -79,7 +79,7 @@ maa_result_t maa_spi_frequency(maa_spi_context dev, int hz);
  * @param data Data to send
  * @return Data received on the miso line
  */
-uint8_t maa_spi_write(maa_spi_context dev, uint8_t data);
+uint8_t mraa_spi_write(mraa_spi_context dev, uint8_t data);
 
 /** Write Buffer of bytes to the SPI device. The pointer return has to be
  * free'd by the caller.
@@ -89,7 +89,7 @@ uint8_t maa_spi_write(maa_spi_context dev, uint8_t data);
  * @param length elements within buffer, Max 4096
  * @return Data received on the miso line, same length as passed in
  */
-uint8_t* maa_spi_write_buf(maa_spi_context dev, uint8_t* data, int length);
+uint8_t* mraa_spi_write_buf(mraa_spi_context dev, uint8_t* data, int length);
 
 /**
  * Change the SPI lsb mode
@@ -98,7 +98,7 @@ uint8_t* maa_spi_write_buf(maa_spi_context dev, uint8_t* data, int length);
  * @param lsb Use least significant bit transmission. 0 for msbi
  * @return Result of operation
  */
-maa_result_t maa_spi_lsbmode(maa_spi_context dev, maa_boolean_t lsb);
+mraa_result_t mraa_spi_lsbmode(mraa_spi_context dev, mraa_boolean_t lsb);
 
 /**
  * Set bits per mode on transaction, defaults at 8
@@ -107,15 +107,15 @@ maa_result_t maa_spi_lsbmode(maa_spi_context dev, maa_boolean_t lsb);
  * @param bits bits per word
  * @return Result of operation
  */
-maa_result_t maa_spi_bit_per_word(maa_spi_context dev, unsigned int bits);
+mraa_result_t mraa_spi_bit_per_word(mraa_spi_context dev, unsigned int bits);
 
 /**
- * De-inits an maa_spi_context device
+ * De-inits an mraa_spi_context device
  *
  * @param dev The Spi context
  * @return Result of operation
  */
-maa_result_t maa_spi_stop(maa_spi_context dev);
+mraa_result_t mraa_spi_stop(mraa_spi_context dev);
 
 #ifdef __cplusplus
 }
