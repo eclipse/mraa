@@ -108,6 +108,19 @@ class I2c {
         maa_result_t write(const unsigned char* data, int length) {
             return maa_i2c_write(m_i2c, data, length);
         }
+
+        /**
+         * Write to an i2c register
+         *
+         * @param reg Register to write to
+         * @param data Value to write to register
+         * @return Result of operation
+         */
+        maa_result_t writeReg(const unsigned char reg, const unsigned char data) {
+            const unsigned char buf[2] = {reg, data};
+            return maa_i2c_write(m_i2c, buf, 2);
+        }
+
         /**
          * Write multiple bytes to the bus
          *
