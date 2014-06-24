@@ -1,3 +1,5 @@
+%include carrays.i
+
 #ifdef DOXYGEN
     %include common_doc.i
     %include gpio_class_doc.i
@@ -29,8 +31,6 @@
 
 %rename(getPlatform) maa_get_platform_type;
 
-%typemap(in) unsigned char* = char*;
-%typemap(in) uint8_t* = char*;
 %typemap(in) uint8_t = char;
 
 %include "types.h"
