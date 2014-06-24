@@ -85,7 +85,7 @@ class Spi {
          * @param length size of buffer to send
          * @return char* data received on the miso line. Same length as passed in
          */
-        unsigned char* write_buf(uint8_t* data, int length) {
+        unsigned char* write(uint8_t* data, int length) {
             return (unsigned char*) maa_spi_write_buf(m_spi, data, length);
         }
         /**
@@ -103,7 +103,7 @@ class Spi {
          * @param bits bits per word
          * @return Result of operation
          */
-        maa_result_t bit_per_word(unsigned int bits) {
+        maa_result_t bitPerWord(unsigned int bits) {
             return maa_spi_bit_per_word(m_spi, bits);
         }
             private:

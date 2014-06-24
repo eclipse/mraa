@@ -54,14 +54,14 @@ int main ()
         int i;
         for (i = 90; i < 130; i++) {
             data[1] = i;
-            recv = spi->write_buf(data, 2);
+            recv = spi->write(data, 2);
             printf("Writing -%i",i);
             printf("RECIVED-%i-%i\n",recv[0],recv[1]);
             usleep(100000);
         }
         for (i = 130; i > 90; i--) {
             data[1] = i;
-            recv = spi->write_buf(data, 2);
+            recv = spi->write(data, 2);
             printf("Writing -%i",i);
             printf("RECIVED-%i-%i\n",recv[0],recv[1]);
             usleep(100000);

@@ -116,7 +116,7 @@ int main ()
 
     while (running == 0) {
         i2c->address(HMC5883L_I2C_ADDR);
-        i2c->write_byte(HMC5883L_DATA_REG);
+        i2c->write(HMC5883L_DATA_REG);
 
         i2c->address(HMC5883L_I2C_ADDR);
         i2c->read(rx_tx_buf, DATA_REG_SIZE);

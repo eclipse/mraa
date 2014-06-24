@@ -127,7 +127,7 @@ class Gpio {
          *
          * @return Result of operation
          */
-        maa_result_t isr_exit() {
+        maa_result_t isrExit() {
             return maa_gpio_isr_exit(m_gpio);
         }
         /**

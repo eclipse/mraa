@@ -85,7 +85,7 @@ class I2c {
          *
          * @return Char read from the bus
          */
-        unsigned char read_byte() {
+        unsigned char readByte() {
             return (unsigned char) maa_i2c_read_byte(m_i2c);
         }
         /**
@@ -127,7 +127,7 @@ class I2c {
          * @param data The byte to send on the bus
          * @return Result of operation
          */
-        maa_result_t write_byte(const unsigned char data) {
+        maa_result_t write(const unsigned char data) {
             return maa_i2c_write_byte(m_i2c, data);
         }
     private:
