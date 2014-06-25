@@ -59,6 +59,10 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.4.0**
+  * Rename to mraa
+  * get_platform_type function added.
+
 **0.3.1**
   * Initial Intel Galileo Gen 2 support
   * mraa_gpio_isr parameters added.
