@@ -419,3 +419,27 @@ mraa_platform_t mraa_get_platform_type()
 {
     return platform_type;
 }
+
+unsigned int
+mraa_adc_raw_bits()
+{
+    if (plat == NULL)
+        return 0;
+
+    if (plat->aio_count == 0)
+        return 0;
+
+    return plat->adc_raw;
+}
+
+unsigned int
+mraa_adc_supported_bits()
+{
+    if (plat == NULL)
+        return 0;
+
+    if (plat->aio_count == 0)
+        return 0;
+
+    return plat->adc_supported;
+}

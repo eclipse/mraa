@@ -38,6 +38,8 @@ mraa_intel_galileo_rev_d()
     b->phy_pin_count = 20;
     b->gpio_count = 14;
     b->aio_count = 6;
+    b->adc_raw = 12;
+    b->adc_supported = 10;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_GALILEO_REV_D_PINCOUNT);
 

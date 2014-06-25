@@ -164,6 +164,8 @@ typedef struct {
     unsigned int spi_bus_count; /**< Usable spi Count */
     mraa_spi_bus_t spi_bus[6];       /**< Array of spi */
     unsigned int def_spi_bus; /**< Position in array of defult spi bus */
+    unsigned int adc_raw; /**< ADC raw bit value */
+    unsigned int adc_supported; /**< ADC supported bit value */
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
     /*@}*/
 } mraa_board_t;
@@ -192,6 +194,20 @@ mraa_result_t mraa_init();
  * @return boolean if the mode is supported, 0=false.
  */
 mraa_boolean_t mraa_pin_mode_test(int pin, mraa_pinmodes_t mode);
+
+/**
+ * Check the board's  bit size when reading the value
+ *
+ * @return raw bits being read from kernel module. zero if no ADC
+ */
+unsigned int mraa_adc_raw_bits();
+
+/**
+ * Return value that the raw value should be shifted to. Zero if no ADC
+ *
+ * @return return actual bit size the adc value should be understood as.
+ */
+unsigned int mraa_adc_supported_bits();
 
 #ifdef __cplusplus
 }

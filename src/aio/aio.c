@@ -34,6 +34,9 @@ struct _aio {
     int adc_in_fp;
 };
 
+static int raw_bits;
+static int sup_bits;
+
 static mraa_result_t aio_get_valid_fp(mraa_aio_context dev)
 {
     char file_path[64]= "";
@@ -92,6 +95,8 @@ mraa_aio_context mraa_aio_init(unsigned int aio_channel)
         free(dev);
         return NULL;
     }
+    raw_bits = mraa_adc_raw_bits();
+    sup_bits = mraa_adc_supported_bits();
 
     return dev;
 }
@@ -132,12 +137,14 @@ uint16_t mraa_aio_read(mraa_aio_context dev)
     }
 
     /* Adjust the raw analog input reading to supported resolution value*/
-    if (ADC_RAW_RESOLUTION_BITS > ADC_SUPPORTED_RESOLUTION_BITS) {
-        shifter_value = ADC_RAW_RESOLUTION_BITS - ADC_SUPPORTED_RESOLUTION_BITS;
-        analog_value =  analog_value >> shifter_value;
-    } else {
-        shifter_value = ADC_SUPPORTED_RESOLUTION_BITS - ADC_RAW_RESOLUTION_BITS;
-        analog_value = analog_value << shifter_value;
+    if (raw_bits =! sup_bits) {
+        if (raw_bits > sup_bits) {
+            shifter_value = raw_bits - sup_bits;
+            analog_value =  analog_value >> shifter_value;
+        } else {
+            shifter_value = sup_bits - raw_bits;
+            analog_value = analog_value << shifter_value;
+        }
     }
 
     return analog_value;

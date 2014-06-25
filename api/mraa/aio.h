@@ -44,9 +44,6 @@ extern "C" {
 #include "common.h"
 #include "gpio.h"
 
-#define ADC_RAW_RESOLUTION_BITS         (12)
-#define ADC_SUPPORTED_RESOLUTION_BITS   (10)
-
 /**
  * Opaque pointer definition to the internal struct _aio. This context refers
  * to one single AIO pin on the board.
