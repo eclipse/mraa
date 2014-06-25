@@ -44,8 +44,8 @@ static mraa_result_t aio_get_valid_fp(mraa_aio_context dev)
 
     dev->adc_in_fp = open(file_path, O_RDONLY);
     if (dev->adc_in_fp == -1) {
-	fprintf(stderr, "Failed to open Analog input raw file %s for "
-	    "reading!\n", file_path); return( MRAA_ERROR_INVALID_RESOURCE);
+    fprintf(stderr, "Failed to open Analog input raw file %s for "
+        "reading!\n", file_path); return( MRAA_ERROR_INVALID_RESOURCE);
     }
 
     return MRAA_SUCCESS;
