@@ -42,6 +42,9 @@ set (mraa_VERSION_STRING ${mraa_VERSION_MAJOR}.${mraa_VERSION_MINOR}.${mraa_VERS
 
 set (CMAKE_SWIG_FLAGS "")
 
+find_path (SYSTEM_USR_DIR "stdlib.h")
+include_directories (${SYSTEM_USR_DIR})
+
 option (GTEST "Build all gtests." OFF)
 option (BUILDDOC "Build all doc." OFF)
 option (BUILDSWIG "Build swig modules." ON)

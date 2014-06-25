@@ -1,6 +1,6 @@
 {
-  "name" : "mraajs",
-  "main" : "./mraajs.node",
+  "name" : "mraa",
+  "main" : "./mraa.node",
   "engines": {
     "node": ">= 1.0.x"
   },

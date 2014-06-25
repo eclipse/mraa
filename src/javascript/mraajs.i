@@ -1,4 +1,4 @@
-%module (docstring="Javascript interface to libmraa") mraajs
+%module (docstring="Javascript interface to libmraa") mraa
 
 %feature("autodoc", "3");
 

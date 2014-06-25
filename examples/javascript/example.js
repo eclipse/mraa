@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var m = require("mraajs")
+var m = require("mraa")
 console.log("mraa version: " + m.getVersion());
 
 var x = new m.Gpio(8)

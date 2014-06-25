@@ -28,9 +28,10 @@ endif ()
 
 set_target_properties (mraajs PROPERTIES
   PREFIX ""
+  OUTPUT_NAME mraa
   SUFFIX ".node"
 )
 
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/package.json
-         ${CMAKE_CURRENT_BINARY_DIR}/mraajs.node
-         DESTINATION lib/node_modules/mraajs)
+         ${CMAKE_CURRENT_BINARY_DIR}/mraa.node
+         DESTINATION lib/node_modules/mraa)

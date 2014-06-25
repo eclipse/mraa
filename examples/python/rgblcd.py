@@ -22,7 +22,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 
-import pymraa as mraa
+import mraa
 
 # This example will change the LCD backlight on the Grove-LCD RGB backlight
 # to a nice shade of purple
