@@ -165,6 +165,15 @@ class Gpio {
         mraa_result_t write(int value) {
             return mraa_gpio_write(m_gpio, value);
         }
+        /**
+         * Enable use of mmap i/o if available.
+         *
+         * @param enable true to use mmap
+         * @return Result of operation
+         */
+        mraa_result_t useMmap(bool enable) {
+            return mraa_gpio_use_mmaped(m_gpio, (mraa_boolean_t) enable);
+        }
     private:
         mraa_gpio_context m_gpio;
 };
