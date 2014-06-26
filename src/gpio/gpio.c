@@ -271,7 +271,7 @@ mraa_gpio_isr(mraa_gpio_context dev, gpio_edge_t mode, void (*fptr)(void *), voi
     if (MRAA_SUCCESS != mraa_gpio_edge_mode(dev, mode)) {
         return MRAA_ERROR_UNSPECIFIED;
     }
-        
+
     dev->isr = fptr;
     dev->isr_args = args;
     pthread_create (&dev->thread_id, NULL, mraa_gpio_interrupt_handler, (void *) dev);
@@ -379,7 +379,6 @@ mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
     int direction = open(filepath, O_RDWR);
 
     if (direction == -1) {
-        fprintf(stderr, "Failed to open direction for writing!\n");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
