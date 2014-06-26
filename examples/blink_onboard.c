@@ -22,8 +22,10 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "stdio.h"
+#include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+
 #include "mraa/gpio.h"
 
 int
@@ -45,7 +47,7 @@ main(int argc, char **argv)
             gpio = mraa_gpio_init(13);
     }
 
-    fprintf(stdout, "Welcome to libmraa\n Version: %s\n Running on %d",
+    fprintf(stdout, "Welcome to libmraa\n Version: %s\n Running on %s",
         mraa_get_version(), board_name);
 
     mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
