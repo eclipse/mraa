@@ -117,7 +117,7 @@ mraa_intel_galileo_gen2()
     b->pins[5].gpio.complex_cap  = (mraa_pin_cap_complex_t) {1,1,0,1,1};
     b->pins[5].gpio.output_enable = 18;
     b->pins[5].gpio.pullup_enable = 19;
-    b->pins[5].pwm.pinmap = 4;
+    b->pins[5].pwm.pinmap = 3;
     b->pins[5].pwm.parent_id = 0;
     b->pins[5].pwm.mux_total = 2;
     b->pins[5].pwm.mux[0].pin = 66;
