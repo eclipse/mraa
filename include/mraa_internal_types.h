@@ -1,4 +1,5 @@
 /*
+ * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
@@ -24,9 +25,24 @@
 
 #pragma once
 
-#include "mraa_adv_func.h"
+#include "common.h"
 
-#define MRAA_INTEL_GALILEO_GEN_2_PINCOUNT 25
-
-mraa_board_t*
-mraa_intel_galileo_gen2(mraa_adv_func* adv);
+/**
+ * A structure representing a gpio pin.
+ */
+struct _gpio {
+    /*@{*/
+    int pin; /**< the pin number, as known to the os. */
+    int phy_pin; /**< pin passed to clean init. -1 none and raw*/
+    int value_fp; /**< the file pointer to the value of the gpio */
+    void (* isr)(void *); /**< the interupt service request */
+    void *isr_args; /**< args return when interupt service request triggered */
+    pthread_t thread_id; /**< the isr handler thread id */
+    int isr_value_fp; /**< the isr file pointer on the value */
+    mraa_boolean_t owner; /**< If this context originally exported the pin */
+    mraa_boolean_t mmap;
+    void *reg;
+    unsigned int reg_sz;
+    unsigned int reg_bit_pos;
+    /*@}*/
+};

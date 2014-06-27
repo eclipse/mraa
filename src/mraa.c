@@ -37,6 +37,7 @@
 //static mraa_pininfo_t* pindata;
 static mraa_board_t* plat = NULL;
 static mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
+static mraa_adv_func* advance = NULL;
 
 const char *
 mraa_get_version()
@@ -81,15 +82,16 @@ mraa_init()
     free(line);
     fclose(fh);
 
+    advance = (mraa_adv_func*) malloc(sizeof(mraa_adv_func));
     switch(platform_type) {
         case MRAA_INTEL_GALILEO_GEN2:
-            plat = mraa_intel_galileo_gen2();
+            plat = mraa_intel_galileo_gen2(advance);
             break;
         case MRAA_INTEL_GALILEO_GEN1:
-            plat = mraa_intel_galileo_rev_d();
+            plat = mraa_intel_galileo_rev_d(advance);
             break;
         default:
-            plat = mraa_intel_galileo_rev_d();
+            plat = mraa_intel_galileo_rev_d(advance);
             fprintf(stderr, "Platform not found, initialising MRAA_INTEL_GALILEO_GEN1\n");
     }
 
@@ -442,4 +444,9 @@ mraa_adc_supported_bits()
         return 0;
 
     return plat->adc_supported;
+}
+
+mraa_adv_func*
+mraa_get_advance() {
+    return advance;
 }
