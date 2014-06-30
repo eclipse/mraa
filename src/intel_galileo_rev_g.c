@@ -237,7 +237,6 @@ mraa_intel_galileo_gen2(mraa_adv_func* adv)
     b->pins[12].spi.mux_total = 1;
     b->pins[12].spi.mux[0].pin = 42;
     b->pins[12].spi.mux[0].value = 1;
-    // THIS NEEDS TESTING UNSURE IF MOSI WILL BE EXPOSED.
 
     strncpy(b->pins[13].name, "IO13", 8);
     b->pins[13].capabilites = (mraa_pincapabilities_t) {1,1,0,0,1,0,0};
@@ -258,35 +257,51 @@ mraa_intel_galileo_gen2(mraa_adv_func* adv)
 
     //ANALOG
     strncpy(b->pins[14].name, "A0", 8);
-    b->pins[14].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,1};
+    b->pins[14].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,1};
     b->pins[14].gpio.complex_cap  = (mraa_pin_cap_complex_t) {1,0,0,1,1};
     b->pins[14].gpio.pullup_enable = 49;
     b->pins[14].aio.pinmap = 0;
-    b->pins[14].aio.mux_total = 0;
+    b->pins[14].aio.mux_total = 1;
+    b->pins[14].aio.mux[0].pin = 49;
+    b->pins[14].aio.mux[0].value = 1;
+    b->pins[14].gpio.pinmap = 48;
+    b->pins[14].gpio.mux_total = 0;
 
     strncpy(b->pins[15].name, "A1", 8);
-    b->pins[15].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,1};
+    b->pins[15].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,1};
     b->pins[15].gpio.complex_cap  = (mraa_pin_cap_complex_t) {1,0,0,1,1};
     b->pins[15].gpio.pullup_enable = 51;
     b->pins[15].aio.pinmap = 1;
+    b->pins[15].aio.mux[0].pin = 51;
+    b->pins[15].aio.mux[0].value = 1;
     b->pins[15].aio.mux_total = 0;
+    b->pins[15].gpio.pinmap = 50;
+    b->pins[15].gpio.mux_total = 0;
 
     strncpy(b->pins[16].name, "A2", 8);
-    b->pins[16].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,1};
+    b->pins[16].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,1};
     b->pins[16].gpio.complex_cap  = (mraa_pin_cap_complex_t) {1,0,0,1,1};
     b->pins[16].gpio.pullup_enable = 53;
     b->pins[16].aio.pinmap = 2;
-    b->pins[16].aio.mux_total = 0;
+    b->pins[16].aio.mux_total = 1;
+    b->pins[16].aio.mux[0].pin = 53;
+    b->pins[16].aio.mux[0].value = 1;
+    b->pins[16].gpio.pinmap = 52;
+    b->pins[16].gpio.mux_total = 0;
 
     strncpy(b->pins[17].name, "A3", 8);
-    b->pins[17].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,1};
+    b->pins[17].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,1};
     b->pins[17].gpio.complex_cap  = (mraa_pin_cap_complex_t) {1,0,0,1,1};
     b->pins[17].gpio.pullup_enable = 55;
     b->pins[17].aio.pinmap = 3;
-    b->pins[17].aio.mux_total = 0;
+    b->pins[17].aio.mux_total = 1;
+    b->pins[17].aio.mux[0].pin = 55;
+    b->pins[17].aio.mux[0].value = 1;
+    b->pins[17].gpio.pinmap = 54;
+    b->pins[17].gpio.mux_total = 0;
 
     strncpy(b->pins[18].name, "A4", 8);
-    b->pins[18].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,1};
+    b->pins[18].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,1,1};
     b->pins[18].gpio.complex_cap  = (mraa_pin_cap_complex_t) {1,0,0,1,1};
     b->pins[18].gpio.pullup_enable = 57;
     b->pins[18].i2c.pinmap = 1;
@@ -294,14 +309,22 @@ mraa_intel_galileo_gen2(mraa_adv_func* adv)
     b->pins[18].i2c.mux[0].pin = 60;
     b->pins[18].i2c.mux[0].value = 0;
     b->pins[18].aio.pinmap = 4;
-    b->pins[18].aio.mux_total = 2;
+    b->pins[18].aio.mux_total = 3;
     b->pins[18].aio.mux[0].pin = 60;
     b->pins[18].aio.mux[0].value = 1;
     b->pins[18].aio.mux[1].pin = 78;
     b->pins[18].aio.mux[1].value = 0;
+    b->pins[18].aio.mux[2].pin = 57;
+    b->pins[18].aio.mux[2].value = 0;
+    b->pins[18].gpio.pinmap = 56;
+    b->pins[18].gpio.mux_total = 2;
+    b->pins[18].gpio.mux[0].pin = 60;
+    b->pins[18].gpio.mux[0].value = 1;
+    b->pins[18].gpio.mux[1].pin = 78;
+    b->pins[18].gpio.mux[1].value = 1;
 
     strncpy(b->pins[19].name, "A5", 8);
-    b->pins[19].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,1};
+    b->pins[19].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,1,1};
     b->pins[19].gpio.complex_cap  = (mraa_pin_cap_complex_t) {1,0,0,1,1};
     b->pins[19].gpio.pullup_enable = 59;
     b->pins[19].i2c.pinmap = 1;
@@ -309,11 +332,19 @@ mraa_intel_galileo_gen2(mraa_adv_func* adv)
     b->pins[19].i2c.mux[0].pin = 60;
     b->pins[19].i2c.mux[0].value = 0;
     b->pins[19].aio.pinmap = 5;
-    b->pins[19].aio.mux_total = 2;
+    b->pins[19].aio.mux_total = 3;
     b->pins[19].aio.mux[0].pin = 60;
     b->pins[19].aio.mux[0].value = 1;
     b->pins[19].aio.mux[1].pin = 79;
     b->pins[19].aio.mux[1].value = 0;
+    b->pins[19].aio.mux[2].pin = 59;
+    b->pins[19].aio.mux[2].value = 1;
+    b->pins[19].gpio.pinmap = 56;
+    b->pins[19].gpio.mux_total = 2;
+    b->pins[19].gpio.mux[0].pin = 60;
+    b->pins[19].gpio.mux[0].value = 1;
+    b->pins[19].gpio.mux[1].pin = 79;
+    b->pins[19].gpio.mux[1].value = 1;
 
     //BUS DEFINITIONS
     b->i2c_bus_count = 1;
