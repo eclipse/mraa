@@ -236,7 +236,7 @@ mraa_intel_galileo_gen2(mraa_adv_func* adv)
     b->pins[12].spi.pinmap = 1;
     b->pins[12].spi.mux_total = 1;
     b->pins[12].spi.mux[0].pin = 42;
-    b->pins[12].spi.mux[0].value = 0;
+    b->pins[12].spi.mux[0].value = 1;
     // THIS NEEDS TESTING UNSURE IF MOSI WILL BE EXPOSED.
 
     strncpy(b->pins[13].name, "IO13", 8);
