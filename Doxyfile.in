@@ -44,7 +44,7 @@ PROJECT_NUMBER         = @mraa_VERSION_STRING@
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "Low Level Skeleton Library for Communication on Intel platforms"
+PROJECT_BRIEF          = "Low Level Skeleton Library for Communication on GNU/Linux platforms"
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is included in
 # the documentation. The maximum height of the logo should not exceed 55 pixels
