@@ -30,7 +30,8 @@ x = mraa.I2c(0)
 x.address(0x62)
 x.writeReg(0,0)
 x.writeReg(1,0)
-x.writeReg(0x08,0xAA)
-x.writeReg(0x04,255)
-x.writeReg(0x02,255)
 
+# Be careful that your i2c device can actually handle a 'batch' handling of
+# such data, this is not typical in arduino type devices
+s = "\x08\xAA\x04\x255\x02\x255"
+x.write(s)

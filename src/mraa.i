@@ -1,4 +1,6 @@
 %include carrays.i
+%include stdint.i
+%array_class(char, mraaBuffer);
 
 #ifdef DOXYGEN
     %include common_doc.i
@@ -32,6 +34,8 @@
 %rename(getPlatform) mraa_get_platform_type;
 
 %typemap(in) uint8_t = char;
+%typemap(in) unsigned char* = char*;
+%apply (char *STRING, size_t LENGTH) { (char *data, size_t length) };
 
 %include "types.h"
 

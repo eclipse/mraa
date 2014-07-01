@@ -95,8 +95,8 @@ class I2c {
          * @param length Size of read
          * @return length of the read or 0 if failed
          */
-        int read(unsigned char * data, int length) {
-            return mraa_i2c_read(m_i2c, data, length);
+        int read(char * data, size_t length) {
+            return mraa_i2c_read(m_i2c, (uint8_t*) data, (int) length);
         }
         /**
          * Write one byte to the bus
@@ -105,8 +105,8 @@ class I2c {
          * @param length Size of buffer to send
          * @return Result of operation
          */
-        mraa_result_t write(const unsigned char* data, int length) {
-            return mraa_i2c_write(m_i2c, data, length);
+        mraa_result_t write(char* data, size_t length) {
+            return mraa_i2c_write(m_i2c, (const unsigned char *)data, (int) length);
         }
 
         /**
@@ -116,8 +116,8 @@ class I2c {
          * @param data Value to write to register
          * @return Result of operation
          */
-        mraa_result_t writeReg(const unsigned char reg, const unsigned char data) {
-            const unsigned char buf[2] = {reg, data};
+        mraa_result_t writeReg(char reg, char data) {
+            const unsigned char buf[2] = {(unsigned char) reg, (unsigned char) data};
             return mraa_i2c_write(m_i2c, buf, 2);
         }
 
@@ -127,7 +127,7 @@ class I2c {
          * @param data The byte to send on the bus
          * @return Result of operation
          */
-        mraa_result_t write(const unsigned char data) {
+        mraa_result_t write(char data) {
             return mraa_i2c_write_byte(m_i2c, data);
         }
     private:
