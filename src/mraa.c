@@ -98,6 +98,13 @@ mraa_init()
     return MRAA_SUCCESS;
 }
 
+void
+mraa_deinit()
+{
+    free(plat->pins);
+    free(plat);
+}
+
 int
 mraa_set_priority(const unsigned int priority)
 {

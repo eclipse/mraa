@@ -30,6 +30,7 @@ int
 main(int argc, char **argv)
 {
     fprintf(stdout, "hello mraa\n Version: %s\n", mraa_get_version());
+    mraa_deinit();
     return 0;
 }
 //! [Interesting]

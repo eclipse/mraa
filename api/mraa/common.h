@@ -187,6 +187,14 @@ mraa_result_t mraa_init();
 #endif
 
 /**
+ * De-Initilise MRAA
+ *
+ * This is not a strict requirement but useful to test memory leaks and for
+ * people who like super clean code.
+ */
+void mraa_deinit();
+
+/**
  * Checks if a pin is able to use the passed in mode.
  *
  * @param pin Physical Pin to be checked.
