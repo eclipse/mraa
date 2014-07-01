@@ -1,6 +1,4 @@
-%include carrays.i
 %include stdint.i
-%array_class(char, mraaBuffer);
 
 #ifdef DOXYGEN
     %include common_doc.i
