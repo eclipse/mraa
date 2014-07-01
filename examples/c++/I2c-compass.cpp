@@ -95,7 +95,7 @@ int main ()
 {
     float direction = 0;
     int16_t x = 0, y = 0, z = 0;
-    uint8_t rx_tx_buf[MAX_BUFFER_LENGTH];
+    char rx_tx_buf[MAX_BUFFER_LENGTH];
 
 //! [Interesting]
     mraa::I2c* i2c;
