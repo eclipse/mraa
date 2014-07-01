@@ -45,13 +45,16 @@ mraa_get_version()
     return gVERSION;
 }
 
-#ifdef SWIG
+#if 0
+const mraa_adv_func*
+mraa_get_advance()
+{
+    return (const mraa_adv_func*) advance;
+}
+#endif
+
 mraa_result_t
 mraa_init()
-#else
-mraa_result_t __attribute__((constructor))
-mraa_init()
-#endif
 {
     /** Once more board definitions have been added,
      *  A method for detecting them will need to be devised.

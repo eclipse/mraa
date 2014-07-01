@@ -177,13 +177,13 @@ typedef struct {
  *
  * @return Result of operation
  */
-#ifndef SWIG
+#if (defined SWIGPYTHON) || (defined SWIG)
+mraa_result_t mraa_init();
+#else
 // this sets a compiler attribute (supported by GCC & clang) to have mraa_init()
 // be called as a constructor make sure your libc supports this!  uclibc needs
 // to be compiled with UCLIBC_CTOR_DTOR
 mraa_result_t mraa_init() __attribute__((constructor));
-#else
-mraa_result_t mraa_init();
 #endif
 
 /**
