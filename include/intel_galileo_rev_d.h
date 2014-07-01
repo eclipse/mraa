@@ -24,9 +24,7 @@
 
 #pragma once
 
-#include "mraa_adv_func.h"
-
 #define MRAA_INTEL_GALILEO_REV_D_PINCOUNT 25
 
 mraa_board_t*
-mraa_intel_galileo_rev_d(mraa_adv_func* adv);
+mraa_intel_galileo_rev_d();
