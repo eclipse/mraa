@@ -48,8 +48,8 @@ int main ()
 
     spi = new mraa::Spi(0);
 
-    uint8_t data[] = {0x00, 100};
-    uint8_t *recv;
+    char data[] = {0x00, 100};
+    char *recv;
     while (running == 0) {
         int i;
         for (i = 90; i < 130; i++) {

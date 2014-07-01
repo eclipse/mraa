@@ -75,8 +75,8 @@ class Spi {
          * @param data the byte to send
          * @return data received on the miso line
          */
-        unsigned char write(char data) {
-            return (unsigned char) mraa_spi_write(m_spi, (uint8_t) data);
+        char write(char data) {
+            return (char) mraa_spi_write(m_spi, (uint8_t) data);
         }
         /**
          * Write buffer of bytes to SPI device
@@ -85,8 +85,8 @@ class Spi {
          * @param length size of buffer to send
          * @return char* data received on the miso line. Same length as passed in
          */
-        unsigned char* write(char* data, size_t length) {
-            return (unsigned char*) mraa_spi_write_buf(m_spi, (uint8_t *) data, (int) length);
+        char* write(char* data, size_t length) {
+            return (char*) mraa_spi_write_buf(m_spi, (uint8_t *) data, (int) length);
         }
         /**
          * Change the SPI lsb mode
