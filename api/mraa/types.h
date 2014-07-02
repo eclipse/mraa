@@ -69,7 +69,7 @@ typedef enum {
  * scheduler to SCHED_RR. Highest * priority is typically 99 and minimum is 0.
  * This function * will set to MAX if * priority is > MAX. Function will return
  * -1 on failure.
-
+ *
  * @param priority Value from typically 0 to 99
  * @return The priority value set
  */
