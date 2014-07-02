@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "mraa/common.h"
+#include "mraa/common.hpp"
 #include "mraa/pwm.hpp"
 #include "mraa/aio.hpp"
 #include "mraa/gpio.hpp"
