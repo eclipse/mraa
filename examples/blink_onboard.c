@@ -47,7 +47,7 @@ main(int argc, char **argv)
             gpio = mraa_gpio_init(13);
     }
 
-    fprintf(stdout, "Welcome to libmraa\n Version: %s\n Running on %s",
+    fprintf(stdout, "Welcome to libmraa\n Version: %s\n Running on %s\n",
         mraa_get_version(), board_name);
 
     mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
