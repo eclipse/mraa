@@ -23,7 +23,7 @@ functionality.
 | @ref aio.h "aio"       | @ref mraa::Aio "Aio class"   |
 | @ref pwm.h "pwm"       | @ref mraa::Pwm "Pwm class"   |
 | @ref spi.h "spi"       | @ref mraa::Spi "Spi class"   |
-| @ref common.h "common" | @ref common.h "common"      |
+| @ref common.h "common" | @ref common.hpp "common"     |
 </center>
 
 ### Hello Mraa

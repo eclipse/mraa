@@ -1,7 +1,8 @@
 %include stdint.i
+%include std_string.i
 
 #ifdef DOXYGEN
-    %include common_doc.i
+    %include common_hpp_doc.i
     %include gpio_class_doc.i
     %include i2c_class_doc.i
     %include pwm_class_doc.i
@@ -10,7 +11,7 @@
 #endif
 
 %{
-    #include "common.h"
+    #include "common.hpp"
     #include "gpio.hpp"
     #include "pwm.hpp"
     #include "i2c.hpp"
@@ -23,17 +24,11 @@
     mraa_init();
 %}
 
-%rename(getVersion) mraa_get_version;
-
-%rename(setPriority) mraa_set_priority;
-
-%rename(printError) mraa_result_print(mraa_result_t error);
-
-%rename(getPlatform) mraa_get_platform_type;
-
 %typemap(in) uint8_t = char;
 %typemap(in) unsigned char* = char*;
 %apply (char *STRING, size_t LENGTH) { (char *data, size_t length) };
+
+%include "common.hpp"
 
 %include "types.h"
 

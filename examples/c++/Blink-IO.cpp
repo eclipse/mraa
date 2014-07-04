@@ -60,8 +60,10 @@ int main (int argc, char **argv)
         return MRAA_ERROR_UNSPECIFIED;
     }
     int response = gpio->dir(mraa::DIR_OUT);
-    if (response != MRAA_SUCCESS)
-        mraa_result_print((mraa_result_t) MRAA_SUCCESS);
+    if (response != MRAA_SUCCESS) {
+        mraa::printError(response);
+        return 1;
+    }
 
     while (running == 0) {
         response = gpio->write(1);

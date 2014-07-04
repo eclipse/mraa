@@ -30,6 +30,7 @@
 namespace mraa {
 
 /**
+ * @file
  * @brief C++ API to common functions of MRAA
  *
  * This file defines the C++ interface for libmraa common functions
@@ -47,7 +48,7 @@ std::string getVersion()
 }
 
 /**
-  * This function attempts to set the mraa process to a given priority and the
+ * This function attempts to set the mraa process to a given priority and the
  * scheduler to SCHED_RR. Highest * priority is typically 99 and minimum is 0.
  * This function * will set to MAX if * priority is > MAX. Function will return
  * -1 on failure.

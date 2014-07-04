@@ -46,6 +46,7 @@ install (TARGETS mraa DESTINATION lib)
 if (DOXYGEN_FOUND)
   set (CMAKE_SWIG_FLAGS -DDOXYGEN=${DOXYGEN_FOUND})
   set (DOCCLASSES aio gpio i2c pwm spi)
+  # CPP class headers
   foreach (_file ${DOCCLASSES})
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_file}_class_doc.i
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxy2swig.py -n
@@ -56,6 +57,7 @@ if (DOXYGEN_FOUND)
     add_custom_target (${_file}class_doc_i DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_file}_class_doc.i)
     add_dependencies (${_file}class_doc_i doc)
   endforeach ()
+  # C header files
   set (DOCFILES common ${DOCCLASSES})
   foreach (_file ${DOCFILES})
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_file}_doc.i
@@ -67,6 +69,15 @@ if (DOXYGEN_FOUND)
     add_custom_target (${_file}doc_i DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${_file}_doc.i)
     add_dependencies (${_file}doc_i doc)
   endforeach ()
+  # CPP common header
+  add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/common_hpp_doc.i
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxy2swig.py -n
+      ${CMAKE_BINARY_DIR}/xml/common_8hpp.xml
+      ${CMAKE_CURRENT_BINARY_DIR}//common_hpp_doc.i
+    DEPENDS ${CMAKE_BINARY_DIR}/xml/common_8hpp.xml
+  )
+  add_custom_target (common_hpp_doc_i DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/common_hpp_doc.i)
+  add_dependencies (common_hpp_doc_i doc)
 endif ()
 
 if (BUILDSWIG)
