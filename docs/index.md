@@ -59,6 +59,13 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.4.1**
+  * Rename python & nodejs modules to mraa
+  * common.hpp introduced for C++
+  * python & nodejs modules can now take binary strings for Spi & I2c
+  * improved Aio module and clear bitness
+  * Improved Galileo Gen 2 support
+
 **0.4.0**
   * Rename to mraa
   * get_platform_type function added.
