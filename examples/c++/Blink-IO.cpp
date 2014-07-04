@@ -59,7 +59,7 @@ int main (int argc, char **argv)
     if (gpio == NULL) {
         return MRAA_ERROR_UNSPECIFIED;
     }
-    int response = gpio->dir(mraa::DIR_OUT);
+    mraa_result_t response = gpio->dir(mraa::DIR_OUT);
     if (response != MRAA_SUCCESS) {
         mraa::printError(response);
         return 1;
