@@ -453,3 +453,32 @@ mraa_adc_supported_bits()
 
     return plat->adc_supported;
 }
+
+mraa_result_t
+mraa_setup_uart(int index)
+{
+    if (plat == NULL)
+        return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
+
+    if (plat->uart_dev_count == 0)
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+
+    if (plat->uart_dev_count <= index)
+        return MRAA_ERROR_NO_RESOURCES;
+
+    int pos = plat->uart_dev[index].rx;
+    if (pos >= 0) {
+        if (plat->pins[pos].uart.mux_total > 0)
+            if (mraa_setup_mux_mapped(plat->pins[pos].uart) != MRAA_SUCCESS)
+                return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    if (pos >= 0) {
+        pos = plat->uart_dev[index].tx;
+        if (plat->pins[pos].uart.mux_total > 0)
+            if (mraa_setup_mux_mapped(plat->pins[pos].uart) != MRAA_SUCCESS)
+                return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return MRAA_SUCCESS;
+}

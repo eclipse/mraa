@@ -51,7 +51,8 @@ typedef enum {
     MRAA_PIN_FAST_GPIO   = 3, /**< Faster GPIO */
     MRAA_PIN_SPI         = 4, /**< SPI */
     MRAA_PIN_I2C         = 5, /**< I2C */
-    MRAA_PIN_AIO         = 6  /**< Analog in */
+    MRAA_PIN_AIO         = 6, /**< Analog in */
+    MRAA_PIN_UART        = 7  /**< UART */
 } mraa_pinmodes_t;
 
 /**
@@ -66,6 +67,7 @@ typedef struct {
     mraa_boolean_t spi:1;       /**< Is the pin spi capable */
     mraa_boolean_t i2c:1;       /**< Is the pin i2c capable */
     mraa_boolean_t aio:1;       /**< Is the pin analog input capable */
+    mraa_boolean_t uart:1;       /**< Is the pin uart capable */
     /*@}*/
 } mraa_pincapabilities_t;
 
@@ -121,6 +123,7 @@ typedef struct {
     mraa_mmap_pin_t mmap; /**< GPIO through memory */
     mraa_pin_t i2c;  /**< i2c bus/pin */
     mraa_pin_t spi;  /**< spi bus/pin */
+    mraa_pin_t uart;  /**< uart module/pin */
     /*@}*/
 } mraa_pininfo_t;
 
@@ -151,6 +154,17 @@ typedef struct {
 } mraa_spi_bus_t;
 
 /**
+ * A Structure representing a uart device.
+ */
+typedef struct {
+    /*@{*/
+    unsigned int index; /**< ID as exposed in the system */
+    int rx; /**< uart rx */
+    int tx; /**< uart tx */
+    /*@}*/
+} mraa_uart_dev_t;
+
+/**
  * A Structure representing a platform/board.
  */
 typedef struct {
@@ -166,6 +180,9 @@ typedef struct {
     unsigned int def_spi_bus; /**< Position in array of defult spi bus */
     unsigned int adc_raw; /**< ADC raw bit value */
     unsigned int adc_supported; /**< ADC supported bit value */
+    unsigned int def_uart_dev; /**< Position in array of defult uart */
+    unsigned int uart_dev_count; /**< Usable spi Count */
+    mraa_uart_dev_t uart_dev[6]; /**< Array of UARTs */
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
     /*@}*/
 } mraa_board_t;

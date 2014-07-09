@@ -77,3 +77,10 @@ mraa_mmap_pin_t* mraa_setup_mmap_gpio(int pin);
  * @return out direction to setup. 1 for output 0 for input
  */
 mraa_result_t mraa_swap_complex_gpio(int pin, int out);
+
+/** Setup uart muxes to exposes the pins physically.
+ *
+ * @param index of the uart in the board definition to expose physically
+ * @return mraa_result_t of operation
+ */
+mraa_result_t mraa_setup_uart(int index);
