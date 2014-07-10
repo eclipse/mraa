@@ -24,6 +24,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "common.h"
 #include "mraa_adv_func.h"
 #include "mraa_internal_types.h"
@@ -79,8 +83,6 @@ mraa_mmap_pin_t* mraa_setup_mmap_gpio(int pin);
  */
 mraa_result_t mraa_swap_complex_gpio(int pin, int out);
 
-/** Get the advance structure.
- *
- * @return struct containing internal advance information for hooks
- */
-mraa_adv_func* mraa_get_advance();
+#ifdef __cplusplus
+}
+#endif

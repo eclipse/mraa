@@ -30,6 +30,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -91,3 +95,7 @@ extern int i2c_smbus_write_i2c_block_data(int fd, uint8_t command, uint8_t lengt
 
 extern int i2c_smbus_block_process_call(int fd, uint8_t command, uint8_t length,
                                           uint8_t *values);
+
+#ifdef __cplusplus
+}
+#endif
