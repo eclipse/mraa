@@ -22,38 +22,21 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#pragma once
+#include "stdio.h"
+//! [Interesting]
+#include "mraa.h"
 
-/**
- * @file
- * @brief UART module
- *
- * UART is the Universal asynchronous receiver/transmitter interface to
- * libmraa. It allows the exposure of UART pins on supported boards.
- * With functionality to expand at a later date.
- *
- * @snippet uart_setup.c Interesting
- */
+int
+main(int argc, char **argv)
+{
+    mraa_uart_context uart;
+    uart = mraa_uart_init(0);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+    if (uart == NULL) {
+        fprintf(stdout, "UART failed to setup\n");
+    }
 
-#include <stdio.h>
-#include <fcntl.h>
-
-#include "common.h"
-
-typedef struct _uart* mraa_uart_context;
-
-/**
- * Initialise uart_context, uses board mapping
- *
- * @param uart the index of the uart set to use
- * @return uart context or NULL
- */
-mraa_uart_context mraa_uart_init(int uart);
-
-#ifdef __cplusplus
+    mraa_deinit();
+    return 0;
 }
-#endif
+//! [Interesting]
