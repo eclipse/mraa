@@ -32,6 +32,8 @@ extern "C" {
 #include "mraa_adv_func.h"
 #include "mraa_internal_types.h"
 
+extern mraa_adv_func advance_func;
+
 /** Setup gpio
  *
  * Will check input is valid for gpio and will also setup required multiplexers.

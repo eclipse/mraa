@@ -29,25 +29,8 @@
 #include "types.h"
 
 typedef struct {
-    mraa_boolean_t gpio_init_pre:1;
-    mraa_boolean_t gpio_init_post:1;
-    mraa_boolean_t gpio_mode_replace:1;
-    mraa_boolean_t gpio_mode_pre:1;
-    mraa_boolean_t gpio_mode_post:1;
-    mraa_boolean_t gpio_dir_replace:1;
-    mraa_boolean_t gpio_dir_pre:1;
-    mraa_boolean_t gpio_dir_post:1;
-    mraa_boolean_t gpio_write_pre:1;
-    mraa_boolean_t gpio_write_post:1;
-    mraa_boolean_t gpio_mmaped_write_replace:1;
-    mraa_boolean_t gpio_mmaped_write_pre:1;
-    mraa_boolean_t gpio_mmaped_write_post:1;
-} mraa_adv_def_t;
-
-typedef struct {
-    mraa_adv_def_t defined;
-    int (*gpio_init_pre) (int pin);
-    void (*gpio_init_post) (mraa_gpio_context dev);
+    mraa_result_t (*gpio_init_pre) (int pin);
+    mraa_result_t (*gpio_init_post) (mraa_gpio_context dev);
 
     mraa_result_t (*gpio_mode_replace) (mraa_gpio_context dev, gpio_mode_t mode);
     mraa_result_t (*gpio_mode_pre) (mraa_gpio_context dev, gpio_mode_t mode);
