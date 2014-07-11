@@ -47,7 +47,7 @@ mraa_i2c_init(int bus)
                 fprintf(stderr, "Failed to set-up i2c multiplexer!\n");
                 return NULL;
             case -3:
-                fprintf(stderr, "Platform Not Initialised");
+                fprintf(stderr, "Platform Not Initialised\n");
                 return NULL;
             default: return NULL;
         }
@@ -65,7 +65,7 @@ mraa_i2c_init_raw(unsigned int bus)
     char filepath[32];
     snprintf(filepath, 32, "/dev/i2c-%u", bus);
     if ((dev->fh = open(filepath, O_RDWR)) < 1) {
-        fprintf(stderr, "Failed to open requested i2c port %s", filepath);
+        fprintf(stderr, "Failed to open requested i2c port %s\n", filepath);
     }
     return dev;
 }
