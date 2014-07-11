@@ -30,6 +30,7 @@ extern "C" {
 
 #include "common.h"
 #include "mraa_internal_types.h"
+#include "mraa_adv_func.h"
 
 extern mraa_adv_func advance_func;
 

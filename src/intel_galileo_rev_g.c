@@ -30,7 +30,7 @@
 #include "intel_galileo_rev_g.h"
 
 mraa_board_t*
-mraa_intel_galileo_gen2()
+mraa_intel_galileo_gen2(mraa_adv_func* adv)
 {
     mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
     if (b == NULL)
