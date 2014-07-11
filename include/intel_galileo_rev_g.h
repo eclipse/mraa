@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#include "mraa_adv_func.h"
+#include "mraa_internal.h"
 
 #define MRAA_INTEL_GALILEO_GEN_2_PINCOUNT 25
 
