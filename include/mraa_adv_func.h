@@ -24,17 +24,26 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "common.h"
+#include "mraa.h"
+#include "types.h"
 
-#include "mraa_internal.h"
+typedef struct {
+    mraa_result_t (*gpio_init_pre) (int pin);
+    mraa_result_t (*gpio_init_post) (mraa_gpio_context dev);
 
-#define MRAA_INTEL_GALILEO_REV_D_PINCOUNT 25
+    mraa_result_t (*gpio_mode_replace) (mraa_gpio_context dev, gpio_mode_t mode);
+    mraa_result_t (*gpio_mode_pre) (mraa_gpio_context dev, gpio_mode_t mode);
+    mraa_result_t (*gpio_mode_post) (mraa_gpio_context dev, gpio_mode_t mode);
 
-mraa_board_t*
-mraa_intel_galileo_rev_d(mraa_adv_func* adv);
+    mraa_result_t (*gpio_dir_replace) (mraa_gpio_context dev, gpio_dir_t dir);
+    mraa_result_t (*gpio_dir_pre) (mraa_gpio_context dev, gpio_dir_t dir);
+    mraa_result_t (*gpio_dir_post) (mraa_gpio_context dev, gpio_dir_t dir);
 
-#ifdef __cplusplus
-}
-#endif
+    mraa_result_t (*gpio_write_pre) (mraa_gpio_context dev, int value);
+    mraa_result_t (*gpio_write_post) (mraa_gpio_context dev, int value);
+
+    mraa_result_t (*gpio_mmaped_write_replace) (mraa_gpio_context dev, int value);
+    mraa_result_t (*gpio_mmaped_write_pre) (mraa_gpio_context dev, int value);
+    mraa_result_t (*gpio_mmaped_write_post) (mraa_gpio_context dev, int value);
+} mraa_adv_func;

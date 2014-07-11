@@ -24,8 +24,14 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "common.h"
 #include "mraa_internal_types.h"
+
+extern mraa_adv_func advance_func;
 
 /** Setup gpio
  *
@@ -84,3 +90,7 @@ mraa_result_t mraa_swap_complex_gpio(int pin, int out);
  * @return mraa_result_t of operation
  */
 mraa_result_t mraa_setup_uart(int index);
+
+#ifdef __cplusplus
+}
+#endif

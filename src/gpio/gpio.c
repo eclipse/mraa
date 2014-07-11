@@ -67,6 +67,12 @@ mraa_gpio_init(int pin)
 mraa_gpio_context
 mraa_gpio_init_raw(int pin)
 {
+    if (advance_func.gpio_init_pre != NULL) {
+        printf("Actually entering\n");
+        if (advance_func.gpio_init_pre(pin) != MRAA_SUCCESS)
+            return NULL;
+    }
+
     if (pin < 0)
         return NULL;
 
@@ -102,18 +108,31 @@ mraa_gpio_init_raw(int pin)
         close(export);
     }
 
+    if (advance_func.gpio_init_post != NULL) {
+        free(dev);
+        return NULL;
+    }
     return dev;
 }
 
 static mraa_result_t
 mraa_gpio_write_register(mraa_gpio_context dev,int value)
 {
-   if (value == 1) {
+    if (advance_func.gpio_mmaped_write_replace != NULL)
+        return advance_func.gpio_mmaped_write_replace(dev,value);
+    if (advance_func.gpio_mmaped_write_pre != NULL) {
+        mraa_result_t pre_ret = (advance_func.gpio_mmaped_write_pre(dev,value));
+        if(pre_ret != MRAA_SUCCESS)
+            return pre_ret;
+    }
+    if (value == 1) {
         *((unsigned *)dev->reg) |= (1<<dev->reg_bit_pos);
         return MRAA_SUCCESS;
     }
     *((unsigned *)dev->reg) &= ~(1<<dev->reg_bit_pos);
 
+    if (advance_func.gpio_mmaped_write_post != NULL)
+        return advance_func.gpio_mmaped_write_post(dev,value);
     return MRAA_SUCCESS;
 }
 
@@ -293,13 +312,21 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
     // assume our thread will exit either way we just lost it's handle
     dev->thread_id = 0;
     dev->isr_value_fp = -1;
-
     return ret;
 }
 
 mraa_result_t
 mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
 {
+    if (advance_func.gpio_mode_replace != NULL)
+        return advance_func.gpio_mode_replace(dev,mode);
+
+    if (advance_func.gpio_mode_pre != NULL) {
+        mraa_result_t pre_ret = (advance_func.gpio_mode_pre(dev,mode));
+        if(pre_ret != MRAA_SUCCESS)
+            return pre_ret;
+    }
+
     if (dev->value_fp != -1) {
          close(dev->value_fp);
          dev->value_fp = -1;
@@ -341,12 +368,22 @@ mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
     }
 
     close(drive);
+    if (advance_func.gpio_mode_post != NULL)
+        return advance_func.gpio_mode_post(dev,mode);
     return MRAA_SUCCESS;
 }
 
 mraa_result_t
 mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
 {
+    if (advance_func.gpio_dir_replace != NULL)
+        return advance_func.gpio_dir_replace(dev,dir);
+    if (advance_func.gpio_dir_pre != NULL) {
+        mraa_result_t pre_ret = (advance_func.gpio_dir_pre(dev,dir));
+        if(pre_ret != MRAA_SUCCESS)
+            return pre_ret;
+    }
+
     if (dev == NULL) {
         return MRAA_ERROR_INVALID_HANDLE;
     }
@@ -391,6 +428,8 @@ mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
     }
 
     close(direction);
+    if (advance_func.gpio_dir_post != NULL)
+        return advance_func.gpio_dir_post(dev,dir);
     return MRAA_SUCCESS;
 }
 
@@ -414,6 +453,7 @@ mraa_gpio_read(mraa_gpio_context dev)
     int ret = strtol(bu, NULL, 10);
 
     return ret;
+    return 0;
 }
 
 mraa_result_t
@@ -421,6 +461,12 @@ mraa_gpio_write(mraa_gpio_context dev, int value)
 {
     if (dev->mmap == 1)
         return mraa_gpio_write_register(dev,value);
+
+    if (advance_func.gpio_write_pre != NULL) {
+        mraa_result_t pre_ret = (advance_func.gpio_write_pre(dev,value));
+        if(pre_ret != MRAA_SUCCESS)
+            return pre_ret;
+    }
 
     if (dev->value_fp == -1) {
         mraa_gpio_get_valfp(dev);
@@ -435,6 +481,8 @@ mraa_gpio_write(mraa_gpio_context dev, int value)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
+    if (advance_func.gpio_write_post != NULL)
+        return advance_func.gpio_write_post(dev,value);
     return MRAA_SUCCESS;
 }
 
