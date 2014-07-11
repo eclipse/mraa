@@ -31,6 +31,7 @@
 #include "mraa_internal.h"
 #include "intel_galileo_rev_d.h"
 #include "intel_galileo_rev_g.h"
+#include "intel_edison_fab_b.h"
 #include "gpio.h"
 #include "version.h"
 
@@ -68,6 +69,10 @@ mraa_init()
         if (getline(&line, &len, fh) != -1) {
             if (strncmp(line, "GalileoGen2", 10) == 0) {
                 platform_type = MRAA_INTEL_GALILEO_GEN2;
+            } else if (strncmp(line, "BODEGA BAY", 10) == 0) {
+                platform_type = MRAA_INTEL_EDISON_FAB_B;
+            } else if (strncmp(line, "SALT BAY", 7) == 0) {
+                platform_type = MRAA_INTEL_EDISON_FAB_B;
             } else {
                 platform_type = MRAA_INTEL_GALILEO_GEN1;
             }
@@ -85,6 +90,9 @@ mraa_init()
             break;
         case MRAA_INTEL_GALILEO_GEN1:
             plat = mraa_intel_galileo_rev_d();
+            break;
+        case MRAA_INTEL_EDISON_FAB_B:
+            plat = mraa_intel_edison_fab_b(&advance_func);
             break;
         default:
             plat = mraa_intel_galileo_rev_d();
