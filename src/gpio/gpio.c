@@ -68,7 +68,6 @@ mraa_gpio_context
 mraa_gpio_init_raw(int pin)
 {
     if (advance_func->gpio_init_pre != NULL) {
-        printf("Actually entering\n");
         if (advance_func->gpio_init_pre(pin) != MRAA_SUCCESS)
             return NULL;
     }
@@ -90,7 +89,6 @@ mraa_gpio_init_raw(int pin)
     snprintf(directory, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/", dev->pin);
     struct stat dir;
     if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
-        //fprintf(stderr, "GPIO Pin already exporting, continuing.\n");
         dev->owner = 0; // Not Owner
     } else {
         int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
@@ -109,8 +107,11 @@ mraa_gpio_init_raw(int pin)
     }
 
     if (advance_func->gpio_init_post != NULL) {
-        free(dev);
-        return NULL;
+        mraa_result_t ret = advance_func->gpio_init_post(dev);
+        if (ret != MRAA_SUCCESS) {
+            free(dev);
+            return NULL;
+        }
     }
     return dev;
 }
