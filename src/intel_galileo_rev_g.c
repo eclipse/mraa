@@ -52,6 +52,25 @@ mraa_intel_galileo_gen2_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
     return MRAA_SUCCESS;
 }
 
+mraa_result_t
+mraa_intel_galileo_gen2_i2c_init_pre(unsigned int bus)
+{
+    mraa_gpio_context io18;
+    int status = 0;
+    io18 = mraa_gpio_init_raw(57);
+    status = status + mraa_gpio_dir(io18, MRAA_GPIO_IN);
+    status = status + mraa_gpio_mode(io18, MRAA_GPIO_HIZ);
+
+    mraa_gpio_context io19;
+    io19 = mraa_gpio_init_raw(59);
+    status = status + mraa_gpio_dir(io19, MRAA_GPIO_IN);
+    status = status + mraa_gpio_mode(io19, MRAA_GPIO_HIZ);
+
+    if (status > 0)
+        return MRAA_ERROR_UNSPECIFIED;
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_intel_galileo_gen2()
 {
@@ -66,6 +85,7 @@ mraa_intel_galileo_gen2()
     b->adc_supported = 10;
 
     advance_func->gpio_dir_pre = &mraa_intel_galileo_gen2_dir_pre;
+    advance_func->i2c_init_pre = &mraa_intel_galileo_gen2_i2c_init_pre;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_GALILEO_GEN_2_PINCOUNT);
 
