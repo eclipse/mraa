@@ -50,6 +50,10 @@ mraa_i2c_init(int bus)
 mraa_i2c_context
 mraa_i2c_init_raw(unsigned int bus)
 {
+    if (advance_func->i2c_init_pre != NULL) {
+        if (advance_func->i2c_init_pre(bus) != MRAA_SUCCESS)
+            return NULL;
+    }
     mraa_i2c_context dev = (mraa_i2c_context) malloc(sizeof(struct _i2c));
     if (dev == NULL)
         return NULL;
@@ -58,6 +62,14 @@ mraa_i2c_init_raw(unsigned int bus)
     snprintf(filepath, 32, "/dev/i2c-%u", bus);
     if ((dev->fh = open(filepath, O_RDWR)) < 1) {
         fprintf(stderr, "Failed to open requested i2c port %s\n", filepath);
+    }
+
+    if (advance_func->i2c_init_post != NULL) {
+        mraa_result_t ret = advance_func->i2c_init_post(dev);
+        if (ret != MRAA_SUCCESS) {
+            free(dev);
+            return NULL;
+        }
     }
     return dev;
 }

@@ -19,3 +19,6 @@ Any functionality perfomed here is done just before the normal function returns.
  * dir (replace-pre-post)
  * write (pre-post)
  * use-mmaped (replace-pre-post)
+
+### I2C
+ * init (pre-post) - On RAW

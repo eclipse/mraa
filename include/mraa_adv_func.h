@@ -46,4 +46,7 @@ typedef struct {
     mraa_result_t (*gpio_mmaped_write_replace) (mraa_gpio_context dev, int value);
     mraa_result_t (*gpio_mmaped_write_pre) (mraa_gpio_context dev, int value);
     mraa_result_t (*gpio_mmaped_write_post) (mraa_gpio_context dev, int value);
+
+    mraa_result_t (*i2c_init_pre) (unsigned int bus);
+    mraa_result_t (*i2c_init_post) (mraa_i2c_context dev);
 } mraa_adv_func_t;
