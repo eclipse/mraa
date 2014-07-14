@@ -59,6 +59,12 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.4.2**
+  * Barebone UART module added.
+  * Hook branch merged.
+  * I2C init hooks added.
+  * Intel Galileo Gen 2, I2C gpio pins now go hiz input when I2C initialised.
+
 **0.4.1**
   * Rename python & nodejs modules to mraa
   * common.hpp introduced for C++
