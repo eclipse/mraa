@@ -1,5 +1,5 @@
 /*
- * Author: Brendan Le Foll
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
