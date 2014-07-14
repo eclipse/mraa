@@ -26,14 +26,6 @@
 #include "smbus.h"
 #include "mraa_internal.h"
 
-struct _i2c {
-    /*@{*/
-    int hz; /**< frequency of communication */
-    int fh; /**< the file handle to the /dev/i2c-* device */
-    int addr; /**< the address of the i2c slave */
-    /*@}*/
-};
-
 mraa_i2c_context
 mraa_i2c_init(int bus)
 {

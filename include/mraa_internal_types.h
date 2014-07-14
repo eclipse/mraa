@@ -46,3 +46,14 @@ struct _gpio {
     unsigned int reg_bit_pos;
     /*@}*/
 };
+
+/**
+ * A structure representing a I2C bus
+ */
+struct _i2c {
+    /*@{*/
+    int hz; /**< frequency of communication */
+    int fh; /**< the file handle to the /dev/i2c-* device */
+    int addr; /**< the address of the i2c slave */
+    /*@}*/
+};
