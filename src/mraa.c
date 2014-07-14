@@ -383,43 +383,6 @@ mraa_setup_mmap_gpio(int pin)
     return ret;
 }
 
-mraa_result_t
-mraa_swap_complex_gpio(int pin, int out)
-{
-    if (plat == NULL)
-        return MRAA_ERROR_INVALID_PLATFORM;
-
-    switch (platform_type) {
-        case MRAA_INTEL_GALILEO_GEN2:
-            if (plat->pins[pin].gpio.complex_cap.complex_pin != 1)
-                return MRAA_SUCCESS;
-            if (plat->pins[pin].gpio.complex_cap.output_en == 1) {
-                mraa_gpio_context output_e;
-                output_e = mraa_gpio_init_raw(plat->pins[pin].gpio.output_enable);
-                if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS)
-                    return MRAA_ERROR_INVALID_RESOURCE;
-                int output_val;
-                if (plat->pins[pin].gpio.complex_cap.output_en_high == 1)
-                    output_val = out;
-                else
-                    if (out == 1)
-                        output_val = 0;
-                    else
-                        output_val = 1;
-                if (mraa_gpio_write(output_e, output_val) != MRAA_SUCCESS)
-                    return MRAA_ERROR_INVALID_RESOURCE;
-            }
-            //if (plat->pins[pin].gpio.complex_cap.pullup_en == 1) {
-            //    mraa_gpio_context pullup_e;
-            //    pullup_e = mraa_gpio_init_raw(plat->pins[pin].gpio.pullup_enable);
-            //    if (mraa_gpio_mode(pullup_e, MRAA_GPIO_HIZ) != MRAA_SUCCESS)
-            //        return MRAA_ERROR_INVALID_RESOURCE;
-            //}
-            break;
-        default: return MRAA_SUCCESS;
-    }
-}
-
 mraa_platform_t mraa_get_platform_type()
 {
     return platform_type;

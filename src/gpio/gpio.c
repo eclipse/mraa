@@ -402,11 +402,9 @@ mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
 
     char bu[MAX_SIZE];
     int length;
-    int out_switch = 0;
     switch(dir) {
         case MRAA_GPIO_OUT:
             length = snprintf(bu, sizeof(bu), "out");
-            out_switch = 1;
             break;
         case MRAA_GPIO_IN:
             length = snprintf(bu, sizeof(bu), "in");
@@ -414,12 +412,6 @@ mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
         default:
             close(direction);
             return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
-    }
-
-    if (dev->phy_pin >= 0) {
-        mraa_result_t swap_res = mraa_swap_complex_gpio(dev->phy_pin, out_switch);
-        if (swap_res != MRAA_SUCCESS)
-            return swap_res;
     }
 
     if (write(direction, bu, length*sizeof(char)) == -1) {

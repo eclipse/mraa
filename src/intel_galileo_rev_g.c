@@ -29,6 +29,29 @@
 #include "common.h"
 #include "intel_galileo_rev_g.h"
 
+mraa_result_t
+mraa_intel_galileo_gen2_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
+{
+    if (dev->phy_pin >= 0) {
+        int pin = dev->phy_pin;
+        if (plat->pins[pin].gpio.complex_cap.complex_pin != 1)
+            return MRAA_SUCCESS;
+
+        if (plat->pins[pin].gpio.complex_cap.output_en == 1) {
+            mraa_gpio_context output_e;
+            output_e = mraa_gpio_init_raw(plat->pins[pin].gpio.output_enable);
+            if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS)
+                return MRAA_ERROR_INVALID_RESOURCE;
+            int output_val = 1;
+            if (dir == MRAA_GPIO_OUT)
+                output_val = 0;
+            if (mraa_gpio_write(output_e, output_val) != MRAA_SUCCESS)
+                return MRAA_ERROR_INVALID_RESOURCE;
+        }
+    }
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_intel_galileo_gen2()
 {
@@ -41,6 +64,8 @@ mraa_intel_galileo_gen2()
     b->aio_count = 6;
     b->adc_raw = 12;
     b->adc_supported = 10;
+
+    advance_func->gpio_dir_pre = &mraa_intel_galileo_gen2_dir_pre;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_GALILEO_GEN_2_PINCOUNT);
 
