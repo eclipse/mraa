@@ -188,9 +188,9 @@ mraa_gpio_interrupt_handler(void* arg)
             PyObject *arglist;
             PyObject *ret;
             arglist = Py_BuildValue("(i)", dev->isr_args);
-			if (arglist == NULL) {
-				fprintf(stdout, "Py_BuildValue NULL\n");
-			} else {
+            if (arglist == NULL) {
+                fprintf(stdout, "Py_BuildValue NULL\n");
+            } else {
                 ret = PyEval_CallObject((PyObject*)dev->isr, arglist);
                 if (ret == NULL) {
                     fprintf(stdout, "PyEval_CallObject failed\n");
