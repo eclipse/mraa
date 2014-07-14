@@ -67,9 +67,9 @@ mraa_gpio_init(int pin)
 mraa_gpio_context
 mraa_gpio_init_raw(int pin)
 {
-    if (advance_func.gpio_init_pre != NULL) {
+    if (advance_func->gpio_init_pre != NULL) {
         printf("Actually entering\n");
-        if (advance_func.gpio_init_pre(pin) != MRAA_SUCCESS)
+        if (advance_func->gpio_init_pre(pin) != MRAA_SUCCESS)
             return NULL;
     }
 
@@ -108,7 +108,7 @@ mraa_gpio_init_raw(int pin)
         close(export);
     }
 
-    if (advance_func.gpio_init_post != NULL) {
+    if (advance_func->gpio_init_post != NULL) {
         free(dev);
         return NULL;
     }
@@ -118,10 +118,10 @@ mraa_gpio_init_raw(int pin)
 static mraa_result_t
 mraa_gpio_write_register(mraa_gpio_context dev,int value)
 {
-    if (advance_func.gpio_mmaped_write_replace != NULL)
-        return advance_func.gpio_mmaped_write_replace(dev,value);
-    if (advance_func.gpio_mmaped_write_pre != NULL) {
-        mraa_result_t pre_ret = (advance_func.gpio_mmaped_write_pre(dev,value));
+    if (advance_func->gpio_mmaped_write_replace != NULL)
+        return advance_func->gpio_mmaped_write_replace(dev,value);
+    if (advance_func->gpio_mmaped_write_pre != NULL) {
+        mraa_result_t pre_ret = (advance_func->gpio_mmaped_write_pre(dev,value));
         if(pre_ret != MRAA_SUCCESS)
             return pre_ret;
     }
@@ -131,8 +131,8 @@ mraa_gpio_write_register(mraa_gpio_context dev,int value)
     }
     *((unsigned *)dev->reg) &= ~(1<<dev->reg_bit_pos);
 
-    if (advance_func.gpio_mmaped_write_post != NULL)
-        return advance_func.gpio_mmaped_write_post(dev,value);
+    if (advance_func->gpio_mmaped_write_post != NULL)
+        return advance_func->gpio_mmaped_write_post(dev,value);
     return MRAA_SUCCESS;
 }
 
@@ -318,11 +318,11 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
 mraa_result_t
 mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
 {
-    if (advance_func.gpio_mode_replace != NULL)
-        return advance_func.gpio_mode_replace(dev,mode);
+    if (advance_func->gpio_mode_replace != NULL)
+        return advance_func->gpio_mode_replace(dev,mode);
 
-    if (advance_func.gpio_mode_pre != NULL) {
-        mraa_result_t pre_ret = (advance_func.gpio_mode_pre(dev,mode));
+    if (advance_func->gpio_mode_pre != NULL) {
+        mraa_result_t pre_ret = (advance_func->gpio_mode_pre(dev,mode));
         if(pre_ret != MRAA_SUCCESS)
             return pre_ret;
     }
@@ -368,18 +368,18 @@ mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
     }
 
     close(drive);
-    if (advance_func.gpio_mode_post != NULL)
-        return advance_func.gpio_mode_post(dev,mode);
+    if (advance_func->gpio_mode_post != NULL)
+        return advance_func->gpio_mode_post(dev,mode);
     return MRAA_SUCCESS;
 }
 
 mraa_result_t
 mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
 {
-    if (advance_func.gpio_dir_replace != NULL)
-        return advance_func.gpio_dir_replace(dev,dir);
-    if (advance_func.gpio_dir_pre != NULL) {
-        mraa_result_t pre_ret = (advance_func.gpio_dir_pre(dev,dir));
+    if (advance_func->gpio_dir_replace != NULL)
+        return advance_func->gpio_dir_replace(dev,dir);
+    if (advance_func->gpio_dir_pre != NULL) {
+        mraa_result_t pre_ret = (advance_func->gpio_dir_pre(dev,dir));
         if(pre_ret != MRAA_SUCCESS)
             return pre_ret;
     }
@@ -428,8 +428,8 @@ mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
     }
 
     close(direction);
-    if (advance_func.gpio_dir_post != NULL)
-        return advance_func.gpio_dir_post(dev,dir);
+    if (advance_func->gpio_dir_post != NULL)
+        return advance_func->gpio_dir_post(dev,dir);
     return MRAA_SUCCESS;
 }
 
@@ -462,8 +462,8 @@ mraa_gpio_write(mraa_gpio_context dev, int value)
     if (dev->mmap == 1)
         return mraa_gpio_write_register(dev,value);
 
-    if (advance_func.gpio_write_pre != NULL) {
-        mraa_result_t pre_ret = (advance_func.gpio_write_pre(dev,value));
+    if (advance_func->gpio_write_pre != NULL) {
+        mraa_result_t pre_ret = (advance_func->gpio_write_pre(dev,value));
         if(pre_ret != MRAA_SUCCESS)
             return pre_ret;
     }
@@ -481,8 +481,8 @@ mraa_gpio_write(mraa_gpio_context dev, int value)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    if (advance_func.gpio_write_post != NULL)
-        return advance_func.gpio_write_post(dev,value);
+    if (advance_func->gpio_write_post != NULL)
+        return advance_func->gpio_write_post(dev,value);
     return MRAA_SUCCESS;
 }
 

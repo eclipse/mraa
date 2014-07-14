@@ -32,7 +32,7 @@ extern "C" {
 #include "mraa_internal_types.h"
 #include "mraa_adv_func.h"
 
-extern mraa_adv_func_t advance_func;
+extern mraa_adv_func_t* advance_func;
 
 /** Setup gpio
  *

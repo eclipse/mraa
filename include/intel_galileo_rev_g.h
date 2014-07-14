@@ -33,7 +33,7 @@ extern "C" {
 #define MRAA_INTEL_GALILEO_GEN_2_PINCOUNT 25
 
 mraa_board_t*
-mraa_intel_galileo_gen2(mraa_adv_func_t* adv);
+mraa_intel_galileo_gen2();
 
 #ifdef __cplusplus
 }
