@@ -37,7 +37,7 @@
 //static mraa_pininfo_t* pindata;
 static mraa_board_t* plat = NULL;
 static mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
-mraa_adv_func advance_func;
+mraa_adv_func_t advance_func;
 
 const char *
 mraa_get_version()
@@ -77,7 +77,7 @@ mraa_init()
     free(line);
     fclose(fh);
 
-    memset(&advance_func, 0, sizeof(mraa_adv_func));
+    memset(&advance_func, 0, sizeof(mraa_adv_func_t));
     switch(platform_type) {
         case MRAA_INTEL_GALILEO_GEN2:
             plat = mraa_intel_galileo_gen2(&advance_func);
