@@ -34,8 +34,7 @@
 #include "gpio.h"
 #include "version.h"
 
-//static mraa_pininfo_t* pindata;
-static mraa_board_t* plat = NULL;
+mraa_board_t* plat = NULL;
 static mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
 mraa_adv_func_t* advance_func;
 

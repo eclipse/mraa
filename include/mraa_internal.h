@@ -33,6 +33,7 @@ extern "C" {
 #include "mraa_adv_func.h"
 
 extern mraa_adv_func_t* advance_func;
+extern mraa_board_t* plat;
 
 /** Setup gpio
  *
