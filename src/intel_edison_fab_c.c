@@ -22,19 +22,40 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#pragma once
+#include <stdlib.h>
+#include <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "mraa_internal.h"
-
-#define MRAA_INTEL_EDISON_PINCOUNT 25
+#include "common.h"
+#include "intel_edison_fab_c.h"
 
 mraa_board_t*
-mraa_intel_edison_fab_b();
+mraa_intel_edison_fab_c()
+{
+    mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
+    if (b == NULL)
+        return NULL;
 
-#ifdef __cplusplus
+    b->phy_pin_count = 20;
+    b->gpio_count = 14;
+    b->aio_count = 6;
+
+    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_EDISON_PINCOUNT);
+
+    //BUS DEFINITIONS
+    b->i2c_bus_count = 1;
+    b->def_i2c_bus = 0;
+    b->i2c_bus[0].bus_id = 0;
+    b->i2c_bus[0].sda = 18;
+    b->i2c_bus[0].scl = 19;
+
+    b->spi_bus_count = 1;
+    b->def_spi_bus = 0;
+    b->spi_bus[0].bus_id = 1;
+    b->spi_bus[0].slave_s = 0;
+    b->spi_bus[0].cs = 10;
+    b->spi_bus[0].mosi = 11;
+    b->spi_bus[0].miso = 12;
+    b->spi_bus[0].sclk = 13;
+
+    return b;
 }
-#endif

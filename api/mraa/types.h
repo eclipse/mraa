@@ -39,7 +39,7 @@ extern "C" {
 typedef enum {
     MRAA_INTEL_GALILEO_GEN1 = 0, /**< The Generation 1 Galileo platform (RevD) */
     MRAA_INTEL_GALILEO_GEN2 = 1, /**< The Generation 2 Galileo platform (RevG/H) */
-    MRAA_INTEL_EDISON_FAB_B = 2, /**< The Intel Edison (FAB B) */
+    MRAA_INTEL_EDISON_FAB_C = 2, /**< The Intel Edison (FAB C) */
 
     MRAA_UNKNOWN_PLATFORM = 99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
 } mraa_platform_t;
