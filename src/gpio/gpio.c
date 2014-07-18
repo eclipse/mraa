@@ -61,6 +61,14 @@ mraa_gpio_init(int pin)
 
     mraa_gpio_context r = mraa_gpio_init_raw(pinm);
     r->phy_pin = pin;
+
+    if (advance_func->gpio_init_post != NULL) {
+        mraa_result_t ret = advance_func->gpio_init_post(r);
+        if (ret != MRAA_SUCCESS) {
+            free(r);
+            return NULL;
+        }
+    }
     return r;
 }
 
@@ -106,13 +114,6 @@ mraa_gpio_init_raw(int pin)
         close(export);
     }
 
-    if (advance_func->gpio_init_post != NULL) {
-        mraa_result_t ret = advance_func->gpio_init_post(dev);
-        if (ret != MRAA_SUCCESS) {
-            free(dev);
-            return NULL;
-        }
-    }
     return dev;
 }
 

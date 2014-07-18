@@ -14,7 +14,7 @@ Any functionality perfomed here is done just before the normal function returns.
 
 ##Hooks
 ### GPIO
- * init (pre-post) - On RAW functions
+ * init (pre-post)
  * mode (replace-pre-post)
  * dir (replace-pre-post)
  * write (pre-post)
