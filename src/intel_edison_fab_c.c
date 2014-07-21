@@ -45,6 +45,8 @@ typedef struct {
     mraa_intel_edision_pindef_t uart;
 } mraa_intel_edison_pinmodes_t;
 
+static mraa_gpio_context tristate;
+
 static mraa_intel_edison_pinmodes_t pinmodes[MRAA_INTEL_EDISON_PINCOUNT];
 static unsigned int outputen[] = {248,249,250,251,252,253,254,255,256,257,258,259,260,261,232,233,234,235,236,237};
 
@@ -77,6 +79,8 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
 mraa_result_t
 mraa_intel_edison_gpio_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
 {
+    if (mraa_gpio_write(tristate, 0) != MRAA_SUCCESS)
+        return MRAA_ERROR_INVALID_RESOURCE;
     if (dev->phy_pin >= 0) {
         int pin = dev->phy_pin;
 
@@ -91,6 +95,12 @@ mraa_intel_edison_gpio_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
             return MRAA_ERROR_INVALID_RESOURCE;
     }
     return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_intel_edison_gpio_dir_post(mraa_gpio_context dev, gpio_dir_t dir)
+{
+    return mraa_gpio_write(tristate, 1);
 }
 
 mraa_result_t
@@ -120,8 +130,18 @@ mraa_intel_edison_fab_c()
 
     advance_func->gpio_dir_pre = &mraa_intel_edison_gpio_dir_pre;
     advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
+    advance_func->gpio_dir_post = &mraa_intel_edison_gpio_dir_post;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_EDISON_PINCOUNT);
+
+    tristate = mraa_gpio_init_raw(214);
+    if (tristate == NULL) {
+        fprintf(stderr, "Intel Edison Failed to initialise Arduino board TriState,\
+                         check i2c devices! FATAL\n");
+        return NULL;
+    }
+    mraa_gpio_dir(tristate, MRAA_GPIO_OUT);
+
 
     strncpy(b->pins[4].name, "IO4", 8);
     b->pins[4].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,0};
