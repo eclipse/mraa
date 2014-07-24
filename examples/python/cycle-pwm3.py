@@ -25,9 +25,9 @@
 import mraa
 import time
 
-x = mraa.PWM(0,3)
-x.enable(1);
+x = mraa.Pwm(0,3)
 x.period_us(20)
+x.enable(1)
 value= 0.0
 
 while True:
