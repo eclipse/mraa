@@ -185,12 +185,17 @@ mraa_setup_i2c(int bus)
     if (plat == NULL)
         return -3;
 
-    if (plat->i2c_bus_count >! 0) {
+    if (plat->i2c_bus_count == 0) {
         fprintf(stderr, "No i2c buses defined in platform");
         return -1;
     }
     if (bus >= plat->i2c_bus_count) {
         fprintf(stderr, "Above i2c bus count");
+        return -1;
+    }
+
+    if (plat->i2c_bus[bus].bus_id == -1) {
+        fprintf(stderr, "Platform not currently allowed for mraa use\n");
         return -1;
     }
 
