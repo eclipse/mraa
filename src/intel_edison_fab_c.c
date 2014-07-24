@@ -119,6 +119,44 @@ mraa_intel_edison_gpio_init_post(mraa_gpio_context dev)
     return MRAA_SUCCESS;
 }
 
+mraa_result_t
+mraa_intel_edison_i2c_init_pre(unsigned int bus)
+{
+    if(bus != 6) {
+        fprintf(stderr, "Edison: You can use that bus, ERR\n");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    mraa_gpio_write(tristate, 0);
+    mraa_gpio_context io18_gpio = mraa_gpio_init_raw(14);
+    mraa_gpio_context io19_gpio = mraa_gpio_init_raw(165);
+    mraa_gpio_dir(io18_gpio, MRAA_GPIO_IN);
+    mraa_gpio_dir(io19_gpio, MRAA_GPIO_IN);
+    mraa_gpio_close(io18_gpio);
+    mraa_gpio_close(io19_gpio);
+
+    mraa_gpio_context io18_enable = mraa_gpio_init_raw(236);
+    mraa_gpio_context io19_enable = mraa_gpio_init_raw(237);
+    mraa_gpio_dir(io18_enable, MRAA_GPIO_OUT);
+    mraa_gpio_dir(io19_enable, MRAA_GPIO_OUT);
+    mraa_gpio_write(io18_enable, 0);
+    mraa_gpio_write(io19_enable, 0);
+    mraa_gpio_close(io18_enable);
+    mraa_gpio_close(io19_enable);
+
+    mraa_gpio_context io18_pullup = mraa_gpio_init_raw(212);
+    mraa_gpio_context io19_pullup = mraa_gpio_init_raw(213);
+    mraa_gpio_dir(io18_pullup, MRAA_GPIO_IN);
+    mraa_gpio_dir(io19_pullup, MRAA_GPIO_IN);
+    mraa_gpio_close(io18_pullup);
+    mraa_gpio_close(io19_pullup);
+
+    mraa_intel_edison_pinmode_change(28, 1);
+    mraa_intel_edison_pinmode_change(27, 1);
+
+    mraa_gpio_write(tristate, 1);
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_intel_edison_fab_c()
 {
@@ -133,6 +171,7 @@ mraa_intel_edison_fab_c()
     advance_func->gpio_dir_pre = &mraa_intel_edison_gpio_dir_pre;
     advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
     advance_func->gpio_dir_post = &mraa_intel_edison_gpio_dir_post;
+    advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_EDISON_PINCOUNT);
 
@@ -239,6 +278,20 @@ mraa_intel_edison_fab_c()
     b->pins[13].gpio.mux_total = 1;
     b->pins[13].gpio.mux[0].pin = 243;
     b->pins[13].gpio.mux[0].value = 0;
+
+    strncpy(b->pins[18].name, "A4", 8);
+    b->pins[18].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,0};
+    b->pins[18].i2c.pinmap = 1;
+    b->pins[18].i2c.mux_total = 1;
+    b->pins[18].i2c.mux[0].pin = 204;
+    b->pins[18].i2c.mux[0].value = 0;
+
+    strncpy(b->pins[19].name, "A5", 8);
+    b->pins[19].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,0};
+    b->pins[19].i2c.pinmap = 1;
+    b->pins[19].i2c.mux_total = 1;
+    b->pins[19].i2c.mux[0].pin = 205;
+    b->pins[19].i2c.mux[0].value = 0;
 
     //BUS DEFINITIONS
     b->i2c_bus_count = 9;
