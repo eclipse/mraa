@@ -173,10 +173,10 @@ typedef struct {
     unsigned int gpio_count; /**< GPIO Count */
     unsigned int aio_count;  /**< Analog side Count */
     unsigned int i2c_bus_count; /**< Usable i2c Count */
-    mraa_i2c_bus_t  i2c_bus[6]; /**< Array of i2c */
+    mraa_i2c_bus_t  i2c_bus[12]; /**< Array of i2c */
     unsigned int def_i2c_bus; /**< Position in array of default i2c bus */
     unsigned int spi_bus_count; /**< Usable spi Count */
-    mraa_spi_bus_t spi_bus[6];       /**< Array of spi */
+    mraa_spi_bus_t spi_bus[12];       /**< Array of spi */
     unsigned int def_spi_bus; /**< Position in array of defult spi bus */
     unsigned int adc_raw; /**< ADC raw bit value */
     unsigned int adc_supported; /**< ADC supported bit value */
