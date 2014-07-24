@@ -57,3 +57,15 @@ struct _i2c {
     int addr; /**< the address of the i2c slave */
     /*@}*/
 };
+
+/**
+ * A structure representing a PWM pin
+ */
+struct _pwm {
+    /*@{*/
+    int pin; /**< the pin number, as known to the os. */
+    int chipid; /**< the chip id, which the pwm resides */
+    int duty_fp; /**< File pointer to duty file */
+    mraa_boolean_t owner; /**< Owner of pwm context*/
+    /*@}*/
+};

@@ -32,18 +32,6 @@
 #define MAX_SIZE 64
 #define SYSFS_PWM "/sys/class/pwm"
 
-/**
- * A structure representing a PWM pin
- */
-struct _pwm {
-    /*@{*/
-    int pin; /**< the pin number, as known to the os. */
-    int chipid; /**< the chip id, which the pwm resides */
-    int duty_fp; /**< File pointer to duty file */
-    mraa_boolean_t owner; /**< Owner of pwm context*/
-    /*@}*/
-};
-
 static int
 mraa_pwm_setup_duty_fp(mraa_pwm_context dev)
 {
