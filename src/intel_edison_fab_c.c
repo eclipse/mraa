@@ -241,11 +241,15 @@ mraa_intel_edison_fab_c()
     b->pins[13].gpio.mux[0].value = 0;
 
     //BUS DEFINITIONS
-    b->i2c_bus_count = 1;
-    b->def_i2c_bus = 0;
-    b->i2c_bus[0].bus_id = 0;
-    b->i2c_bus[0].sda = 18;
-    b->i2c_bus[0].scl = 19;
+    b->i2c_bus_count = 9;
+    b->def_i2c_bus = 6;
+    int ici;
+    for (ici = 0; ici < 9; ici++) {
+        b->i2c_bus[ici].bus_id = -1;
+    }
+    b->i2c_bus[6].bus_id = 6;
+    b->i2c_bus[6].sda = 18;
+    b->i2c_bus[6].scl = 19;
 
     b->spi_bus_count = 1;
     b->def_spi_bus = 0;
