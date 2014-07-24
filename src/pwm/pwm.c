@@ -60,6 +60,9 @@ mraa_pwm_setup_duty_fp(mraa_pwm_context dev)
 static mraa_result_t
 mraa_pwm_write_period(mraa_pwm_context dev, int period)
 {
+    if (advance_func->pwm_period_replace != NULL)
+        return advance_func->pwm_period_replace(dev,period);
+
     char bu[MAX_SIZE];
     snprintf(bu,MAX_SIZE ,"/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
 

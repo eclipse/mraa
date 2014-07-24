@@ -49,4 +49,6 @@ typedef struct {
 
     mraa_result_t (*i2c_init_pre) (unsigned int bus);
     mraa_result_t (*i2c_init_post) (mraa_i2c_context dev);
+
+    mraa_result_t (*pwm_period_replace) (mraa_pwm_context dev, int period);
 } mraa_adv_func_t;
