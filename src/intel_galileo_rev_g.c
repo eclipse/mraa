@@ -29,6 +29,8 @@
 #include "common.h"
 #include "intel_galileo_rev_g.h"
 
+#define MAX_SIZE 64
+
 mraa_result_t
 mraa_intel_galileo_gen2_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
 {
@@ -71,6 +73,28 @@ mraa_intel_galileo_gen2_i2c_init_pre(unsigned int bus)
     return MRAA_SUCCESS;
 }
 
+mraa_result_t
+mraa_intel_galileo_gen2_pwm_period_replace(mraa_pwm_context dev, int period)
+{
+    char bu[MAX_SIZE];
+    snprintf(bu,MAX_SIZE ,"/sys/class/pwm/pwmchip%d/device/pwm_period", dev->chipid);
+
+    int period_f = open(bu, O_RDWR);
+    if (period_f == -1) {
+        fprintf(stderr, "Failed to open period for writing!\n");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    char out[MAX_SIZE];
+    int length = snprintf(out, MAX_SIZE, "%d", period);
+    if (write(period_f, out, length*sizeof(char)) == -1) {
+        close(period_f);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    close(period_f);
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_intel_galileo_gen2()
 {
@@ -86,6 +110,7 @@ mraa_intel_galileo_gen2()
 
     advance_func->gpio_dir_pre = &mraa_intel_galileo_gen2_dir_pre;
     advance_func->i2c_init_pre = &mraa_intel_galileo_gen2_i2c_init_pre;
+    advance_func->pwm_period_replace = &mraa_intel_galileo_gen2_pwm_period_replace;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_GALILEO_GEN_2_PINCOUNT);
 
