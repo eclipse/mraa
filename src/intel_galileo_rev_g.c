@@ -472,7 +472,7 @@ mraa_intel_galileo_gen2()
     b->pins[19].aio.mux[1].value = 0;
     b->pins[19].aio.mux[2].pin = 59;
     b->pins[19].aio.mux[2].value = 1;
-    b->pins[19].gpio.pinmap = 56;
+    b->pins[19].gpio.pinmap = 58;
     b->pins[19].gpio.mux_total = 2;
     b->pins[19].gpio.mux[0].pin = 60;
     b->pins[19].gpio.mux[0].value = 1;
