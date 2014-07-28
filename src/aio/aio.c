@@ -29,11 +29,6 @@
 #include "aio.h"
 #include "mraa_internal.h"
 
-struct _aio {
-    unsigned int channel;
-    int adc_in_fp;
-};
-
 static int raw_bits;
 static int sup_bits;
 

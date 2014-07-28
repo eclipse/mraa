@@ -69,3 +69,11 @@ struct _pwm {
     mraa_boolean_t owner; /**< Owner of pwm context*/
     /*@}*/
 };
+
+/**
+ * A structure representing a Analog Input Channel
+ */
+struct _aio {
+    unsigned int channel; /**< the channel as on board and ADC module */
+    int adc_in_fp; /**< File Pointer to raw sysfs */
+};
