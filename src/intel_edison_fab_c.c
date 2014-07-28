@@ -49,6 +49,7 @@ static mraa_gpio_context tristate;
 
 static mraa_intel_edison_pinmodes_t pinmodes[MRAA_INTEL_EDISON_PINCOUNT];
 static unsigned int outputen[] = {248,249,250,251,252,253,254,255,256,257,258,259,260,261,232,233,234,235,236,237};
+static unsigned int pullup_map[] = {216,217,218,219,220,221,222,223,224,225,226,227,228,229,208,209,210,211,212,213};
 
 static mraa_result_t
 mraa_intel_edison_pinmode_change(int sysfs, int mode)
@@ -56,9 +57,6 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
     if (mode < 0 ) {
         return MRAA_SUCCESS;
     }
-
-    printf("//EDISON// PINMODE CHANGE - gpio%i changing to mode -%u", sysfs, mode);
-
     char buffer[MAX_SIZE];
     snprintf(buffer, MAX_SIZE, SYSFS_PINMODE_PATH "%i/current_pinmux",sysfs);
     int modef = open(buffer, O_WRONLY);
@@ -69,7 +67,6 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
 
     char mode_buf[MAX_MODE_SIZE];
     int length = sprintf(mode_buf, "mode%u",mode);
-    printf("//EDISON// PIMODE = %s", mode_buf);
     if (write(modef, mode_buf, length*sizeof(char)) == -1) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -156,6 +153,97 @@ mraa_intel_edison_i2c_init_pre(unsigned int bus)
     return MRAA_SUCCESS;
 }
 
+static mraa_result_t
+mraa_intel_edison_misc_spi()
+{
+    mraa_gpio_write(tristate, 0);
+
+    mraa_gpio_context io10_p1 = mraa_gpio_init_raw(263);
+    mraa_gpio_context io10_p2 = mraa_gpio_init_raw(240);
+    mraa_gpio_context io11_p1 = mraa_gpio_init_raw(262);
+    mraa_gpio_context io11_p2 = mraa_gpio_init_raw(241);
+    mraa_gpio_context io12_p1 = mraa_gpio_init_raw(242);
+    mraa_gpio_context io13_p1 = mraa_gpio_init_raw(243);
+    mraa_gpio_dir(io10_p1, MRAA_GPIO_OUT);
+    mraa_gpio_dir(io10_p2, MRAA_GPIO_OUT);
+    mraa_gpio_dir(io11_p1, MRAA_GPIO_OUT);
+    mraa_gpio_dir(io11_p2, MRAA_GPIO_OUT);
+    mraa_gpio_dir(io12_p1, MRAA_GPIO_OUT);
+    mraa_gpio_dir(io13_p1, MRAA_GPIO_OUT);
+
+    mraa_gpio_write(io10_p1, 1);
+    mraa_gpio_write(io10_p2, 0);
+    mraa_gpio_write(io11_p1, 1);
+    mraa_gpio_write(io11_p2, 0);
+    mraa_gpio_write(io12_p1, 0);
+    mraa_gpio_write(io13_p1, 0);
+
+    mraa_gpio_close(io10_p1);
+    mraa_gpio_close(io10_p2);
+    mraa_gpio_close(io11_p1);
+    mraa_gpio_close(io11_p2);
+    mraa_gpio_close(io12_p1);
+    mraa_gpio_close(io13_p1);
+
+    mraa_intel_edison_pinmode_change(111, 1);
+    mraa_intel_edison_pinmode_change(115, 1);
+    mraa_intel_edison_pinmode_change(114, 1);
+    mraa_intel_edison_pinmode_change(109, 1);
+    mraa_gpio_write(tristate, 1);
+
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_intel_edison_aio_get_fp(mraa_aio_context dev)
+{
+    char file_path[64]= "";
+
+    snprintf(file_path, 64, "/sys/bus/iio/devices/iio:device1/in_voltage%d_raw",
+        dev->channel );
+
+    dev->adc_in_fp = open(file_path, O_RDONLY);
+    if (dev->adc_in_fp == -1) {
+    fprintf(stderr, "Failed to open Analog input raw file %s for "
+        "reading!\n", file_path); return( MRAA_ERROR_INVALID_RESOURCE);
+    }
+
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_intel_edison_aio_init_pre(unsigned int aio)
+{
+    if (aio > plat->aio_count) {
+        fprintf(stderr, "Invalid analog input channel\n");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    int pin = 14 + aio;
+    mraa_gpio_context output_e;
+    output_e = mraa_gpio_init_raw(outputen[pin]);
+    if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS)
+        return MRAA_ERROR_INVALID_RESOURCE;
+    if (mraa_gpio_write(output_e, 0) != MRAA_SUCCESS)
+        return MRAA_ERROR_INVALID_RESOURCE;
+    mraa_gpio_close(output_e);
+
+    mraa_gpio_context pullup_pin;
+    pullup_pin = mraa_gpio_init_raw(pullup_map[pin]);
+    if (mraa_gpio_dir(pullup_pin, MRAA_GPIO_IN) != MRAA_SUCCESS)
+        return MRAA_ERROR_INVALID_RESOURCE;
+    mraa_gpio_close(pullup_pin);
+
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_intel_edison_aio_init_post(mraa_aio_context dev)
+{
+    mraa_gpio_write(tristate, 1);
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_intel_edison_fab_c()
 {
@@ -171,6 +259,9 @@ mraa_intel_edison_fab_c()
     advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
     advance_func->gpio_dir_post = &mraa_intel_edison_gpio_dir_post;
     advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
+    advance_func->aio_get_valid_fp = &mraa_intel_edison_aio_get_fp;
+    advance_func->aio_init_pre = &mraa_intel_edison_aio_init_pre;
+    advance_func->aio_init_post = &mraa_intel_edison_aio_init_post;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_EDISON_PINCOUNT);
 
@@ -181,6 +272,7 @@ mraa_intel_edison_fab_c()
         return NULL;
     }
     mraa_gpio_dir(tristate, MRAA_GPIO_OUT);
+    mraa_intel_edison_misc_spi();
 
     strncpy(b->pins[0].name, "IO0", 8);
     b->pins[0].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,0};
@@ -278,19 +370,55 @@ mraa_intel_edison_fab_c()
     b->pins[13].gpio.mux[0].pin = 243;
     b->pins[13].gpio.mux[0].value = 0;
 
+    strncpy(b->pins[14].name, "A0", 8);
+    b->pins[14].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,1,0};
+    b->pins[14].aio.pinmap = 0;
+    b->pins[14].aio.mux_total = 1;
+    b->pins[14].aio.mux[0].pin = 200;
+    b->pins[14].aio.mux[0].value = 1;
+
+    strncpy(b->pins[15].name, "A1", 8);
+    b->pins[15].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,1,0};
+    b->pins[15].aio.pinmap = 1;
+    b->pins[15].aio.mux_total = 1;
+    b->pins[15].aio.mux[0].pin = 201;
+    b->pins[15].aio.mux[0].value = 1;
+
+    strncpy(b->pins[16].name, "A2", 8);
+    b->pins[16].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,1,0};
+    b->pins[16].aio.pinmap = 2;
+    b->pins[16].aio.mux_total = 1;
+    b->pins[16].aio.mux[0].pin = 202;
+    b->pins[16].aio.mux[0].value = 1;
+
+    strncpy(b->pins[17].name, "A3", 8);
+    b->pins[17].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,1,0};
+    b->pins[17].aio.pinmap = 3;
+    b->pins[17].aio.mux_total = 1;
+    b->pins[17].aio.mux[0].pin = 203;
+    b->pins[17].aio.mux[0].value = 1;
+
     strncpy(b->pins[18].name, "A4", 8);
-    b->pins[18].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,0};
+    b->pins[18].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,1,0};
     b->pins[18].i2c.pinmap = 1;
     b->pins[18].i2c.mux_total = 1;
     b->pins[18].i2c.mux[0].pin = 204;
     b->pins[18].i2c.mux[0].value = 0;
+    b->pins[18].aio.pinmap = 4;
+    b->pins[18].aio.mux_total = 1;
+    b->pins[18].aio.mux[0].pin = 204;
+    b->pins[18].aio.mux[0].value = 1;
 
     strncpy(b->pins[19].name, "A5", 8);
-    b->pins[19].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,0};
+    b->pins[19].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,1,0};
     b->pins[19].i2c.pinmap = 1;
     b->pins[19].i2c.mux_total = 1;
     b->pins[19].i2c.mux[0].pin = 205;
     b->pins[19].i2c.mux[0].value = 0;
+    b->pins[19].aio.pinmap = 5;
+    b->pins[19].aio.mux_total = 1;
+    b->pins[19].aio.mux[0].pin = 205;
+    b->pins[19].aio.mux[0].value = 1;
 
     //BUS DEFINITIONS
     b->i2c_bus_count = 9;
