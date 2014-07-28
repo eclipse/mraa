@@ -160,5 +160,6 @@ mraa_result_t
 mraa_spi_stop(mraa_spi_context dev)
 {
     close(dev->devfd);
+    free(dev);
     return MRAA_SUCCESS;
 }
