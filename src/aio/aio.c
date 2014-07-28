@@ -137,7 +137,7 @@ uint16_t mraa_aio_read(mraa_aio_context dev)
     }
 
     /* Adjust the raw analog input reading to supported resolution value*/
-    if (raw_bits =! sup_bits) {
+    if (raw_bits != sup_bits) {
         if (raw_bits > sup_bits) {
             shifter_value = raw_bits - sup_bits;
             analog_value =  analog_value >> shifter_value;
