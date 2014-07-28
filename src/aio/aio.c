@@ -39,6 +39,8 @@ static int sup_bits;
 
 static mraa_result_t aio_get_valid_fp(mraa_aio_context dev)
 {
+    if (advance_func->aio_get_valid_fp != NULL)
+        return advance_func->aio_get_valid_fp(dev);
     char file_path[64]= "";
 
     //Open file Analog device input channel raw voltage file for reading.
@@ -63,6 +65,12 @@ static mraa_result_t aio_get_valid_fp(mraa_aio_context dev)
  */
 mraa_aio_context mraa_aio_init(unsigned int aio_channel)
 {
+    if (advance_func->aio_init_pre != NULL) {
+        mraa_result_t pre_ret = (advance_func->aio_init_pre(aio_channel));
+        if(pre_ret != MRAA_SUCCESS)
+            return NULL;
+    }
+
     int checked_pin = mraa_setup_aio(aio_channel);
     if (checked_pin < 0) {
         switch(checked_pin) {
@@ -98,6 +106,13 @@ mraa_aio_context mraa_aio_init(unsigned int aio_channel)
     raw_bits = mraa_adc_raw_bits();
     sup_bits = mraa_adc_supported_bits();
 
+    if (advance_func->aio_init_post != NULL) {
+        mraa_result_t ret = advance_func->aio_init_post(dev);
+        if (ret != MRAA_SUCCESS) {
+            free(dev);
+            return NULL;
+        }
+    }
     return dev;
 }
 
