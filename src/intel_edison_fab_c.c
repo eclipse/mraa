@@ -114,9 +114,8 @@ mraa_intel_edison_gpio_init_post(mraa_gpio_context dev)
     int sysfs = pinmodes[dev->phy_pin].gpio.sysfs;
     int mode = pinmodes[dev->phy_pin].gpio.mode;
     mraa_result_t ret = mraa_intel_edison_pinmode_change(sysfs, mode);
-    if (ret != MRAA_SUCCESS);
-        return ret;
-    return MRAA_SUCCESS;
+
+    return ret;
 }
 
 mraa_result_t
