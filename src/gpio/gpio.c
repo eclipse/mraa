@@ -556,6 +556,7 @@ mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap_en)
             dev->reg = mmap(NULL, dev->reg_sz, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
             dev->reg_bit_pos = mmp->bit_pos;
             dev->mmap = 1;
+            close(fd);
             return MRAA_SUCCESS;
         }
         return MRAA_ERROR_INVALID_PARAMETER;
