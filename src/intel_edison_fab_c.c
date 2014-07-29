@@ -419,35 +419,51 @@ mraa_intel_edison_fab_c()
     b->pins[13].gpio.mux[0].value = 0;
 
     strncpy(b->pins[14].name, "A0", 8);
-    b->pins[14].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,1,0};
+    b->pins[14].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,1,0};
     b->pins[14].aio.pinmap = 0;
     b->pins[14].aio.mux_total = 1;
     b->pins[14].aio.mux[0].pin = 200;
     b->pins[14].aio.mux[0].value = 1;
+    b->pins[14].gpio.pinmap = 44;
+    b->pins[14].gpio.mux_total = 1;
+    b->pins[14].gpio.mux[0].pin = 200;
+    b->pins[14].gpio.mux[0].value = 0;
 
     strncpy(b->pins[15].name, "A1", 8);
-    b->pins[15].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,1,0};
+    b->pins[15].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,1,0};
     b->pins[15].aio.pinmap = 1;
     b->pins[15].aio.mux_total = 1;
     b->pins[15].aio.mux[0].pin = 201;
     b->pins[15].aio.mux[0].value = 1;
+    b->pins[15].gpio.pinmap = 45;
+    b->pins[15].gpio.mux_total = 1;
+    b->pins[15].gpio.mux[0].pin = 201;
+    b->pins[15].gpio.mux[0].value = 0;
 
     strncpy(b->pins[16].name, "A2", 8);
-    b->pins[16].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,1,0};
+    b->pins[16].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,1,0};
     b->pins[16].aio.pinmap = 2;
     b->pins[16].aio.mux_total = 1;
     b->pins[16].aio.mux[0].pin = 202;
     b->pins[16].aio.mux[0].value = 1;
+    b->pins[16].gpio.pinmap = 46;
+    b->pins[16].gpio.mux_total = 1;
+    b->pins[16].gpio.mux[0].pin = 202;
+    b->pins[16].gpio.mux[0].value = 0;
 
     strncpy(b->pins[17].name, "A3", 8);
-    b->pins[17].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,1,0};
+    b->pins[17].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,1,0};
     b->pins[17].aio.pinmap = 3;
     b->pins[17].aio.mux_total = 1;
     b->pins[17].aio.mux[0].pin = 203;
     b->pins[17].aio.mux[0].value = 1;
+    b->pins[17].gpio.pinmap = 47;
+    b->pins[17].gpio.mux_total = 1;
+    b->pins[17].gpio.mux[0].pin = 203;
+    b->pins[17].gpio.mux[0].value = 0;
 
     strncpy(b->pins[18].name, "A4", 8);
-    b->pins[18].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,1,0};
+    b->pins[18].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,1,1,0};
     b->pins[18].i2c.pinmap = 1;
     b->pins[18].i2c.mux_total = 1;
     b->pins[18].i2c.mux[0].pin = 204;
@@ -456,9 +472,13 @@ mraa_intel_edison_fab_c()
     b->pins[18].aio.mux_total = 1;
     b->pins[18].aio.mux[0].pin = 204;
     b->pins[18].aio.mux[0].value = 1;
+    b->pins[18].gpio.pinmap = 14;
+    b->pins[18].gpio.mux_total = 1;
+    b->pins[18].gpio.mux[0].pin = 204;
+    b->pins[18].gpio.mux[0].value = 0;
 
     strncpy(b->pins[19].name, "A5", 8);
-    b->pins[19].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,1,0};
+    b->pins[19].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,1,1,0};
     b->pins[19].i2c.pinmap = 1;
     b->pins[19].i2c.mux_total = 1;
     b->pins[19].i2c.mux[0].pin = 205;
@@ -467,6 +487,10 @@ mraa_intel_edison_fab_c()
     b->pins[19].aio.mux_total = 1;
     b->pins[19].aio.mux[0].pin = 205;
     b->pins[19].aio.mux[0].value = 1;
+    b->pins[19].gpio.pinmap = 165;
+    b->pins[19].gpio.mux_total = 1;
+    b->pins[19].gpio.mux[0].pin = 205;
+    b->pins[19].gpio.mux[0].value = 0;
 
     //BUS DEFINITIONS
     b->i2c_bus_count = 9;
