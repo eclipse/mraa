@@ -124,12 +124,26 @@ mraa_pwm_read_duty(mraa_pwm_context dev)
 
 mraa_pwm_context
 mraa_pwm_init(int pin) {
+    if (advance_func->pwm_init_pre != NULL) {
+        if (advance_func->pwm_init_pre(pin) != MRAA_SUCCESS)
+            return NULL;
+    }
     mraa_pin_t* pinm = mraa_setup_pwm(pin);
     if (pinm == NULL)
         return NULL;
     int chip = pinm->parent_id;
     int pinn = pinm->pinmap;
     free(pinm);
+
+    if (advance_func->gpio_init_post != NULL) {
+        mraa_pwm_context pret = mraa_pwm_init_raw(chip,pinn);
+        mraa_result_t ret = advance_func->pwm_init_post(pret);
+        if (ret != MRAA_SUCCESS) {
+            free(pret);
+            return NULL;
+        }
+        return pret;
+    }
     return mraa_pwm_init_raw(chip,pinn);
 }
 

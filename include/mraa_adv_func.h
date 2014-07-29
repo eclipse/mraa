@@ -54,5 +54,7 @@ typedef struct {
     mraa_result_t (*aio_init_pre) (unsigned int aio);
     mraa_result_t (*aio_init_post) (mraa_aio_context dev);
 
+    mraa_result_t (*pwm_init_pre) (int pin);
+    mraa_result_t (*pwm_init_post) (mraa_pwm_context pwm);
     mraa_result_t (*pwm_period_replace) (mraa_pwm_context dev, int period);
 } mraa_adv_func_t;
