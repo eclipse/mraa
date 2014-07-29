@@ -33,5 +33,5 @@ x.writeReg(1,0)
 
 # Be careful that your i2c device can actually handle a 'batch' handling of
 # such data, this is not typical in arduino type devices
-s = "\x08\xAA\x04\x255\x02\x255"
+s = "\x08\xAA\x04\xFF\x02\xFF"
 x.write(s)
