@@ -52,6 +52,11 @@ struct _spi {
 mraa_spi_context
 mraa_spi_init(int bus)
 {
+    if (advance_func->spi_init_pre != NULL) {
+        if (advance_func->spi_init_pre(bus) != MRAA_SUCCESS)
+            return NULL;
+    }
+
     mraa_spi_bus_t *spi = mraa_setup_spi(bus);
     if(bus < 0) {
         fprintf(stderr, "Failed. SPI platform Error\n");
@@ -73,6 +78,14 @@ mraa_spi_init(int bus)
     dev->clock = 4000000;
     dev->lsb = 0;
     dev->mode = 0;
+
+    if (advance_func->spi_init_post != NULL) {
+        mraa_result_t ret = advance_func->spi_init_post(dev);
+        if (ret != MRAA_SUCCESS) {
+            free(dev);
+            return NULL;
+        }
+    }
 
     return dev;
 }
