@@ -1,16 +1,16 @@
 #######
 Example
 #######
-Here are some examples of how to use pymraa, common convention is to import pymraa as mraa to keep it short but feel free to import it globally!
+Here are some examples of how to use mraa, common convention is to import mraa as mraa to keep it short but feel free to import it globally!
 
 Hello GPIO
 ==========
 
-Here is the simplest Gpio program in pymraa.
+Here is the simplest Gpio program in mraa.
 
 .. literalinclude:: ../../../examples/python/hello_gpio.py
-  :prepend: import pymraa
-  :start-after: import pymraa
+  :prepend: import mraa
+  :start-after: import mraa
 
 GPIO Interupt (isr)
 ===================
@@ -20,6 +20,6 @@ The GPIO module allows you to set an interupt on a GPIO. This interupt is contro
 **Note:** Galileo Gen1 only supports EDGE_BOTH
 
 .. literalinclude:: ../../../examples/python/hello_isr.py
-  :prepend: import pymraa as mraa
-  :start-after: import pymraa as mraa
+  :prepend: import mraa
+  :start-after: import mraa
 

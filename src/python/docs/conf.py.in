@@ -47,7 +47,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'pymraa'
+project = 'mraa'
 copyright = '2014, Intel Corporation'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -180,7 +180,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pymraadoc'
+htmlhelp_basename = 'mraadoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
