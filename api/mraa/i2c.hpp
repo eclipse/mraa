@@ -83,9 +83,9 @@ class I2c {
         /**
          * Read exactly one byte from the bus
          *
-         * @return Char read from the bus
+         * @return char read from the bus
          */
-        unsigned char readByte() {
+        unsigned char read() {
             return (unsigned char) mraa_i2c_read_byte(m_i2c);
         }
         /**
