@@ -278,6 +278,55 @@ mraa_intel_edison_pwm_init_post(mraa_pwm_context pwm)
     return MRAA_SUCCESS;
 }
 
+mraa_result_t
+mraa_intel_edison_spi_init_pre(int bus)
+{
+    mraa_gpio_write(tristate, 0);
+
+    mraa_gpio_context io10_out = mraa_gpio_init_raw(258);
+    mraa_gpio_context io11_out = mraa_gpio_init_raw(259);
+    mraa_gpio_context io12_out = mraa_gpio_init_raw(260);
+    mraa_gpio_context io13_out = mraa_gpio_init_raw(261);
+    mraa_gpio_dir(io10_out, MRAA_GPIO_OUT);
+    mraa_gpio_dir(io11_out, MRAA_GPIO_OUT);
+    mraa_gpio_dir(io12_out, MRAA_GPIO_OUT);
+    mraa_gpio_dir(io13_out, MRAA_GPIO_OUT);
+
+    mraa_gpio_write(io10_out, 1);
+    mraa_gpio_write(io11_out, 1);
+    mraa_gpio_write(io12_out, 0);
+    mraa_gpio_write(io13_out, 1);
+
+    mraa_gpio_close(io10_out);
+    mraa_gpio_close(io11_out);
+    mraa_gpio_close(io12_out);
+    mraa_gpio_close(io13_out);
+
+    mraa_gpio_context io10_pull = mraa_gpio_init_raw(226);
+    mraa_gpio_context io11_pull = mraa_gpio_init_raw(227);
+    mraa_gpio_context io12_pull = mraa_gpio_init_raw(228);
+    mraa_gpio_context io13_pull = mraa_gpio_init_raw(229);
+
+    mraa_gpio_dir(io10_pull, MRAA_GPIO_IN);
+    mraa_gpio_dir(io11_pull, MRAA_GPIO_IN);
+    mraa_gpio_dir(io12_pull, MRAA_GPIO_IN);
+    mraa_gpio_dir(io13_pull, MRAA_GPIO_IN);
+
+    mraa_gpio_close(io10_pull);
+    mraa_gpio_close(io11_pull);
+    mraa_gpio_close(io12_pull);
+    mraa_gpio_close(io13_pull);
+
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_intel_edison_spi_init_post(mraa_spi_context spi)
+{
+    mraa_gpio_write(tristate, 1);
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_intel_edison_fab_c()
 {
@@ -298,6 +347,8 @@ mraa_intel_edison_fab_c()
     advance_func->aio_init_post = &mraa_intel_edison_aio_init_post;
     advance_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
     advance_func->pwm_init_post = &mraa_intel_edison_pwm_init_post;
+    advance_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
+    advance_func->spi_init_post = &mraa_intel_edison_spi_init_post;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_EDISON_PINCOUNT);
 
@@ -391,12 +442,12 @@ mraa_intel_edison_fab_c()
     b->pins[10].gpio.mux[0].value = 1;
     b->pins[10].gpio.mux[1].pin = 240;
     b->pins[10].gpio.mux[1].value = 0;
-    b->pins[11].spi.pinmap = 5;
-    b->pins[11].spi.mux_total = 2;
-    b->pins[11].spi.mux[0].pin = 263;
-    b->pins[11].spi.mux[0].value = 1;
-    b->pins[11].spi.mux[1].pin = 240;
-    b->pins[11].spi.mux[2].value = 1;
+    b->pins[10].spi.pinmap = 5;
+    b->pins[10].spi.mux_total = 2;
+    b->pins[10].spi.mux[0].pin = 263;
+    b->pins[10].spi.mux[0].value = 1;
+    b->pins[10].spi.mux[1].pin = 240;
+    b->pins[10].spi.mux[1].value = 1;
 
     strncpy(b->pins[11].name, "IO11", 8);
     b->pins[11].capabilites = (mraa_pincapabilities_t) {1,1,0,0,1,0,0,0};
@@ -412,7 +463,7 @@ mraa_intel_edison_fab_c()
     b->pins[11].spi.mux[0].pin = 262;
     b->pins[11].spi.mux[0].value = 1;
     b->pins[11].spi.mux[1].pin = 241;
-    b->pins[11].spi.mux[2].value = 1;
+    b->pins[11].spi.mux[1].value = 1;
 
     strncpy(b->pins[12].name, "IO12", 8);
     b->pins[12].capabilites = (mraa_pincapabilities_t) {1,1,0,0,1,0,0,0};
@@ -433,10 +484,10 @@ mraa_intel_edison_fab_c()
     b->pins[13].gpio.mux_total = 1;
     b->pins[13].gpio.mux[0].pin = 243;
     b->pins[13].gpio.mux[0].value = 0;
-    b->pins[12].spi.pinmap = 5;
-    b->pins[12].spi.mux_total = 1;
-    b->pins[12].spi.mux[0].pin = 243;
-    b->pins[12].spi.mux[0].value = 1;
+    b->pins[13].spi.pinmap = 5;
+    b->pins[13].spi.mux_total = 1;
+    b->pins[13].spi.mux[0].pin = 243;
+    b->pins[13].spi.mux[0].value = 1;
 
     strncpy(b->pins[14].name, "A0", 8);
     b->pins[14].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,1,0};
