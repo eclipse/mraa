@@ -71,10 +71,10 @@ mraa_init()
             } else {
                 platform_type = MRAA_INTEL_GALILEO_GEN1;
             }
+            free(line);
         }
+        fclose(fh);
     }
-    free(line);
-    fclose(fh);
 
     advance_func = (mraa_adv_func_t*) malloc(sizeof(mraa_adv_func_t));
     memset(advance_func, 0, sizeof(mraa_adv_func_t));
