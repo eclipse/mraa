@@ -95,20 +95,22 @@ class I2c {
          * @param length Size of read
          * @return length of the read or 0 if failed
          */
-        int read(char * data, size_t length) {
+        int read(char *data, size_t length) {
             return mraa_i2c_read(m_i2c, (uint8_t*) data, (int) length);
         }
 	/**
-	 * Read length bytes from the bus, this function will allocate memory
-	 * and will require you to free the returned pointer
+	 * Read length bytes from the bus, and return as a std::string note
+	 * that this is not a null terminated string
 	 *
 	 * @param length Size of read to make
-	 * @return pointer to read data which must be freed
+	 * @return pointer to std::string
 	 */
-        uint8_t* read(size_t length) {
-            uint8_t* data = (uint8_t*) malloc(sizeof(uint8_t) * length);
-            mraa_i2c_read(m_i2c, data, (int) length);
-            return data;
+        std::string read(size_t length) {
+            char* data = (char*) malloc(sizeof(char) * length);
+            mraa_i2c_read(m_i2c, (uint8_t*) data, (int) length);
+            std::string str(data, (int) length);
+            free(data);
+            return str;
         }
         /**
          * Write one byte to the bus
