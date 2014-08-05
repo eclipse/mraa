@@ -38,7 +38,16 @@ x.writeReg(HMC5883L_CONF_REG_B, HMC5883L_CONT_MODE)
 x.address(0x1E)
 x.write(HMC5883L_DATA_REG)
 
+# this method takes a char* as an input where sizeof(m) defines the read size
 x.address(0x1E)
 m = "      "
 print (x.read(m))
 print (m)
+
+x.address(0x1E)
+x.write(HMC5883L_DATA_REG)
+
+# this method simply takes a size_t arg and returns an std::string, however
+# it's less efficient
+x.address(0x1E)
+print (x.read(6))
