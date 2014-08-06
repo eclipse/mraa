@@ -78,9 +78,33 @@ mraa_spi_init(int bus)
 }
 
 mraa_result_t
-mraa_spi_mode(mraa_spi_context dev, unsigned short mode)
+mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode)
 {
-    dev->mode = mode;
+    uint8_t spi_mode = 0;
+    switch (mode) {
+        case MODE0:
+            spi_mode = SPI_MODE_0;
+            break;
+        case MODE1:
+            spi_mode = SPI_MODE_1;
+            break;
+        case MODE2:
+            spi_mode = SPI_MODE_2;
+            break;
+        case MODE3:
+            spi_mode = SPI_MODE_3;
+            break;
+        default:
+            spi_mode = SPI_MODE_0;
+            break;
+    }
+
+    if (ioctl (dev->devfd, SPI_IOC_WR_MODE, &spi_mode) < 0) {
+        fprintf(stderr, "Failed to set spi mode\n");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    dev->mode = spi_mode;
     return MRAA_SUCCESS;
 }
 

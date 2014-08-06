@@ -44,6 +44,16 @@ extern "C" {
 #include "common.h"
 
 /**
+ * MRAA supported platform types
+ */
+typedef enum {
+    MODE0 = 0, /**< CPOL = 0, CPHA = 0, Clock idle low, data is clocked in on rising edge, output data (change) on falling edge */
+    MODE1 = 1, /**< CPOL = 0, CPHA = 1, Clock idle low, data is clocked in on falling edge, output data (change) on rising edge */
+    MODE2 = 2, /**< CPOL = 1, CPHA = 0, Clock idle low, data is clocked in on falling edge, output data (change) on rising edge */
+    MODE3 = 3, /**< CPOL = 1, CPHA = 1, Clock idle low, data is clocked in on rising, edge output data (change) on falling edge */
+} mraa_spi_mode_t;
+
+/**
  * Opaque pointer definition to the internal struct _spi
  */
 typedef struct _spi* mraa_spi_context;
@@ -63,7 +73,7 @@ mraa_spi_context mraa_spi_init(int bus);
  * @param mode The SPI mode, See Linux spidev
  * @return Spi context or NULL
  */
-mraa_result_t mraa_spi_mode(mraa_spi_context dev,unsigned short mode);
+mraa_result_t mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode);
 
 /** Set the SPI device operating clock frequency.
  *

@@ -57,7 +57,7 @@ class Spi {
          * @param mode the mode. See Linux spidev doc
          * @return Result of operation
          */
-        mraa_result_t mode(unsigned short mode) {
+        mraa_result_t mode(mraa_spi_mode_t mode) {
             return mraa_spi_mode(m_spi, mode);
         }
         /**
