@@ -59,6 +59,13 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.4.3**
+  * SPI Mode function now functional, API Change in SPI
+  * I2C read in swig worked on.
+  * Galileo Gen 2: PWM setting period sets all channel's period
+  * Galileo Gen 2: I2C setup now specific to Gen 2.
+  * General commits around freeing memory at the right times.
+
 **0.4.2**
   * Barebone UART module added.
   * Hook branch merged.
