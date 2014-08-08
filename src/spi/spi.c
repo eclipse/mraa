@@ -82,16 +82,16 @@ mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode)
 {
     uint8_t spi_mode = 0;
     switch (mode) {
-        case MODE0:
+        case MRAA_SPI_MODE0:
             spi_mode = SPI_MODE_0;
             break;
-        case MODE1:
+        case MRAA_SPI_MODE1:
             spi_mode = SPI_MODE_1;
             break;
-        case MODE2:
+        case MRAA_SPI_MODE2:
             spi_mode = SPI_MODE_2;
             break;
-        case MODE3:
+        case MRAA_SPI_MODE3:
             spi_mode = SPI_MODE_3;
             break;
         default:
