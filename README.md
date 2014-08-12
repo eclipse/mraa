@@ -13,6 +13,7 @@ Supported Boards
 ================
 
 Galileo Rev D
+Galileo Rev H
 
 Compiling
 =========
