@@ -22,9 +22,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var m = require("mraa")
-console.log("mraa version: " + m.getVersion());
+var m = require('mraa'); //require maajs
+console.log('MRAA Version: ' + m.getVersion()); //write the mraa version to the console
 
-var analogPin0 = new m.Aio(0);
-var analogValue = analogPin0.read();
-console.log(analogValue);
+var analogPin0 = new m.Aio(0); //setup access analog inpuput pin 0
+var analogValue = analogPin0.read(); //read the value of the analog pin
+console.log(analogValue); //write the value of the analog pin to the console
