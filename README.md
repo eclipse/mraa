@@ -15,6 +15,19 @@ Supported Boards
 * [Galileo Rev D](../master/docs/galileorevd.md)
 * [Galileo Rev H](../master/docs/galileorevh.md)
 
+Installing on your board
+========
+
+See the section below on compiling or use our repository to install on an
+eglibc based yocto poky image that supports opkg. Adding this repository is as
+simple as:
+
+``` bash
+echo "src mraa-upm http://iotdk.intel.com/repos/1.1/intelgalactic" > /etc/opkg/mraa-upm.conf
+opkg update
+opkg install mraa
+```
+
 Compiling
 =========
 
