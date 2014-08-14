@@ -1,5 +1,5 @@
 /*
- * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Author: Dan Yocom <dan.yocom@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -22,9 +22,17 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var m = require("mraa")
-console.log("mraa version: " + m.getVersion());
+var m = require('mraa'); //require mraa
+console.log('MRAA Version: ' + m.getVersion()); //write the mraa version to the console
 
-var x = new m.Gpio(8)
-x.dir(m.DIR_OUT)
-x.write(1)
+var myDigitalPin = new m.Gpio(6); //setup digital read on pin 6
+myDigitalPin.dir(m.DIR_IN); //set the gpio direction to input
+
+periodicActivity(); //call the periodicActivity function
+
+function periodicActivity() //
+{
+  var myDigitalValue =  myDigitalPin.read(); //read the digital value of the pin
+  console.log('Gpio is ' + myDigitalValue); //write the read value out to the console
+  setTimeout(periodicActivity,1000); //call the indicated function after 1 second (1000 milliseconds)
+}
