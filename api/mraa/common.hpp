@@ -93,4 +93,24 @@ bool pinModeTest(int pin, mraa_pinmodes_t mode)
     return (bool) mraa_pin_mode_test(pin,mode);
 }
 
+/**
+ * Check the board's bit size when reading the value
+ *
+ * @return raw bits being read from kernel module. Zero if no ADC
+ */
+unsigned int adcRawBits()
+{
+    return mraa_adc_raw_bits();
+}
+
+/**
+ * Return value that the raw value should be shifted to. Zero if no ADC
+ *
+ * @return return actual bit size the adc value should be understood as.
+ */
+unsigned int adcSupportedBits()
+{
+    return mraa_adc_supported_bits();
+}
+
 }
