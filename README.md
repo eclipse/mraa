@@ -12,20 +12,33 @@ low level communication protocol by high level languages & constructs.
 Supported Boards
 ================
 
-Galileo Rev D
-Galileo Rev H
+* [Galileo Rev D](../master/docs/galileorevd.md)
+* [Galileo Rev H](../master/docs/galileorevh.md)
 
 Compiling
 =========
 
-See docs/building.md.
+See documentation on [building](../master/docs/building.md)
 
 Examples
 ========
 
-See examples/
+See the [examples](../../tree/master/examples) available for various languages
 
-INFORMATION
+C/C++ API Documentation
 ===========
 
-See docs/index.md for more information.
+The C/C++ documentation is available [here](http://iotdk.intel.com/docs/master/mraa/)
+
+Python API Documentation
+===========
+
+The Python documentation is available [here](http://iotdk.intel.com/docs/master/mraa/python)
+
+NodeJS API documentation
+===========
+
+There is no explicit nodejs API documentation, see the examples. The API itself
+is very similar to the python one but with a js syntax. If you know of an
+autodoc tool for generating nodejs APIs from a native C++ nodejs extension
+please get in touch!
