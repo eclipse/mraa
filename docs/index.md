@@ -60,6 +60,10 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.4.4**
+  * prefix SPI mode with MRAA_SPI_
+  * added C++ adc bitness calls
+
 **0.4.3**
   * SPI Mode function now functional, API Change in SPI
   * I2C read in swig worked on.
