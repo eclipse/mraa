@@ -11,8 +11,6 @@ set_source_files_properties (python-mraa.i PROPERTIES SWIG_FLAGS "-I${CMAKE_BINA
 swig_add_module (python-mraa python python-mraa.i ${mraa_LIB_SRCS})
 swig_link_libraries (python-mraa ${PYTHON_LIBRARIES})
 
-set (CMAKE_C_FLAGS -DSWIGPYTHON=${SWIG_FOUND})
-
 if (DOXYGEN_FOUND)
   foreach (_file ${DOCCLASSES})
     add_dependencies (${SWIG_MODULE_python-mraa_REAL_NAME} ${_file}class_doc_i)
@@ -28,6 +26,7 @@ endif ()
 
 set_target_properties (${SWIG_MODULE_python-mraa_REAL_NAME} PROPERTIES
   OUTPUT_NAME _mraa
+  COMPILE_FLAGS "${CMAKE_C_FLAGS} -DSWIGPYTHON=${SWIG_FOUND}"
 )
 
 # Essentially do seperate_arguments but with "." instead of " "
