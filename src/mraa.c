@@ -209,6 +209,9 @@ mraa_setup_spi(int bus)
         fprintf(stderr, "No spi buses defined in platform");
         return NULL;
     }
+    if (plat->spi_bus_count == 1) {
+        bus = plat->def_spi_bus;
+    }
     if (bus >= plat->spi_bus_count) {
         fprintf(stderr, "Above spi bus count");
         return NULL;
