@@ -150,6 +150,27 @@ class Pwm {
             else
                 return mraa_pwm_enable(m_pwm, 0);
         }
+        /**
+         * Set the period and duty of a PWM object.
+         *
+         * @param period represented in ms.
+         * @param duty represnted in ms as float.
+         * @return Result of operation
+         */
+        mraa_result_t config_ms(int period, float duty) {
+            return mraa_pwm_config_ms(m_pwm, period, duty);
+        }
+        /**
+         * Set the period and duty (percent) of a PWM object.
+         *
+         * @param period as represented in ms.
+         * @param duty percentage i.e. 50% = 0.5f
+         * @return Result of operation
+         */
+        mraa_result_t config_percent(int period, float duty) {
+            return mraa_pwm_config_percent(m_pwm, period, duty);
+        }
+
     private:
         mraa_pwm_context m_pwm;
 };
