@@ -16,14 +16,14 @@ classes directly wrap the C API and provide a near 1:1 mapping of
 functionality.
 
 <center>
-| C API Modules          | C++ API Classes             |
-|:----------------------:|:---------------------------:|
+| C API Modules          | C++ API Classes              |
+|:----------------------:|:----------------------------:|
 | @ref gpio.h "gpio"     | @ref mraa::Gpio "Gpio class" |
 | @ref i2c.h "i2c"       | @ref mraa::I2c "I2c class"   |
 | @ref aio.h "aio"       | @ref mraa::Aio "Aio class"   |
 | @ref pwm.h "pwm"       | @ref mraa::Pwm "Pwm class"   |
 | @ref spi.h "spi"       | @ref mraa::Spi "Spi class"   |
-| @ref common.h "common" | @ref common.hpp "common"     |
+| @ref common.h "common" | @ref mraa "common"           |
 </center>
 
 ### Hello Mraa

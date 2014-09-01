@@ -27,6 +27,9 @@
 #include "common.h"
 #include <string>
 
+/**
+ * @namespace mraa namespace
+ */
 namespace mraa {
 
 /**
@@ -40,7 +43,7 @@ namespace mraa {
  * Get libmraa version.
  *
  * @return libmraa version (e.g. v0.4.0-20-gb408207)
-*/
+ */
 std::string getVersion()
 {
     std::string ret = mraa_get_version();
@@ -55,7 +58,7 @@ std::string getVersion()
  *
  * @param priority Value from typically 0 to 99
  * @return The priority value set
-*/
+ */
 int setPriority(const unsigned int priority)
 {
     return mraa_set_priority(priority);

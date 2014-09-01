@@ -6,18 +6,18 @@
     <tab type="pages" visible="yes" title="" intro=""/>
     <tab type="modules" visible="yes" title="" intro=""/>
     <tab type="namespaces" visible="yes" title="">
-      <tab type="namespacelist" visible="yes" title="" intro=""/>
-      <tab type="namespacemembers" visible="yes" title="" intro=""/>
+    <tab type="namespacelist" visible="yes" title="" intro=""/>
+    <tab type="namespacemembers" visible="yes" title="" intro=""/>
     </tab>
     <tab type="classes" visible="yes" title="">
-      <tab type="classlist" visible="yes" title="" intro=""/>
-      <tab type="classindex" visible="$ALPHABETICAL_INDEX" title=""/> 
-      <tab type="hierarchy" visible="yes" title="" intro=""/>
-      <tab type="classmembers" visible="yes" title="" intro=""/>
+    <tab type="classlist" visible="yes" title="" intro=""/>
+    <tab type="classindex" visible="$ALPHABETICAL_INDEX" title=""/> 
+    <tab type="hierarchy" visible="yes" title="" intro=""/>
+    <tab type="classmembers" visible="yes" title="" intro=""/>
     </tab>
     <tab type="files" visible="yes" title="">
-      <tab type="filelist" visible="yes" title="" intro=""/>
-      <tab type="globals" visible="yes" title="" intro=""/>
+    <tab type="filelist" visible="yes" title="" intro=""/>
+    <tab type="globals" visible="yes" title="" intro=""/>
     </tab>
     <tab type="examples" visible="yes" title="" intro=""/>  
   </navindex>
