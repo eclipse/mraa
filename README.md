@@ -12,8 +12,8 @@ low level communication protocol by high level languages & constructs.
 Supported Boards
 ================
 
-* [Galileo Rev D](../master/docs/galileorevd.md)
-* [Galileo Rev H](../master/docs/galileorevh.md)
+* [Galileo Gen 1 - Rev D](../master/docs/galileorevd.md)
+* [Galileo Gen 2 - Rev H](../master/docs/galileorevh.md)
 
 Installing on your board
 ========
@@ -25,7 +25,7 @@ simple as:
 ``` bash
 echo "src mraa-upm http://iotdk.intel.com/repos/1.1/intelgalactic" > /etc/opkg/mraa-upm.conf
 opkg update
-opkg install mraa
+opkg install libmraa0
 ```
 
 Compiling
