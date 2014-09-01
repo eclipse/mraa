@@ -84,7 +84,7 @@ mraa_pwm_write_duty(mraa_pwm_context dev, int duty)
 }
 
 static int
-mraa_pwm_get_period(mraa_pwm_context dev)
+mraa_pwm_read_period(mraa_pwm_context dev)
 {
     char bu[MAX_SIZE];
     char output[MAX_SIZE];
@@ -106,7 +106,7 @@ mraa_pwm_get_period(mraa_pwm_context dev)
 }
 
 static int
-mraa_pwm_get_duty(mraa_pwm_context dev)
+mraa_pwm_read_duty(mraa_pwm_context dev)
 {
     if (dev->duty_fp == -1) {
         mraa_pwm_setup_duty_fp(dev);
@@ -176,13 +176,13 @@ mraa_pwm_init_raw(int chipin, int pin)
 mraa_result_t
 mraa_pwm_write(mraa_pwm_context dev, float percentage)
 {
-    return mraa_pwm_write_duty(dev, percentage * mraa_pwm_get_period(dev));
+    return mraa_pwm_write_duty(dev, percentage * mraa_pwm_read_period(dev));
 }
 
 float
 mraa_pwm_read(mraa_pwm_context dev)
 {
-    float output = mraa_pwm_get_duty(dev) / (float) mraa_pwm_get_period(dev);
+    float output = mraa_pwm_read_duty(dev) / (float) mraa_pwm_read_period(dev);
     return output;
 }
 
