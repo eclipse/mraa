@@ -30,6 +30,9 @@
 #include "intel_galileo_rev_g.h"
 
 #define MAX_SIZE 64
+#define SYSFS_CLASS_GPIO "/sys/class/gpio"
+
+static unsigned int pullup_map[] = {33,29,35,17,37,19,21,39,41,23,27,25,43,31,49,51,53,55,57,59};
 
 mraa_result_t
 mraa_intel_galileo_gen2_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
@@ -95,6 +98,72 @@ mraa_intel_galileo_gen2_pwm_period_replace(mraa_pwm_context dev, int period)
     return MRAA_SUCCESS;
 }
 
+mraa_result_t
+mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
+{
+    if (dev->value_fp != -1) {
+         close(dev->value_fp);
+         dev->value_fp = -1;
+    }
+
+    mraa_gpio_context pullup_e;
+    pullup_e = mraa_gpio_init_raw(pullup_map[dev->phy_pin]);
+    mraa_result_t sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_IN);
+    if(sta != MRAA_SUCCESS) {
+      fprintf(stderr, "MRAA: Galileo Gen 2: Failed to set gpio pullup\n");
+      return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    char filepath[MAX_SIZE];
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/drive", pullup_map[dev->phy_pin]);
+
+    int drive = open(filepath, O_WRONLY);
+    if (drive == -1) {
+        fprintf(stderr, "Failed to open drive for writing!\n");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    char bu[MAX_SIZE];
+    int length;
+    int value = -1;
+    switch(mode) {
+        case MRAA_GPIO_STRONG:
+            length = snprintf(bu, sizeof(bu), "hiz");
+            break;
+        case MRAA_GPIO_PULLUP:
+            length = snprintf(bu, sizeof(bu), "strong");
+            value = 1;
+            break;
+        case MRAA_GPIO_PULLDOWN:
+            length = snprintf(bu, sizeof(bu), "pulldown");
+            value = 0;
+            break;
+        case MRAA_GPIO_HIZ:
+            close(drive);
+            return MRAA_SUCCESS;
+            break;
+        default:
+            close(drive);
+            return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    }
+    if (write(drive, bu, length*sizeof(char)) == -1) {
+        fprintf(stderr, "Failed to write to drive mode!\n");
+        close(drive);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    if (value != -1) {
+        sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_OUT);
+        sta = mraa_gpio_write(pullup_e, value);
+        if (sta != MRAA_SUCCESS) {
+            fprintf(stderr, "MRAA: Galileo Gen 2: Error Setting pullup");
+            return sta;
+        }
+    }
+
+    close(drive);
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_intel_galileo_gen2()
 {
@@ -111,6 +180,7 @@ mraa_intel_galileo_gen2()
     advance_func->gpio_dir_pre = &mraa_intel_galileo_gen2_dir_pre;
     advance_func->i2c_init_pre = &mraa_intel_galileo_gen2_i2c_init_pre;
     advance_func->pwm_period_replace = &mraa_intel_galileo_gen2_pwm_period_replace;
+    advance_func->gpio_mode_replace = &mraa_intel_galileo_gen2_gpio_mode_replace;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_GALILEO_GEN_2_PINCOUNT);
 
