@@ -46,7 +46,7 @@ install (TARGETS mraa DESTINATION lib)
 
 if (DOXYGEN_FOUND)
   set (CMAKE_SWIG_FLAGS -DDOXYGEN=${DOXYGEN_FOUND})
-  set (DOCCLASSES aio gpio i2c pwm spi)
+  set (DOCCLASSES aio gpio i2c pwm spi uart)
   # CPP class headers
   foreach (_file ${DOCCLASSES})
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_file}_class_doc.i

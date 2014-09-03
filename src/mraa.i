@@ -8,6 +8,7 @@
     %include pwm_class_doc.i
     %include aio_class_doc.i
     %include spi_class_doc.i
+    %include uart_class_doc.i
 #endif
 
 %{
@@ -17,6 +18,7 @@
     #include "i2c.hpp"
     #include "spi.hpp"
     #include "aio.hpp"
+    #include "uart.hpp"
 %}
 
 %init %{
@@ -51,3 +53,7 @@
 #### AIO ####
 
 %include "aio.hpp"
+
+#### UART ####
+
+%include "uart.hpp"

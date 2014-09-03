@@ -24,10 +24,34 @@
 
 #pragma once
 
-#include "mraa/common.hpp"
-#include "mraa/pwm.hpp"
-#include "mraa/aio.hpp"
-#include "mraa/gpio.hpp"
-#include "mraa/i2c.hpp"
-#include "mraa/spi.hpp"
-#include "mraa/uart.hpp"
+#include "uart.h"
+
+namespace mraa {
+
+/**
+ * @brief C++ API to UART (enabling only)
+ *
+ * This file defines the UART C++ interface for libmraa
+ */
+class Uart {
+    public:
+        /**
+         * Uart Constructor, takes a pin number which will map directly to the
+         * linux uart number, this 'enables' the uart, nothing more
+         *
+         * @param uart the index of the uart set to use
+         */
+        Uart(int uart) {
+            m_uart = mraa_uart_init(uart);
+        }
+        /**
+         * Uart destructor
+         */
+        ~Uart() {
+            return;
+        }
+    private:
+        mraa_uart_context m_uart;
+};
+
+}
