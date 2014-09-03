@@ -61,6 +61,12 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.4.5**
+  * if only one spidev we default to it reguardless of number
+  * mraa_pwm_config_ms & mraa_pwm_config_percent functions added
+  * Uart C++ class added, adds python & node support
+  * galileo gen2 gpio modes supported
+
 **0.4.4**
   * prefix SPI mode with MRAA_SPI_
   * added C++ adc bitness calls
