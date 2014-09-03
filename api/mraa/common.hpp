@@ -34,9 +34,9 @@ namespace mraa {
 
 /**
  * @file
- * @brief C++ API to common functions of MRAA
+ * @brief API to common functions of MRAA
  *
- * This file defines the C++ interface for libmraa common functions
+ * This file defines the interface for libmraa common functions
  */
 
 /**

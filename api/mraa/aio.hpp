@@ -29,9 +29,9 @@
 namespace mraa {
 
 /**
- * @brief C++ API to Analog IO
+ * @brief API to Analog IO
  *
- * This file defines the aio C++ interface for libmraa
+ * This file defines the aio interface for libmraa
  *
  * @snippet examples/c++/AioA0.cpp Interesting
  */

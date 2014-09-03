@@ -29,9 +29,9 @@
 namespace mraa {
 
 /**
- * @brief C++ API to Pulse Width Modulation
+ * @brief API to Pulse Width Modulation
  *
- * This file defines the PWM C++ interface for libmraa
+ * This file defines the PWM interface for libmraa
  *
  * @snippet Pwm3-cycle.cpp Interesting
  */

@@ -29,9 +29,9 @@
 namespace mraa {
 
 /**
- * @brief C++ API to System Packet Interface
+ * @brief API to System Packet Interface
  *
- * This file defines the SPI C++ interface for libmraa
+ * This file defines the SPI interface for libmraa
  *
  * @snippet Spi-pot.cpp Interesting
  */

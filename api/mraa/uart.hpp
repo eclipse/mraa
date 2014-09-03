@@ -29,9 +29,9 @@
 namespace mraa {
 
 /**
- * @brief C++ API to UART (enabling only)
+ * @brief API to UART (enabling only)
  *
- * This file defines the UART C++ interface for libmraa
+ * This file defines the UART interface for libmraa
  */
 class Uart {
     public:

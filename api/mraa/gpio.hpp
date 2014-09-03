@@ -59,9 +59,9 @@ typedef enum {
 } Edge;
 
 /**
- * @brief C++ API to General Purpose IO
+ * @brief API to General Purpose IO
  *
- * This file defines the gpio C++ interface for libmraa
+ * This file defines the gpio interface for libmraa
  *
  * @snippet Blink-IO.cpp Interesting
  */

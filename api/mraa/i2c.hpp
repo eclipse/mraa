@@ -29,9 +29,9 @@
 namespace mraa {
 
 /**
- * @brief C++ API to Inter-Integrated Circuit
+ * @brief API to Inter-Integrated Circuit
  *
- * This file defines the I2c C++ interface for libmraa
+ * This file defines the I2c interface for libmraa
  *
  * @snippet I2c-compass.cpp Interesting
  */
