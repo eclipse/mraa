@@ -75,7 +75,7 @@ if (IPK)
   target_architecture (DETECTED_ARCH)
   message( INFO " - Target arch is ${DETECTED_ARCH}")
 
-  set(CPACK_GENERATOR "DEB")
+  set(CPACK_GENERATOR "DEB" "TGZ")
   set(OPKG_ARCH ${DETECTED_ARCH})
   set(CPACK_BINARY_DIR ${CMAKE_BINARY_DIR})
   set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Intel IoT-Devkit") #required
