@@ -108,8 +108,6 @@
   <!-- Layout definition for a file page -->
   <file>
     <briefdescription visible="no"/>
-    <includegraph visible="$INCLUDE_GRAPH"/>
-    <includes visible="$SHOW_INCLUDE_FILES"/>
     <detaileddescription title="API Description"/>
     <sourcelink visible="yes"/>
     <memberdecl>
@@ -131,6 +129,8 @@
       <enums title=""/>
       <variables title=""/>
     </memberdef>
+    <includegraph visible="$INCLUDE_GRAPH"/>
+    <includes visible="$SHOW_INCLUDE_FILES"/>
     <includedbygraph visible="$INCLUDED_BY_GRAPH"/>
     <authorsection/>
   </file>
