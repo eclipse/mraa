@@ -39,6 +39,8 @@ helper function.
   :prepend: x = mraa.I2c(0)
   :start-after: x = mraa.I2c(0)
 
+.. literalinclude:: ../../../docs/i2c.txt
+
 Pwm
 ===
 

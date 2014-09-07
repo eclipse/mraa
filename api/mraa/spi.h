@@ -28,7 +28,11 @@
  * @file
  * @brief System Packet Interface
  *
- * This file defines the spi interface for libmraa
+ * This file defines the spi interface for libmraa. A Spi object in libmraa
+ * represents a spidev device. Linux spidev devices are created per spi bus and
+ * every chip select available on that bus has another spidev 'file'. A lot
+ * more information on spidev devices is available
+ * [here](https://www.kernel.org/doc/Documentation/spi/spidev).
  *
  * @snippet spi_mcp4261.c Interesting
  */

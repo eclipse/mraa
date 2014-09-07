@@ -28,11 +28,9 @@
  * @file
  * @brief Inter-Integrated Circuit
  *
- * This file defines the i2c/Iic interface for libmraa. A context represents a
- * bus and that bus may contain multiple addresses or i2c slaves. It is
- * considered best practice to make sure the address is correct before doing
- * any calls on i2c, in case another application or even thread changed the
- * addres on that bus. Multiple instances of the same bus can exist.
+ * An i2c context represents a master on an i2c bus and that context can
+ * communicate to multiple i2c slaves by configuring the address.
+ * @htmlinclude i2c.txt
  *
  * @snippet i2c_HMC5883L.c Interesting
  */

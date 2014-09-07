@@ -31,7 +31,9 @@ namespace mraa {
 /**
  * @brief API to Inter-Integrated Circuit
  *
- * This file defines the I2c interface for libmraa
+ * An I2c object represents an i2c master and can talk multiple i2c slaves by
+ * selecting the correct address
+ * @htmlinclude i2c.txt
  *
  * @snippet I2c-compass.cpp Interesting
  */

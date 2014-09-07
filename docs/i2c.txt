@@ -1,0 +1,3 @@
+It is considered best practice to make sure the address is correct before doing
+any calls on i2c, in case another application or even thread changed the addres
+on that bus. Multiple instances of the same bus can exist.
