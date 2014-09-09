@@ -28,6 +28,7 @@
 #include "common.h"
 #include "intel_edison_fab_c.h"
 
+#define SYSFS_CLASS_GPIO "/sys/class/gpio"
 #define SYSFS_PINMODE_PATH "/sys/kernel/debug/gpio_debug/gpio"
 #define MAX_SIZE 64
 #define MAX_MODE_SIZE 8
@@ -327,6 +328,51 @@ mraa_intel_edison_spi_init_post(mraa_spi_context spi)
     return MRAA_SUCCESS;
 }
 
+mraa_result_t
+mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
+{
+    if (dev->value_fp != -1) {
+         close(dev->value_fp);
+         dev->value_fp = -1;
+    }
+
+    mraa_gpio_context pullup_e;
+    pullup_e = mraa_gpio_init_raw(pullup_map[dev->phy_pin]);
+    mraa_result_t sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_IN);
+    if(sta != MRAA_SUCCESS) {
+      fprintf(stderr, "MRAA: Edison: Failed to set gpio mode-pullup\n");
+      return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    int value = -1;
+    switch(mode) {
+        case MRAA_GPIO_STRONG:
+            break;
+        case MRAA_GPIO_PULLUP:
+            value = 1;
+            break;
+        case MRAA_GPIO_PULLDOWN:
+            value = 0;
+            break;
+        case MRAA_GPIO_HIZ:
+            return MRAA_SUCCESS;
+            break;
+        default:
+            return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    }
+    if (value != -1) {
+        sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_OUT);
+        sta = mraa_gpio_write(pullup_e, value);
+        if (sta != MRAA_SUCCESS) {
+            fprintf(stderr, "MRAA: Edison: Error Setting pullup");
+            return sta;
+        }
+    }
+
+    return MRAA_SUCCESS;
+}
+
+
 mraa_board_t*
 mraa_intel_edison_fab_c()
 {
@@ -349,6 +395,7 @@ mraa_intel_edison_fab_c()
     advance_func->pwm_init_post = &mraa_intel_edison_pwm_init_post;
     advance_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
     advance_func->spi_init_post = &mraa_intel_edison_spi_init_post;
+    advance_func->gpio_mode_replace = &mraa_intel_edison_gpio_mode_replace;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_EDISON_PINCOUNT);
 
