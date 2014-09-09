@@ -14,6 +14,7 @@ Supported Boards
 
 * [Galileo Gen 1 - Rev D](../master/docs/galileorevd.md)
 * [Galileo Gen 2 - Rev H](../master/docs/galileorevh.md)
+* [Edison](../master/docs/edison.md)
 
 Installing on your board
 ========
