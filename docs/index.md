@@ -61,6 +61,11 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.5.0**
+  * Intel Edison - Arduino board support.
+  * Boost Allowable i2c busses to 12
+  * Additional platform hooks added
+
 **0.4.5**
   * if only one spidev we default to it reguardless of number
   * mraa_pwm_config_ms & mraa_pwm_config_percent functions added
