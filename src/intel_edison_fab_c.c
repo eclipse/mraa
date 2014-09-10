@@ -408,6 +408,9 @@ mraa_intel_edison_fab_c()
     mraa_gpio_dir(tristate, MRAA_GPIO_OUT);
     mraa_intel_edison_misc_spi();
 
+    b->adc_raw = 12;
+    b->adc_supported = 10;
+
     strncpy(b->pins[0].name, "IO0", 8);
     b->pins[0].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,0};
     b->pins[0].gpio.pinmap = 130;
