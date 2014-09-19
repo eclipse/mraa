@@ -28,6 +28,9 @@ controlled by the mode that the 'edge' is in.
   :prepend: import mraa
   :start-after: import mraa
 
+**Note:** If the python script is ended the destructors will run meaning that
+the ISR will not run. The sleep call is there for that function.
+
 I2c
 ===
 

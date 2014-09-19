@@ -23,6 +23,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 
 import mraa
+import time
 
 def test(args):
   print("wooo")
@@ -30,3 +31,5 @@ def test(args):
 x = mraa.Gpio(6)
 x.dir(mraa.DIR_IN)
 x.isr(mraa.EDGE_BOTH, test, test)
+
+time.sleep(500)
