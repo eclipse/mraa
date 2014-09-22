@@ -76,4 +76,5 @@ struct _pwm {
 struct _aio {
     unsigned int channel; /**< the channel as on board and ADC module */
     int adc_in_fp; /**< File Pointer to raw sysfs */
+    int value_bit; /**< 10 bits by default. Can be increased if board */
 };

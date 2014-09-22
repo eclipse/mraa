@@ -29,8 +29,9 @@
 #include "aio.h"
 #include "mraa_internal.h"
 
+#define DEFAULT_BITS 10
+
 static int raw_bits;
-static int sup_bits;
 
 static mraa_result_t aio_get_valid_fp(mraa_aio_context dev)
 {
@@ -92,6 +93,7 @@ mraa_aio_context mraa_aio_init(unsigned int aio_channel)
         return NULL;
     }
     dev->channel = checked_pin;
+    dev->value_bit = DEFAULT_BITS;
 
     //Open valid  analog input file and get the pointer.
     if (MRAA_SUCCESS != aio_get_valid_fp(dev)) {
@@ -99,7 +101,6 @@ mraa_aio_context mraa_aio_init(unsigned int aio_channel)
         return NULL;
     }
     raw_bits = mraa_adc_raw_bits();
-    sup_bits = mraa_adc_supported_bits();
 
     if (advance_func->aio_init_post != NULL) {
         mraa_result_t ret = advance_func->aio_init_post(dev);
@@ -146,13 +147,13 @@ uint16_t mraa_aio_read(mraa_aio_context dev)
         fprintf(stderr, "errno was set\n");
     }
 
-    /* Adjust the raw analog input reading to supported resolution value*/
-    if (raw_bits != sup_bits) {
-        if (raw_bits > sup_bits) {
-            shifter_value = raw_bits - sup_bits;
+    if (dev->value_bit != raw_bits) {
+        /* Adjust the raw analog input reading to supported resolution value*/
+        if (raw_bits > dev->value_bit) {
+            shifter_value = raw_bits - dev->value_bit;
             analog_value =  analog_value >> shifter_value;
         } else {
-            shifter_value = sup_bits - raw_bits;
+            shifter_value = dev->value_bit - raw_bits;
             analog_value = analog_value << shifter_value;
         }
     }
@@ -172,4 +173,41 @@ mraa_result_t mraa_aio_close(mraa_aio_context dev)
         free(dev);
 
     return(MRAA_SUCCESS);
+}
+
+/** Set the bits value from read.
+ *
+ * @param dev the analog input context
+ * @param bits the bits the return from read should be i.e 10
+ *
+ * @return mraa result type
+ */
+mraa_result_t mraa_aio_set_bit(mraa_aio_context dev, int bits)
+{
+    if (dev == NULL) {
+        fprintf(stderr, "AIO Device not valid\n");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    if (bits < 1) {
+        fprintf(stderr, "AIO Device not valid\n");
+        // Error Message Here. find with grep fprintf
+        return MRAA_ERROR_INVALID_PARAMETER;
+    }
+    dev->value_bit = bits;
+    return MRAA_SUCCESS;
+}
+
+/**
+ * Gets the bit value mraa is shifting the analog read to.
+ * @param dev the analog input context
+ *
+ * @return bit value mraa is set return from the read function
+ */
+int mraa_aio_get_bit(mraa_aio_context dev)
+{
+    if (dev == NULL) {
+        fprintf(stderr, "AIO Device not valid\n");
+        return 0;
+    }
+    return dev->value_bit;
 }

@@ -62,6 +62,24 @@ class Aio {
             // Use basic types to make swig code generation simpler
             return (int) mraa_aio_read(m_aio);
         }
+        /**
+         * Set the bit value which mraa will shift the raw reading
+         * from the ADC to. I.e. 10bits
+         * @param bits the bits the return from read should be i.e 10
+         * @return mraa result type
+         */
+        mraa_result_t set_bit(int bits) {
+            return mraa_aio_set_bit(m_aio, bits);
+        }
+        /**
+         * Gets the bit value mraa is shifting the analog read to.
+         *
+         * @return bit value mraa is set return from the read function
+         */
+        int get_bit() {
+            return mraa_aio_get_bit(m_aio);
+        }
+
     private:
         mraa_aio_context m_aio;
 };

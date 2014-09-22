@@ -74,6 +74,24 @@ uint16_t mraa_aio_read(mraa_aio_context dev);
  */
 mraa_result_t mraa_aio_close(mraa_aio_context dev);
 
+/**
+ * Set the bit value which mraa will shift the raw reading
+ * from the ADC to. I.e. 10bits
+ * @param dev the analog input context
+ * @param bits the bits the return from read should be i.e 10
+ *
+ * @return mraa result type
+ */
+mraa_result_t mraa_aio_set_bit(mraa_aio_context dev, int bits);
+
+/**
+ * Gets the bit value mraa is shifting the analog read to.
+ * @param dev the analog input context
+ *
+ * @return bit value mraa is set return from the read function
+ */
+int mraa_aio_get_bit(mraa_aio_context dev);
+
 #ifdef __cplusplus
 }
 #endif
