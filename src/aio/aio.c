@@ -112,17 +112,14 @@ mraa_aio_context mraa_aio_init(unsigned int aio_channel)
     return dev;
 }
 
-/** Read the input voltage, represented as an unsigned short in the range [0x0,
- * 0xFFFF]
+/** Read the input voltage.
  *
  * @param pointer to mraa_aio_context structure  initialised by
  * mraa_aio_init()
  *
- * @returns
- *   unsigned 16 bit int representing the current input voltage, normalised to
- *   a 16-bit value
+ * @returns The current input voltage. By default, a 10bit value
  */
-uint16_t mraa_aio_read(mraa_aio_context dev)
+unsigned int mraa_aio_read(mraa_aio_context dev)
 {
     char buffer[16];
     unsigned int shifter_value = 0;
@@ -139,7 +136,7 @@ uint16_t mraa_aio_read(mraa_aio_context dev)
 
     errno = 0;
     char *end;
-    uint16_t analog_value = (uint16_t) strtoul(buffer, &end, 10);
+    unsigned int analog_value = (unsigned int) strtoul(buffer, &end, 10);
     if (end == &buffer[0]) {
         fprintf(stderr, "%s is not a decimal number\n", buffer);
     }

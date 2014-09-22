@@ -53,14 +53,13 @@ class Aio {
             mraa_aio_close(m_aio);
         }
         /**
-         * Read a value from the AIO pin. Note this value can never be outside
-         * of the bounds of an unsigned short
+         * Read a value from the AIO pin. By default mraa will shift
+         * the raw value up or down to a 10 bit value.
          *
-         * @returns The current input voltage, normalised to a 16-bit value
+         * @returns The current input voltage. By default, a 10bit value
          */
         int read() {
-            // Use basic types to make swig code generation simpler
-            return (int) mraa_aio_read(m_aio);
+            return mraa_aio_read(m_aio);
         }
         /**
          * Set the bit value which mraa will shift the raw reading
