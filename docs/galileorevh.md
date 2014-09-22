@@ -10,3 +10,5 @@ The Gen 2 board has the following limitations in libmraa:
 - i2c bus is shared with multiple devices, scanning it usually fails
 - pwm period is set globally for all pwm channels, when changed this will halt
   all pwm channels
+- adc kernel module will return 12bit number but the ADC itself only has an
+  accuracy of 10bits.

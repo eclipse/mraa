@@ -11,3 +11,5 @@ in libmraa:
 
 - PWM avaible on default swizzler postions. (3,5,6,9)
 - SPI exposed is also used for the ADC. Try not to use your own CS.
+- ADC kernel module will return 12bit number but the ADC itself only has an
+  accuracy of 10bits. This ADC is only included on the arduino board.
