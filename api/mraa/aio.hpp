@@ -67,7 +67,7 @@ class Aio {
          * @param bits the bits the return from read should be i.e 10
          * @return mraa result type
          */
-        mraa_result_t set_bit(int bits) {
+        mraa_result_t setBit(int bits) {
             return mraa_aio_set_bit(m_aio, bits);
         }
         /**
@@ -75,7 +75,7 @@ class Aio {
          *
          * @return bit value mraa is set return from the read function
          */
-        int get_bit() {
+        int getBit() {
             return mraa_aio_get_bit(m_aio);
         }
 
