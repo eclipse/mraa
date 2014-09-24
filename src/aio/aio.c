@@ -33,43 +33,40 @@
 
 static int raw_bits;
 
-static mraa_result_t aio_get_valid_fp(mraa_aio_context dev)
+static mraa_result_t
+aio_get_valid_fp(mraa_aio_context dev)
 {
     if (advance_func->aio_get_valid_fp != NULL)
         return advance_func->aio_get_valid_fp(dev);
+
     char file_path[64]= "";
 
     //Open file Analog device input channel raw voltage file for reading.
     snprintf(file_path, 64, "/sys/bus/iio/devices/iio:device0/in_voltage%d_raw",
-        dev->channel );
+            dev->channel );
 
     dev->adc_in_fp = open(file_path, O_RDONLY);
     if (dev->adc_in_fp == -1) {
-    fprintf(stderr, "Failed to open Analog input raw file %s for "
-        "reading!\n", file_path); return( MRAA_ERROR_INVALID_RESOURCE);
+        fprintf(stderr, "Failed to open Analog input raw file %s for "
+            "reading!\n", file_path);
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     return MRAA_SUCCESS;
 }
 
-/** Initialise an Analog input, connected to the specified channel
- *
- * @param aio_channel Analog input channel to read
- *
- * @returns pointer to mraa_aio_context structure  after initialisation of
- * Analog input pin connected to the device successfully, else returns NULL.
- */
-mraa_aio_context mraa_aio_init(unsigned int aio_channel)
+mraa_aio_context
+mraa_aio_init(unsigned int aio_channel)
 {
     if (advance_func->aio_init_pre != NULL) {
         mraa_result_t pre_ret = (advance_func->aio_init_pre(aio_channel));
-        if(pre_ret != MRAA_SUCCESS)
+        if (pre_ret != MRAA_SUCCESS)
             return NULL;
     }
 
     int checked_pin = mraa_setup_aio(aio_channel);
     if (checked_pin < 0) {
-        switch(checked_pin) {
+        switch (checked_pin) {
             case -1:
                 fprintf(stderr, "Invalid analog input channel %d specified\n",
                         aio_channel);
@@ -81,7 +78,8 @@ mraa_aio_context mraa_aio_init(unsigned int aio_channel)
             case -3:
                 fprintf(stderr, "Platform not initialised");
                 return NULL;
-            default: return NULL;
+            default:
+                return NULL;
         }
     }
 
@@ -89,7 +87,7 @@ mraa_aio_context mraa_aio_init(unsigned int aio_channel)
     mraa_aio_context dev = malloc(sizeof(struct _aio));
     if (dev == NULL) {
         fprintf(stderr, "Insufficient memory for specified Analog input channel "
-            "%d\n", aio_channel);
+                "%d\n", aio_channel);
         return NULL;
     }
     dev->channel = checked_pin;
@@ -109,17 +107,12 @@ mraa_aio_context mraa_aio_init(unsigned int aio_channel)
             return NULL;
         }
     }
+
     return dev;
 }
 
-/** Read the input voltage.
- *
- * @param pointer to mraa_aio_context structure  initialised by
- * mraa_aio_init()
- *
- * @returns The current input voltage. By default, a 10bit value
- */
-unsigned int mraa_aio_read(mraa_aio_context dev)
+unsigned int
+mraa_aio_read(mraa_aio_context dev)
 {
     char buffer[16];
     unsigned int shifter_value = 0;
@@ -158,13 +151,8 @@ unsigned int mraa_aio_read(mraa_aio_context dev)
     return analog_value;
 }
 
-/** Close the analog input and free context memory
- *
- * @param dev - the analog input context
- *
- * @return mraa result type.
- */
-mraa_result_t mraa_aio_close(mraa_aio_context dev)
+mraa_result_t
+mraa_aio_close(mraa_aio_context dev)
 {
     if (NULL != dev)
         free(dev);
@@ -172,14 +160,8 @@ mraa_result_t mraa_aio_close(mraa_aio_context dev)
     return(MRAA_SUCCESS);
 }
 
-/** Set the bits value from read.
- *
- * @param dev the analog input context
- * @param bits the bits the return from read should be i.e 10
- *
- * @return mraa result type
- */
-mraa_result_t mraa_aio_set_bit(mraa_aio_context dev, int bits)
+mraa_result_t
+mraa_aio_set_bit(mraa_aio_context dev, int bits)
 {
     if (dev == NULL) {
         fprintf(stderr, "AIO Device not valid\n");
@@ -187,20 +169,14 @@ mraa_result_t mraa_aio_set_bit(mraa_aio_context dev, int bits)
     }
     if (bits < 1) {
         fprintf(stderr, "AIO Device not valid\n");
-        // Error Message Here. find with grep fprintf
         return MRAA_ERROR_INVALID_PARAMETER;
     }
     dev->value_bit = bits;
     return MRAA_SUCCESS;
 }
 
-/**
- * Gets the bit value mraa is shifting the analog read to.
- * @param dev the analog input context
- *
- * @return bit value mraa is set return from the read function
- */
-int mraa_aio_get_bit(mraa_aio_context dev)
+int
+mraa_aio_get_bit(mraa_aio_context dev)
 {
     if (dev == NULL) {
         fprintf(stderr, "AIO Device not valid\n");
