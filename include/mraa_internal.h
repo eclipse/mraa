@@ -28,6 +28,8 @@
 extern "C" {
 #endif
 
+#include <syslog.h>
+
 #include "common.h"
 #include "mraa_internal_types.h"
 #include "mraa_adv_func.h"
@@ -35,23 +37,22 @@ extern "C" {
 extern mraa_adv_func_t* advance_func;
 extern mraa_board_t* plat;
 
-/** Setup gpio
- *
+/**
  * Will check input is valid for gpio and will also setup required multiplexers.
  * @param pin the pin as read from the board surface. i.e IO3 would be 3/
  * @return the pin as found in the pinmap
  */
 unsigned int mraa_setup_gpio(int pin);
 
-/** Setup Analog interface
- *
+/**
  * Will check input is valid for aio and will also setup required multiplexers.
  * @param pin the pin as read from the board surface. i.e A3 would be 3/
  * @return the pin as found in the pinmap
  */
 unsigned int mraa_setup_aio(int pin);
 
-/** Setup i2c interface, sets up multiplexer on device.
+/**
+ * Setup i2c interface, sets up multiplexer on device.
  *
  * @return unsigned int if using /dev/i2c-2 returned would be 2
  */
@@ -63,8 +64,7 @@ unsigned int mraa_setup_i2c(int bus);
  */
 mraa_spi_bus_t* mraa_setup_spi(int bus);
 
-/** Setup PWM
- *
+/**
  * Will check input is valid for pwm and will also setup required multiplexers.
  * IF the pin also does gpio (strong chance), DO NOTHING, REV D quirk
  * @param pin the pin as read from the board surface.
@@ -72,21 +72,24 @@ mraa_spi_bus_t* mraa_setup_spi(int bus);
  */
 mraa_pin_t* mraa_setup_pwm(int pin);
 
-/** Setup gpio mux to go straight to SoC, galileo.
+/**
+ * Setup gpio mux to go straight to SoC, galileo.
  *
  * @param pin physical pin to use
  * @return mraa_mmap_pin_t
  */
 mraa_mmap_pin_t* mraa_setup_mmap_gpio(int pin);
 
-/** Swap Directional mode.
+/**
+ * Swap Directional mode.
  *
  * @param pin physical pin to operate on
  * @return out direction to setup. 1 for output 0 for input
  */
 mraa_result_t mraa_swap_complex_gpio(int pin, int out);
 
-/** Setup uart muxes to exposes the pins physically.
+/**
+ * Setup uart muxes to exposes the pins physically.
  *
  * @param index of the uart in the board definition to expose physically
  * @return mraa_result_t of operation
