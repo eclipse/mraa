@@ -116,4 +116,15 @@ unsigned int adcSupportedBits()
     return mraa_adc_supported_bits();
 }
 
+/**
+ * Sets the log level to use from 0-7 where 7 is very verbose. These are the
+ * syslog log levels, see syslog(3) for more information on the levels.
+ *
+ * @return Result of operation
+ */
+mraa_result_t setLogLevel(int level)
+{
+    return mraa_set_log_level(level);
+}
+
 }

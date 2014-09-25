@@ -32,14 +32,14 @@ mraa_i2c_init(int bus)
     int checked_pin = mraa_setup_i2c(bus);
     if (checked_pin < 0) {
         switch(checked_pin) {
-            case -1:
-                fprintf(stderr, "No i2c on board\n");
+            case MRAA_NO_SUCH_IO:
+                syslog(LOG_ERR, "No i2c on board");
                 return NULL;
-            case -2:
-                fprintf(stderr, "Failed to set-up i2c multiplexer!\n");
+            case MRAA_IO_SETUP_FAILURE:
+                syslog(LOG_ERR, "Failed to set-up i2c multiplexer");
                 return NULL;
-            case -3:
-                fprintf(stderr, "Platform Not Initialised\n");
+            case MRAA_PLATFORM_NO_INIT:
+                syslog(LOG_ERR, "Platform Not Initialised");
                 return NULL;
             default: return NULL;
         }
@@ -61,7 +61,7 @@ mraa_i2c_init_raw(unsigned int bus)
     char filepath[32];
     snprintf(filepath, 32, "/dev/i2c-%u", bus);
     if ((dev->fh = open(filepath, O_RDWR)) < 1) {
-        fprintf(stderr, "Failed to open requested i2c port %s\n", filepath);
+        syslog(LOG_ERR, "Failed to open requested i2c port %s", filepath);
     }
 
     if (advance_func->i2c_init_post != NULL) {
@@ -106,7 +106,7 @@ mraa_result_t
 mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length)
 {
     if (i2c_smbus_write_i2c_block_data(dev->fh, data[0], length-1, (uint8_t*) data+1) < 0) {
-        fprintf(stderr, "Failed to write to i2c\n");
+        syslog(LOG_ERR, "Failed to write to i2c");
 	return MRAA_ERROR_INVALID_HANDLE;
     }
     return MRAA_SUCCESS;
@@ -116,7 +116,7 @@ mraa_result_t
 mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data)
 {
     if (i2c_smbus_write_byte(dev->fh, data) < 0) {
-        fprintf(stderr, "Failed to write to i2c\n");
+        syslog(LOG_ERR, "Failed to write to i2c");
 	return MRAA_ERROR_INVALID_HANDLE;
     }
     return MRAA_SUCCESS;
@@ -127,7 +127,7 @@ mraa_i2c_address(mraa_i2c_context dev, int addr)
 {
     dev->addr = addr;
     if (ioctl(dev->fh, I2C_SLAVE_FORCE, addr) < 0) {
-        fprintf(stderr, "Failed to set slave address %d\n", addr);
+        syslog(LOG_ERR, "Failed to set slave address %d", addr);
 	return MRAA_ERROR_INVALID_HANDLE;
     }
     return MRAA_SUCCESS;

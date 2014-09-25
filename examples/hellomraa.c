@@ -22,15 +22,22 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "stdio.h"
+#include <stdio.h>
+#include <syslog.h>
 //! [Interesting]
 #include "mraa.h"
 
 int
 main(int argc, char **argv)
 {
+    mraa_result_t ret;
+
+    ret = mraa_set_log_level(LOG_DEBUG);
+
     fprintf(stdout, "hello mraa\n Version: %s\n", mraa_get_version());
+
     mraa_deinit();
-    return 0;
+
+    return ret;
 }
 //! [Interesting]

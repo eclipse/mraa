@@ -45,12 +45,28 @@ mraa_get_version()
     return gVERSION;
 }
 
+mraa_result_t
+mraa_set_log_level(int level)
+{
+    if (level <= 7 && level >= 0) {
+        setlogmask(LOG_UPTO(level));
+        return MRAA_SUCCESS;
+    }
+    return MRAA_ERROR_INVALID_PARAMETER;
+}
+
 mraa_result_t __attribute__((constructor))
 mraa_init()
 {
-    /** Once more board definitions have been added,
-     *  A method for detecting them will need to be devised.
-     */
+#ifdef DEBUG
+    setlogmask(LOG_UPTO(LOG_DEBUG));
+#else
+    setlogmask(LOG_UPTO(LOG_NOTICE));
+#endif
+
+    openlog("libmraa", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
+    syslog(LOG_DEBUG, "libmraa initialised by user %d", getuid());
+
     if (plat != NULL) {
         return MRAA_ERROR_PLATFORM_ALREADY_INITIALISED;
     }
@@ -96,9 +112,10 @@ mraa_init()
             break;
         default:
             plat = mraa_intel_galileo_rev_d();
-            fprintf(stderr, "Platform not found, initialising MRAA_INTEL_GALILEO_GEN1\n");
+            syslog(LOG_ERR, "Platform not found, initialising MRAA_INTEL_GALILEO_GEN1");
     }
 
+    syslog(LOG_NOTICE, "libmraa initialised for platform %d", platform_type);
     return MRAA_SUCCESS;
 }
 
@@ -107,6 +124,7 @@ mraa_deinit()
 {
     free(plat->pins);
     free(plat);
+    closelog();
 }
 
 int
@@ -145,17 +163,17 @@ unsigned int
 mraa_setup_gpio(int pin)
 {
     if (plat == NULL)
-        return -1;
+        return MRAA_PLATFORM_NO_INIT;
 
     if (pin < 0 || pin > plat->phy_pin_count)
-        return -1;
+        return MRAA_NO_SUCH_IO;
 
     if(plat->pins[pin].capabilites.gpio != 1)
-      return -1;
+      return MRAA_NO_SUCH_IO;
 
     if (plat->pins[pin].gpio.mux_total > 0)
        if (mraa_setup_mux_mapped(plat->pins[pin].gpio) != MRAA_SUCCESS)
-            return -1;
+            return MRAA_NO_SUCH_IO;
     return plat->pins[pin].gpio.pinmap;
 }
 
@@ -163,19 +181,19 @@ unsigned int
 mraa_setup_aio(int aio)
 {
     if (plat == NULL)
-        return -3;
+        return MRAA_PLATFORM_NO_INIT;
 
     if (aio < 0 || aio > plat->aio_count)
-        return -1;
+        return MRAA_NO_SUCH_IO;
 
     int pin = aio + plat->gpio_count;
 
     if (plat->pins[pin].capabilites.aio != 1)
-      return -1;
+      return MRAA_NO_SUCH_IO;
 
     if (plat->pins[pin].aio.mux_total > 0)
        if (mraa_setup_mux_mapped(plat->pins[pin].aio) != MRAA_SUCCESS)
-            return -1;
+            return MRAA_NO_SUCH_IO;
     return plat->pins[pin].aio.pinmap;
 }
 
@@ -183,31 +201,31 @@ unsigned int
 mraa_setup_i2c(int bus)
 {
     if (plat == NULL)
-        return -3;
+        return MRAA_PLATFORM_NO_INIT;
 
     if (plat->i2c_bus_count == 0) {
-        fprintf(stderr, "No i2c buses defined in platform");
-        return -1;
+        syslog(LOG_ERR, "No i2c buses defined in platform");
+        return MRAA_NO_SUCH_IO;
     }
     if (bus >= plat->i2c_bus_count) {
-        fprintf(stderr, "Above i2c bus count");
-        return -1;
+        syslog(LOG_ERR, "Above i2c bus count");
+        return MRAA_NO_SUCH_IO;
     }
 
     if (plat->i2c_bus[bus].bus_id == -1) {
-        fprintf(stderr, "Platform not currently allowed for mraa use\n");
-        return -1;
+        syslog(LOG_ERR, "Platform not currently allowed for mraa use");
+        return MRAA_NO_SUCH_IO;
     }
 
     int pos = plat->i2c_bus[bus].sda;
     if (plat->pins[pos].i2c.mux_total > 0)
         if (mraa_setup_mux_mapped(plat->pins[pos].i2c) != MRAA_SUCCESS)
-             return -2;
+             return MRAA_IO_SETUP_FAILURE;
 
     pos = plat->i2c_bus[bus].scl;
     if (plat->pins[pos].i2c.mux_total > 0)
         if (mraa_setup_mux_mapped(plat->pins[pos].i2c) != MRAA_SUCCESS)
-             return -2;
+             return MRAA_IO_SETUP_FAILURE;
 
     return plat->i2c_bus[bus].bus_id;
 }
@@ -219,14 +237,14 @@ mraa_setup_spi(int bus)
         return NULL;
 
     if (plat->spi_bus_count >! 0) {
-        fprintf(stderr, "No spi buses defined in platform");
+        syslog(LOG_ERR, "No spi buses defined in platform");
         return NULL;
     }
     if (plat->spi_bus_count == 1) {
         bus = plat->def_spi_bus;
     }
     if (bus >= plat->spi_bus_count) {
-        fprintf(stderr, "Above spi bus count");
+        syslog(LOG_ERR, "Above spi bus count");
         return NULL;
     }
 
@@ -287,49 +305,51 @@ void
 mraa_result_print(mraa_result_t result)
 {
     switch (result) {
-        case MRAA_SUCCESS: fprintf(stderr, "MRAA: SUCCESS\n");
-                          break;
+        case MRAA_SUCCESS:
+            fprintf(stdout, "MRAA: SUCCESS\n");
+            break;
         case MRAA_ERROR_FEATURE_NOT_IMPLEMENTED:
-                          fprintf(stderr, "MRAA: Feature not implemented.\n");
-                          break;
+            fprintf(stdout, "MRAA: Feature not implemented.\n");
+            break;
         case MRAA_ERROR_FEATURE_NOT_SUPPORTED:
-                          fprintf(stderr, "MRAA: Feature not supported by Hardware.\n");
-                          break;
+            fprintf(stdout, "MRAA: Feature not supported by Hardware.\n");
+            break;
         case MRAA_ERROR_INVALID_VERBOSITY_LEVEL:
-                          fprintf(stderr, "MRAA: Invalid verbosity level.\n");
-                          break;
+            fprintf(stdout, "MRAA: Invalid verbosity level.\n");
+            break;
         case MRAA_ERROR_INVALID_PARAMETER:
-                          fprintf(stderr, "MRAA: Invalid parameter.\n");
-                          break;
+            fprintf(stdout, "MRAA: Invalid parameter.\n");
+            break;
         case MRAA_ERROR_INVALID_HANDLE:
-                          fprintf(stderr, "MRAA: Invalid Handle.\n");
-                          break;
+            fprintf(stdout, "MRAA: Invalid Handle.\n");
+            break;
         case MRAA_ERROR_NO_RESOURCES:
-                          fprintf(stderr, "MRAA: No resources.\n");
-                          break;
+            fprintf(stdout, "MRAA: No resources.\n");
+            break;
         case MRAA_ERROR_INVALID_RESOURCE:
-                          fprintf(stderr, "MRAA: Invalid resource.\n");
-                          break;
+            fprintf(stdout, "MRAA: Invalid resource.\n");
+            break;
         case MRAA_ERROR_INVALID_QUEUE_TYPE:
-                          fprintf(stderr, "MRAA: Invalid Queue Type.\n");
-                          break;
+            fprintf(stdout, "MRAA: Invalid Queue Type.\n");
+            break;
         case MRAA_ERROR_NO_DATA_AVAILABLE:
-                          fprintf(stderr, "MRAA: No Data available.\n");
-                          break;
+            fprintf(stdout, "MRAA: No Data available.\n");
+            break;
         case MRAA_ERROR_INVALID_PLATFORM:
-                          fprintf(stderr, "MRAA: Platform not recognised.\n");
-                          break;
+            fprintf(stdout, "MRAA: Platform not recognised.\n");
+            break;
         case MRAA_ERROR_PLATFORM_NOT_INITIALISED:
-                          fprintf(stderr, "MRAA: Platform not initialised.\n");
-                          break;
+            fprintf(stdout, "MRAA: Platform not initialised.\n");
+            break;
         case MRAA_ERROR_PLATFORM_ALREADY_INITIALISED:
-                          fprintf(stderr, "MRAA: Platform already initialised.\n");
-                          break;
+            fprintf(stdout, "MRAA: Platform already initialised.\n");
+            break;
         case MRAA_ERROR_UNSPECIFIED:
-                          fprintf(stderr, "MRAA: Unspecified Error.\n");
-                          break;
-        default:     fprintf(stderr, "MRAA: Unrecognised error.\n");
-                          break;
+            fprintf(stdout, "MRAA: Unspecified Error.\n");
+            break;
+        default:
+            fprintf(stdout, "MRAA: Unrecognised error.\n");
+            break;
     }
 }
 

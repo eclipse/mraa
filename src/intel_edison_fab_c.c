@@ -62,7 +62,7 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
     snprintf(buffer, MAX_SIZE, SYSFS_PINMODE_PATH "%i/current_pinmux",sysfs);
     int modef = open(buffer, O_WRONLY);
     if (modef == -1) {
-        fprintf(stderr, "Failed to open SoC pinmode for opening\n");
+        syslog(LOG_ERR, "Failed to open SoC pinmode for opening");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -120,7 +120,7 @@ mraa_result_t
 mraa_intel_edison_i2c_init_pre(unsigned int bus)
 {
     if(bus != 6) {
-        fprintf(stderr, "Edison: You can use that bus, ERR\n");
+        syslog(LOG_ERR, "Edison: You can't use that bus :/");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     mraa_gpio_write(tristate, 0);
@@ -201,12 +201,13 @@ mraa_intel_edison_aio_get_fp(mraa_aio_context dev)
     char file_path[64]= "";
 
     snprintf(file_path, 64, "/sys/bus/iio/devices/iio:device1/in_voltage%d_raw",
-        dev->channel );
+            dev->channel );
 
     dev->adc_in_fp = open(file_path, O_RDONLY);
     if (dev->adc_in_fp == -1) {
-    fprintf(stderr, "Failed to open Analog input raw file %s for "
-        "reading!\n", file_path); return( MRAA_ERROR_INVALID_RESOURCE);
+        syslog(LOG_ERR, "Failed to open Analog input raw file %s for "
+                "reading!", file_path);
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     return MRAA_SUCCESS;
@@ -216,7 +217,7 @@ mraa_result_t
 mraa_intel_edison_aio_init_pre(unsigned int aio)
 {
     if (aio > plat->aio_count) {
-        fprintf(stderr, "Invalid analog input channel\n");
+        syslog(LOG_ERR, "Invalid analog input channel");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -340,8 +341,8 @@ mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
     pullup_e = mraa_gpio_init_raw(pullup_map[dev->phy_pin]);
     mraa_result_t sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_IN);
     if(sta != MRAA_SUCCESS) {
-      fprintf(stderr, "MRAA: Edison: Failed to set gpio mode-pullup\n");
-      return MRAA_ERROR_INVALID_RESOURCE;
+        syslog(LOG_ERR, "Edison: Failed to set gpio mode-pullup");
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     int value = -1;
@@ -364,7 +365,7 @@ mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
         sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_OUT);
         sta = mraa_gpio_write(pullup_e, value);
         if (sta != MRAA_SUCCESS) {
-            fprintf(stderr, "MRAA: Edison: Error Setting pullup");
+            syslog(LOG_ERR, "Edison: Error Setting pullup");
             return sta;
         }
     }
@@ -401,8 +402,8 @@ mraa_intel_edison_fab_c()
 
     tristate = mraa_gpio_init_raw(214);
     if (tristate == NULL) {
-        fprintf(stderr, "Intel Edison Failed to initialise Arduino board TriState,\
-                         check i2c devices! FATAL\n");
+        syslog(LOG_CRIT, "Intel Edison Failed to initialise Arduino board TriState,\
+                check i2c devices! FATAL\n");
         return NULL;
     }
     mraa_gpio_dir(tristate, MRAA_GPIO_OUT);
@@ -634,8 +635,7 @@ mraa_intel_edison_fab_c()
     b->spi_bus[0].sclk = 13;
 
     int il;
-
-    for(il =0; il < MRAA_INTEL_EDISON_PINCOUNT; il++) {
+    for (il =0; il < MRAA_INTEL_EDISON_PINCOUNT; il++) {
         pinmodes[il].gpio.sysfs = -1;
         pinmodes[il].gpio.mode = -1;
         pinmodes[il].pwm.sysfs = -1;

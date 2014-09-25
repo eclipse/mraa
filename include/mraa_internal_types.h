@@ -27,6 +27,11 @@
 
 #include "common.h"
 
+// general status failures for internal functions
+#define MRAA_PLATFORM_NO_INIT -3
+#define MRAA_IO_SETUP_FAILURE -2
+#define MRAA_NO_SUCH_IO -1
+
 /**
  * A structure representing a gpio pin.
  */

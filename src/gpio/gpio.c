@@ -101,12 +101,12 @@ mraa_gpio_init_raw(int pin)
     } else {
         int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
         if (export == -1) {
-            fprintf(stderr, "Failed to open export for writing!\n");
+            syslog(LOG_ERR, "Failed to open export for writing");
             return NULL;
         }
         length = snprintf(bu, sizeof(bu), "%d", dev->pin);
         if (write(export, bu, length*sizeof(char)) == -1) {
-            fprintf(stderr, "Failed to write to export\n");
+            syslog(LOG_ERR, "Failed to write to export");
             close(export);
             return NULL;
         }
@@ -190,11 +190,11 @@ mraa_gpio_interrupt_handler(void* arg)
             PyObject *ret;
             arglist = Py_BuildValue("(i)", dev->isr_args);
             if (arglist == NULL) {
-                fprintf(stdout, "Py_BuildValue NULL\n");
+                syslog(LOG_ERR, "Py_BuildValue NULL");
             } else {
                 ret = PyEval_CallObject((PyObject*)dev->isr, arglist);
                 if (ret == NULL) {
-                    fprintf(stdout, "PyEval_CallObject failed\n");
+                    syslog(LOG_ERR, "PyEval_CallObject failed");
                 } else {
                     Py_DECREF(ret);
                 }
@@ -229,7 +229,7 @@ mraa_gpio_edge_mode(mraa_gpio_context dev, gpio_edge_t mode)
 
     int edge = open(filepath, O_RDWR);
     if (edge == -1) {
-        fprintf(stderr, "Failed to open edge for writing!\n");
+        syslog(LOG_ERR, "Failed to open edge for writing");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -253,7 +253,7 @@ mraa_gpio_edge_mode(mraa_gpio_context dev, gpio_edge_t mode)
             return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
     }
     if (write(edge, bu, length*sizeof(char)) == -1) {
-        fprintf(stderr, "Failed to write to edge\n");
+        syslog(LOG_ERR, "Failed to write to edge");
         close(edge);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -339,7 +339,7 @@ mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
 
     int drive = open(filepath, O_WRONLY);
     if (drive == -1) {
-        fprintf(stderr, "Failed to open drive for writing!\n");
+        syslog(LOG_ERR, "Failed to open drive for writing");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -363,7 +363,7 @@ mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
             return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
     }
     if (write(drive, bu, length*sizeof(char)) == -1) {
-        fprintf(stderr, "Failed to write to drive mode!\n");
+        syslog(LOG_ERR, "Failed to write to drive mode");
         close(drive);
         return MRAA_ERROR_INVALID_RESOURCE;
 
@@ -432,7 +432,7 @@ mraa_gpio_read(mraa_gpio_context dev)
 {
     if (dev->value_fp == -1) {
         if (mraa_gpio_get_valfp(dev) != MRAA_SUCCESS) {
-             fprintf(stderr, "Failed to get value file pointer\n");
+             syslog(LOG_ERR, "Failed to get value file pointer");
         }
     }
     else {
@@ -441,7 +441,7 @@ mraa_gpio_read(mraa_gpio_context dev)
     }
     char bu[2];
     if (read(dev->value_fp, bu, 2*sizeof(char)) != 2) {
-        fprintf(stderr, "Failed to read a sensible value from sysfs");
+        syslog(LOG_ERR, "Failed to read a sensible value from sysfs");
     }
     lseek(dev->value_fp, 0, SEEK_SET);
     int ret = strtol(bu, NULL, 10);
@@ -485,14 +485,14 @@ mraa_gpio_unexport_force(mraa_gpio_context dev)
 {
     int unexport = open(SYSFS_CLASS_GPIO "/unexport", O_WRONLY);
     if (unexport == -1) {
-        fprintf(stderr, "Failed to open unexport for writing!\n");
+        syslog(LOG_ERR, "Failed to open unexport for writing");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     char bu[MAX_SIZE];
     int length = snprintf(bu, sizeof(bu), "%d", dev->pin);
     if (write(unexport, bu, length*sizeof(char)) == -1) {
-        fprintf(stderr, "Failed to write to unexport\n");
+        syslog(LOG_ERR, "Failed to write to unexport");
         close(unexport);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -550,7 +550,7 @@ mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap_en)
             int fd;
             fd = open(mmp->mem_dev, O_RDWR);
             if (fd < 1) {
-                fprintf(stderr, "Unable to open memory device\n");
+                syslog(LOG_ERR, "Unable to open memory device");
                 return MRAA_ERROR_INVALID_RESOURCE;
             }
             dev->reg_sz = mmp->mem_sz;

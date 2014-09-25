@@ -207,7 +207,8 @@ mraa_result_t mraa_init() __attribute__((constructor));
  * De-Initilise MRAA
  *
  * This is not a strict requirement but useful to test memory leaks and for
- * people who like super clean code.
+ * people who like super clean code. If dynamically loading & unloading
+ * libmraa you need to call this before unloading the library.
  */
 void mraa_deinit();
 
@@ -233,6 +234,15 @@ unsigned int mraa_adc_raw_bits();
  * @return return actual bit size the adc value should be understood as.
  */
 unsigned int mraa_adc_supported_bits();
+
+
+/**
+ * Sets the log level to use from 0-7 where 7 is very verbose. These are the
+ * syslog log levels, see syslog(3) for more information on the levels.
+ *
+ * @return Result of operation
+ */
+mraa_result_t mraa_set_log_level(int level);
 
 #ifdef __cplusplus
 }

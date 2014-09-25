@@ -56,7 +56,7 @@ mraa_pwm_write_period(mraa_pwm_context dev, int period)
 
     int period_f = open(bu, O_RDWR);
     if (period_f == -1) {
-        fprintf(stderr, "Failed to open period for writing!\n");
+        syslog(LOG_ERR, "Failed to open period for writing");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     char out[MAX_SIZE];
@@ -92,7 +92,7 @@ mraa_pwm_read_period(mraa_pwm_context dev)
 
     int period_f = open(bu, O_RDWR);
     if (period_f == -1) {
-        fprintf(stderr, "Failed to open period for reading!\n");
+        syslog(LOG_ERR, "Failed to open period for reading");
         return 0;
     }
     off_t size = lseek(period_f, 0, SEEK_END);
@@ -161,14 +161,14 @@ mraa_pwm_init_raw(int chipin, int pin)
     snprintf(directory, MAX_SIZE, SYSFS_PWM "/pwmchip%d/pwm%d", dev->chipid, dev->pin);
     struct stat dir;
     if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
-        fprintf(stderr, "PWM Pin already exporting, continuing.\n");
+        syslog(LOG_NOTICE, "PWM Pin already exporting, continuing");
         dev->owner = 0; // Not Owner
     } else {
         char buffer[MAX_SIZE];
         snprintf(buffer, MAX_SIZE, "/sys/class/pwm/pwmchip%d/export", dev->chipid);
         int export_f = open(buffer, O_WRONLY);
         if (export_f == -1) {
-            fprintf(stderr, "Failed to open export for writing!\n");
+            syslog(LOG_ERR, "Failed to open export for writing");
             free(dev);
             return NULL;
         }
@@ -176,7 +176,7 @@ mraa_pwm_init_raw(int chipin, int pin)
         char out[MAX_SIZE];
         int size = snprintf(out, MAX_SIZE, "%d", dev->pin);
         if (write(export_f, out, size*sizeof(char)) == -1) {
-            fprintf(stderr, "Failed to write to export! Potentially already enabled\n");
+            syslog(LOG_WARNING, "Failed to write to export! Potentially already enabled");
             close(export_f);
             return NULL;
         }
@@ -251,13 +251,13 @@ mraa_pwm_enable(mraa_pwm_context dev, int enable)
     int enable_f = open(bu, O_RDWR);
 
     if (enable_f == -1) {
-        fprintf(stderr, "Failed to open enable for writing!\n");
+        syslog(LOG_ERR, "Failed to open enable for writing");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     char out[2];
     int size = snprintf(out, sizeof(out), "%d", enable);
     if (write(enable_f, out, size * sizeof(char)) == -1) {
-        fprintf(stderr, "Failed to write to enable!\n");
+        syslog(LOG_ERR, "Failed to write to enable");
         close(enable_f);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -273,14 +273,14 @@ mraa_pwm_unexport_force(mraa_pwm_context dev)
 
     int unexport_f = open(filepath, O_WRONLY);
     if (unexport_f == -1) {
-        fprintf(stderr, "Failed to open unexport for writing!\n");
+        syslog(LOG_ERR, "Failed to open unexport for writing");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     char out[MAX_SIZE];
     int size = snprintf(out, MAX_SIZE, "%d", dev->pin);
     if (write(unexport_f, out, size*sizeof(char)) == -1) {
-        fprintf(stderr, "Failed to write to unexport!\n");
+        syslog(LOG_ERR, "Failed to write to unexport");
         close(unexport_f);
         return MRAA_ERROR_INVALID_RESOURCE;
     }

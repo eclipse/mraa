@@ -84,7 +84,7 @@ mraa_intel_galileo_gen2_pwm_period_replace(mraa_pwm_context dev, int period)
 
     int period_f = open(bu, O_RDWR);
     if (period_f == -1) {
-        fprintf(stderr, "Failed to open period for writing!\n");
+        syslog(LOG_ERR, "Failed to open period for writing!");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     char out[MAX_SIZE];
@@ -109,9 +109,9 @@ mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mod
     mraa_gpio_context pullup_e;
     pullup_e = mraa_gpio_init_raw(pullup_map[dev->phy_pin]);
     mraa_result_t sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_IN);
-    if(sta != MRAA_SUCCESS) {
-      fprintf(stderr, "MRAA: Galileo Gen 2: Failed to set gpio pullup\n");
-      return MRAA_ERROR_INVALID_RESOURCE;
+    if (sta != MRAA_SUCCESS) {
+        syslog(LOG_ERR, "Galileo Gen 2: Failed to set gpio pullup");
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     char filepath[MAX_SIZE];
@@ -119,7 +119,7 @@ mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mod
 
     int drive = open(filepath, O_WRONLY);
     if (drive == -1) {
-        fprintf(stderr, "Failed to open drive for writing!\n");
+        syslog(LOG_ERR, "Failed to open drive for writing");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -147,7 +147,7 @@ mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mod
             return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
     }
     if (write(drive, bu, length*sizeof(char)) == -1) {
-        fprintf(stderr, "Failed to write to drive mode!\n");
+        syslog(LOG_ERR, "Failed to write to drive mode");
         close(drive);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -155,7 +155,7 @@ mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mod
         sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_OUT);
         sta = mraa_gpio_write(pullup_e, value);
         if (sta != MRAA_SUCCESS) {
-            fprintf(stderr, "MRAA: Galileo Gen 2: Error Setting pullup");
+            syslog(LOG_ERR, "Galileo Gen 2: Error Setting pullup");
             return sta;
         }
     }
