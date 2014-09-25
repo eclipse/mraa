@@ -65,6 +65,7 @@ they are listed here. Anything pre 0.2.x is ignored.
   * Intel Edison - Arduino board support.
   * Boost Allowable i2c busses to 12
   * Additional platform hooks added
+  * ADC is now 10bits by default on all platforms but can be changed
 
 **0.4.5**
   * if only one spidev we default to it reguardless of number
