@@ -32,3 +32,18 @@ Using clang instead of gcc:
 
 Building with an older version of swig (swig 2.0+) requires the disabling of javascript:
  -DBUILDSWIGNODE=OFF
+
+Using coverity
+--------------
+
+Static analysis is routinely performed using coverity on libmraa's codebase.
+This is the procedure to submit a build to coverity. You'll need to install
+coverity-submit for your OS.
+
+~~~~~~~~~~~~~{.sh}
+mkdir covbuild/ && cd covbuild
+cmake -DBUILDDOC=OFF -DBUILDSWIG=OFF ..
+cmake -DBUILDDOC=OFF -DBUILDSWIG=OFF ..
+cov-build --dir cov-int make
+tar caf mraa.tar..bz2 cov-int
+~~~~~~~~~~~~~
