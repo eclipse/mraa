@@ -36,6 +36,7 @@ Specific platform information for supported platforms is documented here:
 
 - @ref galileorevd
 - @ref galileorevh
+- @ref edison
 
 ### ENV RECOMENDATIONS
 
