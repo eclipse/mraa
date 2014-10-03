@@ -87,6 +87,11 @@ mraa_gpio_init_raw(int pin)
     int length;
 
     mraa_gpio_context dev = (mraa_gpio_context) malloc(sizeof(struct _gpio));
+    if (dev == NULL) {
+        syslog(LOG_CRIT, "Failed to allocate memory for context");
+        return NULL;
+    }
+
     memset(dev, 0, sizeof(struct _gpio));
     dev->value_fp = -1;
     dev->isr_value_fp = -1;
@@ -102,6 +107,7 @@ mraa_gpio_init_raw(int pin)
         int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
         if (export == -1) {
             syslog(LOG_ERR, "Failed to open export for writing");
+	    free(dev);
             return NULL;
         }
         length = snprintf(bu, sizeof(bu), "%d", dev->pin);
@@ -556,6 +562,7 @@ mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap_en)
             fd = open(mmp->mem_dev, O_RDWR);
             if (fd < 1) {
                 syslog(LOG_ERR, "Unable to open memory device");
+                close(fd);
                 return MRAA_ERROR_INVALID_RESOURCE;
             }
             dev->reg_sz = mmp->mem_sz;

@@ -114,7 +114,7 @@ mraa_aio_init(unsigned int aio_channel)
 unsigned int
 mraa_aio_read(mraa_aio_context dev)
 {
-    char buffer[16];
+    char buffer[17];
     unsigned int shifter_value = 0;
 
     if (dev->adc_in_fp == -1) {
@@ -125,13 +125,15 @@ mraa_aio_read(mraa_aio_context dev)
     if (read(dev->adc_in_fp, buffer, sizeof(buffer)) < 1) {
         syslog(LOG_ERR, "Failed to read a sensible value");
     }
+    // force NULL termination of string
+    buffer[16] = '\0';
     lseek(dev->adc_in_fp, 0, SEEK_SET);
 
     errno = 0;
     char *end;
     unsigned int analog_value = (unsigned int) strtoul(buffer, &end, 10);
     if (end == &buffer[0]) {
-        syslog(LOG_ERR, "%s is not a decimal number", buffer);
+        syslog(LOG_ERR, "value is not a decimal number");
     }
     else if (errno != 0) {
         syslog(LOG_ERR, "errno was set");

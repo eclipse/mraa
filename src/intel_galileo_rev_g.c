@@ -153,9 +153,10 @@ mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mod
     }
     if (value != -1) {
         sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_OUT);
-        sta = mraa_gpio_write(pullup_e, value);
+        sta += mraa_gpio_write(pullup_e, value);
         if (sta != MRAA_SUCCESS) {
             syslog(LOG_ERR, "Galileo Gen 2: Error Setting pullup");
+            close(drive);
             return sta;
         }
     }

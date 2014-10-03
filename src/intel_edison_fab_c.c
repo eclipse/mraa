@@ -69,6 +69,7 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
     char mode_buf[MAX_MODE_SIZE];
     int length = sprintf(mode_buf, "mode%u",mode);
     if (write(modef, mode_buf, length*sizeof(char)) == -1) {
+        close(modef);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     close(modef);
@@ -404,6 +405,7 @@ mraa_intel_edison_fab_c()
     if (tristate == NULL) {
         syslog(LOG_CRIT, "Intel Edison Failed to initialise Arduino board TriState,\
                 check i2c devices! FATAL\n");
+        free(b);
         return NULL;
     }
     mraa_gpio_dir(tristate, MRAA_GPIO_OUT);

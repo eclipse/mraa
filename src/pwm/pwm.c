@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <limits.h>
 
 #include "pwm.h"
 #include "mraa_internal.h"
@@ -100,9 +101,18 @@ mraa_pwm_read_period(mraa_pwm_context dev)
 
     read(period_f, output, size + 1);
     close(period_f);
-    int ret = strtol(output, NULL, 10);
 
-    return ret;
+    char *endptr;
+    long int ret = strtol(output, &endptr, 10);
+    if ('\0' != *endptr) {
+        syslog(LOG_ERR, "error in string converstion");
+        return -1;
+    }
+    else if (ret > INT_MAX || ret < INT_MIN) {
+        syslog(LOG_ERR, "number is invalid");
+        return -1;
+    }
+    return (int) ret;
 }
 
 static int
@@ -118,8 +128,17 @@ mraa_pwm_read_duty(mraa_pwm_context dev)
     char output[MAX_SIZE];
     read(dev->duty_fp, output, size+1);
 
-    int ret = strtol(output, NULL, 10);
-    return ret;
+    char *endptr;
+    long int ret = strtol(output, &endptr, 10);
+    if ('\0' != *endptr) {
+        syslog(LOG_ERR, "error in string converstion");
+        return -1;
+    }
+    else if (ret > INT_MAX || ret < INT_MIN) {
+        syslog(LOG_ERR, "number is invalid");
+        return -1;
+    }
+    return (int) ret;
 }
 
 mraa_pwm_context
@@ -178,6 +197,7 @@ mraa_pwm_init_raw(int chipin, int pin)
         if (write(export_f, out, size*sizeof(char)) == -1) {
             syslog(LOG_WARNING, "Failed to write to export! Potentially already enabled");
             close(export_f);
+            free(dev);
             return NULL;
         }
         dev->owner = 1;

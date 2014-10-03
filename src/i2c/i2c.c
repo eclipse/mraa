@@ -55,8 +55,10 @@ mraa_i2c_init_raw(unsigned int bus)
             return NULL;
     }
     mraa_i2c_context dev = (mraa_i2c_context) malloc(sizeof(struct _i2c));
-    if (dev == NULL)
+    if (dev == NULL) {
+        syslog(LOG_CRIT, "Failed to allocate memory for context");
         return NULL;
+    }
 
     char filepath[32];
     snprintf(filepath, 32, "/dev/i2c-%u", bus);
@@ -96,9 +98,6 @@ uint8_t
 mraa_i2c_read_byte(mraa_i2c_context dev)
 {
     uint8_t byte = i2c_smbus_read_byte(dev->fh);
-    if (byte < 0) {
-        return -1;
-    }
     return byte;
 }
 
