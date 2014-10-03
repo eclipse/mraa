@@ -18,7 +18,7 @@ if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND")
   set (VERSION "v0.5.0-dirty")
 endif ()
 
-message (INFO " - MRAA Version ${VERSION}")
+message (INFO " - libmraa Version ${VERSION}")
 
 #parse the version information into pieces.
 string (REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${VERSION}")

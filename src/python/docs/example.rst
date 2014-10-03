@@ -20,7 +20,10 @@ GPIO Interupt (isr)
 ===================
 
 The GPIO module allows you to set an interupt on a GPIO. This interupt is
-controlled by the mode that the 'edge' is in.
+controlled by the mode that the 'edge' is in. Before setting another isr please
+remove the first one, multiple isrs on one pin are not supported. Some
+platforms will not support interupts on all pins so please check your return
+values.
 
 **Note:** Galileo Gen1 only supports EDGE_BOTH
 
@@ -30,6 +33,9 @@ controlled by the mode that the 'edge' is in.
 
 **Note:** If the python script is ended the destructors will run meaning that
 the ISR will not run. The sleep call is there for that function.
+
+**Note:** The python isr module treats only objects. This means that int
+counters will not work inside your isr. Please use the different edge modes.
 
 I2c
 ===

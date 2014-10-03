@@ -1,4 +1,4 @@
-MRAA - Low Level Skeleton Library for Communication on Intel platforms
+libmraa - Low Level Skeleton Library for Communication on Intel platforms
 ==============
 
 Library in C/C++ to interface with Galileo & other Intel platforms, in a
@@ -49,11 +49,12 @@ cmake, libm and pthreads are technically required to compile.
 
 ## COMPILING
 
-More information on compiling is @ref building page
+More information on compiling is @ref building page.
 
 ## CONTRIBUTING
 
-Please see the @ref contributing page
+Please see the @ref contributing page, the @ref internals page may also be of
+use.
 
 ## API Changelog
 
