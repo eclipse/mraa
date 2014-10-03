@@ -430,6 +430,9 @@ mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
 int
 mraa_gpio_read(mraa_gpio_context dev)
 {
+    if (dev == NULL)
+        return -1;
+
     if (dev->value_fp == -1) {
         if (mraa_gpio_get_valfp(dev) != MRAA_SUCCESS) {
              syslog(LOG_ERR, "Failed to get value file pointer");
@@ -442,17 +445,19 @@ mraa_gpio_read(mraa_gpio_context dev)
     char bu[2];
     if (read(dev->value_fp, bu, 2*sizeof(char)) != 2) {
         syslog(LOG_ERR, "Failed to read a sensible value from sysfs");
+	return -1;
     }
     lseek(dev->value_fp, 0, SEEK_SET);
-    int ret = strtol(bu, NULL, 10);
 
-    return ret;
-    return 0;
+    return strtol(bu, NULL, 10);
 }
 
 mraa_result_t
 mraa_gpio_write(mraa_gpio_context dev, int value)
 {
+    if (dev == NULL)
+        return MRAA_ERROR_INVALID_HANDLE;
+
     if (dev->mmap == 1)
         return mraa_gpio_write_register(dev,value);
 

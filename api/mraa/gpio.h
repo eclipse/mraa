@@ -157,7 +157,8 @@ mraa_result_t mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir);
 mraa_result_t mraa_gpio_close(mraa_gpio_context dev);
 
 /**
- * Read the Gpio value.
+ * Read the Gpio value. This can be 0 or 1. A resonse of -1 means that there
+ * was a fatal error.
  *
  * @param dev The Gpio context
  * @return Result of operation
