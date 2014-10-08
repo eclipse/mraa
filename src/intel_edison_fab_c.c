@@ -404,6 +404,54 @@ mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
 }
 
 mraa_result_t
+mraa_intel_edsion_mb_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
+{
+    if (dev->value_fp != -1) {
+         close(dev->value_fp);
+         dev->value_fp = -1;
+    }
+
+    char filepath[MAX_SIZE];
+    snprintf(filepath, MAX_SIZE,
+                  SYSFS_PINMODE_PATH "%d/current_pullmode", dev->pin);
+
+    int drive = open(filepath, O_WRONLY);
+    if (drive == -1) {
+        syslog(LOG_ERR, "Edison: Failed to open drive for writing");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    char bu[MAX_SIZE];
+    int length;
+    switch(mode) {
+        case MRAA_GPIO_STRONG:
+            close(drive);
+            return MRAA_SUCCESS;
+        case MRAA_GPIO_PULLUP:
+            length = snprintf(bu, sizeof(bu), "pullup");
+            break;
+        case MRAA_GPIO_PULLDOWN:
+            length = snprintf(bu, sizeof(bu), "pulldown");
+            break;
+        case MRAA_GPIO_HIZ:
+            length = snprintf(bu, sizeof(bu), "nopull");
+            break;
+        default:
+            close(drive);
+            return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    }
+    if (write(drive, bu, length*sizeof(char)) == -1) {
+        syslog(LOG_ERR, "Failed to write to drive mode");
+        close(drive);
+        return MRAA_ERROR_INVALID_RESOURCE;
+
+    }
+
+    close(drive);
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
 mraa_intel_edsion_miniboard(mraa_board_t* b)
 {
     miniboard = 1;
@@ -417,7 +465,7 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     advance_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
     advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
     advance_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
-    // // gpio drie modes
+    advance_func->gpio_mode_replace = &mraa_intel_edsion_mb_gpio_mode;
 
     int pos = 0;
     strncpy(b->pins[pos].name, "J17-1", 8);
