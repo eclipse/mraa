@@ -127,38 +127,50 @@ mraa_intel_edison_gpio_init_post(mraa_gpio_context dev)
 mraa_result_t
 mraa_intel_edison_i2c_init_pre(unsigned int bus)
 {
-    if(bus != 6) {
-        syslog(LOG_ERR, "Edison: You can't use that bus :/");
-        return MRAA_ERROR_INVALID_RESOURCE;
+    if (miniboard == 0) {
+        if(bus != 6) {
+            syslog(LOG_ERR, "Edison: You can't use that bus :/");
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        mraa_gpio_write(tristate, 0);
+        mraa_gpio_context io18_gpio = mraa_gpio_init_raw(14);
+        mraa_gpio_context io19_gpio = mraa_gpio_init_raw(165);
+        mraa_gpio_dir(io18_gpio, MRAA_GPIO_IN);
+        mraa_gpio_dir(io19_gpio, MRAA_GPIO_IN);
+        mraa_gpio_close(io18_gpio);
+        mraa_gpio_close(io19_gpio);
+
+        mraa_gpio_context io18_enable = mraa_gpio_init_raw(236);
+        mraa_gpio_context io19_enable = mraa_gpio_init_raw(237);
+        mraa_gpio_dir(io18_enable, MRAA_GPIO_OUT);
+        mraa_gpio_dir(io19_enable, MRAA_GPIO_OUT);
+        mraa_gpio_write(io18_enable, 0);
+        mraa_gpio_write(io19_enable, 0);
+        mraa_gpio_close(io18_enable);
+        mraa_gpio_close(io19_enable);
+
+        mraa_gpio_context io18_pullup = mraa_gpio_init_raw(212);
+        mraa_gpio_context io19_pullup = mraa_gpio_init_raw(213);
+        mraa_gpio_dir(io18_pullup, MRAA_GPIO_IN);
+        mraa_gpio_dir(io19_pullup, MRAA_GPIO_IN);
+        mraa_gpio_close(io18_pullup);
+        mraa_gpio_close(io19_pullup);
+
+        mraa_intel_edison_pinmode_change(28, 1);
+        mraa_intel_edison_pinmode_change(27, 1);
+
+        mraa_gpio_write(tristate, 1);
+    } else {
+        if(bus != 6 && bus != 1) {
+            syslog(LOG_ERR, "Edison: You can't use that bus :/");
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        int scl = plat->pins[plat->i2c_bus[bus].scl].gpio.pinmap;
+        int sda = plat->pins[plat->i2c_bus[bus].sda].gpio.pinmap;
+        mraa_intel_edison_pinmode_change(sda, 1);
+        mraa_intel_edison_pinmode_change(scl, 1);
     }
-    mraa_gpio_write(tristate, 0);
-    mraa_gpio_context io18_gpio = mraa_gpio_init_raw(14);
-    mraa_gpio_context io19_gpio = mraa_gpio_init_raw(165);
-    mraa_gpio_dir(io18_gpio, MRAA_GPIO_IN);
-    mraa_gpio_dir(io19_gpio, MRAA_GPIO_IN);
-    mraa_gpio_close(io18_gpio);
-    mraa_gpio_close(io19_gpio);
 
-    mraa_gpio_context io18_enable = mraa_gpio_init_raw(236);
-    mraa_gpio_context io19_enable = mraa_gpio_init_raw(237);
-    mraa_gpio_dir(io18_enable, MRAA_GPIO_OUT);
-    mraa_gpio_dir(io19_enable, MRAA_GPIO_OUT);
-    mraa_gpio_write(io18_enable, 0);
-    mraa_gpio_write(io19_enable, 0);
-    mraa_gpio_close(io18_enable);
-    mraa_gpio_close(io19_enable);
-
-    mraa_gpio_context io18_pullup = mraa_gpio_init_raw(212);
-    mraa_gpio_context io19_pullup = mraa_gpio_init_raw(213);
-    mraa_gpio_dir(io18_pullup, MRAA_GPIO_IN);
-    mraa_gpio_dir(io19_pullup, MRAA_GPIO_IN);
-    mraa_gpio_close(io18_pullup);
-    mraa_gpio_close(io19_pullup);
-
-    mraa_intel_edison_pinmode_change(28, 1);
-    mraa_intel_edison_pinmode_change(27, 1);
-
-    mraa_gpio_write(tristate, 1);
     return MRAA_SUCCESS;
 }
 
@@ -385,7 +397,6 @@ mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
 }
 
 // EDISON MINIBOARD CHECKLIST
-// I2C - Some Issues need to be solved
 // SPI - Some Issues need to be solved
 
 mraa_result_t
@@ -400,8 +411,8 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
 
     advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
     advance_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
+    advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
 
-    ////FIXME i2c
     ////spi maybe
     // // gpio drie modes
 
@@ -441,7 +452,6 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].i2c.pinmap = 1;
     b->pins[pos].i2c.mux_total = 0;
-    //FIXME
     pos++;
 
     strncpy(b->pins[pos].name, "J17-8", 8);
@@ -450,7 +460,6 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].i2c.pinmap = 1;
     b->pins[pos].i2c.mux_total = 0;
-    //FIXME
     pos++;
 
     strncpy(b->pins[pos].name, "J17-9", 8);
@@ -459,7 +468,6 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].i2c.pinmap = 1;
     b->pins[pos].i2c.mux_total = 0;
-    //FIXME
     pos++;
 
     strncpy(b->pins[pos].name, "J17-10", 8);
@@ -526,7 +534,6 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].i2c.pinmap = 1;
     b->pins[pos].i2c.mux_total = 0;
-    //FIXME
     pos++;
 
     strncpy(b->pins[pos].name, "J18-7", 8);
@@ -711,6 +718,30 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     b->pins[pos].gpio.pinmap = 81;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
+
+    //BUS DEFINITIONS
+    b->i2c_bus_count = 9;
+    b->def_i2c_bus = 6;
+    int ici;
+    for (ici = 0; ici < 9; ici++) {
+        b->i2c_bus[ici].bus_id = -1;
+    }
+    b->i2c_bus[1].bus_id = 1;
+    b->i2c_bus[1].sda = 7;
+    b->i2c_bus[1].scl = 19;
+
+    b->i2c_bus[6].bus_id = 6;
+    b->i2c_bus[6].sda = 8;
+    b->i2c_bus[6].scl = 6;
+
+    b->spi_bus_count = 1;
+    b->def_spi_bus = 0;
+    b->spi_bus[0].bus_id = 5;
+    b->spi_bus[0].slave_s = 1;
+    b->spi_bus[0].cs = 23;
+    b->spi_bus[0].mosi = 11;
+    b->spi_bus[0].miso = 24;
+    b->spi_bus[0].sclk = 10;
 
     return MRAA_SUCCESS;
 }
