@@ -306,6 +306,13 @@ mraa_intel_edison_pwm_init_post(mraa_pwm_context pwm)
 mraa_result_t
 mraa_intel_edison_spi_init_pre(int bus)
 {
+    if (miniboard == 1) {
+        mraa_intel_edison_pinmode_change(111, 1);
+        mraa_intel_edison_pinmode_change(115, 1);
+        mraa_intel_edison_pinmode_change(114, 1);
+        mraa_intel_edison_pinmode_change(109, 1);
+        return MRAA_SUCCESS;
+    }
     mraa_gpio_write(tristate, 0);
 
     mraa_gpio_context io10_out = mraa_gpio_init_raw(258);
@@ -396,9 +403,6 @@ mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
     return MRAA_SUCCESS;
 }
 
-// EDISON MINIBOARD CHECKLIST
-// SPI - Some Issues need to be solved
-
 mraa_result_t
 mraa_intel_edsion_miniboard(mraa_board_t* b)
 {
@@ -412,8 +416,7 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
     advance_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
     advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
-
-    ////spi maybe
+    advance_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
     // // gpio drie modes
 
     int pos = 0;
