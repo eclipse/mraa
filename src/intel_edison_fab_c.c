@@ -385,10 +385,6 @@ mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
 }
 
 // EDISON MINIBOARD CHECKLIST
-// GPIO -
-//       INPUT - Expected to work
-//       OUTPUT - Expected to work
-// PWM - SEG FAULT
 // I2C - Some Issues need to be solved
 // SPI - Some Issues need to be solved
 
@@ -403,9 +399,9 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*56);
 
     advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
+    advance_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
 
     ////FIXME i2c
-    ////pwm_init_pre
     ////spi maybe
     // // gpio drie modes
 
