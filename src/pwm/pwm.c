@@ -154,7 +154,7 @@ mraa_pwm_init(int pin) {
     int pinn = pinm->pinmap;
     free(pinm);
 
-    if (advance_func->gpio_init_post != NULL) {
+    if (advance_func->pwm_init_post != NULL) {
         mraa_pwm_context pret = mraa_pwm_init_raw(chip,pinn);
         mraa_result_t ret = advance_func->pwm_init_post(pret);
         if (ret != MRAA_SUCCESS) {
