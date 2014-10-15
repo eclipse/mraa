@@ -34,7 +34,7 @@ namespace mraa {
  * Gpio Output modes
  */
 typedef enum {
-    MODE_STRONG   = 0, /**< No interrupt on Gpio */
+    MODE_STRONG   = 0, /**< Default. Strong High and Low */
     MODE_PULLUP   = 1, /**< Interupt on rising & falling */
     MODE_PULLDOWN = 2, /**< Interupt on rising only */
     MODE_HIZ      = 3  /**< Interupt on falling only */
