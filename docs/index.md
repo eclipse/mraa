@@ -63,6 +63,12 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.5.1**
+  * Intel Edison - Mini breakout board support
+  * Change to use syslog throughout instead of printing to stderr.
+  * Fix misc issues brought up throuh coverity scans
+  * Clear up Analog call documentation
+
 **0.5.0**
   * Intel Edison - Arduino board support.
   * Boost Allowable i2c busses to 12
