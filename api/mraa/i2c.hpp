@@ -25,6 +25,7 @@
 #pragma once
 
 #include "i2c.h"
+#include <stdexcept>
 
 namespace mraa {
 
@@ -48,10 +49,15 @@ class I2c {
          * @param raw Whether to disable pinmapper for your board
          */
         I2c(int bus, bool raw=false) {
-            if (raw)
+            if (raw) {
                 m_i2c = mraa_i2c_init_raw(bus);
-            else
+            }
+            else {
                 m_i2c = mraa_i2c_init(bus);
+            }
+            if (m_i2c == NULL) {
+		throw std::invalid_argument("Invalid i2c bus");
+            }
         }
         /**
          * Closes the I2c Bus used. This does not guarrantee the bus will not

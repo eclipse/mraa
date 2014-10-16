@@ -25,6 +25,7 @@
 #pragma once
 
 #include "gpio.h"
+#include <stdexcept>
 
 namespace mraa {
 
@@ -80,12 +81,20 @@ class Gpio {
          * you so this may not always work as expected.
          */
         Gpio(int pin, bool owner=true, bool raw=false) {
-            if (raw)
+            if (raw) {
                 m_gpio = mraa_gpio_init_raw(pin);
-            else
+            }
+            else {
                 m_gpio = mraa_gpio_init(pin);
-            if (!owner)
+            }
+
+            if (m_gpio == NULL) {
+                throw std::invalid_argument("Invalid GPIO pin specified");
+            }
+
+            if (!owner) {
                 mraa_gpio_owner(m_gpio, 0);
+            }
         }
         /**
          * Gpio object destructor, this will only unexport the gpio if we where

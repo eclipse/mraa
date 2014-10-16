@@ -25,6 +25,7 @@
 #pragma once
 
 #include "spi.h"
+#include <stdexcept>
 
 namespace mraa {
 
@@ -44,6 +45,10 @@ class Spi {
          */
         Spi(int bus) {
             m_spi = mraa_spi_init(bus);
+
+            if (m_spi == NULL) {
+                throw std::invalid_argument("Error initialising SPI bus");
+            }
         }
         /**
          * Closes spi bus

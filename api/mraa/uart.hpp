@@ -25,6 +25,7 @@
 #pragma once
 
 #include "uart.h"
+#include <stdexcept>
 
 namespace mraa {
 
@@ -43,6 +44,10 @@ class Uart {
          */
         Uart(int uart) {
             m_uart = mraa_uart_init(uart);
+
+            if (m_uart == NULL) {
+                throw std::invalid_argument("Error initialising UART");
+            }
         }
         /**
          * Uart destructor

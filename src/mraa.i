@@ -1,5 +1,6 @@
 %include stdint.i
 %include std_string.i
+%include exception.i
 
 #ifdef DOXYGEN
     %include common_hpp_doc.i
@@ -25,6 +26,16 @@
     //Adding mraa_init() to the module initialisation process
     mraa_init();
 %}
+
+%exception {
+    try {
+        $action
+    } catch(const std::invalid_argument& e) {
+        SWIG_exception(SWIG_ValueError, e.what());
+    } catch(...) {
+        SWIG_exception(SWIG_RuntimeError, "Unknown exception");
+    }
+}
 
 %typemap(in) uint8_t = char;
 %typemap(in) unsigned char* = char*;

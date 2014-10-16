@@ -25,5 +25,9 @@
 import mraa
 
 print (mraa.getVersion())
-x = mraa.Aio(0)
-print (x.read())
+
+try:
+    x = mraa.Aio(0)
+    print (x.read())
+except:
+    print ("Are you sure you have an ADC?")

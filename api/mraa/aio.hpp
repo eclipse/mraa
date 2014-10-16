@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <stdexcept>
 #include "aio.h"
 
 namespace mraa {
@@ -45,6 +46,9 @@ class Aio {
          */
         Aio(unsigned int pin) {
             m_aio = mraa_aio_init(pin);
+            if (m_aio == NULL) {
+                throw std::invalid_argument("Invalid AIO pin specified - do you have an ADC?");
+            }
         }
         /**
          * Aio destructor

@@ -25,6 +25,7 @@
 #pragma once
 
 #include "pwm.h"
+#include <stdexcept>
 
 namespace mraa {
 
@@ -47,12 +48,20 @@ class Pwm {
          * if the pinmapper exported it
          */
         Pwm(int pin, int chipid=-1, bool owner = true) {
-            if (chipid == -1)
+            if (chipid == -1) {
                 m_pwm = mraa_pwm_init(pin);
-            else
+            }
+            else {
                 m_pwm = mraa_pwm_init_raw(pin, chipid);
-            if (!owner)
+            }
+
+            if (m_pwm == NULL) {
+                throw std::invalid_argument("Error initialising PWM on pin");
+            }
+
+            if (!owner) {
                 mraa_pwm_owner(m_pwm, 0);
+            }
         }
         /**
          * Pwm destructor
