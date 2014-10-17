@@ -32,6 +32,7 @@
 #include "intel_galileo_rev_d.h"
 #include "intel_galileo_rev_g.h"
 #include "intel_edison_fab_c.h"
+#include "intel_de3815.h"
 #include "gpio.h"
 #include "version.h"
 
@@ -89,6 +90,8 @@ mraa_init()
                 platform_type = MRAA_INTEL_EDISON_FAB_C;
             } else if (strncmp(line, "SALT BAY", 7) == 0) {
                 platform_type = MRAA_INTEL_EDISON_FAB_C;
+            } else if (strncmp(line, "DE3815", 6) == 0) {
+                platform_type = MRAA_INTEL_DE3815;
             } else {
                 platform_type = MRAA_INTEL_GALILEO_GEN1;
             }
@@ -109,6 +112,9 @@ mraa_init()
             break;
         case MRAA_INTEL_EDISON_FAB_C:
             plat = mraa_intel_edison_fab_c();
+            break;
+        case MRAA_INTEL_DE3815:
+            plat = mraa_intel_de3815();
             break;
         default:
             plat = mraa_intel_galileo_rev_d();
