@@ -96,7 +96,7 @@ mraa_result_t mraa_spi_frequency(mraa_spi_context dev, int hz);
 uint8_t mraa_spi_write(mraa_spi_context dev, uint8_t data);
 
 /** Write Buffer of bytes to the SPI device. The pointer return has to be
- * free'd by the caller.
+ * free'd by the caller. It will return a NULL pointer in cases of error.
  *
  * @param dev The Spi context
  * @param data to send

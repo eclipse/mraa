@@ -85,7 +85,8 @@ class Spi {
         }
         /**
          * Write buffer of bytes to SPI device The pointer return has to be
-         * free'd by the caller.
+	 * free'd by the caller. It will return a NULL pointer in cases of
+	 * error
          *
          * @param data buffer to send
          * @param length size of buffer to send
