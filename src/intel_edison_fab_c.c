@@ -819,6 +819,7 @@ mraa_intel_edison_fab_c()
     b->phy_pin_count = 20;
     b->gpio_count = 14;
     b->aio_count = 6;
+    b->uart_dev_count = 2;
 
     advance_func->gpio_dir_pre = &mraa_intel_edison_gpio_dir_pre;
     advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
@@ -1069,6 +1070,12 @@ mraa_intel_edison_fab_c()
     b->spi_bus[0].mosi = 11;
     b->spi_bus[0].miso = 12;
     b->spi_bus[0].sclk = 13;
+    
+    b->def_uart_dev = 0;
+    b->uart_dev[0].rx = 0;
+    b->uart_dev[0].tx = 1;
+    b->uart_dev[1].rx = -1;
+    b->uart_dev[1].tx = -1;
 
     int il;
     for (il =0; il < MRAA_INTEL_EDISON_PINCOUNT; il++) {
