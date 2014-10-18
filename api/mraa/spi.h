@@ -105,6 +105,17 @@ uint8_t mraa_spi_write(mraa_spi_context dev, uint8_t data);
  */
 uint8_t* mraa_spi_write_buf(mraa_spi_context dev, uint8_t* data, int length);
 
+/** Transfer Buffer of bytes to the SPI device. Both send and recv buffers
+ * are passed in
+ *
+ * @param dev The Spi context
+ * @param data to send
+ * @param rxbuf buffer to recv data back, may be NULL
+ * @param length elements within buffer, Max 4096
+ * @return Result of operation
+ */
+mraa_result_t mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int length);
+
 /**
  * Change the SPI lsb mode
  *
