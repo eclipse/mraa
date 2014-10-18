@@ -193,6 +193,25 @@ mraa_spi_write_buf(mraa_spi_context dev, uint8_t* data, int length)
     return recv;
 }
 
+mraa_result_t 
+mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int length)
+{
+    struct spi_ioc_transfer msg;
+    memset(&msg, 0, sizeof(msg));
+
+    msg.tx_buf = (unsigned long) data;
+    msg.rx_buf = (unsigned long) rxbuf;
+    msg.speed_hz = dev->clock;
+    msg.bits_per_word = dev->bpw;
+    msg.delay_usecs = 0;
+    msg.len = length;
+    if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
+        syslog(LOG_ERR, "Failed to perform dev transfer");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    return MRAA_SUCCESS;
+}
+
 mraa_result_t
 mraa_spi_stop(mraa_spi_context dev)
 {
