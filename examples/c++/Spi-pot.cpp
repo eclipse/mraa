@@ -49,6 +49,7 @@ int main ()
     spi = new mraa::Spi(0);
 
     char data[] = {0x00, 100};
+    char rxBuf[2];
     char *recv;
     while (running == 0) {
         int i;
@@ -56,14 +57,18 @@ int main ()
             data[1] = i;
             recv = spi->write(data, 2);
             printf("Writing -%i",i);
-            printf("RECIVED-%i-%i\n",recv[0],recv[1]);
+            if (recv) {
+                printf("RECIVED-%i-%i\n",recv[0],recv[1]);
+                free(recv);
+            }
             usleep(100000);
         }
         for (i = 130; i > 90; i--) {
             data[1] = i;
-            recv = spi->write(data, 2);
-            printf("Writing -%i",i);
-            printf("RECIVED-%i-%i\n",recv[0],recv[1]);
+            if (spi->transfer(data, rxBuf, 2) == MRAA_SUCCESS) {
+                printf("Writing -%i",i);
+                printf("RECIVED-%i-%i\n",rxBuf[0],rxBuf[1]);
+            }    
             usleep(100000);
         }
 
