@@ -83,3 +83,12 @@ struct _aio {
     int adc_in_fp; /**< File Pointer to raw sysfs */
     int value_bit; /**< 10 bits by default. Can be increased if board */
 };
+
+/**
+ * A structure representing a UART device
+ */
+struct _uart {
+    /*@{*/
+    int index; /**< the uart index, as known to the os. */
+    /*@}*/
+};

@@ -30,15 +30,6 @@
 #include "uart.h"
 #include "mraa_internal.h"
 
-/**
- * A structure representing a UART device
- */
-struct _uart {
-    /*@{*/
-    int index; /**< the uart index, as known to the os. */
-    /*@}*/
-};
-
 mraa_uart_context
 mraa_uart_init(int index)
 {
@@ -49,6 +40,13 @@ mraa_uart_init(int index)
     memset(dev, 0, sizeof(struct _uart));
 
     dev->index = index;
+    if (advance_func->uart_init_post != NULL) {
+        mraa_result_t ret = advance_func->uart_init_post(dev);
+        if (ret != MRAA_SUCCESS) {
+            free(dev);
+            return NULL;
+        }
+    }
 
     return dev;
 }
