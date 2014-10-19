@@ -8,6 +8,9 @@ Currently Supported boards:
 - Intel Arduino board
 - Intel breakout board
 
+UART
+----
+On both the Arduino board and the breakout board, The avaible UART interface is on /dev/ttyMFD1
 
 Intel Arduino board
 -------------------

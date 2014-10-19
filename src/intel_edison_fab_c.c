@@ -452,6 +452,15 @@ mraa_intel_edsion_mb_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
 }
 
 mraa_result_t
+mraa_intel_edison_uart_init_post(mraa_uart_context uart)
+{
+    mraa_result_t ret;
+    ret = mraa_intel_edison_pinmode_change(130,1); //IO0 RX
+    ret = mraa_intel_edison_pinmode_change(131,1); //IO1 TX
+    return ret;
+}
+
+mraa_result_t
 mraa_intel_edsion_miniboard(mraa_board_t* b)
 {
     miniboard = 1;
@@ -466,6 +475,7 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
     advance_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
     advance_func->gpio_mode_replace = &mraa_intel_edsion_mb_gpio_mode;
+    advance_func->uart_init_post = &mraa_intel_edison_uart_init_post;
 
     int pos = 0;
     strncpy(b->pins[pos].name, "J17-1", 8);
@@ -832,6 +842,7 @@ mraa_intel_edison_fab_c()
     advance_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
     advance_func->spi_init_post = &mraa_intel_edison_spi_init_post;
     advance_func->gpio_mode_replace = &mraa_intel_edison_gpio_mode_replace;
+    advance_func->uart_init_post = &mraa_intel_edison_uart_init_post;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_EDISON_PINCOUNT);
 
@@ -849,16 +860,22 @@ mraa_intel_edison_fab_c()
     b->adc_supported = 10;
 
     strncpy(b->pins[0].name, "IO0", 8);
-    b->pins[0].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,0};
+    b->pins[0].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,0,1};
     b->pins[0].gpio.pinmap = 130;
     b->pins[0].gpio.parent_id = 0;
     b->pins[0].gpio.mux_total = 0;
+    b->pins[0].uart.pinmap = 0;
+    b->pins[0].uart.parent_id = 0;
+    b->pins[0].uart.mux_total = 0;
 
     strncpy(b->pins[1].name, "IO1", 8);
-    b->pins[1].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,0};
+    b->pins[1].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,0,1};
     b->pins[1].gpio.pinmap = 131;
     b->pins[1].gpio.parent_id = 0;
     b->pins[1].gpio.mux_total = 0;
+    b->pins[1].uart.pinmap = 0;
+    b->pins[1].uart.parent_id = 0;
+    b->pins[1].uart.mux_total = 1;
 
     strncpy(b->pins[2].name, "IO2", 8);
     b->pins[2].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,0};
@@ -1069,6 +1086,11 @@ mraa_intel_edison_fab_c()
     b->spi_bus[0].mosi = 11;
     b->spi_bus[0].miso = 12;
     b->spi_bus[0].sclk = 13;
+
+    b->uart_dev_count = 1;
+    b->def_uart_dev = 0;
+    b->uart_dev[0].rx = 0;
+    b->uart_dev[0].tx = 1;
 
     int il;
     for (il =0; il < MRAA_INTEL_EDISON_PINCOUNT; il++) {
