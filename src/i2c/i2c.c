@@ -81,7 +81,7 @@ mraa_i2c_frequency(mraa_i2c_context dev, int hz)
 {
     dev->hz = hz;
 
-    return MRAA_SUCCESS;
+    return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
 }
 
 int
