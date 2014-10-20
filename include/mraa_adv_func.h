@@ -61,5 +61,6 @@ typedef struct {
     mraa_result_t (*spi_init_pre) (int bus);
     mraa_result_t (*spi_init_post) (mraa_spi_context spi);
 
+    mraa_result_t (*uart_init_pre) (int index);
     mraa_result_t (*uart_init_post) (mraa_uart_context uart);
 } mraa_adv_func_t;

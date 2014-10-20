@@ -33,6 +33,11 @@
 mraa_uart_context
 mraa_uart_init(int index)
 {
+    if (advance_func->uart_init_pre != NULL) {
+        if (advance_func->uart_init_pre(index) != MRAA_SUCCESS)
+            return NULL;
+    }
+
     if ( mraa_setup_uart(index) != MRAA_SUCCESS)
         return NULL;
 
