@@ -46,8 +46,6 @@ mraa_intel_de3815()
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_DE3815_PINCOUNT);
 
-    printf("THIS IS DA NUC MAN\n");
-
     strncpy(b->pins[0].name, "1.8v", 8);
     b->pins[0].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
 
