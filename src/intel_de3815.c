@@ -69,10 +69,18 @@ mraa_intel_de3815()
     b->pins[8].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
     strncpy(b->pins[9].name, "SCI", 8);
     b->pins[9].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+
     strncpy(b->pins[10].name, "PWM0", 8);
-    b->pins[10].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[10].capabilites = (mraa_pincapabilities_t) {1,0,1,0,0,0,0,0};
+    b->pins[10].pwm.pinmap = 0;
+    b->pins[10].pwm.parent_id = 0;
+    b->pins[10].pwm.mux_total = 0;
+
     strncpy(b->pins[11].name, "PWM1", 8);
-    b->pins[11].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[11].capabilites = (mraa_pincapabilities_t) {1,0,1,0,0,0,0,0};
+    b->pins[11].pwm.pinmap = 0;
+    b->pins[11].pwm.parent_id = 1;
+    b->pins[11].pwm.mux_total = 0;
 
     strncpy(b->pins[12].name, "I2C0-SCL", 8);
     b->pins[12].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,0,0};
