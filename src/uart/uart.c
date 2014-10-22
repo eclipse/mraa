@@ -38,7 +38,7 @@ mraa_uart_init(int index)
             return NULL;
     }
 
-    if ( mraa_setup_uart(index) != MRAA_SUCCESS)
+    if (mraa_setup_uart(index) != MRAA_SUCCESS)
         return NULL;
 
     mraa_uart_context dev = (mraa_uart_context) malloc(sizeof(struct _uart));

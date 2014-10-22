@@ -47,8 +47,8 @@ aio_get_valid_fp(mraa_aio_context dev)
 
     dev->adc_in_fp = open(file_path, O_RDONLY);
     if (dev->adc_in_fp == -1) {
-        syslog(LOG_ERR, "Failed to open Analog input raw file %s for "
-                "reading!", file_path);
+	syslog(LOG_ERR, "aio: Failed to open input raw file %s for reading!",
+                file_path);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -68,15 +68,15 @@ mraa_aio_init(unsigned int aio_channel)
     if (checked_pin < 0) {
         switch (checked_pin) {
             case MRAA_NO_SUCH_IO:
-                syslog(LOG_ERR, "Invalid analog input channel %d specified",
+                syslog(LOG_ERR, "aio: Invalid input channel %d specified",
                         aio_channel);
                 return NULL;
             case MRAA_IO_SETUP_FAILURE:
-                syslog(LOG_ERR, "Failed to set-up analog input channel %d "
+                syslog(LOG_ERR, "aio: Failed to set-up input channel %d "
                         "multiplexer", aio_channel);
                 return NULL;
             case MRAA_PLATFORM_NO_INIT:
-                syslog(LOG_ERR, "Platform not initialised");
+                syslog(LOG_ERR, "aio: Platform not initialised");
                 return NULL;
             default:
                 return NULL;
@@ -86,7 +86,7 @@ mraa_aio_init(unsigned int aio_channel)
     //Create ADC device connected to specified channel
     mraa_aio_context dev = malloc(sizeof(struct _aio));
     if (dev == NULL) {
-        syslog(LOG_ERR, "Insufficient memory for specified Analog input channel "
+        syslog(LOG_ERR, "aio: Insufficient memory for specified input channel "
                 "%d\n", aio_channel);
         return NULL;
     }
@@ -123,7 +123,7 @@ mraa_aio_read(mraa_aio_context dev)
 
     lseek(dev->adc_in_fp, 0, SEEK_SET);
     if (read(dev->adc_in_fp, buffer, sizeof(buffer)) < 1) {
-        syslog(LOG_ERR, "Failed to read a sensible value");
+        syslog(LOG_ERR, "aio: Failed to read a sensible value");
     }
     // force NULL termination of string
     buffer[16] = '\0';
@@ -133,10 +133,10 @@ mraa_aio_read(mraa_aio_context dev)
     char *end;
     unsigned int analog_value = (unsigned int) strtoul(buffer, &end, 10);
     if (end == &buffer[0]) {
-        syslog(LOG_ERR, "value is not a decimal number");
+        syslog(LOG_ERR, "aio: Value is not a decimal number");
     }
     else if (errno != 0) {
-        syslog(LOG_ERR, "errno was set");
+        syslog(LOG_ERR, "aio: Errno was set");
     }
 
     if (dev->value_bit != raw_bits) {
@@ -165,13 +165,9 @@ mraa_aio_close(mraa_aio_context dev)
 mraa_result_t
 mraa_aio_set_bit(mraa_aio_context dev, int bits)
 {
-    if (dev == NULL) {
-        syslog(LOG_ERR, "AIO Device not valid");
+    if (dev == NULL || bits < 1) {
+        syslog(LOG_ERR, "aio: Device not valid");
         return MRAA_ERROR_INVALID_RESOURCE;
-    }
-    if (bits < 1) {
-        syslog(LOG_ERR, "AIO Device not valid");
-        return MRAA_ERROR_INVALID_PARAMETER;
     }
     dev->value_bit = bits;
     return MRAA_SUCCESS;
@@ -181,7 +177,7 @@ int
 mraa_aio_get_bit(mraa_aio_context dev)
 {
     if (dev == NULL) {
-        syslog(LOG_ERR, "AIO Device not valid");
+        syslog(LOG_ERR, "aio: Device not valid");
         return 0;
     }
     return dev->value_bit;

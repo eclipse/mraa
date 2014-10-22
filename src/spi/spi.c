@@ -59,7 +59,7 @@ mraa_spi_init(int bus)
 
     mraa_spi_bus_t *spi = mraa_setup_spi(bus);
     if (bus < 0) {
-        syslog(LOG_ERR, "Failed. SPI platform Error");
+        syslog(LOG_ERR, "spi: Failed. SPI platform Error");
         return NULL;
     }
     mraa_spi_context dev = (mraa_spi_context) malloc(sizeof(struct _spi));
@@ -70,7 +70,7 @@ mraa_spi_init(int bus)
 
     dev->devfd = open(path, O_RDWR);
     if (dev->devfd < 0) {
-        syslog(LOG_ERR, "Failed opening SPI Device. bus:%s", path);
+        syslog(LOG_ERR, "spi: Failed opening SPI Device. bus:%s", path);
         free(dev);
         return NULL;
     }
@@ -113,7 +113,7 @@ mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode)
     }
 
     if (ioctl (dev->devfd, SPI_IOC_WR_MODE, &spi_mode) < 0) {
-        syslog(LOG_ERR, "Failed to set spi mode");
+        syslog(LOG_ERR, "spi: Failed to set spi mode");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -136,7 +136,7 @@ mraa_spi_lsbmode(mraa_spi_context dev, mraa_boolean_t lsb)
         lsb_mode = 1;
     }
     if (ioctl (dev->devfd, SPI_IOC_WR_LSB_FIRST, &lsb_mode) < 0) {
-        syslog(LOG_ERR, "Failed to set bit order");
+        syslog(LOG_ERR, "spi: Failed to set bit order");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     dev->lsb = lsb;
@@ -170,7 +170,7 @@ mraa_spi_write(mraa_spi_context dev, uint8_t data)
     msg.delay_usecs = 0;
     msg.len = length;
     if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
-        syslog(LOG_ERR, "Failed to perform dev transfer");
+        syslog(LOG_ERR, "spi: Failed to perform dev transfer");
         return -1;
     }
     return recv;
@@ -189,7 +189,7 @@ mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int l
     msg.delay_usecs = 0;
     msg.len = length;
     if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
-        syslog(LOG_ERR, "Failed to perform dev transfer");
+        syslog(LOG_ERR, "spi: Failed to perform dev transfer");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     return MRAA_SUCCESS;
