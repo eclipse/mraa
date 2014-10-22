@@ -129,8 +129,8 @@ mraa_intel_edison_i2c_init_pre(unsigned int bus)
 {
     if (miniboard == 0) {
         if(bus != 6) {
-            syslog(LOG_ERR, "Edison: You can't use that bus :/");
-            return MRAA_ERROR_INVALID_RESOURCE;
+            syslog(LOG_ERR, "Edison: You can't use that bus, switching to bus 6");
+            bus = 6;
         }
         mraa_gpio_write(tristate, 0);
         mraa_gpio_context io18_gpio = mraa_gpio_init_raw(14);
@@ -162,8 +162,8 @@ mraa_intel_edison_i2c_init_pre(unsigned int bus)
         mraa_gpio_write(tristate, 1);
     } else {
         if(bus != 6 && bus != 1) {
-            syslog(LOG_ERR, "Edison: You can't use that bus :/");
-            return MRAA_ERROR_INVALID_RESOURCE;
+            syslog(LOG_ERR, "Edison: You can't use that bus, switching to bus 6");
+            bus = 6;
         }
         int scl = plat->pins[plat->i2c_bus[bus].scl].gpio.pinmap;
         int sda = plat->pins[plat->i2c_bus[bus].sda].gpio.pinmap;
