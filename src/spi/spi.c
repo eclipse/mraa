@@ -146,6 +146,10 @@ mraa_spi_lsbmode(mraa_spi_context dev, mraa_boolean_t lsb)
 mraa_result_t
 mraa_spi_bit_per_word(mraa_spi_context dev, unsigned int bits)
 {
+    if (ioctl(dev->devfd, SPI_IOC_WR_BITS_PER_WORD, &bits) < 0) {
+        syslog(LOG_ERR, "spi: Failed to set bit per word");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     dev->bpw = bits;
     return MRAA_SUCCESS;
 }
