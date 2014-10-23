@@ -29,7 +29,7 @@
 mraa_i2c_context
 mraa_i2c_init(int bus)
 {
-    int checked_pin = mraa_setup_i2c(bus);
+    int checked_pin = mraa_setup_i2c(&bus);
     if (checked_pin < 0) {
         switch(checked_pin) {
             case MRAA_NO_SUCH_IO:

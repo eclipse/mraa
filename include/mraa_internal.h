@@ -56,7 +56,7 @@ unsigned int mraa_setup_aio(int pin);
  *
  * @return unsigned int if using /dev/i2c-2 returned would be 2
  */
-unsigned int mraa_setup_i2c(int bus);
+unsigned int mraa_setup_i2c(int* bus);
 
 /** Setup spi interface, sets up multiplexer on device.
  *
