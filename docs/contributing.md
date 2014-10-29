@@ -15,3 +15,11 @@ on github.
 If you'd rather not use github you are more than welcome to send git formatted
 patches to brendan.le.foll@intel.com.
 
+# Basic rules
+- Your code must build
+- Commits must have a sign-off line by at least yourself
+- Commits must be named <file/module>: Some decent description
+- Try not to break master. In any commit.
+- Try to split commits up logically, you will be asked to rebase them if they
+  are not.
+- Try to stick to the established coding style reguardless of your personal feeling for it!
