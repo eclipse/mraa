@@ -300,9 +300,10 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
     // stop isr being useful
     ret = mraa_gpio_edge_mode(dev, MRAA_GPIO_EDGE_NONE);
 
-    if ((dev->thread_id != 0) &&
-        (pthread_cancel(dev->thread_id) != 0)) {
-        ret = MRAA_ERROR_INVALID_HANDLE;
+    if ((dev->thread_id != 0)) {
+        if ((pthread_cancel(dev->thread_id) != 0) || (pthread_join(dev->thread_id, NULL) != 0)) {
+            ret = MRAA_ERROR_INVALID_HANDLE;
+        }
     }
 
     // close the filehandle in case it's still open
