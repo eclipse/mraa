@@ -104,7 +104,7 @@ mraa_pwm_read_period(mraa_pwm_context dev)
 
     char *endptr;
     long int ret = strtol(output, &endptr, 10);
-    if ('\0' != *endptr) {
+    if ('\0' != *endptr && '\n' != *endptr) {
         syslog(LOG_ERR, "pwm: Error in string converstion");
         return -1;
     }
@@ -130,7 +130,7 @@ mraa_pwm_read_duty(mraa_pwm_context dev)
 
     char *endptr;
     long int ret = strtol(output, &endptr, 10);
-    if ('\0' != *endptr) {
+    if ('\0' != *endptr && '\n' != *endptr) {
         syslog(LOG_ERR, "pwm: Error in string converstion");
         return -1;
     }
