@@ -96,6 +96,15 @@ int mraa_i2c_read(mraa_i2c_context dev, uint8_t *data, int length);
 uint8_t mraa_i2c_read_byte(mraa_i2c_context dev);
 
 /**
+ * Read a single byte from i2c context, from designated register
+ *
+ * @param dev The i2c context
+ * @param command The register
+ * @return The result of the read or -1 if failed
+ */
+uint8_t mraa_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command);
+
+/**
  * Write to an i2c context
  *
  * @param dev The i2c context
