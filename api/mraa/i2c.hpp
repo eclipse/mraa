@@ -144,6 +144,18 @@ class I2c {
         }
 
         /**
+         * Read an i2c register
+         *
+         * @param reg Register to read from
+
+         * @return char read from the bus
+         * @return char read from register
+         */
+        int readReg(char reg) {
+            return mraa_i2c_read_byte_data(m_i2c, reg);
+        }
+
+        /**
          * Write multiple bytes to the bus
          *
          * @param data The byte to send on the bus
