@@ -166,24 +166,6 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
 }
 
 unsigned int
-mraa_setup_gpio(int pin)
-{
-    if (plat == NULL)
-        return MRAA_PLATFORM_NO_INIT;
-
-    if (pin < 0 || pin > plat->phy_pin_count)
-        return MRAA_NO_SUCH_IO;
-
-    if(plat->pins[pin].capabilites.gpio != 1)
-      return MRAA_NO_SUCH_IO;
-
-    if (plat->pins[pin].gpio.mux_total > 0)
-       if (mraa_setup_mux_mapped(plat->pins[pin].gpio) != MRAA_SUCCESS)
-            return MRAA_NO_SUCH_IO;
-    return plat->pins[pin].gpio.pinmap;
-}
-
-unsigned int
 mraa_setup_aio(int aio)
 {
     if (plat == NULL)

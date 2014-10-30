@@ -55,11 +55,26 @@ mraa_gpio_get_valfp(mraa_gpio_context dev)
 mraa_gpio_context
 mraa_gpio_init(int pin)
 {
-    int pinm = mraa_setup_gpio(pin);
-    if (pinm < 0)
+    if (plat == NULL) {
+        syslog(LOG_ERR, "gpio: platform not initialised");
         return NULL;
+    }
+    if (pin < 0 || pin > plat->phy_pin_count) {
+        syslog(LOG_ERR, "gpio: pin %i beyond platform definition", pin);
+        return NULL;
+    }
+    if (plat->pins[pin].capabilites.gpio != 1) {
+        syslog(LOG_ERR, "gpio: pin %i not capable of gpio", pin);
+        return NULL;
+    }
+    if (plat->pins[pin].gpio.mux_total > 0) {
+        if (mraa_setup_mux_mapped(plat->pins[pin].gpio) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "gpio: unable to setup muxes");
+            return NULL;
+        }
+    }
 
-    mraa_gpio_context r = mraa_gpio_init_raw(pinm);
+    mraa_gpio_context r = mraa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
     r->phy_pin = pin;
 
     if (advance_func->gpio_init_post != NULL) {
