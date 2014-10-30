@@ -493,6 +493,10 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     b->phy_pin_count = 56;
     b->gpio_count = 56; // A bit of a hack I suppose
     b->aio_count = 0;
+    b->pwm_default_period = 5000;
+    b->pwm_max_period = 218453;
+    b->pwm_min_period = 1;
+
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*56);
 
@@ -890,6 +894,9 @@ mraa_intel_edison_fab_c()
 
     b->adc_raw = 12;
     b->adc_supported = 10;
+    b->pwm_default_period = 5000;
+    b->pwm_max_period = 218453;
+    b->pwm_min_period = 1;
 
     strncpy(b->pins[0].name, "IO0", 8);
     b->pins[0].capabilites = (mraa_pincapabilities_t) {1,1,0,0,0,0,0,1};

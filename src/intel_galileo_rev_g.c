@@ -177,6 +177,9 @@ mraa_intel_galileo_gen2()
     b->aio_count = 6;
     b->adc_raw = 12;
     b->adc_supported = 10;
+    b->pwm_default_period = 5000;
+    b->pwm_max_period = 41666;
+    b->pwm_min_period = 666;
 
     advance_func->gpio_dir_pre = &mraa_intel_galileo_gen2_dir_pre;
     advance_func->i2c_init_pre = &mraa_intel_galileo_gen2_i2c_init_pre;

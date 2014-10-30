@@ -43,6 +43,9 @@ mraa_intel_de3815()
     b->aio_count = 0;
     b->adc_raw = 0;
     b->adc_supported = 0;
+    b->pwm_default_period = 500;
+    b->pwm_max_period = 2147483;
+    b->pwm_min_period = 1;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_DE3815_PINCOUNT);
 

@@ -42,6 +42,9 @@ mraa_intel_galileo_rev_d()
 
     b->adc_raw = 12;
     b->adc_supported = 10;
+    b->pwm_default_period = 500;
+    b->pwm_max_period = 7968;
+    b->pwm_min_period = 1;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_GALILEO_REV_D_PINCOUNT);
 

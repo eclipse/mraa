@@ -183,6 +183,9 @@ typedef struct {
     unsigned int def_uart_dev; /**< Position in array of defult uart */
     unsigned int uart_dev_count; /**< Usable spi Count */
     mraa_uart_dev_t uart_dev[6]; /**< Array of UARTs */
+    int pwm_default_period; /**< The default PWM period is US */
+    int pwm_max_period; /**< Maximum period in us */
+    int pwm_min_period; /**< Minimum period in us */
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
     /*@}*/
 } mraa_board_t;

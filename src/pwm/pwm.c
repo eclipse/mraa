@@ -201,6 +201,7 @@ mraa_pwm_init_raw(int chipin, int pin)
             return NULL;
         }
         dev->owner = 1;
+        mraa_pwm_period_us(dev, plat->pwm_default_period);
         close(export_f);
     }
     mraa_pwm_setup_duty_fp(dev);
@@ -210,6 +211,9 @@ mraa_pwm_init_raw(int chipin, int pin)
 mraa_result_t
 mraa_pwm_write(mraa_pwm_context dev, float percentage)
 {
+    if (percentage >= 1.0f) {
+        return mraa_pwm_write_duty(dev, mraa_pwm_read_period(dev));
+    }
     return mraa_pwm_write_duty(dev, percentage * mraa_pwm_read_period(dev));
 }
 
@@ -235,6 +239,11 @@ mraa_pwm_period_ms(mraa_pwm_context dev, int ms)
 mraa_result_t
 mraa_pwm_period_us(mraa_pwm_context dev, int us)
 {
+    if (us < plat->pwm_min_period ||
+        us > plat->pwm_max_period) {
+        syslog(LOG_ERR, "pwm: period value outside platform range");
+        return MRAA_ERROR_INVALID_PARAMETER;
+    }
     return mraa_pwm_write_period(dev, us*1000);
 }
 
