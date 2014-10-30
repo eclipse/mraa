@@ -365,7 +365,7 @@ mraa_intel_galileo_gen2()
     b->pins[9].pwm.mux[1].value = 0;
 
     strncpy(b->pins[10].name, "IO10", 8);
-    b->pins[10].capabilites = (mraa_pincapabilities_t) {1,1,1,1,0,0,0};
+    b->pins[10].capabilites = (mraa_pincapabilities_t) {1,1,1,1,1,0,0};
     b->pins[10].gpio.pinmap = 10;
     b->pins[10].gpio.parent_id = 0;
     b->pins[10].gpio.mux_total = 1;
@@ -392,6 +392,10 @@ mraa_intel_galileo_gen2()
     b->pins[10].mmap.gpio.mux[2].value = 0;
     b->pins[10].mmap.mem_sz = 0x1000;
     b->pins[10].mmap.bit_pos = 2;
+    b->pins[10].spi.parent_id = 1;
+    b->pins[10].spi.mux_total = 1;
+    b->pins[10].spi.mux[0].pin = 74;
+    b->pins[10].spi.mux[0].value = 0;
 
     strncpy(b->pins[11].name, "IO11", 8);
     b->pins[11].capabilites = (mraa_pincapabilities_t) {1,1,1,0,1,0,0};
