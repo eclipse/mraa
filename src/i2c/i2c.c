@@ -101,6 +101,13 @@ mraa_i2c_read_byte(mraa_i2c_context dev)
     return byte;
 }
 
+uint8_t
+mraa_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
+{
+    uint8_t byte = i2c_smbus_read_byte_data(dev->fh, command);
+    return byte;
+}
+
 mraa_result_t
 mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length)
 {
