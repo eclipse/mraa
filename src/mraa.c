@@ -269,6 +269,11 @@ mraa_setup_spi(int bus)
         if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS)
              return NULL;
 
+    pos = plat->spi_bus[bus].cs;
+    if (plat->pins[pos].spi.mux_total > 0)
+        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS)
+             return NULL;
+
     mraa_spi_bus_t *spi = &(plat->spi_bus[bus]);
     return spi;
 }
