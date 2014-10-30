@@ -149,7 +149,7 @@ mraa_set_priority(const unsigned int priority)
     return sched_setscheduler(0, SCHED_RR, &sched_s);
 }
 
-static mraa_result_t
+mraa_result_t
 mraa_setup_mux_mapped(mraa_pin_t meta)
 {
     int mi;

@@ -38,6 +38,14 @@ extern mraa_adv_func_t* advance_func;
 extern mraa_board_t* plat;
 
 /**
+ * Takes in pin information and sets up the multiplexors.
+ *
+ * @param meta
+ * @return mraa result type indicating success of actions.
+ */
+mraa_result_t mraa_setup_mux_mapped(mraa_pin_t meta);
+
+/**
  * Will check input is valid for gpio and will also setup required multiplexers.
  * @param pin the pin as read from the board surface. i.e IO3 would be 3/
  * @return the pin as found in the pinmap
