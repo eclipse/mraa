@@ -37,8 +37,6 @@
     }
 }
 
-%typemap(in) uint8_t = char;
-%typemap(in) unsigned char* = char*;
 %apply (char *STRING, size_t LENGTH) { (char *data, size_t length) };
 
 %include "common.hpp"

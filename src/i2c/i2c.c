@@ -129,9 +129,9 @@ mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data)
 }
 
 mraa_result_t
-mraa_i2c_address(mraa_i2c_context dev, int addr)
+mraa_i2c_address(mraa_i2c_context dev, uint8_t addr)
 {
-    dev->addr = addr;
+    dev->addr = (int) addr;
     if (ioctl(dev->fh, I2C_SLAVE_FORCE, addr) < 0) {
         syslog(LOG_ERR, "i2c: Failed to set slave address %d", addr);
 	return MRAA_ERROR_INVALID_HANDLE;

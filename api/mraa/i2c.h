@@ -132,7 +132,7 @@ mraa_result_t mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data);
  *   general call address.
  * @return Result of operation
  */
-mraa_result_t mraa_i2c_address(mraa_i2c_context dev, int address);
+mraa_result_t mraa_i2c_address(mraa_i2c_context dev, uint8_t address);
 
 /**
  * De-inits an mraa_i2c_context device

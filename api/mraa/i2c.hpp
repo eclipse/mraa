@@ -85,7 +85,7 @@ class I2c {
          * @param address Communicate to the i2c slave on this address
          * @return Result of operation
          */
-        mraa_result_t address(int address) {
+        mraa_result_t address(uint8_t address) {
             return mraa_i2c_address(m_i2c, address);
         }
         /**
@@ -93,8 +93,8 @@ class I2c {
          *
          * @return char read from the bus
          */
-        unsigned char read() {
-            return (unsigned char) mraa_i2c_read_byte(m_i2c);
+        uint8_t read() {
+            return (uint8_t) mraa_i2c_read_byte(m_i2c);
         }
         /**
          * Read mutliple bytes from the bus
@@ -103,7 +103,7 @@ class I2c {
          * @param length Size of read
          * @return length of the read or 0 if failed
          */
-        int read(char *data, size_t length) {
+        uint8_t read(char *data, size_t length) {
             return mraa_i2c_read(m_i2c, (uint8_t*) data, (int) length);
         }
 	/**
@@ -138,8 +138,8 @@ class I2c {
          * @param data Value to write to register
          * @return Result of operation
          */
-        mraa_result_t writeReg(char reg, char data) {
-            const unsigned char buf[2] = {(unsigned char) reg, (unsigned char) data};
+        mraa_result_t writeReg(uint8_t reg, uint8_t data) {
+            const uint8_t buf[2] = {reg, data};
             return mraa_i2c_write(m_i2c, buf, 2);
         }
 
@@ -147,21 +147,19 @@ class I2c {
          * Read an i2c register
          *
          * @param reg Register to read from
-
-         * @return char read from the bus
          * @return char read from register
          */
-        int readReg(char reg) {
+        uint8_t readReg(uint8_t reg) {
             return mraa_i2c_read_byte_data(m_i2c, reg);
         }
 
         /**
-         * Write multiple bytes to the bus
+         * Write a byte on the bus
          *
          * @param data The byte to send on the bus
          * @return Result of operation
          */
-        mraa_result_t write(char data) {
+        mraa_result_t write(uint8_t data) {
             return mraa_i2c_write_byte(m_i2c, data);
         }
     private:
