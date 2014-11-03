@@ -165,39 +165,6 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
     return MRAA_SUCCESS;
 }
 
-unsigned int
-mraa_setup_i2c(int* bus)
-{
-    if (plat == NULL)
-        return MRAA_PLATFORM_NO_INIT;
-
-    if (plat->i2c_bus_count == 0) {
-        syslog(LOG_ERR, "No i2c buses defined in platform");
-        return MRAA_NO_SUCH_IO;
-    }
-    if (*bus >= plat->i2c_bus_count) {
-        syslog(LOG_ERR, "Above i2c bus count");
-        return MRAA_NO_SUCH_IO;
-    }
-
-    if (plat->i2c_bus[*bus].bus_id == -1) {
-        syslog(LOG_ERR, "Invalid i2c bus, moving to default i2c bus");
-        *bus = plat->def_i2c_bus;
-    }
-
-    int pos = plat->i2c_bus[*bus].sda;
-    if (plat->pins[pos].i2c.mux_total > 0)
-        if (mraa_setup_mux_mapped(plat->pins[pos].i2c) != MRAA_SUCCESS)
-             return MRAA_IO_SETUP_FAILURE;
-
-    pos = plat->i2c_bus[*bus].scl;
-    if (plat->pins[pos].i2c.mux_total > 0)
-        if (mraa_setup_mux_mapped(plat->pins[pos].i2c) != MRAA_SUCCESS)
-             return MRAA_IO_SETUP_FAILURE;
-
-    return plat->i2c_bus[*bus].bus_id;
-}
-
 mraa_spi_bus_t*
 mraa_setup_spi(int bus)
 {

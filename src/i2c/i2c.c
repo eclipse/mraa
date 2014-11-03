@@ -29,22 +29,39 @@
 mraa_i2c_context
 mraa_i2c_init(int bus)
 {
-    int checked_pin = mraa_setup_i2c(&bus);
-    if (checked_pin < 0) {
-        switch(checked_pin) {
-            case MRAA_NO_SUCH_IO:
-                syslog(LOG_ERR, "i2c: No i2c on board");
-                return NULL;
-            case MRAA_IO_SETUP_FAILURE:
-                syslog(LOG_ERR, "i2c: Failed to set-up i2c multiplexer");
-                return NULL;
-            case MRAA_PLATFORM_NO_INIT:
-                syslog(LOG_ERR, "i2c: Platform Not Initialised");
-                return NULL;
-            default: return NULL;
-        }
+    if (plat == NULL) {
+        syslog(LOG_ERR, "i2c: Platform Not Initialised");
+        return NULL;
     }
-    return mraa_i2c_init_raw((unsigned int) checked_pin);
+    if (plat->i2c_bus_count == 0) {
+        syslog(LOG_ERR, "No i2c buses defined in platform");
+        return NULL;
+    }
+    if (bus >= plat->i2c_bus_count) {
+        syslog(LOG_ERR, "Above i2c bus count");
+        return NULL;
+    }
+
+    if (plat->i2c_bus[bus].bus_id == -1) {
+        syslog(LOG_ERR, "Invalid i2c bus, moving to default i2c bus");
+        bus = plat->def_i2c_bus;
+    }
+
+    int pos = plat->i2c_bus[bus].sda;
+    if (plat->pins[pos].i2c.mux_total > 0)
+        if (mraa_setup_mux_mapped(plat->pins[pos].i2c) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "i2c: Failed to set-up i2c sda multiplexer");
+            return NULL;
+        }
+
+    pos = plat->i2c_bus[bus].scl;
+    if (plat->pins[pos].i2c.mux_total > 0)
+        if (mraa_setup_mux_mapped(plat->pins[pos].i2c) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "i2c: Failed to set-up i2c scl multiplexer");
+            return NULL;
+        }
+
+    return mraa_i2c_init_raw((unsigned int) plat->i2c_bus[bus].bus_id);
 }
 
 mraa_i2c_context

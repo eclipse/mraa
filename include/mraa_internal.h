@@ -45,13 +45,6 @@ extern mraa_board_t* plat;
  */
 mraa_result_t mraa_setup_mux_mapped(mraa_pin_t meta);
 
-/**
- * Setup i2c interface, sets up multiplexer on device.
- *
- * @return unsigned int if using /dev/i2c-2 returned would be 2
- */
-unsigned int mraa_setup_i2c(int* bus);
-
 /** Setup spi interface, sets up multiplexer on device.
  *
  * @return spi bus type
