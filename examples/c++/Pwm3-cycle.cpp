@@ -49,6 +49,7 @@ int main ()
         return MRAA_ERROR_UNSPECIFIED;
     }
     fprintf(stdout, "Cycling PWM on IO3 (pwm3) \n");
+    pwm->enable(true);
 
     float value = 0.0f;
     while (running == 0) {
