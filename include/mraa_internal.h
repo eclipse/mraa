@@ -46,13 +46,6 @@ extern mraa_board_t* plat;
 mraa_result_t mraa_setup_mux_mapped(mraa_pin_t meta);
 
 /**
- * Will check input is valid for aio and will also setup required multiplexers.
- * @param pin the pin as read from the board surface. i.e A3 would be 3/
- * @return the pin as found in the pinmap
- */
-unsigned int mraa_setup_aio(int pin);
-
-/**
  * Setup i2c interface, sets up multiplexer on device.
  *
  * @return unsigned int if using /dev/i2c-2 returned would be 2

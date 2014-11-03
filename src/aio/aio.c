@@ -47,7 +47,7 @@ aio_get_valid_fp(mraa_aio_context dev)
 
     dev->adc_in_fp = open(file_path, O_RDONLY);
     if (dev->adc_in_fp == -1) {
-	syslog(LOG_ERR, "aio: Failed to open input raw file %s for reading!",
+        syslog(LOG_ERR, "aio: Failed to open input raw file %s for reading!",
                 file_path);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -56,30 +56,33 @@ aio_get_valid_fp(mraa_aio_context dev)
 }
 
 mraa_aio_context
-mraa_aio_init(unsigned int aio_channel)
+mraa_aio_init(unsigned int aio)
 {
+    if (plat == NULL) {
+        syslog(LOG_ERR, "aio: Platform not initialised");
+        return NULL;
+    }
     if (advance_func->aio_init_pre != NULL) {
-        mraa_result_t pre_ret = (advance_func->aio_init_pre(aio_channel));
+        mraa_result_t pre_ret = (advance_func->aio_init_pre(aio));
         if (pre_ret != MRAA_SUCCESS)
             return NULL;
     }
+    if (aio < 0 || aio > plat->aio_count) {
+        syslog(LOG_ERR, "aio: requested channel out of range");
+        return NULL;
+    }
 
-    int checked_pin = mraa_setup_aio(aio_channel);
-    if (checked_pin < 0) {
-        switch (checked_pin) {
-            case MRAA_NO_SUCH_IO:
-                syslog(LOG_ERR, "aio: Invalid input channel %d specified",
-                        aio_channel);
-                return NULL;
-            case MRAA_IO_SETUP_FAILURE:
-                syslog(LOG_ERR, "aio: Failed to set-up input channel %d "
-                        "multiplexer", aio_channel);
-                return NULL;
-            case MRAA_PLATFORM_NO_INIT:
-                syslog(LOG_ERR, "aio: Platform not initialised");
-                return NULL;
-            default:
-                return NULL;
+    int pin = aio + plat->gpio_count;
+
+    if (plat->pins[pin].capabilites.aio != 1) {
+        syslog(LOG_ERR, "aio: pin uncapable of aio");
+        return NULL;
+    }
+
+    if (plat->pins[pin].aio.mux_total > 0) {
+        if (mraa_setup_mux_mapped(plat->pins[pin].aio) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "aio: unable to setup multiplexers for pin");
+            return NULL;
         }
     }
 
@@ -87,10 +90,10 @@ mraa_aio_init(unsigned int aio_channel)
     mraa_aio_context dev = malloc(sizeof(struct _aio));
     if (dev == NULL) {
         syslog(LOG_ERR, "aio: Insufficient memory for specified input channel "
-                "%d\n", aio_channel);
+                "%d\n", aio);
         return NULL;
     }
-    dev->channel = checked_pin;
+    dev->channel = plat->pins[pin].aio.pinmap;
     dev->value_bit = DEFAULT_BITS;
 
     //Open valid  analog input file and get the pointer.
