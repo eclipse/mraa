@@ -165,53 +165,6 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
     return MRAA_SUCCESS;
 }
 
-mraa_spi_bus_t*
-mraa_setup_spi(int bus)
-{
-    if (plat == NULL)
-        return NULL;
-
-    if (plat->spi_bus_count >! 0) {
-        syslog(LOG_ERR, "No spi buses defined in platform");
-        return NULL;
-    }
-    if (plat->spi_bus_count == 1) {
-        bus = plat->def_spi_bus;
-    }
-    if (bus >= plat->spi_bus_count) {
-        syslog(LOG_ERR, "Above spi bus count");
-        return NULL;
-    }
-
-    int pos = plat->spi_bus[bus].sclk;
-    if (plat->pins[pos].spi.mux_total > 0)
-        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS)
-             return NULL;
-
-    pos = plat->spi_bus[bus].mosi;
-    if (plat->pins[pos].spi.mux_total > 0)
-        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS)
-             return NULL;
-
-    pos = plat->spi_bus[bus].miso;
-    if (plat->pins[pos].spi.mux_total > 0)
-        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS)
-             return NULL;
-
-    pos = plat->spi_bus[bus].cs;
-    if (plat->pins[pos].spi.mux_total > 0)
-        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS)
-             return NULL;
-
-    pos = plat->spi_bus[bus].cs;
-    if (plat->pins[pos].spi.mux_total > 0)
-        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS)
-             return NULL;
-
-    mraa_spi_bus_t *spi = &(plat->spi_bus[bus]);
-    return spi;
-}
-
 mraa_pin_t*
 mraa_setup_pwm(int pin)
 {

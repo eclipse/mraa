@@ -45,12 +45,6 @@ extern mraa_board_t* plat;
  */
 mraa_result_t mraa_setup_mux_mapped(mraa_pin_t meta);
 
-/** Setup spi interface, sets up multiplexer on device.
- *
- * @return spi bus type
- */
-mraa_spi_bus_t* mraa_setup_spi(int bus);
-
 /**
  * Will check input is valid for pwm and will also setup required multiplexers.
  * IF the pin also does gpio (strong chance), DO NOTHING, REV D quirk

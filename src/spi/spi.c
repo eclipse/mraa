@@ -52,21 +52,64 @@ struct _spi {
 mraa_spi_context
 mraa_spi_init(int bus)
 {
+    if (plat == NULL) {
+        syslog(LOG_ERR, "spi: Platform Not Initialised");
+        return NULL;
+    }
+     if (plat->spi_bus_count >! 0) {
+        syslog(LOG_ERR, "spi: no spi buses defined in platform");
+        return NULL;
+    }
+    if (plat->spi_bus_count == 1) {
+        bus = plat->def_spi_bus;
+    }
+    if (bus >= plat->spi_bus_count) {
+        syslog(LOG_ERR, "spi: requested bus above spi bus count");
+        return NULL;
+    }
     if (advance_func->spi_init_pre != NULL) {
         if (advance_func->spi_init_pre(bus) != MRAA_SUCCESS)
             return NULL;
     }
 
-    mraa_spi_bus_t *spi = mraa_setup_spi(bus);
-    if (bus < 0) {
-        syslog(LOG_ERR, "spi: Failed. SPI platform Error");
-        return NULL;
+    int pos = plat->spi_bus[bus].sclk;
+    if (plat->pins[pos].spi.mux_total > 0) {
+        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "spi: failed to set-up spi sclk multiplexer");
+            return NULL;
+        }
     }
+
+    pos = plat->spi_bus[bus].mosi;
+    if (plat->pins[pos].spi.mux_total > 0) {
+        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "spi: failed to set-up spi mosi multiplexer");
+            return NULL;
+        }
+    }
+
+    pos = plat->spi_bus[bus].miso;
+    if (plat->pins[pos].spi.mux_total > 0) {
+        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "spi: failed to set-up spi miso multiplexer");
+            return NULL;
+        }
+    }
+
+    pos = plat->spi_bus[bus].cs;
+    if (plat->pins[pos].spi.mux_total > 0) {
+        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "spi: failed to set-up spi cs multiplexer");
+            return NULL;
+        }
+    }
+
     mraa_spi_context dev = (mraa_spi_context) malloc(sizeof(struct _spi));
     memset(dev, 0, sizeof(struct _spi));
 
     char path[MAX_SIZE];
-    sprintf(path, "/dev/spidev%u.%u", spi->bus_id, spi->slave_s);
+    sprintf(path, "/dev/spidev%u.%u",
+        plat->spi_bus[bus].bus_id, plat->spi_bus[bus].slave_s);
 
     dev->devfd = open(path, O_RDWR);
     if (dev->devfd < 0) {
