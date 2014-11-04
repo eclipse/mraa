@@ -81,7 +81,7 @@ main(int argc, char **argv)
     mraa_init();
     float direction = 0;
     int16_t x = 0, y = 0, z = 0;
-    char rx_tx_buf[MAX_BUFFER_LENGTH];
+    uint8_t rx_tx_buf[MAX_BUFFER_LENGTH];
 
 //! [Interesting]
     mraa_i2c_context i2c;
