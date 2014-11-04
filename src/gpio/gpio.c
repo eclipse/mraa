@@ -107,7 +107,7 @@ mraa_gpio_init_raw(int pin)
         int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
         if (export == -1) {
             syslog(LOG_ERR, "gpio: Failed to open export for writing");
-	    free(dev);
+            free(dev);
             return NULL;
         }
         length = snprintf(bu, sizeof(bu), "%d", dev->pin);
@@ -452,7 +452,7 @@ mraa_gpio_read(mraa_gpio_context dev)
     char bu[2];
     if (read(dev->value_fp, bu, 2*sizeof(char)) != 2) {
         syslog(LOG_ERR, "gpio: Failed to read a sensible value from sysfs");
-	return -1;
+        return -1;
     }
     lseek(dev->value_fp, 0, SEEK_SET);
 
