@@ -105,7 +105,7 @@ mraa_pwm_read_period(mraa_pwm_context dev)
     char *endptr;
     long int ret = strtol(output, &endptr, 10);
     if ('\0' != *endptr && '\n' != *endptr) {
-        syslog(LOG_ERR, "pwm: Error in string converstion");
+        syslog(LOG_ERR, "pwm: Error in string conversion");
         return -1;
     }
     else if (ret > INT_MAX || ret < INT_MIN) {
