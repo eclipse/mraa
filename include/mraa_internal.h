@@ -54,14 +54,6 @@ mraa_result_t mraa_setup_mux_mapped(mraa_pin_t meta);
 mraa_mmap_pin_t* mraa_setup_mmap_gpio(int pin);
 
 /**
- * Swap Directional mode.
- *
- * @param pin physical pin to operate on
- * @return out direction to setup. 1 for output 0 for input
- */
-mraa_result_t mraa_swap_complex_gpio(int pin, int out);
-
-/**
  * Setup uart muxes to exposes the pins physically.
  *
  * @param index of the uart in the board definition to expose physically
