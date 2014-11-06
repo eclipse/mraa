@@ -142,17 +142,52 @@ mraa_pwm_read_duty(mraa_pwm_context dev)
 }
 
 mraa_pwm_context
-mraa_pwm_init(int pin) {
+mraa_pwm_init(int pin)
+{
     if (advance_func->pwm_init_pre != NULL) {
         if (advance_func->pwm_init_pre(pin) != MRAA_SUCCESS)
             return NULL;
     }
-    mraa_pin_t* pinm = mraa_setup_pwm(pin);
-    if (pinm == NULL)
+    if (plat == NULL) {
+        syslog(LOG_ERR, "pwm: Platform Not Initialised");
         return NULL;
-    int chip = pinm->parent_id;
-    int pinn = pinm->pinmap;
-    free(pinm);
+    }
+    if (plat->pins[pin].capabilites.pwm != 1) {
+        syslog(LOG_ERR, "pwm: pin not capable of pwm");
+        return NULL;
+    }
+
+    if (plat->pins[pin].capabilites.gpio == 1) {
+        // This deserves more investigation
+        mraa_gpio_context mux_i;
+        mux_i = mraa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
+        if (mux_i == NULL) {
+            syslog(LOG_ERR, "pwm: error in gpio->pwm transition");
+            return NULL;
+        }
+        if (mraa_gpio_dir(mux_i, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "pwm: error in gpio->pwm transition");
+            return NULL;
+        }
+        if (mraa_gpio_write(mux_i, 1) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "pwm: error in gpio->pwm transition");
+            return NULL;
+        }
+        if (mraa_gpio_close(mux_i) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "pwm: error in gpio->pwm transition");
+            return NULL;
+        }
+    }
+
+    if (plat->pins[pin].pwm.mux_total > 0) {
+        if (mraa_setup_mux_mapped(plat->pins[pin].pwm) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "pwm: Failed to set-up multiplexer");
+            return NULL;
+        }
+    }
+
+    int chip = plat->pins[pin].pwm.parent_id;
+    int pinn = plat->pins[pin].pwm.pinmap;
 
     if (advance_func->pwm_init_post != NULL) {
         mraa_pwm_context pret = mraa_pwm_init_raw(chip,pinn);

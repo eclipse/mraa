@@ -165,40 +165,6 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
     return MRAA_SUCCESS;
 }
 
-mraa_pin_t*
-mraa_setup_pwm(int pin)
-{
-    if (plat == NULL)
-        return NULL;
-
-    if (plat->pins[pin].capabilites.pwm != 1)
-        return NULL;
-
-    if (plat->pins[pin].capabilites.gpio == 1) {
-        mraa_gpio_context mux_i;
-        mux_i = mraa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
-        if (mux_i == NULL)
-            return NULL;
-        if (mraa_gpio_dir(mux_i, MRAA_GPIO_OUT) != MRAA_SUCCESS)
-            return NULL;
-        // Current REV D quirk. //TODO GEN 2
-        if (mraa_gpio_write(mux_i, 1) != MRAA_SUCCESS)
-            return NULL;
-        if (mraa_gpio_close(mux_i) != MRAA_SUCCESS)
-            return NULL;
-    }
-
-    if (plat->pins[pin].pwm.mux_total > 0)
-       if (mraa_setup_mux_mapped(plat->pins[pin].pwm) != MRAA_SUCCESS)
-            return NULL;
-
-    mraa_pin_t *ret;
-    ret = (mraa_pin_t*) malloc(sizeof(mraa_pin_t));
-    ret->pinmap = plat->pins[pin].pwm.pinmap;
-    ret->parent_id = plat->pins[pin].pwm.parent_id;
-    return ret;
-}
-
 void
 mraa_result_print(mraa_result_t result)
 {

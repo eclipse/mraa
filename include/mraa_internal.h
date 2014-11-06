@@ -46,14 +46,6 @@ extern mraa_board_t* plat;
 mraa_result_t mraa_setup_mux_mapped(mraa_pin_t meta);
 
 /**
- * Will check input is valid for pwm and will also setup required multiplexers.
- * IF the pin also does gpio (strong chance), DO NOTHING, REV D quirk
- * @param pin the pin as read from the board surface.
- * @return the pwm pin_info_t of that IO pin
- */
-mraa_pin_t* mraa_setup_pwm(int pin);
-
-/**
  * Setup gpio mux to go straight to SoC, galileo.
  *
  * @param pin physical pin to use
