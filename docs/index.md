@@ -37,13 +37,14 @@ Specific platform information for supported platforms is documented here:
 - @ref galileorevd
 - @ref galileorevh
 - @ref edison
+- @ref de3815
 
 ### ENV RECOMENDATIONS
 
 All of these are 'optional', however they are recommended. Only a C compiler,
 cmake, libm and pthreads are technically required to compile.
 
-- Swig 3.0.1+ built with node.js & python support (0.10.x)
+- Swig 3.0.1+ built with node.js (0.10.x) & python support
 - doxygen
 - sphinx (requires doxygen)
 - pygments
@@ -62,6 +63,17 @@ use.
 This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
+
+**0.5.2**
+  * pwm improvement & bugfix
+  * spi mraa_spi_bit_per_word fix
+  * new spi transfer function
+  * i2c object api uses uint8_t
+  * i2c readReg() calls added
+  * edison i2c bus now defaults to a sensible value
+  * edison uart enable support
+  * edison hardware CS exposed as IO10
+  * DE3815tykhe NUC support
 
 **0.5.1**
   * Intel Edison - Mini breakout board support
