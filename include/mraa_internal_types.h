@@ -26,6 +26,7 @@
 #pragma once
 
 #include "common.h"
+#include "mraa.h"
 
 // general status failures for internal functions
 #define MRAA_PLATFORM_NO_INIT -3
@@ -45,10 +46,8 @@ struct _gpio {
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */
     mraa_boolean_t owner; /**< If this context originally exported the pin */
-    mraa_boolean_t mmap;
-    void *reg;
-    unsigned int reg_sz;
-    unsigned int reg_bit_pos;
+    mraa_result_t (*mmap_write) (mraa_gpio_context dev, int value);
+    int (*mmap_read) (mraa_gpio_context dev);
     /*@}*/
 };
 

@@ -138,26 +138,6 @@ mraa_gpio_init_raw(int pin)
     return dev;
 }
 
-static mraa_result_t
-mraa_gpio_write_register(mraa_gpio_context dev,int value)
-{
-    if (advance_func->gpio_mmaped_write_replace != NULL)
-        return advance_func->gpio_mmaped_write_replace(dev,value);
-    if (advance_func->gpio_mmaped_write_pre != NULL) {
-        mraa_result_t pre_ret = (advance_func->gpio_mmaped_write_pre(dev,value));
-        if(pre_ret != MRAA_SUCCESS)
-            return pre_ret;
-    }
-    if (value == 1) {
-        *((unsigned *)dev->reg) |= (1<<dev->reg_bit_pos);
-        return MRAA_SUCCESS;
-    }
-    *((unsigned *)dev->reg) &= ~(1<<dev->reg_bit_pos);
-
-    if (advance_func->gpio_mmaped_write_post != NULL)
-        return advance_func->gpio_mmaped_write_post(dev,value);
-    return MRAA_SUCCESS;
-}
 
 static mraa_result_t
 mraa_gpio_wait_interrupt(int fd)
@@ -455,6 +435,9 @@ mraa_gpio_read(mraa_gpio_context dev)
     if (dev == NULL)
         return -1;
 
+    if (dev->mmap_read != NULL)
+        return dev->mmap_read(dev);
+
     if (dev->value_fp == -1) {
         if (mraa_gpio_get_valfp(dev) != MRAA_SUCCESS) {
              syslog(LOG_ERR, "gpio: Failed to get value file pointer");
@@ -480,8 +463,8 @@ mraa_gpio_write(mraa_gpio_context dev, int value)
     if (dev == NULL)
         return MRAA_ERROR_INVALID_HANDLE;
 
-    if (dev->mmap == 1)
-        return mraa_gpio_write_register(dev,value);
+    if (dev->mmap_write != NULL)
+        return dev->mmap_write(dev,value);
 
     if (advance_func->gpio_write_pre != NULL) {
         mraa_result_t pre_ret = (advance_func->gpio_write_pre(dev,value));
@@ -560,44 +543,10 @@ mraa_gpio_owner(mraa_gpio_context dev, mraa_boolean_t own)
 mraa_result_t
 mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap_en)
 {
-    if (dev ==  NULL) {
-        return MRAA_ERROR_INVALID_RESOURCE;
+    if (advance_func->gpio_mmap_setup != NULL) {
+        return advance_func->gpio_mmap_setup(dev,mmap_en);
     }
 
-    if (mraa_pin_mode_test(dev->phy_pin, MRAA_PIN_FAST_GPIO) == 0)
-        return MRAA_ERROR_NO_RESOURCES;
-
-    mraa_mmap_pin_t *mmp = mraa_setup_mmap_gpio(dev->phy_pin);
-    if (mmp == NULL)
-        return MRAA_ERROR_INVALID_RESOURCE;
-
-    if (mmap_en == 1) {
-        if (dev->mmap == 0) {
-            close(dev->value_fp);
-            int fd;
-            fd = open(mmp->mem_dev, O_RDWR);
-            if (fd < 1) {
-                syslog(LOG_ERR, "gpio: Unable to open memory device");
-                close(fd);
-                return MRAA_ERROR_INVALID_RESOURCE;
-            }
-            dev->reg_sz = mmp->mem_sz;
-            dev->reg = mmap(NULL, dev->reg_sz, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-            dev->reg_bit_pos = mmp->bit_pos;
-            dev->mmap = 1;
-            close(fd);
-            return MRAA_SUCCESS;
-        }
-        return MRAA_ERROR_INVALID_PARAMETER;
-    }
-
-    if (mmap_en == 0) {
-        if (dev ->mmap == 1) {
-            munmap(dev->reg, dev->reg_sz);
-            dev->mmap = 0;
-        }
-        return MRAA_ERROR_INVALID_PARAMETER;
-    }
-
-    return MRAA_SUCCESS;
+    syslog(LOG_ERR, "gpio: mmap not implemented on this platform");
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }

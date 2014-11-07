@@ -46,14 +46,6 @@ extern mraa_board_t* plat;
 mraa_result_t mraa_setup_mux_mapped(mraa_pin_t meta);
 
 /**
- * Setup gpio mux to go straight to SoC, galileo.
- *
- * @param pin physical pin to use
- * @return mraa_mmap_pin_t
- */
-mraa_mmap_pin_t* mraa_setup_mmap_gpio(int pin);
-
-/**
  * Setup uart muxes to exposes the pins physically.
  *
  * @param index of the uart in the board definition to expose physically
