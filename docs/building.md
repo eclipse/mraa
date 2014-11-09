@@ -16,22 +16,27 @@ cmake ..
 make
 ~~~~~~~~~~~~~
 
-Our cmake configure has a number of options, `cmake -i` will ask you all sorts
-of interesting questions, you can disable swig modules, build documentation
-etc...
+Our cmake configure has a number of options, cmake-gui or ccmake can show you
+all the options. The interesting ones are detailed below:
 
 Few recommended options:
 Changing install path from /usr/local to /usr
--DCMAKE_INSTALL_PREFIX:PATH=/usr
+ -DCMAKE_INSTALL_PREFIX:PATH=/usr
 
 Building debug build:
--DCMAKE_BUILD_TYPE=DEBUG
+ -DCMAKE_BUILD_TYPE=DEBUG
 
 Using clang instead of gcc:
  -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang
 
 Building with an older version of swig (swig 2.0+) requires the disabling of javascript:
  -DBUILDSWIGNODE=OFF
+
+Disabling python module building
+ -DBUILDSWIGPYTHON=OFF
+
+Building doc, this will require sphinx & doxygen
+ -BUILDDOC=ON
 
 Using coverity
 --------------
