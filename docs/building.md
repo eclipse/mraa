@@ -38,6 +38,20 @@ Disabling python module building
 Building doc, this will require sphinx & doxygen
  -BUILDDOC=ON
 
+Using a yocto/oe toolchain
+--------------------------
+
+In order to compile with a yocto/oe toolchain use the following toolchain file.
+This works well on the edison 1.6 SDK. First source the environment file, then
+use our cmake toolchain file.
+
+~~~~~~~~~~~~~{.sh}
+source /opt/poky-edison/1.6/environment-setup-core2-32-poky-linux
+mkdir build
+cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/oe-sdk_cross.cmake ..
+make
+~~~~~~~~~~~~~
+
 Using coverity
 --------------
 
