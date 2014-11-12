@@ -1,9 +1,12 @@
 libmraa - Low Level Skeleton Library for Communication on GNU/Linux platforms
 ==============
 
-Library in C/C++ to interface with Galileo & other Intel platforms, in a
-structured and sane API with port names/numbering that match boards & with
-bindings to javascript & python.
+Libmraa is a C/C++ library with bindings to javascript & python to interface
+with the IO on Galileo, Edison & other platforms, with a structured and sane
+API where port names/numbering matches the board that you are on. Use of
+libmraa does not tie you to specific hardware with board detection done at
+runtime you can create portable code that will work across the supported
+platforms.
 
 The intent is to make it easier for developers and sensor manufacturers to map
 their sensors & actuators on top of supported hardware and to allow control of
