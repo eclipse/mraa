@@ -24,6 +24,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
 
 #include "common.h"
 #include "intel_edison_fab_c.h"
@@ -32,6 +34,11 @@
 #define SYSFS_PINMODE_PATH "/sys/kernel/debug/gpio_debug/gpio"
 #define MAX_SIZE 64
 #define MAX_MODE_SIZE 8
+
+// This is an absolute path to a resource file found within sysfs.
+// Might not always be correct. First thing to check if mmap stops
+// working. Check the device for 0x1199 and Intel Vendor (0x8086)
+#define MMAP_PATH "/sys/devices/pci0000:00/0000:00:0c.0/resource0"
 
 typedef struct {
     int sysfs;
@@ -52,6 +59,12 @@ static mraa_intel_edison_pinmodes_t pinmodes[MRAA_INTEL_EDISON_PINCOUNT];
 static unsigned int outputen[] = {248,249,250,251,252,253,254,255,256,257,258,259,260,261,232,233,234,235,236,237};
 static unsigned int pullup_map[] = {216,217,218,219,220,221,222,223,224,225,226,227,228,229,208,209,210,211,212,213};
 static int miniboard = 0;
+
+//MMAP
+static uint8_t *mmap_reg = NULL;
+static int mmap_fd = 0;
+static int mmap_size;
+static unsigned int mmap_count = 0;
 
 static mraa_result_t
 mraa_intel_edison_pinmode_change(int sysfs, int mode)
@@ -486,6 +499,108 @@ mraa_intel_edison_uart_init_post(mraa_uart_context uart)
     return mraa_gpio_write(tristate, 1);
 }
 
+static mraa_result_t
+mraa_intel_edsion_mmap_unsetup()
+{
+    if (mmap_reg == NULL) {
+        syslog(LOG_ERR, "edison mmap: null register cant unsetup");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    munmap(mmap_reg, mmap_size);
+    mmap_reg == NULL;
+    close(mmap_fd);
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_intel_edison_mmap_write(mraa_gpio_context dev, int value)
+{
+    uint8_t offset = ((dev->pin / 32) * sizeof(uint32_t));
+    uint8_t valoff;
+
+    if (value) {
+        valoff = 0x34;
+    } else {
+        valoff = 0x4c;
+    }
+
+    *(volatile uint32_t*) (mmap_reg + offset + valoff) =
+        (uint32_t)(1 << (dev->pin % 32));
+
+    return MRAA_SUCCESS;
+}
+
+int
+mraa_intel_edison_mmap_read(mraa_gpio_context dev)
+{
+    uint8_t offset = ((dev->pin / 32) * sizeof(uint32_t));
+    uint32_t value;
+
+    value = *(volatile uint32_t*) (mmap_reg +0x04+ offset);
+    if (value&(uint32_t)(1 << (dev->pin % 32)))
+        return 1;
+    return 0;
+}
+
+mraa_result_t
+mraa_intel_edison_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
+{
+    if (dev == NULL) {
+        syslog(LOG_ERR, "edison mmap: context not valid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (en == 0) {
+        if (dev->mmap_write == NULL && dev->mmap_read == NULL) {
+            syslog(LOG_ERR, "edison mmap: can't disable disabled mmap gpio");
+            return MRAA_ERROR_INVALID_PARAMETER;
+        }
+        dev->mmap_write = NULL;
+        dev->mmap_read = NULL;
+        mmap_count--;
+        if (mmap_count == 0) {
+            return mraa_intel_edsion_mmap_unsetup();
+        }
+        return MRAA_SUCCESS;
+    }
+
+    if (dev->mmap_write != NULL && dev->mmap_read != NULL) {
+        syslog(LOG_ERR, "edison mmap: can't enable enabled mmap gpio");
+        return MRAA_ERROR_INVALID_PARAMETER;
+    }
+
+    //Might need to make some elements of this thread safe.
+    //For example only allow one thread to enter the following block
+    //to prevent mmap'ing twice.
+    if (mmap_reg == NULL) {
+        if ((mmap_fd = open(MMAP_PATH, O_RDWR)) < 0) {
+            syslog(LOG_ERR, "edison map: unable to open resource0 file");
+            return MRAA_ERROR_INVALID_HANDLE;
+        }
+
+        struct stat fd_stat;
+        fstat(mmap_fd, &fd_stat);
+        mmap_size = fd_stat.st_size;
+
+        mmap_reg = (uint8_t*) mmap(NULL, fd_stat.st_size,
+                                   PROT_READ | PROT_WRITE,
+                                   MAP_FILE | MAP_SHARED,
+                                   mmap_fd, 0);
+        if (mmap_reg == MAP_FAILED) {
+            syslog(LOG_ERR, "edison mmap: failed to mmap");
+            mmap_reg = NULL;
+            close(mmap_fd);
+            return MRAA_ERROR_NO_RESOURCES;
+        }
+    }
+    dev->mmap_write = &mraa_intel_edison_mmap_write;
+    dev->mmap_read = &mraa_intel_edison_mmap_read;
+    mmap_count++;
+
+
+    return MRAA_SUCCESS;
+}
+
 mraa_result_t
 mraa_intel_edsion_miniboard(mraa_board_t* b)
 {
@@ -506,6 +621,7 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     advance_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
     advance_func->gpio_mode_replace = &mraa_intel_edsion_mb_gpio_mode;
     advance_func->uart_init_post = &mraa_intel_edison_uart_init_post;
+    advance_func->gpio_mmap_setup = &mraa_intel_edison_mmap_setup;
 
     int pos = 0;
     strncpy(b->pins[pos].name, "J17-1", 8);
@@ -886,6 +1002,7 @@ mraa_intel_edison_fab_c()
     advance_func->gpio_mode_replace = &mraa_intel_edison_gpio_mode_replace;
     advance_func->uart_init_pre = &mraa_intel_edison_uart_init_pre;
     advance_func->uart_init_post = &mraa_intel_edison_uart_init_post;
+    advance_func->gpio_mmap_setup = &mraa_intel_edison_mmap_setup;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_EDISON_PINCOUNT);
 
