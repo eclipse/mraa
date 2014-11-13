@@ -28,11 +28,14 @@
 #include <sched.h>
 #include <string.h>
 
+#define DEBUG
+
 #include "mraa_internal.h"
 #include "intel_galileo_rev_d.h"
 #include "intel_galileo_rev_g.h"
 #include "intel_edison_fab_c.h"
 #include "intel_de3815.h"
+#include "intel_minnow_max.h"
 #include "gpio.h"
 #include "version.h"
 
@@ -92,6 +95,10 @@ mraa_init()
                 platform_type = MRAA_INTEL_EDISON_FAB_C;
             } else if (strncmp(line, "DE3815", 6) == 0) {
                 platform_type = MRAA_INTEL_DE3815;
+            } else if (strncmp(line, "NOTEBOOK", 8) == 0) {
+                platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
+            } else if (strncasecmp(line, "MinnowBoard MAX", 15) == 0) {
+                platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
             } else {
                 platform_type = MRAA_INTEL_GALILEO_GEN1;
             }
@@ -116,9 +123,13 @@ mraa_init()
         case MRAA_INTEL_DE3815:
             plat = mraa_intel_de3815();
             break;
+        case MRAA_INTEL_MINNOWBOARD_MAX:
+            plat = mraa_intel_minnow_max();
+            break;
+
         default:
             plat = mraa_intel_galileo_rev_d();
-            syslog(LOG_ERR, "Platform not found, initialising MRAA_INTEL_GALILEO_GEN1");
+            syslog(LOG_ERR, "Platform not supported, initialising as MRAA_INTEL_GALILEO_GEN1");
     }
 
     syslog(LOG_NOTICE, "libmraa initialised for platform %d", platform_type);
