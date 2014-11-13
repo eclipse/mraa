@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <syslog.h>
+#include <string.h>
 //! [Interesting]
 #include "mraa.h"
 
@@ -31,10 +32,33 @@ int
 main(int argc, char **argv)
 {
     mraa_result_t ret;
-
+    char board_name[64];
+    mraa_platform_t platform = mraa_get_platform_type();
     ret = mraa_set_log_level(LOG_DEBUG);
 
-    fprintf(stdout, "hello mraa\n Version: %s\n", mraa_get_version());
+    switch (platform) {
+        case MRAA_INTEL_GALILEO_GEN1:
+            strcpy(board_name, "Intel Galileo Gen1");
+            break;
+        case MRAA_INTEL_GALILEO_GEN2:
+            strcpy(board_name, "Intel Galileo Gen2");
+            break;
+        case MRAA_INTEL_EDISON_FAB_C:
+            strcpy(board_name, "Edison Fab C");
+            break;
+        case MRAA_INTEL_DE3815:
+            strcpy(board_name, "Intel DE3815");
+            break;
+        case MRAA_INTEL_MINNOWBOARD_MAX:
+            strcpy(board_name, "Intel Minnowboard Max");
+            break;
+        default:
+            strcpy(board_name, "Unknown board");
+    }
+
+
+    fprintf(stdout, "hello mraa\n Version: %s\n Running on %s\n", mraa_get_version(), board_name);
+
 
     mraa_deinit();
 
