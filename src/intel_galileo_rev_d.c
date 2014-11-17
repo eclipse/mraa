@@ -24,9 +24,97 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 
 #include "common.h"
 #include "intel_galileo_rev_d.h"
+
+#define UIO_PATH "/dev/uio0"
+
+static uint8_t *mmap_reg = NULL;
+static int mmap_fd = 0;
+static int mmap_size = 0x1000;
+static unsigned int mmap_count = 0;
+
+static mraa_result_t
+mraa_intel_galileo_g1_mmap_unsetup()
+{
+    if (mmap_reg == NULL) {
+        syslog(LOG_ERR, "mmap: null register cant unsetup");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    munmap(mmap_reg, mmap_size);
+    mmap_reg == NULL;
+    close(mmap_fd);
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_intel_galileo_g1_mmap_write(mraa_gpio_context dev, int value)
+{
+    int bitpos = plat->pins[dev->phy_pin].mmap.bit_pos;
+    if (value) {
+        *((unsigned *)mmap_reg) |= (1<<bitpos);
+        return MRAA_SUCCESS;
+    }
+    *((unsigned *)mmap_reg) &= ~(1<<bitpos);
+
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_intel_galileo_g1_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
+{
+    if (dev == NULL) {
+        syslog(LOG_ERR, "Galileo mmap: context not valid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (mraa_pin_mode_test(dev->phy_pin, MRAA_PIN_FAST_GPIO) == 0) {
+        syslog(LOG_ERR, "Galileo mmap: mmap not on this pin");
+        return MRAA_ERROR_NO_RESOURCES;
+    }
+    if (en == 0) {
+        if (dev->mmap_write == NULL) {
+            syslog(LOG_ERR, "mmap: can't disable disabled mmap gpio");
+            return MRAA_ERROR_INVALID_PARAMETER;
+        }
+        dev->mmap_write = NULL;
+        mmap_count--;
+        if (mmap_count == 0) {
+            return mraa_intel_galileo_g1_mmap_unsetup();
+        }
+        return MRAA_SUCCESS;
+    }
+
+    if (dev->mmap_write != NULL) {
+        syslog(LOG_ERR, "mmap: can't enable enabled mmap gpio");
+        return MRAA_ERROR_INVALID_PARAMETER;
+    }
+    if (mmap_reg == NULL) {
+        if ((mmap_fd = open(UIO_PATH, O_RDWR)) < 0) {
+            syslog(LOG_ERR, "mmap: Unable to open UIO device");
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        mmap_reg = mmap(NULL, mmap_size, PROT_READ|PROT_WRITE,
+            MAP_SHARED, mmap_fd, 0);
+
+        if (mmap_reg == MAP_FAILED) {
+            syslog(LOG_ERR, "mmap: failed to mmap");
+            mmap_reg = NULL;
+            close(mmap_fd);
+            return MRAA_ERROR_NO_RESOURCES;
+        }
+    }
+    if (mraa_setup_mux_mapped(plat->pins[dev->phy_pin].mmap.gpio)
+        != MRAA_SUCCESS) {
+        syslog(LOG_ERR, "mmap: unable to setup required multiplexers");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    dev->mmap_write = &mraa_intel_galileo_g1_mmap_write;
+
+    return MRAA_SUCCESS;
+}
 
 mraa_board_t*
 mraa_intel_galileo_rev_d()
@@ -45,6 +133,8 @@ mraa_intel_galileo_rev_d()
     b->pwm_default_period = 500;
     b->pwm_max_period = 7968;
     b->pwm_min_period = 1;
+
+    advance_func->gpio_mmap_setup = &mraa_intel_galileo_g1_mmap_setup;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_GALILEO_REV_D_PINCOUNT);
 
