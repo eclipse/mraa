@@ -165,6 +165,23 @@ mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mod
     return MRAA_SUCCESS;
 }
 
+mraa_result_t
+mraa_intel_galileo_gen2_uart_init_pre(int index)
+{
+    mraa_gpio_context io0_output = mraa_gpio_init_raw(32);
+    mraa_gpio_context io1_output = mraa_gpio_init_raw(28);
+    mraa_gpio_dir(io0_output, MRAA_GPIO_OUT);
+    mraa_gpio_dir(io1_output, MRAA_GPIO_OUT);
+
+    mraa_gpio_write(io0_output, 1);
+    mraa_gpio_write(io1_output, 0);
+
+    mraa_gpio_close(io0_output);
+    mraa_gpio_close(io1_output);
+
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_intel_galileo_gen2()
 {
@@ -185,11 +202,12 @@ mraa_intel_galileo_gen2()
     advance_func->i2c_init_pre = &mraa_intel_galileo_gen2_i2c_init_pre;
     advance_func->pwm_period_replace = &mraa_intel_galileo_gen2_pwm_period_replace;
     advance_func->gpio_mode_replace = &mraa_intel_galileo_gen2_gpio_mode_replace;
+    advance_func->uart_init_pre = &mraa_intel_galileo_gen2_uart_init_pre;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_GALILEO_GEN_2_PINCOUNT);
 
     strncpy(b->pins[0].name, "IO0", 8);
-    b->pins[0].capabilites = (mraa_pincapabilities_t) {1,1,0,1,0,0,0};
+    b->pins[0].capabilites = (mraa_pincapabilities_t) {1,1,0,1,0,0,0,1};
     b->pins[0].gpio.pinmap = 11;
     b->pins[0].gpio.parent_id = 0;
     b->pins[0].gpio.mux_total = 0;
@@ -205,9 +223,11 @@ mraa_intel_galileo_gen2()
     b->pins[0].mmap.gpio.mux[1].value = 0;
     b->pins[0].mmap.mem_sz = 0x1000;
     b->pins[0].mmap.bit_pos = 3;
+    b->pins[0].uart.parent_id = 0;
+    b->pins[0].uart.mux_total = 0;
 
     strncpy(b->pins[1].name, "IO1", 8);
-    b->pins[1].capabilites = (mraa_pincapabilities_t) {1,1,0,1,0,0,0};
+    b->pins[1].capabilites = (mraa_pincapabilities_t) {1,1,0,1,0,0,0,1};
     b->pins[1].gpio.pinmap = 12;
     b->pins[1].gpio.parent_id = 0;
     b->pins[1].gpio.mux_total = 1;
@@ -227,6 +247,8 @@ mraa_intel_galileo_gen2()
     b->pins[1].mmap.gpio.mux[2].value = 0;
     b->pins[1].mmap.mem_sz = 0x1000;
     b->pins[1].mmap.bit_pos = 4;
+    b->pins[1].uart.parent_id = 0;
+    b->pins[1].uart.mux_total = 0;
 
     strncpy(b->pins[2].name, "IO2", 8);
     b->pins[2].capabilites = (mraa_pincapabilities_t) {1,1,0,1,0,0,0};
@@ -572,6 +594,11 @@ mraa_intel_galileo_gen2()
     b->spi_bus[0].mosi = 11;
     b->spi_bus[0].miso = 12;
     b->spi_bus[0].sclk = 13;
+
+    b->uart_dev_count = 1;
+    b->def_uart_dev = 0;
+    b->uart_dev[0].rx = 0;
+    b->uart_dev[0].tx = 1;
 
     return b;
 }
