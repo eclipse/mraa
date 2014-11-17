@@ -638,7 +638,7 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
 
     strncpy(b->pins[pos].name, "J18-8", 8);
     b->pins[pos].capabilites = (mraa_pincapabilities_t) {1,1,1,0,0,0,0};
-    b->pins[pos].gpio.pinmap = 182;
+    b->pins[pos].gpio.pinmap = 183;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].pwm.pinmap = 3;
     b->pins[pos].pwm.parent_id = 0;
