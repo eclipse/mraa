@@ -128,23 +128,22 @@ class I2c {
         }
 
         /**
-         * Write one byte to the bus
-         *
-         * @param data Buffer to send on the bus
-         * @param length Size of buffer to send
-         * @return Result of operation
-         */
-        mraa_result_t write(char* data, size_t length) {
-            return mraa_i2c_write(m_i2c, (const unsigned char *)data, (int) length);
-        }
-
-        /**
-         * Read an i2c register
+         * Read byte from an i2c register
          *
          * @param reg Register to read from
          * @return char read from register
          */
         uint8_t readReg(uint8_t reg) {
+            return mraa_i2c_read_byte_data(m_i2c, reg);
+        }
+
+        /**
+         * Read word from an i2c register
+         *
+         * @param reg Register to read from
+         * @return char read from register
+         */
+        uint16_t readWordReg(uint8_t reg) {
             return mraa_i2c_read_byte_data(m_i2c, reg);
         }
 
@@ -159,15 +158,36 @@ class I2c {
         }
 
         /**
-         * Write to an i2c register
+         * Write length bytes to the bus
+         *
+         * @param data Buffer to send on the bus
+         * @param length Size of buffer to send
+         * @return Result of operation
+         */
+        mraa_result_t write(char* data, size_t length) {
+            return mraa_i2c_write(m_i2c, (const unsigned char *)data, (int) length);
+        }
+
+        /**
+         * Write a byte to an i2c register
          *
          * @param reg Register to write to
          * @param data Value to write to register
          * @return Result of operation
          */
         mraa_result_t writeReg(uint8_t reg, uint8_t data) {
-            const uint8_t buf[2] = {reg, data};
-            return mraa_i2c_write(m_i2c, buf, 2);
+            return mraa_i2c_write_byte_data(m_i2c, data, reg);
+        }
+
+        /**
+         * Write a word to an i2c register
+         *
+         * @param reg Register to write to
+         * @param data Value to write to register
+         * @return Result of operation
+         */
+        mraa_result_t writeWordReg(uint8_t reg, uint16_t data) {
+            return mraa_i2c_write_word_data(m_i2c, data, reg);
         }
     private:
         mraa_i2c_context m_i2c;

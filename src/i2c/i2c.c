@@ -121,8 +121,13 @@ mraa_i2c_read_byte(mraa_i2c_context dev)
 uint8_t
 mraa_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
-    uint8_t byte = i2c_smbus_read_byte_data(dev->fh, command);
-    return byte;
+    return (uint8_t) i2c_smbus_read_byte_data(dev->fh, command);
+}
+
+uint16_t
+mraa_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
+{
+    return (uint16_t) i2c_smbus_read_word_data(dev->fh, command);
 }
 
 mraa_result_t
@@ -130,7 +135,7 @@ mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length)
 {
     if (i2c_smbus_write_i2c_block_data(dev->fh, data[0], length-1, (uint8_t*) data+1) < 0) {
         syslog(LOG_ERR, "i2c: Failed to write");
-	return MRAA_ERROR_INVALID_HANDLE;
+        return MRAA_ERROR_INVALID_HANDLE;
     }
     return MRAA_SUCCESS;
 }
@@ -140,7 +145,27 @@ mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data)
 {
     if (i2c_smbus_write_byte(dev->fh, data) < 0) {
         syslog(LOG_ERR, "i2c: Failed to write");
-	return MRAA_ERROR_INVALID_HANDLE;
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
+{
+    if (i2c_smbus_write_byte_data(dev->fh, command, data) < 0) {
+        syslog(LOG_ERR, "i2c: Failed to write");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_i2c_write_word_data(mraa_i2c_context dev, const uint16_t data, const uint8_t command)
+{
+    if (i2c_smbus_write_word_data(dev->fh, command, data) < 0) {
+        syslog(LOG_ERR, "i2c: Failed to write");
+        return MRAA_ERROR_INVALID_HANDLE;
     }
     return MRAA_SUCCESS;
 }
@@ -151,7 +176,7 @@ mraa_i2c_address(mraa_i2c_context dev, uint8_t addr)
     dev->addr = (int) addr;
     if (ioctl(dev->fh, I2C_SLAVE_FORCE, addr) < 0) {
         syslog(LOG_ERR, "i2c: Failed to set slave address %d", addr);
-	return MRAA_ERROR_INVALID_HANDLE;
+        return MRAA_ERROR_INVALID_HANDLE;
     }
     return MRAA_SUCCESS;
 }

@@ -78,7 +78,8 @@ mraa_i2c_context mraa_i2c_init_raw(unsigned int bus);
 mraa_result_t mraa_i2c_frequency(mraa_i2c_context dev, int hz);
 
 /**
- * Read from an i2c context
+ * Simple bulk read from an i2c context, this will always begin with the i2c
+ * offset 0x0
  *
  * @param dev The i2c context
  * @param data pointer to the byte array to read data in to
@@ -88,7 +89,8 @@ mraa_result_t mraa_i2c_frequency(mraa_i2c_context dev, int hz);
 int mraa_i2c_read(mraa_i2c_context dev, uint8_t *data, int length);
 
 /**
- * Read a single byte from the i2c context
+ * Simple read for a single byte from the i2c context, this will always begin
+ * with the i2c offset 0x0
  *
  * @param dev The i2c context
  * @return The result of the read or -1 if failed
@@ -102,10 +104,19 @@ uint8_t mraa_i2c_read_byte(mraa_i2c_context dev);
  * @param command The register
  * @return The result of the read or -1 if failed
  */
-uint8_t mraa_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command);
+uint8_t mraa_i2c_read_byte_data(mraa_i2c_context dev, const uint8_t command);
 
 /**
- * Write to an i2c context
+ * Read a single word from i2c context, from designated register
+ *
+ * @param dev The i2c context
+ * @param command The register
+ * @return The result of the read or -1 if failed
+ */
+uint16_t mraa_i2c_read_word_data(mraa_i2c_context dev, const uint8_t command);
+
+/**
+ * Perform a simple write to an i2c context, always at offset 0x0
  *
  * @param dev The i2c context
  * @param data pointer to the byte array to be written
@@ -115,13 +126,33 @@ uint8_t mraa_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command);
 mraa_result_t mraa_i2c_write(mraa_i2c_context dev, const uint8_t *data, int length);
 
 /**
- * Write a single byte to an i2c context
+ * Write a single byte to an i2c context, always at offset 0x0
  *
  * @param dev The i2c context
  * @param data The byte to write
  * @return Result of operation
  */
 mraa_result_t mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data);
+
+/**
+ * Write a single byte to an i2c context
+ *
+ * @param dev The i2c context
+ * @param data The byte to write
+ * @param command The register
+ * @return Result of operation
+ */
+mraa_result_t mraa_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t command);
+
+/**
+ * Write a single word to an i2c context
+ *
+ * @param dev The i2c context
+ * @param data The word to write
+ * @param command The register
+ * @return Result of operation
+ */
+mraa_result_t mraa_i2c_write_word_data(mraa_i2c_context dev, const uint16_t data, const uint8_t command);
 
 /**
  * Sets the i2c context address.
