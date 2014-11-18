@@ -106,6 +106,7 @@ class I2c {
          *
          * @param data Buffer to write into
          * @param length Size of read
+         * @param command The i2c command
          * @return length of the read or 0 if failed
          */
         uint8_t read(char *data, size_t length) {
@@ -116,13 +117,13 @@ class I2c {
          * Read length bytes from the bus, and return as a std::string note
          * that this is not a null terminated string
          *
-         * @param length Size of read to make
+         * @param length Size of read in bytes to make
          * @return pointer to std::string
          */
-        std::string read(size_t length) {
-            char* data = (char*) malloc(sizeof(char) * length);
-            mraa_i2c_read(m_i2c, (uint8_t*) data, (int) length);
-            std::string str(data, (int) length);
+        std::string read(int length, uint8_t command) {
+            uint8_t* data = (uint8_t*) malloc(sizeof(uint8_t) * length);
+            mraa_i2c_read(m_i2c, data, command, length);
+            std::string str((char*)data, length);
             free(data);
             return str;
         }
@@ -144,7 +145,7 @@ class I2c {
          * @return char read from register
          */
         uint16_t readWordReg(uint8_t reg) {
-            return mraa_i2c_read_byte_data(m_i2c, reg);
+            return mraa_i2c_read_word_data(m_i2c, reg);
         }
 
         /**
@@ -158,9 +159,10 @@ class I2c {
         }
 
         /**
-         * Write length bytes to the bus
+         * Write length bytes to the bus, the first byte in the array is the
+         * command/register to write
          *
-         * @param data Buffer to send on the bus
+         * @param data Buffer to send on the bus, first byte is i2c command
          * @param length Size of buffer to send
          * @return Result of operation
          */

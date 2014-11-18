@@ -99,11 +99,24 @@ main(int argc, char **argv)
     mraa_i2c_write(i2c, rx_tx_buf, 2);
 
     for(;;) {
+#if 0
+        int i = 0;
+        //alternative, equivalent method which helps to understand exactly what
+        //the below does
+        mraa_i2c_address(i2c, HMC5883L_I2C_ADDR);
+        for (i = 0; i < DATA_REG_SIZE; i++) {
+            mraa_i2c_read_byte_data(i2c, HMC5883L_DATA_REG+i);
+        }
+#endif
+        // first 'select' the register we want to read from
         mraa_i2c_address(i2c, HMC5883L_I2C_ADDR);
         mraa_i2c_write_byte(i2c, HMC5883L_DATA_REG);
 
+        // then we read from that register incrementing with every read the
+        // chosen register
         mraa_i2c_address(i2c, HMC5883L_I2C_ADDR);
-        mraa_i2c_read(i2c, rx_tx_buf, DATA_REG_SIZE);
+        // this call behaves very similarly to the Wire receive() call
+        mraa_i2c_read(i2c, rx_tx_buf, HMC5883L_DATA_REG, DATA_REG_SIZE);
 
         x = (rx_tx_buf[HMC5883L_X_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_X_LSB_REG] ;
         z = (rx_tx_buf[HMC5883L_Z_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_Z_LSB_REG] ;

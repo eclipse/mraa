@@ -2,6 +2,9 @@
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
+ * Code is modified from the RoadNarrows-robotics i2c library (distributed under
+ * the MIT license, license is included verbatim under src/i2c/LICENSE)
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -23,8 +26,46 @@
  */
 
 #include "i2c.h"
-#include "smbus.h"
 #include "mraa_internal.h"
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <inttypes.h>
+#include <sys/types.h>
+#include <sys/errno.h>
+#include <sys/ioctl.h>
+#include "linux/i2c-dev.h"
+
+typedef union i2c_smbus_data_union
+{
+    uint8_t byte; ///< data byte
+    unsigned short word; ///< data short word
+    uint8_t block[I2C_SMBUS_BLOCK_MAX + 2];
+    ///< block[0] is used for length and one more for PEC
+} i2c_smbus_data_t;
+
+typedef struct i2c_smbus_ioctl_data_struct
+{
+    uint8_t read_write; ///< operation direction
+    uint8_t command; ///< ioctl command
+    int size; ///< data size
+    i2c_smbus_data_t *data; ///< data
+} i2c_smbus_ioctl_data_t;
+
+int
+mraa_i2c_smbus_access(int fh, uint8_t read_write, uint8_t command, int size,
+        i2c_smbus_data_t *data)
+{
+  i2c_smbus_ioctl_data_t args;
+
+  args.read_write = read_write;
+  args.command = command;
+  args.size = size;
+  args.data = data;
+
+  return ioctl(fh, I2C_SMBUS, &args);
+}
 
 mraa_i2c_context
 mraa_i2c_init(int bus)
@@ -114,36 +155,69 @@ mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 uint8_t
 mraa_i2c_read_byte(mraa_i2c_context dev)
 {
-    uint8_t byte = i2c_smbus_read_byte(dev->fh);
-    return byte;
+    i2c_smbus_data_t d;
+
+    if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_READ, I2C_NOCMD,
+            I2C_SMBUS_BYTE, &d) < 0) {
+        syslog(LOG_ERR, "i2c: Failed to write");
+        return 0;
+    }
+    return 0x0FF & d.byte;
 }
 
 uint8_t
 mraa_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
-    return (uint8_t) i2c_smbus_read_byte_data(dev->fh, command);
+    i2c_smbus_data_t d;
+
+    if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_READ, command,
+            I2C_SMBUS_BYTE_DATA, &d) < 0) {
+        syslog(LOG_ERR, "i2c: Failed to write");
+        return 0;
+    }
+    return 0x0FF & d.byte;
 }
 
 uint16_t
 mraa_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
-    return (uint16_t) i2c_smbus_read_word_data(dev->fh, command);
+    i2c_smbus_data_t d;
+
+    if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_READ, command,
+            I2C_SMBUS_WORD_DATA, &d) < 0) {
+        syslog(LOG_ERR, "i2c: Failed to write");
+        return 0;
+    }
+    return 0xFFFF & d.byte;
 }
 
 mraa_result_t
 mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length)
 {
-    if (i2c_smbus_write_i2c_block_data(dev->fh, data[0], length-1, (uint8_t*) data+1) < 0) {
-        syslog(LOG_ERR, "i2c: Failed to write");
-        return MRAA_ERROR_INVALID_HANDLE;
+    i2c_smbus_data_t d;
+    int i;
+    uint8_t command = data[0];
+
+    data = &data[1];
+    length = length-1;
+    if (length > I2C_SMBUS_I2C_BLOCK_MAX) {
+        length = I2C_SMBUS_I2C_BLOCK_MAX;
     }
-    return MRAA_SUCCESS;
+
+    for (i=1; i<=length; i++) {
+        d.block[i] = data[i-1];
+    }
+    d.block[0] = length;
+
+    return mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, command,
+            I2C_SMBUS_I2C_BLOCK_DATA, &d);
 }
 
 mraa_result_t
 mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data)
 {
-    if (i2c_smbus_write_byte(dev->fh, data) < 0) {
+    if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, data,
+            I2C_SMBUS_BYTE, NULL) < 0) {
         syslog(LOG_ERR, "i2c: Failed to write");
         return MRAA_ERROR_INVALID_HANDLE;
     }
@@ -151,9 +225,14 @@ mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data)
 }
 
 mraa_result_t
-mraa_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
+mraa_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data,
+        const uint8_t command)
 {
-    if (i2c_smbus_write_byte_data(dev->fh, command, data) < 0) {
+    i2c_smbus_data_t d;
+
+    d.byte = data;
+    if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, command,
+            I2C_SMBUS_BYTE_DATA, &d) < 0) {
         syslog(LOG_ERR, "i2c: Failed to write");
         return MRAA_ERROR_INVALID_HANDLE;
     }
@@ -161,9 +240,14 @@ mraa_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t
 }
 
 mraa_result_t
-mraa_i2c_write_word_data(mraa_i2c_context dev, const uint16_t data, const uint8_t command)
+mraa_i2c_write_word_data(mraa_i2c_context dev, const uint16_t data,
+        const uint8_t command)
 {
-    if (i2c_smbus_write_word_data(dev->fh, command, data) < 0) {
+    i2c_smbus_data_t d;
+
+    d.word = data;
+    if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, command,
+            I2C_SMBUS_WORD_DATA, &d) < 0) {
         syslog(LOG_ERR, "i2c: Failed to write");
         return MRAA_ERROR_INVALID_HANDLE;
     }

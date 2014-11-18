@@ -8,7 +8,6 @@ set (mraa_LIB_SRCS
   ${PROJECT_SOURCE_DIR}/src/mraa.c
   ${PROJECT_SOURCE_DIR}/src/gpio/gpio.c
   ${PROJECT_SOURCE_DIR}/src/i2c/i2c.c
-  ${PROJECT_SOURCE_DIR}/src/i2c/smbus.c
   ${PROJECT_SOURCE_DIR}/src/pwm/pwm.c
   ${PROJECT_SOURCE_DIR}/src/spi/spi.c
   ${PROJECT_SOURCE_DIR}/src/aio/aio.c

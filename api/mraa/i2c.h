@@ -116,7 +116,8 @@ uint8_t mraa_i2c_read_byte_data(mraa_i2c_context dev, const uint8_t command);
 uint16_t mraa_i2c_read_word_data(mraa_i2c_context dev, const uint8_t command);
 
 /**
- * Perform a simple write to an i2c context, always at offset 0x0
+ * Write length bytes to the bus, the first byte in the array is the
+ * command/register to write
  *
  * @param dev The i2c context
  * @param data pointer to the byte array to be written
