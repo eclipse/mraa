@@ -95,6 +95,7 @@ class Spi {
         char* write(char* data, size_t length) {
             return (char*) mraa_spi_write_buf(m_spi, (uint8_t *) data, (int) length);
         }
+#ifndef SWIG
         /**
          * Transfer data to and from SPI device Receive pointer may be null if return
          * data is not needed.
@@ -107,6 +108,7 @@ class Spi {
         mraa_result_t transfer(char* data, char* rxBuf, size_t length) {
             return mraa_spi_transfer_buf(m_spi, (uint8_t *) data, (uint8_t *)rxBuf, (int) length);
         }
+#endif
         /**
          * Change the SPI lsb mode
          *
