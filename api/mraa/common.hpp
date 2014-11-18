@@ -120,6 +120,7 @@ inline unsigned int adcSupportedBits()
  * Sets the log level to use from 0-7 where 7 is very verbose. These are the
  * syslog log levels, see syslog(3) for more information on the levels.
  *
+ * @param level
  * @return Result of operation
  */
 inline mraa_result_t setLogLevel(int level)
