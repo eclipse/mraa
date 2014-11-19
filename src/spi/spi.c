@@ -113,7 +113,7 @@ mraa_spi_init(int bus)
 
     char path[MAX_SIZE];
     sprintf(path, "/dev/spidev%u.%u",
-        plat->spi_bus[bus].bus_id, plat->spi_bus[bus].slave_s);
+            plat->spi_bus[bus].bus_id, plat->spi_bus[bus].slave_s);
 
     dev->devfd = open(path, O_RDWR);
     if (dev->devfd < 0) {
