@@ -27,6 +27,7 @@ Intel breakout board
 --------------------
 
 - Both I2C buses are avaible 1 & 6
+- IO on the miniboard is 1.8V
 
 Please see the following table on how the physical pins map to mraa pin numbers
 
