@@ -129,6 +129,7 @@ mraa_gpio_init_raw(int pin)
         if (write(export, bu, length*sizeof(char)) == -1) {
             syslog(LOG_ERR, "gpio: Failed to write to export");
             close(export);
+            free(dev);
             return NULL;
         }
         dev->owner = 1;
