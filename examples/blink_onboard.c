@@ -27,24 +27,32 @@
 #include <unistd.h>
 
 #include "mraa/gpio.h"
+#define BOARD_NAME_MAX_LENGTH  80
 
 int
 main(int argc, char **argv)
 {
     mraa_platform_t platform = mraa_get_platform_type();
     mraa_gpio_context gpio;
-    char board_name[] = "Some weird devboard that isn't recognised...";
+    char board_name[BOARD_NAME_MAX_LENGTH + 1];
     int ledstate = 0;
 
     switch (platform) {
         case MRAA_INTEL_GALILEO_GEN1:
-            strcpy(board_name, "Intel Galileo Gen1");
+            strncpy(board_name, "Intel(R) Galileo Gen1", BOARD_NAME_MAX_LENGTH);
             gpio = mraa_gpio_init_raw(3);
             break;
         case MRAA_INTEL_GALILEO_GEN2:
-            strcpy(board_name, "Intel Galileo Gen2");
-        default:
+            strncpy(board_name, "Intel(R) Galileo Gen2", BOARD_NAME_MAX_LENGTH);
             gpio = mraa_gpio_init(13);
+            break;
+        case MRAA_INTEL_EDISON_FAB_C:
+            strncpy(board_name, "Intel(R) Edison FAB C", BOARD_NAME_MAX_LENGTH);
+            gpio = mraa_gpio_init(13);
+            break;
+        default:
+        	strncpy(board_name, "Unknown", BOARD_NAME_MAX_LENGTH);
+            gpio = mraa_gpio_init(13); // let's hope this will work on the unknown board
     }
 
     fprintf(stdout, "Welcome to libmraa\n Version: %s\n Running on %s\n",
