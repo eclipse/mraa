@@ -105,6 +105,10 @@ mraa_spi_init(int bus)
     }
 
     mraa_spi_context dev = (mraa_spi_context) malloc(sizeof(struct _spi));
+    if (dev == NULL) {
+        syslog(LOG_CRIT, "spi: Failed to allocate memory for context");
+        return NULL;
+    }
     memset(dev, 0, sizeof(struct _spi));
 
     char path[MAX_SIZE];
