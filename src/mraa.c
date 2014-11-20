@@ -87,11 +87,11 @@ mraa_init()
     FILE *fh = fopen("/sys/devices/virtual/dmi/id/board_name", "r");
     if (fh != NULL) {
         if (getline(&line, &len, fh) != -1) {
-            if (strncmp(line, "GalileoGen2", 10) == 0) {
+            if (strncmp(line, "GalileoGen2", 11) == 0) {
                 platform_type = MRAA_INTEL_GALILEO_GEN2;
             } else if (strncmp(line, "BODEGA BAY", 10) == 0) {
                 platform_type = MRAA_INTEL_EDISON_FAB_C;
-            } else if (strncmp(line, "SALT BAY", 7) == 0) {
+            } else if (strncmp(line, "SALT BAY", 8) == 0) {
                 platform_type = MRAA_INTEL_EDISON_FAB_C;
             } else if (strncmp(line, "DE3815", 6) == 0) {
                 platform_type = MRAA_INTEL_DE3815;
