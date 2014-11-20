@@ -620,7 +620,7 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
     advance_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
     advance_func->gpio_mode_replace = &mraa_intel_edsion_mb_gpio_mode;
-    advance_func->uart_init_post = &mraa_intel_edison_uart_init_post;
+    advance_func->uart_init_pre = &mraa_intel_edison_uart_init_pre;
     advance_func->gpio_mmap_setup = &mraa_intel_edison_mmap_setup;
 
     int pos = 0;
