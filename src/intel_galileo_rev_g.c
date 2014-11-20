@@ -335,7 +335,9 @@ mraa_intel_galileo_gen2()
     b->pins[1].mmap.mem_sz = 0x1000;
     b->pins[1].mmap.bit_pos = 4;
     b->pins[1].uart.parent_id = 0;
-    b->pins[1].uart.mux_total = 0;
+    b->pins[1].uart.mux_total = 1;
+    b->pins[1].uart.mux[0].pin = 45;
+    b->pins[1].uart.mux[0].value = 1;
 
     strncpy(b->pins[2].name, "IO2", 8);
     b->pins[2].capabilites = (mraa_pincapabilities_t) {1,1,0,1,0,0,0};
