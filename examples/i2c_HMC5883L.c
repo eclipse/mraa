@@ -116,7 +116,7 @@ main(int argc, char **argv)
         // chosen register
         mraa_i2c_address(i2c, HMC5883L_I2C_ADDR);
         // this call behaves very similarly to the Wire receive() call
-        mraa_i2c_read(i2c, rx_tx_buf, HMC5883L_DATA_REG, DATA_REG_SIZE);
+        mraa_i2c_read(i2c, rx_tx_buf, DATA_REG_SIZE);
 
         x = (rx_tx_buf[HMC5883L_X_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_X_LSB_REG] ;
         z = (rx_tx_buf[HMC5883L_Z_MSB_REG] << 8 ) | rx_tx_buf[HMC5883L_Z_LSB_REG] ;

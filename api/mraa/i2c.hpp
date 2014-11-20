@@ -120,9 +120,9 @@ class I2c {
          * @param length Size of read in bytes to make
          * @return pointer to std::string
          */
-        std::string read(int length, uint8_t command) {
+        std::string read(int length) {
             uint8_t* data = (uint8_t*) malloc(sizeof(uint8_t) * length);
-            mraa_i2c_read(m_i2c, data, command, length);
+            mraa_i2c_read(m_i2c, data, length);
             std::string str((char*)data, length);
             free(data);
             return str;
