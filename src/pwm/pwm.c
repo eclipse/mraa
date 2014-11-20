@@ -386,13 +386,13 @@ mraa_pwm_config_ms(mraa_pwm_context dev, int ms ,float ms_float)
     int old_dutycycle, old_period, status;
     old_dutycycle = mraa_pwm_read_duty(dev);
     old_period = mraa_pwm_read_period(dev);
-    status = mraa_pwm_write_duty(dev, 0);
-    if (status != MRAA_SUCCESS) {
-        return status;
-    }
     status = mraa_pwm_period_us(dev, ms*1000);
     if (status != MRAA_SUCCESS) {
         mraa_pwm_write_duty(dev, old_dutycycle);
+        return status;
+    }
+    status = mraa_pwm_write_duty(dev, 0);
+    if (status != MRAA_SUCCESS) {
         return status;
     }
     status = mraa_pwm_pulsewidth_us(dev, ms_float*1000);
@@ -410,13 +410,13 @@ mraa_pwm_config_percent(mraa_pwm_context dev, int ms ,float percentage)
     int old_dutycycle, old_period, status;
     old_dutycycle = mraa_pwm_read_duty(dev);
     old_period = mraa_pwm_read_period(dev);
-    status = mraa_pwm_write_duty(dev, 0);
-    if (status != MRAA_SUCCESS) {
-        return status;
-    }
     status = mraa_pwm_period_us(dev, ms*1000);
     if (status != MRAA_SUCCESS) {
         mraa_pwm_write_duty(dev, old_dutycycle);
+        return status;
+    }
+    status = mraa_pwm_write_duty(dev, 0);
+    if (status != MRAA_SUCCESS) {
         return status;
     }
     status = mraa_pwm_pulsewidth_us(dev, (ms*1000)*percentage);
