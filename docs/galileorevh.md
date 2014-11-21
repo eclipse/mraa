@@ -15,3 +15,5 @@ The Gen 2 board has the following limitations in libmraa:
   all pwm channels
 - adc kernel module will return 12bit number but the ADC itself only has an
   accuracy of 10bits.
+- AIO pins are treated as 0-5 in mraa_aio_init() but as 14-19 for everything
+  else. Therefore use mraa_gpio_init(14) to use A0 as a Gpio

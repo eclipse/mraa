@@ -22,6 +22,8 @@ in libmraa:
 - SPI exposed is also used for the ADC. Try not to use your own CS.
 - ADC kernel module will return 12bit number but the ADC itself only has an
   accuracy of 10bits. This ADC is only included on the arduino board.
+- AIO pins are treated as 0-5 in mraa_aio_init() but as 14-19 for everything
+  else. Therefore use mraa_gpio_init(14) to use A0 as a Gpio
 
 Intel breakout board
 --------------------
