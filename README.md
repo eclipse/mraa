@@ -15,11 +15,17 @@ low level communication protocol by high level languages & constructs.
 Supported Boards
 ================
 
+X86
+---
 * [Galileo Gen 1 - Rev D](../master/docs/galileorevd.md)
 * [Galileo Gen 2 - Rev H](../master/docs/galileorevh.md)
 * [Edison](../master/docs/edison.md)
 * [Intel DE3815](../master/docs/intel_de3815.md)
 * [Minnowboard Max](../master/docs/minnow_max.md)
+
+ARM
+---
+* [Raspberry Pi - Model B](../master/docs/raspberry_pi_b.md)
 
 Installing on your board
 ========
