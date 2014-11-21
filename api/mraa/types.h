@@ -42,6 +42,7 @@ typedef enum {
     MRAA_INTEL_EDISON_FAB_C = 2, /**< The Intel Edison (FAB C) */
     MRAA_INTEL_DE3815 = 3, /**< The Intel DE3815 Baytrail NUC */
     MRAA_INTEL_MINNOWBOARD_MAX = 4, /**< The Intel Minnow Board Max */
+    MRAA_RASPBERRY_PI_B = 5, /**< The Raspberry PI Model B */
 
     MRAA_UNKNOWN_PLATFORM = 99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
 } mraa_platform_t;
