@@ -16,12 +16,12 @@ set (mraa_LIB_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/spi/spi.c
   ${PROJECT_SOURCE_DIR}/src/aio/aio.c
   ${PROJECT_SOURCE_DIR}/src/uart/uart.c
-  ${PROJECT_SOURCE_DIR}/src/intel_galileo_rev_d.c
-  ${PROJECT_SOURCE_DIR}/src/intel_galileo_rev_g.c
-  ${PROJECT_SOURCE_DIR}/src/intel_edison_fab_c.c
-  ${PROJECT_SOURCE_DIR}/src/intel_de3815.c
-  ${PROJECT_SOURCE_DIR}/src/intel_minnow_max.c
 )
+
+if (X86PLAT)
+  add_subdirectory(x86)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DX86PLAT=1")
+endif()
 
 set (mraa_LIB_SRCS
   ${mraa_LIB_SRCS_NOAUTO}

@@ -31,11 +31,6 @@
 #define DEBUG
 
 #include "mraa_internal.h"
-#include "intel_galileo_rev_d.h"
-#include "intel_galileo_rev_g.h"
-#include "intel_edison_fab_c.h"
-#include "intel_de3815.h"
-#include "intel_minnow_max.h"
 #include "gpio.h"
 #include "version.h"
 
@@ -80,59 +75,19 @@ mraa_init()
     Py_InitializeEx(0);
     PyEval_InitThreads();
 #endif
-    // detect a galileo gen2 board
-    char *line = NULL;
-    // let getline allocate memory for *line
-    size_t len = 0;
-    FILE *fh = fopen("/sys/devices/virtual/dmi/id/board_name", "r");
-    if (fh != NULL) {
-        if (getline(&line, &len, fh) != -1) {
-            if (strncmp(line, "GalileoGen2", 11) == 0) {
-                platform_type = MRAA_INTEL_GALILEO_GEN2;
-            } else if (strncmp(line, "BODEGA BAY", 10) == 0) {
-                platform_type = MRAA_INTEL_EDISON_FAB_C;
-            } else if (strncmp(line, "SALT BAY", 8) == 0) {
-                platform_type = MRAA_INTEL_EDISON_FAB_C;
-            } else if (strncmp(line, "DE3815", 6) == 0) {
-                platform_type = MRAA_INTEL_DE3815;
-            } else if (strncmp(line, "NOTEBOOK", 8) == 0) {
-                platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
-            } else if (strncasecmp(line, "MinnowBoard MAX", 15) == 0) {
-                platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
-            } else {
-                platform_type = MRAA_INTEL_GALILEO_GEN1;
-            }
-            free(line);
-        }
-        fclose(fh);
-    }
-
     advance_func = (mraa_adv_func_t*) malloc(sizeof(mraa_adv_func_t));
     memset(advance_func, 0, sizeof(mraa_adv_func_t));
 
-    switch(platform_type) {
-        case MRAA_INTEL_GALILEO_GEN2:
-            plat = mraa_intel_galileo_gen2();
-            break;
-        case MRAA_INTEL_GALILEO_GEN1:
-            plat = mraa_intel_galileo_rev_d();
-            break;
-        case MRAA_INTEL_EDISON_FAB_C:
-            plat = mraa_intel_edison_fab_c();
-            break;
-        case MRAA_INTEL_DE3815:
-            plat = mraa_intel_de3815();
-            break;
-        case MRAA_INTEL_MINNOWBOARD_MAX:
-            plat = mraa_intel_minnow_max();
-            break;
+#ifdef X86PLAT
+    // Use runtime x86 platform detection
+    platform_type = mraa_x86_platform();
+#endif
 
-        default:
-            plat = mraa_intel_galileo_rev_d();
-            syslog(LOG_ERR, "Platform not supported, initialising as MRAA_INTEL_GALILEO_GEN1");
+    if (plat == NULL) {
+        printf("mraa: FATAL error, failed to initialise platform\n");
+        return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
     }
-
-    syslog(LOG_NOTICE, "libmraa initialised for platform %d", platform_type);
+    syslog(LOG_INFO, "libmraa initialised for platform %d", platform_type);
     return MRAA_SUCCESS;
 }
 

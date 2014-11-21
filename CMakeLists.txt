@@ -56,6 +56,19 @@ option (BUILDSWIGPYTHON "Build swig python modules." ON)
 option (BUILDSWIGNODE "Build swig node modules." ON)
 option (IPK "Generate IPK using CPack" OFF)
 
+include (TargetArch)
+target_architecture (DETECTED_ARCH)
+message( INFO " - Target arch is ${DETECTED_ARCH}")
+
+if (DETECTED_ARCH STREQUAL "i586" OR DETECTED_ARCH STREQUAL "x86_64"
+    OR DETECTED_ARCH STREQUAL "i386")
+  set (X86PLAT ON)
+elseif (DETECTED_ARCH MATCHES "arm.*")
+  set (ARMPLAT ON)
+else ()
+  message(FATAL_ERROR "Only x86 and arm platforms currently supported")
+endif()
+
 if (GTEST)
   enable_testing ()
   add_subdirectory (tests)
@@ -75,10 +88,6 @@ if (BUILDDOC)
 endif ()
 
 if (IPK)
-  include (TargetArch)
-  target_architecture (DETECTED_ARCH)
-  message( INFO " - Target arch is ${DETECTED_ARCH}")
-
   set(CPACK_GENERATOR "DEB" "TGZ")
   set(OPKG_ARCH ${DETECTED_ARCH})
   set(CPACK_BINARY_DIR ${CMAKE_BINARY_DIR})

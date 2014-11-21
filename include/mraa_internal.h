@@ -53,6 +53,13 @@ mraa_result_t mraa_setup_mux_mapped(mraa_pin_t meta);
  */
 mraa_result_t mraa_setup_uart(int index);
 
+/**
+ * Runtime detect running x86 platform
+ *
+ * @return mraa_platform_t of the init'ed platform
+ */
+mraa_platform_t mraa_x86_platform();
+
 #ifdef __cplusplus
 }
 #endif
