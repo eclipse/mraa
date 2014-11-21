@@ -28,7 +28,7 @@
 #include <sys/mman.h>
 
 #include "common.h"
-#include "intel_galileo_rev_g.h"
+#include "x86/intel_galileo_rev_g.h"
 
 #define MAX_SIZE 64
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"

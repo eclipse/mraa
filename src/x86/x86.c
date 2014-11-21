@@ -25,11 +25,11 @@
 #include <stdlib.h>
 
 #include "mraa_internal.h"
-#include "intel_galileo_rev_d.h"
-#include "intel_galileo_rev_g.h"
-#include "intel_edison_fab_c.h"
-#include "intel_de3815.h"
-#include "intel_minnow_max.h"
+#include "x86/intel_galileo_rev_d.h"
+#include "x86/intel_galileo_rev_g.h"
+#include "x86/intel_edison_fab_c.h"
+#include "x86/intel_de3815.h"
+#include "x86/intel_minnow_max.h"
 
 mraa_platform_t
 mraa_x86_platform()

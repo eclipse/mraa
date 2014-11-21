@@ -27,7 +27,7 @@
 #include <sys/mman.h>
 
 #include "common.h"
-#include "intel_galileo_rev_d.h"
+#include "x86/intel_galileo_rev_d.h"
 
 #define UIO_PATH "/dev/uio0"
 #define PLATFORM_NAME "Intel Galileo Gen 1"

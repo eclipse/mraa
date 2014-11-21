@@ -28,7 +28,7 @@
 #include <sys/mman.h>
 
 #include "common.h"
-#include "intel_edison_fab_c.h"
+#include "x86/intel_edison_fab_c.h"
 
 #define PLATFORM_NAME "Intel Edison"
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"

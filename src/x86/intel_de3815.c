@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include "common.h"
-#include "intel_de3815.h"
+#include "x86/intel_de3815.h"
 
 #define PLATFORM_NAME "Intel DE3815"
 #define MAX_SIZE 64

@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include "common.h"
-#include "intel_minnow_max.h"
+#include "x86/intel_minnow_max.h"
 
 #define PLATFORM_NAME "MinnowBoard MAX"
 #define I2C_BUS_COUNT 10
