@@ -19,6 +19,7 @@ Supported Boards
 * [Galileo Gen 2 - Rev H](../master/docs/galileorevh.md)
 * [Edison](../master/docs/edison.md)
 * [Intel DE3815](../master/docs/intel_de3815.md)
+* [Minnowboard Max](../master/docs/minnow_max.md)
 
 Installing on your board
 ========
