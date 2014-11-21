@@ -56,7 +56,7 @@ mraa_spi_init(int bus)
         syslog(LOG_ERR, "spi: Platform Not Initialised");
         return NULL;
     }
-     if (plat->spi_bus_count >! 0) {
+     if (plat->spi_bus_count == 0) {
         syslog(LOG_ERR, "spi: no spi buses defined in platform");
         return NULL;
     }
