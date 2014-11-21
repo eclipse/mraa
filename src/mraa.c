@@ -81,6 +81,11 @@ mraa_init()
 #ifdef X86PLAT
     // Use runtime x86 platform detection
     platform_type = mraa_x86_platform();
+#elif ARMPLAT
+    // Use runtime ARM platform detection
+    platform_type = mraa_arm_platform();
+#else
+    #error mraa_ARCH NOTHING
 #endif
 
     if (plat == NULL) {
