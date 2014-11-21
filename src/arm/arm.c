@@ -25,12 +25,16 @@
 #include <stdlib.h>
 
 #include "mraa_internal.h"
+#include "arm/raspberry_pi_b.h"
 
 mraa_platform_t
 mraa_arm_platform()
 {
     mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
+
+    //For the Time being, Will always be Raspberry PI when running ARM
+    platform_type = MRAA_RASPBERRY_PI_B;
+    plat = mraa_raspberry_pi_b();
+
     return platform_type;
 }
-
-
