@@ -61,7 +61,7 @@ typedef struct _i2c* mraa_i2c_context;
 mraa_i2c_context mraa_i2c_init(int bus);
 
 /**
- * Initialise i2c context, passing in spi bus to use.
+ * Initialise i2c context, passing in the i2c bus to use.
  *
  * @param bus The i2c bus to use i.e. /dev/i2c-2 would be "2"
  * @return i2c context or NULL
