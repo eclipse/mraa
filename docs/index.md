@@ -41,6 +41,7 @@ Specific platform information for supported platforms is documented here:
 - @ref galileorevh
 - @ref edison
 - @ref de3815
+- @ref minnowmax
 
 ### ENV RECOMENDATIONS
 

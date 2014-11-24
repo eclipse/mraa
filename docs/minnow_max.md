@@ -1,4 +1,4 @@
-Intel Minnowboard Max
+Intel Minnowboard Max               {#minnowmax}
 =====================
 MinnowBoard MAX is an open hardware embedded board designed with the Intel® Atom™ E38xx series SOC (known as Bay Trail).
 
