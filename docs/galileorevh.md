@@ -1,7 +1,7 @@
 Galileo Gen 2 - Rev H                           {#galileorevh}
 =====================
 
-Galileo is a microcontroller board based on the Intel® Quark SoC X1000
+Galileo is a microcontroller board based on the Intel(R) Quark(TM) SoC X1000
 Application Processor, a 32-bit Intel Pentium-class system on a chip.
 
 The Gen 2 board has the following limitations in libmraa:

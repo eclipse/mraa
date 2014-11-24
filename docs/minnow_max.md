@@ -1,8 +1,10 @@
-Intel Minnowboard Max               {#minnowmax}
-=====================
-MinnowBoard MAX is an open hardware embedded board designed with the Intel® Atom™ E38xx series SOC (known as Bay Trail).
+Intel(R) Minnowboard Max               {#minnowmax}
+========================
+MinnowBoard MAX is an open hardware embedded board designed with the Intel(R)
+Atom(TM) E38xx series SOC (Fromerly Bay Trail).
 
-For product overview and faq see http://www.minnowboard.org/faq-minnowboard-max/
+For product overview and faq see
+http://www.minnowboard.org/faq-minnowboard-max/
 
 For technical details see http://www.elinux.org/Minnowboard:MinnowMax
 
@@ -12,12 +14,13 @@ mraa has only been tested with 64 bit firmware version 0.73 or later.
 
 Interface notes
 ---------------
-The low speed I/O connector supported as per table below. 
-This assumes default BIOS settings, as they are not dynamcially detected 
-If any changes are mode (Device Manager -> System Setup -> South Cluster -> LPSS & CSS) 
-them mraa calls will not behave as expected.
+The low speed I/O connector supported as per table below.  This assumes default
+BIOS settings, as they are not dynamcially detected If any changes are mode
+(Device Manager -> System Setup -> South Cluster -> LPSS & CSS) them mraa calls
+will not behave as expected.
 
-Documentation shows i2c on bus #5, ACPI shows it on bus #6, but driver uses bus #7.
+Documentation shows i2c on bus #5, ACPI shows it on bus #6, but driver uses bus
+#7.
 
 **SPI operation is not currently supported**
 

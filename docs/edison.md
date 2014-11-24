@@ -1,8 +1,8 @@
 Intel Edison                            {#edison}
 =============
 
-Edison is a dual core Silvermont Atom clocked at 500MHz. The Edison
-also features 4GB of storage, 1GB ram and onboard wifi and bluetooth.
+Intel(R) Edison is a dual core Silvermont Atom(TM) clocked at 500MHz. The
+Edison also features 4GB of storage, 1GB ram and onboard wifi and bluetooth.
 
 Currently Supported boards:
 - Intel Arduino board
@@ -25,8 +25,8 @@ in libmraa:
 - AIO pins are treated as 0-5 in mraa_aio_init() but as 14-19 for everything
   else. Therefore use mraa_gpio_init(14) to use A0 as a Gpio
 
-Intel breakout board
---------------------
+Intel(R) breakout board
+-----------------------
 
 - Both I2C buses are avaible 1 & 6
 - IO on the miniboard is 1.8V

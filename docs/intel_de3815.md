@@ -1,7 +1,7 @@
-Intel NUC DE3815tykhe                            {#de3815}
+Intel(R) NUC DE3815tykhe                            {#de3815}
 =============
 
-The DE3815 NUC Kit is a single core Atom clocked at 1.46GHz.
+The DE3815 NUC Kit is a single core Atom(TM) clocked at 1.46GHz.
 http://www.intel.com/content/www/us/en/nuc/nuc-kit-de3815tykhe.html
 
 Interface notes
