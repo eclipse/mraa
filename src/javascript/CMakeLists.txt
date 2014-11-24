@@ -31,7 +31,11 @@ set_target_properties (mraajs PROPERTIES
   OUTPUT_NAME mraa
   SUFFIX ".node"
 )
+macro (mraa_CREATE_INSTALL_PACKAGE_JSON generated_file install_location)
+  configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
+  install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} DESTINATION ${install_location})
+endmacro (mraa_CREATE_INSTALL_PACKAGE_JSON)
+mraa_create_install_package_json (package.json lib/node_modules/mraa)
 
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/package.json
-         ${CMAKE_CURRENT_BINARY_DIR}/mraa.node
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.node
          DESTINATION lib/node_modules/mraa)
