@@ -53,15 +53,15 @@ mraa_create_binding_gyp (binding.gyp)
 
 add_custom_target (npmpkg)
 add_custom_command (TARGET npmpkg POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_CURRENT_BINARY_DIR}/mraajsJAVASCRIPT_wrap.cxx ${CMAKE_SOURCE_DIR}/src
-            COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_BINARY_DIR}/src/version.c ${CMAKE_SOURCE_DIR}/src
-            COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_CURRENT_BINARY_DIR}/package.json ${CMAKE_SOURCE_DIR}
-            COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_CURRENT_BINARY_DIR}/binding.gyp ${CMAKE_SOURCE_DIR}
-	    COMMAND ${CMAKE_COMMAND} -E copy
-	    ${CMAKE_SOURCE_DIR}/docs/npm.md ${CMAKE_SOURCE_DIR}/READMEFIRST)
+        ${CMAKE_CURRENT_BINARY_DIR}/mraajsJAVASCRIPT_wrap.cxx ${CMAKE_SOURCE_DIR}/src
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_BINARY_DIR}/src/version.c ${CMAKE_SOURCE_DIR}/src
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_BINARY_DIR}/package.json ${CMAKE_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_BINARY_DIR}/binding.gyp ${CMAKE_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_SOURCE_DIR}/docs/npm.md ${CMAKE_SOURCE_DIR}/READMEFIRST)
 add_dependencies (npmpkg mraajs)
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.node
