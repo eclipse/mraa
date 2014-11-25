@@ -15,13 +15,17 @@ we have generated for you.
 Recreating tarball
 ------------------
 
-From a checkout of mraa you can do the following to 'generate' this tarball
+From a checkout of mraa you can do the following to 'generate' this tarball.
+It's important to not leave a .git directory as npm will then consider the
+tarball contains a full git tree. Also you need a top level dir which matches
+the npm pkg name so we create one with a symlink and add the 'h' flag to tar to
+follow simlinks.
 
 ~~~~~~~~~~~~~{.sh}
 mkdir build
 cd build
 cmake -DBUILDSWIGNODE=ON  ..
 make npmpkg
-cd ../
-tar czv --exclude='build/*' --exclude='.git/*' -f /tmp/mraa.tar.gz .
+ln -s ../ mraa
+tar hczv --exclude='build*' --exclude='.gitignore' --exclude='.git' --exclude='build*/*' --exclude='.git/*' -f mraa.tar.gz mraa
 ~~~~~~~~~~~~~
