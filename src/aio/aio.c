@@ -67,7 +67,7 @@ mraa_aio_init(unsigned int aio)
         if (pre_ret != MRAA_SUCCESS)
             return NULL;
     }
-    if (aio < 0 || aio > plat->aio_count) {
+    if (aio > plat->aio_count) {
         syslog(LOG_ERR, "aio: requested channel out of range");
         return NULL;
     }
