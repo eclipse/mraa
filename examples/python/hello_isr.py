@@ -25,8 +25,16 @@
 import mraa
 import time
 
+class Counter:
+  count = 0
+
+c = Counter()
+
+# inside a python interupt you cannot use 'basic' types so you'll need to use
+# objects
 def test(args):
   print("wooo")
+  c.count+=1
 
 x = mraa.Gpio(6)
 x.dir(mraa.DIR_IN)
