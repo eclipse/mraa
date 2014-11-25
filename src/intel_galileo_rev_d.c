@@ -44,7 +44,7 @@ mraa_intel_galileo_g1_mmap_unsetup()
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     munmap(mmap_reg, mmap_size);
-    mmap_reg == NULL;
+    mmap_reg = NULL;
     close(mmap_fd);
     return MRAA_SUCCESS;
 }
