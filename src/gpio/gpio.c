@@ -76,7 +76,7 @@ mraa_gpio_init(int pin)
 
     mraa_gpio_context r = mraa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
     if (r == NULL) {
-        syslog(LOG_CRIT, "gpio: mraa_setup_gpio(%d) returned error %d", pin, r);
+        syslog(LOG_CRIT, "gpio: mraa_gpio_init_raw(%d) returned error", pin);
         return NULL;
     }
     r->phy_pin = pin;
