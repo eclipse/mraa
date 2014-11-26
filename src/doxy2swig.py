@@ -385,7 +385,7 @@ class Doxy2SWIG:
     def write(self, fname):
         o = my_open_write(fname)
         if self.multi:
-            o.write("".join(self.pieces))
+            o.write("".join(x.encode('utf-8') for x in self.pieces))
         else:
             o.write("".join(self.clean_pieces(self.pieces)))
         o.close()
