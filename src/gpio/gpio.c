@@ -450,7 +450,8 @@ mraa_gpio_read(mraa_gpio_context dev)
 
     if (dev->value_fp == -1) {
         if (mraa_gpio_get_valfp(dev) != MRAA_SUCCESS) {
-             syslog(LOG_ERR, "gpio: Failed to get value file pointer");
+            syslog(LOG_ERR, "gpio: Failed to get value file pointer");
+            return -1;
         }
     }
     else {
@@ -483,8 +484,11 @@ mraa_gpio_write(mraa_gpio_context dev, int value)
     }
 
     if (dev->value_fp == -1) {
-        mraa_gpio_get_valfp(dev);
+        if (mraa_gpio_get_valfp(dev) != MRAA_SUCCESS) {
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
     }
+
     if (lseek(dev->value_fp, 0, SEEK_SET) == -1) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
