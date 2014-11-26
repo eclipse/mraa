@@ -68,6 +68,19 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.5.3**
+  * OE toolchain support added to CMake
+  * Various UART fixes
+  * SPI add CS exposure
+  * Remove functions from mraa.c into modules
+  * Rework of support for mmap
+  * Intel Edison MMAP support added. Read and Write
+  * I2C clean up, add cleaner functions
+  * MinnowBoard Max support added
+  * PWM period is written before duty
+  * Node GYP build supported added
+  * Add Get Platform Name function
+
 **0.5.2**
   * pwm improvement & bugfix
   * spi mraa_spi_bit_per_word fix
