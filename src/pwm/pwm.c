@@ -75,7 +75,9 @@ static mraa_result_t
 mraa_pwm_write_duty(mraa_pwm_context dev, int duty)
 {
     if (dev->duty_fp == -1) {
-        mraa_pwm_setup_duty_fp(dev);
+        if (mraa_pwm_setup_duty_fp(dev) == 1) {
+            return MRAA_ERROR_INVALID_HANDLE;
+        }
     }
     char bu[64];
     int length = sprintf(bu, "%d", duty);
@@ -99,8 +101,13 @@ mraa_pwm_read_period(mraa_pwm_context dev)
     off_t size = lseek(period_f, 0, SEEK_END);
     lseek(period_f, 0, SEEK_SET);
 
-    read(period_f, output, size + 1);
+    ssize_t rb = read(period_f, output, size + 1);
     close(period_f);
+
+    if (rb > 0) {
+        syslog(LOG_ERR, "pwm: Error in reading period");
+        return -1;
+    }
 
     char *endptr;
     long int ret = strtol(output, &endptr, 10);
@@ -119,14 +126,20 @@ static int
 mraa_pwm_read_duty(mraa_pwm_context dev)
 {
     if (dev->duty_fp == -1) {
-        mraa_pwm_setup_duty_fp(dev);
+        if (mraa_pwm_setup_duty_fp(dev) == 1) {
+            return MRAA_ERROR_INVALID_HANDLE;
+        }
     } else {
         lseek(dev->duty_fp, 0, SEEK_SET);
     }
     off_t size = lseek(dev->duty_fp, 0, SEEK_END);
     lseek(dev->duty_fp, 0, SEEK_SET);
     char output[MAX_SIZE];
-    read(dev->duty_fp, output, size+1);
+    ssize_t rb = read(dev->duty_fp, output, size+1);
+    if (rb > 0) {
+        syslog(LOG_ERR, "pwm: Error in reading duty");
+        return -1;
+    }
 
     char *endptr;
     long int ret = strtol(output, &endptr, 10);
