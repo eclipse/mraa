@@ -180,7 +180,12 @@ mraa_gpio_interrupt_handler(void* arg)
     // open gpio value with open(3)
     char bu[MAX_SIZE];
     sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
-    dev->isr_value_fp = open(bu, O_RDONLY);
+    int fp = open(bu, O_RDONLY);
+    if (fp < 0) {
+        syslog(LOG_ERR, "gpio: failed to open gpio%d/value", dev->pin);
+        return NULL;
+    }
+    dev->isr_value_fp = fp;
 
     for (;;) {
         ret = mraa_gpio_wait_interrupt(dev->isr_value_fp);
