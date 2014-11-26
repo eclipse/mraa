@@ -268,8 +268,11 @@ mraa_pwm_write(mraa_pwm_context dev, float percentage)
 float
 mraa_pwm_read(mraa_pwm_context dev)
 {
-    float output = mraa_pwm_read_duty(dev) / (float) mraa_pwm_read_period(dev);
-    return output;
+    int period = mraa_pwm_read_period(dev);
+    if (period > 0) {
+         return (mraa_pwm_read_duty(dev) / (float) period);
+    }
+    return 0.0f;
 }
 
 mraa_result_t
