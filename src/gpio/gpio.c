@@ -465,7 +465,7 @@ mraa_gpio_read(mraa_gpio_context dev)
     }
     lseek(dev->value_fp, 0, SEEK_SET);
 
-    return strtol(bu, NULL, 10);
+    return (int) strtol(bu, NULL, 10);
 }
 
 mraa_result_t
