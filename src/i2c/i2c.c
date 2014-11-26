@@ -188,7 +188,7 @@ mraa_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
         syslog(LOG_ERR, "i2c: Failed to write");
         return 0;
     }
-    return 0xFFFF & d.byte;
+    return 0xFFFF & d.word;
 }
 
 mraa_result_t
