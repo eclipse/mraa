@@ -30,6 +30,7 @@
 #include "intel_galileo_rev_d.h"
 
 #define UIO_PATH "/dev/uio0"
+#define PLATFORM_NAME "Intel Galileo Gen 1"
 
 static uint8_t *mmap_reg = NULL;
 static int mmap_fd = 0;
@@ -122,6 +123,10 @@ mraa_intel_galileo_rev_d()
     mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
     if (b == NULL)
         return NULL;
+
+    b->platform_name_length = strlen(PLATFORM_NAME) + 1;
+    b->platform_name = (char*) malloc(sizeof(char) * b->platform_name_length);
+    strncpy(b->platform_name, PLATFORM_NAME, b->platform_name_length);
 
     b->phy_pin_count = 20;
     b->gpio_count = 14;

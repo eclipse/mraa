@@ -117,6 +117,17 @@ inline unsigned int adcSupportedBits()
 }
 
 /**
+ * Return Platform Name. "Unknown" if no platform inited.
+ *
+ * @return platform name
+ */
+inline std::string getPlatformName()
+{
+    std::string ret_val(mraa_get_platform_name());
+    return ret_val;
+}
+
+/**
  * Sets the log level to use from 0-7 where 7 is very verbose. These are the
  * syslog log levels, see syslog(3) for more information on the levels.
  *

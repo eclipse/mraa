@@ -332,3 +332,11 @@ mraa_setup_uart(int index)
 
     return MRAA_SUCCESS;
 }
+
+char*
+mraa_get_platform_name()
+{
+    if (plat == NULL)
+        return "Unknown";
+    return plat->platform_name;
+}

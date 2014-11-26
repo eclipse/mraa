@@ -30,6 +30,7 @@
 #include "common.h"
 #include "intel_edison_fab_c.h"
 
+#define PLATFORM_NAME "Intel Edison"
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
 #define SYSFS_PINMODE_PATH "/sys/kernel/debug/gpio_debug/gpio"
 #define MAX_SIZE 64
@@ -971,6 +972,10 @@ mraa_intel_edison_fab_c()
     mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
     if (b == NULL)
         return NULL;
+
+    b->platform_name_length = strlen(PLATFORM_NAME) + 1;
+    b->platform_name = (char*) malloc(sizeof(char) * b->platform_name_length);
+    strncpy(b->platform_name, PLATFORM_NAME, b->platform_name_length);
 
     // This seciton will also check if the arduino board is there
     tristate = mraa_gpio_init_raw(214);

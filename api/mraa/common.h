@@ -26,6 +26,8 @@
 
 #include "types.h"
 
+#define MRAA_PLATFORM_NAME_MAX_SIZE 64
+
 /** @file
  *
  * This file defines the basic shared values for libmraa
@@ -186,6 +188,8 @@ typedef struct {
     int pwm_default_period; /**< The default PWM period is US */
     int pwm_max_period; /**< Maximum period in us */
     int pwm_min_period; /**< Minimum period in us */
+    unsigned int platform_name_length; /**< Platform Name length */
+    char* platform_name; /**< Platform Name pointer */
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
     /*@}*/
 } mraa_board_t;
@@ -246,6 +250,13 @@ unsigned int mraa_adc_supported_bits();
  * @return Result of operation
  */
 mraa_result_t mraa_set_log_level(int level);
+
+/**
+ * Return the Platform's Name, If no platform detected return "Unknown"
+ *
+ * @return platform name
+ */
+char* mraa_get_platform_name();
 
 #ifdef __cplusplus
 }

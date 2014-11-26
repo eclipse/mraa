@@ -28,6 +28,7 @@
 #include "common.h"
 #include "intel_minnow_max.h"
 
+#define PLATFORM_NAME "MinnowBoard MAX"
 #define I2C_BUS_COUNT 10
 #define I2C_BUS_DEFAULT 7
 
@@ -75,6 +76,10 @@ mraa_intel_minnow_max()
     mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
     if (b == NULL)
         return NULL;
+
+    b->platform_name_length = strlen(PLATFORM_NAME) + 1;
+    b->platform_name = (char*) malloc(sizeof(char) * b->platform_name_length);
+    strncpy(b->platform_name, PLATFORM_NAME, b->platform_name_length);
 
     b->phy_pin_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
     //b->gpio_count = 14;
