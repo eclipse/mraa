@@ -121,7 +121,10 @@ mraa_aio_read(mraa_aio_context dev)
     unsigned int shifter_value = 0;
 
     if (dev->adc_in_fp == -1) {
-        aio_get_valid_fp(dev);
+        if (aio_get_valid_fp(dev) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "aio: Failed to get to the device");
+            return 0;
+        }
     }
 
     lseek(dev->adc_in_fp, 0, SEEK_SET);
