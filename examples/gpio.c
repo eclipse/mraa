@@ -59,12 +59,8 @@ list_pins() {
     for (i = 0; i < platformInfo->phy_pin_count; ++i) {
         const char *mraa_name = platformInfo->pins[i].name;
         if (strcmp(mraa_name, "INVALID") != 0) {
-            char name[9];
-            strncpy(name, mraa_name, 8);
-            if (name[7] != '\0');
-                name[8] = '\0';
             mraa_pincapabilities_t caps = platformInfo->pins[i].capabilites;
-            fprintf(stdout, "%02d %-8s  ", i, name);
+            fprintf(stdout, "%02d %-8s  ", i, mraa_name);
             if (caps.gpio)
                 fprintf(stdout, "GPIO");
             if (caps.i2c)
