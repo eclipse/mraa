@@ -12,7 +12,8 @@
       'cflags_cc!': [ '-fno-rtti', '-fno-exceptions' ],
       'cflags!': [ '-fno-exceptions' ],
       'defines' : [ 'SWIG',
-                    'SWIGNODE' ],
+                    'SWIGNODE',
+		    'BUILDING_NODE_EXTENSION=1' ],
     }
   ]
 }

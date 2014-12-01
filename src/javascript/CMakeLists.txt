@@ -58,6 +58,8 @@ add_custom_command (TARGET npmpkg POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_BINARY_DIR}/src/version.c ${CMAKE_SOURCE_DIR}/src
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/package.json ${CMAKE_SOURCE_DIR}
+        COMMAND sed -i "'s/mraa.node/build\\/Release\\/mraa.node/'"
+        ${CMAKE_SOURCE_DIR}/package.json
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/binding.gyp ${CMAKE_SOURCE_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy
