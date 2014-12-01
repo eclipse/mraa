@@ -52,7 +52,7 @@ macro (mraa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
 endmacro (mraa_CREATE_INSTALL_PKGCONFIG)
 mraa_create_install_pkgconfig (mraa.pc lib${LIB_SUFFIX}/pkgconfig)
 
-install (TARGETS mraa DESTINATION lib)
+install(TARGETS mraa DESTINATION ${CMAKE_INSTALL_LIBDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} )
 
 if (DOXYGEN_FOUND)
   set (CMAKE_SWIG_FLAGS -DDOXYGEN=${DOXYGEN_FOUND})
