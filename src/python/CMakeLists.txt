@@ -36,6 +36,6 @@ list (GET PYTHON_VERSION_LIST 1 PYTHON_VERSION_MINOR)
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/_mraa.so
          ${CMAKE_CURRENT_BINARY_DIR}/mraa.py
-         DESTINATION lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/)
+         DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/)
 
 add_subdirectory (docs)
