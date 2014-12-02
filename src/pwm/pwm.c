@@ -136,7 +136,7 @@ mraa_pwm_read_duty(mraa_pwm_context dev)
     lseek(dev->duty_fp, 0, SEEK_SET);
     char output[MAX_SIZE];
     ssize_t rb = read(dev->duty_fp, output, size+1);
-    if (rb > 0) {
+    if (rb < 0) {
         syslog(LOG_ERR, "pwm: Error in reading duty");
         return -1;
     }
