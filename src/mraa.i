@@ -1,3 +1,5 @@
+%rename("%(strip:[MRAA_])s", %$isenumitem) "";
+
 %include stdint.i
 %include std_string.i
 %include exception.i
