@@ -44,20 +44,6 @@ extern "C" {
 typedef unsigned int mraa_boolean_t;
 
 /**
- * Enum representing different possible modes for a pin.
- */
-typedef enum {
-    MRAA_PIN_VALID       = 0, /**< Pin Valid */
-    MRAA_PIN_GPIO        = 1, /**< General Purpose IO */
-    MRAA_PIN_PWM         = 2, /**< Pulse Width Modulation */
-    MRAA_PIN_FAST_GPIO   = 3, /**< Faster GPIO */
-    MRAA_PIN_SPI         = 4, /**< SPI */
-    MRAA_PIN_I2C         = 5, /**< I2C */
-    MRAA_PIN_AIO         = 6, /**< Analog in */
-    MRAA_PIN_UART        = 7  /**< UART */
-} mraa_pinmodes_t;
-
-/**
  * A bitfield representing the capabilities of a pin.
  */
 typedef struct {
