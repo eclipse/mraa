@@ -104,7 +104,7 @@ mraa_pwm_read_period(mraa_pwm_context dev)
     ssize_t rb = read(period_f, output, size + 1);
     close(period_f);
 
-    if (rb > 0) {
+    if (rb < 0) {
         syslog(LOG_ERR, "pwm: Error in reading period");
         return -1;
     }
