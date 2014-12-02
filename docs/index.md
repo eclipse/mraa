@@ -68,6 +68,10 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.5.4**
+  * pwm read_* fix introduced in 0.5.3
+  * improved npmpkg support
+
 **0.5.3**
   * OE toolchain support added to CMake
   * Various UART fixes
