@@ -162,8 +162,11 @@ mraa_aio_read(mraa_aio_context dev)
 mraa_result_t
 mraa_aio_close(mraa_aio_context dev)
 {
-    if (NULL != dev)
+    if (NULL != dev) {
+        if (dev->adc_in_fp != -1) 
+            close(dev->adc_in_fp);
         free(dev);
+    }    
 
     return(MRAA_SUCCESS);
 }
