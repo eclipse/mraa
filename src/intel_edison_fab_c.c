@@ -106,8 +106,12 @@ mraa_intel_edison_gpio_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
         int output_val = 0;
         if (dir == MRAA_GPIO_OUT)
             output_val = 1;
-        if (mraa_gpio_write(output_e, output_val) != MRAA_SUCCESS)
+        if (mraa_gpio_write(output_e, output_val) != MRAA_SUCCESS) {
+            mraa_gpio_close(output_e);
             return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        mraa_gpio_close(output_e);
+
     }
     return MRAA_SUCCESS;
 }
@@ -258,16 +262,22 @@ mraa_intel_edison_aio_init_pre(unsigned int aio)
     int pin = 14 + aio;
     mraa_gpio_context output_e;
     output_e = mraa_gpio_init_raw(outputen[pin]);
-    if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS)
+    if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
+        mraa_gpio_close(output_e);
         return MRAA_ERROR_INVALID_RESOURCE;
-    if (mraa_gpio_write(output_e, 0) != MRAA_SUCCESS)
+    }
+    if (mraa_gpio_write(output_e, 0) != MRAA_SUCCESS) {
+        mraa_gpio_close(output_e);
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
     mraa_gpio_close(output_e);
 
     mraa_gpio_context pullup_pin;
     pullup_pin = mraa_gpio_init_raw(pullup_map[pin]);
-    if (mraa_gpio_dir(pullup_pin, MRAA_GPIO_IN) != MRAA_SUCCESS)
+    if (mraa_gpio_dir(pullup_pin, MRAA_GPIO_IN) != MRAA_SUCCESS) {
+        mraa_gpio_close(pullup_pin);
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
     mraa_gpio_close(pullup_pin);
 
     return MRAA_SUCCESS;
@@ -294,16 +304,22 @@ mraa_intel_edison_pwm_init_pre(int pin)
 
     mraa_gpio_context output_e;
     output_e = mraa_gpio_init_raw(outputen[pin]);
-    if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS)
+    if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
+        mraa_gpio_close(output_e);
         return MRAA_ERROR_INVALID_RESOURCE;
-    if (mraa_gpio_write(output_e, 1) != MRAA_SUCCESS)
+    }
+    if (mraa_gpio_write(output_e, 1) != MRAA_SUCCESS) {
+        mraa_gpio_close(output_e);
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
     mraa_gpio_close(output_e);
 
     mraa_gpio_context pullup_pin;
     pullup_pin = mraa_gpio_init_raw(pullup_map[pin]);
-    if (mraa_gpio_dir(pullup_pin, MRAA_GPIO_IN) != MRAA_SUCCESS)
+    if (mraa_gpio_dir(pullup_pin, MRAA_GPIO_IN) != MRAA_SUCCESS) {
+        mraa_gpio_close(pullup_pin);
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
     mraa_gpio_close(pullup_pin);
     mraa_intel_edison_pinmode_change(plat->pins[pin].gpio.pinmap, 1);
 
@@ -386,6 +402,7 @@ mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
     mraa_result_t sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_IN);
     if(sta != MRAA_SUCCESS) {
         syslog(LOG_ERR, "edison: Failed to set gpio mode-pullup");
+        mraa_gpio_close(pullup_e);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -403,11 +420,13 @@ mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
             return MRAA_SUCCESS;
             break;
         default:
+            mraa_gpio_close(pullup_e);
             return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
     }
     if (value != -1) {
         sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_OUT);
         sta = mraa_gpio_write(pullup_e, value);
+        mraa_gpio_close(pullup_e);
         if (sta != MRAA_SUCCESS) {
             syslog(LOG_ERR, "edison: Error setting pullup");
             return sta;
