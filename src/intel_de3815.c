@@ -36,11 +36,15 @@ mraa_board_t*
 mraa_intel_de3815()
 {
     mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
-    if (b == NULL)
+    if (b == NULL) {
         return NULL;
+    }
 
     b->platform_name_length = strlen(PLATFORM_NAME) + 1;
     b->platform_name = (char*) malloc(sizeof(char) * b->platform_name_length);
+    if (b->platform_name == NULL) {
+        goto error;
+    }
     strncpy(b->platform_name, PLATFORM_NAME, b->platform_name_length);
 
     b->phy_pin_count = 18;
@@ -53,6 +57,9 @@ mraa_intel_de3815()
     b->pwm_min_period = 1;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_DE3815_PINCOUNT);
+    if (b->pins == NULL) {
+        goto error;
+    }
 
     strncpy(b->pins[0].name, "1.8v", 8);
     b->pins[0].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
@@ -134,4 +141,8 @@ mraa_intel_de3815()
     b->spi_bus[0].sclk = 13;
 
     return b;
+error:
+    syslog(LOG_CRIT, "de3815: Platform failed to initialise");
+    free(b);
+    return NULL;
 }
