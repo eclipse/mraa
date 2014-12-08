@@ -73,6 +73,7 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
     if (mode < 0 ) {
         return MRAA_SUCCESS;
     }
+
     char buffer[MAX_SIZE];
     snprintf(buffer, MAX_SIZE, SYSFS_PINMODE_PATH "%i/current_pinmux",sysfs);
     int modef = open(buffer, O_WRONLY);
@@ -81,49 +82,62 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
+    mraa_result_t ret = MRAA_SUCCESS;
     char mode_buf[MAX_MODE_SIZE];
     int length = sprintf(mode_buf, "mode%u",mode);
     if (write(modef, mode_buf, length*sizeof(char)) == -1) {
-        close(modef);
-        return MRAA_ERROR_INVALID_RESOURCE;
+        ret = MRAA_ERROR_INVALID_RESOURCE;
     }
     close(modef);
 
-    return MRAA_SUCCESS;
+    return ret;
 }
 
 mraa_result_t
 mraa_intel_edison_gpio_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
 {
-    mraa_gpio_write(tristate, 0);
+    if (mraa_gpio_write(tristate, 0) != MRAA_SUCCESS) {
+        return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
+    }
+
     if (dev->phy_pin >= 0) {
         int pin = dev->phy_pin;
 
         mraa_gpio_context output_e;
         output_e = mraa_gpio_init_raw(outputen[pin]);
-        if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS)
+        if (output_e == NULL) {
             return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
+            mraa_gpio_close(output_e);
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
         int output_val = 0;
-        if (dir == MRAA_GPIO_OUT)
+        if (dir == MRAA_GPIO_OUT) {
             output_val = 1;
-        if (mraa_gpio_write(output_e, output_val) != MRAA_SUCCESS)
+        }
+        if (mraa_gpio_write(output_e, output_val) != MRAA_SUCCESS) {
+            mraa_gpio_close(output_e);
             return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        mraa_gpio_close(output_e);
     }
+
     return MRAA_SUCCESS;
 }
 
 mraa_result_t
 mraa_intel_edison_gpio_dir_post(mraa_gpio_context dev, gpio_dir_t dir)
 {
-    mraa_gpio_write(tristate, 1);
-    return MRAA_SUCCESS;
+    return mraa_gpio_write(tristate, 1);
 }
 
 mraa_result_t
 mraa_intel_edison_gpio_init_post(mraa_gpio_context dev)
 {
-    if (dev == NULL)
+    if (dev == NULL) {
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
 
     int sysfs, mode;
     if (miniboard == 1) {
@@ -133,16 +147,15 @@ mraa_intel_edison_gpio_init_post(mraa_gpio_context dev)
         sysfs = pinmodes[dev->phy_pin].gpio.sysfs;
         mode = pinmodes[dev->phy_pin].gpio.mode;
     }
-    mraa_result_t ret = mraa_intel_edison_pinmode_change(sysfs, mode);
 
-    return ret;
+    return mraa_intel_edison_pinmode_change(sysfs, mode);
 }
 
 mraa_result_t
 mraa_intel_edison_i2c_init_pre(unsigned int bus)
 {
     if (miniboard == 0) {
-        if(bus != 6) {
+        if (bus != 6) {
             syslog(LOG_ERR, "edison: You can't use that bus, switching to bus 6");
             bus = 6;
         }
@@ -258,16 +271,28 @@ mraa_intel_edison_aio_init_pre(unsigned int aio)
     int pin = 14 + aio;
     mraa_gpio_context output_e;
     output_e = mraa_gpio_init_raw(outputen[pin]);
-    if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS)
+    if (output_e == NULL) {
         return MRAA_ERROR_INVALID_RESOURCE;
-    if (mraa_gpio_write(output_e, 0) != MRAA_SUCCESS)
+    }
+    if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
+        mraa_gpio_close(output_e);
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    if (mraa_gpio_write(output_e, 0) != MRAA_SUCCESS) {
+        mraa_gpio_close(output_e);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     mraa_gpio_close(output_e);
 
     mraa_gpio_context pullup_pin;
     pullup_pin = mraa_gpio_init_raw(pullup_map[pin]);
-    if (mraa_gpio_dir(pullup_pin, MRAA_GPIO_IN) != MRAA_SUCCESS)
+    if (pullup_pin == NULL) {
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    if (mraa_gpio_dir(pullup_pin, MRAA_GPIO_IN) != MRAA_SUCCESS) {
+        mraa_gpio_close(pullup_pin);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     mraa_gpio_close(pullup_pin);
 
     return MRAA_SUCCESS;
@@ -276,8 +301,7 @@ mraa_intel_edison_aio_init_pre(unsigned int aio)
 mraa_result_t
 mraa_intel_edison_aio_init_post(mraa_aio_context dev)
 {
-    mraa_gpio_write(tristate, 1);
-    return MRAA_SUCCESS;
+    return mraa_gpio_write(tristate, 1);
 }
 
 mraa_result_t
@@ -286,24 +310,38 @@ mraa_intel_edison_pwm_init_pre(int pin)
     if (miniboard == 1) {
         return mraa_intel_edison_pinmode_change(plat->pins[pin].gpio.pinmap, 1);
     }
-    if (pin < 0 || pin > 19)
+    if (pin < 0 || pin > 19) {
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
 
-    if (!plat->pins[pin].capabilites.pwm)
+    if (!plat->pins[pin].capabilites.pwm) {
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
 
     mraa_gpio_context output_e;
     output_e = mraa_gpio_init_raw(outputen[pin]);
-    if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS)
+    if (output_e == NULL) {
         return MRAA_ERROR_INVALID_RESOURCE;
-    if (mraa_gpio_write(output_e, 1) != MRAA_SUCCESS)
+    }
+    if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
+        mraa_gpio_close(output_e);
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    if (mraa_gpio_write(output_e, 1) != MRAA_SUCCESS) {
+        mraa_gpio_close(output_e);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     mraa_gpio_close(output_e);
 
     mraa_gpio_context pullup_pin;
     pullup_pin = mraa_gpio_init_raw(pullup_map[pin]);
-    if (mraa_gpio_dir(pullup_pin, MRAA_GPIO_IN) != MRAA_SUCCESS)
+    if (pullup_pin == NULL) {
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    if (mraa_gpio_dir(pullup_pin, MRAA_GPIO_IN) != MRAA_SUCCESS) {
+        mraa_gpio_close(pullup_pin);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     mraa_gpio_close(pullup_pin);
     mraa_intel_edison_pinmode_change(plat->pins[pin].gpio.pinmap, 1);
 
@@ -313,8 +351,7 @@ mraa_intel_edison_pwm_init_pre(int pin)
 mraa_result_t
 mraa_intel_edison_pwm_init_post(mraa_pwm_context pwm)
 {
-    mraa_gpio_write(tristate, 1);
-    return MRAA_SUCCESS;
+    return mraa_gpio_write(tristate, 1);
 }
 
 mraa_result_t
@@ -369,23 +406,27 @@ mraa_intel_edison_spi_init_pre(int bus)
 mraa_result_t
 mraa_intel_edison_spi_init_post(mraa_spi_context spi)
 {
-    mraa_gpio_write(tristate, 1);
-    return MRAA_SUCCESS;
+    return mraa_gpio_write(tristate, 1);
 }
 
 mraa_result_t
 mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
 {
     if (dev->value_fp != -1) {
-         close(dev->value_fp);
+         if (close(dev->value_fp) != 0) {
+             return MRAA_ERROR_INVALID_RESOURCE;
+         }
          dev->value_fp = -1;
     }
 
     mraa_gpio_context pullup_e;
     pullup_e = mraa_gpio_init_raw(pullup_map[dev->phy_pin]);
-    mraa_result_t sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_IN);
-    if(sta != MRAA_SUCCESS) {
+    if (pullup_e == NULL) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    if (mraa_gpio_dir(pullup_e, MRAA_GPIO_IN) != MRAA_SUCCESS) {
         syslog(LOG_ERR, "edison: Failed to set gpio mode-pullup");
+        mraa_gpio_close(pullup_e);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -406,28 +447,34 @@ mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
             return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
     }
     if (value != -1) {
-        sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_OUT);
-        sta = mraa_gpio_write(pullup_e, value);
-        if (sta != MRAA_SUCCESS) {
+        if (mraa_gpio_dir(pullup_e, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
             syslog(LOG_ERR, "edison: Error setting pullup");
-            return sta;
+            mraa_gpio_close(pullup_e);
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        if (mraa_gpio_write(pullup_e, value)!= MRAA_SUCCESS) {
+            syslog(LOG_ERR, "edison: Error setting pullup");
+            mraa_gpio_close(pullup_e);
+            return MRAA_ERROR_INVALID_RESOURCE;
         }
     }
 
-    return MRAA_SUCCESS;
+    return mraa_gpio_close(pullup_e);
 }
 
 mraa_result_t
 mraa_intel_edsion_mb_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
 {
     if (dev->value_fp != -1) {
-         close(dev->value_fp);
+         if (close(dev->value_fp) != 0) {
+             return MRAA_ERROR_INVALID_RESOURCE;
+         }
          dev->value_fp = -1;
     }
 
     char filepath[MAX_SIZE];
     snprintf(filepath, MAX_SIZE,
-                  SYSFS_PINMODE_PATH "%d/current_pullmode", dev->pin);
+             SYSFS_PINMODE_PATH "%d/current_pullmode", dev->pin);
 
     int drive = open(filepath, O_WRONLY);
     if (drive == -1) {
@@ -458,10 +505,11 @@ mraa_intel_edsion_mb_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
         syslog(LOG_ERR, "edison: Failed to write to drive mode");
         close(drive);
         return MRAA_ERROR_INVALID_RESOURCE;
-
     }
 
-    close(drive);
+    if (close(drive) != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     return MRAA_SUCCESS;
 }
 
@@ -509,7 +557,9 @@ mraa_intel_edsion_mmap_unsetup()
     }
     munmap(mmap_reg, mmap_size);
     mmap_reg = NULL;
-    close(mmap_fd);
+    if (close(mmap_fd) != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     return MRAA_SUCCESS;
 }
 
@@ -538,8 +588,9 @@ mraa_intel_edison_mmap_read(mraa_gpio_context dev)
     uint32_t value;
 
     value = *(volatile uint32_t*) (mmap_reg +0x04+ offset);
-    if (value&(uint32_t)(1 << (dev->pin % 32)))
+    if (value&(uint32_t)(1 << (dev->pin % 32))) {
         return 1;
+    }
     return 0;
 }
 
@@ -598,7 +649,6 @@ mraa_intel_edison_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
     dev->mmap_read = &mraa_intel_edison_mmap_read;
     mmap_count++;
 
-
     return MRAA_SUCCESS;
 }
 
@@ -613,8 +663,10 @@ mraa_intel_edsion_miniboard(mraa_board_t* b)
     b->pwm_max_period = 218453;
     b->pwm_min_period = 1;
 
-
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*56);
+    if (b->pins == NULL) {
+        return MRAA_ERROR_UNSPECIFIED;
+    }
 
     advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
     advance_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
@@ -970,11 +1022,15 @@ mraa_board_t*
 mraa_intel_edison_fab_c()
 {
     mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
-    if (b == NULL)
+    if (b == NULL) {
         return NULL;
+    }
 
     b->platform_name_length = strlen(PLATFORM_NAME) + 1;
     b->platform_name = (char*) malloc(sizeof(char) * b->platform_name_length);
+    if (b->platform_name == NULL) {
+        goto error;
+    }
     strncpy(b->platform_name, PLATFORM_NAME, b->platform_name_length);
 
     // This seciton will also check if the arduino board is there
@@ -983,8 +1039,7 @@ mraa_intel_edison_fab_c()
         syslog(LOG_INFO, "edison: Failed to initialise Arduino board TriState,\
                 assuming Intel Edison Miniboard\n");
         if (mraa_intel_edsion_miniboard(b) != MRAA_SUCCESS) {
-            free(b);
-            return NULL;
+            goto error;
         }
         return b;
     }
@@ -1010,6 +1065,9 @@ mraa_intel_edison_fab_c()
     advance_func->gpio_mmap_setup = &mraa_intel_edison_mmap_setup;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_EDISON_PINCOUNT);
+    if (b->pins == NULL) {
+        goto error;
+    }
 
     mraa_gpio_dir(tristate, MRAA_GPIO_OUT);
     mraa_intel_edison_misc_spi();
@@ -1333,4 +1391,8 @@ mraa_intel_edison_fab_c()
     pinmodes[19].i2c.mode = 1;
 
     return b;
+error:
+    syslog(LOG_CRIT, "edison: Arduino board failed to initialise");
+    free(b);
+    return NULL;
 }
