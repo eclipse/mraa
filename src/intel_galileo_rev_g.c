@@ -52,15 +52,21 @@ mraa_intel_galileo_gen2_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
             return MRAA_SUCCESS;
 
         if (plat->pins[pin].gpio.complex_cap.output_en == 1) {
-            mraa_gpio_context output_e;
-            output_e = mraa_gpio_init_raw(plat->pins[pin].gpio.output_enable);
-            if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS)
+            mraa_gpio_context output_e = mraa_gpio_init_raw(plat->pins[pin].gpio.output_enable);
+            if (output_e == NULL) {
                 return MRAA_ERROR_INVALID_RESOURCE;
+            }
+            if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
+                return mraa_gpio_close(output_e);
+            }
             int output_val = 1;
-            if (dir == MRAA_GPIO_OUT)
+            if (dir == MRAA_GPIO_OUT) {
                 output_val = 0;
-            if (mraa_gpio_write(output_e, output_val) != MRAA_SUCCESS)
-                return MRAA_ERROR_INVALID_RESOURCE;
+            }
+            if (mraa_gpio_write(output_e, output_val) != MRAA_SUCCESS) {
+                return mraa_gpio_close(output_e);
+            }
+            mraa_gpio_close(output_e);
         }
     }
     return MRAA_SUCCESS;
@@ -69,19 +75,27 @@ mraa_intel_galileo_gen2_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
 mraa_result_t
 mraa_intel_galileo_gen2_i2c_init_pre(unsigned int bus)
 {
-    mraa_gpio_context io18;
+    mraa_gpio_context io18  = mraa_gpio_init_raw(57);
     int status = 0;
-    io18 = mraa_gpio_init_raw(57);
-    status = status + mraa_gpio_dir(io18, MRAA_GPIO_IN);
-    status = status + mraa_gpio_mode(io18, MRAA_GPIO_HIZ);
 
-    mraa_gpio_context io19;
-    io19 = mraa_gpio_init_raw(59);
-    status = status + mraa_gpio_dir(io19, MRAA_GPIO_IN);
-    status = status + mraa_gpio_mode(io19, MRAA_GPIO_HIZ);
-
-    if (status > 0)
+    if (io18 == NULL) {
         return MRAA_ERROR_UNSPECIFIED;
+    }
+    status += mraa_gpio_dir(io18, MRAA_GPIO_IN);
+    status += mraa_gpio_mode(io18, MRAA_GPIO_HIZ);
+    mraa_gpio_close(io18);
+
+    mraa_gpio_context io19 = mraa_gpio_init_raw(59);
+    if (io19 == NULL) {
+        return MRAA_ERROR_UNSPECIFIED;
+    }
+    status += mraa_gpio_dir(io19, MRAA_GPIO_IN);
+    status += mraa_gpio_mode(io19, MRAA_GPIO_HIZ);
+    mraa_gpio_close(io19);
+
+    if (status > 0) {
+        return MRAA_ERROR_UNSPECIFIED;
+    }
     return MRAA_SUCCESS;
 }
 
@@ -117,8 +131,11 @@ mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mod
 
     mraa_gpio_context pullup_e;
     pullup_e = mraa_gpio_init_raw(pullup_map[dev->phy_pin]);
-    mraa_result_t sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_IN);
-    if (sta != MRAA_SUCCESS) {
+    if (pullup_e == NULL) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    if (mraa_gpio_dir(pullup_e, MRAA_GPIO_IN) != MRAA_SUCCESS) {
+        mraa_gpio_close(pullup_e);
         syslog(LOG_ERR, "galileo2: Failed to set gpio pullup");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -158,18 +175,20 @@ mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mod
     if (write(drive, bu, length*sizeof(char)) == -1) {
         syslog(LOG_ERR, "galileo2: Failed to write to drive mode");
         close(drive);
+        mraa_gpio_close(pullup_e);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     if (value != -1) {
-        sta = mraa_gpio_dir(pullup_e, MRAA_GPIO_OUT);
-        sta += mraa_gpio_write(pullup_e, value);
-        if (sta != MRAA_SUCCESS) {
+        mraa_result_t ret = mraa_gpio_dir(pullup_e, MRAA_GPIO_OUT);
+        ret += mraa_gpio_write(pullup_e, value);
+        if (ret != MRAA_SUCCESS) {
             syslog(LOG_ERR, "galileo2: Error Setting pullup");
             close(drive);
-            return sta;
+            return MRAA_ERROR_INVALID_RESOURCE;
         }
     }
 
+    mraa_gpio_close(pullup_e);
     close(drive);
     return MRAA_SUCCESS;
 }
@@ -178,15 +197,28 @@ mraa_result_t
 mraa_intel_galileo_gen2_uart_init_pre(int index)
 {
     mraa_gpio_context io0_output = mraa_gpio_init_raw(32);
+    if (io0_output == NULL) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     mraa_gpio_context io1_output = mraa_gpio_init_raw(28);
-    mraa_gpio_dir(io0_output, MRAA_GPIO_OUT);
-    mraa_gpio_dir(io1_output, MRAA_GPIO_OUT);
+    if (io1_output == NULL) {
+        mraa_gpio_close(io0_output);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
 
-    mraa_gpio_write(io0_output, 1);
-    mraa_gpio_write(io1_output, 0);
+    int status = 0;
+    status += mraa_gpio_dir(io0_output, MRAA_GPIO_OUT);
+    status += mraa_gpio_dir(io1_output, MRAA_GPIO_OUT);
+
+    status += mraa_gpio_write(io0_output, 1);
+    status += mraa_gpio_write(io1_output, 0);
 
     mraa_gpio_close(io0_output);
     mraa_gpio_close(io1_output);
+
+    if (status > 0) {
+        return MRAA_ERROR_UNSPECIFIED;
+    }
     return MRAA_SUCCESS;
 }
 
@@ -273,11 +305,15 @@ mraa_board_t*
 mraa_intel_galileo_gen2()
 {
     mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
-    if (b == NULL)
+    if (b == NULL) {
         return NULL;
+    }
 
     b->platform_name_length = strlen(PLATFORM_NAME) + 1;
     b->platform_name = (char*) malloc(sizeof(char) * b->platform_name_length);
+    if (b->platform_name == NULL) {
+        goto error;
+    }
     strncpy(b->platform_name, PLATFORM_NAME, b->platform_name_length);
 
     b->phy_pin_count = 20;
@@ -297,6 +333,9 @@ mraa_intel_galileo_gen2()
     advance_func->gpio_mmap_setup = &mraa_intel_galileo_g2_mmap_setup;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_GALILEO_GEN_2_PINCOUNT);
+    if (b->pins == NULL) {
+        goto error;
+    }
 
     strncpy(b->pins[0].name, "IO0", 8);
     b->pins[0].capabilites = (mraa_pincapabilities_t) {1,1,0,1,0,0,0,1};
@@ -695,4 +734,8 @@ mraa_intel_galileo_gen2()
     b->uart_dev[0].tx = 1;
 
     return b;
+error:
+    syslog(LOG_CRIT, "galileo2: Platform failed to initialise");
+    free(b);
+    return NULL;
 }
