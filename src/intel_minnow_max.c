@@ -74,11 +74,15 @@ mraa_board_t*
 mraa_intel_minnow_max()
 {
     mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
-    if (b == NULL)
+    if (b == NULL) {
         return NULL;
+    }
 
     b->platform_name_length = strlen(PLATFORM_NAME) + 1;
     b->platform_name = (char*) malloc(sizeof(char) * b->platform_name_length);
+    if (b->platform_name == NULL) {
+        goto error;
+    }
     strncpy(b->platform_name, PLATFORM_NAME, b->platform_name_length);
 
     b->phy_pin_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
@@ -88,6 +92,9 @@ mraa_intel_minnow_max()
     b->adc_supported = 0;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_MINNOW_MAX_PINCOUNT);
+    if (b->pins == NULL) {
+        goto error;
+    }
     mraa_set_pininfo(b,  0, "INVALID",  (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, -1);
     mraa_set_pininfo(b,  1, "GND",      (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, -1);
     mraa_set_pininfo(b,  2, "GND",      (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, -1);
@@ -151,4 +158,8 @@ mraa_intel_minnow_max()
     b->spi_bus[0].sclk = 11;
 
     return b;
+error:
+    syslog(LOG_CRIT, "minnowmax: Platform failed to initialise");
+    free(b);
+    return NULL;
 }
