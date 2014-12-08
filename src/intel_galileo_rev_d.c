@@ -121,11 +121,15 @@ mraa_board_t*
 mraa_intel_galileo_rev_d()
 {
     mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
-    if (b == NULL)
+    if (b == NULL) {
         return NULL;
+    }
 
     b->platform_name_length = strlen(PLATFORM_NAME) + 1;
     b->platform_name = (char*) malloc(sizeof(char) * b->platform_name_length);
+    if (b->platform_name == NULL) {
+        goto error;
+    }
     strncpy(b->platform_name, PLATFORM_NAME, b->platform_name_length);
 
     b->phy_pin_count = 20;
@@ -142,6 +146,9 @@ mraa_intel_galileo_rev_d()
     advance_func->gpio_mmap_setup = &mraa_intel_galileo_g1_mmap_setup;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_GALILEO_REV_D_PINCOUNT);
+    if (b->pins == NULL) {
+        goto error;
+    }
 
     //GPIO IO0 - IO10
     strncpy(b->pins[0].name, "IO0", 8);
@@ -405,4 +412,8 @@ mraa_intel_galileo_rev_d()
     b->uart_dev[1].tx = -1;
 
     return b;
+error:
+    syslog(LOG_CRIT, "galileo1: Platform failed to initialise");
+    free(b);
+    return NULL;
 }
