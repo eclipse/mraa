@@ -41,7 +41,7 @@ static mraa_result_t
 mraa_intel_galileo_g1_mmap_unsetup()
 {
     if (mmap_reg == NULL) {
-        syslog(LOG_ERR, "mmap: null register cant unsetup");
+        syslog(LOG_WARNING, "galileo1: Mmap null register nothing to unsetup");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     munmap(mmap_reg, mmap_size);
@@ -67,17 +67,17 @@ mraa_result_t
 mraa_intel_galileo_g1_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
 {
     if (dev == NULL) {
-        syslog(LOG_ERR, "Galileo mmap: context not valid");
+        syslog(LOG_ERR, "galileo1: Gpio context not valid");
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
     if (mraa_pin_mode_test(dev->phy_pin, MRAA_PIN_FAST_GPIO) == 0) {
-        syslog(LOG_ERR, "Galileo mmap: mmap not on this pin");
+        syslog(LOG_WARNING, "galileo1: Mmap not available on this pin");
         return MRAA_ERROR_NO_RESOURCES;
     }
     if (en == 0) {
         if (dev->mmap_write == NULL) {
-            syslog(LOG_ERR, "mmap: can't disable disabled mmap gpio");
+            syslog(LOG_NOTICE, "galileo1: Can't disable disabled mmap gpio");
             return MRAA_ERROR_INVALID_PARAMETER;
         }
         dev->mmap_write = NULL;
@@ -89,27 +89,27 @@ mraa_intel_galileo_g1_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
     }
 
     if (dev->mmap_write != NULL) {
-        syslog(LOG_ERR, "mmap: can't enable enabled mmap gpio");
+        syslog(LOG_ERR, "galileo1: Can't enable enabled mmap gpio");
         return MRAA_ERROR_INVALID_PARAMETER;
     }
     if (mmap_reg == NULL) {
         if ((mmap_fd = open(UIO_PATH, O_RDWR)) < 0) {
-            syslog(LOG_ERR, "mmap: Unable to open UIO device");
+            syslog(LOG_ERR, "galileo1: Unable to open UIO device");
             return MRAA_ERROR_INVALID_RESOURCE;
         }
         mmap_reg = mmap(NULL, mmap_size, PROT_READ|PROT_WRITE,
             MAP_SHARED, mmap_fd, 0);
 
         if (mmap_reg == MAP_FAILED) {
-            syslog(LOG_ERR, "mmap: failed to mmap");
+            syslog(LOG_ERR, "galileo1: Mmap failed to mmap");
             mmap_reg = NULL;
             close(mmap_fd);
             return MRAA_ERROR_NO_RESOURCES;
         }
     }
     if (mraa_setup_mux_mapped(plat->pins[dev->phy_pin].mmap.gpio)
-        != MRAA_SUCCESS) {
-        syslog(LOG_ERR, "mmap: unable to setup required multiplexers");
+            != MRAA_SUCCESS) {
+        syslog(LOG_ERR, "galileo1: Unable to setup required multiplexers for mmap");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     dev->mmap_write = &mraa_intel_galileo_g1_mmap_write;
