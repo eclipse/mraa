@@ -653,7 +653,7 @@ mraa_intel_edison_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
 }
 
 mraa_result_t
-mraa_intel_edsion_miniboard(mraa_board_t* b)
+mraa_intel_edison_miniboard(mraa_board_t* b)
 {
     miniboard = 1;
     b->phy_pin_count = 56;
@@ -1038,7 +1038,7 @@ mraa_intel_edison_fab_c()
     if (tristate == NULL) {
         syslog(LOG_INFO, "edison: Failed to initialise Arduino board TriState,\
                 assuming Intel Edison Miniboard\n");
-        if (mraa_intel_edsion_miniboard(b) != MRAA_SUCCESS) {
+        if (mraa_intel_edison_miniboard(b) != MRAA_SUCCESS) {
             goto error;
         }
         return b;
