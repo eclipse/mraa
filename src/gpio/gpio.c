@@ -39,6 +39,10 @@
 #define MAX_SIZE 64
 #define POLL_TIMEOUT
 
+// Maybe have a debug GPIO pin sitting around to try and toggle to show status
+
+mraa_gpio_context g_gpioDebug = NULL;  // could be NULL which will clear our usage of this...
+
 static mraa_result_t
 mraa_gpio_get_valfp(mraa_gpio_context dev)
 {
@@ -102,8 +106,6 @@ mraa_gpio_init_raw(int pin)
     if (pin < 0)
         return NULL;
 
-    char bu[MAX_SIZE];
-    int length;
 
     mraa_gpio_context dev = (mraa_gpio_context) malloc(sizeof(struct _gpio));
     if (dev == NULL) {
@@ -117,6 +119,10 @@ mraa_gpio_init_raw(int pin)
     dev->pin = pin;
     dev->phy_pin = -1;
 
+    char bu[MAX_SIZE];
+    int length;
+
+    // then check to make sure the pin is exported. 
     char directory[MAX_SIZE];
     snprintf(directory, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/", dev->pin);
     struct stat dir;
@@ -142,7 +148,6 @@ mraa_gpio_init_raw(int pin)
 
     return dev;
 }
-
 
 static mraa_result_t
 mraa_gpio_wait_interrupt(int fd)
@@ -387,6 +392,7 @@ mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
     return MRAA_SUCCESS;
 }
 
+
 mraa_result_t
 mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
 {
@@ -436,9 +442,12 @@ mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
     }
 
     close(direction);
+    mraa_result_t result = MRAA_SUCCESS;
+    
     if (advance_func->gpio_dir_post != NULL)
-        return advance_func->gpio_dir_post(dev,dir);
-    return MRAA_SUCCESS;
+        result = advance_func->gpio_dir_post(dev,dir);
+
+    return result;
 }
 
 int
@@ -539,12 +548,18 @@ mraa_gpio_unexport(mraa_gpio_context dev)
 mraa_result_t
 mraa_gpio_close(mraa_gpio_context dev)
 {
+    mraa_result_t result = MRAA_SUCCESS;
+    
+    if (advance_func->gpio_close_pre != NULL) {
+        result = advance_func->gpio_close_pre(dev);
+    }
+    
     if (dev->value_fp != -1) {
         close(dev->value_fp);
     }
     mraa_gpio_unexport(dev);
     free(dev);
-    return MRAA_SUCCESS;
+    return result;
 }
 
 mraa_result_t
