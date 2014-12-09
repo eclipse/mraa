@@ -14,6 +14,17 @@
       'defines' : [ 'SWIG',
                     'SWIGNODE',
 		    'BUILDING_NODE_EXTENSION=1' ],
+      'conditions' : [
+          [ 'target_arch=="x64"',
+            { 'defines' : [ 'X86PLAT=ON' ], },
+          ],
+          [ 'target_arch=="x86"',
+            { 'defines' : [ 'X86PLAT=ON' ], },
+          ],
+          [ 'target_arch=="arm"',
+            { 'defines' : [ 'ARMPLAT=ON' ], },
+          ],
+      ],
     }
   ]
 }
