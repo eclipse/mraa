@@ -155,29 +155,29 @@ mraa_raspberry_pi_b()
     b->i2c_bus_count = 1;
     b->def_i2c_bus = 0;
     b->i2c_bus[0].bus_id = 0;
-    b->i2c_bus[0].sda = 2;
-    b->i2c_bus[0].scl = 4;
+    b->i2c_bus[0].sda = 3;
+    b->i2c_bus[0].scl = 5;
 
     b->spi_bus_count = 2;
     b->def_spi_bus = 0;
     b->spi_bus[0].bus_id = 0;
     b->spi_bus[0].slave_s = 0;
-    b->spi_bus[0].cs = 23;
-    b->spi_bus[0].mosi = 18;
-    b->spi_bus[0].miso = 20;
-    b->spi_bus[0].sclk = 22;
+    b->spi_bus[0].cs = 24;
+    b->spi_bus[0].mosi = 19;
+    b->spi_bus[0].miso = 21;
+    b->spi_bus[0].sclk = 23;
 
     b->spi_bus[1].bus_id = 0;
     b->spi_bus[1].slave_s = 1;
-    b->spi_bus[1].cs = 25;
-    b->spi_bus[1].mosi = 18;
-    b->spi_bus[1].miso = 20;
-    b->spi_bus[1].sclk = 22;
+    b->spi_bus[1].cs = 26;
+    b->spi_bus[1].mosi = 19;
+    b->spi_bus[1].miso = 21;
+    b->spi_bus[1].sclk = 23;
 
     b->uart_dev_count = 1;
     b->def_uart_dev = 0;
-    b->uart_dev[0].rx = 9;
-    b->uart_dev[0].tx = 7;
+    b->uart_dev[0].rx = 10;
+    b->uart_dev[0].tx = 8;
 
     return b;
 }
