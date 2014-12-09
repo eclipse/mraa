@@ -57,6 +57,10 @@ mraa_set_log_level(int level)
 mraa_result_t __attribute__((constructor))
 mraa_init()
 {
+    if (plat != NULL) {
+        return MRAA_ERROR_PLATFORM_ALREADY_INITIALISED;
+    }
+
 #ifdef DEBUG
     setlogmask(LOG_UPTO(LOG_DEBUG));
 #else
@@ -66,9 +70,6 @@ mraa_init()
     openlog("libmraa", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
     syslog(LOG_DEBUG, "libmraa initialised by user %d", getuid());
 
-    if (plat != NULL) {
-        return MRAA_ERROR_PLATFORM_ALREADY_INITIALISED;
-    }
 #ifdef SWIGPYTHON
     // Initialise python threads, this allows use to grab the GIL when we are
     // required to do so
