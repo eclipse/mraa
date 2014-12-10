@@ -56,7 +56,6 @@ struct _gpio {
  */
 struct _i2c {
     /*@{*/
-    int hz; /**< frequency of communication */
     int fh; /**< the file handle to the /dev/i2c-* device */
     int addr; /**< the address of the i2c slave */
     /*@}*/
