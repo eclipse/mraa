@@ -18,7 +18,7 @@
           [ 'target_arch=="x64"',
             { 'defines' : [ 'X86PLAT=ON' ], },
           ],
-          [ 'target_arch=="x86"',
+          [ 'target_arch=="ia32"',
             { 'defines' : [ 'X86PLAT=ON' ], },
           ],
           [ 'target_arch=="arm"',
