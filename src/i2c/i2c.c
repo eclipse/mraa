@@ -138,6 +138,9 @@ mraa_i2c_init_raw(unsigned int bus)
 mraa_result_t
 mraa_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 {
+    if (advance_func->i2c_set_frequency_replace != NULL) {
+        return advance_func->i2c_set_frequency_replace(dev, mode);
+    }
     return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
 }
 

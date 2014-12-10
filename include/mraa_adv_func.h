@@ -48,6 +48,7 @@ typedef struct {
 
     mraa_result_t (*i2c_init_pre) (unsigned int bus);
     mraa_result_t (*i2c_init_post) (mraa_i2c_context dev);
+    mraa_result_t (*i2c_set_frequency_replace) (mraa_i2c_context dev, mraa_i2c_mode_t mode);
 
     mraa_result_t (*aio_get_valid_fp) (mraa_aio_context dev);
     mraa_result_t (*aio_init_pre) (unsigned int aio);

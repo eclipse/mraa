@@ -671,6 +671,38 @@ mraa_intel_edison_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
 }
 
 mraa_result_t
+mraa_intel_edison_i2c_freq(mraa_i2c_context dev, mraa_i2c_mode_t mode)
+{
+    if (dev->busnum == 6) {
+        int sysnode = open("/sys/devices/pci0000:00/0000:00:09.1/i2c_dw_sysnode", O_RDWR);
+        if (sysnode == -1) {
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+
+        char bu[5];
+        int length;
+        switch (mode) {
+            case MRAA_I2C_STD:
+                length = snprintf(bu, sizeof(bu), "std");
+                break;
+            case MRAA_I2C_FAST:
+                length = snprintf(bu, sizeof(bu), "fast");
+                break;
+            case MRAA_I2C_HIGH:
+                length = snprintf(bu, sizeof(bu), "high");
+                break;
+        }
+        if (write(sysnode, bu, length*sizeof(char)) == -1) {
+            close(sysnode);
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        close(sysnode);
+        return MRAA_SUCCESS;
+    }
+    return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+}
+
+mraa_result_t
 mraa_intel_edison_miniboard(mraa_board_t* b)
 {
     miniboard = 1;
@@ -691,6 +723,7 @@ mraa_intel_edison_miniboard(mraa_board_t* b)
 
     advance_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
     advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
+    advance_func->i2c_set_frequency_replace = &mraa_intel_edison_i2c_freq;
     advance_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
     advance_func->gpio_mode_replace = &mraa_intel_edsion_mb_gpio_mode;
     advance_func->uart_init_pre = &mraa_intel_edison_uart_init_pre;
@@ -1072,6 +1105,7 @@ mraa_intel_edison_fab_c()
     advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
     advance_func->gpio_dir_post = &mraa_intel_edison_gpio_dir_post;
     advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
+    advance_func->i2c_set_frequency_replace = &mraa_intel_edison_i2c_freq;
     advance_func->aio_get_valid_fp = &mraa_intel_edison_aio_get_fp;
     advance_func->aio_init_pre = &mraa_intel_edison_aio_init_pre;
     advance_func->aio_init_post = &mraa_intel_edison_aio_init_post;
