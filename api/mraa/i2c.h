@@ -72,10 +72,10 @@ mraa_i2c_context mraa_i2c_init_raw(unsigned int bus);
  * Sets the frequency of the i2c context. Most platforms do not support this.
  *
  * @param dev The i2c context
- * @param hz The bus frequency in hertz
+ * @param mode The bus mode
  * @return Result of operation
  */
-mraa_result_t mraa_i2c_frequency(mraa_i2c_context dev, int hz);
+mraa_result_t mraa_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode);
 
 /**
  * Simple bulk read from an i2c context, this will always begin with the i2c

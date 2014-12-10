@@ -174,6 +174,15 @@ typedef enum {
     MRAA_PIN_UART        = 7  /**< UART */
 } mraa_pinmodes_t;
 
+/**
+ * Enum reprensenting different i2c speeds/modes
+ */
+typedef enum {
+    MRAA_I2C_STD =  0, /**< up to 100Khz */
+    MRAA_I2C_FAST = 1, /**< up to 400Khz */
+    MRAA_I2C_HIGH = 2  /**< up to 3.4Mhz */
+} mraa_i2c_mode_t;
+
 #ifdef __cplusplus
 }
 #endif

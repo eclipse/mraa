@@ -74,11 +74,11 @@ class I2c {
          * the set frequency. Anyone can change this at any time and this will
          * affect every slave on the bus
          *
-         * @param hz Frequency to set the bus to in hz
+         * @param mode Frequency to set the bus to
          * @return Result of operation
          */
-        mraa_result_t frequency(int hz) {
-            return mraa_i2c_frequency(m_i2c, hz);
+        mraa_result_t frequency(mraa_i2c_mode_t mode) {
+            return mraa_i2c_frequency(m_i2c, mode);
         }
 
         /**

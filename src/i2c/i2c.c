@@ -135,7 +135,7 @@ mraa_i2c_init_raw(unsigned int bus)
 }
 
 mraa_result_t
-mraa_i2c_frequency(mraa_i2c_context dev, int hz)
+mraa_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 {
     dev->hz = hz;
 
