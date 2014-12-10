@@ -119,6 +119,7 @@ mraa_i2c_init_raw(unsigned int bus)
     }
 
     char filepath[32];
+    dev->busnum = bus;
     snprintf(filepath, 32, "/dev/i2c-%u", bus);
     if ((dev->fh = open(filepath, O_RDWR)) < 1) {
         syslog(LOG_ERR, "i2c: Failed to open requested i2c port %s", filepath);
