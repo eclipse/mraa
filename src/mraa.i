@@ -45,26 +45,14 @@
 
 %include "types.h"
 
-#### GPIO ####
-
 %include "gpio.hpp"
-
-#### i2c ####
 
 %include "i2c.hpp"
 
-#### PWM ####
-
 %include "pwm.hpp"
-
-#### SPI ####
 
 %include "spi.hpp"
 
-#### AIO ####
-
 %include "aio.hpp"
-
-#### UART ####
 
 %include "uart.hpp"
