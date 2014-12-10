@@ -125,15 +125,24 @@ mraa_result_t
 mraa_setup_mux_mapped(mraa_pin_t meta)
 {
     int mi;
+
     for (mi = 0; mi < meta.mux_total; mi++) {
         mraa_gpio_context mux_i;
         mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-        if (mux_i == NULL)
+        if (mux_i == NULL) {
             return MRAA_ERROR_INVALID_HANDLE;
-        mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
-        if (mraa_gpio_write(mux_i, meta.mux[mi].value) != MRAA_SUCCESS)
+        }
+        if (mraa_gpio_dir(mux_i, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
+            mraa_gpio_close(mux_i);
+            return MRAA_ERROR_UNSPECIFIED;
+        }
+        if (mraa_gpio_write(mux_i, meta.mux[mi].value) != MRAA_SUCCESS) {
+            mraa_gpio_close(mux_i);
             return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        mraa_gpio_close(mux_i);
     }
+
     return MRAA_SUCCESS;
 }
 
