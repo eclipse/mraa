@@ -97,7 +97,9 @@ mraa_result_t
 mraa_intel_edison_gpio_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
 {
     if (mraa_gpio_write(tristate, 0) != MRAA_SUCCESS) {
-        return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
+        // call can sometimes fail, this does not actually mean much except
+        // that the kernel drivers don't always behave very well
+        syslog(LOG_NOTICE, "edison: Failed to write to tristate");
     }
 
     if (dev->phy_pin >= 0) {
