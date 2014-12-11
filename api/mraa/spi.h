@@ -26,7 +26,7 @@
 
 /**
  * @file
- * @brief System Packet Interface
+ * @brief Serial Peripheral Interface
  *
  * This file defines the spi interface for libmraa. A Spi object in libmraa
  * represents a spidev device. Linux spidev devices are created per spi bus and

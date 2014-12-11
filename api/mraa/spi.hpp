@@ -30,7 +30,7 @@
 namespace mraa {
 
 /**
- * @brief API to System Packet Interface
+ * @brief API to Serial Peripheral Interface
  *
  * This file defines the SPI interface for libmraa
  *
