@@ -43,6 +43,8 @@ static unsigned int mmap_count = 0;
 
 static unsigned int pullup_map[] = {33,29,35,17,37,19,21,39,41,23,27,25,43,31,49,51,53,55,57,59};
 
+static mraa_gpio_context agpioOutputen[MRAA_INTEL_GALILEO_GEN_2_PINCOUNT];
+
 mraa_result_t
 mraa_intel_galileo_gen2_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
 {
@@ -52,23 +54,38 @@ mraa_intel_galileo_gen2_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
             return MRAA_SUCCESS;
 
         if (plat->pins[pin].gpio.complex_cap.output_en == 1) {
-            mraa_gpio_context output_e = mraa_gpio_init_raw(plat->pins[pin].gpio.output_enable);
-            if (output_e == NULL) {
-                return MRAA_ERROR_INVALID_RESOURCE;
+            if (!agpioOutputen[pin]) {
+                agpioOutputen[pin] = mraa_gpio_init_raw(plat->pins[pin].gpio.output_enable);
+                if (agpioOutputen[pin] == NULL) {
+                    return MRAA_ERROR_INVALID_RESOURCE;
+                }
+                if (mraa_gpio_dir(agpioOutputen[pin], MRAA_GPIO_OUT) != MRAA_SUCCESS) {
+                    return MRAA_ERROR_INVALID_RESOURCE;
+                }
             }
-            if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
-                return mraa_gpio_close(output_e);
-            }
+
             int output_val = 1;
             if (dir == MRAA_GPIO_OUT) {
                 output_val = 0;
             }
-            if (mraa_gpio_write(output_e, output_val) != MRAA_SUCCESS) {
-                return mraa_gpio_close(output_e);
+            if (mraa_gpio_write(agpioOutputen[pin], output_val) != MRAA_SUCCESS) {
+                return MRAA_ERROR_INVALID_RESOURCE;
             }
-            mraa_gpio_close(output_e);
         }
     }
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_intel_galileo_gen2_gpio_close_pre(mraa_gpio_context dev)
+{
+    if (dev->phy_pin >= 0) {
+        int pin = dev->phy_pin;
+        if (agpioOutputen[pin]) {
+            mraa_gpio_close(agpioOutputen[pin]);
+            agpioOutputen[pin] = NULL;
+        }
+    }    
     return MRAA_SUCCESS;
 }
 
@@ -325,6 +342,7 @@ mraa_intel_galileo_gen2()
     b->pwm_max_period = 41666;
     b->pwm_min_period = 666;
 
+    advance_func->gpio_close_pre = &mraa_intel_galileo_gen2_gpio_close_pre;
     advance_func->gpio_dir_pre = &mraa_intel_galileo_gen2_dir_pre;
     advance_func->i2c_init_pre = &mraa_intel_galileo_gen2_i2c_init_pre;
     advance_func->pwm_period_replace = &mraa_intel_galileo_gen2_pwm_period_replace;
