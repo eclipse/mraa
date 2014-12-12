@@ -578,7 +578,7 @@ mraa_intel_galileo_gen2()
     b->pins[11].spi.mux[0].pin = 72;
     b->pins[11].spi.mux[0].value = 0;
     b->pins[11].spi.mux[1].pin = 44;
-    b->pins[11].spi.mux[2].value = 1;
+    b->pins[11].spi.mux[1].value = 1;
     b->pins[11].pwm.mux[2].pin = 24;
     b->pins[11].pwm.mux[2].value = 0;
 
