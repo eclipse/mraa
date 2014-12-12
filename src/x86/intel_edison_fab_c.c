@@ -96,13 +96,13 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
 mraa_result_t
 mraa_intel_edison_gpio_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
 {
-    if (mraa_gpio_write(tristate, 0) != MRAA_SUCCESS) {
-        // call can sometimes fail, this does not actually mean much except
-        // that the kernel drivers don't always behave very well
-        syslog(LOG_NOTICE, "edison: Failed to write to tristate");
-    }
 
     if (dev->phy_pin >= 0) {
+        if (mraa_gpio_write(tristate, 0) != MRAA_SUCCESS) {
+            // call can sometimes fail, this does not actually mean much except
+            // that the kernel drivers don't always behave very well
+            syslog(LOG_NOTICE, "edison: Failed to write to tristate");
+        }
         int pin = dev->phy_pin;
 
         mraa_gpio_context output_e;
@@ -131,7 +131,10 @@ mraa_intel_edison_gpio_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
 mraa_result_t
 mraa_intel_edison_gpio_dir_post(mraa_gpio_context dev, gpio_dir_t dir)
 {
-    return mraa_gpio_write(tristate, 1);
+    if (dev->phy_pin >= 0) {
+        return mraa_gpio_write(tristate, 1);
+    }
+    return MRAA_SUCCESS;
 }
 
 mraa_result_t
