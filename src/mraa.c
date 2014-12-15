@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <sched.h>
 #include <string.h>
+#include <pwd.h>
 
 #define DEBUG
 
@@ -61,6 +62,9 @@ mraa_init()
         return MRAA_ERROR_PLATFORM_ALREADY_INITIALISED;
     }
 
+    uid_t proc_euid = geteuid();
+    struct passwd *proc_user = getpwuid(proc_euid);
+
 #ifdef DEBUG
     setlogmask(LOG_UPTO(LOG_DEBUG));
 #else
@@ -68,7 +72,19 @@ mraa_init()
 #endif
 
     openlog("libmraa", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
-    syslog(LOG_DEBUG, "libmraa initialised by user %d", getuid());
+    syslog(LOG_DEBUG,
+           "libmraa initialised by user '%s' with EUID %d",
+           (proc_user != NULL) ? proc_user->pw_name : "<unknown>",
+           proc_euid);
+
+    if (proc_euid != 0) {
+        char *err_msg = "mraa: FATAL error, "
+                        "libmraa program must be run as root (EUID 0), "
+                        "cannot proceed\n";
+        syslog(LOG_ERR, err_msg);
+        fprintf(stderr, err_msg);
+        return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
+    }
 
 #ifdef SWIGPYTHON
     // Initialise python threads, this allows use to grab the GIL when we are
@@ -93,7 +109,11 @@ mraa_init()
         printf("mraa: FATAL error, failed to initialise platform\n");
         return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
     }
-    syslog(LOG_INFO, "libmraa initialised for platform %d", platform_type);
+
+    syslog(LOG_INFO,
+           "libmraa initialised for platform '%s' of type %d",
+           mraa_get_platform_name(),
+           platform_type);
     return MRAA_SUCCESS;
 }
 
