@@ -390,12 +390,14 @@ mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
 mraa_result_t
 mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
 {
-    if (advance_func->gpio_dir_replace != NULL)
+    if (advance_func->gpio_dir_replace != NULL) {
         return advance_func->gpio_dir_replace(dev,dir);
+    }
     if (advance_func->gpio_dir_pre != NULL) {
         mraa_result_t pre_ret = (advance_func->gpio_dir_pre(dev,dir));
-        if(pre_ret != MRAA_SUCCESS)
+        if (pre_ret != MRAA_SUCCESS) {
             return pre_ret;
+        }
     }
 
     if (dev == NULL) {
