@@ -29,8 +29,6 @@
 #include <string.h>
 #include <pwd.h>
 
-#define DEBUG
-
 #include "mraa_internal.h"
 #include "gpio.h"
 #include "version.h"
