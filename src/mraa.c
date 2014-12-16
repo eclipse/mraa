@@ -118,8 +118,12 @@ mraa_init()
 void
 mraa_deinit()
 {
-    free(plat->pins);
-    free(plat);
+    if (plat != NULL) {
+        if (plat->pins != NULL) {
+            free(plat->pins);
+        }
+        free(plat);
+    }
     closelog();
 }
 
