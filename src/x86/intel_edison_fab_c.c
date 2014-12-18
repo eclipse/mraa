@@ -58,6 +58,8 @@ static mraa_gpio_context tristate;
 
 static mraa_intel_edison_pinmodes_t pinmodes[MRAA_INTEL_EDISON_PINCOUNT];
 static unsigned int outputen[] = {248,249,250,251,252,253,254,255,256,257,258,259,260,261,232,233,234,235,236,237};
+static mraa_gpio_context agpioOutputen[sizeof(outputen)/sizeof(outputen[0])];
+
 static unsigned int pullup_map[] = {216,217,218,219,220,221,222,223,224,225,226,227,228,229,208,209,210,211,212,213};
 static int miniboard = 0;
 
@@ -105,24 +107,22 @@ mraa_intel_edison_gpio_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
         }
         int pin = dev->phy_pin;
 
-        mraa_gpio_context output_e;
-        output_e = mraa_gpio_init_raw(outputen[pin]);
-        if (output_e == NULL) {
-            return MRAA_ERROR_INVALID_RESOURCE;
-        }
-        if (mraa_gpio_dir(output_e, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
-            mraa_gpio_close(output_e);
-            return MRAA_ERROR_INVALID_RESOURCE;
+        if (!agpioOutputen[pin]) {
+            agpioOutputen[pin] = mraa_gpio_init_raw(outputen[pin]);
+            if (agpioOutputen[pin] == NULL) {
+                return MRAA_ERROR_INVALID_RESOURCE;
+            }
+            if (mraa_gpio_dir(agpioOutputen[pin], MRAA_GPIO_OUT) != MRAA_SUCCESS) {
+                return MRAA_ERROR_INVALID_RESOURCE;
+            }
         }
         int output_val = 0;
         if (dir == MRAA_GPIO_OUT) {
             output_val = 1;
         }
-        if (mraa_gpio_write(output_e, output_val) != MRAA_SUCCESS) {
-            mraa_gpio_close(output_e);
+        if (mraa_gpio_write(agpioOutputen[pin], output_val) != MRAA_SUCCESS) {
             return MRAA_ERROR_INVALID_RESOURCE;
         }
-        mraa_gpio_close(output_e);
     }
 
     return MRAA_SUCCESS;
@@ -154,6 +154,19 @@ mraa_intel_edison_gpio_init_post(mraa_gpio_context dev)
     }
 
     return mraa_intel_edison_pinmode_change(sysfs, mode);
+}
+
+mraa_result_t
+mraa_intel_edison_gpio_close_pre(mraa_gpio_context dev)
+{
+    if (dev->phy_pin >= 0) {
+        int pin = dev->phy_pin;
+        if (agpioOutputen[pin]) {
+            mraa_gpio_close(agpioOutputen[pin]);
+            agpioOutputen[pin] = NULL;
+        }
+    }    
+    return MRAA_SUCCESS;
 }
 
 mraa_result_t
@@ -674,6 +687,8 @@ mraa_intel_edison_miniboard(mraa_board_t* b)
     }
 
     advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
+    advance_func->gpio_close_pre = &mraa_intel_edison_gpio_close_pre;
+
     advance_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
     advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
     advance_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
