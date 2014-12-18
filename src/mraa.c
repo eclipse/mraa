@@ -257,8 +257,6 @@ mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
                 return 1;
             break;
         case MRAA_PIN_AIO:
-            if (pin < plat->aio_count)
-                pin = pin + plat->gpio_count;
             if (plat->pins[pin].capabilites.aio ==1)
                 return 1;
             break;
