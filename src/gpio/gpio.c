@@ -117,6 +117,7 @@ mraa_gpio_init_raw(int pin)
     dev->pin = pin;
     dev->phy_pin = -1;
 
+    // then check to make sure the pin is exported.
     char directory[MAX_SIZE];
     snprintf(directory, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/", dev->pin);
     struct stat dir;
