@@ -539,12 +539,18 @@ mraa_gpio_unexport(mraa_gpio_context dev)
 mraa_result_t
 mraa_gpio_close(mraa_gpio_context dev)
 {
+    mraa_result_t result = MRAA_SUCCESS;
+
+    if (advance_func->gpio_close_pre != NULL) {
+        result = advance_func->gpio_close_pre(dev);
+    }
+
     if (dev->value_fp != -1) {
         close(dev->value_fp);
     }
     mraa_gpio_unexport(dev);
     free(dev);
-    return MRAA_SUCCESS;
+    return result;
 }
 
 mraa_result_t
