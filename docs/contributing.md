@@ -15,7 +15,8 @@ on github.
 If you'd rather not use github you are more than welcome to send git formatted
 patches to brendan.le.foll@intel.com.
 
-# Basic rules
+Basic rules
+-----------
 - Your code must build
 - Commits must have a sign-off line by at least yourself
 - Commits must be named <file/module>: Some decent description
@@ -25,7 +26,7 @@ patches to brendan.le.foll@intel.com.
 - Try to stick to the established coding style reguardless of your personal feeling for it!
 
 Code signing
-============
+------------
 
 The sign-off is a simple line at the end of the explanation for the
 patch, which certifies that you wrote it or otherwise have the right to pass it
@@ -52,15 +53,14 @@ the below:
             person who certified (a), (b) or (c) and I have not modified
             it.
 
-	(d) I understand and agree that this project and the contribution
-	    are public and that a record of the contribution (including all
-	    personal information I submit with it, including my sign-off) is
-	    maintained indefinitely and may be redistributed consistent with
-	    this project or the open source license(s) involved.
+        (d) I understand and agree that this project and the contribution
+            are public and that a record of the contribution (including all
+            personal information I submit with it, including my sign-off) is
+            maintained indefinitely and may be redistributed consistent with
+            this project or the open source license(s) involved.
 
 then you just add a line saying
 
 	Signed-off-by: Random J Developer <random@developer.example.org>
 
-using your real name (sorry, no pseudonyms or anonymous contributions.)
-Unsigned commits will not be accepted.
+Using your real name (sorry, no pseudonyms or anonymous contributions.)
