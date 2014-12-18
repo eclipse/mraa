@@ -228,7 +228,7 @@ mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
         if (plat == NULL)
             return 0;
     }
-    if (pin > plat->phy_pin_count || pin < 0)
+    if (pin > (plat->phy_pin_count -1) || pin < 0)
         return 0;
 
     switch(mode) {
