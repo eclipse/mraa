@@ -573,3 +573,9 @@ mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap_en)
     syslog(LOG_ERR, "gpio: mmap not implemented on this platform");
     return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
+
+int
+mraa_gpio_get_pin(mraa_gpio_context dev)
+{
+    return (int) dev->phy_pin;
+}
