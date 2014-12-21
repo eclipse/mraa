@@ -183,6 +183,14 @@ class Gpio {
         mraa_result_t useMmap(bool enable) {
             return mraa_gpio_use_mmaped(m_gpio, (mraa_boolean_t) enable);
         }
+        /**
+         * Get pin number of Gpio
+         *
+         * @return Pin number
+         */
+        int getPin() {
+            return mraa_gpio_get_pin(m_gpio);
+        }
     private:
         mraa_gpio_context m_gpio;
 };
