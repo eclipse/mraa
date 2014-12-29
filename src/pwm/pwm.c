@@ -49,9 +49,13 @@ mraa_pwm_setup_duty_fp(mraa_pwm_context dev)
 static mraa_result_t
 mraa_pwm_write_period(mraa_pwm_context dev, int period)
 {
-    if (advance_func->pwm_period_replace != NULL)
-        return advance_func->pwm_period_replace(dev,period);
-
+    if (advance_func->pwm_period_replace != NULL) {
+        mraa_result_t result = advance_func->pwm_period_replace(dev,period);
+        if (result == MRAA_SUCCESS) {
+            dev->period = period;
+        }
+        return result;
+    }
     char bu[MAX_SIZE];
     snprintf(bu,MAX_SIZE ,"/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
 
@@ -68,6 +72,7 @@ mraa_pwm_write_period(mraa_pwm_context dev, int period)
     }
 
     close(period_f);
+    dev->period = period;
     return MRAA_SUCCESS;
 }
 
@@ -119,6 +124,7 @@ mraa_pwm_read_period(mraa_pwm_context dev)
         syslog(LOG_ERR, "pwm: Number is invalid");
         return -1;
     }
+    dev->period = (int)ret;
     return (int) ret;
 }
 
@@ -223,6 +229,7 @@ mraa_pwm_init_raw(int chipin, int pin)
     dev->duty_fp = -1;
     dev->chipid = chipin;
     dev->pin = pin;
+    dev->period = -1;
 
     char directory[MAX_SIZE];
     snprintf(directory, MAX_SIZE, SYSFS_PWM "/pwmchip%d/pwm%d", dev->chipid, dev->pin);
@@ -259,10 +266,15 @@ mraa_pwm_init_raw(int chipin, int pin)
 mraa_result_t
 mraa_pwm_write(mraa_pwm_context dev, float percentage)
 {
-    if (percentage >= 1.0f) {
-        return mraa_pwm_write_duty(dev, mraa_pwm_read_period(dev));
+    if (dev->period == -1) {
+        if (mraa_pwm_read_period(dev) <= 0)
+            return MRAA_ERROR_NO_DATA_AVAILABLE;
     }
-    return mraa_pwm_write_duty(dev, percentage * mraa_pwm_read_period(dev));
+
+    if (percentage >= 1.0f) {
+        return mraa_pwm_write_duty(dev, dev->period);
+    }
+    return mraa_pwm_write_duty(dev, percentage * dev->period);
 }
 
 float
