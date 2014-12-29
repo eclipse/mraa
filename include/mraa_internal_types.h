@@ -70,6 +70,7 @@ struct _pwm {
     int pin; /**< the pin number, as known to the os. */
     int chipid; /**< the chip id, which the pwm resides */
     int duty_fp; /**< File pointer to duty file */
+    int period;  /**< Cache the period to speed up setting duty */
     mraa_boolean_t owner; /**< Owner of pwm context*/
     /*@}*/
 };
