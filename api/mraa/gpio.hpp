@@ -45,8 +45,10 @@ typedef enum {
  * Gpio Direction options
  */
 typedef enum {
-    DIR_OUT = 0, /**< Output. A Mode can also be set */
-    DIR_IN  = 1  /**< Input */
+    DIR_OUT      = 0, /**< Output. A Mode can also be set */
+    DIR_IN       = 1,  /**< Input */
+    DIR_OUT_HIGH = 2, /**< Output. Init High */
+    DIR_OUT_LOW  = 3, /**< Output. Init Low */
 } Dir;
 
 /**
