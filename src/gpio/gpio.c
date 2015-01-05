@@ -426,6 +426,12 @@ mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
         case MRAA_GPIO_IN:
             length = snprintf(bu, sizeof(bu), "in");
             break;
+        case MRAA_GPIO_OUT_HIGH:
+            length = snprintf(bu, sizeof(bu), "high");
+            break;
+        case MRAA_GPIO_OUT_LOW:
+            length = snprintf(bu, sizeof(bu), "low");
+            break;
         default:
             close(direction);
             return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;

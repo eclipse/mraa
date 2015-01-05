@@ -70,7 +70,9 @@ typedef enum {
  */
 typedef enum {
     MRAA_GPIO_OUT    = 0, /**< Output. A Mode can also be set */
-    MRAA_GPIO_IN     = 1  /**< Input */
+    MRAA_GPIO_IN     = 1,  /**< Input */
+    MRAA_GPIO_OUT_HIGH = 2, /**< Output. Init High */
+    MRAA_GPIO_OUT_LOW = 3 /**< Output. Init Low */
 } gpio_dir_t;
 
 /**
