@@ -263,6 +263,7 @@ mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
         case MRAA_PIN_UART:
             if (plat->pins[pin].capabilites.uart == 1)
                 return 1;
+            break;
         default:
             syslog(LOG_NOTICE, "requested pinmode invalid");
             break;
