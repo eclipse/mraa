@@ -97,35 +97,19 @@ class I2c {
          *
          * @return char read from the bus
          */
-        uint8_t read() {
+        uint8_t readByte() {
             return (uint8_t) mraa_i2c_read_byte(m_i2c);
         }
 
         /**
-         * Read mutliple bytes from the bus
+	 * Read length bytes from the bus into *data pointer
          *
-         * @param data Buffer to write into
-         * @param length Size of read
-         * @param command The i2c command
-         * @return length of the read or 0 if failed
-         */
-        uint8_t read(char *data, size_t length) {
-            return mraa_i2c_read(m_i2c, (uint8_t*) data, (int) length);
-        }
-
-        /**
-         * Read length bytes from the bus, and return as a std::string note
-         * that this is not a null terminated string
-         *
+         * @param data Data to read into
          * @param length Size of read in bytes to make
          * @return pointer to std::string
          */
-        std::string read(int length) {
-            uint8_t* data = (uint8_t*) malloc(sizeof(uint8_t) * length);
-            mraa_i2c_read(m_i2c, data, length);
-            std::string str((char*)data, length);
-            free(data);
-            return str;
+        int read(uint8_t *data, int length) {
+            return mraa_i2c_read(m_i2c, data, length);
         }
 
         /**
@@ -154,7 +138,7 @@ class I2c {
          * @param data The byte to send on the bus
          * @return Result of operation
          */
-        mraa_result_t write(uint8_t data) {
+        mraa_result_t writeByte(uint8_t data) {
             return mraa_i2c_write_byte(m_i2c, data);
         }
 
@@ -166,8 +150,8 @@ class I2c {
          * @param length Size of buffer to send
          * @return Result of operation
          */
-        mraa_result_t write(char* data, size_t length) {
-            return mraa_i2c_write(m_i2c, (const unsigned char *)data, (int) length);
+        mraa_result_t write(const uint8_t* data, int length) {
+            return mraa_i2c_write(m_i2c, data, length);
         }
 
         /**
