@@ -39,8 +39,6 @@
     }
 }
 
-%apply (char *STRING, size_t LENGTH) { (char *data, size_t length) };
-
 %include "common.hpp"
 
 %include "types.h"
