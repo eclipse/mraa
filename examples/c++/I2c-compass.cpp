@@ -95,7 +95,7 @@ int main ()
 {
     float direction = 0;
     int16_t x = 0, y = 0, z = 0;
-    char rx_tx_buf[MAX_BUFFER_LENGTH];
+    uint8_t rx_tx_buf[MAX_BUFFER_LENGTH];
 
 //! [Interesting]
     mraa::I2c* i2c;
@@ -116,7 +116,7 @@ int main ()
 
     while (running == 0) {
         i2c->address(HMC5883L_I2C_ADDR);
-        i2c->write(HMC5883L_DATA_REG);
+        i2c->writeByte(HMC5883L_DATA_REG);
 
         i2c->address(HMC5883L_I2C_ADDR);
         i2c->read(rx_tx_buf, DATA_REG_SIZE);
