@@ -719,7 +719,6 @@ mraa_intel_edison_miniboard(mraa_board_t* b)
     }
 
     advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
-    advance_func->gpio_close_pre = &mraa_intel_edison_gpio_close_pre;
 
     advance_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
     advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
@@ -1103,6 +1102,7 @@ mraa_intel_edison_fab_c()
 
     advance_func->gpio_dir_pre = &mraa_intel_edison_gpio_dir_pre;
     advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
+    advance_func->gpio_close_pre = &mraa_intel_edison_gpio_close_pre;
     advance_func->gpio_dir_post = &mraa_intel_edison_gpio_dir_post;
     advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
     advance_func->i2c_set_frequency_replace = &mraa_intel_edison_i2c_freq;
