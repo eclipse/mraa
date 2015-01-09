@@ -91,7 +91,7 @@ mraa_intel_minnow_max()
     strncpy(b->platform_name, PLATFORM_NAME, b->platform_name_length);
 
     b->phy_pin_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
-    //b->gpio_count = 14;
+    b->gpio_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
     b->aio_count = 0;
     b->adc_raw = 0;
     b->adc_supported = 0;
