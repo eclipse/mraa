@@ -33,11 +33,14 @@
 #define I2C_BUS_COUNT 10
 #define I2C_BUS_DEFAULT 7
 
+int arch_nr_gpios_adjust = 0x100;
+
 mraa_result_t
 mraa_set_pininfo(mraa_board_t* board, int mraa_index, char *name, mraa_pincapabilities_t caps, int sysfs_pin)
 {
     if (mraa_index < board->phy_pin_count) {
-        mraa_pininfo_t* pin_info = &board->pins[mraa_index];
+        // adjust mraa_index for ARCH_NR_GPIOS value
+        mraa_pininfo_t* pin_info = &board->pins[(mraa_index)];
         strncpy(pin_info->name, name, 7);
         pin_info->capabilites = caps;
         if (caps.gpio)
@@ -112,92 +115,37 @@ mraa_intel_minnow_max()
      * they start at 512 and number down, at some point this is going to change again when
      * GPIO moves to a radix.
      */
-    if( uname_major <= 3 && uname_minor <= 17 ){
-	max_pins[0]  =  -1; // INVALID, doesn't exist
-	max_pins[1]  =  -1; // GND
-	max_pins[2]  =  -1; // GND
-	max_pins[3]  =  -1; // 5v
-	max_pins[4]  =  -1; // 3.3v
-	max_pins[5]  = 220; // SPI_CS
-	max_pins[6]  = 225; // UART1TX
-	max_pins[7]  = 221; // SPIMISO
-	max_pins[8]  = 224; // UART1RX
-	max_pins[9]  = 222; // SPIMOSI
-	max_pins[10] = 227; // UART1CT
-	max_pins[11] = 223; // SPI_CLK
-	max_pins[12] = 226; // UART1RT
-	max_pins[13] = 243; // I2C_SCL
-	max_pins[14] = 216; // I2S_CLK
-	max_pins[15] = 242; // I2C_SDA
-	max_pins[16] = 217; // I2S_FRM
-	max_pins[17] = 229; // UART2TX
-	max_pins[18] = 219; // I2S_DO
-	max_pins[19] = 228; // UART2RX
-	max_pins[20] = 218; // I2S_DI
-	max_pins[21] =  82; // S5_0
-	max_pins[22] = 248; // PWM0
-	max_pins[23] =  83; // S5_1
-	max_pins[24] = 249; // PWM1
-	max_pins[25] =  84; // S5_4
-	max_pins[26] = 208; // IBL8254
-    } else {
-	// This is mainly for +3.18
-	max_pins[0]  =  -1; // INVALID, doesn't exist
-	max_pins[1]  =  -1; // GND
-	max_pins[2]  =  -1; // GND
-	max_pins[3]  =  -1; // 5v
-	max_pins[4]  =  -1; // 3.3v
-	max_pins[5]  = 476; // SPI_CS
-	max_pins[6]  = 481; // UART1TX
-	max_pins[7]  = 477; // SPIMISO
-	max_pins[8]  = 480; // UART1RX
-	max_pins[9]  = 478; // SPIMOSI
-	max_pins[10] = 483; // UART1CT
-	max_pins[11] = 479; // SPI_CLK
-	max_pins[12] = 484; // UART1RT
-	max_pins[13] = 499; // I2C_SCL
-	max_pins[14] = 472; // I2S_CLK
-	max_pins[15] = 498; // I2C_SDA
-	max_pins[16] = 473; // I2S_FRM
-	max_pins[17] = 485; // UART2TX
-	max_pins[18] = 475; // I2S_DO
-	max_pins[19] = 484; // UART2RX
-	max_pins[20] = 474; // I2S_DI
-	max_pins[21] = 338; // S5_0
-	max_pins[22] = 504; // PWM0
-	max_pins[23] = 339; // S5_1
-	max_pins[24] = 505; // PWM1
-	max_pins[25] = 340; // S5_4
-	max_pins[26] = 464; // IBL8254
+    if (uname_major <= 3 && uname_minor <= 17 ) {
+        arch_nr_gpios_adjust = 0;
     }
 
-    mraa_set_pininfo(b,  0, "INVALID",  (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, max_pins[0]);
-    mraa_set_pininfo(b,  1, "GND",      (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, max_pins[1]);
-    mraa_set_pininfo(b,  2, "GND",      (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, max_pins[2]);
-    mraa_set_pininfo(b,  3, "5v",       (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, max_pins[3]);
-    mraa_set_pininfo(b,  4, "3.3v",     (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, max_pins[4]);
-    mraa_set_pininfo(b,  5, "SPI_CS",   (mraa_pincapabilities_t){1,0,0,0,1,0,0,0}, max_pins[5]);
-    mraa_set_pininfo(b,  6, "UART1TX",  (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, max_pins[6]);
-    mraa_set_pininfo(b,  7, "SPIMISO",  (mraa_pincapabilities_t){1,0,0,0,1,0,0,0}, max_pins[7]);
-    mraa_set_pininfo(b,  8, "UART1RX",  (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, max_pins[8]);
-    mraa_set_pininfo(b,  9, "SPIMOSI",  (mraa_pincapabilities_t){1,0,0,0,1,0,0,0}, max_pins[9]);
-    mraa_set_pininfo(b, 10, "UART1CT",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, max_pins[10]);
-    mraa_set_pininfo(b, 11, "SPI_CLK",  (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, max_pins[11]);
-    mraa_set_pininfo(b, 12, "UART1RT",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, max_pins[12]);
-    mraa_set_pininfo(b, 13, "I2C_SCL",  (mraa_pincapabilities_t){1,0,0,0,0,1,0,0}, max_pins[13]);
-    mraa_set_pininfo(b, 14, "I2S_CLK",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, max_pins[14]);
-    mraa_set_pininfo(b, 15, "I2C_SDA",  (mraa_pincapabilities_t){1,0,0,0,0,1,0,0}, max_pins[15]);
-    mraa_set_pininfo(b, 16, "I2S_FRM",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, max_pins[16]);
-    mraa_set_pininfo(b, 17, "UART2TX",  (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, max_pins[17]);
-    mraa_set_pininfo(b, 18, "I2S_DO",   (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, max_pins[18]);
-    mraa_set_pininfo(b, 19, "UART2RX",  (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, max_pins[19]);
-    mraa_set_pininfo(b, 20, "I2S_DI",   (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, max_pins[20]);
-    mraa_set_pininfo(b, 21, "S5_0",     (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, max_pins[21]);
-    mraa_set_pininfo(b, 22, "PWM0",     (mraa_pincapabilities_t){1,0,1,0,0,0,0,0}, max_pins[22]); // Assume BIOS configured for PWM
-    mraa_set_pininfo(b, 23, "S5_1",     (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, max_pins[23]);
-    mraa_set_pininfo(b, 24, "PWM1",     (mraa_pincapabilities_t){1,0,1,0,0,0,0,0}, max_pins[24]); // Assume BIOS configured for PWM
-    mraa_set_pininfo(b, 25, "S5_4",     (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, max_pins[25]);
-    mraa_set_pininfo(b, 26, "IBL8254",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, max_pins[26]);
+    mraa_set_pininfo(b, 0, "INVALID",   (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, -1 );
+    mraa_set_pininfo(b, 1, "GND",       (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, -1 );
+    mraa_set_pininfo(b, 2, "GND",       (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, -1 );
+    mraa_set_pininfo(b, 3, "5v",        (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, -1 );
+    mraa_set_pininfo(b, 4, "3.3v",      (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, -1 );
+    mraa_set_pininfo(b, 5, "SPI_CS",    (mraa_pincapabilities_t){1,0,0,0,1,0,0,0}, 220);
+    mraa_set_pininfo(b, 6, "UART1TX",   (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, 225);
+    mraa_set_pininfo(b, 7, "SPIMISO",   (mraa_pincapabilities_t){1,0,0,0,1,0,0,0}, 221);
+    mraa_set_pininfo(b, 8, "UART1RX",   (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, 224);
+    mraa_set_pininfo(b, 9, "SPIMOSI",   (mraa_pincapabilities_t){1,0,0,0,1,0,0,0}, 222);
+    mraa_set_pininfo(b, 10, "UART1CT",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 227);
+    mraa_set_pininfo(b, 11, "SPI_CLK",  (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, 223);
+    mraa_set_pininfo(b, 12, "UART1RT",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 226);
+    mraa_set_pininfo(b, 13, "I2C_SCL",  (mraa_pincapabilities_t){1,0,0,0,0,1,0,0}, 243);
+    mraa_set_pininfo(b, 14, "I2S_CLK",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 216);
+    mraa_set_pininfo(b, 15, "I2C_SDA",  (mraa_pincapabilities_t){1,0,0,0,0,1,0,0}, 242);
+    mraa_set_pininfo(b, 16, "I2S_FRM",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 217);
+    mraa_set_pininfo(b, 17, "UART2TX",  (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, 229);
+    mraa_set_pininfo(b, 18, "I2S_DO",   (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 219);
+    mraa_set_pininfo(b, 19, "UART2RX",  (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, 228);
+    mraa_set_pininfo(b, 20, "I2S_DI",   (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 218);
+    mraa_set_pininfo(b, 21, "S5_0",     (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 82 );
+    mraa_set_pininfo(b, 22, "PWM0",     (mraa_pincapabilities_t){1,0,1,0,0,0,0,0}, 248); // Assume BIOS configured for PWM
+    mraa_set_pininfo(b, 23, "S5_1",     (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 83 );
+    mraa_set_pininfo(b, 24, "PWM1",     (mraa_pincapabilities_t){1,0,1,0,0,0,0,0}, 249); // Assume BIOS configured for PWM
+    mraa_set_pininfo(b, 25, "S5_4",     (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 84 );
+    mraa_set_pininfo(b, 26, "IBL8254",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 208);
 
     // Set number of i2c adaptors
     // Got this from running 'i2cdetect -l'
