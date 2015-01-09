@@ -597,8 +597,8 @@ mraa_intel_galileo_gen2()
     b->pins[11].spi.mux[0].value = 0;
     b->pins[11].spi.mux[1].pin = 44;
     b->pins[11].spi.mux[1].value = 1;
-    b->pins[11].pwm.mux[2].pin = 24;
-    b->pins[11].pwm.mux[2].value = 0;
+    b->pins[11].spi.mux[2].pin = 24;
+    b->pins[11].spi.mux[2].value = 0;
 
     strncpy(b->pins[12].name, "IO12", 8);
     b->pins[12].capabilites = (mraa_pincapabilities_t) {1,1,0,1,1,0,0};
