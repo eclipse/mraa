@@ -43,44 +43,31 @@ mraa_x86_platform()
         if (getline(&line, &len, fh) != -1) {
             if (strncmp(line, "GalileoGen2", 11) == 0) {
                 platform_type = MRAA_INTEL_GALILEO_GEN2;
+                plat = mraa_intel_galileo_gen2();
             } else if (strncmp(line, "BODEGA BAY", 10) == 0) {
                 platform_type = MRAA_INTEL_EDISON_FAB_C;
+                plat = mraa_intel_edison_fab_c();
             } else if (strncmp(line, "SALT BAY", 8) == 0) {
                 platform_type = MRAA_INTEL_EDISON_FAB_C;
+                plat = mraa_intel_edison_fab_c();
             } else if (strncmp(line, "DE3815", 6) == 0) {
                 platform_type = MRAA_INTEL_DE3815;
+                plat = mraa_intel_de3815();
             } else if (strncmp(line, "NOTEBOOK", 8) == 0) {
                 platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
+                plat = mraa_intel_minnow_max();
             } else if (strncasecmp(line, "MinnowBoard MAX", 15) == 0) {
                 platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
+                plat = mraa_intel_minnow_max();
             } else {
+                syslog(LOG_ERR, "Platform not supported, initialising as MRAA_INTEL_GALILEO_GEN1");
                 platform_type = MRAA_INTEL_GALILEO_GEN1;
+                plat = mraa_intel_galileo_rev_d();
             }
             free(line);
         }
         fclose(fh);
     }
 
-    switch(platform_type) {
-        case MRAA_INTEL_GALILEO_GEN2:
-            plat = mraa_intel_galileo_gen2();
-            break;
-        case MRAA_INTEL_GALILEO_GEN1:
-            plat = mraa_intel_galileo_rev_d();
-            break;
-        case MRAA_INTEL_EDISON_FAB_C:
-            plat = mraa_intel_edison_fab_c();
-            break;
-        case MRAA_INTEL_DE3815:
-            plat = mraa_intel_de3815();
-            break;
-        case MRAA_INTEL_MINNOWBOARD_MAX:
-            plat = mraa_intel_minnow_max();
-            break;
-
-        default:
-            plat = mraa_intel_galileo_rev_d();
-            syslog(LOG_ERR, "Platform not supported, initialising as MRAA_INTEL_GALILEO_GEN1");
-    }
     return platform_type;
 }
