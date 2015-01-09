@@ -48,7 +48,7 @@ extern "C" {
 #include "common.h"
 
 /**
- * MRAA supported platform types
+ * MRAA SPI Modes
  */
 typedef enum {
     MRAA_SPI_MODE0 = 0, /**< CPOL = 0, CPHA = 0, Clock idle low, data is clocked in on rising edge, output data (change) on falling edge */

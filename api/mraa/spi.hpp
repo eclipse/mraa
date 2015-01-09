@@ -30,6 +30,17 @@
 namespace mraa {
 
 /**
+ * MRAA SPI Modes
+ */
+typedef enum {
+    SPI_MODE0 = 0, /**< CPOL = 0, CPHA = 0, Clock idle low, data is clocked in on rising edge, output data (change) on falling edge */
+    SPI_MODE1 = 1, /**< CPOL = 0, CPHA = 1, Clock idle low, data is clocked in on falling edge, output data (change) on rising edge */
+    SPI_MODE2 = 2, /**< CPOL = 1, CPHA = 0, Clock idle low, data is clocked in on falling edge, output data (change) on rising edge */
+    SPI_MODE3 = 3, /**< CPOL = 1, CPHA = 1, Clock idle low, data is clocked in on rising, edge output data (change) on falling edge */
+} Spi_Mode;
+
+
+  /**
  * @brief API to Serial Peripheral Interface
  *
  * This file defines the SPI interface for libmraa
@@ -62,8 +73,8 @@ class Spi {
          * @param mode the mode. See Linux spidev doc
          * @return Result of operation
          */
-        mraa_result_t mode(mraa_spi_mode_t mode) {
-            return mraa_spi_mode(m_spi, mode);
+        mraa_result_t mode(Spi_Mode mode) {
+            return mraa_spi_mode(m_spi, (mraa_spi_mode_t) mode);
         }
         /**
          * Set the SPI device operating clock frequency
