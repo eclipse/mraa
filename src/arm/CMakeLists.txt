@@ -1,6 +1,8 @@
 message (INFO " - Adding ARM platforms")
 set (mraa_LIB_SRCS_NOAUTO ${mraa_LIB_SRCS_NOAUTO}
   ${PROJECT_SOURCE_DIR}/src/arm/arm.c
-  ${PROJECT_SOURCE_DIR}/src/arm/raspberry_pi_b.c
+  ${PROJECT_SOURCE_DIR}/src/arm/raspberry_pi.c
+  ${PROJECT_SOURCE_DIR}/src/arm/banana_pi.c
+  ${PROJECT_SOURCE_DIR}/src/arm/beaglebone.c
   PARENT_SCOPE
 )
