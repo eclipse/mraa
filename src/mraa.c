@@ -79,8 +79,8 @@ mraa_init()
         char *err_msg = "mraa: FATAL error, "
                         "libmraa program must be run as root (EUID 0), "
                         "cannot proceed\n";
-        syslog(LOG_ERR, err_msg);
-        fprintf(stderr, err_msg);
+        syslog(LOG_ERR, "%s", err_msg);
+        fprintf(stderr, "%s", err_msg);
         return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
     }
 
