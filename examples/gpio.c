@@ -62,15 +62,17 @@ list_pins() {
             mraa_pincapabilities_t caps = platformInfo->pins[i].capabilites;
             fprintf(stdout, "%02d %-8s  ", i, mraa_name);
             if (caps.gpio)
-                fprintf(stdout, "GPIO");
+                fprintf(stdout, "GPIO ");
             if (caps.i2c)
-                fprintf(stdout, "I2C");
+                fprintf(stdout, "I2C  ");
             if (caps.spi)
-                fprintf(stdout, "SPI");
+                fprintf(stdout, "SPI  ");
             if (caps.pwm)
-                fprintf(stdout, "PWM");
+                fprintf(stdout, "PWM  ");
+            if (caps.aio)
+                fprintf(stdout, "AIO  ");
             if (caps.uart)
-                fprintf(stdout, "UART");
+                fprintf(stdout, "UART ");
             fprintf(stdout, "\n");
         }
     }
@@ -115,6 +117,15 @@ main(int argc, char **argv)
             break;
         case MRAA_INTEL_MINNOWBOARD_MAX:
             strcpy(board_name, "Intel Minnowboard Max");
+            break;
+        case MRAA_RASPBERRY_PI:
+            strcpy(board_name, "Raspberry Pi");
+            break;
+        case MRAA_BANANA_PI:
+            strcpy(board_name, "Banana Pi");
+            break;
+        case MRAA_BEAGLEBONE:
+            strcpy(board_name, "Beaglebone");
             break;
         default:
             fprintf(stdout, "Unknown platform code %d\n", platform);
