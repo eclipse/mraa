@@ -103,7 +103,22 @@ mraa_spi_init(int bus)
             return NULL;
         }
     }
+    mraa_spi_context dev = mraa_spi_init_raw(plat->spi_bus[bus].bus_id, plat->spi_bus[bus].slave_s);
 
+    if (advance_func->spi_init_post != NULL) {
+        mraa_result_t ret = advance_func->spi_init_post(dev);
+        if (ret != MRAA_SUCCESS) {
+            free(dev);
+            return NULL;
+        }
+    }
+
+    return dev;
+}
+
+mraa_spi_context
+mraa_spi_init_raw(unsigned int bus, unsigned int cs)
+{
     mraa_spi_context dev = (mraa_spi_context) malloc(sizeof(struct _spi));
     if (dev == NULL) {
         syslog(LOG_CRIT, "spi: Failed to allocate memory for context");
@@ -112,8 +127,7 @@ mraa_spi_init(int bus)
     memset(dev, 0, sizeof(struct _spi));
 
     char path[MAX_SIZE];
-    sprintf(path, "/dev/spidev%u.%u",
-            plat->spi_bus[bus].bus_id, plat->spi_bus[bus].slave_s);
+    sprintf(path, "/dev/spidev%u.%u", bus, cs);
 
     dev->devfd = open(path, O_RDWR);
     if (dev->devfd < 0) {
@@ -125,14 +139,6 @@ mraa_spi_init(int bus)
     dev->clock = 4000000;
     dev->lsb = 0;
     dev->mode = 0;
-
-    if (advance_func->spi_init_post != NULL) {
-        mraa_result_t ret = advance_func->spi_init_post(dev);
-        if (ret != MRAA_SUCCESS) {
-            free(dev);
-            return NULL;
-        }
-    }
 
     return dev;
 }

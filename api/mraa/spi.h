@@ -71,6 +71,15 @@ typedef struct _spi* mraa_spi_context;
 mraa_spi_context mraa_spi_init(int bus);
 
 /**
+ * Initialise SPI_context without any board configuration, selects a bus and a mux.
+ *
+ * @param bus Bus to use as listed by spidev
+ * @param cs Chip select to use as listed in spidev
+ * @return Spi context or NULL
+ */
+mraa_spi_context mraa_spi_init_raw(unsigned int bus, unsigned int cs);
+
+/**
  * Set the SPI device mode. see spidev 0-3.
  *
  * @param dev The Spi context
