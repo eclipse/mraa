@@ -2,6 +2,13 @@
 # https://qt.gitorious.org/qt/qtbase/blobs/master/src/corelib/global/qprocessordetection.h
 # Currently handles arm (v5, v6, v7), x86 (32/64), ia64, and ppc (32/64)
 
+# This file is under the terms of the GNU Lesser General Public License version
+# 2.1 as published by the Free Software Foundation and appearing in the file
+# LICENSE.LGPL included in the packaging of this file. Please review the
+# following information to ensure the GNU Lesser General Public License version
+# 2.1 requirements will be met:
+# http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+
 # Regarding POWER/PowerPC, just as is noted in the Qt source,
 # "There are many more known variants/revisions that we do not handle/detect."
 
