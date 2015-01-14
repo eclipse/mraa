@@ -106,7 +106,7 @@ class I2c {
          *
          * @param data Data to read into
          * @param length Size of read in bytes to make
-         * @return pointer to std::string
+         * @return length of read, should match length
          */
         int read(uint8_t *data, int length) {
             return mraa_i2c_read(m_i2c, data, length);
