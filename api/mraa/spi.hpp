@@ -61,12 +61,14 @@ class Spi {
                 throw std::invalid_argument("Error initialising SPI bus");
             }
         }
+
         /**
          * Closes spi bus
          */
         ~Spi() {
             mraa_spi_stop(m_spi);
         }
+
         /**
          * Set the SPI device mode. see spidev0-3
          *
@@ -76,6 +78,7 @@ class Spi {
         mraa_result_t mode(Spi_Mode mode) {
             return mraa_spi_mode(m_spi, (mraa_spi_mode_t) mode);
         }
+
         /**
          * Set the SPI device operating clock frequency
          *
@@ -85,6 +88,7 @@ class Spi {
         mraa_result_t frequency(int hz) {
             return mraa_spi_frequency(m_spi, hz);
         }
+
         /**
          * Write single byte to the SPI device
          *
@@ -94,6 +98,7 @@ class Spi {
         uint8_t writeByte(uint8_t data) {
             return mraa_spi_write(m_spi, (uint8_t) data);
         }
+
         /**
          * Write buffer of bytes to SPI device The pointer return has to be
 	 * free'd by the caller. It will return a NULL pointer in cases of
@@ -106,10 +111,11 @@ class Spi {
         uint8_t* write(uint8_t* txBuf, int length) {
             return mraa_spi_write_buf(m_spi, txBuf, length);
         }
+
 #ifndef SWIG
         /**
-         * Transfer data to and from SPI device Receive pointer may be null if return
-         * data is not needed.
+         * Transfer data to and from SPI device Receive pointer may be null if
+         * return data is not needed.
          *
          * @param data buffer to send
          * @param rxBuf buffer to optionally receive data from spi device
@@ -120,6 +126,7 @@ class Spi {
             return mraa_spi_transfer_buf(m_spi, txBuf, rxBuf, length);
         }
 #endif
+
         /**
          * Change the SPI lsb mode
          *
@@ -129,6 +136,7 @@ class Spi {
         mraa_result_t lsbmode(bool lsb) {
             return mraa_spi_lsbmode(m_spi, (mraa_boolean_t) lsb);
         }
+
         /**
          * Set bits per mode on transaction, default is 8
          *
@@ -138,7 +146,8 @@ class Spi {
         mraa_result_t bitPerWord(unsigned int bits) {
             return mraa_spi_bit_per_word(m_spi, bits);
         }
-            private:
-                mraa_spi_context m_spi;
-        };
+
+    private:
+        mraa_spi_context m_spi;
+};
 }
