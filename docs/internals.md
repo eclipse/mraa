@@ -17,7 +17,10 @@ only one, libmraa will try to be helpful and everything is treated as 6 when
 doing a mraa_i2c_init and so when this is the case, libmraa will always use the
 bus in the pinmapper. For example edison uses i2c #6 but since there is only
 one, libmraa will try to be helpful and everything is treated as 6 when doing a
-mraa_i2c_init().
+mraa_i2c_init(). The _raw functions will override the pinmapper and can be
+accessed without a valid board configuration. This can be helpful either in
+development of platform configurations for mraa or when modifying kernels
+etc... The mechanism is used heavily internaly.
 
 In libmraa, all code is split into 7 modules, src/{i2c, spi, gpio, uart, pwm,
 aio and common}. These should be fairly self explanatory in goals/purpose but a
@@ -43,8 +46,8 @@ context will lead to undefined behaviour.
 
 The mraa_board_t is defined in mraa/common.h. It's a mostly static structure
 initialised during mraa_init(). The pinmap file in
-src/{manufacturer}_{boardname}_{revision}.c then fills this array. It's also
-where platform hooks can be defined, functions that will be run at various
+src/{arch}/{manufacturer}_{boardname}_{revision}.c then fills this array. It's
+also where platform hooks can be defined, functions that will be run at various
 'hook' points in the code.
 
 The mraa_pininfo_t structure needs to be set for the board pincount (set in a
@@ -70,6 +73,15 @@ addresses please look at your sensors datasheet!
 
 ### spi ###
 
+Mraa deals exclusively with spidev, so when we say bus we really mean bus +
+chip select from spidev. Spi(0) could lead to spidev5.1 and Spi(1) to
+spidev5.2. Typically on a micro using a random gpio as a chip select works
+well, and on some platforms if one is careful with threads this can work well
+with mraa. However when a kernel module shares the same bus as spidev (but on a
+different CS) this behaviour is *very* dangerous. Platforms such as galileo
+gen2 & edison + arduino breakout work this way. Mraa will not help you in using
+a non HW chip select, do so at your own peril!
+
 ### gpio ###
 
 GPIO is probably the most complicated and odd module in libmraa. It is based on
@@ -92,6 +104,11 @@ hooks. We do support by default to go hit /dev/mem or another device at
 specific addresses to toggle gpios which is how mmap access works on some
 boards.
 
+Note that in Linux gpios are numbered from ARCH_NR_GPIOS down. This means that
+if ARCH_NR_GPIOS is changed, the gpio numbering will change. In 3.18+ the
+default changed from 256 to 512, sadly the value cannot be viewed from
+userspace so we rely on the kernel version to extrapolate the likely value.
+
 ### uart ###
 
 libmraa does not support UART/serial as there are many good libraries that do
@@ -101,6 +118,18 @@ set the pinmapper correctly for uart to work on some platforms.
 ### pwm ###
 
 ### aio ###
+
+AIO pins are numbered after GPIO pins. This means that on arduino style boards
+pin 14 is A0. Typically mraa will only support an ADC if a platform ships with
+one and has a good kernel module for it. extra i2c/spi ADCs can be supported
+via something like UPM but are unlikely to receive support in mraa at the moment.
+
+Note that giving mraa_aio_init(0) will literally query the pinmapper for
+board->gpio_count + 0 so you must place your aio pins after gpio_count. This is
+the default behaviour but can of course be overriden by advance function
+pointers. Whilst maybe not the sanest of defaults, most of the hobbyist boards
+we deal with follow a similar naming pattern to arduino or have no ADC so for
+now we have considered this sensible.
 
 ### Initialisation ###
 
@@ -119,12 +148,31 @@ never seen an issue in running it in a CTOR.
 
 ### SWIG ###
 
-At the time when libmraa was created the only - working - API/wrapper
-generation tool that supported nodejs was SWIG. For more general information on
-swig please see the swig documentation.
+At the time when libmraa was created (still the case?) the only - working -
+API/wrapper generation tool that supported nodejs was SWIG. For more general
+information on swig please see the swig documentation.
 
 The src/{javascript, python} & src/mraa.i folders contain all the files for the
 swig generation. The C++ headers in api/mraa/ are given as input sources to
 SWIG. SWIG modules do not link to libmraa (although maybe that would be a good
 idea...)
+
+Typemaps are used heavily to map uint8_t* pointers to bytearrays and
+node_buffers. These are native python & nodejs types that represent uint8_t
+data the best and are very well supported in both languages. Argument
+conversions and memory allocations are performed so the performance of using
+these functions compared to the C/C++ equivalent will likely be a little lower,
+however it is much more natural than using carrays.i typemap library.
+
+### NPM ###
+
+mraa is published on NPM, there is a target to prebuild a mraa src tarball that
+can be built with node-gyp. The way this works is to use the mraa_LIB_SRCS
+array to generate a binding.gyp file from the skeleton binding.gyp.cmake in
+src/javascript. Because we don't expect most NPM users to have SWIG we
+precompile the src/mraajsJAVASCRIPT_wrap.cxx. The src/version.c is already
+known since this is a static tarball so we write that too. These files are
+placed not in a build/ dir but in the main mraa dir. You can then tar the dir
+up and send it to NPM. This is done automatically on every commit by our
+automated build system.
 
