@@ -42,12 +42,12 @@ class Pwm {
          * instanciates a PWM object on a pin
          *
          * @param pin the pin number used on your board
-         * @param chipid the pwmchip to use, use only in raw mode
          * @param owner if you are the owner of the pin the destructor will
+         * @param chipid the pwmchip to use, use only in raw mode
          * unexport the pin from sysfs, default behaviour is you are the owner
          * if the pinmapper exported it
          */
-        Pwm(int pin, int chipid=-1, bool owner = true) {
+        Pwm(int pin, bool owner=true, int chipid=-1) {
             if (chipid == -1) {
                 m_pwm = mraa_pwm_init(pin);
             }
