@@ -91,20 +91,20 @@ class Spi {
          * @param data the byte to send
          * @return data received on the miso line
          */
-        char write(char data) {
-            return (char) mraa_spi_write(m_spi, (uint8_t) data);
+        uint8_t writeByte(uint8_t data) {
+            return mraa_spi_write(m_spi, (uint8_t) data);
         }
         /**
          * Write buffer of bytes to SPI device The pointer return has to be
 	 * free'd by the caller. It will return a NULL pointer in cases of
 	 * error
          *
-         * @param data buffer to send
+         * @param txBuf buffer to send
          * @param length size of buffer to send
-         * @return char* data received on the miso line. Same length as passed in
+         * @return uint8_t* data received on the miso line. Same length as passed in
          */
-        char* write(char* data, size_t length) {
-            return (char*) mraa_spi_write_buf(m_spi, (uint8_t *) data, (int) length);
+        uint8_t* write(uint8_t* txBuf, int length) {
+            return mraa_spi_write_buf(m_spi, txBuf, length);
         }
 #ifndef SWIG
         /**
@@ -116,8 +116,8 @@ class Spi {
          * @param length size of buffer to send
          * @return Result of operation
          */
-        mraa_result_t transfer(char* data, char* rxBuf, size_t length) {
-            return mraa_spi_transfer_buf(m_spi, (uint8_t *) data, (uint8_t *)rxBuf, (int) length);
+        mraa_result_t transfer(uint8_t* txBuf, uint8_t* rxBuf, int length) {
+            return mraa_spi_transfer_buf(m_spi, txBuf, rxBuf, length);
         }
 #endif
         /**

@@ -14,7 +14,23 @@
   $2 = node::Buffer::Length($input);
 }
 
+// Spi write()
+%typemap(in) (uint8_t *txBuf, int length) {
+  $1 = (uint8_t*) node::Buffer::Data($input);
+  $2 = node::Buffer::Length($input);
+}
+
+namespace mraa {
+class Spi;
+%typemap(out) uint8_t*
+{
+  // need to loop over length
+  $result = node::Buffer::New((char*) $1, arg3)->handle_;
+}
+}
+
 %newobject I2c::read(uint8_t *data, int length);
+%newobject Spi::write(uint8_t *data, int length);
 
 %typemap(in) (uint8_t *data, int length) {
    int x;

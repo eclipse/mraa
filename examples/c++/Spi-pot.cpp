@@ -48,9 +48,9 @@ int main ()
 
     spi = new mraa::Spi(0);
 
-    char data[] = {0x00, 100};
-    char rxBuf[2];
-    char *recv;
+    uint8_t data[] = {0x00, 100};
+    uint8_t rxBuf[2];
+    uint8_t *recv;
     while (running == 0) {
         int i;
         for (i = 90; i < 130; i++) {
