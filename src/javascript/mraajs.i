@@ -2,19 +2,18 @@
 
 %feature("autodoc", "3");
 
+%include carrays.i
 %array_class(uint8_t, uint8Array);
 
 %inline %{
   #include <node_buffer.h>
 %}
 
-// i2c write()
 %typemap(in) (const uint8_t *data, int length) {
   $1 = (uint8_t*) node::Buffer::Data($input);
   $2 = node::Buffer::Length($input);
 }
 
-// Spi write()
 %typemap(in) (uint8_t *txBuf, int length) {
   $1 = (uint8_t*) node::Buffer::Data($input);
   $2 = node::Buffer::Length($input);
@@ -24,7 +23,6 @@ namespace mraa {
 class Spi;
 %typemap(out) uint8_t*
 {
-  // need to loop over length
   $result = node::Buffer::New((char*) $1, arg3)->handle_;
 }
 }
@@ -52,8 +50,6 @@ class Spi;
        SWIG_exception_fail(SWIG_ERROR, "I2c write failed");
        SWIGV8_RETURN(v8::Undefined());
    }
-   // Append output value $1 to $result
-   // return the v8::handle of the node_buffer
    $result = node::Buffer::New((char*) $1, result)->handle_;
    free($1);
 }
