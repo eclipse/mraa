@@ -64,3 +64,10 @@ then you just add a line saying
 	Signed-off-by: Random J Developer <random@developer.example.org>
 
 Using your real name (sorry, no pseudonyms or anonymous contributions.)
+
+Where to find us
+----------------
+
+Hop onto the freenode network on IRC and join #mraa. Please be patient as we're
+not always online.
+

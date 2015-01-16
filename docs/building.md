@@ -2,18 +2,19 @@ Building libmraa                         {#building}
 ===============
 
 libmraa uses cmake in order to make compilation relatively painless. Cmake runs
-build out of tree so the recommended way is to clone from git and make a build/ directory.
+build out of tree so the recommended way is to clone from git and make a build/
+directory.
 
-You'll need swig version 3.0.2 and we recommend 3.0.3 to build the javascript
-modules. If you're version of SWIG is older than this then please see below for
-disabling SWIGNODE otherwise you will get a weird build failure.
+## Build dependencies
+Not all these are required but if you're unsure of what you're doing this is
+what you'll need:
+* swig 3.0.4+
+* git
+* python 2.7 or 3.4+ (you'll need not just the interpreter but python-dev)
+* nodejs 0.10.x (you'll need not just the interneter but nodejs-dev)
+* cmake 2.8.8+
 
-The basic build steps are as follow, we'll assume you're building from git,
-note that if you compile with git installed your version of mraa will be tagged
--dirty. This simply means git wasn't installed or that you where building form
-a tarball. You can modify build/src/version.c before running make if this is
-incorrect. The instructions listed here all assume that build/ is an empty dir
-that lives inside the cloned repository of mraa.
+## Basic build steps
 
 ~~~~~~~~~~~~~{.sh}
 mkdir build
@@ -21,6 +22,12 @@ cd build
 cmake ..
 make
 ~~~~~~~~~~~~~
+
+If this goes wrong and you have all the dependencies installed, then please
+file an issue with the full output of `cmake ..` and `make` or however far you
+got.
+
+## Configuration flags
 
 Our cmake configure has a number of options, cmake-gui or ccmake (cmake -i is
 no longer with us :() can show you all the options. A few of the more common
@@ -47,8 +54,26 @@ Disabling python module building
 Building doc, this will require sphinx & doxygen
  -BUILDDOC=ON
 
-Using a yocto/oe toolchain
---------------------------
+## Dependancies continued
+
+You'll need at least swig version 3.0.2 and we recommend 3.0.4 to build the
+javascript & python modules. If your version of SWIG is older than this then
+please see below for disabling SWIGNODE otherwise you will get a weird build
+failure when building the js module. The python module builds with swig 2.x.
+
+The basic build steps are as follow, we'll assume you're building from git,
+note that if you compile with git installed your version of mraa will be tagged
+-dirty. This simply means git wasn't installed or that you where building form
+a tarball. You can modify build/src/version.c before running make if this is
+incorrect. The instructions listed here all assume that build/ is an empty dir
+that lives inside the cloned repository of mraa.
+
+If you have multiple versions of python then mraa can get confused, we
+recommend using virtualenv to select which version of python you want. We test
+2.7 the most but swig will generate valid 3.x python code but we do not
+generally support building both at once.
+
+## Using a yocto/oe toolchain
 
 In order to compile with a yocto/oe toolchain use the following toolchain file.
 This works well on the edison 1.6 SDK. First source the environment file, then
@@ -61,8 +86,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/oe-sdk_cross.cmake ..
 make
 ~~~~~~~~~~~~~
 
-Using coverity
---------------
+## Using coverity
 
 Static analysis is routinely performed using coverity on libmraa's codebase.
 This is the procedure to submit a build to coverity. You'll need to install
