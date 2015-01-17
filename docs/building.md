@@ -43,7 +43,7 @@ Building debug build - adds -g and disables optimisations - this will force a fu
  -DCMAKE_BUILD_TYPE=DEBUG
 
 Using clang instead of gcc:
- -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang
+ -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
 
 Building with an older version of swig (swig < 3.0.2) requires the disabling of javascript:
  -DBUILDSWIGNODE=OFF
