@@ -129,7 +129,7 @@ mraa_i2c_init_raw(unsigned int bus)
 
     if (ioctl(dev->fh, I2C_FUNCS, &dev->funcs) < 0) {
         syslog(LOG_CRIT, "i2c: Failed to get I2C_FUNC map from device");
-        return NULL;
+        dev->funcs = 0;
     }
 
     if (advance_func->i2c_init_post != NULL) {
