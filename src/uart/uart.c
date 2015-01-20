@@ -83,7 +83,7 @@ mraa_uart_init(int index)
     memset(dev, 0, sizeof(struct _uart));
 
     dev->index = index;
-    dev->path = plat->uart_dev[index].device_path;
+    dev->path = (char*) plat->uart_dev[index].device_path;
     if (advance_func->uart_init_post != NULL) {
         mraa_result_t ret = advance_func->uart_init_post(dev);
         if (ret != MRAA_SUCCESS) {

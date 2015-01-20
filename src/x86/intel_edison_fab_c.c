@@ -1067,6 +1067,7 @@ mraa_intel_edison_miniboard(mraa_board_t* b)
     b->def_uart_dev = 0;
     b->uart_dev[0].rx = 26;
     b->uart_dev[0].tx = 35;
+    b->uart_dev[0].device_path = UART_DEV_PATH;
 
     return MRAA_SUCCESS;
 }
@@ -1365,13 +1366,7 @@ mraa_intel_edison_fab_c()
     b->def_uart_dev = 0;
     b->uart_dev[0].rx = 0;
     b->uart_dev[0].tx = 1;
-
-    int uart_path_length = strlen(UART_DEV_PATH) + 1;
-    b->uart_dev[0].device_path = (char*) malloc(sizeof(char) * uart_path_length);
-    if (b->uart_dev[0].device_path == NULL) {
-         goto error;
-    }
-    strncpy(b->uart_dev[0].device_path, UART_DEV_PATH, uart_path_length);
+    b->uart_dev[0].device_path = UART_DEV_PATH;
 
     int il;
     for (il =0; il < MRAA_INTEL_EDISON_PINCOUNT; il++) {
