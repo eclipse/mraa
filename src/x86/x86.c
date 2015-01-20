@@ -23,6 +23,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "mraa_internal.h"
 #include "x86/intel_galileo_rev_d.h"

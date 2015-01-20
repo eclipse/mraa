@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/utsname.h>
+#include <ctype.h>
 
 #include "common.h"
 #include "x86/intel_minnow_max.h"
