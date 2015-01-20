@@ -40,8 +40,11 @@ main(int argc, char **argv)
         case MRAA_INTEL_GALILEO_GEN1:
             gpio = mraa_gpio_init_raw(3);
             break;
-        case MRAA_INTEL_MINNOWBOARD_MAX:
-            gpio = mraa_gpio_init(21);
+	case MRAA_INTEL_MINNOWBOARD_MAX:
+	    // there is no onboard LED that we can flash on the minnowboard max
+	    // but on the calamari lure pin 21 is an LED. If you don't have the
+	    // lure put an LED on pin 21
+	    gpio = mraa_gpio_init(21);
             break;
         default:
             gpio = mraa_gpio_init(13);
@@ -61,7 +64,8 @@ main(int argc, char **argv)
         gpio_in = mraa_gpio_init(14);
 	if (gpio_in != NULL) {
             mraa_gpio_dir(gpio_in, MRAA_GPIO_IN);
-            fprintf(stdout, "Press and hold S1 to stop\n");
+            // S1 on minnowboardmax's calamari lure maps to pin 14, SW1 != S1
+            fprintf(stdout, "Press and hold S1 to stop, Press SW1 to shutdown!\n");
         }
     }
 
