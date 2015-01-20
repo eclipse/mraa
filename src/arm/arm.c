@@ -1,5 +1,6 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+ * Author: Michael Ring <mail@michael-ring.org>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -23,18 +24,51 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "mraa_internal.h"
-#include "arm/raspberry_pi_b.h"
+#include "arm/raspberry_pi.h"
+#include "arm/banana_pi.h"
+#include "arm/beaglebone.h"
 
 mraa_platform_t
 mraa_arm_platform()
 {
     mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
+    size_t len = 100;
+    char *line = malloc(len);
+    FILE *fh = fopen("/proc/cpuinfo", "r");
+    if (fh != NULL) {
+        while (getline(&line, &len, fh) != -1) {
+            if (strncmp(line, "Hardware", 8) == 0) {
+                if (strstr(line,"BCM2708")) {
+                    platform_type = MRAA_RASPBERRY_PI;
+                }
+                if (strstr(line,"sun7i")) {
+                    platform_type = MRAA_BANANA_PI;
+                    }
+                }
+            if (strstr(line,"Generic AM33XX")) {
+                platform_type = MRAA_BEAGLEBONE;
+            }
+        }
+        fclose(fh);
+    }
+    free(line);
 
-    //For the Time being, Will always be Raspberry PI when running ARM
-    platform_type = MRAA_RASPBERRY_PI_B;
-    plat = mraa_raspberry_pi_b();
-
+    switch(platform_type) {
+        case MRAA_BEAGLEBONE:
+            plat = mraa_beaglebone();
+            break;
+        case MRAA_RASPBERRY_PI:
+            plat = mraa_raspberry_pi();
+            break;
+        case MRAA_BANANA_PI:
+            plat = mraa_banana_pi();
+            break;
+        default:
+            plat = mraa_raspberry_pi();
+            syslog(LOG_ERR, "Platform not supported, initialising as MRAA_RASPBERRY_PI");
+    }
     return platform_type;
 }

@@ -1,5 +1,6 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+ * Author: Michael Ring <mail@michael-ring.org>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -30,10 +31,13 @@ extern "C" {
 
 #include "mraa_internal.h"
 
-#define MRAA_RASPBERRY_PI_B 27
+#define MRAA_RASPBERRY_PI_B_REV_1_PINCOUNT 27
+#define MRAA_RASPBERRY_PI_AB_REV_2_PINCOUNT 35
+#define MRAA_RASPBERRY_PI_AB_PLUS_PINCOUNT 41
+#define MRAA_RASPBERRY_PI_COMPUTE_MODULE_PINCOUNT 41
 
-mraa_board_t*
-mraa_raspberry_pi_b();
+mraa_board_t *
+        mraa_raspberry_pi();
 
 #ifdef __cplusplus
 }
