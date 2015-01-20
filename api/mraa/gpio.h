@@ -202,6 +202,14 @@ mraa_result_t mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap);
  */
 int mraa_gpio_get_pin(mraa_gpio_context dev);
 
+/**
+ * Get a gpio number as used within sysfs
+ *
+ * @param dev The Gpio context
+ * @return gpio number
+ */
+int mraa_gpio_get_pin_raw(mraa_gpio_context dev);
+
 #ifdef __cplusplus
 }
 #endif

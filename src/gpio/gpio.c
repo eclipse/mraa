@@ -583,5 +583,17 @@ mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap_en)
 int
 mraa_gpio_get_pin(mraa_gpio_context dev)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "gpio: context is invalid");
+    }
     return dev->phy_pin;
+}
+
+int
+mraa_gpio_get_pin_raw(mraa_gpio_context dev)
+{
+    if (dev == NULL) {
+        syslog(LOG_ERR, "gpio: context is invalid");
+    }
+    return dev->pin;
 }

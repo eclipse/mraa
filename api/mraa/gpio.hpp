@@ -186,11 +186,16 @@ class Gpio {
             return mraa_gpio_use_mmaped(m_gpio, (mraa_boolean_t) enable);
         }
         /**
-         * Get pin number of Gpio
+         * Get pin number of Gpio. If raw param is True will return the
+         * number as used within sysfs
          *
+         * @param raw (optional) get the raw gpio number.
          * @return Pin number
          */
-        int getPin() {
+        int getPin(bool raw = false) {
+            if (raw) {
+                return mraa_gpio_get_pin_raw(m_gpio);
+            }
             return mraa_gpio_get_pin(m_gpio);
         }
     private:
