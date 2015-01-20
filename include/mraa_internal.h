@@ -46,14 +46,6 @@ extern mraa_board_t* plat;
 mraa_result_t mraa_setup_mux_mapped(mraa_pin_t meta);
 
 /**
- * Setup uart muxes to exposes the pins physically.
- *
- * @param index of the uart in the board definition to expose physically
- * @return mraa_result_t of operation
- */
-mraa_result_t mraa_setup_uart(int index);
-
-/**
  * runtime detect running x86 platform
  *
  * @return mraa_platform_t of the init'ed platform

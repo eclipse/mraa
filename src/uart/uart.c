@@ -33,15 +33,53 @@
 mraa_uart_context
 mraa_uart_init(int index)
 {
-    if (advance_func->uart_init_pre != NULL) {
-        if (advance_func->uart_init_pre(index) != MRAA_SUCCESS)
-            return NULL;
+    if (plat == NULL) {
+        syslog(LOG_ERR, "uart: platform not initialised");
+        return NULL;
     }
 
-    if (mraa_setup_uart(index) != MRAA_SUCCESS)
+    if (advance_func->uart_init_pre != NULL) {
+        if (advance_func->uart_init_pre(index) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "uart: failure in pre-init platform hook");
+            return NULL;
+        }
+    }
+
+    if (plat->uart_dev_count == 0) {
+        syslog(LOG_ERR, "uart: platform has no UARTs defined");
         return NULL;
+    }
+
+    if (plat->uart_dev_count <= index) {
+        syslog(LOG_ERR, "uart: platform has only %i", plat->uart_dev_count);
+        return NULL;
+    }
+
+    int pos = plat->uart_dev[index].rx;
+    if (pos >= 0) {
+        if (plat->pins[pos].uart.mux_total > 0) {
+            if (mraa_setup_mux_mapped(plat->pins[pos].uart) != MRAA_SUCCESS) {
+                syslog(LOG_ERR, "uart: failed to setup muxes for RX pin");
+                return NULL;
+            }
+        }
+    }
+
+    if (pos >= 0) {
+        pos = plat->uart_dev[index].tx;
+        if (plat->pins[pos].uart.mux_total > 0) {
+            if (mraa_setup_mux_mapped(plat->pins[pos].uart) != MRAA_SUCCESS) {
+                syslog(LOG_ERR, "uart: failed to setup muxes for TX pin");
+                return NULL;
+            }
+        }
+    }
 
     mraa_uart_context dev = (mraa_uart_context) malloc(sizeof(struct _uart));
+    if (dev == NULL) {
+        syslog(LOG_CRIT, "uart: Failed to allocate memory for context");
+        return NULL;
+    }
     memset(dev, 0, sizeof(struct _uart));
 
     dev->index = index;
