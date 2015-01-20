@@ -140,6 +140,8 @@ mraa_intel_de3815()
     b->spi_bus[0].miso = 12;
     b->spi_bus[0].sclk = 13;
 
+    b->uart_dev_count = 0;
+
     return b;
 error:
     syslog(LOG_CRIT, "de3815: Platform failed to initialise");

@@ -54,6 +54,15 @@ typedef struct _uart* mraa_uart_context;
  */
 mraa_uart_context mraa_uart_init(int uart);
 
+/**
+ * Get Char pointer with tty device path within Linux
+ * For example. Could point to "/dev/ttyS0"
+ *
+ * @param dev uart context
+ * @return char pointer of device path
+ */
+char* mraa_uart_get_dev_path(mraa_uart_context dev);
+
 #ifdef __cplusplus
 }
 #endif

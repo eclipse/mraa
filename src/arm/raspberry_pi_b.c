@@ -28,6 +28,8 @@
 #include "common.h"
 #include "arm/raspberry_pi_b.h"
 
+#define UART_DEV_PATH "/dev/ttyAMA0"
+
 mraa_board_t*
 mraa_raspberry_pi_b()
 {
@@ -178,6 +180,17 @@ mraa_raspberry_pi_b()
     b->def_uart_dev = 0;
     b->uart_dev[0].rx = 10;
     b->uart_dev[0].tx = 8;
+    int uart_path_length = strlen(UART_DEV_PATH) + 1;
+    b->uart_dev[0].device_path = (char*) malloc(sizeof(char) * uart_path_length);
+    if (b->uart_dev[0].device_path == NULL) {
+         goto error;
+    }
+    strncpy(b->uart_dev[0].device_path, UART_DEV_PATH, uart_path_length);
 
     return b;
+
+error:
+    syslog(LOG_CRIT, "raspberry pi: board failed to initialise");
+    free(b);
+    return NULL;
 }

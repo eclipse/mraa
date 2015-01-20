@@ -55,6 +55,17 @@ class Uart {
         ~Uart() {
             return;
         }
+
+        /**
+         * Get string with tty device path within Linux
+         * For example. Could point to "/dev/ttyS0"
+         *
+         * @return char pointer of device path
+         */
+        std::string getDevicePath() {
+            std::string ret_val(mraa_uart_get_dev_path(m_uart));
+            return ret_val;
+        }
     private:
         mraa_uart_context m_uart;
 };

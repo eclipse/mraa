@@ -405,11 +405,25 @@ mraa_intel_galileo_rev_d()
     b->spi_bus[0].miso = 12;
     b->spi_bus[0].sclk = 13;
 
+    int uart_path_length = strlen("/dev/ttyS0") + 1;
+
+    b->uart_dev_count = 2;
     b->def_uart_dev = 0;
     b->uart_dev[0].rx = 0;
     b->uart_dev[0].tx = 1;
+    b->uart_dev[0].device_path = (char*) malloc(sizeof(char) * uart_path_length);
+    if (b->uart_dev[0].device_path == NULL) {
+        goto error;
+    }
+    strncpy(b->uart_dev[0].device_path, "/dev/ttyS0", uart_path_length);
+
     b->uart_dev[1].rx = -1;
     b->uart_dev[1].tx = -1;
+    b->uart_dev[1].device_path = (char*) malloc(sizeof(char) * uart_path_length);
+    if (b->uart_dev[1].device_path == NULL) {
+        goto error;
+    }
+    strncpy(b->uart_dev[1].device_path, "/dev/ttyS1", uart_path_length);
 
     return b;
 error:

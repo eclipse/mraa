@@ -181,6 +181,8 @@ mraa_intel_minnow_max()
     b->spi_bus[0].miso = 7;
     b->spi_bus[0].sclk = 11;
 
+    b->uart_dev_count = 0;
+
     return b;
 error:
     syslog(LOG_CRIT, "minnowmax: Platform failed to initialise");

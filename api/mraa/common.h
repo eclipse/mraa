@@ -149,6 +149,7 @@ typedef struct {
     unsigned int index; /**< ID as exposed in the system */
     int rx; /**< uart rx */
     int tx; /**< uart tx */
+    char* device_path; /**< To store "/dev/ttyS1" for example */
     /*@}*/
 } mraa_uart_dev_t;
 

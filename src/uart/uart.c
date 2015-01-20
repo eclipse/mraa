@@ -83,6 +83,7 @@ mraa_uart_init(int index)
     memset(dev, 0, sizeof(struct _uart));
 
     dev->index = index;
+    dev->path = plat->uart_dev[index].device_path;
     if (advance_func->uart_init_post != NULL) {
         mraa_result_t ret = advance_func->uart_init_post(dev);
         if (ret != MRAA_SUCCESS) {
@@ -92,4 +93,18 @@ mraa_uart_init(int index)
     }
 
     return dev;
+}
+
+char*
+mraa_uart_get_dev_path(mraa_uart_context dev)
+{
+    if (dev == NULL) {
+        syslog(LOG_ERR, "uart: get_device_path failed, context is NULL");
+        return "ERROR:CONTEXT_IS_NULL";
+    }
+    if (dev->path == NULL) {
+        syslog(LOG_ERR, "uart: device path undefined");
+        return "ERROR:PATH_NOT_SET";
+    }
+    return dev->path;
 }

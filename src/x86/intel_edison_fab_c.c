@@ -40,6 +40,7 @@
 // Might not always be correct. First thing to check if mmap stops
 // working. Check the device for 0x1199 and Intel Vendor (0x8086)
 #define MMAP_PATH "/sys/devices/pci0000:00/0000:00:0c.0/resource0"
+#define UART_DEV_PATH "/dev/ttyMFD1"
 
 typedef struct {
     int sysfs;
@@ -1364,6 +1365,13 @@ mraa_intel_edison_fab_c()
     b->def_uart_dev = 0;
     b->uart_dev[0].rx = 0;
     b->uart_dev[0].tx = 1;
+
+    int uart_path_length = strlen(UART_DEV_PATH) + 1;
+    b->uart_dev[0].device_path = (char*) malloc(sizeof(char) * uart_path_length);
+    if (b->uart_dev[0].device_path == NULL) {
+         goto error;
+    }
+    strncpy(b->uart_dev[0].device_path, UART_DEV_PATH, uart_path_length);
 
     int il;
     for (il =0; il < MRAA_INTEL_EDISON_PINCOUNT; il++) {
