@@ -305,7 +305,7 @@ mraa_get_platform_name()
 {
     if (plat == NULL)
         return "Unknown";
-    return plat->platform_name;
+    return (char*) plat->platform_name;
 }
 
 unsigned int

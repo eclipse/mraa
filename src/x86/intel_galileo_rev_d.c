@@ -125,13 +125,7 @@ mraa_intel_galileo_rev_d()
         return NULL;
     }
 
-    b->platform_name_length = strlen(PLATFORM_NAME) + 1;
-    b->platform_name = (char*) malloc(sizeof(char) * b->platform_name_length);
-    if (b->platform_name == NULL) {
-        goto error;
-    }
-    strncpy(b->platform_name, PLATFORM_NAME, b->platform_name_length);
-
+    b->platform_name = PLATFORM_NAME;
     b->phy_pin_count = 20;
     b->gpio_count = 14;
     b->aio_count = 6;

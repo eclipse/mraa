@@ -87,13 +87,7 @@ mraa_intel_minnow_max()
         return NULL;
     }
 
-    b->platform_name_length = strlen(PLATFORM_NAME) + 1;
-    b->platform_name = (char*) malloc(sizeof(char) * b->platform_name_length);
-    if (b->platform_name == NULL) {
-        goto error;
-    }
-    strncpy(b->platform_name, PLATFORM_NAME, b->platform_name_length);
-
+    b->platform_name = PLATFORM_NAME;
     b->phy_pin_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
     b->gpio_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
     b->aio_count = 0;

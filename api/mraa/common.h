@@ -175,8 +175,7 @@ typedef struct {
     int pwm_default_period; /**< The default PWM period is US */
     int pwm_max_period; /**< Maximum period in us */
     int pwm_min_period; /**< Minimum period in us */
-    unsigned int platform_name_length; /**< Platform Name length */
-    char* platform_name; /**< Platform Name pointer */
+    const char* platform_name; /**< Platform Name pointer */
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
     /*@}*/
 } mraa_board_t;
