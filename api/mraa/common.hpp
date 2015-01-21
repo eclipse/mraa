@@ -117,7 +117,7 @@ inline unsigned int adcSupportedBits()
 }
 
 /**
- * Return Platform Name. "Unknown" if no platform inited.
+ * Return Platform Name. Returns NULL if no platform inited.
  *
  * @return platform name
  */

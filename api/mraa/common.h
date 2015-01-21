@@ -237,7 +237,7 @@ unsigned int mraa_adc_supported_bits();
 mraa_result_t mraa_set_log_level(int level);
 
 /**
- * Return the Platform's Name, If no platform detected return "Unknown"
+ * Return the Platform's Name, If no platform detected return NULL
  *
  * @return platform name
  */

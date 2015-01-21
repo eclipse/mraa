@@ -303,8 +303,9 @@ mraa_adc_supported_bits()
 char*
 mraa_get_platform_name()
 {
-    if (plat == NULL)
-        return "Unknown";
+    if (plat == NULL) {
+        return NULL;
+    }
     return (char*) plat->platform_name;
 }
 
