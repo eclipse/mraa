@@ -28,9 +28,7 @@
 
 #include "mraa/gpio.h"
 
-extern mraa_board_t* plat;
-
-char board_name[] = "Some weird devboard that isn't recognised...";
+char* board_name;
 
 void
 print_version() {
@@ -42,6 +40,7 @@ print_help() {
     fprintf(stdout, "list              List pins\n");
     fprintf(stdout, "set pin level     Set pin to level (0/1)\n");
     fprintf(stdout, "get pin           Get pin level\n");
+    fprintf(stdout, "version           Get mraa version and board name\n");
 }
 
 void
@@ -50,29 +49,30 @@ print_command_error() {
     fprintf(stdout, "list              List pins\n");
     fprintf(stdout, "set pin level     Set pin to level (0/1)\n");
     fprintf(stdout, "get pin           Get pin level\n");
+    fprintf(stdout, "version           Get mraa version and board name\n");
 }
 
 void
 list_pins() {
-    const mraa_board_t* platformInfo = plat;
+    int pin_count = mraa_get_pin_count();
+    if (pin_count == 0) {
+        fprintf(stdout, "No Pins\n");
+        return;
+    }
     int i;
-    for (i = 0; i < platformInfo->phy_pin_count; ++i) {
-        const char *mraa_name = platformInfo->pins[i].name;
-        if (strcmp(mraa_name, "INVALID") != 0) {
-            mraa_pincapabilities_t caps = platformInfo->pins[i].capabilites;
-            fprintf(stdout, "%02d %-8s  ", i, mraa_name);
-            if (caps.gpio)
-                fprintf(stdout, "GPIO");
-            if (caps.i2c)
-                fprintf(stdout, "I2C");
-            if (caps.spi)
-                fprintf(stdout, "SPI");
-            if (caps.pwm)
-                fprintf(stdout, "PWM");
-            if (caps.uart)
-                fprintf(stdout, "UART");
-            fprintf(stdout, "\n");
-        }
+    for (i = 0; i < pin_count; ++i) {
+        fprintf(stdout, "%02d ", i);
+        if (mraa_pin_mode_test(i, MRAA_PIN_GPIO))
+            fprintf(stdout, "GPIO");
+        if (mraa_pin_mode_test(i, MRAA_PIN_I2C))
+            fprintf(stdout, "I2C");
+        if (mraa_pin_mode_test(i, MRAA_PIN_SPI))
+            fprintf(stdout, "SPI");
+        if (mraa_pin_mode_test(i, MRAA_PIN_PWM))
+            fprintf(stdout, "PWM");
+        if (mraa_pin_mode_test(i, MRAA_PIN_UART))
+            fprintf(stdout, "UART");
+        fprintf(stdout, "\n");
     }
 }
 
@@ -101,26 +101,10 @@ gpio_get(int pin, int* level) {
 int
 main(int argc, char **argv)
 {
-    mraa_platform_t platform = mraa_get_platform_type();
-
-    switch (platform) {
-        case MRAA_INTEL_GALILEO_GEN1:
-            strcpy(board_name, "Intel Galileo Gen1");
-            break;
-        case MRAA_INTEL_GALILEO_GEN2:
-            strcpy(board_name, "Intel Galileo Gen2");
-            break;
-        case MRAA_INTEL_EDISON_FAB_C:
-            strcpy(board_name, "Intel Edison");
-            break;
-        case MRAA_INTEL_MINNOWBOARD_MAX:
-            strcpy(board_name, "Intel Minnowboard Max");
-            break;
-        default:
-            fprintf(stdout, "Unknown platform code %d\n", platform);
-            return 1;
+    board_name = mraa_get_platform_name();
+    if (board_name == NULL) {
+        board_name = "Error";
     }
-
 
     if (argc == 1) {
         print_command_error();
@@ -131,6 +115,8 @@ main(int argc, char **argv)
             list_pins();
         } else if (strcmp(argv[1], "help") == 0) {
             print_help();
+        } else if (strcmp(argv[1], "version") == 0) {
+            print_version();
         } else if (strcmp(argv[1], "set") == 0) {
             if (argc == 4) {
                 int pin = atoi(argv[2]);
