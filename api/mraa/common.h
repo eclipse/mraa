@@ -278,6 +278,13 @@ void mraa_result_print(mraa_result_t result);
  */
 mraa_platform_t mraa_get_platform_type();
 
+/**
+ * Get platform pincount, board must be initialised.
+ *
+ * @return uint of physical pin count on the in-use platform
+ */
+unsigned int mraa_get_pin_count();
+
 #ifdef __cplusplus
 }
 #endif

@@ -128,6 +128,16 @@ inline std::string getPlatformName()
 }
 
 /**
+ * Return count of physical pins on the running platform
+ *
+ * @return uint of physical pins.
+ */
+inline unsigned int getPinCount()
+{
+    return mraa_get_pin_count();
+}
+
+/**
  * Sets the log level to use from 0-7 where 7 is very verbose. These are the
  * syslog log levels, see syslog(3) for more information on the levels.
  *

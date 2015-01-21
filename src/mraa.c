@@ -307,3 +307,12 @@ mraa_get_platform_name()
         return "Unknown";
     return plat->platform_name;
 }
+
+unsigned int
+mraa_get_pin_count()
+{
+    if (plat == NULL) {
+        return 0;
+    }
+    return plat->phy_pin_count;
+}
