@@ -23,7 +23,7 @@ Basic rules
 - Try not to break master. In any commit.
 - Try to split commits up logically, you will be asked to rebase them if they
   are not.
-- Try to stick to the established coding style reguardless of your personal feeling for it!
+- Try to stick to the established coding style regardless of your personal feeling for it!
 
 Code signing
 ------------
