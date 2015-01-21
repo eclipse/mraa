@@ -29,14 +29,17 @@
 #include "arm/raspberry_pi_b.h"
 
 #define UART_DEV_PATH "/dev/ttyAMA0"
+#define PLATFORM_NAME "Raspberry Pi B"
 
 mraa_board_t*
 mraa_raspberry_pi_b()
 {
     mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
-    if (b == NULL)
+    if (b == NULL) {
         return NULL;
+    }
 
+    b->platform_name = PLATFORM_NAME;
     b->phy_pin_count = MRAA_RASPBERRY_PI_B;
     b->aio_count = 0;
     b->adc_raw = 0;
