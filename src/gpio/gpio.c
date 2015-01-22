@@ -414,7 +414,16 @@ mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
     int direction = open(filepath, O_RDWR);
 
     if (direction == -1) {
-        return MRAA_ERROR_INVALID_RESOURCE;
+        // Direction Failed to Open. If HIGH or LOW was passed will try and set
+        // If not fail as usual.
+        switch (dir) {
+            case MRAA_GPIO_OUT_HIGH:
+                return mraa_gpio_write(dev, 1);
+            case MRAA_GPIO_OUT_LOW:
+                return mraa_gpio_write(dev, 0);
+            default:
+                return MRAA_ERROR_INVALID_RESOURCE;
+        }
     }
 
     char bu[MAX_SIZE];
