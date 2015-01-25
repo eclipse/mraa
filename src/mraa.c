@@ -70,8 +70,9 @@ mraa_init()
 #endif
 
     openlog("libmraa", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
-    syslog(LOG_DEBUG,
-           "libmraa initialised by user '%s' with EUID %d",
+    syslog(LOG_NOTICE,
+           "libmraa version %s initialised by user '%s' with EUID %d",
+           mraa_get_version(),
            (proc_user != NULL) ? proc_user->pw_name : "<unknown>",
            proc_euid);
 
