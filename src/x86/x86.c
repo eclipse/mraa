@@ -60,6 +60,9 @@ mraa_x86_platform()
             } else if (strncasecmp(line, "MinnowBoard MAX", 15) == 0) {
                 platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
                 plat = mraa_intel_minnow_max();
+            } else if (strncasecmp(line, "Galileo", 7) == 0) {
+                platform_type = MRAA_INTEL_GALILEO_GEN1;
+                plat = mraa_intel_galileo_rev_d();
             } else {
                 syslog(LOG_ERR, "Platform not supported, initialising as MRAA_INTEL_GALILEO_GEN1");
                 platform_type = MRAA_INTEL_GALILEO_GEN1;
