@@ -44,8 +44,10 @@ mraa_set_pininfo(mraa_board_t* board, int mraa_index, char *name, mraa_pincapabi
         mraa_pininfo_t* pin_info = &board->pins[mraa_index];
         strncpy(pin_info->name, name, 7);
         pin_info->capabilites = caps;
-        if (caps.gpio)
+        if (caps.gpio) {
             pin_info->gpio.pinmap = sysfs_pin | arch_nr_gpios_adjust;
+            pin_info->gpio.mux_total = 0;
+        }
         if (caps.i2c) {
             pin_info->i2c.pinmap = 1;
             pin_info->i2c.mux_total = 0;
