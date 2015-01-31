@@ -76,15 +76,6 @@ mraa_init()
            (proc_user != NULL) ? proc_user->pw_name : "<unknown>",
            proc_euid);
 
-    if (proc_euid != 0) {
-        char *err_msg = "mraa: FATAL error, "
-                        "libmraa program must be run as root (EUID 0), "
-                        "cannot proceed\n";
-        syslog(LOG_ERR, "%s", err_msg);
-        fprintf(stderr, "%s", err_msg);
-        return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
-    }
-
 #ifdef SWIGPYTHON
     // Initialise python threads, this allows use to grab the GIL when we are
     // required to do so
