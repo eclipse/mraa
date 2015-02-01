@@ -68,6 +68,14 @@ mraa_aio_context mraa_aio_init(unsigned int pin);
 unsigned int mraa_aio_read(mraa_aio_context dev);
 
 /**
+ * Read the input voltage and return it as a normalized float (0.0f-1.0f).
+ *
+ * @param dev The AIO context
+ * @returns The current input voltage as a normalized float (0.0f-1.0f)
+ */
+float mraa_aio_read_float(mraa_aio_context dev);
+
+/**
  * Close the analog input context, this will free the memory for the context
  *
  * @param dev The AIO context

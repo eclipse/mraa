@@ -66,6 +66,14 @@ class Aio {
             return mraa_aio_read(m_aio);
         }
         /**
+         * Read a value from the AIO pin and return it as a normalized float.
+         *
+         * @returns The current input voltage as a normalized float (0.0f-1.0f)
+         */
+        float readFloat() {
+            return mraa_aio_read_float(m_aio);
+        }
+        /**
          * Set the bit value which mraa will shift the raw reading
          * from the ADC to. I.e. 10bits
          * @param bits the bits the return from read should be i.e 10

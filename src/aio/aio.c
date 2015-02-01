@@ -159,6 +159,20 @@ mraa_aio_read(mraa_aio_context dev)
     return analog_value;
 }
 
+float
+mraa_aio_read_float(mraa_aio_context dev)
+{
+    if (dev == NULL) {
+        syslog(LOG_ERR, "aio: Device not valid");
+        return 0.0;
+    }
+
+    float max_analog_value = (1 << dev->value_bit) - 1;
+    unsigned int analog_value_int = mraa_aio_read(dev);
+
+    return analog_value_int / max_analog_value;
+}
+
 mraa_result_t
 mraa_aio_close(mraa_aio_context dev)
 {
