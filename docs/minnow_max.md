@@ -19,8 +19,8 @@ BIOS settings, as they are not dynamcially detected If any changes are mode
 (Device Manager -> System Setup -> South Cluster -> LPSS & CSS) them mraa calls
 will not behave as expected.
 
-Documentation shows i2c on bus #5, ACPI shows it on bus #6, but driver uses bus
-#7.
+Documentation shows i2c on bus #5, ACPI shows it on bus #6, but driver uses
+bus #7.
 
 **SPI operation is not currently supported**
 
