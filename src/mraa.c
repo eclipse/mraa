@@ -154,17 +154,13 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
         if (mux_i == NULL) {
             return MRAA_ERROR_INVALID_HANDLE;
         }
+        // this function will sometimes fail, however this is not critical as
+        // long as the write succeeds - Test case galileo gen2 pin2
+        mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
 
-        if (meta.mux[mi].value) {
-            if (mraa_gpio_dir(mux_i, MRAA_GPIO_OUT_HIGH) != MRAA_SUCCESS) {
-                mraa_gpio_close(mux_i);
-                return MRAA_ERROR_INVALID_RESOURCE;
-            }
-        } else {
-            if (mraa_gpio_dir(mux_i, MRAA_GPIO_OUT_LOW) != MRAA_SUCCESS) {
-                mraa_gpio_close(mux_i);
-                return MRAA_ERROR_INVALID_RESOURCE;
-            }
+        if (mraa_gpio_write(mux_i, meta.mux[mi].value) != MRAA_SUCCESS) {
+            mraa_gpio_close(mux_i);
+            return MRAA_ERROR_INVALID_RESOURCE;
         }
         mraa_gpio_close(mux_i);
     }
