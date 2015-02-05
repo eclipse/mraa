@@ -28,7 +28,13 @@
 
 #include "mraa/gpio.h"
 
+struct gpio_source {
+   int pin;
+   mraa_gpio_context context;
+};
+
 char* board_name;
+
 
 void
 print_version() {
@@ -40,16 +46,14 @@ print_help() {
     fprintf(stdout, "list              List pins\n");
     fprintf(stdout, "set pin level     Set pin to level (0/1)\n");
     fprintf(stdout, "get pin           Get pin level\n");
+    fprintf(stdout, "monitor pin       Monitor pin level changes\n");
     fprintf(stdout, "version           Get mraa version and board name\n");
 }
 
 void
 print_command_error() {
     fprintf(stdout, "Invalid command, options are:\n");
-    fprintf(stdout, "list              List pins\n");
-    fprintf(stdout, "set pin level     Set pin to level (0/1)\n");
-    fprintf(stdout, "get pin           Get pin level\n");
-    fprintf(stdout, "version           Get mraa version and board name\n");
+    print_help();
 }
 
 void
@@ -63,15 +67,15 @@ list_pins() {
     for (i = 0; i < pin_count; ++i) {
         fprintf(stdout, "%02d ", i);
         if (mraa_pin_mode_test(i, MRAA_PIN_GPIO))
-            fprintf(stdout, "GPIO");
+            fprintf(stdout, "GPIO ");
         if (mraa_pin_mode_test(i, MRAA_PIN_I2C))
-            fprintf(stdout, "I2C");
+            fprintf(stdout, "I2C ");
         if (mraa_pin_mode_test(i, MRAA_PIN_SPI))
-            fprintf(stdout, "SPI");
+            fprintf(stdout, "SPI ");
         if (mraa_pin_mode_test(i, MRAA_PIN_PWM))
-            fprintf(stdout, "PWM");
+            fprintf(stdout, "PWM ");
         if (mraa_pin_mode_test(i, MRAA_PIN_UART))
-            fprintf(stdout, "UART");
+            fprintf(stdout, "UART ");
         fprintf(stdout, "\n");
     }
 }
@@ -97,6 +101,34 @@ gpio_get(int pin, int* level) {
     } else
         return MRAA_ERROR_INVALID_RESOURCE;
 }
+
+
+void gpio_isr_handler(void * args) {
+   struct gpio_source* gpio_info = (struct gpio_source*)args;
+   int level = mraa_gpio_read(gpio_info->context);
+   fprintf(stdout, "Pin %d = %d\n", gpio_info->pin, level);
+}
+
+mraa_result_t
+gpio_isr_start(struct gpio_source* gpio_info) {
+    gpio_info->context = mraa_gpio_init(gpio_info->pin);
+    if (gpio_info->context != NULL) {
+        mraa_result_t status = mraa_gpio_dir(gpio_info->context, MRAA_GPIO_IN);
+        if (status == MRAA_SUCCESS)
+            status = mraa_gpio_isr(gpio_info->context, MRAA_GPIO_EDGE_BOTH, &gpio_isr_handler, gpio_info);
+        return status;
+    } else
+        return MRAA_ERROR_INVALID_RESOURCE;
+}
+
+
+mraa_result_t
+gpio_isr_stop(struct gpio_source* gpio_info) {
+    mraa_gpio_isr_exit(gpio_info->context);
+    mraa_gpio_close(gpio_info->context);
+    return MRAA_SUCCESS;
+}
+
 
 int
 main(int argc, char **argv)
@@ -134,7 +166,22 @@ main(int argc, char **argv)
                     fprintf(stdout, "Could not initialize gpio %d\n", pin);
             } else
                 print_command_error();
-        } else {
+         } else if (strcmp(argv[1], "monitor") == 0) {
+            if (argc == 3) {
+                int pin = atoi(argv[2]);
+                struct gpio_source gpio_info;
+                gpio_info.pin = pin;
+                if (gpio_isr_start(&gpio_info) == MRAA_SUCCESS) {
+                    fprintf(stdout, "Monitoring level changes to pin %d. Press RETURN to exit.\n", pin);
+                    gpio_isr_handler(&gpio_info);
+                    getchar();
+                    gpio_isr_stop(&gpio_info);
+                }                    
+                else
+                    fprintf(stdout, "Failed to register ISR for pin %d\n", pin);
+            } else
+                print_command_error();
+       } else {
             print_command_error();
         }
     }
