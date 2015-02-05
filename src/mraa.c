@@ -157,6 +157,7 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
         // this function will sometimes fail, however this is not critical as
         // long as the write succeeds - Test case galileo gen2 pin2
         mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
+        mraa_gpio_owner(mux_i, 0);
 
         if (mraa_gpio_write(mux_i, meta.mux[mi].value) != MRAA_SUCCESS) {
             mraa_gpio_close(mux_i);
