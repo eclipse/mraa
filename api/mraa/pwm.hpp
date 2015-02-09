@@ -52,7 +52,7 @@ class Pwm {
                 m_pwm = mraa_pwm_init(pin);
             }
             else {
-                m_pwm = mraa_pwm_init_raw(pin, chipid);
+                m_pwm = mraa_pwm_init_raw(chipid, pin);
             }
 
             if (m_pwm == NULL) {
