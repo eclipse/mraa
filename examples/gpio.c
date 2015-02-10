@@ -33,12 +33,9 @@ struct gpio_source {
    mraa_gpio_context context;
 };
 
-char* board_name;
-
-
 void
 print_version() {
-    fprintf(stdout, "Version %s on %s\n", mraa_get_version(), board_name);
+    fprintf(stdout, "Version %s on %s\n", mraa_get_version(), mraa_get_platform_name());
 }
 
 void
@@ -87,8 +84,8 @@ gpio_set(int pin, int level) {
         mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
         mraa_gpio_write(gpio, level);
         return MRAA_SUCCESS;
-    } else
-        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    return MRAA_ERROR_INVALID_RESOURCE;
 }
 
 mraa_result_t
@@ -98,8 +95,8 @@ gpio_get(int pin, int* level) {
         mraa_gpio_dir(gpio, MRAA_GPIO_IN);
         *level = mraa_gpio_read(gpio);
         return MRAA_SUCCESS;
-    } else
-        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    return MRAA_ERROR_INVALID_RESOURCE;
 }
 
 
@@ -114,11 +111,13 @@ gpio_isr_start(struct gpio_source* gpio_info) {
     gpio_info->context = mraa_gpio_init(gpio_info->pin);
     if (gpio_info->context != NULL) {
         mraa_result_t status = mraa_gpio_dir(gpio_info->context, MRAA_GPIO_IN);
-        if (status == MRAA_SUCCESS)
+        if (status == MRAA_SUCCESS) {
             status = mraa_gpio_isr(gpio_info->context, MRAA_GPIO_EDGE_BOTH, &gpio_isr_handler, gpio_info);
+        }
         return status;
-    } else
+    } else {
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
 }
 
 
@@ -133,11 +132,6 @@ gpio_isr_stop(struct gpio_source* gpio_info) {
 int
 main(int argc, char **argv)
 {
-    board_name = mraa_get_platform_name();
-    if (board_name == NULL) {
-        board_name = "Error";
-    }
-
     if (argc == 1) {
         print_command_error();
     }
@@ -154,18 +148,22 @@ main(int argc, char **argv)
                 int pin = atoi(argv[2]);
                 if (gpio_set(pin, atoi(argv[3])) != MRAA_SUCCESS)
                     fprintf(stdout, "Could not initialize gpio %d\n", pin);
-            } else
+            } else {
                 print_command_error();
+            }
         } else if (strcmp(argv[1], "get") == 0) {
             if (argc == 3) {
                 int pin = atoi(argv[2]);
                 int level;
-                if (gpio_get(pin, &level) == MRAA_SUCCESS)
+                if (gpio_get(pin, &level) == MRAA_SUCCESS) {
                     fprintf(stdout, "Pin %d = %d\n", pin, level);
-                else
+                }
+                else {
                     fprintf(stdout, "Could not initialize gpio %d\n", pin);
-            } else
+                }
+            } else {
                 print_command_error();
+            }
          } else if (strcmp(argv[1], "monitor") == 0) {
             if (argc == 3) {
                 int pin = atoi(argv[2]);
@@ -177,13 +175,15 @@ main(int argc, char **argv)
                     while (getchar() != '\n');
                     gpio_isr_stop(&gpio_info);
                 }
-                else
+                else {
                     fprintf(stdout, "Failed to register ISR for pin %d\n", pin);
-            } else
+               }
+            } else {
                 print_command_error();
+            }
        } else {
             print_command_error();
-        }
+       }
     }
     return 0;
 }
