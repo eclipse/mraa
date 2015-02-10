@@ -573,8 +573,10 @@ mraa_gpio_close(mraa_gpio_context dev)
 mraa_result_t
 mraa_gpio_owner(mraa_gpio_context dev, mraa_boolean_t own)
 {
-    if (dev == NULL)
+    if (dev == NULL) {
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    syslog(LOG_DEBUG, "gpio: Set owner to %d", (int) own);
     dev->owner = own;
     return MRAA_SUCCESS;
 }
