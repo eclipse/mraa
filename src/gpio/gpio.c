@@ -155,7 +155,7 @@ mraa_gpio_wait_interrupt(int fd)
     pfd.fd = fd;
     pfd.events = POLLPRI;
 
-    // do an initial read to clear interupt
+    // do an initial read to clear interrupt
     lseek (fd, 0, SEEK_SET);
     read (fd, &c, 1);
 
@@ -167,7 +167,7 @@ mraa_gpio_wait_interrupt(int fd)
     // poll is a cancelable point like sleep()
     int x = poll (&pfd, 1, -1);
 
-    // do a final read to clear interupt
+    // do a final read to clear interrupt
     read (fd, &c, 1);
 
     return MRAA_SUCCESS;
