@@ -156,6 +156,7 @@ mraa_gpio_wait_interrupt(int fd)
     pfd.events = POLLPRI;
 
     // do an initial read to clear interupt
+    lseek (fd, 0, SEEK_SET);
     read (fd, &c, 1);
 
     if (fd <= 0) {
