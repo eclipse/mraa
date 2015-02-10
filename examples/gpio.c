@@ -174,7 +174,7 @@ main(int argc, char **argv)
                 if (gpio_isr_start(&gpio_info) == MRAA_SUCCESS) {
                     fprintf(stdout, "Monitoring level changes to pin %d. Press RETURN to exit.\n", pin);
                     gpio_isr_handler(&gpio_info);
-                    getchar();
+                    while (getchar() != '\n');
                     gpio_isr_stop(&gpio_info);
                 }
                 else
