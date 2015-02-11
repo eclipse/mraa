@@ -66,6 +66,13 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.6.0**
+  * add device path queries for uart
+  * add platform configuration querying
+  * gpio sample added
+  * improve i2c/spi write/read API for python & nodejs
+  * performance improvements on edison & galileo
+
 **0.5.4**
   * pwm read_* fix introduced in 0.5.3
   * improved npmpkg support
