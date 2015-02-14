@@ -42,7 +42,9 @@ void
 print_help() {
     fprintf(stdout, "list              List pins\n");
     fprintf(stdout, "set pin level     Set pin to level (0/1)\n");
+    fprintf(stdout, "setraw pin level  Set pin to level (0/1) via mmap (if available)\n");
     fprintf(stdout, "get pin           Get pin level\n");
+    fprintf(stdout, "getraw pin        Get pin level via mmap (if available)\n");
     fprintf(stdout, "monitor pin       Monitor pin level changes\n");
     fprintf(stdout, "version           Get mraa version and board name\n");
 }
@@ -78,10 +80,15 @@ list_pins() {
 }
 
 mraa_result_t
-gpio_set(int pin, int level) {
+gpio_set(int pin, int level, mraa_boolean_t raw) {
     mraa_gpio_context gpio = mraa_gpio_init(pin);
     if (gpio != NULL) {
         mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
+        if (raw != 0) {
+            if (mraa_gpio_use_mmaped(gpio, 1) != MRAA_SUCCESS) {
+                fprintf(stdout, "mmapped access to gpio not supported, falling back to normal mode\n", pin);
+            }
+        }
         mraa_gpio_write(gpio, level);
         return MRAA_SUCCESS;
     }
@@ -89,10 +96,15 @@ gpio_set(int pin, int level) {
 }
 
 mraa_result_t
-gpio_get(int pin, int* level) {
+gpio_get(int pin, int *level, mraa_boolean_t raw) {
     mraa_gpio_context gpio = mraa_gpio_init(pin);
     if (gpio != NULL) {
         mraa_gpio_dir(gpio, MRAA_GPIO_IN);
+        if (raw != 0) {
+            if (mraa_gpio_use_mmaped(gpio, 1) != MRAA_SUCCESS) {
+                fprintf(stdout, "mmapped access to gpio not supported, falling back to normal mode\n", pin);
+            }
+        }
         *level = mraa_gpio_read(gpio);
         return MRAA_SUCCESS;
     }
@@ -143,19 +155,21 @@ main(int argc, char **argv)
             print_help();
         } else if (strcmp(argv[1], "version") == 0) {
             print_version();
-        } else if (strcmp(argv[1], "set") == 0) {
+        } else if ((strcmp(argv[1], "set") == 0) || (strcmp(argv[1], "setraw") == 0)) {
             if (argc == 4) {
                 int pin = atoi(argv[2]);
-                if (gpio_set(pin, atoi(argv[3])) != MRAA_SUCCESS)
+                mraa_boolean_t rawmode = strcmp(argv[1], "setraw") == 0;
+                if (gpio_set(pin, atoi(argv[3]), rawmode) != MRAA_SUCCESS)
                     fprintf(stdout, "Could not initialize gpio %d\n", pin);
             } else {
                 print_command_error();
             }
-        } else if (strcmp(argv[1], "get") == 0) {
+        } else if ((strcmp(argv[1], "get") == 0) || (strcmp(argv[1], "getraw") == 0)) {
             if (argc == 3) {
                 int pin = atoi(argv[2]);
                 int level;
-                if (gpio_get(pin, &level) == MRAA_SUCCESS) {
+                mraa_boolean_t rawmode = strcmp(argv[1], "getraw") == 0;
+                if (gpio_get(pin, &level, rawmode) == MRAA_SUCCESS) {
                     fprintf(stdout, "Pin %d = %d\n", pin, level);
                 }
                 else {
