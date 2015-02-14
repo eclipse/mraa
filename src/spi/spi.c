@@ -256,9 +256,48 @@ mraa_spi_write(mraa_spi_context dev, uint8_t data)
     return recv;
 }
 
+uint16_t
+mraa_spi_write_uint16(mraa_spi_context dev, uint16_t data) {
+    struct spi_ioc_transfer msg;
+    memset(&msg, 0, sizeof(msg));
+
+    uint16_t length = 2;
+
+    uint16_t recv = 0;
+    msg.tx_buf = (unsigned long) &data;
+    msg.rx_buf = (unsigned long) &recv;
+    msg.speed_hz = dev->clock;
+    msg.bits_per_word = dev->bpw;
+    msg.delay_usecs = 0;
+    msg.len = length;
+    if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
+        syslog(LOG_ERR, "spi: Failed to perform dev transfer");
+        return -1;
+    }
+    return recv;
+}
+
 mraa_result_t
 mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int length)
 {
+    struct spi_ioc_transfer msg;
+    memset(&msg, 0, sizeof(msg));
+
+    msg.tx_buf = (unsigned long) data;
+    msg.rx_buf = (unsigned long) rxbuf;
+    msg.speed_hz = dev->clock;
+    msg.bits_per_word = dev->bpw;
+    msg.delay_usecs = 0;
+    msg.len = length;
+    if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
+        syslog(LOG_ERR, "spi: Failed to perform dev transfer");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_spi_transfer_buf_uint16(mraa_spi_context dev, uint16_t *data, uint16_t *rxbuf, int length) {
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
 
@@ -286,6 +325,19 @@ mraa_spi_write_buf(mraa_spi_context dev, uint8_t* data, int length)
     }
     return recv;
 }
+
+uint16_t *
+mraa_spi_write_buf_uint16(mraa_spi_context dev, uint16_t *data, int length) {
+    uint16_t* recv = malloc(sizeof(uint16_t) * length);
+
+    if (mraa_spi_transfer_buf_uint16(dev, data, recv, length) != MRAA_SUCCESS) {
+        free(recv);
+        return NULL;
+    }
+    return recv;
+}
+
+
 
 mraa_result_t
 mraa_spi_stop(mraa_spi_context dev)
