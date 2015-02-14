@@ -56,7 +56,7 @@ mraa_spi_init(int bus)
         syslog(LOG_ERR, "spi: Platform Not Initialised");
         return NULL;
     }
-     if (plat->spi_bus_count == 0) {
+    if (plat->spi_bus_count == 0) {
         syslog(LOG_ERR, "spi: no spi buses defined in platform");
         return NULL;
     }
@@ -135,10 +135,29 @@ mraa_spi_init_raw(unsigned int bus, unsigned int cs)
         free(dev);
         return NULL;
     }
-    dev->bpw = 8;
-    dev->clock = 4000000;
-    dev->lsb = 0;
-    dev->mode = 0;
+
+    int speed = 0;
+    if ((ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) != -1) && (speed < 4000000)) {
+        dev->clock = speed;
+    }
+    else {
+        dev->clock = 4000000;
+    }
+
+    if (mraa_spi_mode(dev, MRAA_SPI_MODE0) != MRAA_SUCCESS) {
+        free(dev);
+        return NULL;
+    };
+
+    if (mraa_spi_lsbmode(dev, 0) != MRAA_SUCCESS) {
+        free(dev);
+        return NULL;
+    };
+
+    if (mraa_spi_bit_per_word(dev, 8) != MRAA_SUCCESS) {
+        free(dev);
+        return NULL;
+    };
 
     return dev;
 }
@@ -177,7 +196,14 @@ mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode)
 mraa_result_t
 mraa_spi_frequency(mraa_spi_context dev, int hz)
 {
+    int speed = 0;
     dev->clock = hz;
+    if (ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) != -1) {
+        if (speed < hz) {
+            dev->clock = speed;
+            syslog(LOG_WARNING, "spi: Selected speed reduced to max allowed speed");
+        }
+    }
     return MRAA_SUCCESS;
 }
 
