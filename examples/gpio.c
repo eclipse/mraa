@@ -66,11 +66,11 @@ list_pins() {
         if (mraa_pin_mode_test(i, MRAA_PIN_GPIO))
             fprintf(stdout, "GPIO ");
         if (mraa_pin_mode_test(i, MRAA_PIN_I2C))
-            fprintf(stdout, "I2C ");
+            fprintf(stdout, "I2C  ");
         if (mraa_pin_mode_test(i, MRAA_PIN_SPI))
-            fprintf(stdout, "SPI ");
+            fprintf(stdout, "SPI  ");
         if (mraa_pin_mode_test(i, MRAA_PIN_PWM))
-            fprintf(stdout, "PWM ");
+            fprintf(stdout, "PWM  ");
         if (mraa_pin_mode_test(i, MRAA_PIN_UART))
             fprintf(stdout, "UART ");
         fprintf(stdout, "\n");
