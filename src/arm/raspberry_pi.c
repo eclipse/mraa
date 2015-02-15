@@ -70,15 +70,15 @@ mraa_raspberry_pi_spi_init_pre(int index) {
     char devpath[MAX_SIZE];
     sprintf(devpath, "/dev/spidev%u.0", plat->spi_bus[index].bus_id);
     if (!mraa_file_exist(devpath)) {
+        syslog(LOG_INFO, "trying modprobe for spi-bcm2708");
         system("modprobe spi-bcm2708 >/dev/null 2>&1");
+        syslog(LOG_INFO, "trying modprobe for spi_bcm2708");
         system("modprobe spi_bcm2708 >/dev/null 2>&1");
+        if (mraa_file_exist(devpath))
+          return MRAA_SUCCESS;
     }
-    if (mraa_file_exist(devpath))
-        ret = MRAA_SUCCESS;
-    else {
-        syslog(LOG_ERR, "spi: Device not initialized");
-        syslog(LOG_ERR, "spi: If you run a kernel >=3.18 then you will have to add dtparam=spi=on to /boot/config.txt and reboot");
-    }
+    syslog(LOG_ERR, "spi: Device not initialized");
+    syslog(LOG_ERR, "spi: If you run a kernel >=3.18 then you will have to add dtparam=spi=on to /boot/config.txt and reboot");
     return ret;
 }
 
