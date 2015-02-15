@@ -48,37 +48,37 @@ main(int argc, char **argv) {
         exit(1);
     };
 
-    mraa_spi_write_uint16(spi, 0x0900);  // Do not decode bits
-    mraa_spi_write_uint16(spi, 0x0a05);  // Brightness of LEDs
-    mraa_spi_write_uint16(spi, 0x0b07);  // Show all Scan Lines
-    mraa_spi_write_uint16(spi, 0x0c01);  // Display on
-    mraa_spi_write_uint16(spi, 0x0f00);  // Testmode off
+    mraa_spi_write_word(spi, 0x0900);  // Do not decode bits
+    mraa_spi_write_word(spi, 0x0a05);  // Brightness of LEDs
+    mraa_spi_write_word(spi, 0x0b07);  // Show all Scan Lines
+    mraa_spi_write_word(spi, 0x0c01);  // Display on
+    mraa_spi_write_word(spi, 0x0f00);  // Testmode off
 
     // Display Pattern on the display
     uint16_t dataAA55[] = {0x01aa, 0x0255, 0x03aa, 0x0455, 0x05aa, 0x0655, 0x07aa, 0x0855};
-    mraa_spi_write_buf_uint16(spi, dataAA55, 16);
+    mraa_spi_write_buf_word(spi, dataAA55, 16);
 
     sleep(2);
 
     // Display inverted Pattern
     uint16_t data55AA[] = {0x0155, 0x02aa, 0x0355, 0x04aa, 0x0555, 0x06aa, 0x0755, 0x08aa};
-    mraa_spi_write_buf_uint16(spi, data55AA, 16);
+    mraa_spi_write_buf_word(spi, data55AA, 16);
 
     sleep(2);
 
     // Clear the display
     uint16_t data[] = {0x0100, 0x0200, 0x0300, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800};
-    mraa_spi_write_buf_uint16(spi, data, 16);
+    mraa_spi_write_buf_word(spi, data, 16);
 
     int i;
     int j;
     // cycle through all LED's
     for (i = 1; i <= 8; i++) {
         for (j = 0; j < 8; j++) {
-            mraa_spi_write_uint16(spi, (i << 8) + (1 << j));
+            mraa_spi_write_word(spi, (i << 8) + (1 << j));
             sleep(1);
         }
-        mraa_spi_write_uint16(spi, i << 8);
+        mraa_spi_write_word(spi, i << 8);
     }
 
     mraa_spi_stop(spi);

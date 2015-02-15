@@ -110,7 +110,7 @@ uint8_t mraa_spi_write(mraa_spi_context dev, uint8_t data);
 * @param data Data to send
 * @return Data received on the miso line
 */
-uint16_t mraa_spi_write_uint16(mraa_spi_context dev, uint16_t data);
+uint16_t mraa_spi_write_word(mraa_spi_context dev, uint16_t data);
 
 /** Write Buffer of bytes to the SPI device. The pointer return has to be
  * free'd by the caller. It will return a NULL pointer in cases of error.
@@ -130,7 +130,7 @@ uint8_t* mraa_spi_write_buf(mraa_spi_context dev, uint8_t* data, int length);
 * @param length elements (in bytes) within buffer, Max 4096
 * @return Data received on the miso line, same length as passed in
 */
-uint16_t* mraa_spi_write_buf_uint16(mraa_spi_context dev, uint16_t* data, int length);
+uint16_t* mraa_spi_write_buf_word(mraa_spi_context dev, uint16_t* data, int length);
 
 /** Transfer Buffer of bytes to the SPI device. Both send and recv buffers
  * are passed in
@@ -152,7 +152,7 @@ mraa_result_t mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t
 * @param length elements (in bytes) within buffer, Max 4096
 * @return Result of operation
 */
-mraa_result_t mraa_spi_transfer_buf_uint16(mraa_spi_context dev, uint16_t* data, uint16_t* rxbuf, int length);
+mraa_result_t mraa_spi_transfer_buf_word(mraa_spi_context dev, uint16_t* data, uint16_t* rxbuf, int length);
 
 /**
  * Change the SPI lsb mode

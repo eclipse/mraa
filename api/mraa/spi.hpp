@@ -105,8 +105,8 @@ class Spi {
          * @param data the byte to send
          * @return data received on the miso line
          */
-        uint16_t write_uint16(uint16_t data) {
-            return mraa_spi_write_uint16(m_spi, (uint16_t) data);
+        uint16_t write_word(uint16_t data) {
+            return mraa_spi_write_word(m_spi, (uint16_t) data);
         }
 
         /**
@@ -131,8 +131,8 @@ class Spi {
          * @param length size of buffer (in bytes) to send
          * @return uint8_t* data received on the miso line. Same length as passed in
          */
-        uint16_t* write_uint16(uint16_t* txBuf, int length) {
-            return mraa_spi_write_buf_uint16(m_spi, txBuf, length);
+        uint16_t* write_word(uint16_t* txBuf, int length) {
+            return mraa_spi_write_buf_word(m_spi, txBuf, length);
         }
 
 #ifndef SWIG
@@ -158,8 +158,8 @@ class Spi {
          * @param length size of buffer to send
          * @return Result of operation
          */
-        mraa_result_t transfer_uint16(uint16_t* txBuf, uint16_t* rxBuf, int length) {
-            return mraa_spi_transfer_buf_uint16(m_spi, txBuf, rxBuf, length);
+        mraa_result_t transfer_word(uint16_t* txBuf, uint16_t* rxBuf, int length) {
+            return mraa_spi_transfer_buf_word(m_spi, txBuf, rxBuf, length);
         }
 #endif
 
