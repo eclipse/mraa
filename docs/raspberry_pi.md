@@ -1,27 +1,28 @@
-Raspberry Pi Model B    {#rasppib}
-====================
+Raspberry Pi    {#rasppi}
+============
 
-The Raspberry Pi is based on the Broadcom BCM2835 system on a chip,
-which includes an ARM1176JZF-S 700 MHz processor, VideoCore IV GPU
-and was originally shipped with 256 megabytes of RAM, later 
-upgraded (Model B & Model B+) to 512 MB.
+The Raspberry Pi is based on the Broadcom BCM2835 system on a chip, which
+includes an ARM1176JZF-S 700 MHz processor, VideoCore IV GPU and was originally
+shipped with 256 megabytes of RAM, later upgraded (Model B & Model B+) to 512
+MB. The Raspberry Pi 2 is based on an armv7 CPU but shares a number of
+similarities with the original.
 
 Revision Support
 ----------------
-Currently only rev 1 is supported.
+Raspberry Pi A/B/A+/B+
+Raspberry Pi 2 B
 
 Interface notes
 ---------------
-**GPIO** Supported on pin 6,10,11,12,14,15,17,21
 
 **PWM** Whilst the Raspberry Pi is meant to have 1 PWM channel this is currently not supported.
 
-**I2C** The blacklist for the kernel module will need to be removed and the `i2c-dev` needs to be loaded.
-
-**SPI** The blacklist for the kernel module needs to be removed and `spidev` loaded
-
 Pin Mapping
 -----------
+
+This pin mapping refers to the first generation 'B' model Pi but gives an idea
+as to what the values are from mraa. Note that there is an emum to use wiringPi
+style numbers.
 
 | MRAA Number | Physical Pin | Function |
 |-------------|--------------|----------|

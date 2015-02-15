@@ -25,7 +25,7 @@ X86
 
 ARM
 ---
-* [Raspberry Pi - Model B](../master/docs/raspberry_pi_b.md)
+* [Raspberry Pi](../master/docs/raspberry_pi.md)
 
 Installing on your board
 ========
