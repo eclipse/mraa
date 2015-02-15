@@ -111,8 +111,8 @@ class Spi {
 
         /**
          * Write buffer of bytes to SPI device The pointer return has to be
-	     * free'd by the caller. It will return a NULL pointer in cases of
-	     * error
+         * free'd by the caller. It will return a NULL pointer in cases of
+         * error
          *
          * @param txBuf buffer to send
          * @param length size of buffer to send
