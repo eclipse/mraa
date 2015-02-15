@@ -10,6 +10,7 @@ add_executable (mmap-io2 mmap-io2.c)
 add_executable (blink_onboard blink_onboard.c)
 add_executable (uart_setup uart_setup.c)
 add_executable (gpio gpio.c)
+add_executable (i2c_ht16k33 i2c_ht16k33.c)
 
 include_directories(${PROJECT_SOURCE_DIR}/api)
 
@@ -25,6 +26,7 @@ target_link_libraries (mmap-io2 mraa)
 target_link_libraries (blink_onboard mraa)
 target_link_libraries (uart_setup mraa)
 target_link_libraries (gpio mraa)
+target_link_libraries (i2c_ht16k33 mraa)
 
 add_subdirectory (c++)
 
