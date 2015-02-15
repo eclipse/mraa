@@ -59,6 +59,31 @@ mraa_platform_t mraa_x86_platform();
  */
 mraa_platform_t mraa_arm_platform();
 
+/**
+* helper function to check if file exists
+*
+* @param filename to check
+* @return mraa_boolean_t boolean result.
+*/
+mraa_boolean_t mraa_file_exist(char *filename);
+
+/**
+* helper function to unglob filenames
+*
+* @param filename to unglob
+* @return char * with the existing filename matching the pattern of input. NULL if there is no match. Caller must free result
+*/
+char * mraa_file_unglob(char *filename);
+
+/**
+* helper function to find out if file that is targeted by a softlink (partially) matches the given name
+*
+* @param filename of the softlink
+* @param (partial) filename that is matched with the filename of the link-targeted file
+* @return mraa_boolean_t true when targetname (partially) matches
+*/
+mraa_boolean_t mraa_link_targets(char *filename,char *targetname);
+
 #ifdef __cplusplus
 }
 #endif
