@@ -28,6 +28,8 @@
 #include <sched.h>
 #include <string.h>
 #include <pwd.h>
+#include <glob.h>
+
 
 #include "mraa_internal.h"
 #include "gpio.h"
@@ -309,4 +311,53 @@ mraa_get_pin_count()
         return 0;
     }
     return plat->phy_pin_count;
+}
+
+mraa_boolean_t mraa_file_exist(char *filename) {
+    glob_t results;
+    results.gl_pathc = 0;
+    glob(filename, 0, NULL, &results);
+    int file_found = results.gl_pathc == 1;
+    globfree(&results);
+    return file_found;
+}
+
+char *mraa_file_unglob(char *filename) {
+    glob_t results;
+    char *res = NULL;
+    results.gl_pathc = 0;
+    glob(filename, 0, NULL, &results);
+    if (results.gl_pathc == 1)
+        res = strdup(results.gl_pathv[0]);
+    globfree(&results);
+    return res;
+}
+
+mraa_boolean_t mraa_link_targets(char *filename,char *targetname) {
+    int size = 100;
+    int nchars = 0;
+    char *buffer = NULL;
+    while (nchars == 0)
+    {
+        buffer = (char *) realloc(buffer,size);
+        if (buffer == NULL)
+            return 0;
+        nchars = readlink(filename,buffer,size);
+        if (nchars < 0 ) {
+            free(buffer);
+            return 0;
+        }
+        if (nchars >= size) {
+            size *=2;
+            nchars=0;
+        }
+    }
+    if (strstr(buffer,targetname)) {
+        free(buffer);
+        return 1;
+    }
+    else {
+        free(buffer);
+        return 0;
+    }
 }
