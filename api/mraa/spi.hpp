@@ -100,6 +100,16 @@ class Spi {
         }
 
         /**
+         * Write single byte to the SPI device
+         *
+         * @param data the byte to send
+         * @return data received on the miso line
+         */
+        uint16_t write_word(uint16_t data) {
+            return mraa_spi_write_word(m_spi, (uint16_t) data);
+        }
+
+        /**
          * Write buffer of bytes to SPI device The pointer return has to be
 	 * free'd by the caller. It will return a NULL pointer in cases of
 	 * error
@@ -110,6 +120,19 @@ class Spi {
          */
         uint8_t* write(uint8_t* txBuf, int length) {
             return mraa_spi_write_buf(m_spi, txBuf, length);
+        }
+
+        /**
+         * Write buffer of bytes to SPI device The pointer return has to be
+         * free'd by the caller. It will return a NULL pointer in cases of
+         * error
+         *
+         * @param txBuf buffer to send
+         * @param length size of buffer (in bytes) to send
+         * @return uint8_t* data received on the miso line. Same length as passed in
+         */
+        uint16_t* write_word(uint16_t* txBuf, int length) {
+            return mraa_spi_write_buf_word(m_spi, txBuf, length);
         }
 
 #ifndef SWIG
@@ -124,6 +147,19 @@ class Spi {
          */
         mraa_result_t transfer(uint8_t* txBuf, uint8_t* rxBuf, int length) {
             return mraa_spi_transfer_buf(m_spi, txBuf, rxBuf, length);
+        }
+
+        /**
+         * Transfer data to and from SPI device Receive pointer may be null if
+         * return data is not needed.
+         *
+         * @param data buffer to send
+         * @param rxBuf buffer to optionally receive data from spi device
+         * @param length size of buffer to send
+         * @return Result of operation
+         */
+        mraa_result_t transfer_word(uint16_t* txBuf, uint16_t* rxBuf, int length) {
+            return mraa_spi_transfer_buf_word(m_spi, txBuf, rxBuf, length);
         }
 #endif
 
