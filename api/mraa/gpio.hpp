@@ -118,6 +118,31 @@ class Gpio {
         mraa_result_t isr(Edge mode, PyObject *pyfunc, PyObject* args) {
             return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, (void (*) (void *)) pyfunc, (void *) args);
         }
+#elif defined(SWIGJAVASCRIPT)
+        static void v8isr(uv_work_t* req, int status) {
+            mraa::Gpio *This = (mraa::Gpio *)req->data;
+            int argc = 1;
+            v8::Local<v8::Value> argv[] = { v8::Integer::New(-1) };
+            This->m_v8isr->Call(v8::Context::GetCurrent()->Global(), argc, argv);
+            delete req;
+        }
+
+        static void nop(uv_work_t* req)
+        {
+            // Do nothing.
+        }
+
+        static void uvwork(void *ctx) {
+            uv_work_t* req = new uv_work_t;
+            req->data = ctx;
+            uv_queue_work(uv_default_loop(), req, nop, v8isr);
+        }
+
+        mraa_result_t isr(Edge mode, v8::Handle<v8::Function> func) {
+            m_v8isr = v8::Persistent<v8::Function>::New(func);
+            mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, &uvwork, this);
+            return MRAA_SUCCESS;
+        }
 #else
         /**
          * Sets a callback to be called when pin value changes
@@ -139,6 +164,9 @@ class Gpio {
          * @return Result of operation
          */
         mraa_result_t isrExit() {
+#if defined(SWIGJAVASCRIPT)
+            m_v8isr.Dispose();
+#endif
             return mraa_gpio_isr_exit(m_gpio);
         }
         /**
@@ -200,6 +228,9 @@ class Gpio {
         }
     private:
         mraa_gpio_context m_gpio;
+#if defined(SWIGJAVASCRIPT)
+        v8::Persistent<v8::Function> m_v8isr;
+#endif
 };
 
 }

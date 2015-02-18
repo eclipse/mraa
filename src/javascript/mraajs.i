@@ -3,6 +3,7 @@
 %feature("autodoc", "3");
 
 %include carrays.i
+%include cpointer.i
 %array_class(uint8_t, uint8Array);
 
 %inline %{
@@ -17,6 +18,10 @@
 %typemap(in) (uint8_t *txBuf, int length) {
   $1 = (uint8_t*) node::Buffer::Data($input);
   $2 = node::Buffer::Length($input);
+}
+
+%typemap(in) (v8::Handle<v8::Function> func) {
+  $1 = v8::Local<v8::Function>::Cast($input);
 }
 
 namespace mraa {

@@ -12,7 +12,7 @@
       'cflags_cc!': [ '-fno-rtti', '-fno-exceptions' ],
       'cflags!': [ '-fno-exceptions' ],
       'defines' : [ 'SWIG',
-                    'SWIGNODE',
+                    'SWIGJAVASCRIPT',
 		    'BUILDING_NODE_EXTENSION=1' ],
       'conditions' : [
           [ 'target_arch=="x64"',

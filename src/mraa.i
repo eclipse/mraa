@@ -43,6 +43,11 @@
 
 %include "types.h"
 
+%ignore Gpio::nop(uv_work_t* req);
+%ignore Gpio::v8isr(uv_work_t* req);
+%ignore Gpio::v8isr(uv_work_t* req, int status);
+%ignore Gpio::uvwork(void *ctx);
+
 %include "gpio.hpp"
 
 %include "i2c.hpp"
