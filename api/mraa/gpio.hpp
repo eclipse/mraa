@@ -140,8 +140,7 @@ class Gpio {
 
         mraa_result_t isr(Edge mode, v8::Handle<v8::Function> func) {
             m_v8isr = v8::Persistent<v8::Function>::New(func);
-            mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, &uvwork, this);
-            return MRAA_SUCCESS;
+            return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, &uvwork, this);
         }
 #else
         /**
