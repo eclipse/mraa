@@ -151,6 +151,10 @@ mraa_gpio_wait_interrupt(int fd)
     unsigned char c;
     struct pollfd pfd;
 
+    if (fd < 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
     // setup poll on POLLPRI
     pfd.fd = fd;
     pfd.events = POLLPRI;
@@ -158,10 +162,6 @@ mraa_gpio_wait_interrupt(int fd)
     // do an initial read to clear interrupt
     lseek (fd, 0, SEEK_SET);
     read (fd, &c, 1);
-
-    if (fd <= 0) {
-        return MRAA_ERROR_INVALID_RESOURCE;
-    }
 
     // Wait for it forever or until pthread_cancel
     // poll is a cancelable point like sleep()
