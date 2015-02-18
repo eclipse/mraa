@@ -100,11 +100,11 @@ mraa_uart_get_dev_path(mraa_uart_context dev)
 {
     if (dev == NULL) {
         syslog(LOG_ERR, "uart: get_device_path failed, context is NULL");
-        return "ERROR:CONTEXT_IS_NULL";
+        return NULL;
     }
     if (dev->path == NULL) {
         syslog(LOG_ERR, "uart: device path undefined");
-        return "ERROR:PATH_NOT_SET";
+        return NULL;
     }
     return dev->path;
 }
