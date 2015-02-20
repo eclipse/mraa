@@ -151,7 +151,7 @@ mraa_gpio_wait_interrupt(int fd)
     unsigned char c;
     struct pollfd pfd;
 
-    if (fd <= 0) {
+    if (fd < 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
