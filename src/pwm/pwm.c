@@ -163,6 +163,9 @@ mraa_pwm_read_duty(mraa_pwm_context dev)
 mraa_pwm_context
 mraa_pwm_init(int pin)
 {
+    if (advance_func->pwm_init_replace != NULL)
+        return advance_func->pwm_init_replace(pin);
+
     if (advance_func->pwm_init_pre != NULL) {
         if (advance_func->pwm_init_pre(pin) != MRAA_SUCCESS)
             return NULL;
