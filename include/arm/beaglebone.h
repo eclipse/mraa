@@ -23,48 +23,19 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdlib.h>
-#include <string.h>
+#pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "mraa_internal.h"
-#include "arm/raspberry_pi.h"
-#include "arm/beaglebone.h"
 
-mraa_platform_t
-mraa_arm_platform()
-{
-    mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
-    size_t len = 100;
-    char *line = malloc(len);
-    FILE *fh = fopen("/proc/cpuinfo", "r");
-    if (fh != NULL) {
-        while (getline(&line, &len, fh) != -1) {
-            if (strncmp(line, "Hardware", 8) == 0) {
-                if (strstr(line, "BCM2708")) {
-                    platform_type = MRAA_RASPBERRY_PI;
-                }
-                if (strstr(line, "BCM2709")) {
-                    platform_type = MRAA_RASPBERRY_PI;
-                }
-                if (strstr(line, "Generic AM33XX")) {
-                    platform_type = MRAA_BEAGLEBONE;
-                }
-            }
-        }
-        fclose(fh);
-    }
-    free(line);
+#define MRAA_BEAGLEBONE_BLACK_PINCOUNT 93
 
-    switch(platform_type) {
-        case MRAA_RASPBERRY_PI:
-            plat = mraa_raspberry_pi();
-            break;
-        case MRAA_BEAGLEBONE:
-            plat = mraa_beaglebone();
-            break;
-        default:
-            plat = NULL;
-            syslog(LOG_ERR, "Unknown Platform, currently not supported by MRAA");
-    }
-    return platform_type;
+mraa_board_t *
+        mraa_beaglebone();
+
+#ifdef __cplusplus
 }
+#endif
