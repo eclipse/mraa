@@ -268,8 +268,10 @@ mraa_beaglebone_spi_init_pre(int index) {
         plat->spi_bus[index].bus_id = deviceindex;
         ret = MRAA_SUCCESS;
     }
-    else
-        syslog(LOG_ERR, "spi: Device not initialized");
+    else {
+        syslog(LOG_ERR, "spi: Device not initialized, check that /lib/firmware/%s exists", SPI_OVERLAY, index);
+        syslog(LOG_ERR, "spi: Check http://elinux.org/BeagleBone_Black_Enable_SPIDEV for details");
+    }
     return ret;
 }
 
@@ -300,8 +302,9 @@ mraa_beaglebone_i2c_init_pre(unsigned int bus) {
     }
     if (mraa_file_exist(devpath))
         ret = MRAA_SUCCESS;
-    else
-        syslog(LOG_ERR, "i2c: Device not initialized");
+    else {
+        syslog(LOG_ERR, "i2c: Device not initialized, check that /lib/firmware/ADAFRUIT-I2C%d exists", index);
+    }
     return ret;
 }
 
@@ -362,7 +365,7 @@ mraa_beaglebone_pwm_init_replace(int pin) {
         return dev;
     }
     else
-        syslog(LOG_ERR, "pwm: pin not initialized");
+        syslog(LOG_ERR, "pwm: pin not initialized, check that /lib/firmware/%s exists",SYSFS_PWM_OVERLAY);
     return NULL;
 }
 
