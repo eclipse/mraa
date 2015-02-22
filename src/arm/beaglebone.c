@@ -458,7 +458,7 @@ mraa_beaglebone() {
         b->phy_pin_count = MRAA_BEAGLEBONE_BLACK_PINCOUNT;
     }
     if (is_rev_c == 1) {
-        b->platform_name, PLATFORM_NAME_BEAGLEBONE_BLACK_REV_C;
+        b->platform_name = PLATFORM_NAME_BEAGLEBONE_BLACK_REV_C;
         b->phy_pin_count = MRAA_BEAGLEBONE_BLACK_PINCOUNT;
     }
 
