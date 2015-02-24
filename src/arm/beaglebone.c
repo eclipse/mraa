@@ -1162,9 +1162,9 @@ mraa_beaglebone() {
     b->pins[72].gpio.mux_total = 0;
     b->pins[72].uart.mux_total = 0;
 
-    strncpy(b->pins[73].name, "GPIO125", 8);
+    strncpy(b->pins[73].name, "GPIO115", 8);
     b->pins[73].capabilites = (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 0};
-    b->pins[73].gpio.pinmap = 125;
+    b->pins[73].gpio.pinmap = 115;
     b->pins[73].gpio.parent_id = 0;
     b->pins[73].gpio.mux_total = 0;
 
