@@ -46,7 +46,9 @@ typedef unsigned int mraa_boolean_t;
 /**
  * Initialise MRAA
  *
- * Detects running platform and attempts to use included pinmap
+ * Detects running platform and attempts to use included pinmap, this is run on
+ * module/library init/load but is handy to rerun to check board initialised
+ * correctly. Anything but MRAA_SUCCESS should be considered a critical failure
  *
  * @return Result of operation
  */
