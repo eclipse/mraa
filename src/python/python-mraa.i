@@ -13,6 +13,9 @@
     // whilst this may seem 'hopeful' it turns out this is safe
     $1 = (uint8_t*) PyByteArray_AsString($input);
     $2 = PyByteArray_Size($input);
+  } else {
+    PyErr_SetString(PyExc_ValueError, "bytearray expected");
+    return NULL;
   }
 }
 
@@ -22,6 +25,9 @@
     // whilst this may seem 'hopeful' it turns out this is safe
     $1 = (uint8_t*) PyByteArray_AsString($input);
     $2 = PyByteArray_Size($input);
+  } else {
+    PyErr_SetString(PyExc_ValueError, "bytearray expected");
+    return NULL;
   }
 }
 
