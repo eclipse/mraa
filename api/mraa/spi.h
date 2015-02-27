@@ -84,7 +84,7 @@ mraa_spi_context mraa_spi_init_raw(unsigned int bus, unsigned int cs);
  *
  * @param dev The Spi context
  * @param mode The SPI mode, See Linux spidev
- * @return Spi context or NULL
+ * @return Result of operation
  */
 mraa_result_t mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode);
 
@@ -92,7 +92,7 @@ mraa_result_t mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode);
  *
  * @param dev the Spi context
  * @param hz the frequency in hz
- * @return mraa_spi_context The returned initialised SPI context
+ * @return Result of operation
  */
 mraa_result_t mraa_spi_frequency(mraa_spi_context dev, int hz);
 
