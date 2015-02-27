@@ -88,7 +88,8 @@ mraa_spi_context mraa_spi_init_raw(unsigned int bus, unsigned int cs);
  */
 mraa_result_t mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode);
 
-/** Set the SPI device operating clock frequency.
+/**
+ * Set the SPI device operating clock frequency.
  *
  * @param dev the Spi context
  * @param hz the frequency in hz
@@ -96,7 +97,8 @@ mraa_result_t mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode);
  */
 mraa_result_t mraa_spi_frequency(mraa_spi_context dev, int hz);
 
-/** Write Single Byte to the SPI device.
+/**
+ * Write Single Byte to the SPI device.
  *
  * @param dev The Spi context
  * @param data Data to send
@@ -104,15 +106,17 @@ mraa_result_t mraa_spi_frequency(mraa_spi_context dev, int hz);
  */
 uint8_t mraa_spi_write(mraa_spi_context dev, uint8_t data);
 
-/** Write Two Bytes to the SPI device.
-*
-* @param dev The Spi context
-* @param data Data to send
-* @return Data received on the miso line
-*/
+/**
+ *Write Two Bytes to the SPI device.
+ *
+ * @param dev The Spi context
+ * @param data Data to send
+ * @return Data received on the miso line
+ */
 uint16_t mraa_spi_write_word(mraa_spi_context dev, uint16_t data);
 
-/** Write Buffer of bytes to the SPI device. The pointer return has to be
+/**
+ * Write Buffer of bytes to the SPI device. The pointer return has to be
  * free'd by the caller. It will return a NULL pointer in cases of error.
  *
  * @param dev The Spi context
@@ -122,17 +126,19 @@ uint16_t mraa_spi_write_word(mraa_spi_context dev, uint16_t data);
  */
 uint8_t* mraa_spi_write_buf(mraa_spi_context dev, uint8_t* data, int length);
 
-/** Write Buffer of uint16 to the SPI device. The pointer return has to be
-* free'd by the caller. It will return a NULL pointer in cases of error.
-*
-* @param dev The Spi context
-* @param data to send
-* @param length elements (in bytes) within buffer, Max 4096
-* @return Data received on the miso line, same length as passed in
-*/
+/**
+ * Write Buffer of uint16 to the SPI device. The pointer return has to be
+ * free'd by the caller. It will return a NULL pointer in cases of error.
+ *
+ * @param dev The Spi context
+ * @param data to send
+ * @param length elements (in bytes) within buffer, Max 4096
+ * @return Data received on the miso line, same length as passed in
+ */
 uint16_t* mraa_spi_write_buf_word(mraa_spi_context dev, uint16_t* data, int length);
 
-/** Transfer Buffer of bytes to the SPI device. Both send and recv buffers
+/**
+ * Transfer Buffer of bytes to the SPI device. Both send and recv buffers
  * are passed in
  *
  * @param dev The Spi context
@@ -143,15 +149,16 @@ uint16_t* mraa_spi_write_buf_word(mraa_spi_context dev, uint16_t* data, int leng
  */
 mraa_result_t mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int length);
 
-/** Transfer Buffer of uint16 to the SPI device. Both send and recv buffers
-* are passed in
-*
-* @param dev The Spi context
-* @param data to send
-* @param rxbuf buffer to recv data back, may be NULL
-* @param length elements (in bytes) within buffer, Max 4096
-* @return Result of operation
-*/
+/**
+ * Transfer Buffer of uint16 to the SPI device. Both send and recv buffers
+ * are passed in
+ *
+ * @param dev The Spi context
+ * @param data to send
+ * @param rxbuf buffer to recv data back, may be NULL
+ * @param length elements (in bytes) within buffer, Max 4096
+ * @return Result of operation
+ */
 mraa_result_t mraa_spi_transfer_buf_word(mraa_spi_context dev, uint16_t* data, uint16_t* rxbuf, int length);
 
 /**
