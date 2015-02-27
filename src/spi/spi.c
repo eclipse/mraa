@@ -42,7 +42,7 @@
 struct _spi {
     /*@{*/
     int devfd; /**< File descriptor to SPI Device */
-    int mode; /**< Spi mode see spidev.h */
+    uint32_t mode; /**< Spi mode see spidev.h */
     int clock; /**< clock to run transactions at */
     mraa_boolean_t lsb; /**< least significant bit mode */
     unsigned int bpw; /**< Bits per word */
