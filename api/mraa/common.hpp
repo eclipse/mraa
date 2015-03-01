@@ -40,6 +40,20 @@ namespace mraa {
  */
 
 /**
+ * Initialise MRAA
+ *
+ * Detects running platform and attempts to use included pinmap, this is run on
+ * module/library init/load but is handy to rerun to check board initialised
+ * correctly. Anything but MRAA_SUCCESS should be considered a critical failure
+ *
+ * @return Result of operation
+ */
+inline mraa_result_t init()
+{
+    return mraa_init();
+}
+
+/**
  * Get libmraa version.
  *
  * @return libmraa version (e.g. v0.4.0-20-gb408207)

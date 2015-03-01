@@ -4,13 +4,13 @@ Contributing to libmraa                           {#contributing}
 libmraa is an opensource project and we are actively looking for people to help
 with:
 
-- Writing platform supports for all types of embedded boards running linux
-- People to write cool samples
-- People to extend the functionality
+- Writing platform supports for all types of boards running linux
+- People to extend the functionality, API with useful functions
+- Anything we haven't thought about :) Ideas always welcome!
 
 The recommended method to contribute is to fork on github, and then send pull
-requests to the main project. Questions can be also be asked and issues raised
-on github.
+requests to the main project. You can open issues if you find any bugs/have
+questions.
 
 If you'd rather not use github you are more than welcome to send git formatted
 patches to brendan.le.foll@intel.com.

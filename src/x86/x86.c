@@ -64,9 +64,8 @@ mraa_x86_platform()
                 platform_type = MRAA_INTEL_GALILEO_GEN1;
                 plat = mraa_intel_galileo_rev_d();
             } else {
-                syslog(LOG_ERR, "Platform not supported, initialising as MRAA_INTEL_GALILEO_GEN1");
-                platform_type = MRAA_INTEL_GALILEO_GEN1;
-                plat = mraa_intel_galileo_rev_d();
+                syslog(LOG_ERR, "Platform not supported, not initialising");
+                platform_type = MRAA_UNKNOWN_PLATFORM;
             }
             free(line);
         }

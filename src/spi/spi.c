@@ -42,7 +42,7 @@
 struct _spi {
     /*@{*/
     int devfd; /**< File descriptor to SPI Device */
-    int mode; /**< Spi mode see spidev.h */
+    uint32_t mode; /**< Spi mode see spidev.h */
     int clock; /**< clock to run transactions at */
     mraa_boolean_t lsb; /**< least significant bit mode */
     unsigned int bpw; /**< Bits per word */
@@ -147,17 +147,17 @@ mraa_spi_init_raw(unsigned int bus, unsigned int cs)
     if (mraa_spi_mode(dev, MRAA_SPI_MODE0) != MRAA_SUCCESS) {
         free(dev);
         return NULL;
-    };
+    }
 
     if (mraa_spi_lsbmode(dev, 0) != MRAA_SUCCESS) {
         free(dev);
         return NULL;
-    };
+    }
 
     if (mraa_spi_bit_per_word(dev, 8) != MRAA_SUCCESS) {
         free(dev);
         return NULL;
-    };
+    }
 
     return dev;
 }
@@ -257,7 +257,8 @@ mraa_spi_write(mraa_spi_context dev, uint8_t data)
 }
 
 uint16_t
-mraa_spi_write_word(mraa_spi_context dev, uint16_t data) {
+mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
+{
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
 
@@ -297,7 +298,8 @@ mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int l
 }
 
 mraa_result_t
-mraa_spi_transfer_buf_word(mraa_spi_context dev, uint16_t *data, uint16_t *rxbuf, int length) {
+mraa_spi_transfer_buf_word(mraa_spi_context dev, uint16_t* data, uint16_t* rxbuf, int length)
+{
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
 
@@ -326,8 +328,9 @@ mraa_spi_write_buf(mraa_spi_context dev, uint8_t* data, int length)
     return recv;
 }
 
-uint16_t *
-mraa_spi_write_buf_word(mraa_spi_context dev, uint16_t *data, int length) {
+uint16_t*
+mraa_spi_write_buf_word(mraa_spi_context dev, uint16_t *data, int length)
+{
     uint16_t* recv = malloc(sizeof(uint16_t) * length);
 
     if (mraa_spi_transfer_buf_word(dev, data, recv, length) != MRAA_SUCCESS) {
@@ -336,8 +339,6 @@ mraa_spi_write_buf_word(mraa_spi_context dev, uint16_t *data, int length) {
     }
     return recv;
 }
-
-
 
 mraa_result_t
 mraa_spi_stop(mraa_spi_context dev)
