@@ -55,7 +55,11 @@ mraa_set_log_level(int level)
     return MRAA_ERROR_INVALID_PARAMETER;
 }
 
+#if (defined SWIGPYTHON) || (defined SWIG)
+mraa_result_t
+#else
 mraa_result_t __attribute__((constructor))
+#endif
 mraa_init()
 {
     if (plat != NULL) {
