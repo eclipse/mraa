@@ -55,6 +55,7 @@ option (BUILDSWIG "Build swig modules." ON)
 option (BUILDSWIGPYTHON "Build swig python modules." ON)
 option (BUILDSWIGNODE "Build swig node modules." ON)
 option (IPK "Generate IPK using CPack" OFF)
+option (BUILDPYTHON3 "Use python3 for building/installing" OFF)
 
 include (TargetArch)
 target_architecture (DETECTED_ARCH)
