@@ -252,7 +252,6 @@ mraa_intel_edison_misc_spi()
     mraa_gpio_close(io12_p1);
     mraa_gpio_close(io13_p1);
 
-    mraa_intel_edison_pinmode_change(111, 1);
     mraa_intel_edison_pinmode_change(115, 1);
     mraa_intel_edison_pinmode_change(114, 1);
     mraa_intel_edison_pinmode_change(109, 1);
@@ -377,7 +376,6 @@ mraa_result_t
 mraa_intel_edison_spi_init_pre(int bus)
 {
     if (miniboard == 1) {
-        mraa_intel_edison_pinmode_change(111, 1);
         mraa_intel_edison_pinmode_change(115, 1);
         mraa_intel_edison_pinmode_change(114, 1);
         mraa_intel_edison_pinmode_change(109, 1);
