@@ -102,7 +102,7 @@ class I2c {
         }
 
         /**
-	 * Read length bytes from the bus into *data pointer
+         * Read length bytes from the bus into *data pointer
          *
          * @param data Data to read into
          * @param length Size of read in bytes to make
