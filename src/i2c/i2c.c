@@ -200,6 +200,27 @@ mraa_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
     return 0xFFFF & d.word;
 }
 
+int
+mraa_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* data, int length)
+{
+    struct i2c_rdwr_ioctl_data d;
+    struct i2c_msg m[2];
+
+    m[0].addr = dev->addr;
+    m[0].flags = I2C_M_RD;
+    m[0].len = 1;
+    m[0].buf = &command;
+    m[1].addr = dev->addr;
+    m[1].flags = 0x00;
+    m[1].len = length;
+    m[1].buf = data;
+
+    d.msgs = m;
+    d.nmsgs = 2;
+
+    return ioctl(dev->fh, I2C_RDWR, &d) < 0 ? -1 : length;
+}
+
 mraa_result_t
 mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length)
 {
