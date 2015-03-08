@@ -55,7 +55,7 @@ main(int argc, char **argv) {
             printf("Could not set SPI Device to 16Bit mode, exit...\n");
             exit(1);
         }
-        printf("Hardware support for 16Bit mode not available switched to software cs\n");
+        printf("Hardware support for 16Bit mode not available switched to software cs. SPI performance may suffer.\n");
     }
 
     mraa_spi_write_word(spi, 0x0900);  // Do not decode bits
