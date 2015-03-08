@@ -174,6 +174,20 @@ class Spi {
         }
 
         /**
+         *
+         */
+        mraa_result_t hwcs(bool hwcs) {
+            return mraa_spi_hw_cs(m_spi, (mraa_boolean_t) hwcs);
+        }
+
+      /**
+      *
+      */
+      mraa_result_t swcs(mraa_spi_soft_bits_t softbits,int pin) {
+          return mraa_spi_sw_cs(m_spi,softbits,pin);
+      }
+
+      /**
          * Set bits per mode on transaction, default is 8
          *
          * @param bits bits per word
