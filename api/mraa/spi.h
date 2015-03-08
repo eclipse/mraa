@@ -102,9 +102,9 @@ mraa_result_t mraa_spi_frequency(mraa_spi_context dev, int hz);
  *
  * @param dev The Spi context
  * @param data Data to send
- * @return Data received on the miso line
+ * @return Data received on the miso line or -1 in case of error
  */
-uint8_t mraa_spi_write(mraa_spi_context dev, uint8_t data);
+int mraa_spi_write(mraa_spi_context dev, uint8_t data);
 
 /**
  *Write Two Bytes to the SPI device.

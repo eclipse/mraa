@@ -234,7 +234,7 @@ mraa_spi_bit_per_word(mraa_spi_context dev, unsigned int bits)
     return MRAA_SUCCESS;
 }
 
-uint8_t
+int
 mraa_spi_write(mraa_spi_context dev, uint8_t data)
 {
     struct spi_ioc_transfer msg;
@@ -242,7 +242,7 @@ mraa_spi_write(mraa_spi_context dev, uint8_t data)
 
     uint16_t length = 1;
 
-    uint8_t recv = 0;
+    unsigned long recv = 0;
     msg.tx_buf = (unsigned long) &data;
     msg.rx_buf = (unsigned long) &recv;
     msg.speed_hz = dev->clock;
@@ -253,7 +253,7 @@ mraa_spi_write(mraa_spi_context dev, uint8_t data)
         syslog(LOG_ERR, "spi: Failed to perform dev transfer");
         return -1;
     }
-    return recv;
+    return (int) recv;
 }
 
 uint16_t

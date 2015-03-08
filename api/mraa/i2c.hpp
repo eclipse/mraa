@@ -102,7 +102,7 @@ class I2c {
         }
 
         /**
-	 * Read length bytes from the bus into *data pointer
+         * Read length bytes from the bus into *data pointer
          *
          * @param data Data to read into
          * @param length Size of read in bytes to make
@@ -130,6 +130,19 @@ class I2c {
          */
         uint16_t readWordReg(uint8_t reg) {
             return mraa_i2c_read_word_data(m_i2c, reg);
+        }
+
+        /**
+         * Read length bytes from the bus into *data pointer starting from
+         * an i2c register
+         *
+         * @param reg Register to read from
+         * @param data pointer to the byte array to read data in to
+         * @param length max number of bytes to read
+         * @return length passed to the function or 0
+         */
+        int readBytesReg(uint8_t reg, uint8_t* data, int length) {
+            return mraa_i2c_read_bytes_data(m_i2c, reg, data, length);
         }
 
         /**

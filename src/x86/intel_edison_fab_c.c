@@ -252,7 +252,6 @@ mraa_intel_edison_misc_spi()
     mraa_gpio_close(io12_p1);
     mraa_gpio_close(io13_p1);
 
-    mraa_intel_edison_pinmode_change(111, 1);
     mraa_intel_edison_pinmode_change(115, 1);
     mraa_intel_edison_pinmode_change(114, 1);
     mraa_intel_edison_pinmode_change(109, 1);
@@ -377,7 +376,6 @@ mraa_result_t
 mraa_intel_edison_spi_init_pre(int bus)
 {
     if (miniboard == 1) {
-        mraa_intel_edison_pinmode_change(111, 1);
         mraa_intel_edison_pinmode_change(115, 1);
         mraa_intel_edison_pinmode_change(114, 1);
         mraa_intel_edison_pinmode_change(109, 1);
@@ -674,33 +672,46 @@ mraa_intel_edison_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
 mraa_result_t
 mraa_intel_edison_i2c_freq(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 {
-    if (dev->busnum == 6) {
-        int sysnode = open("/sys/devices/pci0000:00/0000:00:09.1/i2c_dw_sysnode", O_RDWR);
-        if (sysnode == -1) {
-            return MRAA_ERROR_INVALID_RESOURCE;
-        }
+    int sysnode = -1;
 
-        char bu[5];
-        int length;
-        switch (mode) {
-            case MRAA_I2C_STD:
-                length = snprintf(bu, sizeof(bu), "std");
-                break;
-            case MRAA_I2C_FAST:
-                length = snprintf(bu, sizeof(bu), "fast");
-                break;
-            case MRAA_I2C_HIGH:
-                length = snprintf(bu, sizeof(bu), "high");
-                break;
-        }
-        if (write(sysnode, bu, length*sizeof(char)) == -1) {
-            close(sysnode);
-            return MRAA_ERROR_INVALID_RESOURCE;
-        }
-        close(sysnode);
-        return MRAA_SUCCESS;
+    switch (dev->busnum) {
+        case 1:
+            sysnode = open("/sys/devices/pci0000:00/0000:00:08.0/i2c_dw_sysnode/mode", O_RDWR);
+            break;
+        case 6:
+            sysnode = open("/sys/devices/pci0000:00/0000:00:09.1/i2c_dw_sysnode/mode", O_RDWR);
+            break;
+        default:
+            syslog(LOG_NOTICE, "i2c bus selected does not support frequency changes");
+            return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
     }
-    return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    if (sysnode == -1) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    char bu[5];
+    int length;
+    switch (mode) {
+        case MRAA_I2C_STD:
+            length = snprintf(bu, sizeof(bu), "std");
+            break;
+        case MRAA_I2C_FAST:
+            length = snprintf(bu, sizeof(bu), "fast");
+            break;
+        case MRAA_I2C_HIGH:
+            length = snprintf(bu, sizeof(bu), "high");
+            break;
+        default:
+            syslog(LOG_ERR, "Invalid i2c mode selected");
+            close(sysnode);
+            return MRAA_ERROR_INVALID_PARAMETER;
+    }
+    if (write(sysnode, bu, length*sizeof(char)) == -1) {
+        close(sysnode);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    close(sysnode);
+    return MRAA_SUCCESS;
 }
 
 mraa_result_t
