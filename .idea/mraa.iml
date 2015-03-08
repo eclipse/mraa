@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="CPP_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$USER_HOME$/Library/Caches/clion10/cmake/generated/3c24f981/3c24f981/Debug0/src/version.c">
+      <sourceFolder url="file://$USER_HOME$/Library/Caches/clion10/cmake/generated/3c24f981/3c24f981/Debug0/src/version.c" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/Library/Caches/clion10/cmake/generated/3c24f981/3c24f981/MinSizeRel0/src/version.c">
+      <sourceFolder url="file://$USER_HOME$/Library/Caches/clion10/cmake/generated/3c24f981/3c24f981/MinSizeRel0/src/version.c" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/Library/Caches/clion10/cmake/generated/3c24f981/3c24f981/RelWithDebInfo0/src/version.c">
+      <sourceFolder url="file://$USER_HOME$/Library/Caches/clion10/cmake/generated/3c24f981/3c24f981/RelWithDebInfo0/src/version.c" isTestSource="false" />
+    </content>
+    <content url="file://$USER_HOME$/Library/Caches/clion10/cmake/generated/3c24f981/3c24f981/Release0/src/version.c">
+      <sourceFolder url="file://$USER_HOME$/Library/Caches/clion10/cmake/generated/3c24f981/3c24f981/Release0/src/version.c" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

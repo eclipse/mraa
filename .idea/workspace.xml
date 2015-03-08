@@ -1,0 +1,1154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true">
+    <generated>
+      <config projectName="mraa" targetName="hellomraa" />
+      <config projectName="mraa" targetName="blink-io-cpp" />
+      <config projectName="mraa" targetName="isr_pin6" />
+      <config projectName="mraa" targetName="uart_setup" />
+      <config projectName="mraa" targetName="analogin_a0" />
+      <config projectName="mraa" targetName="AioA0" />
+      <config projectName="mraa" targetName="blink-io" />
+      <config projectName="mraa" targetName="mmap-io2" />
+      <config projectName="mraa" targetName="gpio_read6" />
+      <config projectName="mraa" targetName="spi_max7219" />
+      <config projectName="mraa" targetName="i2c_ht16k33" />
+      <config projectName="mraa" targetName="I2c-compass" />
+      <config projectName="mraa" targetName="blink_onboard" />
+      <config projectName="mraa" targetName="Pwm3-cycle" />
+      <config projectName="mraa" targetName="spi_mcp4261" />
+      <config projectName="mraa" targetName="i2c_HMC5883L" />
+      <config projectName="mraa" targetName="mraa" />
+      <config projectName="mraa" targetName="cycle-pwm3" />
+      <config projectName="mraa" targetName="Spi-pot" />
+      <config projectName="mraa" targetName="gpio" />
+    </generated>
+  </component>
+  <component name="CMakeSettings" AUTO_RELOAD="false" GENERATION_OPTIONS="-D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=/Users/ring/devel/mraa/linaro-armhf.cmake" GENERATION_PASS_SYSTEM_ENVIRONMENT="true">
+    <ADDITIONAL_GENERATION_ENVIRONMENT>
+      <envs />
+    </ADDITIONAL_GENERATION_ENVIRONMENT>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="47a1da7a-8388-4e84-80ef-91b2bd995fdb" name="Default" comment="src/arm/beaglebone.c Changed gpio assignment for Pin 73, the documentation I used was incorrect.&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/spi/spi.c" afterPath="$PROJECT_DIR$/src/spi/spi.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/api/mraa/spi.h" afterPath="$PROJECT_DIR$/api/mraa/spi.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/api/mraa/spi.hpp" afterPath="$PROJECT_DIR$/api/mraa/spi.hpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/spi_max7219.c" afterPath="$PROJECT_DIR$/examples/spi_max7219.c" />
+    </list>
+    <ignored path="mraa.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <ignored path="build-clion/" />
+    <ignored path="linaro-armhf.cmake" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="mraa" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="spi_max7219.c" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/examples/spi_max7219.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="60" column="0" selection-start-line="60" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="spi.c" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/spi/spi.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-0.18960674">
+              <caret line="247" column="0" selection-start-line="247" selection-start-column="0" selection-end-line="247" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="spi.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/api/mraa/spi.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="127" column="71" selection-start-line="127" selection-start-column="51" selection-end-line="127" selection-end-column="71" />
+              <folding>
+                <element signature="e#1683#1701#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Michael Ring" />
+      </list>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+  </component>
+  <component name="GithubProjectSettings">
+    <option name="CREATE_PULL_REQUEST_DEFAULT_BRANCH" value="master" />
+    <option name="CREATE_PULL_REQUEST_DEFAULT_REPO_USER" value="intel-iot-devkit" />
+    <option name="CREATE_PULL_REQUEST_DEFAULT_REPO_NAME" value="mraa" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/include/arm/raspberry_pi_b.h" />
+        <option value="$PROJECT_DIR$/src/arm/raspberry_pi_b.c" />
+        <option value="$PROJECT_DIR$/include/arm/beaglebone.h" />
+        <option value="$PROJECT_DIR$/include/arm/banana_pi.h" />
+        <option value="$PROJECT_DIR$/src/arm/banana_pi.c" />
+        <option value="$PROJECT_DIR$/examples/gpio.c" />
+        <option value="$PROJECT_DIR$/examples/i2c_ht16k33.c" />
+        <option value="$PROJECT_DIR$/examples/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/include/arm/raspberry_pi.h" />
+        <option value="$PROJECT_DIR$/include/arm/arm.h" />
+        <option value="$PROJECT_DIR$/include/mraa_internal.h" />
+        <option value="$PROJECT_DIR$/src/mraa.c" />
+        <option value="$USER_HOME$/calibration.pas" />
+        <option value="$PROJECT_DIR$/src/arm/raspberry_pi.c" />
+        <option value="$PROJECT_DIR$/src/arm/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/src/arm/arm.c" />
+        <option value="$PROJECT_DIR$/api/mraa/types.h" />
+        <option value="$PROJECT_DIR$/src/pwm/pwm.c" />
+        <option value="$PROJECT_DIR$/include/mraa_adv_func.h" />
+        <option value="$PROJECT_DIR$/src/arm/beaglebone.c" />
+        <option value="$PROJECT_DIR$/api/mraa/spi.h" />
+        <option value="$PROJECT_DIR$/examples/spi_max7219.c" />
+        <option value="$PROJECT_DIR$/api/mraa/spi.hpp" />
+        <option value="$PROJECT_DIR$/src/spi/spi.c" />
+      </list>
+    </option>
+  </component>
+  <component name="NamedScopeManager">
+    <order />
+  </component>
+  <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="1" />
+    <option name="y" value="23" />
+    <option name="width" value="1405" />
+    <option name="height" value="1173" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$1$1" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$1$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$1$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$1$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$1$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="spi" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$1$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="include" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$1$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="include" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="arm" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$1$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="api" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$1$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="api" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mraa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="recentsLimit" value="5" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.splitter.proportion" value="0.2" />
+    <property name="FullScreen" value="false" />
+    <property name="restartRequiresConfirmation" value="true" />
+    <property name="last_opened_file_path" value="$USER_HOME$/txpwrlimit_cfg_Vestel_Arcadyan_Airgain.conf" />
+    <property name="two.files.diff.last.used.file" value="$USER_HOME$/txpwrlimit_cfg_Vestel_Arcadyan_Airgain.conf" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/arm" />
+      <recent name="$PROJECT_DIR$/include/arm" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.spi_max7219">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="AioA0" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="false" />
+      </method>
+    </configuration>
+    <configuration default="false" name="AioA0" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="AioA0" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="I2c-compass" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="I2c-compass" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="Pwm3-cycle" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="Pwm3-cycle" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="Spi-pot" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="Spi-pot" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="analogin_a0" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="analogin_a0" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="blink-io" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="blink-io" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="blink-io-cpp" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="blink-io-cpp" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="blink_onboard" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="blink_onboard" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="cycle-pwm3" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="cycle-pwm3" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="gpio" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="gpio" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="gpio_read6" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="gpio_read6" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="hellomraa" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="hellomraa" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="i2c_HMC5883L" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="i2c_HMC5883L" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="isr_pin6" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="isr_pin6" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="mmap-io2" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="mmap-io2" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="mraa" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="mraa" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="spi_mcp4261" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="spi_mcp4261" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="uart_setup" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="uart_setup" CONFIG_NAME="Debug">
+      <envs />
+      <method>
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="spi_max7219" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="spi_max7219" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="i2c_ht16k33" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="mraa" TARGET_NAME="i2c_ht16k33" CONFIG_NAME="Debug">
+      <envs />
+      <method />
+    </configuration>
+    <list size="20">
+      <item index="0" class="java.lang.String" itemvalue="Application.AioA0" />
+      <item index="1" class="java.lang.String" itemvalue="Application.I2c-compass" />
+      <item index="2" class="java.lang.String" itemvalue="Application.Pwm3-cycle" />
+      <item index="3" class="java.lang.String" itemvalue="Application.Spi-pot" />
+      <item index="4" class="java.lang.String" itemvalue="Application.analogin_a0" />
+      <item index="5" class="java.lang.String" itemvalue="Application.blink-io" />
+      <item index="6" class="java.lang.String" itemvalue="Application.blink-io-cpp" />
+      <item index="7" class="java.lang.String" itemvalue="Application.blink_onboard" />
+      <item index="8" class="java.lang.String" itemvalue="Application.cycle-pwm3" />
+      <item index="9" class="java.lang.String" itemvalue="Application.gpio" />
+      <item index="10" class="java.lang.String" itemvalue="Application.gpio_read6" />
+      <item index="11" class="java.lang.String" itemvalue="Application.hellomraa" />
+      <item index="12" class="java.lang.String" itemvalue="Application.i2c_HMC5883L" />
+      <item index="13" class="java.lang.String" itemvalue="Application.isr_pin6" />
+      <item index="14" class="java.lang.String" itemvalue="Application.mmap-io2" />
+      <item index="15" class="java.lang.String" itemvalue="Application.mraa" />
+      <item index="16" class="java.lang.String" itemvalue="Application.spi_mcp4261" />
+      <item index="17" class="java.lang.String" itemvalue="Application.uart_setup" />
+      <item index="18" class="java.lang.String" itemvalue="Application.spi_max7219" />
+      <item index="19" class="java.lang.String" itemvalue="Application.i2c_ht16k33" />
+    </list>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration">
+    <configuration>$USER_HOME$/.subversion</configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="47a1da7a-8388-4e84-80ef-91b2bd995fdb" name="Default" comment="" />
+      <created>1419870770690</created>
+      <option name="number" value="Default" />
+      <updated>1419870770690</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Added platform definitions for new devices">
+      <created>1421092263286</created>
+      <option name="number" value="00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1421092263286</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Initial version of Banana Pi Support.&#10;&#10;Banana Pro definitions are also there but not verified on hardware">
+      <created>1421092445156</created>
+      <option name="number" value="00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1421092445156</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Initial version of Beaglebone Black Support.&#10;&#10;Based on official Debian Image  3.8.x Kernel.)&#10; All working so far except for pwm which is still messy (mostly because available documentation is usually for older kernels and improvements from newer unofficial builds are not yet available in the official build">
+      <created>1421092719813</created>
+      <option name="number" value="00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1421092719813</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Updated version of Raspberry Pi Support.&#10;&#10;Added Models A/B/A+/B+ and extended the definitions for the &quot;+&quot; devices&#10;Removed the old Raspberry Pi specific files">
+      <created>1421092820666</created>
+      <option name="number" value="00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1421092820666</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Some cosmetic changes and added the new devices">
+      <created>1421092860255</created>
+      <option name="number" value="00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1421092860255</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Added new function to be able to use pwm on Beaglebone Black">
+      <created>1421092903691</created>
+      <option name="number" value="00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1421092903691</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Initial version of Beaglebone Black Support.&#10;&#10;Based on official Debian Image  3.8.x Kernel.)&#10; All working so far except for pwm which is still messy (mostly because available documentation is usually for older kernels and improvements from newer unofficial builds are not yet available in the official build">
+      <created>1421092924343</created>
+      <option name="number" value="00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1421092924343</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Added Definitions for new boards and changed Raspberry Pi definition">
+      <created>1421092978624</created>
+      <option name="number" value="00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1421092978624</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Added Source Files to the cmake build">
+      <created>1421093018798</created>
+      <option name="number" value="00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1421093018798</updated>
+    </task>
+    <task id="LOCAL-00010" summary="examples/gpio.c Added whitespace to better align gpio list output&#10;&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1423925216183</created>
+      <option name="number" value="00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1423925216183</updated>
+    </task>
+    <task id="LOCAL-00011" summary="examples/gpio.c Added support for mmap access to gpio&#10;&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1423931166449</created>
+      <option name="number" value="00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1423931166449</updated>
+    </task>
+    <task id="LOCAL-00012" summary="examples/spi.c Initialization of spi is necessary on Beaglebone Black&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1423934095482</created>
+      <option name="number" value="00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1423934095482</updated>
+    </task>
+    <task id="LOCAL-00013" summary="examples/spi.c Add 16bit wide convenience functions for spi&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1423936117099</created>
+      <option name="number" value="00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1423936117099</updated>
+    </task>
+    <task id="LOCAL-00014" summary="examples/spi_max7219.c Example for 16bit wide convenience functions&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1423936316563</created>
+      <option name="number" value="00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1423936316563</updated>
+    </task>
+    <task id="LOCAL-00015" summary="examples/i2c_ht16k33.c Example for the ht16k33 LED driver chip&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1423940339948</created>
+      <option name="number" value="00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1423940339948</updated>
+    </task>
+    <task id="LOCAL-00016" summary="src/mraa.c added helper functions to support globbing and link analysis&#10;include/mraa_internal.h exported helper functions as internal functions&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424000831886</created>
+      <option name="number" value="00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1424000831886</updated>
+    </task>
+    <task id="LOCAL-00017" summary="api/mraa/types.h renamed enum for raspberry to make it more global&#10;&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424001037251</created>
+      <option name="number" value="00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1424001037251</updated>
+    </task>
+    <task id="LOCAL-00018" summary="include/arm/raspberry_pi.h Added pincount defines for all supported devices&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424001105754</created>
+      <option name="number" value="00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1424001105754</updated>
+    </task>
+    <task id="LOCAL-00019" summary="src/arm/ added support for all models of Raspbery Pi A/B/A+/B+ and Raspberry Pi 2 B&#10;&#10;Features SPI,I2C,GPIO and mmap access to GPIO&#10; &#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424001315376</created>
+      <option name="number" value="00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1424001315376</updated>
+    </task>
+    <task id="LOCAL-00020" summary="src/arm/raspberry_pi.c added log.info when loading modules for spi, &#10;moved check for device existance into the load block&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424038921862</created>
+      <option name="number" value="00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1424038921862</updated>
+    </task>
+    <task id="LOCAL-00021" summary="api/mraa/spi.h replaced uint16 in new functions with word&#10;api/mraa/spi.hpp replaced uint16 in new functions with word&#10;examples/spi_max7219.c changed code to match renamed functions&#10;src/spi/spi.c replaced uint16 in new functions with word &#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424040079667</created>
+      <option name="number" value="00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1424040079667</updated>
+    </task>
+    <task id="LOCAL-00022" summary="api/mraa/spi.hpp replaced tab's on start of line with spaces&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424041048716</created>
+      <option name="number" value="00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1424041048716</updated>
+    </task>
+    <task id="LOCAL-00023" summary="api/mraa/src/arm/raspberry_pi.c fixed cut &amp; waste error, wrong pin number used for Raspberry Pi in default case&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424518308356</created>
+      <option name="number" value="00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1424518308356</updated>
+    </task>
+    <task id="LOCAL-00024" summary="api/mraa/src/arm/raspberry_pi.c fixed cut &amp; waste error, wrong pin number used for Raspberry Pi in default case&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424519308771</created>
+      <option name="number" value="00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1424519308771</updated>
+    </task>
+    <task id="LOCAL-00025" summary="include/mraa_adv_func.h Added possibility to override pwm initialization, current code in pwm does not work for beaglebone&#10;src/pwm/pwm.c Implemented check for pwm_init_replace&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424532433984</created>
+      <option name="number" value="00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1424532433984</updated>
+    </task>
+    <task id="LOCAL-00026" summary="api/mraa/types.h added enum for Beaglebone devices&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424532524197</created>
+      <option name="number" value="00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1424532524197</updated>
+    </task>
+    <task id="LOCAL-00027" summary="include/arm/beaglebone.h added header with definitions for the Beaglebone Black&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424532609621</created>
+      <option name="number" value="00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1424532609621</updated>
+    </task>
+    <task id="LOCAL-00028" summary="src/arm/beaglebone.c Fixed bug in detection of Beaglebone Black Rev C&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424640794474</created>
+      <option name="number" value="00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1424640794474</updated>
+    </task>
+    <task id="LOCAL-00029" summary="src/arm/beaglebone.c Better Error Messages when loading of Cape fails&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424642328294</created>
+      <option name="number" value="00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1424642328295</updated>
+    </task>
+    <task id="LOCAL-00030" summary="src/arm/beaglebone.c Changed gpio assignment for Pin 73, the documentation I used was incorrect.&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;">
+      <created>1424815046792</created>
+      <option name="number" value="00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1424815046792</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1" y="23" width="1405" height="1173" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32971016" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.13224638" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18078291" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32971016" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32971016" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27807972" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32971016" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+    </layout>
+    <layout-to-restore>
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32971016" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32971016" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32971016" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32971016" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27807972" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23442733" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32971016" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+    </layout-to-restore>
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="CHECK_NEW_TODO" value="false" />
+    <option name="myTodoPanelSettings">
+      <TodoPanelSettings />
+    </option>
+    <MESSAGE value="Initial version of Beaglebone Black Support.&#10;&#10;Based on official Debian Image  3.8.x Kernel.)&#10; All working so far except for pwm which is still messy (mostly because available documentation is usually for older kernels and improvements from newer unofficial builds are not yet available in the official build" />
+    <MESSAGE value="Added Definitions for new boards and changed Raspberry Pi definition" />
+    <MESSAGE value="Added Source Files to the cmake build" />
+    <MESSAGE value="Added whitespace to better align gpio list output" />
+    <MESSAGE value="Added whitespace to better align gpio list output&#10;&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="examples/gpio.c Added whitespace to better align gpio list output&#10;&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="examples/gpio.c Added support for mmap access to gpio&#10;&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="examples/spi.c Initialization of spi is necessary on Beaglebone Black&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="examples/spi.c Add 16bit wide convenience functions for spi&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="examples/spi_max7219.c Example for 16bit wide convenience functions&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="examples/i2c_ht16k33.c Example for the ht16k33 LED driver chip&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="src/mraa.c added helper functions to support globbing and link analysis&#10;include/mraa_internal.h exported helper functions as internal functions&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="api/mraa/types.h renamed enum for raspberry to make it more global&#10;&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="include/arm/raspberry_pi.h Added pincount defines for all supported devices&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="src/arm/ added support for all models of Raspbery Pi A/B/A+/B+ and Raspberry Pi 2 B&#10;&#10;Features SPI,I2C,GPIO and mmap access to GPIO&#10; &#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="src/arm/raspberry_pi.c added log.info when loading modules for spi, &#10;moved check for device existance into the load block&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="api/mraa/spi.h replaced uint16 in new functions with word&#10;api/mraa/spi.hpp replaced uint16 in new functions with word&#10;examples/spi_max7219.c changed code to match renamed functions&#10;src/spi/spi.c replaced uint16 in new functions with word &#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="api/mraa/spi.hpp replaced tab's on start of line with spaces&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="api/mraa/src/arm/raspberry_pi.c fixed cut &amp; waste error, wrong pin number used for Raspberry Pi in default case&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="include/mraa_adv_func.h Added possibility to override pwm initialization, current code in pwm does not work for beaglebone&#10;src/pwm/pwm.c Implemented check for pwm_init_replace&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="api/mraa/types.h added enum for Beaglebone devices&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="include/arm/beaglebone.h added header with definitions for the Beaglebone Black&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="src/arm/beaglebone.c Fixed bug in detection of Beaglebone Black Rev C&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="src/arm/beaglebone.c Better Error Messages when loading of Cape fails&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <MESSAGE value="src/arm/beaglebone.c Changed gpio assignment for Pin 73, the documentation I used was incorrect.&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+    <option name="LAST_COMMIT_MESSAGE" value="src/arm/beaglebone.c Changed gpio assignment for Pin 73, the documentation I used was incorrect.&#10;Signed-off-by: Michael Ring &lt;mail@michael-ring.org&gt;" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="3" />
+    </breakpoint-manager>
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/api/mraa/spi.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/mraa/types.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="176" column="0" selection-start-line="176" selection-start-column="0" selection-end-line="176" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/x86/intel_minnow_max.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.14962825">
+          <caret line="97" column="0" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/mraa.pc.cmake">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.7261236">
+          <caret line="106" column="0" selection-start-line="106" selection-start-column="0" selection-end-line="106" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/x86/x86.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/uart/uart.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/linux/README">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/linux/i2c-dev.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.9901685">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/linux/compiler.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/x86/intel_galileo_rev_g.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.62418723">
+          <caret line="131" column="55" selection-start-line="131" selection-start-column="55" selection-end-line="131" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/x86/intel_galileo_rev_d.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.023407">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/x86/intel_de3815.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.9258778">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/x86/intel_de3815.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/spi_mcp4261.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="37" column="4" selection-start-line="37" selection-start-column="4" selection-end-line="37" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/analogin_a0.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/blink-io.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="59" column="0" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/blink_onboard.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/cycle-pwm3.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/hellomraa.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/helloedison.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/isr_pin6.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/mmap-io2.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="38" column="0" selection-start-line="37" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gpio/gpio.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="4.2184653">
+          <caret line="338" column="0" selection-start-line="335" selection-start-column="0" selection-end-line="338" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/i2c/i2c.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.94795537">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/gpio.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="92" column="49" selection-start-line="92" selection-start-column="49" selection-end-line="92" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/mraa/i2c.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="26" column="33" selection-start-line="26" selection-start-column="33" selection-end-line="26" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/mraa.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/x86/intel_edison_fab_c.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="583" column="0" selection-start-line="568" selection-start-column="0" selection-end-line="583" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/mraa.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="58" column="0" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/arm/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.6">
+          <caret line="6" column="1" selection-start-line="6" selection-start-column="1" selection-end-line="6" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/mraa/types.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.58064514">
+          <caret line="45" column="30" selection-start-line="45" selection-start-column="30" selection-end-line="45" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/mraa/common.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.7419355">
+          <caret line="50" column="18" selection-start-line="50" selection-start-column="4" selection-end-line="50" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/mraa_adv_func.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="56" column="20" selection-start-line="56" selection-start-column="20" selection-end-line="56" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/pwm/pwm.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="162" column="16" selection-start-line="162" selection-start-column="0" selection-end-line="162" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/mraa/pwm.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="32" column="76" selection-start-line="32" selection-start-column="76" selection-end-line="32" selection-end-column="76" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/arm/arm.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="31" column="0" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/calibration.pas">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.59779006">
+          <caret line="121" column="37" selection-start-line="121" selection-start-column="37" selection-end-line="121" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/linaro-armhf.cmake">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/mraa/gpio.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="55" column="22" selection-start-line="55" selection-start-column="22" selection-end-line="55" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/mraa_internal_types.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/mraa_internal.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6462939">
+          <caret line="73" column="125" selection-start-line="73" selection-start-column="125" selection-end-line="73" selection-end-column="125" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/arm/raspberry_pi.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.54616386">
+          <caret line="28" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/mraa/spi.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="127" column="71" selection-start-line="127" selection-start-column="51" selection-end-line="127" selection-end-column="71" />
+          <folding>
+            <element signature="e#1683#1701#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/mraa/spi.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.253576">
+          <caret line="186" column="46" selection-start-line="186" selection-start-column="46" selection-end-line="186" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/spi_max7219.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="60" column="0" selection-start-line="60" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/txpwrlimit_cfg_Vestel_Arcadyan_Airgain.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/txpwrlimit_cfg.conf.Arcadyan">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/spi/spi.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.18960674">
+          <caret line="247" column="0" selection-start-line="247" selection-start-column="0" selection-end-line="247" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>
