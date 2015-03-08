@@ -93,9 +93,9 @@ class Spi {
          * Write single byte to the SPI device
          *
          * @param data the byte to send
-         * @return data received on the miso line
+         * @return data received on the miso line or -1 in case of error
          */
-        uint8_t writeByte(uint8_t data) {
+        int writeByte(uint8_t data) {
             return mraa_spi_write(m_spi, (uint8_t) data);
         }
 
