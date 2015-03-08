@@ -105,7 +105,7 @@ class Spi {
          * @param data the byte to send
          * @return data received on the miso line
          */
-        uint16_t write_word(uint16_t data) {
+        long write_word(uint16_t data) {
             return mraa_spi_write_word(m_spi, (uint16_t) data);
         }
 

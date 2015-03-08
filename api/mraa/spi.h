@@ -143,7 +143,7 @@ int mraa_spi_write(mraa_spi_context dev, uint8_t data);
  * @param data Data to send
  * @return Data received on the miso line
  */
-uint16_t mraa_spi_write_word(mraa_spi_context dev, uint16_t data);
+long mraa_spi_write_word(mraa_spi_context dev, uint16_t data);
 
 /**
  * Write Buffer of bytes to the SPI device. The pointer return has to be

@@ -336,7 +336,7 @@ mraa_spi_write(mraa_spi_context dev, uint8_t data)
     return mraa_spi_write_internal(dev,data);
 }
 
-uint16_t
+long
 mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
 {
     if (((dev->bpw < 9) && (dev->softbpw == 0)) || ((dev->softbpw > 0) && (dev->softbpw < 9))) {
@@ -345,7 +345,7 @@ mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
     }
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
-    uint16_t recv = 0;
+    unsigned long recv = 0;
 
     if ((dev->softcspin_context != NULL) && (dev->hwcs == 0) && dev->lsb == 0) {
         mraa_gpio_write(dev->softcspin_context,0);
@@ -366,7 +366,7 @@ mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
             return -1;
         }
     }
-    return recv;
+    return (long) recv;
 }
 
 mraa_result_t
