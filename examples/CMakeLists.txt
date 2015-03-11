@@ -31,3 +31,9 @@ target_link_libraries (spi_max7219 mraa)
 add_subdirectory (c++)
 
 install (DIRECTORY ${PROJECT_SOURCE_DIR}/examples/ DESTINATION share/mraa/examples)
+
+if (INSTALLGPIOTOOL)
+   install (TARGETS gpio DESTINATION bin)
+endif()
+
+
