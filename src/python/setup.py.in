@@ -1,0 +1,18 @@
+from setuptools import setup
+import sys
+
+# search the proper path for python libs
+for p in sys.path:
+  if p.endswith('site-packages'):
+    ind=p.rfind('/lib')
+    sys.argv.append('--prefix='+p[0:ind])
+    break
+
+setup(
+  name='mraa',
+  version='${VERSION}',
+  description='Low Level Skeleton Library for IO Communication on GNU/Linux platforms',
+  url='https://github.com/intel-iot-devkit/mraa',
+  py_modules=['mraa'],
+  data_files=[('', ['_mraa.so'])],
+  )
