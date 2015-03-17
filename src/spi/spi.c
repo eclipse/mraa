@@ -41,11 +41,14 @@
  */
 struct _spi {
     /*@{*/
-    int devfd;          /**< File descriptor to SPI Device */
-    uint32_t mode;      /**< Spi mode see spidev.h */
-    int clock;          /**< clock to run transactions at */
-    mraa_boolean_t lsb; /**< least significant bit mode */
-    unsigned int bpw;   /**< Bits per word */
+    int devfd;                           /**< File descriptor to SPI Device */
+    uint32_t mode;                       /**< Spi mode see spidev.h */
+    int clock;                           /**< clock to run transactions at */
+    mraa_boolean_t lsb;                  /**< least significant bit mode */
+    mraa_boolean_t hwcs;                 /**< Hardware CS */
+    mraa_gpio_context softcspin_context; /**< Soft CS pin */
+    unsigned int bpw;                    /**< Bits per word */
+    unsigned int softbpw;                /**< Bits per word in softspi */
     /*@}*/
 };
 
@@ -113,6 +116,7 @@ mraa_spi_init(int bus)
         }
     }
 
+    dev->softbpw = 0;
     return dev;
 }
 
@@ -143,6 +147,8 @@ mraa_spi_init_raw(unsigned int bus, unsigned int cs)
         dev->clock = 4000000;
     }
 
+    // default is to enable HW cs
+    dev->hwcs = 1;
     if (mraa_spi_mode(dev, MRAA_SPI_MODE0) != MRAA_SUCCESS) {
         free(dev);
         return NULL;
@@ -183,6 +189,10 @@ mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode)
             break;
     }
 
+    if (!dev->hwcs) {
+        spi_mode |= SPI_NO_CS;
+    }
+
     if (ioctl(dev->devfd, SPI_IOC_WR_MODE, &spi_mode) < 0) {
         syslog(LOG_ERR, "spi: Failed to set spi mode");
         return MRAA_ERROR_INVALID_RESOURCE;
@@ -193,6 +203,66 @@ mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode)
 }
 
 mraa_result_t
+mraa_spi_hw_cs(mraa_spi_context dev, mraa_boolean_t hwcs)
+{
+    dev->hwcs = hwcs;
+    if (!dev->hwcs) {
+        syslog(LOG_DEBUG, "spi: Disabled HW CS");
+    } else {
+        dev->softbpw = 0;
+        if (dev->softcspin_context != NULL) {
+            mraa_gpio_close(dev->softcspin_context);
+        }
+    }
+    return mraa_spi_mode(dev, dev->mode);
+}
+
+mraa_result_t
+mraa_spi_sw_cs(mraa_spi_context dev, mraa_spi_soft_bits_t softbits, int pin)
+{
+    mraa_result_t result;
+    switch (softbits) {
+        case MRAA_SPI_SOFT_8BIS:
+            result = mraa_spi_bit_per_word(dev, 8);
+            break;
+        case MRAA_SPI_SOFT_9BIS:
+            result = mraa_spi_bit_per_word(dev, 9);
+            break;
+        case MRAA_SPI_SOFT_16BIS:
+            result = mraa_spi_bit_per_word(dev, 8);
+            break;
+        default:
+            result = mraa_spi_bit_per_word(dev, 8);
+    }
+    if (result != MRAA_SUCCESS) {
+        syslog(LOG_ERR, "spi: Could not initialize 8 transfer for soft cs");
+        return result;
+    }
+
+    dev->softbpw = softbits;
+
+    // disable HW CS
+    result = mraa_spi_hw_cs(dev, 0);
+    if (result != MRAA_SUCCESS) {
+        return result;
+    }
+
+    dev->softcspin_context = mraa_gpio_init(pin);
+    if (dev->softcspin_context == NULL) {
+        syslog(LOG_ERR, "spi: Could not initialize soft cs pin %d", pin);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    // try to enable mmap gpio access to speed up CS
+    if (mraa_pin_mode_test(pin, MRAA_PIN_FAST_GPIO)) {
+        if (mraa_gpio_use_mmaped(dev->softcspin_context, 1) != MRAA_SUCCESS) {
+            syslog(LOG_INFO, "spi: could do initialise mmap for soft cs pin");
+        }
+    }
+    return mraa_gpio_dir(dev->softcspin_context, MRAA_GPIO_OUT_HIGH);
+}
+
+mraa_result_t
 mraa_spi_frequency(mraa_spi_context dev, int hz)
 {
     int speed = 0;
@@ -200,7 +270,13 @@ mraa_spi_frequency(mraa_spi_context dev, int hz)
     if (ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) != -1) {
         if (speed < hz) {
             dev->clock = speed;
-            syslog(LOG_WARNING, "spi: Selected speed reduced to max allowed speed");
+            syslog(LOG_WARNING, "spi: Selected speed reduced to max allowed read speed of %d", speed);
+        }
+    }
+    if (ioctl(dev->devfd, SPI_IOC_WR_MAX_SPEED_HZ, &speed) != -1) {
+        if (speed < dev->clock) {
+            dev->clock = speed;
+            syslog(LOG_WARNING, "spi: Selected speed reduced to max allowed write speed of %d", speed);
         }
     }
     return MRAA_SUCCESS;
@@ -229,12 +305,23 @@ mraa_spi_bit_per_word(mraa_spi_context dev, unsigned int bits)
         syslog(LOG_ERR, "spi: Failed to set bit per word");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
+    if (ioctl(dev->devfd, SPI_IOC_RD_BITS_PER_WORD, &bits) < 0) {
+        syslog(LOG_ERR, "spi: Failed to set bit per word");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     dev->bpw = bits;
+    if (dev->softbpw > 0) {
+        syslog(LOG_NOTICE, "spi: turned off soft-cs");
+        if (dev->softcspin_context != NULL) {
+            mraa_gpio_close(dev->softcspin_context);
+            dev->softbpw = 0;
+        }
+    }
     return MRAA_SUCCESS;
 }
 
 int
-mraa_spi_write(mraa_spi_context dev, uint8_t data)
+mraa_spi_write_internal(mraa_spi_context dev, uint8_t data)
 {
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
@@ -255,31 +342,58 @@ mraa_spi_write(mraa_spi_context dev, uint8_t data)
     return (int) recv;
 }
 
-uint16_t
-mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
+int
+mraa_spi_write(mraa_spi_context dev, uint8_t data)
 {
-    struct spi_ioc_transfer msg;
-    memset(&msg, 0, sizeof(msg));
-
-    uint16_t length = 2;
-
-    uint16_t recv = 0;
-    msg.tx_buf = (unsigned long) &data;
-    msg.rx_buf = (unsigned long) &recv;
-    msg.speed_hz = dev->clock;
-    msg.bits_per_word = dev->bpw;
-    msg.delay_usecs = 0;
-    msg.len = length;
-    if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
-        syslog(LOG_ERR, "spi: Failed to perform dev transfer");
+    if ((dev->bpw) > 8 || (dev->softbpw > 8)) {
+        syslog(LOG_ERR,
+               "spi: refusing to transfer 8 bits in non 8-bit mode, use mraa_spi_write_word");
         return -1;
     }
-    return recv;
+    return mraa_spi_write_internal(dev, data);
+}
+
+long
+mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
+{
+    if (((dev->bpw < 9) && (dev->softbpw == 0)) || ((dev->softbpw > 0) && (dev->softbpw < 9))) {
+        syslog(LOG_ERR, "spi: refusing to transfer <9 bits in 16-bit mode, use mraa_spi_write");
+        return -1;
+    }
+    struct spi_ioc_transfer msg;
+    memset(&msg, 0, sizeof(msg));
+    unsigned long recv = 0;
+
+    if ((dev->softcspin_context != NULL) && (dev->hwcs == 0) && dev->lsb == 0) {
+        mraa_gpio_write(dev->softcspin_context, 0);
+        recv = mraa_spi_write_internal(dev, data >> 8) << 8;
+        recv += mraa_spi_write_internal(dev, data & 0xff);
+        mraa_gpio_write(dev->softcspin_context, 1);
+    } else {
+        uint16_t length = 2;
+
+        msg.tx_buf = (unsigned long) &data;
+        msg.rx_buf = (unsigned long) &recv;
+        msg.speed_hz = dev->clock;
+        msg.bits_per_word = dev->bpw;
+        msg.delay_usecs = 0;
+        msg.len = length;
+        if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
+            syslog(LOG_ERR, "spi: Failed to perform dev transfer");
+            return -1;
+        }
+    }
+    return (long) recv;
 }
 
 mraa_result_t
 mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int length)
 {
+    if ((dev->bpw) > 8 || (dev->softbpw > 8)) {
+        syslog(LOG_ERR, "spi: refusing to transfer 8 bits in non 8-bit mode, use "
+                        "mraa_spi_transfer_buf_word");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
 
@@ -299,18 +413,30 @@ mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int l
 mraa_result_t
 mraa_spi_transfer_buf_word(mraa_spi_context dev, uint16_t* data, uint16_t* rxbuf, int length)
 {
-    struct spi_ioc_transfer msg;
-    memset(&msg, 0, sizeof(msg));
-
-    msg.tx_buf = (unsigned long) data;
-    msg.rx_buf = (unsigned long) rxbuf;
-    msg.speed_hz = dev->clock;
-    msg.bits_per_word = dev->bpw;
-    msg.delay_usecs = 0;
-    msg.len = length;
-    if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
-        syslog(LOG_ERR, "spi: Failed to perform dev transfer");
+    if (((dev->bpw < 9) && (dev->softbpw == 0)) || ((dev->softbpw > 0) && (dev->softbpw < 9))) {
+        syslog(LOG_ERR,
+               "spi: refusing to transfer <9 bits in 16-bit mode, use mraa_spi_transfer_buf");
         return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    if ((dev->softcspin_context != NULL) && (dev->hwcs == 0) && dev->lsb == 0) {
+        int i;
+        for (i = 0; i < length / 2; i++) {
+            rxbuf[i] = mraa_spi_write_word(dev, data[i]);
+        }
+    } else {
+        struct spi_ioc_transfer msg;
+        memset(&msg, 0, sizeof(msg));
+
+        msg.tx_buf = (unsigned long) data;
+        msg.rx_buf = (unsigned long) rxbuf;
+        msg.speed_hz = dev->clock;
+        msg.bits_per_word = dev->bpw;
+        msg.delay_usecs = 0;
+        msg.len = length;
+        if (ioctl(dev->devfd, SPI_IOC_MESSAGE(1), &msg) < 0) {
+            syslog(LOG_ERR, "spi: Failed to perform dev transfer");
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
     }
     return MRAA_SUCCESS;
 }
@@ -343,6 +469,9 @@ mraa_result_t
 mraa_spi_stop(mraa_spi_context dev)
 {
     close(dev->devfd);
+    if (dev->softcspin_context != NULL) {
+        mraa_gpio_close(dev->softcspin_context);
+    }
     free(dev);
     return MRAA_SUCCESS;
 }

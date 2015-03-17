@@ -44,14 +44,20 @@ typedef enum {
                       output data (change) on falling edge */
 } Spi_Mode;
 
+typedef enum {
+    MRAA_SPI_SOFT_8BIS = 8,   //** SoftSPI handles CS pin in chunks of 8 Bits */
+    MRAA_SPI_SOFT_9BIS = 9,   //** SoftSPI handles CS pin in chunks of 9 Bits (if spidev associated
+                              //allows 9 bit transfer) */
+    MRAA_SPI_SOFT_16BIS = 16, //** SoftSPI handles CS pin in chunks of 16 bits */
+} Spi_Soft_Bits;
 
 /**
-* @brief API to Serial Peripheral Interface
-*
-* This file defines the SPI interface for libmraa
-*
-* @snippet Spi-pot.cpp Interesting
-*/
+ * @brief API to Serial Peripheral Interface
+ *
+ * This file defines the SPI interface for libmraa
+ *
+ * @snippet Spi-pot.cpp Interesting
+ */
 class Spi
 {
   public:
@@ -197,6 +203,38 @@ class Spi
     lsbmode(bool lsb)
     {
         return mraa_spi_lsbmode(m_spi, (mraa_boolean_t) lsb);
+    }
+
+    /**
+     * Disables the hardware chip select on the platform that is toggled by spidev
+     * effectively giving you a handle on the raw spi bus
+     *
+     * @param hwcs Disable/Enable hardware chip select
+     * @return Result of operation
+     */
+    mraa_result_t
+    hwcs(bool hwcs)
+    {
+        return mraa_spi_hw_cs(m_spi, (mraa_boolean_t) hwcs);
+    }
+
+    /**
+     * Disables the hardware chip select on the platform that is toggled by spidev
+     * and replaces it with a software based chip select managed by mraa to
+     * overcome limitations of the implementation on some platforms supporting only
+     * 8 or 9 bit transfers do not use this on platforms that have native support
+     * for your required bitlength as spi performance will suffer using soft chip
+     * select
+     *
+     * @param number of bits per chip select. Only multiples of existing number of bits are
+     *supported
+     * @param replacement cs pin (can be any valid mraa Gpio)
+     * @return Result of operation
+     */
+    mraa_result_t
+    swcs(Spi_Soft_Bits softbits, int pin)
+    {
+        return mraa_spi_sw_cs(m_spi, (mraa_spi_soft_bits_t) softbits, pin);
     }
 
     /**
