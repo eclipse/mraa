@@ -64,18 +64,23 @@ list_pins() {
     }
     int i;
     for (i = 0; i < pin_count; ++i) {
-        fprintf(stdout, "%02d ", i);
-        if (mraa_pin_mode_test(i, MRAA_PIN_GPIO))
-            fprintf(stdout, "GPIO ");
-        if (mraa_pin_mode_test(i, MRAA_PIN_I2C))
-            fprintf(stdout, "I2C  ");
-        if (mraa_pin_mode_test(i, MRAA_PIN_SPI))
-            fprintf(stdout, "SPI  ");
-        if (mraa_pin_mode_test(i, MRAA_PIN_PWM))
-            fprintf(stdout, "PWM  ");
-        if (mraa_pin_mode_test(i, MRAA_PIN_UART))
-            fprintf(stdout, "UART ");
-        fprintf(stdout, "\n");
+        if (strcmp(mraa_get_pin_name(i),"INVALID") != 0) {
+            fprintf(stdout, "%02d ", i);
+            fprintf(stdout, "%8s: ", mraa_get_pin_name(i));
+            if (mraa_pin_mode_test(i, MRAA_PIN_GPIO))
+                fprintf(stdout, "GPIO ");
+            if (mraa_pin_mode_test(i, MRAA_PIN_I2C))
+                fprintf(stdout, "I2C  ");
+            if (mraa_pin_mode_test(i, MRAA_PIN_SPI))
+                fprintf(stdout, "SPI  ");
+            if (mraa_pin_mode_test(i, MRAA_PIN_PWM))
+                fprintf(stdout, "PWM  ");
+            if (mraa_pin_mode_test(i, MRAA_PIN_AIO))
+                fprintf(stdout, "AIO  ");
+            if (mraa_pin_mode_test(i, MRAA_PIN_UART))
+                fprintf(stdout, "UART ");
+            fprintf(stdout, "\n");
+        }
     }
 }
 

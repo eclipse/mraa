@@ -149,6 +149,15 @@ mraa_platform_t mraa_get_platform_type();
  */
 unsigned int mraa_get_pin_count();
 
+/**
+* Get name of pin, board must be initialised.
+*
+* @param pin number
+*
+* @return char* of pin name
+*/
+char* mraa_get_pin_name(int pin);
+
 #ifdef __cplusplus
 }
 #endif
