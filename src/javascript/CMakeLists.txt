@@ -1,20 +1,17 @@
-find_path (NODE_ROOT_DIR "node/node.h" "src/node.h"
-  PATHS /usr/include/nodejs /usr/local/include/nodejs)
-
-set (NODE_INCLUDE_DIRS
-  ${NODE_ROOT_DIR}/src
-  ${NODE_ROOT_DIR}/node
-  ${NODE_ROOT_DIR}/deps/v8/include
-  ${NODE_ROOT_DIR}/deps/uv/include
-)
+find_package (Nodejs)
 
 include_directories (
   ${NODE_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-# SWIG treats SWIG_FLAGS as a list and not a string so semicolon seperation is required
-set_source_files_properties (mraajs.i PROPERTIES SWIG_FLAGS "-node;-I${CMAKE_BINARY_DIR}/src")
+# SWIG treats SWIG_FLAGS as a list and not a string so semicolon seperation is
+# required. This hardcodes V8_VERSION to be <10 but I assume that's not going
+# to be a problem for a little while!
+#set_source_files_properties (mraajs.i PROPERTIES SWIG_FLAGS "-node;-DV8_VERSION=0x0${V8_VERSION_HEX};-I${CMAKE_BINARY_DIR}/src")
+#set_source_files_properties (mraajs.i PROPERTIES SWIG_FLAGS "-node;-I${CMAKE_BINARY_DIR}/src")
+set_property (SOURCE mraajs.i PROPERTY SWIG_FLAGS "-node"
+              "-I${CMAKE_BINARY_DIR}/src" "-DV8_VERSION=0x0${V8_VERSION_MAJOR}${V8_VERSION_MINOR}${V8_VERSION_PATCH}")
 set_source_files_properties (mraajs.i PROPERTIES CPLUSPLUS ON)
 
 swig_add_module (mraajs javascript mraajs.i ${mraa_LIB_SRCS})
