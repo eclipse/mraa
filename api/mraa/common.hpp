@@ -152,6 +152,19 @@ inline unsigned int getPinCount()
 }
 
 /**
+* Get name of pin, board must be initialised.
+*
+* @param pin number
+*
+* @return char* of pin name
+*/
+    inline std::string getPinName(int pin)
+    {
+        std::string ret_val(mraa_get_pin_name(pin));
+        return ret_val;
+    }
+
+/**
  * Sets the log level to use from 0-7 where 7 is very verbose. These are the
  * syslog log levels, see syslog(3) for more information on the levels.
  *

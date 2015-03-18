@@ -328,6 +328,17 @@ mraa_file_exist(char *filename) {
 }
 
 char*
+mraa_get_pin_name(int pin)
+{
+    if (plat == NULL) {
+        return NULL;
+    }
+    if (pin > (plat->phy_pin_count -1) || pin < 0)
+        return NULL;
+    return (char*) plat->pins[pin].name;
+}
+
+char*
 mraa_file_unglob(char *filename) {
     glob_t results;
     char *res = NULL;
