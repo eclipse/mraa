@@ -1,4 +1,12 @@
-FIND_PACKAGE(PythonLibs)
+if (BUILDPYTHON3)
+  set (PYTHONBUILD_VERSION 3)
+else ()
+  set (PYTHONBUILD_VERSION 2.7)
+endif ()
+
+find_package (PythonLibs ${PYTHONBUILD_VERSION} REQUIRED)
+find_package (PythonInterp ${PYTHONBUILD_VERSION} REQUIRED)
+
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 
 include_directories(
@@ -29,13 +37,23 @@ set_target_properties (${SWIG_MODULE_python-mraa_REAL_NAME} PROPERTIES
   COMPILE_FLAGS "${CMAKE_C_FLAGS} -DSWIGPYTHON=${SWIG_FOUND}"
 )
 
-# Essentially do seperate_arguments but with "." instead of " "
-string (REPLACE "." ";" PYTHON_VERSION_LIST ${PYTHONLIBS_VERSION_STRING})
-list (GET PYTHON_VERSION_LIST 0 PYTHON_VERSION_MAJOR)
-list (GET PYTHON_VERSION_LIST 1 PYTHON_VERSION_MINOR)
+execute_process (
+   COMMAND ${PYTHON_EXECUTABLE} -c
+       "import site, sys; sys.stdout.write(site.PREFIXES[-1])"
+   OUTPUT_VARIABLE PYTHON_PREFIX
+)
+file (TO_CMAKE_PATH "${PYTHON_PREFIX}" PYTHON_PREFIX)
+execute_process (
+   COMMAND ${PYTHON_EXECUTABLE} -c
+       "import site, sys; sys.stdout.write(site.getusersitepackages().replace(site.getuserbase(), site.PREFIXES[-1]))"
+   OUTPUT_VARIABLE PYTHON_SITE_DIR
+)
+file (TO_CMAKE_PATH "${PYTHON_SITE_DIR}" PYTHON_SITE_DIR)
+string (REGEX REPLACE "^${PYTHON_PREFIX}/" ""
+   PYTHON_SITE_DIR "${PYTHON_SITE_DIR}")
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/_mraa.so
          ${CMAKE_CURRENT_BINARY_DIR}/mraa.py
-         DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/)
+         DESTINATION ${PYTHON_SITE_DIR})
 
 add_subdirectory (docs)

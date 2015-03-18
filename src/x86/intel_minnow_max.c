@@ -60,6 +60,9 @@ mraa_set_pininfo(mraa_board_t* board, int mraa_index, char *name, mraa_pincapabi
             pin_info->pwm.pinmap = 0;
             pin_info->pwm.mux_total = 0;
         }
+        if (caps.spi) {
+            pin_info->spi.mux_total = 0;
+        }
         return MRAA_SUCCESS;
     }
     return MRAA_ERROR_INVALID_RESOURCE;

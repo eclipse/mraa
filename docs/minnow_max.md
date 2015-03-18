@@ -12,6 +12,12 @@ Supported Firmware
 ------------------
 mraa has only been tested with 64 bit firmware version 0.73 or later.
 
+SPI
+---
+For SPI support you need to load the low_speed_spidev kernel module and that
+will create the /dev/spidev0.0 device node. Mraa only knows about this one SPI
+bus and no other.
+
 Interface notes
 ---------------
 The low speed I/O connector supported as per table below.  This assumes default
@@ -21,8 +27,6 @@ will not behave as expected.
 
 Documentation shows i2c on bus #5, ACPI shows it on bus #6, but driver uses
 bus #7.
-
-**SPI operation is not currently supported**
 
 | MRAA Number | Physical Pin  | Function   | Sysfs GPIO | Notes                |
 |-------------|---------------|------------|------------|----------------------|
