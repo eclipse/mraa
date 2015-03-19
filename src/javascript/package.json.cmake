@@ -5,7 +5,7 @@
   "homepage": "http://github.com/intel-iot-devkit/mraa",
   "main" : "./mraa.node",
   "engines": {
-    "node": ">= @NODE_VERSION_MAJOR@.@NODE_VERSION_MINOR@.x"
+    "node": ">= 0.10.x"
   },
   "bugs": {
     "url" : "http://github.com/intel-iot-devkit/mraa/issues"
