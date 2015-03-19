@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 project (mraa)
 
-FIND_PACKAGE (Threads)
+FIND_PACKAGE (Threads REQUIRED)
 
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -fno-omit-frame-pointer")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
