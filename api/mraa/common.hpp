@@ -44,7 +44,9 @@ namespace mraa {
  *
  * Detects running platform and attempts to use included pinmap, this is run on
  * module/library init/load but is handy to rerun to check board initialised
- * correctly. Anything but MRAA_SUCCESS should be considered a critical failure
+ * correctly. MRAA_SUCCESS inidicates correct (first time) initialisation
+ * whilst MRAA_ERROR_PLATFORM_ALREADY_INITIALISED indicates the board is
+ * already initialised correctly
  *
  * @return Result of operation
  */
