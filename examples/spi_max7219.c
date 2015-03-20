@@ -31,7 +31,7 @@ int
 main(int argc, char **argv) {
 //! [Interesting]
     mraa_spi_context spi;
-    spi = mraa_spi_init(1);
+    spi = mraa_spi_init(0);
     if (spi == NULL) {
         printf("Initialization of spi failed, check syslog for details, exit...\n");
         exit(1);
@@ -39,19 +39,33 @@ main(int argc, char **argv) {
 
     printf("SPI initialised successfully\n");
 
-    mraa_spi_frequency(spi, 400000);
-    mraa_spi_lsbmode(spi, 0);
+    if (mraa_spi_frequency(spi, 400000) != MRAA_SUCCESS) {
+        printf("Could not set spi frequency");
+        exit(1);
+    }
+
+    if (mraa_spi_lsbmode(spi, 0) != MRAA_SUCCESS) {
+        printf("Could not set lsb mode");
+        exit(1);
+    }
 
     // The MAX7219/21 Chip needs the data in word size
     if (mraa_spi_bit_per_word(spi, 16) != MRAA_SUCCESS) {
-        printf("Could not set SPI Device to 16Bit mode, exit...\n");
-        exit(1);
-    };
+        if (mraa_spi_sw_cs(spi,MRAA_SPI_SOFT_16BIS,24) != MRAA_SUCCESS) {
+            printf("Could not set SPI Device to 16Bit mode, exit...\n");
+            exit(1);
+        }
+        printf("Hardware support for 16Bit mode not available switched to software cs. SPI performance may suffer.\n");
+    }
 
     mraa_spi_write_word(spi, 0x0900);  // Do not decode bits
     mraa_spi_write_word(spi, 0x0a05);  // Brightness of LEDs
     mraa_spi_write_word(spi, 0x0b07);  // Show all Scan Lines
     mraa_spi_write_word(spi, 0x0c01);  // Display on
+    mraa_spi_write_word(spi, 0x0f01);  // Testmode on
+
+    sleep(1);
+
     mraa_spi_write_word(spi, 0x0f00);  // Testmode off
 
     // Display Pattern on the display

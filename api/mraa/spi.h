@@ -57,6 +57,12 @@ typedef enum {
     MRAA_SPI_MODE3 = 3, /**< CPOL = 1, CPHA = 1, Clock idle low, data is clocked in on rising, edge output data (change) on falling edge */
 } mraa_spi_mode_t;
 
+typedef enum {
+    MRAA_SPI_SOFT_8BIS = 8,   //** SoftSPI handles CS pin in chunks of 8 Bits */
+    MRAA_SPI_SOFT_9BIS = 9,   //** SoftSPI handles CS pin in chunks of 9 Bits (if spidev associated allows 9 bit transfer) */
+    MRAA_SPI_SOFT_16BIS = 16, //** SoftSPI handles CS pin in chunks of 16 bits */
+} mraa_spi_soft_bits_t;
+
 /**
  * Opaque pointer definition to the internal struct _spi
  */
@@ -98,6 +104,30 @@ mraa_result_t mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode);
 mraa_result_t mraa_spi_frequency(mraa_spi_context dev, int hz);
 
 /**
+ * Disables the hardware chip select on the platform that is toggled by spidev
+ * effectively giving you a handle on the raw spi bus
+ *
+ * @param dev The Spi context
+ * @param
+ * @return Result of operation
+ */
+mraa_result_t mraa_spi_hw_cs(mraa_spi_context dev, mraa_boolean_t hwcs);
+
+/**
+* Disables the hardware chip select on the platform that is toggled by spidev
+* and replaces it with a software based chip select managed by mraa to overcome
+* limitations of the implementation on some platforms supporting only 8 or 9 bit transfers
+* do not use this on platforms that have native support for your required bitlength as spi
+* performance will suffer using soft chip select
+*
+* @param dev The Spi context
+* @param number of bits per chip select. Only multiples of existing number of bits are supported.
+* @param replacement cs pin
+* @return Result of operation
+*/
+mraa_result_t mraa_spi_sw_cs(mraa_spi_context dev, mraa_spi_soft_bits_t softbits, int pin);
+
+/**
  * Write Single Byte to the SPI device.
  *
  * @param dev The Spi context
@@ -113,7 +143,7 @@ int mraa_spi_write(mraa_spi_context dev, uint8_t data);
  * @param data Data to send
  * @return Data received on the miso line
  */
-uint16_t mraa_spi_write_word(mraa_spi_context dev, uint16_t data);
+long mraa_spi_write_word(mraa_spi_context dev, uint16_t data);
 
 /**
  * Write Buffer of bytes to the SPI device. The pointer return has to be
