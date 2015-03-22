@@ -29,3 +29,17 @@ make npmpkg
 ln -s ../ mraa
 tar hczv --exclude='build*' --exclude='.gitignore' --exclude='.git' --exclude='build*/*' --exclude='.git/*' -f mraa.tar.gz mraa
 ~~~~~~~~~~~~~
+
+Building with node-gyp
+----------------------
+
+You can build with node-gyp using the binding.gyp file, obviously this requires
+either the prebuilt tarball from npm or to do the above to generate it with the
+npmpkg target. Note the --target='' flag will not work since binding.gyp will
+do a check for the running node v8 version, you'll also need to run that
+version (or close to) in your $PATH.
+
+~~~~~~~~~~~{.sh}
+node-gyp configure --python=/usr/bin/python2
+node-gyp build --python=/usr/bin/python2 --verbose
+~~~~~~~~~~~
