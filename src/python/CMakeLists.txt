@@ -14,9 +14,9 @@ include_directories(
   ${PYTHON_INCLUDE_DIRS}
 )
 
-set_source_files_properties (python-mraa.i PROPERTIES CPLUSPLUS ON)
-set_source_files_properties (python-mraa.i PROPERTIES SWIG_FLAGS "-I${CMAKE_BINARY_DIR}/src")
-swig_add_module (python-mraa python python-mraa.i ${mraa_LIB_SRCS})
+set_source_files_properties (mraa.i PROPERTIES CPLUSPLUS ON)
+set_source_files_properties (mraa.i PROPERTIES SWIG_FLAGS "-I${CMAKE_BINARY_DIR}/src")
+swig_add_module (python-mraa python mraa.i ${mraa_LIB_SRCS})
 swig_link_libraries (python-mraa ${PYTHON_LIBRARIES})
 
 if (DOXYGEN_FOUND)
