@@ -27,6 +27,7 @@
 #include "types.h"
 
 #define MRAA_PLATFORM_NAME_MAX_SIZE 64
+#define MRAA_PIN_NAME_SIZE 12
 
 /** @file
  *

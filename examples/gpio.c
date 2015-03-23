@@ -70,7 +70,7 @@ list_pins()
     for (i = 0; i < pin_count; ++i) {
         if (strcmp(mraa_get_pin_name(i), "INVALID") != 0) {
             fprintf(stdout, "%02d ", i);
-            fprintf(stdout, "%8s: ", mraa_get_pin_name(i));
+            fprintf(stdout, "%*s: ", (MRAA_PIN_NAME_SIZE - 1), mraa_get_pin_name(i));
             if (mraa_pin_mode_test(i, MRAA_PIN_GPIO))
                 fprintf(stdout, "GPIO ");
             if (mraa_pin_mode_test(i, MRAA_PIN_I2C))
