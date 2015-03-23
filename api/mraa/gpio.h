@@ -59,30 +59,30 @@ typedef struct _gpio* mraa_gpio_context;
  * Gpio Output modes
  */
 typedef enum {
-    MRAA_GPIO_STRONG     = 0, /**< Default. Strong high and low */
-    MRAA_GPIO_PULLUP     = 1, /**< Resistive High */
-    MRAA_GPIO_PULLDOWN   = 2, /**< Resistive Low */
-    MRAA_GPIO_HIZ        = 3  /**< High Z State */
+    MRAA_GPIO_STRONG = 0,   /**< Default. Strong high and low */
+    MRAA_GPIO_PULLUP = 1,   /**< Resistive High */
+    MRAA_GPIO_PULLDOWN = 2, /**< Resistive Low */
+    MRAA_GPIO_HIZ = 3       /**< High Z State */
 } gpio_mode_t;
 
 /**
  * Gpio Direction options
  */
 typedef enum {
-    MRAA_GPIO_OUT    = 0, /**< Output. A Mode can also be set */
-    MRAA_GPIO_IN     = 1,  /**< Input */
+    MRAA_GPIO_OUT = 0,      /**< Output. A Mode can also be set */
+    MRAA_GPIO_IN = 1,       /**< Input */
     MRAA_GPIO_OUT_HIGH = 2, /**< Output. Init High */
-    MRAA_GPIO_OUT_LOW = 3 /**< Output. Init Low */
+    MRAA_GPIO_OUT_LOW = 3   /**< Output. Init Low */
 } gpio_dir_t;
 
 /**
  * Gpio Edge types for interupts
  */
 typedef enum {
-    MRAA_GPIO_EDGE_NONE    = 0, /**< No interrupt on Gpio */
-    MRAA_GPIO_EDGE_BOTH    = 1, /**< Interupt on rising & falling */
-    MRAA_GPIO_EDGE_RISING  = 2, /**< Interupt on rising only */
-    MRAA_GPIO_EDGE_FALLING = 3  /**< Interupt on falling only */
+    MRAA_GPIO_EDGE_NONE = 0,   /**< No interrupt on Gpio */
+    MRAA_GPIO_EDGE_BOTH = 1,   /**< Interupt on rising & falling */
+    MRAA_GPIO_EDGE_RISING = 2, /**< Interupt on rising only */
+    MRAA_GPIO_EDGE_FALLING = 3 /**< Interupt on falling only */
 } gpio_edge_t;
 
 /**
@@ -120,7 +120,7 @@ mraa_result_t mraa_gpio_edge_mode(mraa_gpio_context dev, gpio_edge_t mode);
  * @param args Arguments passed to the interrupt handler (fptr)
  * @return Result of operation
  */
-mraa_result_t mraa_gpio_isr(mraa_gpio_context dev, gpio_edge_t edge, void (*fptr)(void *), void * args);
+mraa_result_t mraa_gpio_isr(mraa_gpio_context dev, gpio_edge_t edge, void (*fptr)(void*), void* args);
 
 /**
  * Stop the current interupt watcher on this Gpio, and set the Gpio edge mode

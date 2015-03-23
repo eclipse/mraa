@@ -28,12 +28,13 @@
 #include <stdexcept>
 
 #if defined(SWIGJAVASCRIPT)
-  #if NODE_MODULE_VERSION >= 0x000D
-    #include <uv.h>
-  #endif
+#if NODE_MODULE_VERSION >= 0x000D
+#include <uv.h>
+#endif
 #endif
 
-namespace mraa {
+namespace mraa
+{
 
 // These enums must match the enums in gpio.h
 
@@ -41,30 +42,30 @@ namespace mraa {
  * Gpio Output modes
  */
 typedef enum {
-    MODE_STRONG   = 0, /**< Default. Strong High and Low */
-    MODE_PULLUP   = 1, /**< Interupt on rising & falling */
+    MODE_STRONG = 0,   /**< Default. Strong High and Low */
+    MODE_PULLUP = 1,   /**< Interupt on rising & falling */
     MODE_PULLDOWN = 2, /**< Interupt on rising only */
-    MODE_HIZ      = 3  /**< Interupt on falling only */
+    MODE_HIZ = 3       /**< Interupt on falling only */
 } Mode;
 
 /**
  * Gpio Direction options
  */
 typedef enum {
-    DIR_OUT      = 0, /**< Output. A Mode can also be set */
-    DIR_IN       = 1, /**< Input */
+    DIR_OUT = 0,      /**< Output. A Mode can also be set */
+    DIR_IN = 1,       /**< Input */
     DIR_OUT_HIGH = 2, /**< Output. Init High */
-    DIR_OUT_LOW  = 3  /**< Output. Init Low */
+    DIR_OUT_LOW = 3   /**< Output. Init Low */
 } Dir;
 
 /**
  * Gpio Edge types for interupts
  */
 typedef enum {
-    EDGE_NONE    = 0, /**< No interrupt on Gpio */
-    EDGE_BOTH    = 1, /**< Interupt on rising & falling */
-    EDGE_RISING  = 2, /**< Interupt on rising only */
-    EDGE_FALLING = 3  /**< Interupt on falling only */
+    EDGE_NONE = 0,   /**< No interrupt on Gpio */
+    EDGE_BOTH = 1,   /**< Interupt on rising & falling */
+    EDGE_RISING = 2, /**< Interupt on rising only */
+    EDGE_FALLING = 3 /**< Interupt on falling only */
 } Edge;
 
 /**
@@ -74,182 +75,211 @@ typedef enum {
  *
  * @snippet Blink-IO.cpp Interesting
  */
-class Gpio {
-    public:
-        /**
-         * Instanciates a Gpio object
-         *
-         * @param pin pin number to use
-         * @param owner (optional) Set pin owner, default behaviour is to 'own'
-         * the pin if we exported it. This means we will close it on destruct.
-         * Otherwise it will get left open. This is only valid in sysfs use
-         * cases
-         * @param raw (optional) Raw pins will use gpiolibs pin numbering from
-         * the kernel module. Note that you will not get any muxers set up for
-         * you so this may not always work as expected.
-         */
-        Gpio(int pin, bool owner=true, bool raw=false) {
-            if (raw) {
-                m_gpio = mraa_gpio_init_raw(pin);
-            }
-            else {
-                m_gpio = mraa_gpio_init(pin);
-            }
+class Gpio
+{
+  public:
+    /**
+     * Instanciates a Gpio object
+     *
+     * @param pin pin number to use
+     * @param owner (optional) Set pin owner, default behaviour is to 'own'
+     * the pin if we exported it. This means we will close it on destruct.
+     * Otherwise it will get left open. This is only valid in sysfs use
+     * cases
+     * @param raw (optional) Raw pins will use gpiolibs pin numbering from
+     * the kernel module. Note that you will not get any muxers set up for
+     * you so this may not always work as expected.
+     */
+    Gpio(int pin, bool owner = true, bool raw = false)
+    {
+        if (raw) {
+            m_gpio = mraa_gpio_init_raw(pin);
+        } else {
+            m_gpio = mraa_gpio_init(pin);
+        }
 
-            if (m_gpio == NULL) {
-                throw std::invalid_argument("Invalid GPIO pin specified");
-            }
+        if (m_gpio == NULL) {
+            throw std::invalid_argument("Invalid GPIO pin specified");
+        }
 
-            if (!owner) {
-                mraa_gpio_owner(m_gpio, 0);
-            }
+        if (!owner) {
+            mraa_gpio_owner(m_gpio, 0);
         }
-        /**
-         * Gpio object destructor, this will only unexport the gpio if we where
-         * the owner
-         */
-        ~Gpio() {
-            mraa_gpio_close(m_gpio);
-        }
-        /**
-         * Set the edge mode for ISR
-         *
-         * @param mode The edge mode to set
-         * @return Result of operation
-         */
-        mraa_result_t edge(Edge mode) {
-            return mraa_gpio_edge_mode(m_gpio, (gpio_edge_t) mode);
-        }
+    }
+    /**
+     * Gpio object destructor, this will only unexport the gpio if we where
+     * the owner
+     */
+    ~Gpio()
+    {
+        mraa_gpio_close(m_gpio);
+    }
+    /**
+     * Set the edge mode for ISR
+     *
+     * @param mode The edge mode to set
+     * @return Result of operation
+     */
+    mraa_result_t
+    edge(Edge mode)
+    {
+        return mraa_gpio_edge_mode(m_gpio, (gpio_edge_t) mode);
+    }
 #if defined(SWIGPYTHON)
-        mraa_result_t isr(Edge mode, PyObject *pyfunc, PyObject* args) {
-            return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, (void (*) (void *)) pyfunc, (void *) args);
-        }
+    mraa_result_t
+    isr(Edge mode, PyObject* pyfunc, PyObject* args)
+    {
+        return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, (void (*) (void*)) pyfunc, (void*) args);
+    }
 #elif defined(SWIGJAVASCRIPT)
-        static void v8isr(uv_work_t* req, int status) {
-            mraa::Gpio *This = (mraa::Gpio *)req->data;
-            int argc = 1;
-            v8::Local<v8::Value> argv[] = { SWIGV8_INTEGER_NEW(-1) };
+    static void
+    v8isr(uv_work_t* req, int status)
+    {
+        mraa::Gpio* This = (mraa::Gpio*) req->data;
+        int argc = 1;
+        v8::Local<v8::Value> argv[] = { SWIGV8_INTEGER_NEW(-1) };
 #if NODE_MODULE_VERSION >= 0x000D
-            v8::Local<v8::Function> f = v8::Local<v8::Function>::New(v8::Isolate::GetCurrent(), This->m_v8isr);
-            f->Call(SWIGV8_CURRENT_CONTEXT()->Global(), argc, argv);
+        v8::Local<v8::Function> f = v8::Local<v8::Function>::New(v8::Isolate::GetCurrent(), This->m_v8isr);
+        f->Call(SWIGV8_CURRENT_CONTEXT()->Global(), argc, argv);
 #else
-            This->m_v8isr->Call(SWIGV8_CURRENT_CONTEXT()->Global(), argc, argv);
+        This->m_v8isr->Call(SWIGV8_CURRENT_CONTEXT()->Global(), argc, argv);
 #endif
-            delete req;
-        }
+        delete req;
+    }
 
-        static void nop(uv_work_t* req)
-        {
-            // Do nothing.
-        }
+    static void
+    nop(uv_work_t* req)
+    {
+        // Do nothing.
+    }
 
-        static void uvwork(void *ctx) {
-            uv_work_t* req = new uv_work_t;
-            req->data = ctx;
-            uv_queue_work(uv_default_loop(), req, nop, v8isr);
-        }
+    static void
+    uvwork(void* ctx)
+    {
+        uv_work_t* req = new uv_work_t;
+        req->data = ctx;
+        uv_queue_work(uv_default_loop(), req, nop, v8isr);
+    }
 
-        mraa_result_t isr(Edge mode, v8::Handle<v8::Function> func) {
+    mraa_result_t
+    isr(Edge mode, v8::Handle<v8::Function> func)
+    {
 #if NODE_MODULE_VERSION >= 0x000D
-            m_v8isr.Reset(v8::Isolate::GetCurrent(), func);
+        m_v8isr.Reset(v8::Isolate::GetCurrent(), func);
 #else
-            m_v8isr = v8::Persistent<v8::Function>::New(func);
+        m_v8isr = v8::Persistent<v8::Function>::New(func);
 #endif
-            return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, &uvwork, this);
-        }
+        return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, &uvwork, this);
+    }
 #else
-        /**
-         * Sets a callback to be called when pin value changes
-         *
-         * @param mode The edge mode to set
-         * @param fptr Function pointer to function to be called when interupt is
-         * triggered
-         * @param args Arguments passed to the interrupt handler (fptr)
-         * @return Result of operation
-         */
-        mraa_result_t isr(Edge mode, void (*fptr)(void *), void * args) {
-            return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, fptr, args);
-        }
+    /**
+     * Sets a callback to be called when pin value changes
+     *
+     * @param mode The edge mode to set
+     * @param fptr Function pointer to function to be called when interupt is
+     * triggered
+     * @param args Arguments passed to the interrupt handler (fptr)
+     * @return Result of operation
+     */
+    mraa_result_t
+    isr(Edge mode, void (*fptr)(void*), void* args)
+    {
+        return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, fptr, args);
+    }
 #endif
-        /**
-         * Exits callback - this call will not kill the isr thread imediatlu
-         * but only when it is out of it's critical section
-         *
-         * @return Result of operation
-         */
-        mraa_result_t isrExit() {
+    /**
+     * Exits callback - this call will not kill the isr thread imediatlu
+     * but only when it is out of it's critical section
+     *
+     * @return Result of operation
+     */
+    mraa_result_t
+    isrExit()
+    {
 #if defined(SWIGJAVASCRIPT)
-  #if NODE_MODULE_VERSION >= 0x000D
-            m_v8isr.Reset();
-  #else
-            m_v8isr.Dispose();
-            m_v8isr.Clear();
-  #endif
+#if NODE_MODULE_VERSION >= 0x000D
+        m_v8isr.Reset();
+#else
+        m_v8isr.Dispose();
+        m_v8isr.Clear();
 #endif
-            return mraa_gpio_isr_exit(m_gpio);
+#endif
+        return mraa_gpio_isr_exit(m_gpio);
+    }
+    /**
+     * Change Gpio mode
+     *
+     * @param mode The mode to change the gpio into
+     * @return Result of operation
+     */
+    mraa_result_t
+    mode(Mode mode)
+    {
+        return mraa_gpio_mode(m_gpio, (gpio_mode_t) mode);
+    }
+    /**
+     * Change Gpio direction
+     *
+     * @param dir The direction to change the gpio into
+     * @return Result of operation
+     */
+    mraa_result_t
+    dir(Dir dir)
+    {
+        return mraa_gpio_dir(m_gpio, (gpio_dir_t) dir);
+    }
+    /**
+     * Read value from Gpio
+     *
+     * @return Gpio value
+     */
+    int
+    read()
+    {
+        return mraa_gpio_read(m_gpio);
+    }
+    /**
+     * Write value to Gpio
+     *
+     * @param value Value to write to Gpio
+     * @return Result of operation
+     */
+    mraa_result_t
+    write(int value)
+    {
+        return mraa_gpio_write(m_gpio, value);
+    }
+    /**
+     * Enable use of mmap i/o if available.
+     *
+     * @param enable true to use mmap
+     * @return Result of operation
+     */
+    mraa_result_t
+    useMmap(bool enable)
+    {
+        return mraa_gpio_use_mmaped(m_gpio, (mraa_boolean_t) enable);
+    }
+    /**
+     * Get pin number of Gpio. If raw param is True will return the
+     * number as used within sysfs
+     *
+     * @param raw (optional) get the raw gpio number.
+     * @return Pin number
+     */
+    int
+    getPin(bool raw = false)
+    {
+        if (raw) {
+            return mraa_gpio_get_pin_raw(m_gpio);
         }
-        /**
-         * Change Gpio mode
-         *
-         * @param mode The mode to change the gpio into
-         * @return Result of operation
-         */
-        mraa_result_t mode(Mode mode) {
-            return mraa_gpio_mode(m_gpio, (gpio_mode_t) mode);
-        }
-        /**
-         * Change Gpio direction
-         *
-         * @param dir The direction to change the gpio into
-         * @return Result of operation
-         */
-        mraa_result_t dir(Dir dir) {
-            return mraa_gpio_dir(m_gpio, (gpio_dir_t) dir);
-        }
-        /**
-         * Read value from Gpio
-         *
-         * @return Gpio value
-         */
-        int read() {
-            return mraa_gpio_read(m_gpio);
-        }
-        /**
-         * Write value to Gpio
-         *
-         * @param value Value to write to Gpio
-         * @return Result of operation
-         */
-        mraa_result_t write(int value) {
-            return mraa_gpio_write(m_gpio, value);
-        }
-        /**
-         * Enable use of mmap i/o if available.
-         *
-         * @param enable true to use mmap
-         * @return Result of operation
-         */
-        mraa_result_t useMmap(bool enable) {
-            return mraa_gpio_use_mmaped(m_gpio, (mraa_boolean_t) enable);
-        }
-        /**
-         * Get pin number of Gpio. If raw param is True will return the
-         * number as used within sysfs
-         *
-         * @param raw (optional) get the raw gpio number.
-         * @return Pin number
-         */
-        int getPin(bool raw = false) {
-            if (raw) {
-                return mraa_gpio_get_pin_raw(m_gpio);
-            }
-            return mraa_gpio_get_pin(m_gpio);
-        }
-    private:
-        mraa_gpio_context m_gpio;
+        return mraa_gpio_get_pin(m_gpio);
+    }
+
+  private:
+    mraa_gpio_context m_gpio;
 #if defined(SWIGJAVASCRIPT)
-        v8::Persistent<v8::Function> m_v8isr;
+    v8::Persistent<v8::Function> m_v8isr;
 #endif
 };
-
 }

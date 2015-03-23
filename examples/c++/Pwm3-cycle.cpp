@@ -38,10 +38,11 @@ sig_handler(int signo)
     }
 }
 
-int main ()
+int
+main()
 {
     signal(SIGINT, sig_handler);
-//! [Interesting]
+    //! [Interesting]
     mraa::Pwm* pwm;
 
     pwm = new mraa::Pwm(3);
@@ -61,7 +62,7 @@ int main ()
         }
     }
     delete pwm;
-//! [Interesting]
+    //! [Interesting]
 
     return MRAA_SUCCESS;
 }

@@ -42,7 +42,7 @@ mraa_intel_de3815()
 
     b->platform_name = PLATFORM_NAME;
     b->phy_pin_count = 18;
-    //b->gpio_count = 14;
+    // b->gpio_count = 14;
     b->aio_count = 0;
     b->adc_raw = 0;
     b->adc_supported = 0;
@@ -50,71 +50,71 @@ mraa_intel_de3815()
     b->pwm_max_period = 2147483;
     b->pwm_min_period = 1;
 
-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_DE3815_PINCOUNT);
+    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_DE3815_PINCOUNT);
     if (b->pins == NULL) {
         goto error;
     }
 
     strncpy(b->pins[0].name, "1.8v", 8);
-    b->pins[0].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[0].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[1].name, "GND", 8);
-    b->pins[1].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[1].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     strncpy(b->pins[2].name, "HDMIcec", 8);
-    b->pins[2].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[2].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     strncpy(b->pins[3].name, "DMICclk", 8);
-    b->pins[3].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[3].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     strncpy(b->pins[4].name, "3.3v", 8);
-    b->pins[4].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[4].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     strncpy(b->pins[5].name, "DMICda", 8);
-    b->pins[5].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[5].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     strncpy(b->pins[6].name, "Key", 8);
-    b->pins[6].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[6].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     strncpy(b->pins[7].name, "SMB-A", 8);
-    b->pins[7].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[7].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     strncpy(b->pins[8].name, "5v", 8);
-    b->pins[8].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[8].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     strncpy(b->pins[9].name, "SCI", 8);
-    b->pins[9].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[9].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[10].name, "PWM0", 8);
-    b->pins[10].capabilites = (mraa_pincapabilities_t) {1,0,1,0,0,0,0,0};
+    b->pins[10].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
     b->pins[10].pwm.pinmap = 0;
     b->pins[10].pwm.parent_id = 0;
     b->pins[10].pwm.mux_total = 0;
 
     strncpy(b->pins[11].name, "PWM1", 8);
-    b->pins[11].capabilites = (mraa_pincapabilities_t) {1,0,1,0,0,0,0,0};
+    b->pins[11].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
     b->pins[11].pwm.pinmap = 0;
     b->pins[11].pwm.parent_id = 1;
     b->pins[11].pwm.mux_total = 0;
 
     strncpy(b->pins[12].name, "I2C0SCL", 8);
-    b->pins[12].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,0,0};
+    b->pins[12].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[12].i2c.pinmap = 1;
     b->pins[12].i2c.mux_total = 0;
 
     strncpy(b->pins[13].name, "I2C0SDA", 8);
-    b->pins[13].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,0,0};
+    b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[13].i2c.pinmap = 1;
     b->pins[13].i2c.mux_total = 0;
 
     strncpy(b->pins[14].name, "I2C1SCL", 8);
-    b->pins[14].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,0,0};
+    b->pins[14].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[14].i2c.pinmap = 1;
     b->pins[14].i2c.mux_total = 0;
 
     strncpy(b->pins[15].name, "I2C1SDA", 8);
-    b->pins[15].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,1,0,0};
+    b->pins[15].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[15].i2c.pinmap = 1;
     b->pins[15].i2c.mux_total = 0;
 
     strncpy(b->pins[16].name, "SMB_CLK", 8);
-    b->pins[16].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[16].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     strncpy(b->pins[17].name, "SMB_SDA", 8);
-    b->pins[17].capabilites = (mraa_pincapabilities_t) {1,0,0,0,0,0,0,0};
+    b->pins[17].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
-    //BUS DEFINITIONS
+    // BUS DEFINITIONS
     b->i2c_bus_count = 2;
     b->def_i2c_bus = 0;
     b->i2c_bus[0].bus_id = 0;

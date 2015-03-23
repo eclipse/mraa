@@ -41,11 +41,11 @@
  */
 struct _spi {
     /*@{*/
-    int devfd; /**< File descriptor to SPI Device */
-    uint32_t mode; /**< Spi mode see spidev.h */
-    int clock; /**< clock to run transactions at */
+    int devfd;          /**< File descriptor to SPI Device */
+    uint32_t mode;      /**< Spi mode see spidev.h */
+    int clock;          /**< clock to run transactions at */
     mraa_boolean_t lsb; /**< least significant bit mode */
-    unsigned int bpw; /**< Bits per word */
+    unsigned int bpw;   /**< Bits per word */
     /*@}*/
 };
 
@@ -139,8 +139,7 @@ mraa_spi_init_raw(unsigned int bus, unsigned int cs)
     int speed = 0;
     if ((ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) != -1) && (speed < 4000000)) {
         dev->clock = speed;
-    }
-    else {
+    } else {
         dev->clock = 4000000;
     }
 
@@ -184,7 +183,7 @@ mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode)
             break;
     }
 
-    if (ioctl (dev->devfd, SPI_IOC_WR_MODE, &spi_mode) < 0) {
+    if (ioctl(dev->devfd, SPI_IOC_WR_MODE, &spi_mode) < 0) {
         syslog(LOG_ERR, "spi: Failed to set spi mode");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -211,11 +210,11 @@ mraa_result_t
 mraa_spi_lsbmode(mraa_spi_context dev, mraa_boolean_t lsb)
 {
     uint8_t lsb_mode = (uint8_t) lsb;
-    if (ioctl (dev->devfd, SPI_IOC_WR_LSB_FIRST, &lsb_mode) < 0) {
+    if (ioctl(dev->devfd, SPI_IOC_WR_LSB_FIRST, &lsb_mode) < 0) {
         syslog(LOG_ERR, "spi: Failed to set bit order");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
-    if (ioctl (dev->devfd, SPI_IOC_RD_LSB_FIRST, &lsb_mode) < 0) {
+    if (ioctl(dev->devfd, SPI_IOC_RD_LSB_FIRST, &lsb_mode) < 0) {
         syslog(LOG_ERR, "spi: Failed to set bit order");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -329,7 +328,7 @@ mraa_spi_write_buf(mraa_spi_context dev, uint8_t* data, int length)
 }
 
 uint16_t*
-mraa_spi_write_buf_word(mraa_spi_context dev, uint16_t *data, int length)
+mraa_spi_write_buf_word(mraa_spi_context dev, uint16_t* data, int length)
 {
     uint16_t* recv = malloc(sizeof(uint16_t) * length);
 

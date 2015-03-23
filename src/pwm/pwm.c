@@ -37,7 +37,7 @@ static int
 mraa_pwm_setup_duty_fp(mraa_pwm_context dev)
 {
     char bu[MAX_SIZE];
-    snprintf(bu,MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev->chipid, dev->pin);
+    snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev->chipid, dev->pin);
 
     dev->duty_fp = open(bu, O_RDWR);
     if (dev->duty_fp == -1) {
@@ -50,14 +50,14 @@ static mraa_result_t
 mraa_pwm_write_period(mraa_pwm_context dev, int period)
 {
     if (advance_func->pwm_period_replace != NULL) {
-        mraa_result_t result = advance_func->pwm_period_replace(dev,period);
+        mraa_result_t result = advance_func->pwm_period_replace(dev, period);
         if (result == MRAA_SUCCESS) {
             dev->period = period;
         }
         return result;
     }
     char bu[MAX_SIZE];
-    snprintf(bu,MAX_SIZE ,"/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
+    snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
 
     int period_f = open(bu, O_RDWR);
     if (period_f == -1) {
@@ -66,7 +66,7 @@ mraa_pwm_write_period(mraa_pwm_context dev, int period)
     }
     char out[MAX_SIZE];
     int length = snprintf(out, MAX_SIZE, "%d", period);
-    if (write(period_f, out, length*sizeof(char)) == -1) {
+    if (write(period_f, out, length * sizeof(char)) == -1) {
         close(period_f);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -96,7 +96,7 @@ mraa_pwm_read_period(mraa_pwm_context dev)
 {
     char bu[MAX_SIZE];
     char output[MAX_SIZE];
-    snprintf(bu,MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
+    snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
 
     int period_f = open(bu, O_RDWR);
     if (period_f == -1) {
@@ -114,17 +114,16 @@ mraa_pwm_read_period(mraa_pwm_context dev)
         return -1;
     }
 
-    char *endptr;
+    char* endptr;
     long int ret = strtol(output, &endptr, 10);
     if ('\0' != *endptr && '\n' != *endptr) {
         syslog(LOG_ERR, "pwm: Error in string conversion");
         return -1;
-    }
-    else if (ret > INT_MAX || ret < INT_MIN) {
+    } else if (ret > INT_MAX || ret < INT_MIN) {
         syslog(LOG_ERR, "pwm: Number is invalid");
         return -1;
     }
-    dev->period = (int)ret;
+    dev->period = (int) ret;
     return (int) ret;
 }
 
@@ -141,19 +140,18 @@ mraa_pwm_read_duty(mraa_pwm_context dev)
     off_t size = lseek(dev->duty_fp, 0, SEEK_END);
     lseek(dev->duty_fp, 0, SEEK_SET);
     char output[MAX_SIZE];
-    ssize_t rb = read(dev->duty_fp, output, size+1);
+    ssize_t rb = read(dev->duty_fp, output, size + 1);
     if (rb < 0) {
         syslog(LOG_ERR, "pwm: Error in reading duty");
         return -1;
     }
 
-    char *endptr;
+    char* endptr;
     long int ret = strtol(output, &endptr, 10);
     if ('\0' != *endptr && '\n' != *endptr) {
         syslog(LOG_ERR, "pwm: Error in string converstion");
         return -1;
-    }
-    else if (ret > INT_MAX || ret < INT_MIN) {
+    } else if (ret > INT_MAX || ret < INT_MIN) {
         syslog(LOG_ERR, "pwm: Number is invalid");
         return -1;
     }
@@ -209,7 +207,7 @@ mraa_pwm_init(int pin)
     int pinn = plat->pins[pin].pwm.pinmap;
 
     if (advance_func->pwm_init_post != NULL) {
-        mraa_pwm_context pret = mraa_pwm_init_raw(chip,pinn);
+        mraa_pwm_context pret = mraa_pwm_init_raw(chip, pinn);
         mraa_result_t ret = advance_func->pwm_init_post(pret);
         if (ret != MRAA_SUCCESS) {
             free(pret);
@@ -217,7 +215,7 @@ mraa_pwm_init(int pin)
         }
         return pret;
     }
-    return mraa_pwm_init_raw(chip,pinn);
+    return mraa_pwm_init_raw(chip, pinn);
 }
 
 mraa_pwm_context
@@ -249,7 +247,7 @@ mraa_pwm_init_raw(int chipin, int pin)
 
         char out[MAX_SIZE];
         int size = snprintf(out, MAX_SIZE, "%d", dev->pin);
-        if (write(export_f, out, size*sizeof(char)) == -1) {
+        if (write(export_f, out, size * sizeof(char)) == -1) {
             syslog(LOG_WARNING, "pwm: Failed to write to export! Potentially already enabled");
             close(export_f);
             free(dev);
@@ -282,7 +280,7 @@ mraa_pwm_read(mraa_pwm_context dev)
 {
     int period = mraa_pwm_read_period(dev);
     if (period > 0) {
-         return (mraa_pwm_read_duty(dev) / (float) period);
+        return (mraa_pwm_read_duty(dev) / (float) period);
     }
     return 0.0f;
 }
@@ -290,42 +288,41 @@ mraa_pwm_read(mraa_pwm_context dev)
 mraa_result_t
 mraa_pwm_period(mraa_pwm_context dev, float seconds)
 {
-    return mraa_pwm_period_ms(dev, seconds*1000);
+    return mraa_pwm_period_ms(dev, seconds * 1000);
 }
 
 mraa_result_t
 mraa_pwm_period_ms(mraa_pwm_context dev, int ms)
 {
-    return mraa_pwm_period_us(dev, ms*1000);
+    return mraa_pwm_period_us(dev, ms * 1000);
 }
 
 mraa_result_t
 mraa_pwm_period_us(mraa_pwm_context dev, int us)
 {
-    if (us < plat->pwm_min_period ||
-        us > plat->pwm_max_period) {
+    if (us < plat->pwm_min_period || us > plat->pwm_max_period) {
         syslog(LOG_ERR, "pwm: period value outside platform range");
         return MRAA_ERROR_INVALID_PARAMETER;
     }
-    return mraa_pwm_write_period(dev, us*1000);
+    return mraa_pwm_write_period(dev, us * 1000);
 }
 
 mraa_result_t
 mraa_pwm_pulsewidth(mraa_pwm_context dev, float seconds)
 {
-    return mraa_pwm_pulsewidth_ms(dev, seconds*1000);
+    return mraa_pwm_pulsewidth_ms(dev, seconds * 1000);
 }
 
 mraa_result_t
 mraa_pwm_pulsewidth_ms(mraa_pwm_context dev, int ms)
 {
-    return mraa_pwm_pulsewidth_us(dev, ms*1000);
+    return mraa_pwm_pulsewidth_us(dev, ms * 1000);
 }
 
 mraa_result_t
 mraa_pwm_pulsewidth_us(mraa_pwm_context dev, int us)
 {
-    return mraa_pwm_write_duty(dev, us*1000);
+    return mraa_pwm_write_duty(dev, us * 1000);
 }
 
 mraa_result_t
@@ -338,7 +335,7 @@ mraa_pwm_enable(mraa_pwm_context dev, int enable)
         status = enable;
     }
     char bu[MAX_SIZE];
-    snprintf(bu,MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/enable", dev->chipid, dev->pin);
+    snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/enable", dev->chipid, dev->pin);
 
     int enable_f = open(bu, O_RDWR);
 
@@ -371,7 +368,7 @@ mraa_pwm_unexport_force(mraa_pwm_context dev)
 
     char out[MAX_SIZE];
     int size = snprintf(out, MAX_SIZE, "%d", dev->pin);
-    if (write(unexport_f, out, size*sizeof(char)) == -1) {
+    if (write(unexport_f, out, size * sizeof(char)) == -1) {
         syslog(LOG_ERR, "pwm: Failed to write to unexport");
         close(unexport_f);
         return MRAA_ERROR_INVALID_RESOURCE;
@@ -409,12 +406,12 @@ mraa_pwm_owner(mraa_pwm_context dev, mraa_boolean_t owner_new)
 }
 
 mraa_result_t
-mraa_pwm_config_ms(mraa_pwm_context dev, int ms ,float ms_float)
+mraa_pwm_config_ms(mraa_pwm_context dev, int ms, float ms_float)
 {
     int old_dutycycle, old_period, status;
     old_dutycycle = mraa_pwm_read_duty(dev);
     old_period = mraa_pwm_read_period(dev);
-    status = mraa_pwm_period_us(dev, ms*1000);
+    status = mraa_pwm_period_us(dev, ms * 1000);
     if (status != MRAA_SUCCESS) {
         mraa_pwm_write_duty(dev, old_dutycycle);
         return status;
@@ -423,7 +420,7 @@ mraa_pwm_config_ms(mraa_pwm_context dev, int ms ,float ms_float)
     if (status != MRAA_SUCCESS) {
         return status;
     }
-    status = mraa_pwm_pulsewidth_us(dev, ms_float*1000);
+    status = mraa_pwm_pulsewidth_us(dev, ms_float * 1000);
     if (status != MRAA_SUCCESS) {
         mraa_pwm_write_duty(dev, old_dutycycle);
         mraa_pwm_write_period(dev, old_period);
@@ -433,12 +430,12 @@ mraa_pwm_config_ms(mraa_pwm_context dev, int ms ,float ms_float)
 }
 
 mraa_result_t
-mraa_pwm_config_percent(mraa_pwm_context dev, int ms ,float percentage)
+mraa_pwm_config_percent(mraa_pwm_context dev, int ms, float percentage)
 {
     int old_dutycycle, old_period, status;
     old_dutycycle = mraa_pwm_read_duty(dev);
     old_period = mraa_pwm_read_period(dev);
-    status = mraa_pwm_period_us(dev, ms*1000);
+    status = mraa_pwm_period_us(dev, ms * 1000);
     if (status != MRAA_SUCCESS) {
         mraa_pwm_write_duty(dev, old_dutycycle);
         return status;
@@ -447,7 +444,7 @@ mraa_pwm_config_percent(mraa_pwm_context dev, int ms ,float percentage)
     if (status != MRAA_SUCCESS) {
         return status;
     }
-    status = mraa_pwm_pulsewidth_us(dev, (ms*1000)*percentage);
+    status = mraa_pwm_pulsewidth_us(dev, (ms * 1000) * percentage);
     if (status != MRAA_SUCCESS) {
         mraa_pwm_write_duty(dev, old_dutycycle);
         mraa_pwm_write_period(dev, old_period);

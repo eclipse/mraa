@@ -25,7 +25,8 @@
 //! [Interesting]
 #include "mraa.hpp"
 
-int main ()
+int
+main()
 {
     uint16_t adc_value;
     float adc_value_float;
@@ -36,7 +37,7 @@ int main ()
         return MRAA_ERROR_UNSPECIFIED;
     }
 
-    for(;;) {
+    for (;;) {
         adc_value = a0->read();
         adc_value_float = a0->readFloat();
         fprintf(stdout, "ADC A0 read %X - %d\n", adc_value, adc_value);

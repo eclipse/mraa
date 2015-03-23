@@ -43,7 +43,8 @@ sig_handler(int signo)
         running = -1;
     }
 }
-int main (int argc, char **argv)
+int
+main(int argc, char** argv)
 {
     if (argc < 2) {
         printf("Provide an int arg if you want to flash on something other than %d\n", DEFAULT_IOPIN);
@@ -54,7 +55,7 @@ int main (int argc, char **argv)
 
     signal(SIGINT, sig_handler);
 
-//! [Interesting]
+    //! [Interesting]
     mraa::Gpio* gpio = new mraa::Gpio(iopin);
     if (gpio == NULL) {
         return MRAA_ERROR_UNSPECIFIED;
@@ -73,5 +74,5 @@ int main (int argc, char **argv)
     }
     delete gpio;
     return response;
-//! [Interesting]
+    //! [Interesting]
 }

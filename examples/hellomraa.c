@@ -29,7 +29,7 @@
 #include "mraa.h"
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
     char* board_name = mraa_get_platform_name();
 

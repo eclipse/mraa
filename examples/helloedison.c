@@ -30,7 +30,7 @@
 #include "mraa.h"
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
     mraa_result_t ret = MRAA_SUCCESS;
     mraa_platform_t platform_type = mraa_get_platform_type();

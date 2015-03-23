@@ -34,8 +34,8 @@ mraa_arm_platform()
 {
     mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
     size_t len = 100;
-    char *line = malloc(len);
-    FILE *fh = fopen("/proc/cpuinfo", "r");
+    char* line = malloc(len);
+    FILE* fh = fopen("/proc/cpuinfo", "r");
     if (fh != NULL) {
         while (getline(&line, &len, fh) != -1) {
             if (strncmp(line, "Hardware", 8) == 0) {
@@ -51,7 +51,7 @@ mraa_arm_platform()
     }
     free(line);
 
-    switch(platform_type) {
+    switch (platform_type) {
         case MRAA_RASPBERRY_PI:
             plat = mraa_raspberry_pi();
             break;

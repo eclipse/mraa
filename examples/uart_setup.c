@@ -27,7 +27,7 @@
 #include "mraa.h"
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
     mraa_uart_context uart;
     uart = mraa_uart_init(0);

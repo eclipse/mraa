@@ -36,10 +36,10 @@ mraa_platform_t
 mraa_x86_platform()
 {
     mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
-    char *line = NULL;
+    char* line = NULL;
     // let getline allocate memory for *line
     size_t len = 0;
-    FILE *fh = fopen("/sys/devices/virtual/dmi/id/board_name", "r");
+    FILE* fh = fopen("/sys/devices/virtual/dmi/id/board_name", "r");
     if (fh != NULL) {
         if (getline(&line, &len, fh) != -1) {
             if (strncmp(line, "GalileoGen2", 11) == 0) {

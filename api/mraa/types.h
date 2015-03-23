@@ -37,14 +37,15 @@ extern "C" {
  * MRAA supported platform types
  */
 typedef enum {
-    MRAA_INTEL_GALILEO_GEN1 = 0, /**< The Generation 1 Galileo platform (RevD) */
-    MRAA_INTEL_GALILEO_GEN2 = 1, /**< The Generation 2 Galileo platform (RevG/H) */
-    MRAA_INTEL_EDISON_FAB_C = 2, /**< The Intel Edison (FAB C) */
-    MRAA_INTEL_DE3815 = 3, /**< The Intel DE3815 Baytrail NUC */
+    MRAA_INTEL_GALILEO_GEN1 = 0,    /**< The Generation 1 Galileo platform (RevD) */
+    MRAA_INTEL_GALILEO_GEN2 = 1,    /**< The Generation 2 Galileo platform (RevG/H) */
+    MRAA_INTEL_EDISON_FAB_C = 2,    /**< The Intel Edison (FAB C) */
+    MRAA_INTEL_DE3815 = 3,          /**< The Intel DE3815 Baytrail NUC */
     MRAA_INTEL_MINNOWBOARD_MAX = 4, /**< The Intel Minnow Board Max */
-    MRAA_RASPBERRY_PI = 5, /**< The different Raspberry PI Models -like  A,B,A+,B+ */
+    MRAA_RASPBERRY_PI = 5,          /**< The different Raspberry PI Models -like  A,B,A+,B+ */
 
-    MRAA_UNKNOWN_PLATFORM = 99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
+    MRAA_UNKNOWN_PLATFORM =
+    99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
 } mraa_platform_t;
 
 /**
@@ -160,12 +161,12 @@ typedef enum {
     MRAA_RASPBERRY_WIRING_PIN14 = 23,
     MRAA_RASPBERRY_WIRING_PIN10 = 24,
     MRAA_RASPBERRY_WIRING_PIN11 = 26,
-    MRAA_RASPBERRY_WIRING_PIN17 = 29, //RPi B V2
+    MRAA_RASPBERRY_WIRING_PIN17 = 29, // RPi B V2
     MRAA_RASPBERRY_WIRING_PIN21 = 29,
-    MRAA_RASPBERRY_WIRING_PIN18 = 30, //RPi B V2
-    MRAA_RASPBERRY_WIRING_PIN19 = 31, //RPI B V2
+    MRAA_RASPBERRY_WIRING_PIN18 = 30, // RPi B V2
+    MRAA_RASPBERRY_WIRING_PIN19 = 31, // RPI B V2
     MRAA_RASPBERRY_WIRING_PIN22 = 31,
-    MRAA_RASPBERRY_WIRING_PIN20 = 32, //RPi B V2
+    MRAA_RASPBERRY_WIRING_PIN20 = 32, // RPi B V2
     MRAA_RASPBERRY_WIRING_PIN26 = 32,
     MRAA_RASPBERRY_WIRING_PIN23 = 33,
     MRAA_RASPBERRY_WIRING_PIN24 = 35,
@@ -179,42 +180,42 @@ typedef enum {
  * MRAA return codes
  */
 typedef enum {
-    MRAA_SUCCESS                              =  0, /**< Expected response */
-    MRAA_ERROR_FEATURE_NOT_IMPLEMENTED        =  1, /**< Feature TODO */
-    MRAA_ERROR_FEATURE_NOT_SUPPORTED          =  2, /**< Feature not supported by HW */
-    MRAA_ERROR_INVALID_VERBOSITY_LEVEL        =  3, /**< Verbosity level wrong */
-    MRAA_ERROR_INVALID_PARAMETER              =  4, /**< Parameter invalid */
-    MRAA_ERROR_INVALID_HANDLE                 =  5, /**< Handle invalid */
-    MRAA_ERROR_NO_RESOURCES                   =  6, /**< No resource of that type avail */
-    MRAA_ERROR_INVALID_RESOURCE               =  7, /**< Resource invalid */
-    MRAA_ERROR_INVALID_QUEUE_TYPE             =  8, /**< Queue type incorrect */
-    MRAA_ERROR_NO_DATA_AVAILABLE              =  9, /**< No data available */
-    MRAA_ERROR_INVALID_PLATFORM               = 10, /**< Platform not recognised */
-    MRAA_ERROR_PLATFORM_NOT_INITIALISED       = 11, /**< Board information not initialised */
-    MRAA_ERROR_PLATFORM_ALREADY_INITIALISED   = 12, /**< Board is already initialised */
+    MRAA_SUCCESS = 0,                             /**< Expected response */
+    MRAA_ERROR_FEATURE_NOT_IMPLEMENTED = 1,       /**< Feature TODO */
+    MRAA_ERROR_FEATURE_NOT_SUPPORTED = 2,         /**< Feature not supported by HW */
+    MRAA_ERROR_INVALID_VERBOSITY_LEVEL = 3,       /**< Verbosity level wrong */
+    MRAA_ERROR_INVALID_PARAMETER = 4,             /**< Parameter invalid */
+    MRAA_ERROR_INVALID_HANDLE = 5,                /**< Handle invalid */
+    MRAA_ERROR_NO_RESOURCES = 6,                  /**< No resource of that type avail */
+    MRAA_ERROR_INVALID_RESOURCE = 7,              /**< Resource invalid */
+    MRAA_ERROR_INVALID_QUEUE_TYPE = 8,            /**< Queue type incorrect */
+    MRAA_ERROR_NO_DATA_AVAILABLE = 9,             /**< No data available */
+    MRAA_ERROR_INVALID_PLATFORM = 10,             /**< Platform not recognised */
+    MRAA_ERROR_PLATFORM_NOT_INITIALISED = 11,     /**< Board information not initialised */
+    MRAA_ERROR_PLATFORM_ALREADY_INITIALISED = 12, /**< Board is already initialised */
 
-    MRAA_ERROR_UNSPECIFIED                    = 99 /**< Unknown Error */
+    MRAA_ERROR_UNSPECIFIED = 99 /**< Unknown Error */
 } mraa_result_t;
 
 /**
  * Enum representing different possible modes for a pin.
  */
 typedef enum {
-    MRAA_PIN_VALID       = 0, /**< Pin Valid */
-    MRAA_PIN_GPIO        = 1, /**< General Purpose IO */
-    MRAA_PIN_PWM         = 2, /**< Pulse Width Modulation */
-    MRAA_PIN_FAST_GPIO   = 3, /**< Faster GPIO */
-    MRAA_PIN_SPI         = 4, /**< SPI */
-    MRAA_PIN_I2C         = 5, /**< I2C */
-    MRAA_PIN_AIO         = 6, /**< Analog in */
-    MRAA_PIN_UART        = 7  /**< UART */
+    MRAA_PIN_VALID = 0,     /**< Pin Valid */
+    MRAA_PIN_GPIO = 1,      /**< General Purpose IO */
+    MRAA_PIN_PWM = 2,       /**< Pulse Width Modulation */
+    MRAA_PIN_FAST_GPIO = 3, /**< Faster GPIO */
+    MRAA_PIN_SPI = 4,       /**< SPI */
+    MRAA_PIN_I2C = 5,       /**< I2C */
+    MRAA_PIN_AIO = 6,       /**< Analog in */
+    MRAA_PIN_UART = 7       /**< UART */
 } mraa_pinmodes_t;
 
 /**
  * Enum reprensenting different i2c speeds/modes
  */
 typedef enum {
-    MRAA_I2C_STD =  0, /**< up to 100Khz */
+    MRAA_I2C_STD = 0,  /**< up to 100Khz */
     MRAA_I2C_FAST = 1, /**< up to 400Khz */
     MRAA_I2C_HIGH = 2  /**< up to 3.4Mhz */
 } mraa_i2c_mode_t;

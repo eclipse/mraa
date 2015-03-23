@@ -39,16 +39,14 @@ aio_get_valid_fp(mraa_aio_context dev)
     if (advance_func->aio_get_valid_fp != NULL)
         return advance_func->aio_get_valid_fp(dev);
 
-    char file_path[64]= "";
+    char file_path[64] = "";
 
-    //Open file Analog device input channel raw voltage file for reading.
-    snprintf(file_path, 64, "/sys/bus/iio/devices/iio:device0/in_voltage%d_raw",
-            dev->channel );
+    // Open file Analog device input channel raw voltage file for reading.
+    snprintf(file_path, 64, "/sys/bus/iio/devices/iio:device0/in_voltage%d_raw", dev->channel);
 
     dev->adc_in_fp = open(file_path, O_RDONLY);
     if (dev->adc_in_fp == -1) {
-        syslog(LOG_ERR, "aio: Failed to open input raw file %s for reading!",
-                file_path);
+        syslog(LOG_ERR, "aio: Failed to open input raw file %s for reading!", file_path);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -86,17 +84,18 @@ mraa_aio_init(unsigned int aio)
         }
     }
 
-    //Create ADC device connected to specified channel
+    // Create ADC device connected to specified channel
     mraa_aio_context dev = malloc(sizeof(struct _aio));
     if (dev == NULL) {
         syslog(LOG_ERR, "aio: Insufficient memory for specified input channel "
-                "%d\n", aio);
+                        "%d\n",
+               aio);
         return NULL;
     }
     dev->channel = plat->pins[pin].aio.pinmap;
     dev->value_bit = DEFAULT_BITS;
 
-    //Open valid  analog input file and get the pointer.
+    // Open valid  analog input file and get the pointer.
     if (MRAA_SUCCESS != aio_get_valid_fp(dev)) {
         free(dev);
         return NULL;
@@ -136,12 +135,11 @@ mraa_aio_read(mraa_aio_context dev)
     lseek(dev->adc_in_fp, 0, SEEK_SET);
 
     errno = 0;
-    char *end;
+    char* end;
     unsigned int analog_value = (unsigned int) strtoul(buffer, &end, 10);
     if (end == &buffer[0]) {
         syslog(LOG_ERR, "aio: Value is not a decimal number");
-    }
-    else if (errno != 0) {
+    } else if (errno != 0) {
         syslog(LOG_ERR, "aio: Errno was set");
     }
 
@@ -149,7 +147,7 @@ mraa_aio_read(mraa_aio_context dev)
         /* Adjust the raw analog input reading to supported resolution value*/
         if (raw_bits > dev->value_bit) {
             shifter_value = raw_bits - dev->value_bit;
-            analog_value =  analog_value >> shifter_value;
+            analog_value = analog_value >> shifter_value;
         } else {
             shifter_value = dev->value_bit - raw_bits;
             analog_value = analog_value << shifter_value;
@@ -182,7 +180,7 @@ mraa_aio_close(mraa_aio_context dev)
         free(dev);
     }
 
-    return(MRAA_SUCCESS);
+    return (MRAA_SUCCESS);
 }
 
 mraa_result_t
