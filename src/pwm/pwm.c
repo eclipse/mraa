@@ -452,3 +452,21 @@ mraa_pwm_config_percent(mraa_pwm_context dev, int ms, float percentage)
     }
     return MRAA_SUCCESS;
 }
+
+int
+mraa_pwm_get_max_period()
+{
+    if (plat == NULL) {
+        return -1;
+    }
+    return plat->pwm_max_period;
+}
+
+int
+mraa_pwm_get_min_period()
+{
+    if (plat == NULL) {
+        return -1;
+    }
+    return plat->pwm_min_period;
+}

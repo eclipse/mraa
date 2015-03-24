@@ -204,6 +204,26 @@ class Pwm
     {
         return mraa_pwm_config_percent(m_pwm, period, duty);
     }
+    /**
+     * Get the maximum pwm period in us
+     *
+     * @return max pwm in us
+     */
+    int
+    max_period()
+    {
+        return mraa_pwm_get_max_period();
+    }
+    /**
+     * Get the minimum pwm period in us
+     *
+     * @return min pwm in us
+     */
+    int
+    min_period()
+    {
+        return mraa_pwm_get_min_period();
+    }
 
   private:
     mraa_pwm_context m_pwm;
