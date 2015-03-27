@@ -13,6 +13,8 @@ what you'll need:
 * [python](http://python.org) 2.7 or 3.4+ (you'll need not just the interpreter but python-dev)
 * [node.js](http://nodejs.org) 0.10.x (you'll need not just the interpreter but nodejs-dev)
 * [CMake](http://cmake.org) 2.8.8+
+* [Doxygen](http://www.stack.nl/~dimitri/doxygen/) 1.8.9.1+
+* [Sphinx](http://sphinx-doc.org/) 1.1.3+ (For Python docs)
 
 ## Basic build steps
 
