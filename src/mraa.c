@@ -311,17 +311,6 @@ mraa_get_pin_count()
     return plat->phy_pin_count;
 }
 
-mraa_boolean_t
-mraa_file_exist(const char* filename)
-{
-    glob_t results;
-    results.gl_pathc = 0;
-    glob(filename, 0, NULL, &results);
-    int file_found = results.gl_pathc == 1;
-    globfree(&results);
-    return file_found;
-}
-
 char*
 mraa_get_pin_name(int pin)
 {
@@ -331,6 +320,18 @@ mraa_get_pin_name(int pin)
     if (pin > (plat->phy_pin_count - 1) || pin < 0)
         return NULL;
     return (char*) plat->pins[pin].name;
+}
+
+
+mraa_boolean_t
+mraa_file_exist(const char* filename)
+{
+    glob_t results;
+    results.gl_pathc = 0;
+    glob(filename, 0, NULL, &results);
+    int file_found = results.gl_pathc == 1;
+    globfree(&results);
+    return file_found;
 }
 
 mraa_boolean_t
