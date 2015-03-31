@@ -215,11 +215,8 @@ mraa_result_print(mraa_result_t result)
 mraa_boolean_t
 mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
 {
-    if (plat == NULL) {
-        mraa_init();
-        if (plat == NULL)
-            return 0;
-    }
+    if (plat == NULL)
+        return 0;
     if (pin > (plat->phy_pin_count - 1) || pin < 0)
         return 0;
 
@@ -361,7 +358,8 @@ mraa_file_contains(const char *filename, const char *content)
 }
 
 mraa_boolean_t
-mraa_file_contains_both(const char *filename, const char *content, const char *content2) {
+mraa_file_contains_both(const char *filename, const char *content, const char *content2)
+{
     mraa_boolean_t found = 0;
     if ((filename == NULL) || (content == NULL))  {
         return 0;
@@ -386,7 +384,8 @@ mraa_file_contains_both(const char *filename, const char *content, const char *c
 }
 
 char*
-mraa_file_unglob(const char *filename) {
+mraa_file_unglob(const char *filename)
+{
     glob_t results;
     char* res = NULL;
     results.gl_pathc = 0;
@@ -398,7 +397,8 @@ mraa_file_unglob(const char *filename) {
 }
 
 mraa_boolean_t
-mraa_link_targets(const char *filename,const char *targetname) {
+mraa_link_targets(const char *filename,const char *targetname)
+{
     int size = 100;
     int nchars = 0;
     char* buffer = NULL;
