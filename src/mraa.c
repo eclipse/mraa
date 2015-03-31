@@ -385,7 +385,7 @@ mraa_file_contains_both(const char *filename, const char *content, const char *c
 }
 
 char*
-mraa_file_unglob(char *filename) {
+mraa_file_unglob(const char *filename) {
     glob_t results;
     char* res = NULL;
     results.gl_pathc = 0;
@@ -397,7 +397,7 @@ mraa_file_unglob(char *filename) {
 }
 
 mraa_boolean_t
-mraa_link_targets(const char *filename,char *targetname) {
+mraa_link_targets(const char *filename,const char *targetname) {
     int size = 100;
     int nchars = 0;
     char* buffer = NULL;
