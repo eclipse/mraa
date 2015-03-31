@@ -215,11 +215,8 @@ mraa_result_print(mraa_result_t result)
 mraa_boolean_t
 mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
 {
-    if (plat == NULL) {
-        mraa_init();
-        if (plat == NULL)
-            return 0;
-    }
+    if (plat == NULL)
+        return 0;
     if (pin > (plat->phy_pin_count - 1) || pin < 0)
         return 0;
 
@@ -311,17 +308,6 @@ mraa_get_pin_count()
     return plat->phy_pin_count;
 }
 
-mraa_boolean_t
-mraa_file_exist(char* filename)
-{
-    glob_t results;
-    results.gl_pathc = 0;
-    glob(filename, 0, NULL, &results);
-    int file_found = results.gl_pathc == 1;
-    globfree(&results);
-    return file_found;
-}
-
 char*
 mraa_get_pin_name(int pin)
 {
@@ -333,8 +319,72 @@ mraa_get_pin_name(int pin)
     return (char*) plat->pins[pin].name;
 }
 
+
+mraa_boolean_t
+mraa_file_exist(const char* filename)
+{
+    glob_t results;
+    results.gl_pathc = 0;
+    glob(filename, 0, NULL, &results);
+    int file_found = results.gl_pathc == 1;
+    globfree(&results);
+    return file_found;
+}
+
+mraa_boolean_t
+mraa_file_contains(const char *filename, const char *content) 
+{
+    mraa_boolean_t found = 0;
+    if ((filename == NULL) || (content == NULL))  {
+        return 0;
+    }
+
+    char *file = mraa_file_unglob(filename);
+    if (file != NULL) {
+        size_t len = 1024;
+        char *line = malloc(len);
+        FILE *fh = fopen(file, "r");
+        while ((getline(&line, &len, fh) != -1) && (found == 0)) {
+            if (strstr(line, content)) {
+                found = 1;
+                break;
+            }
+        }
+        fclose(fh);
+        free(file);
+        free(line);
+    }
+    return found;
+}
+
+mraa_boolean_t
+mraa_file_contains_both(const char *filename, const char *content, const char *content2)
+{
+    mraa_boolean_t found = 0;
+    if ((filename == NULL) || (content == NULL))  {
+        return 0;
+    }
+
+    char *file = mraa_file_unglob(filename);
+    if (file != NULL) {
+        size_t len = 1024;
+        char *line = malloc(len);
+        FILE *fh = fopen(file, "r");
+        while ((getline(&line, &len, fh) != -1) && (found == 0)) {
+            if (strstr(line, content) && strstr(line, content2)) {
+                found = 1;
+                break;
+            }
+        }
+        fclose(fh);
+        free(file);
+        free(line);
+    }
+    return found;
+}
+
 char*
-mraa_file_unglob(char* filename)
+mraa_file_unglob(const char *filename)
 {
     glob_t results;
     char* res = NULL;
@@ -347,7 +397,7 @@ mraa_file_unglob(char* filename)
 }
 
 mraa_boolean_t
-mraa_link_targets(char* filename, char* targetname)
+mraa_link_targets(const char *filename,const char *targetname)
 {
     int size = 100;
     int nchars = 0;
