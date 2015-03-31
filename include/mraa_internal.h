@@ -65,7 +65,13 @@ mraa_platform_t mraa_arm_platform();
 * @param filename to check
 * @return mraa_boolean_t boolean result.
 */
-mraa_boolean_t mraa_file_exist(char *filename);
+/**
+* helper function to check if file exists
+*
+* @param filename to check
+* @return mraa_boolean_t boolean result.
+*/
+mraa_boolean_t mraa_file_exist(const char *filename);
 
 /**
 * helper function to unglob filenames
@@ -73,7 +79,35 @@ mraa_boolean_t mraa_file_exist(char *filename);
 * @param filename to unglob
 * @return char * with the existing filename matching the pattern of input. NULL if there is no match. Caller must free result
 */
-char * mraa_file_unglob(char *filename);
+char * mraa_file_unglob(const char *filename);
+
+/**
+* helper function to check if file contains a given text
+*
+* @param filename to check
+* @param content to check in file
+* @return mraa_boolean_t boolean result.
+*/
+mraa_boolean_t mraa_file_contains(const char *filename,const char *content);
+
+/**
+* helper function to check if file contains a given text
+*
+* @param filename to check
+* @param content to check in file
+* @param content2 to check in same line of file
+* @return mraa_boolean_t boolean result.
+*/
+mraa_boolean_t mraa_file_contains_both(const char *filename,const char *content,const char *content2);
+
+/**
+* helper function to extract a line identified by content
+*
+* @param filename to check
+* @param content to search for in file
+* @return char* resulting line. The memory allocated for this string must be freed at the end of usage
+*/
+char * mraa_file_extract(const char *filename,const char *content);
 
 /**
 * helper function to find out if file that is targeted by a softlink (partially) matches the given name
@@ -82,7 +116,7 @@ char * mraa_file_unglob(char *filename);
 * @param (partial) filename that is matched with the filename of the link-targeted file
 * @return mraa_boolean_t true when targetname (partially) matches
 */
-mraa_boolean_t mraa_link_targets(char *filename,char *targetname);
+mraa_boolean_t mraa_link_targets(const char *filename,const char *targetname);
 
 #ifdef __cplusplus
 }
