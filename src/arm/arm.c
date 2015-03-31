@@ -29,6 +29,7 @@
 #include "mraa_internal.h"
 #include "arm/raspberry_pi.h"
 #include "arm/beaglebone.h"
+#include "arm/banana.h"
 
 mraa_platform_t
 mraa_arm_platform()
@@ -49,6 +50,18 @@ mraa_arm_platform()
                 if (strstr(line, "Generic AM33XX")) {
                     platform_type = MRAA_BEAGLEBONE;
                 }
+                if (strstr(line, "sun7i")) {
+                    if (mraa_file_contains("/sys/firmware/devicetree/base/model", "Banana Pro")) {
+                        platform_type = MRAA_BANANA;
+                    }
+                    if (mraa_file_contains("/sys/firmware/devicetree/base/model", "Banana Pi")) {
+                        platform_type = MRAA_BANANA;
+                    }
+                    // For old kernels
+                    if (mraa_file_exist("/sys/class/leds/green:ph24:led1")) {
+                        platform_type = MRAA_BANANA;
+                    }
+                }
             }
         }
         fclose(fh);
@@ -61,6 +74,9 @@ mraa_arm_platform()
             break;
         case MRAA_BEAGLEBONE:
             plat = mraa_beaglebone();
+            break;
+        case MRAA_BANANA:
+            plat = mraa_banana();
             break;
         default:
             plat = NULL;
