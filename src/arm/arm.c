@@ -28,6 +28,7 @@
 
 #include "mraa_internal.h"
 #include "arm/raspberry_pi.h"
+#include "arm/banana.h"
 
 mraa_platform_t
 mraa_arm_platform()
@@ -45,6 +46,18 @@ mraa_arm_platform()
                 if (strstr(line, "BCM2709")) {
                     platform_type = MRAA_RASPBERRY_PI;
                 }
+                if (strstr(line, "sun7i")) {
+                    if (mraa_file_contains("/sys/firmware/devicetree/base/model","Banana Pro")) {
+                        platform_type = MRAA_BANANA;
+                    }
+                    if (mraa_file_contains("/sys/firmware/devicetree/base/model","Banana Pi")) {
+                        platform_type = MRAA_BANANA;
+                    }
+                    // For old kernels
+                    if (mraa_file_exist("/sys/class/leds/green:ph24:led1")) {
+                        platform_type = MRAA_BANANA;
+                    }
+                }
             }
         }
         fclose(fh);
@@ -55,9 +68,12 @@ mraa_arm_platform()
         case MRAA_RASPBERRY_PI:
             plat = mraa_raspberry_pi();
             break;
+        case MRAA_BANANA:
+            plat = mraa_banana();
+            break;
         default:
-            plat = mraa_raspberry_pi();
-            syslog(LOG_ERR, "Platform not supported, initialising as MRAA_RASPBERRY_PI");
+            plat = NULL;
+            syslog(LOG_ERR, "Unknown Platform, currently not supported by MRAA");
     }
     return platform_type;
 }
