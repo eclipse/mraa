@@ -17,12 +17,6 @@ set_source_files_properties (mraajs.i PROPERTIES CPLUSPLUS ON)
 swig_add_module (mraajs javascript mraajs.i ${mraa_LIB_SRCS})
 swig_link_libraries (mraajs ${NODE_LIBRARIES})
 
-if (DOXYGEN_FOUND)
-  foreach (_file ${DOCFILES})
-    add_dependencies (${SWIG_MODULE_mraajs_REAL_NAME} ${_file}doc_i)
-  endforeach ()
-endif ()
-
 set_target_properties (mraajs PROPERTIES
   COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_NODE_EXTENSION -DSWIGJAVASCRIPT=${SWIG_FOUND}"
   PREFIX ""
