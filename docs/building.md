@@ -58,7 +58,7 @@ Disabling python module building:
 
 Building doc, this will require [SPHINX](http://sphinx-doc.org) &
 [Doxygen](http://doxygen.org):
- -BUILDDOC=ON
+ -DBUILDDOC=ON
 
 ## Dependencies continued
 
