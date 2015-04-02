@@ -16,7 +16,9 @@ what you'll need:
 
 To build the documentation you'll also need:
 * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) 1.8.9.1+
+* [Graphviz](http://graphviz.org/) 2+ (For doxygen graph generation)
 * [Sphinx](http://sphinx-doc.org/) 1.1.3+ (For Python docs)
+
 
 ## Basic build steps
 
