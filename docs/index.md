@@ -1,4 +1,4 @@
-libmraa - Low Level Skeleton Library for Communication on Intel platforms
+libmraa - Low Level Skeleton Library for Communication on GNU/Linux platforms
 ==============
 
 Libmraa is a C/C++ library with bindings to javascript & python to interface

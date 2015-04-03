@@ -4,9 +4,11 @@
    contain the root `toctree` directive.
 
 Welcome to mraa's documentation!
-=============================
+================================
 
-Contents:
+.. include:: ../../../docs/index.md
+  :start-after: ==============
+  :end-before: ## API
 
 .. toctree::
    :maxdepth: 2
@@ -14,6 +16,32 @@ Contents:
    mraa
    example
 
+Supported Platforms
+===================
+
+   * `Galileo Gen 1 - Rev D <../galileorevd.html>`_
+   * `Galileo Gen 2 - Rev H <../galileorevh.html>`_
+   * `Intel Edison <../edison.html>`_
+   * `Intel(R) NUC DE3815tykhe <../de3815.html>`_
+   * `Intel(R) Minnowboard Max <../minnowmax.html>`_
+   * `Raspberry Pi <../rasspi.html>`_
+
+Compiling & Debugging libmraa
+=============================
+
+Libmraa is a C library and SWIG is used to generate bindings therefore to
+debug, you very quickly need to use the same methods as you would for debugging
+a C library. Generally attaching gdb to python works well, build mraa with
+debug symbols and set breakpoints either in the SWIG _wrap functions, the C++
+method/functions or the underlying C function. More info can be found on the
+C/C++ documentation:
+   * `Debugging <../debugging.html>`_
+   * `Building from source <../building.html>`_
+
+API Changelog
+=============
+.. include:: ../../../docs/index.md
+  :start-after: API Changelog
 
 Indices and tables
 ==================
