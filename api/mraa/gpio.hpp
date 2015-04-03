@@ -188,7 +188,7 @@ class Gpio
     }
 #endif
     /**
-     * Exits callback - this call will not kill the isr thread imediatlu
+     * Exits callback - this call will not kill the isr thread immediatly
      * but only when it is out of it's critical section
      *
      * @return Result of operation
