@@ -216,9 +216,7 @@ mraa_boolean_t
 mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
 {
     if (plat == NULL) {
-        mraa_init();
-        if (plat == NULL)
-            return 0;
+        return 0;
     }
     if (pin > (plat->phy_pin_count - 1) || pin < 0)
         return 0;
