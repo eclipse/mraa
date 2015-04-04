@@ -312,7 +312,7 @@ mraa_get_pin_count()
 }
 
 mraa_boolean_t
-mraa_file_exist(char* filename)
+mraa_file_exist(const char* filename)
 {
     glob_t results;
     results.gl_pathc = 0;
@@ -334,7 +334,7 @@ mraa_get_pin_name(int pin)
 }
 
 char*
-mraa_file_unglob(char* filename)
+mraa_file_unglob(const char* filename)
 {
     glob_t results;
     char* res = NULL;
@@ -347,7 +347,7 @@ mraa_file_unglob(char* filename)
 }
 
 mraa_boolean_t
-mraa_link_targets(char* filename, char* targetname)
+mraa_link_targets(const char* filename, const char* targetname)
 {
     int size = 100;
     int nchars = 0;
