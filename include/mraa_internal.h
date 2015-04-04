@@ -77,6 +77,25 @@ mraa_boolean_t mraa_file_exist(const char* filename);
 char* mraa_file_unglob(const char* filename);
 
 /**
+ * helper function to check if file contains a given text
+ *
+ * @param filename to check
+ * @param content to check in file
+ * @return mraa_boolean_t boolean result.
+ */
+mraa_boolean_t mraa_file_contains(const char* filename, const char* content);
+
+/**
+ * helper function to check if file contains a given text
+ *
+ * @param filename to check
+ * @param content to check in file
+ * @param content2 to check in same line of file
+ * @return mraa_boolean_t boolean result.
+ */
+mraa_boolean_t mraa_file_contains_both(const char* filename, const char* content, const char* content2);
+
+/**
  * helper function to find out if file that is targeted by a softlink
  * (partially) matches the given name
  *

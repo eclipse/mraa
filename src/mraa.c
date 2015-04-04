@@ -311,6 +311,17 @@ mraa_get_pin_count()
     return plat->phy_pin_count;
 }
 
+char*
+mraa_get_pin_name(int pin)
+{
+    if (plat == NULL) {
+        return NULL;
+    }
+    if (pin > (plat->phy_pin_count - 1) || pin < 0)
+        return NULL;
+    return (char*) plat->pins[pin].name;
+}
+
 mraa_boolean_t
 mraa_file_exist(const char* filename)
 {
@@ -322,15 +333,56 @@ mraa_file_exist(const char* filename)
     return file_found;
 }
 
-char*
-mraa_get_pin_name(int pin)
+mraa_boolean_t
+mraa_file_contains(const char* filename, const char* content)
 {
-    if (plat == NULL) {
-        return NULL;
+    mraa_boolean_t found = 0;
+    if ((filename == NULL) || (content == NULL)) {
+        return 0;
     }
-    if (pin > (plat->phy_pin_count - 1) || pin < 0)
-        return NULL;
-    return (char*) plat->pins[pin].name;
+
+    char* file = mraa_file_unglob(filename);
+    if (file != NULL) {
+        size_t len = 1024;
+        char* line = malloc(len);
+        FILE* fh = fopen(file, "r");
+        while ((getline(&line, &len, fh) != -1) && (found == 0)) {
+            if (strstr(line, content)) {
+                found = 1;
+                break;
+            }
+        }
+        fclose(fh);
+        free(file);
+        free(line);
+    }
+    return found;
+}
+
+mraa_boolean_t
+mraa_file_contains_both(const char* filename, const char* content, const char* content2)
+{
+    mraa_boolean_t found = 0;
+    if ((filename == NULL) || (content == NULL)) {
+        return 0;
+    }
+
+    char* file = mraa_file_unglob(filename);
+    if (file != NULL) {
+        size_t len = 1024;
+        char* line = malloc(len);
+        FILE* fh = fopen(file, "r");
+        while ((getline(&line, &len, fh) != -1) && (found == 0)) {
+            if (strstr(line, content) && strstr(line, content2)) {
+                found = 1;
+                break;
+            }
+        }
+        fclose(fh);
+        free(file);
+        free(line);
+    }
+    return found;
 }
 
 char*
