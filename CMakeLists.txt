@@ -54,6 +54,7 @@ option (BUILDDOC "Build all doc." OFF)
 option (BUILDSWIG "Build swig modules." ON)
 option (BUILDSWIGPYTHON "Build swig python modules." ON)
 option (BUILDSWIGNODE "Build swig node modules." ON)
+option (BUILDSWIGJAVA "Build swig Java modules." OFF)
 option (IPK "Generate IPK using CPack" OFF)
 
 include (TargetArch)

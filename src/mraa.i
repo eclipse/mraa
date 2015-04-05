@@ -24,11 +24,6 @@
     #include "uart.hpp"
 %}
 
-%init %{
-    //Adding mraa_init() to the module initialisation process
-    mraa_init();
-%}
-
 %exception {
     try {
         $action

@@ -60,3 +60,9 @@ class Spi;
 }
 
 %include ../mraa.i
+
+%init %{
+    //Adding mraa_init() to the module initialisation process
+    mraa_init();
+%}
+
