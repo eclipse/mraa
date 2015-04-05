@@ -101,3 +101,12 @@ cmake -DBUILDDOC=OFF -DBUILDSWIG=OFF ..
 cov-build --dir cov-int make
 tar caf mraa.tar.bz2 cov-int
 ~~~~~~~~~~~~~
+Building with Java:
+Have JAVA_HOME set to JDK install directory
+ -DBUILDSWIGJAVA=ON
+To compile Example.java
+javac -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example.java
+To run:
+make sure libmraajava.so is in LD_LIBRARY_PATH
+jave -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example
+
