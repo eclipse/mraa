@@ -1,0 +1,36 @@
+MRAA TEST CASES:
+
+This is the first set of test cases for libmraa. Curently each component of mraa is
+tested in it's separated designed file (*_test.py + general_checks.py). In order to
+run these tests simply type the name of the script (eg.: ./GPIO_test.py script's path)
+For a verbose run, just add the -v flag (eg. ./GPIO_test.py -v). 
+The tests set created is intended for easy and quick sanity checks. They are intended 
+to give an idea of the functionality available on the board.
+
+
+WHERE WERE THESE TESTS RAN:
+
+As main platform, Intel Galileo v1 was used. Tests were conducted on Intel Galileo v2,
+but because of hardware differences, some failures may occur. Logic will be added to 
+auto-select board to work on.
+
+KNOWN ISSUES:
+
+Since libmraa is a library addressed for boards communication with outside world, for 
+specific components like I2C, SPI some sensors were used (I2C ---> HTU21 and SPI ---> TMP125).
+As of this some tests may not be relevant unless those sensors are available. Also, some 
+small mistakes may be present.
+
+WHAT'S NEXT? 
+
+At this point tests were made to do a quick sanity check. For the future the followings will
+be implemented:
+ - create a physical layer that will emulate sensors behavior and generate I/O signals. This
+   layer will be available to the community and will help replace the need of specific sensors.
+   The simplest solution will be chosen allowing anyone to rapidly implement it. 
+ - Implement stress tests over long periods of time. This feature alone is possible only with
+   the use of a physical layer since it will behave both as signals generator and interpreter.
+ - analyze a tests result collection solution (and after, interpretation). This is useful
+   since tests mean nothing without a history and possibility to check on results.
+ - any new idea is welcomed.
+
