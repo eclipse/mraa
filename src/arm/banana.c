@@ -61,10 +61,10 @@ const char* i2clink[] = {
     "/sys/class/i2c-dev/i2c-0", "/sys/class/i2c-dev/i2c-1", "/sys/class/i2c-dev/i2c-2",
     "/sys/class/i2c-dev/i2c-3", "/sys/class/i2c-dev/i2c-4",
 };
-const char* spilink[] = { "/sys/class/spidev/i2c-0",
-                          "/sys/class/spidev/i2c-1",
-                          "/sys/class/spidev/i2c-2",
-                          "/sys/class/spidev/i2c-3" };
+const char* spilink[] = { "/sys/class/spidev/spidev0.0",
+                          "/sys/class/spidev/spidev1.0",
+                          "/sys/class/spidev/spidev2.0",
+                          "/sys/class/spidev/spidev3.0" };
 
 mraa_result_t
 mraa_banana_spi_init_pre(int index)
@@ -325,9 +325,14 @@ mraa_banana()
     strncpy(b->pins[6].name, "GND", 8);
     b->pins[6].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
-    strncpy(b->pins[7].name, "PH02", 8); // PH2 Pin226
+    if (platform_detected == PLATFORM_BANANA_PRO) {
+        strncpy(b->pins[7].name, "PH02", 8); // PH2 Pin226
+        b->pins[7].gpio.pinmap = 226;
+    } else {
+        strncpy(b->pins[7].name, "PI03", 8); // PI3 Pin259 PWM
+        b->pins[7].gpio.pinmap = 259;
+    }
     b->pins[7].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[7].gpio.pinmap = 226;
 
     if (platform_detected == PLATFORM_BANANA_PRO) {
         strncpy(b->pins[8].name, "UART4_TX", 8); // PH4 Pin228 UART4_TX
@@ -354,9 +359,14 @@ mraa_banana()
     b->pins[11].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[11].gpio.pinmap = 275;
 
-    strncpy(b->pins[12].name, "PI03", 8); // PI3 Pin259 PWM
+    if (platform_detected == PLATFORM_BANANA_PRO) {
+        strncpy(b->pins[12].name, "PI03", 8); // PI3 Pin259 PWM
+        b->pins[12].gpio.pinmap = 259;
+    } else {
+        strncpy(b->pins[12].name, "PH02", 8); // PH2 Pin226
+        b->pins[12].gpio.pinmap = 226;
+    }
     b->pins[12].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
-    b->pins[12].gpio.pinmap = 259;
 
     strncpy(b->pins[13].name, "PI18", 8); // PI18 Pin274 UART2_TX
     b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
