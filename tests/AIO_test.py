@@ -72,6 +72,6 @@ if __name__ == '__main__':
     u.main()
 
   else:
-    print "Couldn't set the pin as GPIO \n"
+    print "Couldn't set the pin as AIO \n"
 
 

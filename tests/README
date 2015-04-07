@@ -32,5 +32,5 @@ be implemented:
    the use of a physical layer since it will behave both as signals generator and interpreter.
  - analyze a tests result collection solution (and after, interpretation). This is useful
    since tests mean nothing without a history and possibility to check on results.
- - any new idea is welcomed.
+ - any new idea is welcome.
 
