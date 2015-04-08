@@ -26,6 +26,8 @@ X86
 ARM
 ---
 * [Raspberry Pi](../master/docs/raspberry_pi.md)
+* [Bannana Pi](../master/docs/banana_pi.md)
+* Beaglebone Black
 
 Installing on your board
 ========

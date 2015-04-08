@@ -43,6 +43,7 @@ Specific platform information for supported platforms is documented here:
 - @ref de3815
 - @ref minnowmax
 - @ref rasppi
+- @ref bananapi
 
 ## DEBUGGING
 
