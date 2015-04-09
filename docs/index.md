@@ -44,6 +44,7 @@ Specific platform information for supported platforms is documented here:
 - @ref minnowmax
 - @ref rasppi
 - @ref bananapi
+- @ref beaglebone
 
 ## DEBUGGING
 
