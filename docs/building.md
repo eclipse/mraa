@@ -102,7 +102,7 @@ cov-build --dir cov-int make
 tar caf mraa.tar.bz2 cov-int
 ~~~~~~~~~~~~~
 Building with Java:
-Have JAVA_HOME set to JDK install directory
+Have JAVA_HOME set to JDK install directory, theh PATH to $PATH:$JAVA_HOME/bin
  -DBUILDSWIGJAVA=ON
 To compile Example.java
 javac -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example.java
