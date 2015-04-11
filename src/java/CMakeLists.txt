@@ -12,6 +12,9 @@ set_source_files_properties (mraajava.i PROPERTIES CPLUSPLUS ON)
 
 SET(CMAKE_CXX_FLAGS "-fpermissive")
 
+SET(JAVAC $ENV{JAVA_HOME}/bin/javac)
+SET(JAR $ENV{JAVA_HOME}/bin/jar)
+
 swig_add_module (mraajava java mraajava.i ${mraa_LIB_SRCS})
 swig_link_libraries (mraajava ${JAVA_LIBRARIES})
 
@@ -19,9 +22,9 @@ add_custom_command(TARGET mraajava
 	POST_BUILD
 	COMMAND cmake -E echo "Compiling java.."
 	COMMAND cmake -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/mraa
-	COMMAND javac *.java -d ${CMAKE_CURRENT_BINARY_DIR}
+	COMMAND ${JAVAC} *.java -d ${CMAKE_CURRENT_BINARY_DIR}
 	COMMAND cmake -E echo "Creating jar"
-	COMMAND jar cvf mraa.jar mraa
+	COMMAND ${JAR} cvf mraa.jar mraa
 	)
 
 
