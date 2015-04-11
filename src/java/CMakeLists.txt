@@ -10,6 +10,8 @@ include_directories (
 set_source_files_properties (mraajava.i PROPERTIES SWIG_FLAGS ";-package;mraa;-I${CMAKE_BINARY_DIR}/src")
 set_source_files_properties (mraajava.i PROPERTIES CPLUSPLUS ON)
 
+SET(CMAKE_CXX_FLAGS "-fpermissive")
+
 swig_add_module (mraajava java mraajava.i ${mraa_LIB_SRCS})
 swig_link_libraries (mraajava ${JAVA_LIBRARIES})
 
