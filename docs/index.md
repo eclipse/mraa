@@ -68,6 +68,13 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.6.2**
+  * Node.js 0.12 support
+  * NPM support
+  * Formatting done with clang-format
+  * Various examples and documentation updates
+  * Supported added for Beaglebone Black + Banana Pi
+
 **0.6.1**
   * 16bit spi iunctions added
   * Node.js ISR now supported
