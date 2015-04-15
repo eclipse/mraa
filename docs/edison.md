@@ -30,6 +30,11 @@ in libmraa:
 - Arduino pin 7 can sometimes negatively impact the wifi capability, if using
   wifi avoid using this pin
 
+Because of the way IO is setup with the tristate on the arduino breakout board
+IO will be flipped as it is setup. It's recommended to setup IO pins &
+direction before using them in a setup() method or similar. It's impossible on
+this platform to avoid some GPIOs flipping on setup.
+
 Intel(R) breakout board
 -----------------------
 
