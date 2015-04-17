@@ -52,6 +52,37 @@ style numbers.
 | 24          | P1-24        | SPI CS0  |
 | 25          | P1-25        | GND      |
 | 26          | P1-26        | SPI CS1  |
+
+The following pin mapping refers to the second generation model 2 Pi.
+
+| MRAA Number | Physical Pin | Function |
+|-------------|--------------|----------|
+| 1           | P1-01        | 3V3 VCC  |
+| 2           | P1-02        | 5V VCC   |
+| 3           | P1-03        | I2C SDA  |
+| 4           | P1-04        | 5V VCC   |
+| 5           | P1-05        | I2C SCL  |
+| 6           | P1-06        | GND      |
+| 7           | P1-07        | GPIO(4)  |
+| 8           | P1-08        | UART TX  |
+| 9           | P1-09        | GND      |
+| 10           | P1-10        | UART RX  |
+| 11          | P1-11        | GPIO(17) |
+| 12          | P1-12        | GPIO(18) |
+| 13          | P1-13        | GPIO(27) |
+| 14          | P1-14        | GND      |
+| 15          | P1-15        | GPIO(22) |
+| 16          | P1-16        | GPIO(23) |
+| 17          | P1-17        | 3V3 VCC  |
+| 18          | P1-18        | GPIO(24) |
+| 19          | P1-19        | SPI MOSI |
+| 20          | P1-20        | GND      |
+| 21          | P1-21        | SPI MISO |
+| 22          | P1-22        | GPIO(25) |
+| 23          | P1-23        | SPI SCL  |
+| 24          | P1-24        | SPI CS0  |
+| 25          | P1-25        | GND      |
+| 26          | P1-26        | SPI CS1  |
 | 27          | P1-27        | I2C SDA0 |
 | 28          | P1-28        | I2C SCL0 |
 | 29          | P1-29        | GPIO(5)  |
