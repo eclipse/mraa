@@ -292,7 +292,7 @@ class Gpio
     }
     /**
      * Get pin number of Gpio. If raw param is True will return the
-     * number as used within sysfs
+     * number as used within sysfs. Invalid will return -1.
      *
      * @param raw (optional) get the raw gpio number.
      * @return Pin number

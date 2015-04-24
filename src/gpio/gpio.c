@@ -595,6 +595,7 @@ mraa_gpio_get_pin(mraa_gpio_context dev)
 {
     if (dev == NULL) {
         syslog(LOG_ERR, "gpio: context is invalid");
+        return -1;
     }
     return dev->phy_pin;
 }
@@ -604,6 +605,7 @@ mraa_gpio_get_pin_raw(mraa_gpio_context dev)
 {
     if (dev == NULL) {
         syslog(LOG_ERR, "gpio: context is invalid");
+        return -1;
     }
     return dev->pin;
 }
