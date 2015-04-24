@@ -68,6 +68,22 @@ typedef enum {
     EDGE_FALLING = 3 /**< Interupt on falling only */
 } Edge;
 
+#if defined(SWIGJAVA)
+
+class IsrCallback {
+        public:
+                virtual ~IsrCallback() {}
+                virtual void run() {/* empty, overloaded in Java*/ }
+        private:
+};
+
+void generic_isr_callback(void *data)
+{
+        IsrCallback *callback = (IsrCallback*)data;
+        callback->run();
+}
+#endif
+
 /**
  * @brief API to General Purpose IO
  *
@@ -170,6 +186,12 @@ class Gpio
         m_v8isr = v8::Persistent<v8::Function>::New(func);
 #endif
         return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, &uvwork, this);
+    }
+#elif defined(SWIGJAVA)
+    mraa_result_t
+    isr(Edge mode, IsrCallback *cb, void* args)
+    {
+        return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, generic_isr_callback, cb);
     }
 #else
     /**

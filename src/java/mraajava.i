@@ -1,4 +1,4 @@
-%module (docstring="Java interface to libmraa") mraa
+%module (directors="1",docstring="Java interface to libmraa") mraa
 
 %feature("autodoc", "3");
 
@@ -35,5 +35,6 @@
   $2 = JCALL1(GetArrayLength, jenv, $input);
 }
 
+%feature("director") IsrCallback;
 %include ../mraa.i
 
