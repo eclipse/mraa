@@ -195,7 +195,7 @@ mraa_result_t mraa_gpio_owner(mraa_gpio_context dev, mraa_boolean_t owner);
 mraa_result_t mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap);
 
 /**
- * Get a pin number of the gpio
+ * Get a pin number of the gpio, invalid will return -1
  *
  * @param dev The Gpio context
  * @return Pin number
@@ -203,7 +203,7 @@ mraa_result_t mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap);
 int mraa_gpio_get_pin(mraa_gpio_context dev);
 
 /**
- * Get a gpio number as used within sysfs
+ * Get a gpio number as used within sysfs, invalid will return -1
  *
  * @param dev The Gpio context
  * @return gpio number

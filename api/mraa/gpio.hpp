@@ -68,6 +68,30 @@ typedef enum {
     EDGE_FALLING = 3 /**< Interupt on falling only */
 } Edge;
 
+#if defined(SWIGJAVA)
+
+class IsrCallback
+{
+  public:
+    virtual ~IsrCallback()
+    {
+    }
+    virtual void
+    run()
+    { /* empty, overloaded in Java*/
+    }
+
+  private:
+};
+
+void
+generic_isr_callback(void* data)
+{
+    IsrCallback* callback = (IsrCallback*) data;
+    callback->run();
+}
+#endif
+
 /**
  * @brief API to General Purpose IO
  *
@@ -171,6 +195,12 @@ class Gpio
 #endif
         return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, &uvwork, this);
     }
+#elif defined(SWIGJAVA)
+    mraa_result_t
+    isr(Edge mode, IsrCallback* cb, void* args)
+    {
+        return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, generic_isr_callback, cb);
+    }
 #else
     /**
      * Sets a callback to be called when pin value changes
@@ -262,7 +292,7 @@ class Gpio
     }
     /**
      * Get pin number of Gpio. If raw param is True will return the
-     * number as used within sysfs
+     * number as used within sysfs. Invalid will return -1.
      *
      * @param raw (optional) get the raw gpio number.
      * @return Pin number

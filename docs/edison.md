@@ -27,6 +27,13 @@ in libmraa:
   accuracy of 10bits. This ADC is only included on the arduino board.
 - AIO pins are treated as 0-5 in mraa_aio_init() but as 14-19 for everything
   else. Therefore use mraa_gpio_init(14) to use A0 as a Gpio
+- Arduino pin 7 can sometimes negatively impact the wifi capability, if using
+  wifi avoid using this pin
+
+Because of the way IO is setup with the tristate on the arduino breakout board
+IO will be flipped as it is setup. It's recommended to setup IO pins &
+direction before using them in a setup() method or similar. It's impossible on
+this platform to avoid some GPIOs flipping on setup.
 
 Intel(R) breakout board
 -----------------------
