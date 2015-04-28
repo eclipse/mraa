@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-public class bmp85 {
+public class Bmp85 {
   static {
     try {
       System.loadLibrary("mraajava");
