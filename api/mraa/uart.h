@@ -1,5 +1,6 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+ * Contributions: Jon Trulson <jtrulson@ics.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -41,6 +42,15 @@ extern "C" {
 
 #include <stdio.h>
 #include <fcntl.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
+#include <termios.h>
+#include <sys/time.h>
+#include <sys/select.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "common.h"
 
@@ -62,6 +72,26 @@ mraa_uart_context mraa_uart_init(int uart);
  * @return char pointer of device path
  */
 char* mraa_uart_get_dev_path(mraa_uart_context dev);
+
+/**
+ * Open the TTY device associated with a UART context, and set up the
+ * terminal modes and baud rate.  The TTY is setup for a 'raw'
+ * mode. 81N, no echo or special character handling, such as flow
+ * control or line editing semantics.
+ *
+ * @param dev uart context
+ * @param baud desired baud rate
+ * @return mraa_result_t
+ */
+mraa_result_t mraa_uart_open_dev(mraa_uart_context dev, speed_t baud);
+
+/**
+ * Close a device previously opened with mraa_uart_open_dev().
+ *
+ * @param dev uart context
+ * @return mraa_result_t
+ */
+mraa_result_t mraa_uart_close_dev(mraa_uart_context dev);
 
 #ifdef __cplusplus
 }

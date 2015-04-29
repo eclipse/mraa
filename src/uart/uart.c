@@ -1,5 +1,6 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+ * Contributions: Jon Trulson <jtrulson@ics.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -108,4 +109,66 @@ mraa_uart_get_dev_path(mraa_uart_context dev)
         return NULL;
     }
     return dev->path;
+}
+
+mraa_result_t
+mraa_uart_open_dev(mraa_uart_context dev, speed_t baud)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: open: context is NULL");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    char *devPath = mraa_uart_get_dev_path(dev);
+
+    if (!devPath) {
+        syslog(LOG_ERR, "uart: device path undefined, open failed");
+        return MRAA_ERROR_UNSPECIFIED;
+    }
+
+    // now open the device
+    if ( (dev->fd = open(devPath, O_RDWR)) == -1) {
+        syslog(LOG_ERR, "uart: open() failed");
+        return MRAA_ERROR_UNSPECIFIED;
+    }
+
+    // now setup the tty and the selected baud rate
+
+    struct termios termio;
+
+    // get current modes
+    tcgetattr(dev->fd, &termio);
+
+    // setup for a 'raw' mode.  81N, no echo or special character
+    // handling, such as flow control or line editing semantics.
+    cfmakeraw(&termio);
+
+    // set our baud rates
+    cfsetispeed(&termio, baud);
+    cfsetospeed(&termio, baud);
+
+    // make it so
+    if (tcsetattr(dev->fd, TCSAFLUSH, &termio) < 0) {
+        syslog(LOG_ERR, "uart: tcsetattr() failed");
+        return MRAA_ERROR_UNSPECIFIED;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_uart_close_dev(mraa_uart_context dev)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: close: context is NULL");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    // just close the device and reset our fd.
+    if (dev->fd >= 0) {
+        close(dev->fd);
+    }
+
+    dev->fd = -1;
+    return MRAA_SUCCESS;
 }
