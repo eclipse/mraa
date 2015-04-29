@@ -1,6 +1,8 @@
 /*
- * Author: Alexander Komarov <alexander.komarov@intel.com>
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
+ * Author: Jakub Kramarz <jkramarz@virtuslab.com>
+ * Copyright (c) 2015 VirtusLab
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,7 +24,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-public class bmp85 {
+
+public class CyclePwm3 {
   static {
     try {
       System.loadLibrary("mraajava");
@@ -33,43 +36,20 @@ public class bmp85 {
       System.exit(1);
     }
   }
-  public static void main(String argv[]) {
+  public static void main(String argv[]) throws InterruptedException{
     mraa.mraa.init();
-    System.out.println(mraa.mraa.getVersion());
+    mraa.Pwm pwm = new mraa.Pwm(3);
+    pwm.period_us(200);
+    pwm.enable(true);
 
-    // helper function to go from hex val to dec
-    // function char(x) { return parseInt(x, 16); }
-
-    mraa.I2c i2c = new mraa.I2c(0);
-    i2c.address((byte)0x77);
-    i2c.writeByte((byte)0xd0);
-    /*
-    SWIGTYPE_p_unsigned_char data0 = new SWIGTYPE_p_unsigned_char();*/
-    byte[] data = new byte[1];
-    i2c.read(data);
-    System.out.println((new Integer(data[0])).toString());
-
-    i2c.writeReg((byte)0xf4, (byte)0x2e);
-    // initialise device
-    if (i2c.readReg((byte)0xd0) != 0x55) {
-      System.out.println("error");
+    float value = 0;
+    while(true){
+        value += 0.01;
+        pwm.write(value);
+        Thread.sleep(50); 
+        if(value >= 1){
+            value = 0;
+        }
     }
-
-    // we want to read temperature so write 0x2e into control reg
-    i2c.writeReg((byte)0xf4, (byte)0x2e);
-
-    // read a 16bit reg, obviously it's uncalibrated so mostly a useless value
-    // :)
-    System.out.println(i2c.readWordReg((byte)0xf6));
-
-    byte[] buf = new byte[2];
-    buf[0] = (byte)0xf4;
-    buf[1] = (byte)0x2e;
-    i2c.write(buf);
-
-    i2c.writeByte((byte)0xf6);
-    int d = i2c.readReg((byte)2);
-    System.out.println((new Integer(d)).toString());
-  };
+  }
 }
-;
