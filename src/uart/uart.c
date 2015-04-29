@@ -204,3 +204,39 @@ mraa_uart_write(mraa_uart_context dev, char *buf, size_t len)
 
     return write(dev->fd, buf, len);
 }
+
+mraa_boolean_t
+mraa_uart_data_available(mraa_uart_context dev, unsigned int millis)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: data_available: write context is NULL");
+        return 0;
+    }
+
+    if (dev->fd < 0) {
+        syslog(LOG_ERR, "uart: port is not open");
+        return 0;
+    }
+
+    struct timeval timeout;
+
+    if (millis == 0) {
+        // no waiting
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 0;
+    }
+    else {
+        timeout.tv_sec = millis / 1000;
+        timeout.tv_usec = (millis % 1000) * 1000;
+    }
+
+    fd_set readfds;
+
+    FD_ZERO(&readfds);
+    FD_SET(dev->fd, &readfds);
+
+    if (select(dev->fd + 1, &readfds, NULL, NULL, &timeout) > 0)
+        return 1;                // data is ready
+    else
+        return 0;
+}
