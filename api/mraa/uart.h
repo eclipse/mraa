@@ -93,6 +93,27 @@ mraa_result_t mraa_uart_open_dev(mraa_uart_context dev, speed_t baud);
  */
 mraa_result_t mraa_uart_close_dev(mraa_uart_context dev);
 
+/**
+ * Read bytes from the device into a buffer
+ *
+ * @param dev uart context
+ * @param buf buffer pointer
+ * @param len maximum size of buffer
+ * @return the number of bytes read, or -1 if an error occurred
+ */
+int mraa_uart_read(mraa_uart_context dev, char *buf, size_t len);
+
+/**
+ * Write bytes in buffer to a device
+ *
+ * @param dev uart context
+ * @param buf buffer pointer
+ * @param len maximum size of buffer
+ * @return the number of bytes written, or -1 if an error occurred
+ */
+int mraa_uart_write(mraa_uart_context dev, char *buf, size_t len);
+
+
 #ifdef __cplusplus
 }
 #endif
