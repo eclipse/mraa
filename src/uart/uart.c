@@ -172,3 +172,35 @@ mraa_uart_close_dev(mraa_uart_context dev)
     dev->fd = -1;
     return MRAA_SUCCESS;
 }
+
+int
+mraa_uart_read(mraa_uart_context dev, char *buf, size_t len)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: read: context is NULL");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (dev->fd < 0) {
+        syslog(LOG_ERR, "uart: port is not open");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return read(dev->fd, buf, len);
+}
+
+int
+mraa_uart_write(mraa_uart_context dev, char *buf, size_t len)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: write: context is NULL");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (dev->fd < 0) {
+        syslog(LOG_ERR, "uart: port is not open");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return write(dev->fd, buf, len);
+}

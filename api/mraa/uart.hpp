@@ -102,6 +102,32 @@ class Uart
         return mraa_uart_close_dev(m_uart);
     }
 
+    /**
+     * Read bytes from the device into a buffer
+     *
+     * @param buf buffer pointer
+     * @param len maximum size of buffer
+     * @return the number of bytes read, or -1 if an error occurred
+     */
+    int
+    read(char *buf, size_t len)
+    {
+        return mraa_uart_read(m_uart, buf, len);
+    }
+
+    /**
+     * Write bytes in buffer to a device
+     *
+     * @param buf buffer pointer
+     * @param len maximum size of buffer
+     * @return the number of bytes written, or -1 if an error occurred
+     */
+    int
+    write(char *buf, size_t len)
+    {
+        return mraa_uart_write(m_uart, buf, len);
+    }
+
   private:
     mraa_uart_context m_uart;
 };
