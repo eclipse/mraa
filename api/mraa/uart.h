@@ -113,6 +113,15 @@ int mraa_uart_read(mraa_uart_context dev, char *buf, size_t len);
  */
 int mraa_uart_write(mraa_uart_context dev, char *buf, size_t len);
 
+/**
+ * Check to see if data is available on the device for reading
+ *
+ * @param dev uart context
+ * @param millis number of milliseconds to wait, or 0 to return immediately
+ * @return 1 if there is data available to read, 0 otherwise
+ */
+mraa_boolean_t
+mraa_uart_data_available(mraa_uart_context dev, unsigned int millis);
 
 #ifdef __cplusplus
 }

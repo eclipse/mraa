@@ -128,6 +128,21 @@ class Uart
         return mraa_uart_write(m_uart, buf, len);
     }
 
+    /**
+     * Check to see if data is available on the device for reading
+     *
+     * @param millis number of milliseconds to wait, or 0 to return immediately
+     * @return true if there is data available to read, false otherwise
+     */
+     bool
+     dataAvailable(unsigned int millis=0)
+     {
+       if (mraa_uart_data_available(m_uart, millis))
+           return true;
+       else
+           return false;
+     }
+
   private:
     mraa_uart_context m_uart;
 };
