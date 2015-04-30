@@ -83,7 +83,7 @@ char* mraa_uart_get_dev_path(mraa_uart_context dev);
  * @param baud desired baud rate
  * @return mraa_result_t
  */
-mraa_result_t mraa_uart_open_dev(mraa_uart_context dev, speed_t baud);
+mraa_result_t mraa_uart_open_dev(mraa_uart_context dev, unsigned int baud);
 
 /**
  * Close a device previously opened with mraa_uart_open_dev().

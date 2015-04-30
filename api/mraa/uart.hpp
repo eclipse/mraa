@@ -85,7 +85,7 @@ class Uart
      * @return mraa_result_t
      */
     mraa_result_t
-    openDevice(speed_t baud)
+    openDevice(unsigned int baud)
     {
         return mraa_uart_open_dev(m_uart, baud);
     }
