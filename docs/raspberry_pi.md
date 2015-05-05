@@ -55,6 +55,9 @@ style numbers.
 
 
 The following pin mapping applies to the new Raspberry Pi model 2 and B+. Note that GPIO(21) is now GPIO(27)
+
+| MRAA Number | Physical Pin | Function |
+|-------------|--------------|----------|
 | 1           | P1-01        | 3V3 VCC  |
 | 2           | P1-02        | 5V VCC   |
 | 3           | P1-03        | I2C SDA  |
