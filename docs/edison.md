@@ -1,44 +1,44 @@
 Intel Edison                            {#edison}
 =============
 
-Intel(R) Edison is a dual core Silvermont Atom(TM) clocked at 500MHz. The
-Edison also features 4GB of storage, 1GB ram and onboard wifi and bluetooth.
+Intel(R) Edison is a dual-core Silvermont Atom(TM) clocked at 500MHz. The
+Edison also features 4GB of storage, 1GB ram and on-board WiFi and Bluetooth.
 
-Currently Supported boards:
+Currently supported boards:
 - Intel Arduino board
 - Intel breakout board
 
 UART
 ----
-On both the Arduino board and the breakout board, The avaible UART interface is on /dev/ttyMFD1
+On both the Arduino board and the breakout board, The available UART interface is on /dev/ttyMFD1
 
 Intel Arduino board
 -------------------
 The Edison used with the Arduino board has the following limitations
 in libmraa:
 
-- i2c is exposed on i2c-6, therfore you must use bus 6 and not bus 0
-- PWM avaible on default swizzler postions. (3,5,6,9)
+- I2C is exposed on i2c-6, therefore you must use bus 6 and not bus 0
+- PWM available on default swizzler positions. (3,5,6,9)
 - SPI exposed is also used for the ADC. Try not to use your own CS.
 - Max SPI speed is 25Mhz/4 ~6.25Mhz
 - SPI PM can sometimes do weird things you can disable it with:
-  echo on > /sys/devices/pci0000\:00/0000\:00\:07.1/power/control
+  `echo on > /sys/devices/pci0000\:00/0000\:00\:07.1/power/control`
 - ADC kernel module will return 12bit number but the ADC itself only has an
-  accuracy of 10bits. This ADC is only included on the arduino board.
-- AIO pins are treated as 0-5 in mraa_aio_init() but as 14-19 for everything
-  else. Therefore use mraa_gpio_init(14) to use A0 as a Gpio
-- Arduino pin 7 can sometimes negatively impact the wifi capability, if using
-  wifi avoid using this pin
+  accuracy of 10bits. This ADC is only included on the Arduino board.
+- AIO pins are treated as 0-5 in `mraa_aio_init()` but as 14-19 for everything
+  else. Therefore use `mraa_gpio_init(14)` to use A0 as a GPIO
+- Arduino pin 7 can sometimes negatively impact the WiFi capability, if using
+  WiFi avoid using this pin
 
-Because of the way IO is setup with the tristate on the arduino breakout board
+Because of the way IO is setup with the tristate on the Arduino breakout board
 IO will be flipped as it is setup. It's recommended to setup IO pins &
-direction before using them in a setup() method or similar. It's impossible on
+direction before using them in a `setup()` method or similar. It's impossible on
 this platform to avoid some GPIOs flipping on setup.
 
 Intel(R) breakout board
 -----------------------
 
-- Both I2C buses are avaible 1 & 6
+- Both I2C buses are available 1 & 6
 - IO on the miniboard is 1.8V
 
 Please see the following table on how the physical pins map to mraa pin numbers
