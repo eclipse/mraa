@@ -1,7 +1,8 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Contributions: Jon Trulson <jtrulson@ics.com>
- * Copyright (c) 2014 Intel Corporation.
+ *                Brendan le Foll <brendan.le.foll@intel.com>
+ * Copyright (c) 2014 - 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -30,49 +31,6 @@
 
 #include "uart.h"
 #include "mraa_internal.h"
-
-// This function takes an unsigned int and converts it to a B* speed_t
-// that can be used with linux termios.
-static speed_t uint2speed(unsigned int speed)
-{
-    switch (speed) {
-    case 0:         return B0; // hangup, not too useful otherwise
-    case 50:        return B50;
-    case 75:        return B75;
-    case 110:       return B110;
-    case 150:       return B150;
-    case 200:       return B200;
-    case 300:       return B300;
-    case 600:       return B600;
-    case 1200:      return B1200;
-    case 1800:      return B1800;
-    case 2400:      return B2400;
-    case 4800:      return B4800;
-    case 9600:      return B9600;
-    case 19200:     return B19200;
-    case 38400:     return B38400;
-    case 57600:     return B57600;
-    case 115200:    return B115200;
-    case 230400:    return B230400;
-    case 460800:    return B460800;
-    case 500000:    return B500000;
-    case 576000:    return B576000;
-    case 921600:    return B921600;
-    case 1000000:   return B1000000;
-    case 1152000:   return B1152000;
-    case 1500000:   return B1500000;
-    case 2000000:   return B2000000;
-    case 2500000:   return B2500000;
-    case 3000000:   return B3000000;
-    case 3500000:   return B3500000;
-    case 4000000:   return B4000000;
-    }
-
-    // if we are here, then an unsupported baudrate was selected.
-    // Report it via syslog and return B9600, a common default.
-    syslog(LOG_ERR, "uart: unsupported baud rate, defaulting to 9600.");
-    return B9600;
-}
 
 mraa_uart_context
 mraa_uart_init(int index)
@@ -119,16 +77,8 @@ mraa_uart_init(int index)
         }
     }
 
-    mraa_uart_context dev = (mraa_uart_context) malloc(sizeof(struct _uart));
-    if (dev == NULL) {
-        syslog(LOG_CRIT, "uart: Failed to allocate memory for context");
-        return NULL;
-    }
-    memset(dev, 0, sizeof(struct _uart));
+    mraa_uart_context dev = mraa_uart_init_raw(index);
 
-    dev->index = index;
-    dev->fd = -1;
-    dev->path = (char*) plat->uart_dev[index].device_path;
     if (advance_func->uart_init_post != NULL) {
         mraa_result_t ret = advance_func->uart_init_post(dev);
         if (ret != MRAA_SUCCESS) {
@@ -140,51 +90,104 @@ mraa_uart_init(int index)
     return dev;
 }
 
-char*
-mraa_uart_get_dev_path(mraa_uart_context dev)
+mraa_uart_context
+mraa_uart_init_raw(int index)
 {
+    mraa_uart_context dev = (mraa_uart_context) malloc(sizeof(struct _uart));
     if (dev == NULL) {
-        syslog(LOG_ERR, "uart: get_device_path failed, context is NULL");
+        syslog(LOG_CRIT, "uart: Failed to allocate memory for context");
         return NULL;
     }
-    if (dev->path == NULL) {
-        syslog(LOG_ERR, "uart: device path undefined");
-        return NULL;
-    }
-    return dev->path;
-}
+    memset(dev, 0, sizeof(struct _uart));
 
-mraa_result_t
-mraa_uart_open_dev(mraa_uart_context dev, unsigned int baud)
-{
-    if (!dev) {
-        syslog(LOG_ERR, "uart: open: context is NULL");
-        return MRAA_ERROR_INVALID_HANDLE;
-    }
+    dev->index = index;
+    dev->fd = -1;
+    dev->path = (char*) plat->uart_dev[index].device_path;
 
-    char *devPath = mraa_uart_get_dev_path(dev);
+    char* devPath = mraa_uart_get_dev_path(dev);
 
     if (!devPath) {
         syslog(LOG_ERR, "uart: device path undefined, open failed");
-        return MRAA_ERROR_UNSPECIFIED;
+        free(dev);
+        return NULL;
     }
 
     // now open the device
-    if ( (dev->fd = open(devPath, O_RDWR)) == -1) {
+    if ((dev->fd = open(devPath, O_RDWR)) == -1) {
         syslog(LOG_ERR, "uart: open() failed");
-        return MRAA_ERROR_UNSPECIFIED;
+        free(dev);
+        return NULL;
     }
 
     // now setup the tty and the selected baud rate
-
     struct termios termio;
 
     // get current modes
-    tcgetattr(dev->fd, &termio);
+    if (!tcgetattr(dev->fd, &termio)) {
+        syslog(LOG_ERR, "uart: tcgetattr() failed");
+        free(dev);
+        return NULL;
+    }
 
-    // setup for a 'raw' mode.  81N, no echo or special character
+    // setup for a 'raw' mode.  8N1, no echo or special character
     // handling, such as flow control or line editing semantics.
+    // cfmakeraw is not POSIX!
     cfmakeraw(&termio);
+
+    if (!mraa_uart_set_baudrate(dev, 9600)) {
+        free(dev);
+        return NULL;
+    }
+
+    return dev;
+}
+
+mraa_result_t
+mraa_uart_stop(mraa_uart_context dev)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: stop: context is NULL");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    // just close the device and reset our fd.
+    if (dev->fd >= 0) {
+        close(dev->fd);
+    }
+
+    free(dev);
+
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_uart_flush(mraa_uart_context dev)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: stop: context is NULL");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (!tcdrain(dev->fd)) {
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_uart_set_baudrate(mraa_uart_context dev, unsigned int baud)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: stop: context is NULL");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    struct termios termio;
+    if (!tcgetattr(dev->fd, &termio)) {
+        syslog(LOG_ERR, "uart: tcgetattr() failed");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
 
     // set our baud rates
     speed_t speed = uint2speed(baud);
@@ -194,31 +197,145 @@ mraa_uart_open_dev(mraa_uart_context dev, unsigned int baud)
     // make it so
     if (tcsetattr(dev->fd, TCSAFLUSH, &termio) < 0) {
         syslog(LOG_ERR, "uart: tcsetattr() failed");
-        return MRAA_ERROR_UNSPECIFIED;
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
     }
-
     return MRAA_SUCCESS;
 }
 
 mraa_result_t
-mraa_uart_close_dev(mraa_uart_context dev)
+mraa_uart_set_mode(mraa_uart_context dev, int bytesize, mraa_uart_parity_t parity, int stopbits)
 {
     if (!dev) {
-        syslog(LOG_ERR, "uart: close: context is NULL");
+        syslog(LOG_ERR, "uart: stop: context is NULL");
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    // just close the device and reset our fd.
-    if (dev->fd >= 0) {
-        close(dev->fd);
+    struct termios termio;
+    if (!tcgetattr(dev->fd, &termio)) {
+        syslog(LOG_ERR, "uart: tcgetattr() failed");
+        return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    dev->fd = -1;
-    return MRAA_SUCCESS;
+    termio.c_cflag &= ~CSIZE;
+    switch (bytesize) {
+        case 8:
+            termio.c_cflag |= CS8;
+            break;
+        case 7:
+            termio.c_cflag |= CS7;
+            break;
+        case 6:
+            termio.c_cflag |= CS6;
+            break;
+        case 5:
+            termio.c_cflag |= CS5;
+            break;
+        default:
+            termio.c_cflag |= CS8;
+            break;
+    }
+
+    // POSIX & linux doesn't support 1.5 and I've got bigger fish to fry
+    switch (stopbits) {
+        case 1:
+            termio.c_cflag &= CSTOPB;
+            break;
+        case 2:
+            termio.c_cflag |= CSTOPB;
+        default:
+            break;
+    }
+
+    switch (parity) {
+        case MRAA_UART_PARITY_NONE:
+            termio.c_cflag &= ~(PARENB | PARODD);
+            break;
+        case MRAA_UART_PARITY_EVEN:
+            termio.c_cflag &= ~PARODD;
+            termio.c_cflag |= PARODD;
+            break;
+        case MRAA_UART_PARITY_ODD:
+            termio.c_cflag |= PARENB | PARODD;
+            break;
+        case MRAA_UART_PARITY_MARK: // not POSIX
+            termio.c_cflag |= PARENB | CMSPAR | PARODD;
+            break;
+        case MRAA_UART_PARITY_SPACE: // not POSIX
+            termio.c_cflag |= PARENB | CMSPAR;
+            termio.c_cflag &= ~PARODD;
+            break;
+    }
+
+    if (tcsetattr(dev->fd, TCSAFLUSH, &termio) < 0) {
+        syslog(LOG_ERR, "uart: tcsetattr() failed");
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
+}
+
+mraa_result_t
+mraa_uart_set_flowcontrol(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_boolean_t rtscts)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: stop: context is NULL");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    // hardware flow control
+    int action = TCIOFF;
+    if (xonxoff) {
+        action = TCION;
+    }
+    if (!tcflow(dev->fd, action)) {
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
+
+    // rtscts
+    struct termios termio;
+
+    // get current modes
+    if (!tcgetattr(dev->fd, &termio)) {
+        syslog(LOG_ERR, "uart: tcgetattr() failed");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (rtscts) {
+        termio.c_cflag |= CRTSCTS;
+    } else {
+        termio.c_cflag &= ~CRTSCTS;
+    }
+
+    if (tcsetattr(dev->fd, TCSAFLUSH, &termio) < 0) {
+        syslog(LOG_ERR, "uart: tcsetattr() failed");
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
+}
+
+mraa_result_t
+mraa_uart_set_timeout(mraa_uart_context dev, int read, int write, int interchar)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: stop: context is NULL");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+}
+
+char*
+mraa_uart_get_dev_path(mraa_uart_context dev)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: get_device_path failed, context is NULL");
+        return NULL;
+    }
+    if (dev->path == NULL) {
+        syslog(LOG_ERR, "uart: device path undefined");
+        return NULL;
+    }
+
+    return dev->path;
 }
 
 int
-mraa_uart_read(mraa_uart_context dev, char *buf, size_t len)
+mraa_uart_read(mraa_uart_context dev, char* buf, size_t len)
 {
     if (!dev) {
         syslog(LOG_ERR, "uart: read: context is NULL");
@@ -234,7 +351,7 @@ mraa_uart_read(mraa_uart_context dev, char *buf, size_t len)
 }
 
 int
-mraa_uart_write(mraa_uart_context dev, char *buf, size_t len)
+mraa_uart_write(mraa_uart_context dev, char* buf, size_t len)
 {
     if (!dev) {
         syslog(LOG_ERR, "uart: write: context is NULL");
@@ -268,8 +385,7 @@ mraa_uart_data_available(mraa_uart_context dev, unsigned int millis)
         // no waiting
         timeout.tv_sec = 0;
         timeout.tv_usec = 0;
-    }
-    else {
+    } else {
         timeout.tv_sec = millis / 1000;
         timeout.tv_usec = (millis % 1000) * 1000;
     }
@@ -279,8 +395,83 @@ mraa_uart_data_available(mraa_uart_context dev, unsigned int millis)
     FD_ZERO(&readfds);
     FD_SET(dev->fd, &readfds);
 
-    if (select(dev->fd + 1, &readfds, NULL, NULL, &timeout) > 0)
-        return 1;                // data is ready
-    else
+    if (select(dev->fd + 1, &readfds, NULL, NULL, &timeout) > 0) {
+        return 1; // data is ready
+    } else {
         return 0;
+    }
+}
+
+// This function takes an unsigned int and converts it to a B* speed_t
+// that can be used with linux/posix termios
+static speed_t
+uint2speed(unsigned int speed)
+{
+    switch (speed) {
+        case 0:
+            return B0; // hangup, not too useful otherwise
+        case 50:
+            return B50;
+        case 75:
+            return B75;
+        case 110:
+            return B110;
+        case 150:
+            return B150;
+        case 200:
+            return B200;
+        case 300:
+            return B300;
+        case 600:
+            return B600;
+        case 1200:
+            return B1200;
+        case 1800:
+            return B1800;
+        case 2400:
+            return B2400;
+        case 4800:
+            return B4800;
+        case 9600:
+            return B9600;
+        case 19200:
+            return B19200;
+        case 38400:
+            return B38400;
+        case 57600:
+            return B57600;
+        case 115200:
+            return B115200;
+        case 230400:
+            return B230400;
+        case 460800:
+            return B460800;
+        case 500000:
+            return B500000;
+        case 576000:
+            return B576000;
+        case 921600:
+            return B921600;
+        case 1000000:
+            return B1000000;
+        case 1152000:
+            return B1152000;
+        case 1500000:
+            return B1500000;
+        case 2000000:
+            return B2000000;
+        case 2500000:
+            return B2500000;
+        case 3000000:
+            return B3000000;
+        case 3500000:
+            return B3500000;
+        case 4000000:
+            return B4000000;
+        default:
+            // if we are here, then an unsupported baudrate was selected.
+            // Report it via syslog and return B9600, a common default.
+            syslog(LOG_ERR, "uart: unsupported baud rate, defaulting to 9600.");
+            return B9600;
+    }
 }

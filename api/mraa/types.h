@@ -222,6 +222,14 @@ typedef enum {
     MRAA_I2C_HIGH = 2  /**< up to 3.4Mhz */
 } mraa_i2c_mode_t;
 
+typedef enum {
+	MRAA_UART_PARITY_NONE = 0,
+	MRAA_UART_PARITY_EVEN = 1,
+	MRAA_UART_PARITY_ODD = 2,
+	MRAA_UART_PARITY_MARK = 3,
+	MRAA_UART_PARITY_SPACE = 4
+} mraa_uart_parity_t;
+
 #ifdef __cplusplus
 }
 #endif

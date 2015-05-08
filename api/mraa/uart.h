@@ -1,7 +1,8 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Contributions: Jon Trulson <jtrulson@ics.com>
- * Copyright (c) 2014 Intel Corporation.
+ *                Brendan Le Foll <brendan.le.foll@intel.com>
+ * Copyright (c) 2014 - 2015 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -64,6 +65,18 @@ typedef struct _uart* mraa_uart_context;
  */
 mraa_uart_context mraa_uart_init(int uart);
 
+mraa_uart_context mraa_uart_init_raw(int uart);
+
+mraa_result_t mraa_uart_flush(mraa_uart_context);
+
+mraa_result_t mraa_uart_set_baudrate(mraa_uart_context dev, unsigned int baud);
+
+mraa_result_t mraa_uart_set_mode(mraa_uart_context dev, int bytesize, mraa_uart_parity_t parity, int stopbits);
+
+mraa_result_t mraa_uart_set_flowcontrol(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_boolean_t rtscts);
+
+mraa_result_t mraa_uart_set_timeout(mraa_uart_context dev, int read, int write, int interchar);
+
 /**
  * Get Char pointer with tty device path within Linux
  * For example. Could point to "/dev/ttyS0"
@@ -86,12 +99,12 @@ char* mraa_uart_get_dev_path(mraa_uart_context dev);
 mraa_result_t mraa_uart_open_dev(mraa_uart_context dev, unsigned int baud);
 
 /**
- * Close a device previously opened with mraa_uart_open_dev().
+ * Destroy a mraa_uart_context
  *
  * @param dev uart context
  * @return mraa_result_t
  */
-mraa_result_t mraa_uart_close_dev(mraa_uart_context dev);
+mraa_result_t mraa_uart_stop(mraa_uart_context dev);
 
 /**
  * Read bytes from the device into a buffer
@@ -101,7 +114,7 @@ mraa_result_t mraa_uart_close_dev(mraa_uart_context dev);
  * @param len maximum size of buffer
  * @return the number of bytes read, or -1 if an error occurred
  */
-int mraa_uart_read(mraa_uart_context dev, char *buf, size_t len);
+int mraa_uart_read(mraa_uart_context dev, char* buf, size_t len);
 
 /**
  * Write bytes in buffer to a device
@@ -111,7 +124,7 @@ int mraa_uart_read(mraa_uart_context dev, char *buf, size_t len);
  * @param len maximum size of buffer
  * @return the number of bytes written, or -1 if an error occurred
  */
-int mraa_uart_write(mraa_uart_context dev, char *buf, size_t len);
+int mraa_uart_write(mraa_uart_context dev, char* buf, size_t len);
 
 /**
  * Check to see if data is available on the device for reading
@@ -120,8 +133,7 @@ int mraa_uart_write(mraa_uart_context dev, char *buf, size_t len);
  * @param millis number of milliseconds to wait, or 0 to return immediately
  * @return 1 if there is data available to read, 0 otherwise
  */
-mraa_boolean_t
-mraa_uart_data_available(mraa_uart_context dev, unsigned int millis);
+mraa_boolean_t mraa_uart_data_available(mraa_uart_context dev, unsigned int millis);
 
 #ifdef __cplusplus
 }

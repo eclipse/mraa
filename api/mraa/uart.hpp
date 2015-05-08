@@ -1,7 +1,7 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Contributions: Jon Trulson <jtrulson@ics.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Copyright (c) 2014 - 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -110,7 +110,7 @@ class Uart
      * @return the number of bytes read, or -1 if an error occurred
      */
     int
-    read(char *buf, size_t len)
+    read(char* buf, size_t len)
     {
         return mraa_uart_read(m_uart, buf, len);
     }
@@ -123,7 +123,7 @@ class Uart
      * @return the number of bytes written, or -1 if an error occurred
      */
     int
-    write(char *buf, size_t len)
+    write(char* buf, size_t len)
     {
         return mraa_uart_write(m_uart, buf, len);
     }
@@ -134,14 +134,14 @@ class Uart
      * @param millis number of milliseconds to wait, or 0 to return immediately
      * @return true if there is data available to read, false otherwise
      */
-     bool
-     dataAvailable(unsigned int millis=0)
-     {
-       if (mraa_uart_data_available(m_uart, millis))
-           return true;
-       else
-           return false;
-     }
+    bool
+    dataAvailable(unsigned int millis = 0)
+    {
+        if (mraa_uart_data_available(m_uart, millis))
+            return true;
+        else
+            return false;
+    }
 
   private:
     mraa_uart_context m_uart;
