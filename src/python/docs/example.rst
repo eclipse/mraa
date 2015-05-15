@@ -44,9 +44,9 @@ The I2c module module has a number of different ways of interacting with the
 i2c bus, including a number of overloaded read() calls and the writeReg()
 helper function.
 
-.. literalinclude:: ../../../examples/python/i2c_HMC5883.py
-  :prepend: x = mraa.I2c(0)
-  :start-after: x = mraa.I2c(0)
+.. literalinclude:: ../../../examples/python/bmp85.py
+  :prepend: x = m.I2c(0)
+  :start-after: x = m.I2c(0)
 
 .. literalinclude:: ../../../docs/i2c.txt
 

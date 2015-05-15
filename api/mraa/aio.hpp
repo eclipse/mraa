@@ -27,7 +27,8 @@
 #include <stdexcept>
 #include "aio.h"
 
-namespace mraa {
+namespace mraa
+{
 
 /**
  * @brief API to Analog IO
@@ -36,63 +37,73 @@ namespace mraa {
  *
  * @snippet examples/c++/AioA0.cpp Interesting
  */
-class Aio {
-    public:
-        /**
-         * Aio Constructor, takes a pin number which will map directly to the
-         * board number
-         *
-         * @param pin channel number to read ADC inputs
-         */
-        Aio(unsigned int pin) {
-            m_aio = mraa_aio_init(pin);
-            if (m_aio == NULL) {
-                throw std::invalid_argument("Invalid AIO pin specified - do you have an ADC?");
-            }
+class Aio
+{
+  public:
+    /**
+     * Aio Constructor, takes a pin number which will map directly to the
+     * board number
+     *
+     * @param pin channel number to read ADC inputs
+     */
+    Aio(unsigned int pin)
+    {
+        m_aio = mraa_aio_init(pin);
+        if (m_aio == NULL) {
+            throw std::invalid_argument("Invalid AIO pin specified - do you have an ADC?");
         }
-        /**
-         * Aio destructor
-         */
-        ~Aio() {
-            mraa_aio_close(m_aio);
-        }
-        /**
-         * Read a value from the AIO pin. By default mraa will shift
-         * the raw value up or down to a 10 bit value.
-         *
-         * @returns The current input voltage. By default, a 10bit value
-         */
-        int read() {
-            return mraa_aio_read(m_aio);
-        }
-        /**
-         * Read a value from the AIO pin and return it as a normalized float.
-         *
-         * @returns The current input voltage as a normalized float (0.0f-1.0f)
-         */
-        float readFloat() {
-            return mraa_aio_read_float(m_aio);
-        }
-        /**
-         * Set the bit value which mraa will shift the raw reading
-         * from the ADC to. I.e. 10bits
-         * @param bits the bits the return from read should be i.e 10
-         * @return mraa result type
-         */
-        mraa_result_t setBit(int bits) {
-            return mraa_aio_set_bit(m_aio, bits);
-        }
-        /**
-         * Gets the bit value mraa is shifting the analog read to.
-         *
-         * @return bit value mraa is set return from the read function
-         */
-        int getBit() {
-            return mraa_aio_get_bit(m_aio);
-        }
+    }
+    /**
+     * Aio destructor
+     */
+    ~Aio()
+    {
+        mraa_aio_close(m_aio);
+    }
+    /**
+     * Read a value from the AIO pin. By default mraa will shift
+     * the raw value up or down to a 10 bit value.
+     *
+     * @returns The current input voltage. By default, a 10bit value
+     */
+    int
+    read()
+    {
+        return mraa_aio_read(m_aio);
+    }
+    /**
+     * Read a value from the AIO pin and return it as a normalized float.
+     *
+     * @returns The current input voltage as a normalized float (0.0f-1.0f)
+     */
+    float
+    readFloat()
+    {
+        return mraa_aio_read_float(m_aio);
+    }
+    /**
+     * Set the bit value which mraa will shift the raw reading
+     * from the ADC to. I.e. 10bits
+     * @param bits the bits the return from read should be i.e 10
+     * @return mraa result type
+     */
+    mraa_result_t
+    setBit(int bits)
+    {
+        return mraa_aio_set_bit(m_aio, bits);
+    }
+    /**
+     * Gets the bit value mraa is shifting the analog read to.
+     *
+     * @return bit value mraa is set return from the read function
+     */
+    int
+    getBit()
+    {
+        return mraa_aio_get_bit(m_aio);
+    }
 
-    private:
-        mraa_aio_context m_aio;
+  private:
+    mraa_aio_context m_aio;
 };
-
 }

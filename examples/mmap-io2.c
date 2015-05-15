@@ -28,9 +28,9 @@
 #include "mraa.h"
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
-//! [Interesting]
+    //! [Interesting]
     fprintf(stdout, "hello mraa\n Version: %s\n", mraa_get_version());
     mraa_gpio_context gpio;
     gpio = mraa_gpio_init(2);
@@ -38,10 +38,10 @@ main(int argc, char **argv)
     mraa_gpio_use_mmaped(gpio, 1);
 
     for (;;) {
-        mraa_gpio_write(gpio , 1);
+        mraa_gpio_write(gpio, 1);
         usleep(50000);
         mraa_gpio_write(gpio, 0);
         usleep(50000);
     }
-//! [Interesting]
+    //! [Interesting]
 }

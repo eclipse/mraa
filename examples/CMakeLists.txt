@@ -9,7 +9,7 @@ add_executable (spi_mcp4261 spi_mcp4261.c)
 add_executable (mmap-io2 mmap-io2.c)
 add_executable (blink_onboard blink_onboard.c)
 add_executable (uart_setup uart_setup.c)
-add_executable (gpio gpio.c)
+add_executable (mraa-gpio mraa-gpio.c)
 add_executable (spi_max7219 spi_max7219.c)
 
 include_directories(${PROJECT_SOURCE_DIR}/api)
@@ -25,7 +25,7 @@ target_link_libraries (spi_mcp4261 mraa)
 target_link_libraries (mmap-io2 mraa)
 target_link_libraries (blink_onboard mraa)
 target_link_libraries (uart_setup mraa)
-target_link_libraries (gpio mraa)
+target_link_libraries (mraa-gpio mraa)
 target_link_libraries (spi_max7219 mraa)
 
 add_subdirectory (c++)
@@ -33,7 +33,5 @@ add_subdirectory (c++)
 install (DIRECTORY ${PROJECT_SOURCE_DIR}/examples/ DESTINATION share/mraa/examples)
 
 if (INSTALLGPIOTOOL)
-   install (TARGETS gpio DESTINATION bin)
+   install (TARGETS mraa-gpio DESTINATION bin)
 endif()
-
-

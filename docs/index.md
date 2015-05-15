@@ -1,4 +1,4 @@
-libmraa - Low Level Skeleton Library for Communication on Intel platforms
+libmraa - Low Level Skeleton Library for Communication on GNU/Linux platforms
 ==============
 
 Libmraa is a C/C++ library with bindings to javascript & python to interface
@@ -43,6 +43,8 @@ Specific platform information for supported platforms is documented here:
 - @ref de3815
 - @ref minnowmax
 - @ref rasppi
+- @ref bananapi
+- @ref beaglebone
 
 ## DEBUGGING
 
@@ -65,6 +67,13 @@ use.
 This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
+
+**0.6.2**
+  * Node.js 0.12 support
+  * NPM support
+  * Formatting done with clang-format
+  * Various examples and documentation updates
+  * Supported added for Beaglebone Black + Banana Pi
 
 **0.6.1**
   * 16bit spi iunctions added

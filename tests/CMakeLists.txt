@@ -1,15 +1,9 @@
-find_package (GTest REQUIRED)
+add_test (NAME py_general COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/general_checks.py)
+set_tests_properties(py_general PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/src/python/")
 
-set(PROJECT_TEST_NAME "${PROJECT_NAME}_test")
+add_test (NAME py_platform COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/platform_checks.py)
+set_tests_properties(py_platform PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/src/python/")
 
-include_directories(
-  ${GTEST_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/api
-  ${PROJECT_SOURCE_DIR}/include
-)
+add_test (NAME py_gpio COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/gpio_checks.py)
+set_tests_properties(py_gpio PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/src/python/")
 
-add_executable(${PROJECT_TEST_NAME} "mraa_test.cxx")
-
-target_link_libraries(${PROJECT_TEST_NAME} ${PROJECT_NAME_STR} ${GTEST_BOTH_LIBRARIES} mraa pthread)
-
-add_test(Basic ${PROJECT_TEST_NAME})

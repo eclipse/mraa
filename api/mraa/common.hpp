@@ -30,7 +30,8 @@
 /**
  * @namespace mraa namespace
  */
-namespace mraa {
+namespace mraa
+{
 
 /**
  * @file
@@ -44,11 +45,14 @@ namespace mraa {
  *
  * Detects running platform and attempts to use included pinmap, this is run on
  * module/library init/load but is handy to rerun to check board initialised
- * correctly. Anything but MRAA_SUCCESS should be considered a critical failure
+ * correctly. MRAA_SUCCESS inidicates correct (first time) initialisation
+ * whilst MRAA_ERROR_PLATFORM_ALREADY_INITIALISED indicates the board is
+ * already initialised correctly
  *
  * @return Result of operation
  */
-inline mraa_result_t init()
+inline mraa_result_t
+init()
 {
     return mraa_init();
 }
@@ -58,7 +62,8 @@ inline mraa_result_t init()
  *
  * @return libmraa version (e.g. v0.4.0-20-gb408207)
  */
-inline std::string getVersion()
+inline std::string
+getVersion()
 {
     std::string ret = mraa_get_version();
     return ret;
@@ -73,7 +78,8 @@ inline std::string getVersion()
  * @param priority Value from typically 0 to 99
  * @return The priority value set
  */
-inline int setPriority(const unsigned int priority)
+inline int
+setPriority(const unsigned int priority)
 {
     return mraa_set_priority(priority);
 }
@@ -83,7 +89,8 @@ inline int setPriority(const unsigned int priority)
  *
  * @return mraa_platform_t Platform type enum
  */
-inline mraa_platform_t getPlatformType()
+inline mraa_platform_t
+getPlatformType()
 {
     return mraa_get_platform_type();
 }
@@ -93,7 +100,8 @@ inline mraa_platform_t getPlatformType()
  *
  * @param result the result to print
  */
-inline void printError(mraa_result_t result)
+inline void
+printError(mraa_result_t result)
 {
     mraa_result_print(result);
 }
@@ -105,9 +113,10 @@ inline void printError(mraa_result_t result)
  * @param mode the mode to be tested.
  * @return boolean if the mode is supported, 0=false.
  */
-inline bool pinModeTest(int pin, mraa_pinmodes_t mode)
+inline bool
+pinModeTest(int pin, mraa_pinmodes_t mode)
 {
-    return (bool) mraa_pin_mode_test(pin,mode);
+    return (bool) mraa_pin_mode_test(pin, mode);
 }
 
 /**
@@ -115,7 +124,8 @@ inline bool pinModeTest(int pin, mraa_pinmodes_t mode)
  *
  * @return raw bits being read from kernel module. Zero if no ADC
  */
-inline unsigned int adcRawBits()
+inline unsigned int
+adcRawBits()
 {
     return mraa_adc_raw_bits();
 }
@@ -125,7 +135,8 @@ inline unsigned int adcRawBits()
  *
  * @return return actual bit size the adc value should be understood as.
  */
-inline unsigned int adcSupportedBits()
+inline unsigned int
+adcSupportedBits()
 {
     return mraa_adc_supported_bits();
 }
@@ -135,7 +146,8 @@ inline unsigned int adcSupportedBits()
  *
  * @return platform name
  */
-inline std::string getPlatformName()
+inline std::string
+getPlatformName()
 {
     std::string ret_val(mraa_get_platform_name());
     return ret_val;
@@ -146,9 +158,24 @@ inline std::string getPlatformName()
  *
  * @return uint of physical pins.
  */
-inline unsigned int getPinCount()
+inline unsigned int
+getPinCount()
 {
     return mraa_get_pin_count();
+}
+
+/**
+* Get name of pin, board must be initialised.
+*
+* @param pin number
+*
+* @return char* of pin name
+*/
+inline std::string
+getPinName(int pin)
+{
+    std::string ret_val(mraa_get_pin_name(pin));
+    return ret_val;
 }
 
 /**
@@ -158,9 +185,9 @@ inline unsigned int getPinCount()
  * @param level
  * @return Result of operation
  */
-inline mraa_result_t setLogLevel(int level)
+inline mraa_result_t
+setLogLevel(int level)
 {
     return mraa_set_log_level(level);
 }
-
 }

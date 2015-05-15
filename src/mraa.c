@@ -39,7 +39,7 @@ mraa_board_t* plat = NULL;
 static mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
 mraa_adv_func_t* advance_func;
 
-const char *
+const char*
 mraa_get_version()
 {
     return gVERSION;
@@ -67,7 +67,7 @@ mraa_init()
     }
 
     uid_t proc_euid = geteuid();
-    struct passwd *proc_user = getpwuid(proc_euid);
+    struct passwd* proc_user = getpwuid(proc_euid);
 
 #ifdef DEBUG
     setlogmask(LOG_UPTO(LOG_DEBUG));
@@ -76,11 +76,8 @@ mraa_init()
 #endif
 
     openlog("libmraa", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
-    syslog(LOG_NOTICE,
-           "libmraa version %s initialised by user '%s' with EUID %d",
-           mraa_get_version(),
-           (proc_user != NULL) ? proc_user->pw_name : "<unknown>",
-           proc_euid);
+    syslog(LOG_NOTICE, "libmraa version %s initialised by user '%s' with EUID %d",
+           mraa_get_version(), (proc_user != NULL) ? proc_user->pw_name : "<unknown>", proc_euid);
 
 #ifdef SWIGPYTHON
     // Initialise python threads, this allows use to grab the GIL when we are
@@ -98,7 +95,7 @@ mraa_init()
     // Use runtime ARM platform detection
     platform_type = mraa_arm_platform();
 #else
-    #error mraa_ARCH NOTHING
+#error mraa_ARCH NOTHING
 #endif
 
     if (plat == NULL) {
@@ -106,10 +103,7 @@ mraa_init()
         return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
     }
 
-    syslog(LOG_INFO,
-           "libmraa initialised for platform '%s' of type %d",
-           mraa_get_platform_name(),
-           platform_type);
+    syslog(LOG_INFO, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), platform_type);
     return MRAA_SUCCESS;
 }
 
@@ -133,8 +127,7 @@ mraa_set_priority(const unsigned int priority)
     memset(&sched_s, 0, sizeof(struct sched_param));
     if (priority > sched_get_priority_max(SCHED_RR)) {
         sched_s.sched_priority = sched_get_priority_max(SCHED_RR);
-    }
-    else {
+    } else {
         sched_s.sched_priority = priority;
     }
 
@@ -223,40 +216,38 @@ mraa_boolean_t
 mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
 {
     if (plat == NULL) {
-        mraa_init();
-        if (plat == NULL)
-            return 0;
+        return 0;
     }
-    if (pin > (plat->phy_pin_count -1) || pin < 0)
+    if (pin > (plat->phy_pin_count - 1) || pin < 0)
         return 0;
 
-    switch(mode) {
+    switch (mode) {
         case MRAA_PIN_VALID:
             if (plat->pins[pin].capabilites.valid == 1)
                 return 1;
             break;
         case MRAA_PIN_GPIO:
-            if (plat->pins[pin].capabilites.gpio ==1)
+            if (plat->pins[pin].capabilites.gpio == 1)
                 return 1;
             break;
         case MRAA_PIN_PWM:
-            if (plat->pins[pin].capabilites.pwm ==1)
+            if (plat->pins[pin].capabilites.pwm == 1)
                 return 1;
             break;
         case MRAA_PIN_FAST_GPIO:
-            if (plat->pins[pin].capabilites.fast_gpio ==1)
+            if (plat->pins[pin].capabilites.fast_gpio == 1)
                 return 1;
             break;
         case MRAA_PIN_SPI:
-            if (plat->pins[pin].capabilites.spi ==1)
+            if (plat->pins[pin].capabilites.spi == 1)
                 return 1;
             break;
         case MRAA_PIN_I2C:
-            if (plat->pins[pin].capabilites.i2c ==1)
+            if (plat->pins[pin].capabilites.i2c == 1)
                 return 1;
             break;
         case MRAA_PIN_AIO:
-            if (plat->pins[pin].capabilites.aio ==1)
+            if (plat->pins[pin].capabilites.aio == 1)
                 return 1;
             break;
         case MRAA_PIN_UART:
@@ -270,7 +261,8 @@ mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
     return 0;
 }
 
-mraa_platform_t mraa_get_platform_type()
+mraa_platform_t
+mraa_get_platform_type()
 {
     return platform_type;
 }
@@ -317,8 +309,20 @@ mraa_get_pin_count()
     return plat->phy_pin_count;
 }
 
+char*
+mraa_get_pin_name(int pin)
+{
+    if (plat == NULL) {
+        return NULL;
+    }
+    if (pin > (plat->phy_pin_count - 1) || pin < 0)
+        return NULL;
+    return (char*) plat->pins[pin].name;
+}
+
 mraa_boolean_t
-mraa_file_exist(char *filename) {
+mraa_file_exist(const char* filename)
+{
     glob_t results;
     results.gl_pathc = 0;
     glob(filename, 0, NULL, &results);
@@ -327,10 +331,63 @@ mraa_file_exist(char *filename) {
     return file_found;
 }
 
+mraa_boolean_t
+mraa_file_contains(const char* filename, const char* content)
+{
+    mraa_boolean_t found = 0;
+    if ((filename == NULL) || (content == NULL)) {
+        return 0;
+    }
+
+    char* file = mraa_file_unglob(filename);
+    if (file != NULL) {
+        size_t len = 1024;
+        char* line = malloc(len);
+        FILE* fh = fopen(file, "r");
+        while ((getline(&line, &len, fh) != -1) && (found == 0)) {
+            if (strstr(line, content)) {
+                found = 1;
+                break;
+            }
+        }
+        fclose(fh);
+        free(file);
+        free(line);
+    }
+    return found;
+}
+
+mraa_boolean_t
+mraa_file_contains_both(const char* filename, const char* content, const char* content2)
+{
+    mraa_boolean_t found = 0;
+    if ((filename == NULL) || (content == NULL)) {
+        return 0;
+    }
+
+    char* file = mraa_file_unglob(filename);
+    if (file != NULL) {
+        size_t len = 1024;
+        char* line = malloc(len);
+        FILE* fh = fopen(file, "r");
+        while ((getline(&line, &len, fh) != -1) && (found == 0)) {
+            if (strstr(line, content) && strstr(line, content2)) {
+                found = 1;
+                break;
+            }
+        }
+        fclose(fh);
+        free(file);
+        free(line);
+    }
+    return found;
+}
+
 char*
-mraa_file_unglob(char *filename) {
+mraa_file_unglob(const char* filename)
+{
     glob_t results;
-    char *res = NULL;
+    char* res = NULL;
     results.gl_pathc = 0;
     glob(filename, 0, NULL, &results);
     if (results.gl_pathc == 1)
@@ -340,30 +397,29 @@ mraa_file_unglob(char *filename) {
 }
 
 mraa_boolean_t
-mraa_link_targets(char *filename,char *targetname) {
+mraa_link_targets(const char* filename, const char* targetname)
+{
     int size = 100;
     int nchars = 0;
-    char *buffer = NULL;
-    while (nchars == 0)
-    {
-        buffer = (char *) realloc(buffer,size);
+    char* buffer = NULL;
+    while (nchars == 0) {
+        buffer = (char*) realloc(buffer, size);
         if (buffer == NULL)
             return 0;
-        nchars = readlink(filename,buffer,size);
-        if (nchars < 0 ) {
+        nchars = readlink(filename, buffer, size);
+        if (nchars < 0) {
             free(buffer);
             return 0;
         }
         if (nchars >= size) {
-            size *=2;
-            nchars=0;
+            size *= 2;
+            nchars = 0;
         }
     }
-    if (strstr(buffer,targetname)) {
+    if (strstr(buffer, targetname)) {
         free(buffer);
         return 1;
-    }
-    else {
+    } else {
         free(buffer);
         return 0;
     }

@@ -23,23 +23,26 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "mraa/gpio.h"
 
 struct gpio_source {
-   int pin;
-   mraa_gpio_context context;
+    int pin;
+    mraa_gpio_context context;
 };
 
 void
-print_version() {
+print_version()
+{
     fprintf(stdout, "Version %s on %s\n", mraa_get_version(), mraa_get_platform_name());
 }
 
 void
-print_help() {
+print_help()
+{
     fprintf(stdout, "list              List pins\n");
     fprintf(stdout, "set pin level     Set pin to level (0/1)\n");
     fprintf(stdout, "setraw pin level  Set pin to level (0/1) via mmap (if available)\n");
@@ -50,13 +53,15 @@ print_help() {
 }
 
 void
-print_command_error() {
+print_command_error()
+{
     fprintf(stdout, "Invalid command, options are:\n");
     print_help();
 }
 
 void
-list_pins() {
+list_pins()
+{
     int pin_count = mraa_get_pin_count();
     if (pin_count == 0) {
         fprintf(stdout, "No Pins\n");
@@ -64,29 +69,36 @@ list_pins() {
     }
     int i;
     for (i = 0; i < pin_count; ++i) {
-        fprintf(stdout, "%02d ", i);
-        if (mraa_pin_mode_test(i, MRAA_PIN_GPIO))
-            fprintf(stdout, "GPIO ");
-        if (mraa_pin_mode_test(i, MRAA_PIN_I2C))
-            fprintf(stdout, "I2C  ");
-        if (mraa_pin_mode_test(i, MRAA_PIN_SPI))
-            fprintf(stdout, "SPI  ");
-        if (mraa_pin_mode_test(i, MRAA_PIN_PWM))
-            fprintf(stdout, "PWM  ");
-        if (mraa_pin_mode_test(i, MRAA_PIN_UART))
-            fprintf(stdout, "UART ");
-        fprintf(stdout, "\n");
+        if (strcmp(mraa_get_pin_name(i), "INVALID") != 0) {
+            fprintf(stdout, "%02d ", i);
+            fprintf(stdout, "%*s: ", (MRAA_PIN_NAME_SIZE - 1), mraa_get_pin_name(i));
+            if (mraa_pin_mode_test(i, MRAA_PIN_GPIO))
+                fprintf(stdout, "GPIO ");
+            if (mraa_pin_mode_test(i, MRAA_PIN_I2C))
+                fprintf(stdout, "I2C  ");
+            if (mraa_pin_mode_test(i, MRAA_PIN_SPI))
+                fprintf(stdout, "SPI  ");
+            if (mraa_pin_mode_test(i, MRAA_PIN_PWM))
+                fprintf(stdout, "PWM  ");
+            if (mraa_pin_mode_test(i, MRAA_PIN_AIO))
+                fprintf(stdout, "AIO  ");
+            if (mraa_pin_mode_test(i, MRAA_PIN_UART))
+                fprintf(stdout, "UART ");
+            fprintf(stdout, "\n");
+        }
     }
 }
 
 mraa_result_t
-gpio_set(int pin, int level, mraa_boolean_t raw) {
+gpio_set(int pin, int level, mraa_boolean_t raw)
+{
     mraa_gpio_context gpio = mraa_gpio_init(pin);
     if (gpio != NULL) {
         mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
         if (raw != 0) {
             if (mraa_gpio_use_mmaped(gpio, 1) != MRAA_SUCCESS) {
-                fprintf(stdout, "mmapped access to gpio not supported, falling back to normal mode\n", pin);
+                fprintf(stdout,
+                        "mmapped access to gpio %d not supported, falling back to normal mode\n", pin);
             }
         }
         mraa_gpio_write(gpio, level);
@@ -96,13 +108,15 @@ gpio_set(int pin, int level, mraa_boolean_t raw) {
 }
 
 mraa_result_t
-gpio_get(int pin, int *level, mraa_boolean_t raw) {
+gpio_get(int pin, int* level, mraa_boolean_t raw)
+{
     mraa_gpio_context gpio = mraa_gpio_init(pin);
     if (gpio != NULL) {
         mraa_gpio_dir(gpio, MRAA_GPIO_IN);
         if (raw != 0) {
             if (mraa_gpio_use_mmaped(gpio, 1) != MRAA_SUCCESS) {
-                fprintf(stdout, "mmapped access to gpio not supported, falling back to normal mode\n", pin);
+                fprintf(stdout,
+                        "mmapped access to gpio not supported, falling back to normal mode\n", pin);
             }
         }
         *level = mraa_gpio_read(gpio);
@@ -112,14 +126,17 @@ gpio_get(int pin, int *level, mraa_boolean_t raw) {
 }
 
 
-void gpio_isr_handler(void * args) {
-   struct gpio_source* gpio_info = (struct gpio_source*)args;
-   int level = mraa_gpio_read(gpio_info->context);
-   fprintf(stdout, "Pin %d = %d\n", gpio_info->pin, level);
+void
+gpio_isr_handler(void* args)
+{
+    struct gpio_source* gpio_info = (struct gpio_source*) args;
+    int level = mraa_gpio_read(gpio_info->context);
+    fprintf(stdout, "Pin %d = %d\n", gpio_info->pin, level);
 }
 
 mraa_result_t
-gpio_isr_start(struct gpio_source* gpio_info) {
+gpio_isr_start(struct gpio_source* gpio_info)
+{
     gpio_info->context = mraa_gpio_init(gpio_info->pin);
     if (gpio_info->context != NULL) {
         mraa_result_t status = mraa_gpio_dir(gpio_info->context, MRAA_GPIO_IN);
@@ -134,7 +151,8 @@ gpio_isr_start(struct gpio_source* gpio_info) {
 
 
 mraa_result_t
-gpio_isr_stop(struct gpio_source* gpio_info) {
+gpio_isr_stop(struct gpio_source* gpio_info)
+{
     mraa_gpio_isr_exit(gpio_info->context);
     mraa_gpio_close(gpio_info->context);
     return MRAA_SUCCESS;
@@ -142,7 +160,7 @@ gpio_isr_stop(struct gpio_source* gpio_info) {
 
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
     if (argc == 1) {
         print_command_error();
@@ -171,14 +189,13 @@ main(int argc, char **argv)
                 mraa_boolean_t rawmode = strcmp(argv[1], "getraw") == 0;
                 if (gpio_get(pin, &level, rawmode) == MRAA_SUCCESS) {
                     fprintf(stdout, "Pin %d = %d\n", pin, level);
-                }
-                else {
+                } else {
                     fprintf(stdout, "Could not initialize gpio %d\n", pin);
                 }
             } else {
                 print_command_error();
             }
-         } else if (strcmp(argv[1], "monitor") == 0) {
+        } else if (strcmp(argv[1], "monitor") == 0) {
             if (argc == 3) {
                 int pin = atoi(argv[2]);
                 struct gpio_source gpio_info;
@@ -186,18 +203,18 @@ main(int argc, char **argv)
                 if (gpio_isr_start(&gpio_info) == MRAA_SUCCESS) {
                     fprintf(stdout, "Monitoring level changes to pin %d. Press RETURN to exit.\n", pin);
                     gpio_isr_handler(&gpio_info);
-                    while (getchar() != '\n');
+                    while (getchar() != '\n')
+                        ;
                     gpio_isr_stop(&gpio_info);
-                }
-                else {
+                } else {
                     fprintf(stdout, "Failed to register ISR for pin %d\n", pin);
-               }
+                }
             } else {
                 print_command_error();
             }
-       } else {
+        } else {
             print_command_error();
-       }
+        }
     }
     return 0;
 }

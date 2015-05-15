@@ -29,11 +29,14 @@
 static volatile int counter = 0;
 static volatile int oldcounter = 0;
 
-void interrupt (void * args) {
+void
+interrupt(void* args)
+{
     ++counter;
 }
 
-int main ()
+int
+main()
 {
     mraa_init();
     mraa_gpio_context x;
@@ -46,13 +49,13 @@ int main ()
     mraa_gpio_dir(x, MRAA_GPIO_IN);
 
     gpio_edge_t edge = MRAA_GPIO_EDGE_BOTH;
-   
+
     mraa_gpio_isr(x, edge, &interrupt, NULL);
 
-    for(;;) {
-        if(counter != oldcounter) {
-          fprintf(stdout, "timeout counter == %d\n", counter);
-          oldcounter = counter;
+    for (;;) {
+        if (counter != oldcounter) {
+            fprintf(stdout, "timeout counter == %d\n", counter);
+            oldcounter = counter;
         }
         // got to relieve our poor CPU!
         sleep(1);

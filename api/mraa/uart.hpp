@@ -27,47 +27,53 @@
 #include "uart.h"
 #include <stdexcept>
 
-namespace mraa {
+namespace mraa
+{
 
 /**
  * @brief API to UART (enabling only)
  *
  * This file defines the UART interface for libmraa
  */
-class Uart {
-    public:
-        /**
-         * Uart Constructor, takes a pin number which will map directly to the
-         * linux uart number, this 'enables' the uart, nothing more
-         *
-         * @param uart the index of the uart set to use
-         */
-        Uart(int uart) {
-            m_uart = mraa_uart_init(uart);
+class Uart
+{
+  public:
+    /**
+     * Uart Constructor, takes a pin number which will map directly to the
+     * linux uart number, this 'enables' the uart, nothing more
+     *
+     * @param uart the index of the uart set to use
+     */
+    Uart(int uart)
+    {
+        m_uart = mraa_uart_init(uart);
 
-            if (m_uart == NULL) {
-                throw std::invalid_argument("Error initialising UART");
-            }
+        if (m_uart == NULL) {
+            throw std::invalid_argument("Error initialising UART");
         }
-        /**
-         * Uart destructor
-         */
-        ~Uart() {
-            return;
-        }
+    }
+    /**
+     * Uart destructor
+     */
+    ~Uart()
+    {
+        return;
+    }
 
-        /**
-         * Get string with tty device path within Linux
-         * For example. Could point to "/dev/ttyS0"
-         *
-         * @return char pointer of device path
-         */
-        std::string getDevicePath() {
-            std::string ret_val(mraa_uart_get_dev_path(m_uart));
-            return ret_val;
-        }
-    private:
-        mraa_uart_context m_uart;
+    /**
+     * Get string with tty device path within Linux
+     * For example. Could point to "/dev/ttyS0"
+     *
+     * @return char pointer of device path
+     */
+    std::string
+    getDevicePath()
+    {
+        std::string ret_val(mraa_uart_get_dev_path(m_uart));
+        return ret_val;
+    }
+
+  private:
+    mraa_uart_context m_uart;
 };
-
 }

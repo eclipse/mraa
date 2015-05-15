@@ -27,10 +27,10 @@
 #include "mraa.h"
 
 int
-main ()
+main()
 {
     mraa_init();
-//! [Interesting]
+    //! [Interesting]
     mraa_pwm_context pwm;
     pwm = mraa_pwm_init(3);
     if (pwm == NULL) {
@@ -50,6 +50,6 @@ main ()
         }
         float output = mraa_pwm_read(pwm);
     }
-//! [Interesting]
+    //! [Interesting]
     return 0;
 }

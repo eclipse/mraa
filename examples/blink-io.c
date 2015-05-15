@@ -45,7 +45,7 @@ sig_handler(int signo)
 }
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
     mraa_result_t r = MRAA_SUCCESS;
     iopin = DEFAULT_IOPIN;
@@ -57,14 +57,13 @@ main(int argc, char **argv)
     }
 
     mraa_init();
-    fprintf(stdout, "MRAA Version: %s\nStarting Blinking on IO%d\n",
-            mraa_get_version(), iopin);
+    fprintf(stdout, "MRAA Version: %s\nStarting Blinking on IO%d\n", mraa_get_version(), iopin);
 
     mraa_gpio_context gpio;
     gpio = mraa_gpio_init(iopin);
     if (gpio == NULL) {
         fprintf(stderr, "Are you sure that pin%d you requested is valid on your platform?", iopin);
-	exit(1);
+        exit(1);
     }
     printf("Initialised pin%d\n", iopin);
 

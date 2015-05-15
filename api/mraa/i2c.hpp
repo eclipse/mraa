@@ -27,7 +27,8 @@
 #include "i2c.h"
 #include <stdexcept>
 
-namespace mraa {
+namespace mraa
+{
 
 /**
  * @brief API to Inter-Integrated Circuit
@@ -38,158 +39,182 @@ namespace mraa {
  *
  * @snippet I2c-compass.cpp Interesting
  */
-class I2c {
-    public:
-        /**
-         * Instantiates an i2c bus. Multiple instances of the same bus can
-         * exist and the bus is not guarranteed to be on the correct address
-         * before read/write.
-         *
-         * @param bus The i2c bus to use
-         * @param raw Whether to disable pinmapper for your board
-         */
-        I2c(int bus, bool raw=false) {
-            if (raw) {
-                m_i2c = mraa_i2c_init_raw(bus);
-            }
-            else {
-                m_i2c = mraa_i2c_init(bus);
-            }
-            if (m_i2c == NULL) {
-                throw std::invalid_argument("Invalid i2c bus");
-            }
+class I2c
+{
+  public:
+    /**
+     * Instantiates an i2c bus. Multiple instances of the same bus can
+     * exist and the bus is not guarranteed to be on the correct address
+     * before read/write.
+     *
+     * @param bus The i2c bus to use
+     * @param raw Whether to disable pinmapper for your board
+     */
+    I2c(int bus, bool raw = false)
+    {
+        if (raw) {
+            m_i2c = mraa_i2c_init_raw(bus);
+        } else {
+            m_i2c = mraa_i2c_init(bus);
         }
+        if (m_i2c == NULL) {
+            throw std::invalid_argument("Invalid i2c bus");
+        }
+    }
 
-        /**
-         * Closes the I2c Bus used. This does not guarrantee the bus will not
-         * be usable by anyone else or communicates this disconnect to any
-         * slaves.
-         */
-        ~I2c() {
-            mraa_i2c_stop(m_i2c);
-        }
+    /**
+     * Closes the I2c Bus used. This does not guarrantee the bus will not
+     * be usable by anyone else or communicates this disconnect to any
+     * slaves.
+     */
+    ~I2c()
+    {
+        mraa_i2c_stop(m_i2c);
+    }
 
-        /**
-         * Sets the i2c Frequency for communication. Your board may not support
-         * the set frequency. Anyone can change this at any time and this will
-         * affect every slave on the bus
-         *
-         * @param mode Frequency to set the bus to
-         * @return Result of operation
-         */
-        mraa_result_t frequency(mraa_i2c_mode_t mode) {
-            return mraa_i2c_frequency(m_i2c, mode);
-        }
+    /**
+     * Sets the i2c Frequency for communication. Your board may not support
+     * the set frequency. Anyone can change this at any time and this will
+     * affect every slave on the bus
+     *
+     * @param mode Frequency to set the bus to
+     * @return Result of operation
+     */
+    mraa_result_t
+    frequency(mraa_i2c_mode_t mode)
+    {
+        return mraa_i2c_frequency(m_i2c, mode);
+    }
 
-        /**
-         * Set the slave to talk to, typically called before every read/write
-         * operation
-         *
-         * @param address Communicate to the i2c slave on this address
-         * @return Result of operation
-         */
-        mraa_result_t address(uint8_t address) {
-            return mraa_i2c_address(m_i2c, address);
-        }
+    /**
+     * Set the slave to talk to, typically called before every read/write
+     * operation
+     *
+     * @param address Communicate to the i2c slave on this address
+     * @return Result of operation
+     */
+    mraa_result_t
+    address(uint8_t address)
+    {
+        return mraa_i2c_address(m_i2c, address);
+    }
 
-        /**
-         * Read exactly one byte from the bus
-         *
-         * @return char read from the bus
-         */
-        uint8_t readByte() {
-            return (uint8_t) mraa_i2c_read_byte(m_i2c);
-        }
+    /**
+     * Read exactly one byte from the bus
+     *
+     * @return char read from the bus
+     */
+    uint8_t
+    readByte()
+    {
+        return (uint8_t) mraa_i2c_read_byte(m_i2c);
+    }
 
-        /**
-         * Read length bytes from the bus into *data pointer
-         *
-         * @param data Data to read into
-         * @param length Size of read in bytes to make
-         * @return length of read, should match length
-         */
-        int read(uint8_t *data, int length) {
-            return mraa_i2c_read(m_i2c, data, length);
-        }
+    /**
+     * Read length bytes from the bus into *data pointer
+     *
+     * @param data Data to read into
+     * @param length Size of read in bytes to make
+     * @return length of read, should match length
+     */
+    int
+    read(uint8_t* data, int length)
+    {
+        return mraa_i2c_read(m_i2c, data, length);
+    }
 
-        /**
-         * Read byte from an i2c register
-         *
-         * @param reg Register to read from
-         * @return char read from register
-         */
-        uint8_t readReg(uint8_t reg) {
-            return mraa_i2c_read_byte_data(m_i2c, reg);
-        }
+    /**
+     * Read byte from an i2c register
+     *
+     * @param reg Register to read from
+     * @return char read from register
+     */
+    uint8_t
+    readReg(uint8_t reg)
+    {
+        return mraa_i2c_read_byte_data(m_i2c, reg);
+    }
 
-        /**
-         * Read word from an i2c register
-         *
-         * @param reg Register to read from
-         * @return char read from register
-         */
-        uint16_t readWordReg(uint8_t reg) {
-            return mraa_i2c_read_word_data(m_i2c, reg);
-        }
+    /**
+     * Read word from an i2c register
+     *
+     * @param reg Register to read from
+     * @return char read from register
+     */
+    uint16_t
+    readWordReg(uint8_t reg)
+    {
+        return mraa_i2c_read_word_data(m_i2c, reg);
+    }
 
-        /**
-         * Read length bytes from the bus into *data pointer starting from
-         * an i2c register
-         *
-         * @param reg Register to read from
-         * @param data pointer to the byte array to read data in to
-         * @param length max number of bytes to read
-         * @return length passed to the function or 0
-         */
-        int readBytesReg(uint8_t reg, uint8_t* data, int length) {
-            return mraa_i2c_read_bytes_data(m_i2c, reg, data, length);
-        }
+    /**
+     * Read length bytes from the bus into *data pointer starting from
+     * an i2c register
+     *
+     * @param reg Register to read from
+     * @param data pointer to the byte array to read data in to
+     * @param length max number of bytes to read
+     * @return length passed to the function or 0
+     */
+    int
+    readBytesReg(uint8_t reg, uint8_t* data, int length)
+    {
+        return mraa_i2c_read_bytes_data(m_i2c, reg, data, length);
+    }
 
-        /**
-         * Write a byte on the bus
-         *
-         * @param data The byte to send on the bus
-         * @return Result of operation
-         */
-        mraa_result_t writeByte(uint8_t data) {
-            return mraa_i2c_write_byte(m_i2c, data);
-        }
+    /**
+     * Write a byte on the bus
+     *
+     * @param data The byte to send on the bus
+     * @return Result of operation
+     */
+    mraa_result_t
+    writeByte(uint8_t data)
+    {
+        return mraa_i2c_write_byte(m_i2c, data);
+    }
 
-        /**
-         * Write length bytes to the bus, the first byte in the array is the
-         * command/register to write
-         *
-         * @param data Buffer to send on the bus, first byte is i2c command
-         * @param length Size of buffer to send
-         * @return Result of operation
-         */
-        mraa_result_t write(const uint8_t* data, int length) {
-            return mraa_i2c_write(m_i2c, data, length);
-        }
+    /**
+     * Write length bytes to the bus, the first byte in the array is the
+     * command/register to write
+     *
+     * @param data Buffer to send on the bus, first byte is i2c command
+     * @param length Size of buffer to send
+     * @return Result of operation
+     */
+    mraa_result_t
+    write(const uint8_t* data, int length)
+    {
+        return mraa_i2c_write(m_i2c, data, length);
+    }
 
-        /**
-         * Write a byte to an i2c register
-         *
-         * @param reg Register to write to
-         * @param data Value to write to register
-         * @return Result of operation
-         */
-        mraa_result_t writeReg(uint8_t reg, uint8_t data) {
-            return mraa_i2c_write_byte_data(m_i2c, data, reg);
-        }
+    /**
+     * Write a byte to an i2c register
+     *
+     * @param reg Register to write to
+     * @param data Value to write to register
+     * @return Result of operation
+     */
+    mraa_result_t
+    writeReg(uint8_t reg, uint8_t data)
+    {
+        return mraa_i2c_write_byte_data(m_i2c, data, reg);
+    }
 
-        /**
-         * Write a word to an i2c register
-         *
-         * @param reg Register to write to
-         * @param data Value to write to register
-         * @return Result of operation
-         */
-        mraa_result_t writeWordReg(uint8_t reg, uint16_t data) {
-            return mraa_i2c_write_word_data(m_i2c, data, reg);
-        }
-    private:
-        mraa_i2c_context m_i2c;
+    /**
+     * Write a word to an i2c register
+     *
+     * @param reg Register to write to
+     * @param data Value to write to register
+     * @return Result of operation
+     */
+    mraa_result_t
+    writeWordReg(uint8_t reg, uint16_t data)
+    {
+        return mraa_i2c_write_word_data(m_i2c, data, reg);
+    }
+
+  private:
+    mraa_i2c_context m_i2c;
 };
-
 }

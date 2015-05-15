@@ -26,7 +26,8 @@
 //! [Interesting]
 #include "mraa/aio.h"
 
-int main ()
+int
+main()
 {
     mraa_aio_context adc_a0;
     uint16_t adc_value = 0;
@@ -37,7 +38,7 @@ int main ()
         return 1;
     }
 
-    for(;;) {
+    for (;;) {
         adc_value = mraa_aio_read(adc_a0);
         adc_value_float = mraa_aio_read_float(adc_a0);
         fprintf(stdout, "ADC A0 read %X - %d\n", adc_value, adc_value);

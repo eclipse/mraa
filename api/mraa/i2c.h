@@ -86,7 +86,7 @@ mraa_result_t mraa_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode);
  * @param length max number of bytes to read
  * @return length of the read in bytes or 0
  */
-int mraa_i2c_read(mraa_i2c_context dev, uint8_t *data, int length);
+int mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length);
 
 /**
  * Simple read for a single byte from the i2c context, this will always begin
@@ -135,7 +135,7 @@ int mraa_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* dat
  * @param length the number of bytes to transmit
  * @return Result of operation
  */
-mraa_result_t mraa_i2c_write(mraa_i2c_context dev, const uint8_t *data, int length);
+mraa_result_t mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length);
 
 /**
  * Write a single byte to an i2c context, always at offset 0x0

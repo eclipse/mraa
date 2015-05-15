@@ -155,7 +155,7 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
-    char name[8];                      /**< Pin's real world name */
+    char name[MRAA_PIN_NAME_SIZE]; /**< Pin's real world name */
     mraa_pincapabilities_t capabilites; /**< Pin Capabiliites */
     mraa_pin_t gpio; /**< GPIO structure */
     mraa_pin_t pwm;  /**< PWM structure */

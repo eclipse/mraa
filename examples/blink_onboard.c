@@ -29,7 +29,7 @@
 #include "mraa/gpio.h"
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
     mraa_platform_t platform = mraa_get_platform_type();
     mraa_gpio_context gpio, gpio_in = NULL;
@@ -40,18 +40,17 @@ main(int argc, char **argv)
         case MRAA_INTEL_GALILEO_GEN1:
             gpio = mraa_gpio_init_raw(3);
             break;
-	case MRAA_INTEL_MINNOWBOARD_MAX:
-	    // there is no onboard LED that we can flash on the minnowboard max
-	    // but on the calamari lure pin 21 is an LED. If you don't have the
-	    // lure put an LED on pin 21
-	    gpio = mraa_gpio_init(21);
+        case MRAA_INTEL_MINNOWBOARD_MAX:
+            // there is no onboard LED that we can flash on the minnowboard max
+            // but on the calamari lure pin 21 is an LED. If you don't have the
+            // lure put an LED on pin 21
+            gpio = mraa_gpio_init(21);
             break;
         default:
             gpio = mraa_gpio_init(13);
     }
 
-    fprintf(stdout, "Welcome to libmraa\n Version: %s\n Running on %s\n",
-        mraa_get_version(), board_name);
+    fprintf(stdout, "Welcome to libmraa\n Version: %s\n Running on %s\n", mraa_get_version(), board_name);
 
 
     if (gpio == NULL) {
@@ -62,7 +61,7 @@ main(int argc, char **argv)
     // on platforms with physical button use gpio_in
     if (platform == MRAA_INTEL_MINNOWBOARD_MAX) {
         gpio_in = mraa_gpio_init(14);
-	if (gpio_in != NULL) {
+        if (gpio_in != NULL) {
             mraa_gpio_dir(gpio_in, MRAA_GPIO_IN);
             // S1 on minnowboardmax's calamari lure maps to pin 14, SW1 != S1
             fprintf(stdout, "Press and hold S1 to stop, Press SW1 to shutdown!\n");

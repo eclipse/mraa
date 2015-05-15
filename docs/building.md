@@ -11,8 +11,14 @@ what you'll need:
 * [SWIG](http://swig.org) 3.0.5+
 * [git](http://git-scm.com)
 * [python](http://python.org) 2.7 or 3.4+ (you'll need not just the interpreter but python-dev)
-* [node.js](http://nodejs.org) 0.10.x (you'll need not just the interpreter but nodejs-dev)
+* [node.js](http://nodejs.org) 0.10.x or 0.12.x (you'll need not just the interpreter but nodejs-dev)
 * [CMake](http://cmake.org) 2.8.8+
+
+To build the documentation you'll also need:
+* [Doxygen](http://www.stack.nl/~dimitri/doxygen/) 1.8.9.1+
+* [Graphviz](http://graphviz.org/) 2+ (For doxygen graph generation)
+* [Sphinx](http://sphinx-doc.org/) 1.1.3+ (For Python docs)
+
 
 ## Basic build steps
 
@@ -54,7 +60,15 @@ Disabling python module building:
 
 Building doc, this will require [SPHINX](http://sphinx-doc.org) &
 [Doxygen](http://doxygen.org):
- -BUILDDOC=ON
+ -DBUILDDOC=ON
+
+Building with python3 (careful you need to clear cmake cache between python
+version switches!)
+ -DBUILDPYTHON3=ON
+
+Override build architecture (this is useful because on x86 arm code is not
+compiled so use this flag to force the target arch)
+ -DBUILDARCH=arm
 
 ## Dependencies continued
 
@@ -100,4 +114,16 @@ mkdir covbuild/ && cd covbuild
 cmake -DBUILDDOC=OFF -DBUILDSWIG=OFF ..
 cov-build --dir cov-int make
 tar caf mraa.tar.bz2 cov-int
+~~~~~~~~~~~~~
+
+## Building Java bindings
+Have JAVA_HOME set to JDK install directory. Then use the cmake configuration flag:
+ -DBUILDSWIGJAVA=ON
+To compile Example.java
+~~~~~~~~~~~~~{.sh}
+javac -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example.java
+~~~~~~~~~~~~~
+To run, make sure libmraajava.so is in LD_LIBRARY_PATH
+ ~~~~~~~~~~~~~{.sh}
+jave -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example
 ~~~~~~~~~~~~~

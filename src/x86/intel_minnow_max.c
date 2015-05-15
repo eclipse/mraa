@@ -37,7 +37,7 @@
 int arch_nr_gpios_adjust = 0x100;
 
 mraa_result_t
-mraa_set_pininfo(mraa_board_t* board, int mraa_index, char *name, mraa_pincapabilities_t caps, int sysfs_pin)
+mraa_set_pininfo(mraa_board_t* board, int mraa_index, char* name, mraa_pincapabilities_t caps, int sysfs_pin)
 {
     if (mraa_index < board->phy_pin_count) {
         // adjust mraa_index for ARCH_NR_GPIOS value
@@ -60,13 +60,17 @@ mraa_set_pininfo(mraa_board_t* board, int mraa_index, char *name, mraa_pincapabi
             pin_info->pwm.pinmap = 0;
             pin_info->pwm.mux_total = 0;
         }
+        if (caps.spi) {
+            pin_info->spi.mux_total = 0;
+        }
         return MRAA_SUCCESS;
     }
     return MRAA_ERROR_INVALID_RESOURCE;
 }
 
 mraa_result_t
-mraa_get_pin_index(mraa_board_t* board, char *name, int* pin_index) {
+mraa_get_pin_index(mraa_board_t* board, char* name, int* pin_index)
+{
     int i;
     for (i = 0; i < board->phy_pin_count; ++i) {
         if (strcmp(name, board->pins[i].name) == 0) {
@@ -96,7 +100,7 @@ mraa_intel_minnow_max()
     b->adc_raw = 0;
     b->adc_supported = 0;
 
-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t)*MRAA_INTEL_MINNOW_MAX_PINCOUNT);
+    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_MINNOW_MAX_PINCOUNT);
     if (b->pins == NULL) {
         goto error;
     }
@@ -112,37 +116,39 @@ mraa_intel_minnow_max()
      * they start at 512 and number down, at some point this is going to change again when
      * GPIO moves to a radix.
      */
-    if (uname_major <= 3 && uname_minor <= 17 ) {
+    if (uname_major <= 3 && uname_minor <= 17) {
         arch_nr_gpios_adjust = 0;
     }
 
-    mraa_set_pininfo(b, 0, "INVALID",   (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, -1 );
-    mraa_set_pininfo(b, 1, "GND",       (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, -1 );
-    mraa_set_pininfo(b, 2, "GND",       (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, -1 );
-    mraa_set_pininfo(b, 3, "5v",        (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, -1 );
-    mraa_set_pininfo(b, 4, "3.3v",      (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, -1 );
-    mraa_set_pininfo(b, 5, "SPI_CS",    (mraa_pincapabilities_t){1,0,0,0,1,0,0,0}, 220);
-    mraa_set_pininfo(b, 6, "UART1TX",   (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, 225);
-    mraa_set_pininfo(b, 7, "SPIMISO",   (mraa_pincapabilities_t){1,0,0,0,1,0,0,0}, 221);
-    mraa_set_pininfo(b, 8, "UART1RX",   (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, 224);
-    mraa_set_pininfo(b, 9, "SPIMOSI",   (mraa_pincapabilities_t){1,0,0,0,1,0,0,0}, 222);
-    mraa_set_pininfo(b, 10, "UART1CT",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 227);
-    mraa_set_pininfo(b, 11, "SPI_CLK",  (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, 223);
-    mraa_set_pininfo(b, 12, "UART1RT",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 226);
-    mraa_set_pininfo(b, 13, "I2C_SCL",  (mraa_pincapabilities_t){1,0,0,0,0,1,0,0}, 243);
-    mraa_set_pininfo(b, 14, "I2S_CLK",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 216);
-    mraa_set_pininfo(b, 15, "I2C_SDA",  (mraa_pincapabilities_t){1,0,0,0,0,1,0,0}, 242);
-    mraa_set_pininfo(b, 16, "I2S_FRM",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 217);
-    mraa_set_pininfo(b, 17, "UART2TX",  (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, 229);
-    mraa_set_pininfo(b, 18, "I2S_DO",   (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 219);
-    mraa_set_pininfo(b, 19, "UART2RX",  (mraa_pincapabilities_t){1,0,0,0,0,0,0,1}, 228);
-    mraa_set_pininfo(b, 20, "I2S_DI",   (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 218);
-    mraa_set_pininfo(b, 21, "S5_0",     (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 82 );
-    mraa_set_pininfo(b, 22, "PWM0",     (mraa_pincapabilities_t){1,0,1,0,0,0,0,0}, 248); // Assume BIOS configured for PWM
-    mraa_set_pininfo(b, 23, "S5_1",     (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 83 );
-    mraa_set_pininfo(b, 24, "PWM1",     (mraa_pincapabilities_t){1,0,1,0,0,0,0,0}, 249); // Assume BIOS configured for PWM
-    mraa_set_pininfo(b, 25, "S5_4",     (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 84 );
-    mraa_set_pininfo(b, 26, "IBL8254",  (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, 208);
+    mraa_set_pininfo(b, 0, "INVALID", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_set_pininfo(b, 1, "GND", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_set_pininfo(b, 2, "GND", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_set_pininfo(b, 3, "5v", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_set_pininfo(b, 4, "3.3v", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_set_pininfo(b, 5, "SPI_CS", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 220);
+    mraa_set_pininfo(b, 6, "UART1TX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 225);
+    mraa_set_pininfo(b, 7, "SPIMISO", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 221);
+    mraa_set_pininfo(b, 8, "UART1RX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 224);
+    mraa_set_pininfo(b, 9, "SPIMOSI", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 222);
+    mraa_set_pininfo(b, 10, "UART1CT", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 227);
+    mraa_set_pininfo(b, 11, "SPI_CLK", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 223);
+    mraa_set_pininfo(b, 12, "UART1RT", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 226);
+    mraa_set_pininfo(b, 13, "I2C_SCL", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, 243);
+    mraa_set_pininfo(b, 14, "I2S_CLK", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 216);
+    mraa_set_pininfo(b, 15, "I2C_SDA", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, 242);
+    mraa_set_pininfo(b, 16, "I2S_FRM", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 217);
+    mraa_set_pininfo(b, 17, "UART2TX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 229);
+    mraa_set_pininfo(b, 18, "I2S_DO", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 219);
+    mraa_set_pininfo(b, 19, "UART2RX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 228);
+    mraa_set_pininfo(b, 20, "I2S_DI", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 218);
+    mraa_set_pininfo(b, 21, "S5_0", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 82);
+    mraa_set_pininfo(b, 22, "PWM0", (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 },
+                     248); // Assume BIOS configured for PWM
+    mraa_set_pininfo(b, 23, "S5_1", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 83);
+    mraa_set_pininfo(b, 24, "PWM1", (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 },
+                     249); // Assume BIOS configured for PWM
+    mraa_set_pininfo(b, 25, "S5_4", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 84);
+    mraa_set_pininfo(b, 26, "IBL8254", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 208);
 
     // Set number of i2c adaptors
     // Got this from running 'i2cdetect -l'

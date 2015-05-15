@@ -28,13 +28,12 @@
 #include "mraa.h"
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
     mraa_init();
-    fprintf(stdout, "MRAA Version: %s\nStarting Read on IO6\n",
-            mraa_get_version());
+    fprintf(stdout, "MRAA Version: %s\nStarting Read on IO6\n", mraa_get_version());
 
-//! [Interesting]
+    //! [Interesting]
     mraa_gpio_context gpio;
 
     gpio = mraa_gpio_init(6);
@@ -47,7 +46,7 @@ main(int argc, char **argv)
     }
 
     mraa_gpio_close(gpio);
-//! [Interesting]
+    //! [Interesting]
 
     return 0;
 }

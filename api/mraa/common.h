@@ -27,6 +27,7 @@
 #include "types.h"
 
 #define MRAA_PLATFORM_NAME_MAX_SIZE 64
+#define MRAA_PIN_NAME_SIZE 12
 
 /** @file
  *
@@ -48,7 +49,9 @@ typedef unsigned int mraa_boolean_t;
  *
  * Detects running platform and attempts to use included pinmap, this is run on
  * module/library init/load but is handy to rerun to check board initialised
- * correctly. Anything but MRAA_SUCCESS should be considered a critical failure
+ * correctly. MRAA_SUCCESS inidicates correct (first time) initialisation
+ * whilst MRAA_ERROR_PLATFORM_ALREADY_INITIALISED indicates the board is
+ * already initialised correctly
  *
  * @return Result of operation
  */
@@ -148,6 +151,15 @@ mraa_platform_t mraa_get_platform_type();
  * @return uint of physical pin count on the in-use platform
  */
 unsigned int mraa_get_pin_count();
+
+/**
+* Get name of pin, board must be initialised.
+*
+* @param pin number
+*
+* @return char* of pin name
+*/
+char* mraa_get_pin_name(int pin);
 
 #ifdef __cplusplus
 }
