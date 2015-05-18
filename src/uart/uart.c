@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
+#include <termios.h>
 
 #include "uart.h"
 #include "mraa_internal.h"

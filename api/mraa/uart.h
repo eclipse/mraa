@@ -42,16 +42,6 @@ extern "C" {
 #endif
 
 #include <stdio.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <termios.h>
-#include <sys/time.h>
-#include <sys/select.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include "common.h"
 
