@@ -129,6 +129,11 @@ class Gpio
         if (!owner) {
             mraa_gpio_owner(m_gpio, 0);
         }
+#if defined(SWIGJAVASCRIPT)
+        if (uv_mutex_init(m_mutex) < 0) {
+            throw std::invalid_argument("Unable to initialise mutex");
+        }
+#endif
     }
     /**
      * Gpio object destructor, this will only unexport the gpio if we where
@@ -136,6 +141,9 @@ class Gpio
      */
     ~Gpio()
     {
+#if defined(SWIGJAVASCRIPT)
+        uv_mutex_destroy(m_mutex);
+#endif
         mraa_gpio_close(m_gpio);
     }
     /**
@@ -156,6 +164,7 @@ class Gpio
         return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, (void (*) (void*)) pyfunc, (void*) args);
     }
 #elif defined(SWIGJAVASCRIPT)
+    // this function can only be called once from mraa_gpio_isr
     static void
     v8isr(uv_work_t* req, int status)
     {
@@ -168,6 +177,7 @@ class Gpio
 #else
         This->m_v8isr->Call(SWIGV8_CURRENT_CONTEXT()->Global(), argc, argv);
 #endif
+        uv_mutex_unlock(This->m_mutex);
         delete req;
     }
 
@@ -182,7 +192,12 @@ class Gpio
     {
         uv_work_t* req = new uv_work_t;
         req->data = ctx;
+        mraa::Gpio* This = (mraa::Gpio*) req->data;
+        uv_mutex_lock(This->m_mutex);
         uv_queue_work(uv_default_loop(), req, nop, v8isr);
+        while (uv_mutex_trylock(This->m_mutex) < 0) {
+            printf("doing something else \n");
+        }
     }
 
     mraa_result_t
@@ -310,6 +325,7 @@ class Gpio
     mraa_gpio_context m_gpio;
 #if defined(SWIGJAVASCRIPT)
     v8::Persistent<v8::Function> m_v8isr;
+    uv_mutex_t* m_mutex;
 #endif
 };
 }
