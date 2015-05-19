@@ -58,7 +58,7 @@ class Uart
      */
     ~Uart()
     {
-        closeDevice();
+        stopDevice();
         return;
     }
 
@@ -97,9 +97,9 @@ class Uart
      * @return mraa_result_t
      */
     mraa_result_t
-    closeDevice()
+    stopDevice()
     {
-        return mraa_uart_close_dev(m_uart);
+        return mraa_uart_stop(m_uart);
     }
 
     /**
