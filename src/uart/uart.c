@@ -345,6 +345,8 @@ mraa_uart_set_mode(mraa_uart_context dev, int bytesize, mraa_uart_parity_t parit
         syslog(LOG_ERR, "uart: tcsetattr() failed");
         return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
     }
+
+    return MRAA_SUCCESS;
 }
 
 mraa_result_t
@@ -383,6 +385,8 @@ mraa_uart_set_flowcontrol(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_bo
         syslog(LOG_ERR, "uart: tcsetattr() failed");
         return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
     }
+
+    return MRAA_SUCCESS;
 }
 
 mraa_result_t
@@ -392,6 +396,8 @@ mraa_uart_set_timeout(mraa_uart_context dev, int read, int write, int interchar)
         syslog(LOG_ERR, "uart: stop: context is NULL");
         return MRAA_ERROR_INVALID_HANDLE;
     }
+
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
 char*
