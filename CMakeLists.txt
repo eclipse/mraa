@@ -55,6 +55,7 @@ option (BUILDSWIGPYTHON "Build swig python modules." ON)
 option (BUILDSWIGNODE "Build swig node modules." ON)
 option (BUILDSWIGJAVA "Build Java API." OFF)
 option (IPK "Generate IPK using CPack" OFF)
+option (RPM "Generate RPM using CPack" OFF)
 option (BUILDPYTHON3 "Use python3 for building/installing" OFF)
 option (INSTALLGPIOTOOL "Install gpio tool" OFF)
 option (BUILDARCH "Override architecture to build for - override" OFF)
@@ -142,5 +143,28 @@ if (IPK)
   include (CPack)
 endif()
 
+
+if (RPM)
+  message (INFO " - Enabled RPM packaging for ${DETECTED_ARCH}")
+  set(CPACK_PACKAGE_VERSION ${VERSION})
+  set(CPACK_GENERATOR "RPM")
+  set(CPACK_PACKAGE_NAME "libmraa${mraa_VERSION_MAJOR}")
+  set(CPACK_PACKAGE_RELEASE 1)
+  set(CPACK_PACKAGE_VERSION 
+      "${mraa_VERSION_MAJOR}.${mraa_VERSION_MINOR}.${mraa_VERSION_PATCH}${mraa_PACKAGE_ON_TAG}${VERSION_COMMIT}")
+  set(CPACK_PACKAGE_CONTACT "Intel IoT-Devkit")
+  set(CPACK_PACKAGE_VENDOR "Intel IoT-Devkit")
+  set(CPACK_RPM_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME}-devel")
+  EXECUTE_PROCESS(COMMAND rpm --showrc
+    COMMAND grep -E "dist[[:space:]]*\\."
+    COMMAND sed -e "s/^.*dist\\s*\\.//"
+    COMMAND tr \\n \\t
+    COMMAND sed  -e s/\\t//
+    OUTPUT_VARIABLE DIST_TAG)
+  set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${DIST_TAG}.${DETECTED_ARCH}")
+  include(CPack)
+endif()
+
 add_subdirectory (src)
 add_subdirectory (examples)
+
