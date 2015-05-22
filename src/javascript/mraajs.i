@@ -11,11 +11,17 @@
 %}
 
 %typemap(in) (const uint8_t *data, int length) {
+  if (!node::Buffer::HasInstance($input)) {
+      SWIG_exception_fail(SWIG_ERROR, "Expected a node Buffer");
+  }
   $1 = (uint8_t*) node::Buffer::Data($input);
   $2 = node::Buffer::Length($input);
 }
 
 %typemap(in) (uint8_t *txBuf, int length) {
+  if (!node::Buffer::HasInstance($input)) {
+      SWIG_exception_fail(SWIG_ERROR, "Expected a node Buffer");
+  }
   $1 = (uint8_t*) node::Buffer::Data($input);
   $2 = node::Buffer::Length($input);
 }
