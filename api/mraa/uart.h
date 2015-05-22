@@ -77,18 +77,6 @@ mraa_result_t mraa_uart_set_timeout(mraa_uart_context dev, int read, int write, 
 char* mraa_uart_get_dev_path(mraa_uart_context dev);
 
 /**
- * Open the TTY device associated with a UART context, and set up the
- * terminal modes and baud rate.  The TTY is setup for a 'raw'
- * mode. 81N, no echo or special character handling, such as flow
- * control or line editing semantics.
- *
- * @param dev uart context
- * @param baud desired baud rate
- * @return mraa_result_t
- */
-mraa_result_t mraa_uart_open_dev(mraa_uart_context dev, unsigned int baud);
-
-/**
  * Destroy a mraa_uart_context
  *
  * @param dev uart context

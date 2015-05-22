@@ -198,8 +198,9 @@ mraa_uart_init_raw(int index)
     struct termios termio;
 
     // get current modes
-    if (!tcgetattr(dev->fd, &termio)) {
+    if (tcgetattr(dev->fd, &termio)) {
         syslog(LOG_ERR, "uart: tcgetattr() failed");
+        close(dev->fd);
         free(dev);
         return NULL;
     }
@@ -209,7 +210,8 @@ mraa_uart_init_raw(int index)
     // cfmakeraw is not POSIX!
     cfmakeraw(&termio);
 
-    if (!mraa_uart_set_baudrate(dev, 9600)) {
+    if (mraa_uart_set_baudrate(dev, 9600) != MRAA_SUCCESS) {
+        close(dev->fd);
         free(dev);
         return NULL;
     }
@@ -259,7 +261,7 @@ mraa_uart_set_baudrate(mraa_uart_context dev, unsigned int baud)
     }
 
     struct termios termio;
-    if (!tcgetattr(dev->fd, &termio)) {
+    if (tcgetattr(dev->fd, &termio)) {
         syslog(LOG_ERR, "uart: tcgetattr() failed");
         return MRAA_ERROR_INVALID_HANDLE;
     }

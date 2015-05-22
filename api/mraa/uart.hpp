@@ -58,8 +58,7 @@ class Uart
      */
     ~Uart()
     {
-        stopDevice();
-        return;
+        mraa_uart_stop(m_uart);
     }
 
     /**
@@ -76,56 +75,29 @@ class Uart
     }
 
     /**
-     * Open the TTY device associated with a UART context, and set up the
-     * terminal modes and baud rate.  The TTY is setup for a 'raw'
-     * mode.  81N, no echo or special character handling, such as flow
-     * control or line editing semantics.
-     *
-     * @param baud desired baud rate
-     * @return mraa_result_t
-     */
-    mraa_result_t
-    openDevice(unsigned int baud)
-    {
-        return mraa_uart_open_dev(m_uart, baud);
-    }
-
-    /**
-     * Close a device previously opened with mraa_uart_open_dev().
-     *
-     * @param dev uart context
-     * @return mraa_result_t
-     */
-    mraa_result_t
-    stopDevice()
-    {
-        return mraa_uart_stop(m_uart);
-    }
-
-    /**
      * Read bytes from the device into a buffer
      *
-     * @param buf buffer pointer
-     * @param len maximum size of buffer
+     * @param data buffer pointer
+     * @param length maximum size of buffer
      * @return the number of bytes read, or -1 if an error occurred
      */
     int
-    read(char* buf, size_t len)
+    read(char* data, int length)
     {
-        return mraa_uart_read(m_uart, buf, len);
+        return mraa_uart_read(m_uart, data, length);
     }
 
     /**
      * Write bytes in buffer to a device
      *
-     * @param buf buffer pointer
-     * @param len maximum size of buffer
+     * @param data buffer pointer
+     * @param length maximum size of buffer
      * @return the number of bytes written, or -1 if an error occurred
      */
     int
-    write(char* buf, size_t len)
+    write(char* data, int length)
     {
-        return mraa_uart_write(m_uart, buf, len);
+        return mraa_uart_write(m_uart, data, length);
     }
 
     /**
