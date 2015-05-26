@@ -55,16 +55,67 @@ typedef struct _uart* mraa_uart_context;
  */
 mraa_uart_context mraa_uart_init(int uart);
 
-mraa_uart_context mraa_uart_init_raw(int uart);
+/**
+ * Initialise a raw uart_context. No board setup.
+ *
+ * @param path for example "/dev/ttyS0"
+ * @return uart context or NULL
+ */
+mraa_uart_context mraa_uart_init_raw(char* path);
 
-mraa_result_t mraa_uart_flush(mraa_uart_context);
+/**
+ * Flush the outbound data.
+ * Blocks until complete.
+ *
+ * @param dev The UART context
+ * @return Result of operation
+ */
+mraa_result_t mraa_uart_flush(mraa_uart_context dev);
 
+/**
+ * Set the baudrate.
+ * Takes an int and will attempt to decide what baudrate  is
+ * to be used on the UART hardware.
+ *
+ * @param dev The UART context
+ * @param baud unsigned int of baudrate i.e. 9600
+ * @return Result of operation
+ */
 mraa_result_t mraa_uart_set_baudrate(mraa_uart_context dev, unsigned int baud);
 
+/**
+ * Set the transfer mode
+ * For example setting the mode to 8N1 would be
+ * "mraa_uart_set_mode(dev, 8,MRAA_UART_PARITY_NONE , 1)"
+ *
+ * @param dev The UART context
+ * @param bytesize data bits
+ * @param parity Parity bit setting
+ * @param stopbits stop bits
+ * @return Result of operation
+ */
 mraa_result_t mraa_uart_set_mode(mraa_uart_context dev, int bytesize, mraa_uart_parity_t parity, int stopbits);
 
+/**
+ * Set the flowcontrol
+ *
+ * @param dev The UART context
+ * @param xonxoff XON/XOFF Software flow control.
+ * @param rtscts RTS/CTS out of band hardware flow control
+ * @return Result of operation
+ */
 mraa_result_t mraa_uart_set_flowcontrol(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_boolean_t rtscts);
 
+/**
+ * Set the timeout for read and write operations
+ * <= 0 will disable that timeout
+ *
+ * @param dev The UART context
+ * @param read read timeout
+ * @param write write timeout
+ * @param interchar inbetween char timeout
+ * @return Result of operation
+ */
 mraa_result_t mraa_uart_set_timeout(mraa_uart_context dev, int read, int write, int interchar);
 
 /**
@@ -89,20 +140,20 @@ mraa_result_t mraa_uart_stop(mraa_uart_context dev);
  *
  * @param dev uart context
  * @param buf buffer pointer
- * @param len maximum size of buffer
+ * @param length maximum size of buffer
  * @return the number of bytes read, or -1 if an error occurred
  */
-int mraa_uart_read(mraa_uart_context dev, char* buf, size_t len);
+int mraa_uart_read(mraa_uart_context dev, char* buf, size_t length);
 
 /**
  * Write bytes in buffer to a device
  *
  * @param dev uart context
  * @param buf buffer pointer
- * @param len maximum size of buffer
+ * @param length maximum size of buffer
  * @return the number of bytes written, or -1 if an error occurred
  */
-int mraa_uart_write(mraa_uart_context dev, char* buf, size_t len);
+int mraa_uart_write(mraa_uart_context dev, char* buf, size_t length);
 
 /**
  * Check to see if data is available on the device for reading

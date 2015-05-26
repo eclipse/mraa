@@ -152,7 +152,11 @@ mraa_uart_init(int index)
         }
     }
 
-    mraa_uart_context dev = mraa_uart_init_raw(index);
+    mraa_uart_context dev = mraa_uart_init_raw((char*)plat->uart_dev[index].device_path);
+    if (dev == NULL) {
+        return NULL;
+    }
+    dev->index = index; //Set the board Index.
 
     if (advance_func->uart_init_post != NULL) {
         mraa_result_t ret = advance_func->uart_init_post(dev);
@@ -166,7 +170,7 @@ mraa_uart_init(int index)
 }
 
 mraa_uart_context
-mraa_uart_init_raw(int index)
+mraa_uart_init_raw(char* path)
 {
     mraa_uart_context dev = (mraa_uart_context) malloc(sizeof(struct _uart));
     if (dev == NULL) {
@@ -175,20 +179,18 @@ mraa_uart_init_raw(int index)
     }
     memset(dev, 0, sizeof(struct _uart));
 
-    dev->index = index;
+    dev->index = -1;
     dev->fd = -1;
-    dev->path = (char*) plat->uart_dev[index].device_path;
+    dev->path = path;
 
-    char* devPath = mraa_uart_get_dev_path(dev);
-
-    if (!devPath) {
+    if (!dev->path) {
         syslog(LOG_ERR, "uart: device path undefined, open failed");
         free(dev);
         return NULL;
     }
 
     // now open the device
-    if ((dev->fd = open(devPath, O_RDWR)) == -1) {
+    if ((dev->fd = open(dev->path, O_RDWR)) == -1) {
         syslog(LOG_ERR, "uart: open() failed");
         free(dev);
         return NULL;

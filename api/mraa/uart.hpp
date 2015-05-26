@@ -1,6 +1,7 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Contributions: Jon Trulson <jtrulson@ics.com>
+ * Contributions: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Copyright (c) 2014 - 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -27,6 +28,7 @@
 
 #include "uart.h"
 #include <stdexcept>
+#include <cstring>
 
 namespace mraa
 {
@@ -53,6 +55,24 @@ class Uart
             throw std::invalid_argument("Error initialising UART");
         }
     }
+
+    /**
+     * Uart Constructor, takes a string to the path of the serial
+     * interface that is needed.
+     *
+     * @param uart the index of the uart set to use
+     */
+    Uart(std::string path)
+    {
+        char *p = new char[path.length() + 1];
+        std::strcpy(p, path.c_str());
+        m_uart = mraa_uart_init_raw(p);
+
+        if (m_uart == NULL) {
+            throw std::invalid_argument("Error initialising UART");
+        }
+    }
+
     /**
      * Uart destructor
      */
