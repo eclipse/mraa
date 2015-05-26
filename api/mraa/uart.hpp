@@ -99,12 +99,19 @@ class Uart
      *
      * @param data buffer pointer
      * @param length maximum size of buffer
-     * @return the number of bytes read, or -1 if an error occurred
+     * @return string of data
      */
-    int
-    read(char* data, int length)
+    std::string
+    read(int length)
     {
-        return mraa_uart_read(m_uart, data, length);
+        char* data = (char*) malloc(sizeof(char) * length);
+        int v = mraa_uart_read(m_uart, data, (size_t) length);
+        char* out = (char*) malloc(sizeof(char) * v);
+        strncpy(out, data, v);
+        std::string ret(out);
+        free(data);
+        free(out);
+        return ret;
     }
 
     /**
@@ -115,9 +122,11 @@ class Uart
      * @return the number of bytes written, or -1 if an error occurred
      */
     int
-    write(char* data, int length)
+    write(std::string data)
     {
-        return mraa_uart_write(m_uart, data, length);
+        char *d = new char[data.length() + 1];
+        std::strcpy(d, data.c_str());
+        return mraa_uart_write(m_uart, d, (data.length() + 1));
     }
 
     /**
@@ -133,6 +142,76 @@ class Uart
             return true;
         else
             return false;
+    }
+
+    /**
+     * Flush the outbound data.
+     * Blocks until complete.
+     *
+     * @return Result of operation
+     */
+    mraa_result_t
+    flush()
+    {
+        return mraa_uart_flush(m_uart);
+    }
+
+    /**
+     * Set the baudrate.
+     * Takes an int and will attempt to decide what baudrate  is
+     * to be used on the UART hardware.
+     *
+     * @param baud unsigned int of baudrate i.e. 9600
+     * @return Result of operation
+     */
+    mraa_result_t
+    setBaudRate(unsigned int baud)
+    {
+        return mraa_uart_set_baudrate(m_uart, baud);
+    }
+
+    /**
+     * Set the transfer mode
+     * For example setting the mode to 8N1 would be
+     * "dev.setMode(8,MRAA_UART_PARITY_NONE , 1)"
+     *
+     * @param bytesize data bits
+     * @param parity Parity bit setting
+     * @param stopbits stop bits
+     * @return Result of operation
+     */
+    mraa_result_t
+    setMode(int bytesize, mraa_uart_parity_t parity, int stopbits)
+    {
+        return mraa_uart_set_mode(m_uart, bytesize, parity, stopbits);
+    }
+
+    /**
+     * Set the flowcontrol
+     *
+     * @param xonxoff XON/XOFF Software flow control.
+     * @param rtscts RTS/CTS out of band hardware flow control
+     * @return Result of operation
+     */
+    mraa_result_t
+    setFlowcontrol(bool xonxoff, bool rtscts)
+    {
+        return mraa_uart_set_flowcontrol(m_uart, xonxoff, rtscts);
+    }
+
+    /**
+     * Set the timeout for read and write operations
+     * <= 0 will disable that timeout
+     *
+     * @param read read timeout
+     * @param write write timeout
+     * @param interchar inbetween char timeout
+     * @return Result of operation
+     */
+    mraa_result_t
+    setTimeout(int read, int write, int interchar)
+    {
+        return mraa_uart_set_timeout(m_uart, read, write, interchar);
     }
 
   private:
