@@ -1,5 +1,6 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Contributions: Jon Trulson <jtrulson@ics.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -57,6 +58,7 @@ class Uart
      */
     ~Uart()
     {
+        closeDevice();
         return;
     }
 
@@ -72,6 +74,74 @@ class Uart
         std::string ret_val(mraa_uart_get_dev_path(m_uart));
         return ret_val;
     }
+
+    /**
+     * Open the TTY device associated with a UART context, and set up the
+     * terminal modes and baud rate.  The TTY is setup for a 'raw'
+     * mode.  81N, no echo or special character handling, such as flow
+     * control or line editing semantics.
+     *
+     * @param baud desired baud rate
+     * @return mraa_result_t
+     */
+    mraa_result_t
+    openDevice(unsigned int baud)
+    {
+        return mraa_uart_open_dev(m_uart, baud);
+    }
+
+    /**
+     * Close a device previously opened with mraa_uart_open_dev().
+     *
+     * @param dev uart context
+     * @return mraa_result_t
+     */
+    mraa_result_t
+    closeDevice()
+    {
+        return mraa_uart_close_dev(m_uart);
+    }
+
+    /**
+     * Read bytes from the device into a buffer
+     *
+     * @param buf buffer pointer
+     * @param len maximum size of buffer
+     * @return the number of bytes read, or -1 if an error occurred
+     */
+    int
+    read(char *buf, size_t len)
+    {
+        return mraa_uart_read(m_uart, buf, len);
+    }
+
+    /**
+     * Write bytes in buffer to a device
+     *
+     * @param buf buffer pointer
+     * @param len maximum size of buffer
+     * @return the number of bytes written, or -1 if an error occurred
+     */
+    int
+    write(char *buf, size_t len)
+    {
+        return mraa_uart_write(m_uart, buf, len);
+    }
+
+    /**
+     * Check to see if data is available on the device for reading
+     *
+     * @param millis number of milliseconds to wait, or 0 to return immediately
+     * @return true if there is data available to read, false otherwise
+     */
+     bool
+     dataAvailable(unsigned int millis=0)
+     {
+       if (mraa_uart_data_available(m_uart, millis))
+           return true;
+       else
+           return false;
+     }
 
   private:
     mraa_uart_context m_uart;
