@@ -98,6 +98,10 @@ mraa_init()
     advance_func = (mraa_adv_func_t*) malloc(sizeof(mraa_adv_func_t));
     memset(advance_func, 0, sizeof(mraa_adv_func_t));
 
+#ifdef USBPLAT
+    platform_type = mraa_usb_platform();
+#endif
+
 #if defined(X86PLAT)
     // Use runtime x86 platform detection
     platform_type = mraa_x86_platform();
