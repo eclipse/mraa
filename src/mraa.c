@@ -97,17 +97,29 @@ mraa_init()
     Py_InitializeEx(0);
     PyEval_InitThreads();
 #endif
+
     advance_func = (mraa_adv_func_t*) malloc(sizeof(mraa_adv_func_t));
     memset(advance_func, 0, sizeof(mraa_adv_func_t));
 
-#if defined(X86PLAT)
+#ifdef X86PLAT
     // Use runtime x86 platform detection
     platform_type = mraa_x86_platform();
-#elif defined(ARMPLAT)
+#ifdef USBPLAT
+    // This is a platform extender so create null base platform if one doesn't already exist
+    if (plat == NULL) {
+        plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
+        plat->platform_name = "Null platform";
+        if (plat != NULL) {
+            int usb_platform_type = mraa_usb_platform_extender(plat);
+            if (platform_type == MRAA_UNKNOWN_PLATFORM)
+                platform_type = usb_platform_type;
+        }
+    }
+#endif
+
+#if defined(ARMPLAT)
     // Use runtime ARM platform detection
     platform_type = mraa_arm_platform();
-#else
-#error mraa_ARCH NOTHING
 #endif
 
     if (plat == NULL) {
@@ -115,7 +127,7 @@ mraa_init()
         return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
     }
 
-    syslog(LOG_INFO, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), platform_type);
+    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), platform_type);
     return MRAA_SUCCESS;
 }
 
@@ -354,6 +366,17 @@ mraa_get_pin_name(int pin)
         return NULL;
     return (char*) plat->pins[pin].name;
 }
+
+int
+mraa_get_default_i2c_bus()
+{
+    if (plat == NULL) {
+        return -1;
+    } else
+        return plat->def_i2c_bus;
+}
+
+
 
 mraa_boolean_t
 mraa_file_exist(const char* filename)

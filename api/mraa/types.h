@@ -47,6 +47,9 @@ typedef enum {
     MRAA_BANANA = 7,                /**< Allwinner A20 based Banana Pi and Banana Pro */
     MRAA_INTEL_NUC5 = 8,            /**< The Intel 5th generations Broadwell NUCs */
 
+    // USB platform extenders start at 256
+    MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
+
     MRAA_UNKNOWN_PLATFORM =
     99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
 } mraa_platform_t;
@@ -230,6 +233,8 @@ typedef enum {
 	MRAA_UART_PARITY_MARK = 3,
 	MRAA_UART_PARITY_SPACE = 4
 } mraa_uart_parity_t;
+
+
 
 #ifdef __cplusplus
 }
