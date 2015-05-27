@@ -35,6 +35,8 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/arm/banana.c
 )
 
+set (mraa_LIBS ${CMAKE_THREAD_LIBS_INIT})
+
 if (X86PLAT)
   add_subdirectory(x86)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DX86PLAT=1")
@@ -44,6 +46,13 @@ if (ARMPLAT)
   add_subdirectory(arm)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DARMPLAT=1")
 endif()
+
+if (USBPLAT)
+  add_subdirectory(usb)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSBPLAT=1")
+  set (mraa_LIBS ${mraa_LIBS} ft4222)
+endif()
+
 
 set (mraa_LIB_SRCS
   ${mraa_LIB_PLAT_SRCS_NOAUTO}
@@ -57,7 +66,9 @@ set (mraa_LIB_GLOB_HEADERS
 )
 
 add_library (mraa SHARED ${mraa_LIB_SRCS})
-target_link_libraries (mraa ${CMAKE_THREAD_LIBS_INIT})
+
+
+target_link_libraries (mraa ${mraa_LIBS})
 
 set_target_properties(
    mraa
