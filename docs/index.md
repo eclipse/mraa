@@ -68,6 +68,12 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.7.0**
+  * Uart module now contains read/write interactions and configuration
+  * Python API contains more buffer checks
+  * Java support
+  * RPM cpack support
+
 **0.6.2**
   * Node.js 0.12 support
   * NPM support
