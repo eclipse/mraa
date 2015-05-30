@@ -161,6 +161,14 @@ unsigned int mraa_get_pin_count();
 */
 char* mraa_get_pin_name(int pin);
 
+/**
+ * Get default i2c bus, board must be initialised.
+ *
+ * @return int default i2c bus index
+ */
+int mraa_get_default_2c_bus();
+
+
 #ifdef __cplusplus
 }
 #endif
