@@ -32,11 +32,12 @@
 mraa_platform_t
 mraa_usb_platform()
 {
-    unsigned int versionChip, versionLib;
-
     mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
-    if (mraa_ftdi_ft4222_get_version(&versionChip, &versionLib) == MRAA_SUCCESS) {
-        platform_type = MRAA_FTDI_FT4222;        
+    if (mraa_ftdi_ft4222_init() == MRAA_SUCCESS) {
+        unsigned int versionChip, versionLib;
+        if (mraa_ftdi_ft4222_get_version(&versionChip, &versionLib) == MRAA_SUCCESS) {
+            platform_type = MRAA_FTDI_FT4222;        
+        }
     }  
     switch (platform_type) {
         case MRAA_FTDI_FT4222:
