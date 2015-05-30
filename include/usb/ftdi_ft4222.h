@@ -30,6 +30,7 @@ extern "C" {
 
 #include "mraa_internal.h"
 
+mraa_result_t mraa_ftdi_ft4222_init();
 mraa_result_t mraa_ftdi_ft4222_get_version(unsigned int* versionChip, unsigned int* versionLib);
 mraa_board_t* mraa_ftdi_ft4222();
 

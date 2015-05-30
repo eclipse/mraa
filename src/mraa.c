@@ -102,15 +102,17 @@ mraa_init()
     platform_type = mraa_usb_platform();
 #endif
 
+    if (platform_type == MRAA_UNKNOWN_PLATFORM) {
 #if defined(X86PLAT)
-    // Use runtime x86 platform detection
-    platform_type = mraa_x86_platform();
+        // Use runtime x86 platform detection
+        platform_type = mraa_x86_platform();
 #elif defined(ARMPLAT)
-    // Use runtime ARM platform detection
-    platform_type = mraa_arm_platform();
+        // Use runtime ARM platform detection
+        platform_type = mraa_arm_platform();
 #else
 #error mraa_ARCH NOTHING
 #endif
+    }
 
     if (plat == NULL) {
         printf("mraa: FATAL error, failed to initialise platform\n");
@@ -333,6 +335,17 @@ mraa_get_pin_name(int pin)
         return NULL;
     return (char*) plat->pins[pin].name;
 }
+
+int
+mraa_get_default_i2c_bus()
+{
+    if (plat == NULL) {
+        return -1;
+    } else
+        return plat->def_i2c_bus;
+}
+
+
 
 mraa_boolean_t
 mraa_file_exist(const char* filename)
