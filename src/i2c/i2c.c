@@ -117,16 +117,23 @@ mraa_i2c_init_raw(unsigned int bus)
         return NULL;
     }
 
-    char filepath[32];
     dev->busnum = bus;
-    snprintf(filepath, 32, "/dev/i2c-%u", bus);
-    if ((dev->fh = open(filepath, O_RDWR)) < 1) {
-        syslog(LOG_ERR, "i2c: Failed to open requested i2c port %s", filepath);
-    }
+    if (advance_func->i2c_init_bus_replace == NULL) {
+        char filepath[32];
+        snprintf(filepath, 32, "/dev/i2c-%u", bus);
+        if ((dev->fh = open(filepath, O_RDWR)) < 1) {
+            syslog(LOG_ERR, "i2c: Failed to open requested i2c port %s", filepath);
+        }
 
-    if (ioctl(dev->fh, I2C_FUNCS, &dev->funcs) < 0) {
-        syslog(LOG_CRIT, "i2c: Failed to get I2C_FUNC map from device");
-        dev->funcs = 0;
+        if (ioctl(dev->fh, I2C_FUNCS, &dev->funcs) < 0) {
+            syslog(LOG_CRIT, "i2c: Failed to get I2C_FUNC map from device");
+            dev->funcs = 0;
+        }
+    } else {
+        if (advance_func->i2c_init_bus_replace(dev) != MRAA_SUCCESS) {
+            free(dev);
+            return NULL;
+        }
     }
 
     if (advance_func->i2c_init_post != NULL) {
@@ -151,11 +158,16 @@ mraa_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 int
 mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 {
-    // this is the read(3) syscall not mraa_i2c_read()
-    if (read(dev->fh, data, length) == length) {
-        return length;
-    }
-    return 0;
+    int bytes_read = 0;
+    if (advance_func->i2c_read_replace == NULL) {
+        // this is the read(3) syscall not mraa_i2c_read()
+        bytes_read = read(dev->fh, data, length);
+    } else
+        bytes_read = advance_func->i2c_read_replace(dev, data, length);
+   if (bytes_read == length)
+      return length;
+   else
+      return 0;
 }
 
 uint8_t
@@ -239,11 +251,14 @@ mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length)
 mraa_result_t
 mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data)
 {
-    if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, data, I2C_SMBUS_BYTE, NULL) < 0) {
-        syslog(LOG_ERR, "i2c: Failed to write");
-        return MRAA_ERROR_INVALID_HANDLE;
-    }
-    return MRAA_SUCCESS;
+    if (advance_func->i2c_write_byte_replace == NULL) {
+        if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, data, I2C_SMBUS_BYTE, NULL) < 0) {
+            syslog(LOG_ERR, "i2c: Failed to write");
+            return MRAA_ERROR_INVALID_HANDLE;
+        }
+        return MRAA_SUCCESS;
+    } else
+        return advance_func->i2c_write_byte_replace(dev, data);
 }
 
 mraa_result_t
@@ -276,11 +291,14 @@ mraa_result_t
 mraa_i2c_address(mraa_i2c_context dev, uint8_t addr)
 {
     dev->addr = (int) addr;
-    if (ioctl(dev->fh, I2C_SLAVE_FORCE, addr) < 0) {
-        syslog(LOG_ERR, "i2c: Failed to set slave address %d", addr);
-        return MRAA_ERROR_INVALID_HANDLE;
-    }
-    return MRAA_SUCCESS;
+    if (advance_func->i2c_init_bus_replace == NULL) {
+        if (ioctl(dev->fh, I2C_SLAVE_FORCE, addr) < 0) {
+            syslog(LOG_ERR, "i2c: Failed to set slave address %d", addr);
+            return MRAA_ERROR_INVALID_HANDLE;
+        }
+        return MRAA_SUCCESS;
+    } else
+        return advance_func->i2c_address_replace(dev, addr);
 }
 
 mraa_result_t
