@@ -10,6 +10,7 @@ build/
 
 # Temp files
 *.swp
+*.swo
 *~
 
 # npmpub files
