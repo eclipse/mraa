@@ -58,5 +58,21 @@ add_custom_command (TARGET npmpkg POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_SOURCE_DIR}/docs/npm.md ${CMAKE_SOURCE_DIR}/READMEFIRST)
 add_dependencies (npmpkg mraajs)
 
+if (BUILDDOC)
+  find_package(Yuidoc)
+  if (YUIDOC_FOUND)
+    add_custom_target(jsdoc ALL
+      COMMAND ${CMAKE_SOURCE_DIR}/doxygen2jsdoc/docgen.js -m mraa i xml/ -o jsdoc -c ${CMAKE_CURRENT_SOURCE_DIR}/doxygen2jsdoc_custom.json --strict -h
+      COMMAND ${YUIDOC_EXECUTABLE} -C --no-sort --helpers ${CMAKE_SOURCE_DIR}/doxygen2jsdoc/generators/yuidoc/tmpl/mraa/helper.js --themedir ${CMAKE_SOURCE_DIR}/doxygen2jsdoc/generators/yuidoc/tmpl/mraa -o html/node jsdoc/yuidoc/mraa
+      COMMAND ${CMAKE_SOURCE_DIR}/doxygen2jsdoc/tolower.js -i html/node
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      DEPENDS doc
+      COMMENT "Generating API documentation with Yuidoc" VERBATIM
+  )
+  else ()
+    message (INFO " - Failed to find Yuidoc. node.js API doc will not be generated")
+  endif ()
+endif ()
+
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.node
          DESTINATION lib/node_modules/mraa)
