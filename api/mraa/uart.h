@@ -61,7 +61,7 @@ mraa_uart_context mraa_uart_init(int uart);
  * @param path for example "/dev/ttyS0"
  * @return uart context or NULL
  */
-mraa_uart_context mraa_uart_init_raw(char* path);
+mraa_uart_context mraa_uart_init_raw(const char* path);
 
 /**
  * Flush the outbound data.
@@ -153,7 +153,7 @@ int mraa_uart_read(mraa_uart_context dev, char* buf, size_t length);
  * @param length maximum size of buffer
  * @return the number of bytes written, or -1 if an error occurred
  */
-int mraa_uart_write(mraa_uart_context dev, char* buf, size_t length);
+int mraa_uart_write(mraa_uart_context dev, const char* buf, size_t length);
 
 /**
  * Check to see if data is available on the device for reading

@@ -170,7 +170,7 @@ mraa_uart_init(int index)
 }
 
 mraa_uart_context
-mraa_uart_init_raw(char* path)
+mraa_uart_init_raw(const char* path)
 {
     mraa_uart_context dev = (mraa_uart_context) malloc(sizeof(struct _uart));
     if (dev == NULL) {
@@ -436,7 +436,7 @@ mraa_uart_read(mraa_uart_context dev, char* buf, size_t len)
 }
 
 int
-mraa_uart_write(mraa_uart_context dev, char* buf, size_t len)
+mraa_uart_write(mraa_uart_context dev, const char* buf, size_t len)
 {
     if (!dev) {
         syslog(LOG_ERR, "uart: write: context is NULL");
