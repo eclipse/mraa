@@ -104,11 +104,8 @@ class Uart
     {
         char* data = (char*) malloc(sizeof(char) * length);
         int v = mraa_uart_read(m_uart, data, (size_t) length);
-        char* out = (char*) malloc(sizeof(char) * v);
-        strncpy(out, data, v);
-        std::string ret(out);
+        std::string ret(data, v);
         free(data);
-        free(out);
         return ret;
     }
 
