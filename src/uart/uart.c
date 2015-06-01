@@ -404,7 +404,7 @@ mraa_uart_set_timeout(mraa_uart_context dev, int read, int write, int interchar)
     return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-char*
+const char*
 mraa_uart_get_dev_path(mraa_uart_context dev)
 {
     if (!dev) {

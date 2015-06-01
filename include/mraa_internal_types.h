@@ -91,7 +91,7 @@ struct _aio {
 struct _uart {
     /*@{*/
     int index; /**< the uart index, as known to the os. */
-    char* path; /**< the uart device path. */
+    const char* path; /**< the uart device path. */
     int fd; /**< file descriptor for device. */
     /*@}*/
 };

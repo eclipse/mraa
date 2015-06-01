@@ -125,7 +125,7 @@ mraa_result_t mraa_uart_set_timeout(mraa_uart_context dev, int read, int write, 
  * @param dev uart context
  * @return char pointer of device path
  */
-char* mraa_uart_get_dev_path(mraa_uart_context dev);
+const char* mraa_uart_get_dev_path(mraa_uart_context dev);
 
 /**
  * Destroy a mraa_uart_context
