@@ -318,7 +318,7 @@ mraa_uart_set_mode(mraa_uart_context dev, int bytesize, mraa_uart_parity_t parit
     // POSIX & linux doesn't support 1.5 and I've got bigger fish to fry
     switch (stopbits) {
         case 1:
-            termio.c_cflag &= CSTOPB;
+            termio.c_cflag &= ~CSTOPB;
             break;
         case 2:
             termio.c_cflag |= CSTOPB;
