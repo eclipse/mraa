@@ -1,4 +1,4 @@
 [submodule "doxygen2jsdoc"]
 	path = doxygen2jsdoc
-	url = git@github.com:arfoll/doxygen2jsdoc.git
+	url = https://github.com/arfoll/doxygen2jsdoc.git
 	branch = master
