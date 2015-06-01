@@ -93,14 +93,39 @@ class Uart
     }
 
     /**
-     * Read bytes from the device into a buffer
+     * Read bytes from the device into char* buffer
      *
      * @param data buffer pointer
      * @param length maximum size of buffer
+     * @return numbers of bytes read
+     */
+    int
+    read(char* data, int length)
+    {
+        return mraa_uart_read(m_uart, data, (size_t) length);
+    }
+
+    /**
+     * Write bytes in String object to a device
+     *
+     * @param data buffer pointer
+     * @param length maximum size of buffer
+     * @return the number of bytes written, or -1 if an error occurred
+     */
+    int
+    write(const char* data, int length)
+    {
+        return mraa_uart_write(m_uart, data, (size_t) length);
+    }
+
+    /**
+     * Read bytes from the device into a String object
+     *
+     * @param length to read
      * @return string of data
      */
     std::string
-    read(int length)
+    readStr(int length)
     {
         char* data = (char*) malloc(sizeof(char) * length);
         int v = mraa_uart_read(m_uart, data, (size_t) length);
@@ -110,14 +135,13 @@ class Uart
     }
 
     /**
-     * Write bytes in buffer to a device
+     * Write bytes in String object to a device
      *
-     * @param data buffer pointer
-     * @param length maximum size of buffer
+     * @param string to write
      * @return the number of bytes written, or -1 if an error occurred
      */
     int
-    write(std::string data)
+    writeStr(std::string data)
     {
         // this is data.length() not +1 because we want to avoid the '\0' char
         return mraa_uart_write(m_uart, data.c_str(), (data.length()));

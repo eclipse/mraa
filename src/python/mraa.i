@@ -7,6 +7,18 @@
 
 %array_class(uint8_t, uint8Array);
 
+// uart write()
+%typemap(in) (const char* data, int length) {
+  if (PyByteArray_Check($input)) {
+    // whilst this may seem 'hopeful' it turns out this is safe
+    $1 = (char*) PyByteArray_AsString($input);
+    $2 = PyByteArray_Size($input);
+  } else {
+    PyErr_SetString(PyExc_ValueError, "bytearray expected");
+    return NULL;
+  }
+}
+
 // i2c write()
 %typemap(in) (const uint8_t *data, int length) {
   if (PyByteArray_Check($input)) {
@@ -49,7 +61,35 @@ class Spi;
 
 %newobject I2c::read(uint8_t *data, int length);
 %newobject Spi::write(uint8_t *data, int length);
+%newobject Uart::read(char* data, int length);
 %newobject Spi::transfer(uint8_t *txBuf, uint8_t *rxBuf, int length);
+
+// Uart::read()
+
+%typemap(in) (char* data, int length) {
+   if (!PyInt_Check($input)) {
+       PyErr_SetString(PyExc_ValueError, "Expecting an integer");
+       return NULL;
+   }
+   $2 = PyInt_AsLong($input);
+   if ($2 < 0) {
+       PyErr_SetString(PyExc_ValueError, "Positive integer expected");
+       return NULL;
+   }
+   $1 = (char*) malloc($2 * sizeof(char));
+}
+
+%typemap(argout) (char* data, int length) {
+   Py_XDECREF($result);   /* Blow away any previous result */
+   if (result < 0) {      /* Check for I/O error */
+       free($1);
+       PyErr_SetFromErrno(PyExc_IOError);
+       return NULL;
+   }
+   // Append output value $1 to $result
+   $result = PyByteArray_FromStringAndSize((char*) $1, result);
+   free($1);
+}
 
 // I2c::read()
 
