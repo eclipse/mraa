@@ -26,6 +26,21 @@ Basic rules
 - Try to stick to the established coding style regardless of your personal
   feeling for it! Use clang-format (3.6+ required)
 
+Coding Style
+------------
+
+Coding style for all code is defined by clang-format, have a look at it. Avoid
+styling fixes as they make history difficult to read. Javascript & Java can
+also be parsed through the clang-format, it complains but seems to do an ok
+job. Few exceptions to coding styles:
+- All python code is indented by 2 spaces
+- CmakeLists files are 2 space indented and a space is required before all
+  brackets so endif () and if () and command (). Also use lowercase for
+  everything but variables. Cmake is case insensitive but this isn't the wild
+  wild west ;-)
+
+Use common sense and don't be afraid to challenge something if it doesn't make sense!
+
 Code signing
 ------------
 
