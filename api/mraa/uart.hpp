@@ -111,15 +111,13 @@ class Uart
      * Write bytes in buffer to a device
      *
      * @param data buffer pointer
-     * @param length maximum size of buffer
+     * @param length length of buffer
      * @return the number of bytes written, or -1 if an error occurred
      */
     int
-    write(std::string data)
+    write(char* data, int length)
     {
-        char *d = new char[data.length() + 1];
-        std::strcpy(d, data.c_str());
-        return mraa_uart_write(m_uart, d, (data.length() + 1));
+        return mraa_uart_write(m_uart, data, length);
     }
 
     /**
