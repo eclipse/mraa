@@ -64,9 +64,7 @@ class Uart
      */
     Uart(std::string path)
     {
-        char *p = new char[path.length() + 1];
-        std::strcpy(p, path.c_str());
-        m_uart = mraa_uart_init_raw(p);
+        m_uart = mraa_uart_init_raw(path.c_str());
 
         if (m_uart == NULL) {
             throw std::invalid_argument("Error initialising UART");
@@ -124,9 +122,8 @@ class Uart
     int
     write(std::string data)
     {
-        char *d = new char[data.length() + 1];
-        std::strcpy(d, data.c_str());
-        return mraa_uart_write(m_uart, d, (data.length() + 1));
+        // this is data.length() not +1 because we want to avoid the '\0' char
+        return mraa_uart_write(m_uart, data.c_str(), (data.length()));
     }
 
     /**
