@@ -140,6 +140,7 @@ class Spi
         return mraa_spi_write_buf(m_spi, txBuf, length);
     }
 
+#ifndef SWIG
     /**
      * Write buffer of bytes to SPI device The pointer return has to be
      * free'd by the caller. It will return a NULL pointer in cases of
@@ -154,6 +155,7 @@ class Spi
     {
         return mraa_spi_write_buf_word(m_spi, txBuf, length);
     }
+#endif
 
 #ifndef SWIG
     /**
