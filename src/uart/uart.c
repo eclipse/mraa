@@ -232,6 +232,7 @@ mraa_uart_stop(mraa_uart_context dev)
     // just close the device and reset our fd.
     if (dev->fd >= 0) {
         close(dev->fd);
+        dev->fd = -1;
     }
 
     free(dev);
