@@ -42,7 +42,7 @@ namespace mraa {
 class Spi;
 %typemap(out) uint8_t*
 {
-%#if SWIG_V8_VERSION > 0x032872
+%#if SWIG_V8_VERSION > 0x032870
   $result = node::Buffer::New((char*) $1, arg3);
 %#else
   $result = node::Buffer::New((char*) $1, arg3)->handle_;
@@ -75,7 +75,7 @@ class Spi;
        SWIG_exception_fail(SWIG_ERROR, "I2c write failed");
        SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
-%#if SWIG_V8_VERSION > 0x032872
+%#if SWIG_V8_VERSION > 0x032870
    $result = node::Buffer::New((char*) $1, result);
 %#else
    $result = node::Buffer::New((char*) $1, result)->handle_;
@@ -104,7 +104,7 @@ class Spi;
        SWIG_exception_fail(SWIG_ERROR, "I2c write failed");
        SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
-%#if SWIG_V8_VERSION > 0x032872
+%#if SWIG_V8_VERSION > 0x032870
    $result = node::Buffer::New((char*) $1, result);
 %#else
    $result = node::Buffer::New((char*) $1, result)->handle_;
