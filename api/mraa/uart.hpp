@@ -99,34 +99,25 @@ class Uart
      *
      * @param data buffer pointer
      * @param length maximum size of buffer
-     * @return string of data
+     * @return number of bytes read, or -1 on error
      */
-    std::string
-    read(int length)
+    int
+    read(char* data, int length)
     {
-        char* data = (char*) malloc(sizeof(char) * length);
-        int v = mraa_uart_read(m_uart, data, (size_t) length);
-        char* out = (char*) malloc(sizeof(char) * v);
-        strncpy(out, data, v);
-        std::string ret(out);
-        free(data);
-        free(out);
-        return ret;
+        return mraa_uart_read(m_uart, data, length);
     }
 
     /**
      * Write bytes in buffer to a device
      *
      * @param data buffer pointer
-     * @param length maximum size of buffer
+     * @param length length of buffer
      * @return the number of bytes written, or -1 if an error occurred
      */
     int
-    write(std::string data)
+    write(char* data, int length)
     {
-        char *d = new char[data.length() + 1];
-        std::strcpy(d, data.c_str());
-        return mraa_uart_write(m_uart, d, (data.length() + 1));
+        return mraa_uart_write(m_uart, data, length);
     }
 
     /**
