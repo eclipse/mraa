@@ -290,7 +290,7 @@ mraa_uart_set_mode(mraa_uart_context dev, int bytesize, mraa_uart_parity_t parit
     }
 
     struct termios termio;
-    if (!tcgetattr(dev->fd, &termio)) {
+    if (tcgetattr(dev->fd, &termio)) {
         syslog(LOG_ERR, "uart: tcgetattr() failed");
         return MRAA_ERROR_INVALID_HANDLE;
     }
@@ -366,7 +366,7 @@ mraa_uart_set_flowcontrol(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_bo
     if (xonxoff) {
         action = TCION;
     }
-    if (!tcflow(dev->fd, action)) {
+    if (tcflow(dev->fd, action)) {
         return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
     }
 
@@ -374,7 +374,7 @@ mraa_uart_set_flowcontrol(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_bo
     struct termios termio;
 
     // get current modes
-    if (!tcgetattr(dev->fd, &termio)) {
+    if (tcgetattr(dev->fd, &termio)) {
         syslog(LOG_ERR, "uart: tcgetattr() failed");
         return MRAA_ERROR_INVALID_HANDLE;
     }
