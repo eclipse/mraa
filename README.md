@@ -90,7 +90,4 @@ The Python documentation is available [here](http://iotdk.intel.com/docs/master/
 NodeJS API documentation
 ===========
 
-There is no explicit nodejs API documentation, see the examples. The API itself
-is very similar to the python one but with a js syntax. If you know of an
-autodoc tool for generating nodejs APIs from a native C++ nodejs extension
-please get in touch!
+The Javascript documention is available [here](http://iotdk.intel.com/docs/master/mraa/node/modules/mraa.html)
