@@ -162,7 +162,7 @@ class Spi
      * Transfer data to and from SPI device Receive pointer may be null if
      * return data is not needed.
      *
-     * @param data buffer to send
+     * @param txBuf buffer to send
      * @param rxBuf buffer to optionally receive data from spi device
      * @param length size of buffer to send
      * @return Result of operation
@@ -177,7 +177,7 @@ class Spi
      * Transfer data to and from SPI device Receive pointer may be null if
      * return data is not needed.
      *
-     * @param data buffer to send
+     * @param txBuf buffer to send
      * @param rxBuf buffer to optionally receive data from spi device
      * @param length size of buffer to send
      * @return Result of operation
