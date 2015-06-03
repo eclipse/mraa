@@ -18,18 +18,8 @@
                     'SWIGJAVASCRIPT',
                     'BUILDING_NODE_EXTENSION=1',
                     'SWIG_V8_VERSION=0x0<(v8_version)',
-                    'V8_VERSION=0x0<(v8_version)' ],
-      'conditions' : [
-          [ 'target_arch=="x64"',
-            { 'defines' : [ 'X86PLAT=ON' ], },
-          ],
-          [ 'target_arch=="ia32"',
-            { 'defines' : [ 'X86PLAT=ON' ], },
-          ],
-          [ 'target_arch=="arm"',
-            { 'defines' : [ 'ARMPLAT=ON' ], },
-          ],
-      ],
+                    'V8_VERSION=0x0<(v8_version)',
+                    'X86PLAT=ON' ]
     }
   ]
 }
