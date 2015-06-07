@@ -23,8 +23,10 @@ in libmraa:
 - Max SPI speed is 25Mhz/4 ~6.25Mhz
 - SPI PM can sometimes do weird things you can disable it with:
   `echo on > /sys/devices/pci0000\:00/0000\:00\:07.1/power/control`
-- ADC kernel module will return 12bit number but the ADC itself only has an
-  accuracy of 10bits. This ADC is only included on the Arduino board.
+- ADC kernel module will return 16bit number but the ADC itself only has an
+  accuracy of maximum 12bits and in MRAA it's limited to 10bits by default.
+  Use `mraa_aio_set_bit(12)` to switch to the maximum resolution mode.
+  This ADC is only included on the Arduino board.
 - AIO pins are treated as 0-5 in `mraa_aio_init()` but as 14-19 for everything
   else. Therefore use `mraa_gpio_init(14)` to use A0 as a GPIO
 - Arduino pin 7 can sometimes negatively impact the WiFi capability, if using
