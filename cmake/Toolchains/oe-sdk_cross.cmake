@@ -17,3 +17,10 @@ set( CMAKE_INSTALL_PREFIX $ENV{OECORE_TARGET_SYSROOT}/usr CACHE STRING "" FORCE)
 set( ORC_INCLUDE_DIRS $ENV{OECORE_TARGET_SYSROOT}/usr/include/orc-0.4 )
 set( ORC_LIBRARY_DIRS $ENV{OECORE_TARGET_SYSROOT}/usr/lib )
 
+# for java
+set( ENV{JAVA_HOME} "/home/andreiva/work/yocto_1.8/edison-src/build/tmp/sysroots/edison/usr/lib/jvm/java-7-openjdk")
+set( JAVA_AWT_INCLUDE_PATH /home/andreiva/work/yocto_1.8/edison-src/build/tmp/sysroots/edison/usr/lib/jvm/java-7-openjdk/include CACHE PATH "" FORCE)
+set( JAVA_AWT_LIBRARY /home/andreiva/work/yocto_1.8/edison-src/build/tmp/sysroots/edison/usr/lib/jvm/java-7-openjdk/jre/lib/amd64/libjawt.so CACHE FILEPATH "" FORCE)
+set( JAVA_INCLUDE_PATH /home/andreiva/work/yocto_1.8/edison-src/build/tmp/sysroots/edison/usr/lib/jvm/java-7-openjdk/include CACHE PATH "" FORCE)
+set( JAVA_INCLUDE_PATH2 /home/andreiva/work/yocto_1.8/edison-src/build/tmp/sysroots/edison/usr/lib/jvm/java-7-openjdk/include/linux CACHE PATH "" FORCE)
+set( JAVA_JVM_LIBRARY /home/andreiva/work/yocto_1.8/edison-src/build/tmp/sysroots/edison/usr/lib/jvm/java-7-openjdk/jre/lib/amd64/libjvm.so CACHE FILEPATH "" FORCE)
