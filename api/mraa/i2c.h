@@ -122,7 +122,7 @@ uint16_t mraa_i2c_read_word_data(mraa_i2c_context dev, const uint8_t command);
  * @param command The register
  * @param data pointer to the byte array to read data in to
  * @param length max number of bytes to read
- * @return The length in bytes passed to the function or 0
+ * @return The length in bytes passed to the function or -1
  */
 int mraa_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* data, int length);
 

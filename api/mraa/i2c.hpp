@@ -154,7 +154,7 @@ class I2c
      * @param reg Register to read from
      * @param data pointer to the byte array to read data in to
      * @param length max number of bytes to read
-     * @return length passed to the function or 0
+     * @return length passed to the function or -1
      */
     int
     readBytesReg(uint8_t reg, uint8_t* data, int length)
