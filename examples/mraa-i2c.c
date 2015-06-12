@@ -28,6 +28,9 @@
 #include <unistd.h>
 #include "mraa/i2c.h"
 
+#include "mraa_internal_types.h"
+
+extern mraa_board_t* plat;
 
 void
 print_version()
@@ -38,8 +41,10 @@ print_version()
 void
 print_help()
 {
-    fprintf(stdout, "list              List avaialble busses\n");
-    fprintf(stdout, "version           Get mraa version and board name\n");
+    fprintf(stdout, "version                   Get mraa version and board name\n");
+    fprintf(stdout, "list                      List available busses\n");
+    fprintf(stdout, "get bus device reg        Get value from specified device register\n");
+    fprintf(stdout, "set bus device reg value  Set specified device register to value\n");
 }
 
 void
@@ -51,196 +56,102 @@ print_command_error()
 
 
 
-/*
 void
-list_pins()
+print_busses()
 {
-    int pin_count = mraa_get_pin_count();
-    if (pin_count == 0) {
-        fprintf(stdout, "No Pins\n");
-        return;
-    }
-    int i;
-    for (i = 0; i < pin_count; ++i) {
-        if (strcmp(mraa_get_pin_name(i), "INVALID") != 0) {
-            fprintf(stdout, "%02d ", i);
-            fprintf(stdout, "%*s: ", (MRAA_PIN_NAME_SIZE - 1), mraa_get_pin_name(i));
-            if (mraa_pin_mode_test(i, MRAA_PIN_GPIO))
-                fprintf(stdout, "GPIO ");
-            if (mraa_pin_mode_test(i, MRAA_PIN_I2C))
-                fprintf(stdout, "I2C  ");
-            if (mraa_pin_mode_test(i, MRAA_PIN_SPI))
-                fprintf(stdout, "SPI  ");
-            if (mraa_pin_mode_test(i, MRAA_PIN_PWM))
-                fprintf(stdout, "PWM  ");
-            if (mraa_pin_mode_test(i, MRAA_PIN_AIO))
-                fprintf(stdout, "AIO  ");
-            if (mraa_pin_mode_test(i, MRAA_PIN_UART))
-                fprintf(stdout, "UART ");
-            fprintf(stdout, "\n");
+    int bus;
+    for (bus = 0; bus < plat->i2c_bus_count; ++bus) {
+        char* busType;
+        switch (plat->i2c_bus[bus].drv_type) {
+        case MRAA_DRV_API_STD:
+            busType = "stdapi";
+            break;
+        case MRAA_DRV_API_FT4222:
+            busType = "ft4222";
+            break;
+        default:
+            busType = "unknown";
+            break;
         }
-    }
-}
-
-mraa_result_t
-gpio_set(int pin, int level, mraa_boolean_t raw)
-{
-    mraa_gpio_context gpio = mraa_gpio_init(pin);
-    if (gpio != NULL) {
-        mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
-        if (raw != 0) {
-            if (mraa_gpio_use_mmaped(gpio, 1) != MRAA_SUCCESS) {
-                fprintf(stdout,
-                        "mmapped access to gpio %d not supported, falling back to normal mode\n", pin);
-            }
-        }
-        mraa_gpio_write(gpio, level);
-        return MRAA_SUCCESS;
-    }
-    return MRAA_ERROR_INVALID_RESOURCE;
-}
-
-mraa_result_t
-gpio_get(int pin, int* level, mraa_boolean_t raw)
-{
-    mraa_gpio_context gpio = mraa_gpio_init(pin);
-    if (gpio != NULL) {
-        mraa_gpio_dir(gpio, MRAA_GPIO_IN);
-        if (raw != 0) {
-            if (mraa_gpio_use_mmaped(gpio, 1) != MRAA_SUCCESS) {
-                fprintf(stdout,
-                        "mmapped access to gpio not supported, falling back to normal mode\n", pin);
-            }
-        }
-        *level = mraa_gpio_read(gpio);
-        return MRAA_SUCCESS;
-    }
-    return MRAA_ERROR_INVALID_RESOURCE;
-}
-
-
-void
-gpio_isr_handler(void* args)
-{
-    struct gpio_source* gpio_info = (struct gpio_source*) args;
-    int level = mraa_gpio_read(gpio_info->context);
-    fprintf(stdout, "Pin %d = %d\n", gpio_info->pin, level);
-}
-
-mraa_result_t
-gpio_isr_start(struct gpio_source* gpio_info)
-{
-    gpio_info->context = mraa_gpio_init(gpio_info->pin);
-    if (gpio_info->context != NULL) {
-        mraa_result_t status = mraa_gpio_dir(gpio_info->context, MRAA_GPIO_IN);
-        if (status == MRAA_SUCCESS) {
-            status = mraa_gpio_isr(gpio_info->context, MRAA_GPIO_EDGE_BOTH, &gpio_isr_handler, gpio_info);
-        }
-        return status;
-    } else {
-        return MRAA_ERROR_INVALID_RESOURCE;
+        fprintf(stdout, "Bus %2d: id=%02d type=%s ", bus, plat->i2c_bus[bus].bus_id, busType);
+        if (bus == plat->def_i2c_bus)
+            fprintf(stdout, " default", bus);
+        fprintf(stdout, "\n", bus);
     }
 }
 
 
 mraa_result_t
-gpio_isr_stop(struct gpio_source* gpio_info)
-{
-    mraa_gpio_isr_exit(gpio_info->context);
-    mraa_gpio_close(gpio_info->context);
-    return MRAA_SUCCESS;
-}
-
-
-int
-main(int argc, char** argv)
-{
-    if (argc == 1) {
-        print_command_error();
-    }
-
-    if (argc > 1) {
-        if (strcmp(argv[1], "list") == 0) {
-            list_pins();
-        } else if (strcmp(argv[1], "help") == 0) {
-            print_help();
-        } else if (strcmp(argv[1], "version") == 0) {
-            print_version();
-        } else if ((strcmp(argv[1], "set") == 0) || (strcmp(argv[1], "setraw") == 0)) {
-            if (argc == 4) {
-                int pin = atoi(argv[2]);
-                mraa_boolean_t rawmode = strcmp(argv[1], "setraw") == 0;
-                if (gpio_set(pin, atoi(argv[3]), rawmode) != MRAA_SUCCESS)
-                    fprintf(stdout, "Could not initialize gpio %d\n", pin);
-            } else {
-                print_command_error();
-            }
-        } else if ((strcmp(argv[1], "get") == 0) || (strcmp(argv[1], "getraw") == 0)) {
-            if (argc == 3) {
-                int pin = atoi(argv[2]);
-                int level;
-                mraa_boolean_t rawmode = strcmp(argv[1], "getraw") == 0;
-                if (gpio_get(pin, &level, rawmode) == MRAA_SUCCESS) {
-                    fprintf(stdout, "Pin %d = %d\n", pin, level);
-                } else {
-                    fprintf(stdout, "Could not initialize gpio %d\n", pin);
-                }
-            } else {
-                print_command_error();
-            }
-        } else if (strcmp(argv[1], "monitor") == 0) {
-            if (argc == 3) {
-                int pin = atoi(argv[2]);
-                struct gpio_source gpio_info;
-                gpio_info.pin = pin;
-                if (gpio_isr_start(&gpio_info) == MRAA_SUCCESS) {
-                    fprintf(stdout, "Monitoring level changes to pin %d. Press RETURN to exit.\n", pin);
-                    gpio_isr_handler(&gpio_info);
-                    while (getchar() != '\n')
-                        ;
-                    gpio_isr_stop(&gpio_info);
-                } else {
-                    fprintf(stdout, "Failed to register ISR for pin %d\n", pin);
-                }
-            } else {
-                print_command_error();
-            }
-        } else {
-            print_command_error();
-        }
-    }
-    return 0;
-}
-*/
-
-
-mraa_result_t
-i2c_get(uint8_t device_address, uint8_t register_address, uint8_t* data)
+i2c_get(int bus, uint8_t device_address, uint8_t register_address, uint8_t* data)
 {
     mraa_result_t status = MRAA_SUCCESS;
-    int bus = mraa_get_default_i2c_bus();
     mraa_i2c_context i2c = mraa_i2c_init(bus);
-    if (i2c != NULL) {
-        status = mraa_i2c_address(i2c, device_address);
-        if (status == MRAA_SUCCESS) {
-            mraa_i2c_write_byte(i2c, register_address);
-            int bytes_read = mraa_i2c_read(i2c, data, 1);
-            if (bytes_read != 1) {
-                fprintf(stdout, "i2c read failed\n");
-                status = MRAA_ERROR_UNSPECIFIED;
-            }
-        } else
-            fprintf(stdout, "Could not set i2c device address\n");
-    } else
+    if (i2c == NULL) {
+        status = MRAA_ERROR_NO_RESOURCES;
         fprintf(stdout, "Could not initialize i2c\n");
+        goto i2c_get_exit;
+    }
+    status = mraa_i2c_address(i2c, device_address);
+    if (status != MRAA_SUCCESS) {
+        fprintf(stdout, "Could not set i2c device address\n");
+        goto i2c_get_exit;
+    }
+    status = mraa_i2c_write_byte(i2c, register_address);
+    if (status != MRAA_SUCCESS) {
+        fprintf(stdout, "Could not set i2c register address. Status = %d\n", status);
+        goto i2c_get_exit;
+    }
+    status = mraa_i2c_read(i2c, data, 1) == 1 ? MRAA_SUCCESS : MRAA_ERROR_UNSPECIFIED;
+    if (status != MRAA_SUCCESS) {
+        fprintf(stdout, "i2c read failed\n");
+       goto i2c_get_exit;
+    }
+i2c_get_exit:
+    if (i2c != NULL)
     mraa_i2c_stop(i2c);
     return status;
 }
 
 
+mraa_result_t
+i2c_set(int bus, uint8_t device_address, uint8_t register_address, uint8_t data)
+{
+    mraa_result_t status = MRAA_SUCCESS;
+    mraa_i2c_context i2c = mraa_i2c_init(bus);
+    if (i2c == NULL) {
+        status = MRAA_ERROR_NO_RESOURCES;
+        fprintf(stdout, "Could not initialize i2c\n");
+        goto i2c_set_exit;
+    }
+    status = mraa_i2c_address(i2c, device_address);
+    if (status != MRAA_SUCCESS) {
+        fprintf(stdout, "Could not set i2c device address\n");
+        goto i2c_set_exit;
+    }
+    status = mraa_i2c_write_byte_data(i2c, data, register_address);
+    if (status != MRAA_SUCCESS) {
+        fprintf(stdout, "Could not set i2c register address. Status = %d\n", status);
+        goto i2c_set_exit;
+    }
+/*
+    status = mraa_i2c_write_byte(i2c, data);
+    if (status != MRAA_SUCCESS) {
+        fprintf(stdout, "Could not set value. Status = %d\n", status);
+        goto i2c_set_exit;
+  }
+*/
+i2c_set_exit:
+    if (i2c != NULL)
+    mraa_i2c_stop(i2c);
+    return status;
+}
+
+
+
 int
 main(int argc, char** argv)
 {
+    mraa_set_log_level(7);
     if (argc == 1) {
         print_command_error();
     }
@@ -250,15 +161,32 @@ main(int argc, char** argv)
             print_help();
         } else if (strcmp(argv[1], "version") == 0) {
             print_version();
+        } else if (strcmp(argv[1], "list") == 0) {
+            print_busses();
         } else if ((strcmp(argv[1], "get") == 0)) {
-            if (argc == 4) {
-                uint8_t device_address = atoi(argv[2]);
-                uint8_t register_address = atoi(argv[3]);
+            if (argc == 5) {
+                uint8_t bus = strtol(argv[2], NULL, 0);
+                uint8_t device_address = strtol(argv[3], NULL, 0);
+                uint8_t register_address = strtol(argv[4], NULL, 0);
+                // fprintf(stdout, "Device %02X, Register = %02X\n", device_address, register_address);
                 uint8_t data;
-                if (i2c_get(device_address, register_address, &data) == MRAA_SUCCESS) {
-                    fprintf(stdout, "Register %d = %d\n", register_address, data);
+                if (i2c_get(bus, device_address, register_address, &data) == MRAA_SUCCESS) {
+                    fprintf(stdout, "Register %#02X = %#02X\n", register_address, data);
                 } else {
                     fprintf(stdout, "i2c get failed\n");
+                }
+            } else {
+                print_command_error();
+            }
+        } else if ((strcmp(argv[1], "set") == 0)) {
+            if (argc == 6) {
+                uint8_t bus = strtol(argv[2], NULL, 0);
+                uint8_t device_address = strtol(argv[3], NULL, 0);
+                uint8_t register_address = strtol(argv[4], NULL, 0);
+                uint8_t value = strtol(argv[5], NULL, 0);
+                fprintf(stdout, "Device %02X, Register = %02X, Value = %02X\n", device_address, register_address, value);
+                if (i2c_set(bus, device_address, register_address, value) != MRAA_SUCCESS) {
+                    fprintf(stdout, "i2c set failed\n");
                 }
             } else {
                 print_command_error();
