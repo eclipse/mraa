@@ -14,6 +14,9 @@ add_executable (mraa-i2c mraa-i2c.c)
 add_executable (spi_max7219 spi_max7219.c)
 
 include_directories(${PROJECT_SOURCE_DIR}/api)
+# FIXME Hack to access internal types used by mraa-i2c
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/api/mraa)
 
 target_link_libraries (hellomraa mraa)
 target_link_libraries (i2c_HMC5883L mraa m)
