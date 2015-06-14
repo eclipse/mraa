@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <sys/ioctl.h>
+#include <linux/spi/spidev.h>
 
 #include "common.h"
 #include "x86/intel_galileo_rev_d.h"
@@ -115,6 +117,29 @@ mraa_intel_galileo_g1_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
     return MRAA_SUCCESS;
 }
 
+mraa_result_t
+mraa_intel_galileo_g1_spi_lsbmode_replace(mraa_spi_context dev, mraa_boolean_t lsb)
+{
+    uint8_t lsb_mode = (uint8_t) lsb;
+
+    // Galileo Gen1 doesn't support LSB_FIRST, we need to react appropriately
+    if (!lsb) {
+        if (ioctl(dev->devfd, SPI_IOC_WR_LSB_FIRST, &lsb_mode) < 0) {
+        syslog(LOG_ERR, "spi: Failed to set bit order");
+        return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        if (ioctl(dev->devfd, SPI_IOC_RD_LSB_FIRST, &lsb_mode) < 0) {
+            syslog(LOG_ERR, "spi: Failed to set bit order");
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+    } else {
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
+
+    dev->lsb = lsb;
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_intel_galileo_rev_d()
 {
@@ -136,6 +161,7 @@ mraa_intel_galileo_rev_d()
     b->pwm_min_period = 1;
 
     advance_func->gpio_mmap_setup = &mraa_intel_galileo_g1_mmap_setup;
+    advance_func->spi_lsbmode_replace = &mraa_intel_galileo_g1_spi_lsbmode_replace;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_GALILEO_REV_D_PINCOUNT);
     if (b->pins == NULL) {
