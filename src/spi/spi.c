@@ -36,19 +36,6 @@
 #define MAX_SIZE 64
 #define SPI_MAX_LENGTH 4096
 
-/**
- * A structure representing the SPI device
- */
-struct _spi {
-    /*@{*/
-    int devfd;          /**< File descriptor to SPI Device */
-    uint32_t mode;      /**< Spi mode see spidev.h */
-    int clock;          /**< clock to run transactions at */
-    mraa_boolean_t lsb; /**< least significant bit mode */
-    unsigned int bpw;   /**< Bits per word */
-    /*@}*/
-};
-
 mraa_spi_context
 mraa_spi_init(int bus)
 {
