@@ -196,6 +196,10 @@ mraa_spi_frequency(mraa_spi_context dev, int hz)
 mraa_result_t
 mraa_spi_lsbmode(mraa_spi_context dev, mraa_boolean_t lsb)
 {
+    if (advance_func->spi_lsbmode_replace != NULL) {
+        return advance_func->spi_lsbmode_replace(dev, lsb);
+    }
+
     uint8_t lsb_mode = (uint8_t) lsb;
     if (ioctl(dev->devfd, SPI_IOC_WR_LSB_FIRST, &lsb_mode) < 0) {
         syslog(LOG_ERR, "spi: Failed to set bit order");
