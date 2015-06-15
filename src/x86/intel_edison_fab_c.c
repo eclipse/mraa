@@ -26,6 +26,8 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+#include <sys/ioctl.h>
+#include <linux/spi/spidev.h>
 
 #include "common.h"
 #include "x86/intel_edison_fab_c.h"
@@ -71,6 +73,29 @@ static uint8_t* mmap_reg = NULL;
 static int mmap_fd = 0;
 static int mmap_size;
 static unsigned int mmap_count = 0;
+
+mraa_result_t
+mraa_intel_edison_spi_lsbmode_replace(mraa_spi_context dev, mraa_boolean_t lsb)
+{
+    uint8_t lsb_mode = (uint8_t) lsb;
+
+    // Edison doesn't support LSB_FIRST, we need to react appropriately
+    if (!lsb) {
+        if (ioctl(dev->devfd, SPI_IOC_WR_LSB_FIRST, &lsb_mode) < 0) {
+            syslog(LOG_ERR, "spi: Failed to set bit order");
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        if (ioctl(dev->devfd, SPI_IOC_RD_LSB_FIRST, &lsb_mode) < 0) {
+            syslog(LOG_ERR, "spi: Failed to set bit order");
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+    } else {
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
+
+    dev->lsb = lsb;
+    return MRAA_SUCCESS;
+}
 
 static mraa_result_t
 mraa_intel_edison_pinmode_change(int sysfs, int mode)
@@ -1122,6 +1147,7 @@ mraa_intel_edison_fab_c()
     advance_func->uart_init_pre = &mraa_intel_edison_uart_init_pre;
     advance_func->uart_init_post = &mraa_intel_edison_uart_init_post;
     advance_func->gpio_mmap_setup = &mraa_intel_edison_mmap_setup;
+    advance_func->spi_lsbmode_replace = &mraa_intel_edison_spi_lsbmode_replace;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_EDISON_PINCOUNT);
     if (b->pins == NULL) {
