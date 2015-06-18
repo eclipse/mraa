@@ -61,6 +61,12 @@ option (INSTALLGPIOTOOL "Install gpio tool" OFF)
 option (BUILDARCH "Override architecture to build for - override" OFF)
 option (TESTS "Override the addition of tests" ON)
 
+if (NOT BUILDSWIG)
+  set (BUILDSWIGPYTHON OFF)
+  set (BUILDSWIGNODE OFF)
+  set (BUILDSWIGJAVA OFF)
+endif()
+
 if (NOT BUILDARCH)
   include (TargetArch)
   target_architecture (DETECTED_ARCH)
