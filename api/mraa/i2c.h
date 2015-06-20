@@ -93,7 +93,7 @@ int mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length);
  * with the i2c offset 0x0
  *
  * @param dev The i2c context
- * @return The result of the read or -1 if failed
+ * @return The result of the read and 0 if failed
  */
 uint8_t mraa_i2c_read_byte(mraa_i2c_context dev);
 
@@ -102,7 +102,7 @@ uint8_t mraa_i2c_read_byte(mraa_i2c_context dev);
  *
  * @param dev The i2c context
  * @param command The register
- * @return The result of the read or -1 if failed
+ * @return The result of the read and 0 if failed
  */
 uint8_t mraa_i2c_read_byte_data(mraa_i2c_context dev, const uint8_t command);
 
@@ -111,7 +111,7 @@ uint8_t mraa_i2c_read_byte_data(mraa_i2c_context dev, const uint8_t command);
  *
  * @param dev The i2c context
  * @param command The register
- * @return The result of the read or -1 if failed
+ * @return The result of the read and 0 if failed
  */
 uint16_t mraa_i2c_read_word_data(mraa_i2c_context dev, const uint8_t command);
 
