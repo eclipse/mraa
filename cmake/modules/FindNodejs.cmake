@@ -8,7 +8,7 @@ find_program (NODE_EXECUTABLE NAMES node
 include (FindPackageHandleStandardArgs)
 
 find_path (NODE_ROOT_DIR "node/node.h" "src/node.h"
-  PATHS /usr/include/nodejs /usr/local/include/nodejs)
+  PATHS /usr/include/nodejs /usr/local/include/nodejs /usr/local/include)
 
 set (NODE_INCLUDE_DIRS
   ${NODE_ROOT_DIR}/src
