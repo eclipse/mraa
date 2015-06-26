@@ -31,7 +31,7 @@ if (ARMPLAT)
 endif()
 
 if (USBPLAT)
-  add_subdirectory(usb)
+  message (INFO " - Adding USB platforms")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSBPLAT=1")
   find_package (Ftd2xx)
   if (FTDID2xx)
@@ -42,8 +42,17 @@ if (USBPLAT)
       message (WARNING " - Enabled FTDID2xx support but library not found")
     endif ()
   endif ()
+  find_package (Ftd4222)
+  if (FTDI4222)
+    if (${LIBFT4222_FOUND})
+      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFTDI4222=1")
+      set (mraa_LIBS ${mraa_LIBS} ${LIBFT4222_LIBRARIES})
+    else ()
+      message (WARNING " - Enabled FTDI4222 support but library not found")
+    endif ()
+  endif ()
+  add_subdirectory(usb)
 endif ()
-
 
 set (mraa_LIB_SRCS
   ${mraa_LIB_SRCS_NOAUTO}
