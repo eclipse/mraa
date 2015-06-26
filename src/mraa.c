@@ -101,9 +101,16 @@ mraa_init()
     advance_func = (mraa_adv_func_t*) malloc(sizeof(mraa_adv_func_t));
     memset(advance_func, 0, sizeof(mraa_adv_func_t));
 
-#ifdef X86PLAT
+#if defined(X86PLAT)
     // Use runtime x86 platform detection
     platform_type = mraa_x86_platform();
+#elif defined(ARMPLAT)
+    // Use runtime ARM platform detection
+    platform_type = mraa_arm_platform();
+#else
+#error mraa_ARCH NOTHING
+#endif
+
 #ifdef USBPLAT
     // This is a platform extender so create null base platform if one doesn't already exist
     if (plat == NULL) {
@@ -115,17 +122,11 @@ mraa_init()
                 platform_type = usb_platform_type;
         }
     }
-#endif
-
-#if defined(ARMPLAT)
-    // Use runtime ARM platform detection
-    platform_type = mraa_arm_platform();
-#endif
-
     if (plat == NULL) {
         printf("mraa: FATAL error, failed to initialise platform\n");
         return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
     }
+#endif
 
     syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), platform_type);
     return MRAA_SUCCESS;
