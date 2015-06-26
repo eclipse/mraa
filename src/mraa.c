@@ -113,11 +113,12 @@ mraa_init()
     // This is a platform extender so create null base platform if one doesn't already exist
     if (plat == NULL) {
         plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
-        plat->platform_name = "Null platform";
+        plat->platform_name = "Unknown platform";
         if (plat != NULL) {
             int usb_platform_type = mraa_usb_platform_extender(plat);
-            if (platform_type == MRAA_UNKNOWN_PLATFORM)
+            if (platform_type == MRAA_UNKNOWN_PLATFORM) {
                 platform_type = usb_platform_type;
+            }
         }
     }
     if (plat == NULL) {

@@ -49,8 +49,16 @@ endif()
 if (USBPLAT)
   add_subdirectory(usb)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSBPLAT=1")
-  set (mraa_LIBS ${mraa_LIBS} ft4222)
-endif()
+  find_package (Ftd2xx)
+  if (FTDID2xx)
+    if (${LIBFTD2XX_FOUND})
+      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFTDID2XX=1")
+      set (mraa_LIBS ${mraa_LIBS} ${LIBFTD2XX_LIBRARIES})
+    else ()
+      message (WARNING " - Enabled FTDID2xx support but library not found")
+    endif ()
+  endif ()
+endif ()
 
 
 set (mraa_LIB_SRCS
