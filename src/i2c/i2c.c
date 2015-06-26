@@ -80,14 +80,14 @@ mraa_i2c_init(int bus)
         return NULL;
     }
 
-    if (MRAA_IS_ON_SUB_PLATFORM(bus)) {
+    if (mraa_is_on_sub_platform(bus)) {
         syslog(LOG_NOTICE, "i2c: Using sub platform");
         board = board->sub_platform;
         if (board == NULL) {
             syslog(LOG_ERR, "i2c: Sub platform Not Initialised");
             return NULL;
         }
-        bus = MRAA_GET_SUB_PLATFORM_INDEX(bus);
+        bus = mraa_get_sub_platform_index(bus);
     }
 
     if (board->i2c_bus_count == 0) {
