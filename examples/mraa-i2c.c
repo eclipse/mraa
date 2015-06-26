@@ -63,9 +63,8 @@ print_command_error()
 void
 print_bus(mraa_board_t* board)
 {
-    int bus_index;
-    int bus;
-    for (bus = 0; bus < board->i2c_bus_count; ++bus) {
+    int i, bus;
+    for (i = 0; i < board->i2c_bus_count; ++i) {
         char* busType;
         switch (mraa_get_platform_type()) {
         case MRAA_INTEL_GALILEO_GEN1:
@@ -76,21 +75,21 @@ print_bus(mraa_board_t* board)
         case MRAA_RASPBERRY_PI:
         case MRAA_BEAGLEBONE:
         case MRAA_BANANA:
-            bus_index = bus;
+            bus = i;
             busType = "stdapi";
             break;
         case MRAA_FTDI_FT4222:
             busType = "ft4222";
-            bus_index = MRAA_USE_SUB_PLATFORM(bus);
+            bus = mraa_use_sub_platform(i);
             break;
         default:
             busType = "unknown";
             break;
         }
-        fprintf(stdout, "Bus %2d: id=%02d type=%s ", bus_index, plat->i2c_bus[bus].bus_id, busType);
-        if (bus == plat->def_i2c_bus)
-            fprintf(stdout, " default", bus);
-        fprintf(stdout, "\n", bus);
+        fprintf(stdout, "Bus %2d: id=%02d type=%s ", bus, plat->i2c_bus[bus].bus_id, busType);
+        if (i == plat->def_i2c_bus)
+            fprintf(stdout, " default", i);
+        fprintf(stdout, "\n");
     }
 }
 

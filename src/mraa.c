@@ -452,3 +452,22 @@ mraa_link_targets(const char* filename, const char* targetname)
         return 0;
     }
 }
+
+mraa_boolean_t
+mraa_is_on_sub_platform(int pin_or_bus)
+{
+    return (pin_or_bus | MRAA_SUB_PLATFORM_MASK) != 0;
+}
+
+int 
+mraa_use_sub_platform(int pin_or_bus)
+{
+    return pin_or_bus | MRAA_SUB_PLATFORM_MASK;
+}
+
+int 
+mraa_get_sub_platform_index(int pin_or_bus)
+{
+    return pin_or_bus & (~MRAA_SUB_PLATFORM_MASK);
+}
+
