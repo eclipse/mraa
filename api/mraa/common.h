@@ -31,9 +31,6 @@
 
 #define MRAA_SUB_PLATFORM_BIT_SHIFT 9
 #define MRAA_SUB_PLATFORM_MASK (1<<MRAA_SUB_PLATFORM_BIT_SHIFT)
-#define MRAA_IS_ON_SUB_PLATFORM(pin_or_bus) (((pin_or_bus)|MRAA_SUB_PLATFORM_MASK) != 0)
-#define MRAA_USE_SUB_PLATFORM(pin_or_bus) ((pin_or_bus)|MRAA_SUB_PLATFORM_MASK)
-#define MRAA_GET_SUB_PLATFORM_INDEX(pin_or_bus) ((pin_or_bus)&(~MRAA_SUB_PLATFORM_MASK))
 
 
 
@@ -175,6 +172,34 @@ char* mraa_get_pin_name(int pin);
  * @return int default i2c bus index
  */
 int mraa_get_default_2c_bus();
+
+/**
+ * Check if pin or bus id includes sub platform mask.
+ *
+ * @param int pin or bus number
+ *
+ * @return mraa_boolean_t 1 if pin or bus is for sub platform, 0 otherwise
+ */
+mraa_boolean_t mraa_is_on_sub_platform(int pin_or_bus);
+
+/**
+ * Convert pin or bus id to corresponding sub platform id.
+ *
+ * @param int pin or bus number
+ *
+ * @return int sub platform pin or bus number
+ */
+int mraa_use_sub_platform(int pin_or_bus);
+
+/**
+ * Convert pin or bus sub platform id to base platform id.
+ *
+ * @param int sub platform pin or bus number
+ *
+ * @return int base platform pin or bus number
+ */
+int mraa_get_sub_platform_index(int pin_or_bus);
+
 
 
 #ifdef __cplusplus
