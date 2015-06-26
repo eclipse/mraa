@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include "mraa_internal.h"
-#ifdef FTDID2XX
+#ifdef FTDI4222
 #include "usb/ftdi_ft4222.h"
 #endif
 
@@ -35,7 +35,7 @@ mraa_platform_t
 mraa_usb_platform_extender(mraa_board_t* board)
 {
     mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
-#ifdef FTDID2XX
+#ifdef FTDI4222
     if (mraa_ftdi_ft4222_init() == MRAA_SUCCESS) {
         unsigned int versionChip, versionLib;
         if (mraa_ftdi_ft4222_get_version(&versionChip, &versionLib) == MRAA_SUCCESS) {
@@ -43,13 +43,17 @@ mraa_usb_platform_extender(mraa_board_t* board)
             platform_type = MRAA_FTDI_FT4222;        
         }
     }  
+#endif
     switch (platform_type) {
+#ifdef FTDI4222
         case MRAA_FTDI_FT4222:
             mraa_ftdi_ft4222(board);
             break;
+#endif
         default:
             syslog(LOG_ERR, "Unknown USB Platform Extender, currently not supported by MRAA");
     }
-#endif
+
     return platform_type;
 }
+
