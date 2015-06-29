@@ -273,7 +273,7 @@ mraa_pwm_write(mraa_pwm_context dev, float percentage)
             return MRAA_ERROR_NO_DATA_AVAILABLE;
     }
 
-    if (percentage >= 1.0f) {
+    if (percentage > 1.0f) {
         syslog(LOG_WARNING, "pwm: number greater than 1 entered, defaulting to 100%");
         return mraa_pwm_write_duty(dev, dev->period);
     }
