@@ -142,8 +142,8 @@ mraa_uart_init(int index)
         }
     }
 
+    pos = plat->uart_dev[index].tx;
     if (pos >= 0) {
-        pos = plat->uart_dev[index].tx;
         if (plat->pins[pos].uart.mux_total > 0) {
             if (mraa_setup_mux_mapped(plat->pins[pos].uart) != MRAA_SUCCESS) {
                 syslog(LOG_ERR, "uart: failed to setup muxes for TX pin");
