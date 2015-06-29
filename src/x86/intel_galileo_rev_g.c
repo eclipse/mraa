@@ -739,11 +739,14 @@ mraa_intel_galileo_gen2()
     b->spi_bus[0].miso = 12;
     b->spi_bus[0].sclk = 13;
 
-    b->uart_dev_count = 1;
+    b->uart_dev_count = 2;
     b->def_uart_dev = 0;
     b->uart_dev[0].rx = 0;
     b->uart_dev[0].tx = 1;
     b->uart_dev[0].device_path = "/dev/ttyS0";
+    b->uart_dev[1].rx = -1;
+    b->uart_dev[1].tx = -1;
+    b->uart_dev[1].device_path = "/dev/ttyS1";
 
     return b;
 error:
