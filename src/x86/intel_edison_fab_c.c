@@ -559,6 +559,10 @@ mraa_intel_edsion_mb_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
 mraa_result_t
 mraa_intel_edison_uart_init_pre(int index)
 {
+    if (index != 0) {
+        syslog(LOG_ERR, "edison: Failed to write to drive mode");
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
     if (miniboard == 0) {
         mraa_gpio_write(tristate, 0);
         mraa_gpio_context io0_output = mraa_gpio_init_raw(248);
