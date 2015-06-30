@@ -230,7 +230,7 @@ mraa_gpio_interrupt_handler(void* arg)
 }
 
 mraa_result_t
-mraa_gpio_edge_mode(mraa_gpio_context dev, gpio_edge_t mode)
+mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode)
 {
     if (dev->value_fp != -1) {
         close(dev->value_fp);
@@ -276,7 +276,7 @@ mraa_gpio_edge_mode(mraa_gpio_context dev, gpio_edge_t mode)
 }
 
 mraa_result_t
-mraa_gpio_isr(mraa_gpio_context dev, gpio_edge_t mode, void (*fptr)(void*), void* args)
+mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t mode, void (*fptr)(void*), void* args)
 {
     // we only allow one isr per mraa_gpio_context
     if (dev->thread_id != 0) {
@@ -332,7 +332,7 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
 }
 
 mraa_result_t
-mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
+mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 {
     if (advance_func->gpio_mode_replace != NULL)
         return advance_func->gpio_mode_replace(dev, mode);
@@ -389,7 +389,7 @@ mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
 }
 
 mraa_result_t
-mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir)
+mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
     if (advance_func->gpio_dir_replace != NULL) {
         return advance_func->gpio_dir_replace(dev, dir);

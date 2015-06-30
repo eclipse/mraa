@@ -34,13 +34,13 @@ typedef struct {
 
     mraa_result_t (*gpio_close_pre) (mraa_gpio_context dev);
 
-    mraa_result_t (*gpio_mode_replace) (mraa_gpio_context dev, gpio_mode_t mode);
-    mraa_result_t (*gpio_mode_pre) (mraa_gpio_context dev, gpio_mode_t mode);
-    mraa_result_t (*gpio_mode_post) (mraa_gpio_context dev, gpio_mode_t mode);
+    mraa_result_t (*gpio_mode_replace) (mraa_gpio_context dev, mraa_gpio_mode_t mode);
+    mraa_result_t (*gpio_mode_pre) (mraa_gpio_context dev, mraa_gpio_mode_t mode);
+    mraa_result_t (*gpio_mode_post) (mraa_gpio_context dev, mraa_gpio_mode_t mode);
 
-    mraa_result_t (*gpio_dir_replace) (mraa_gpio_context dev, gpio_dir_t dir);
-    mraa_result_t (*gpio_dir_pre) (mraa_gpio_context dev, gpio_dir_t dir);
-    mraa_result_t (*gpio_dir_post) (mraa_gpio_context dev, gpio_dir_t dir);
+    mraa_result_t (*gpio_dir_replace) (mraa_gpio_context dev, mraa_gpio_dir_t dir);
+    mraa_result_t (*gpio_dir_pre) (mraa_gpio_context dev, mraa_gpio_dir_t dir);
+    mraa_result_t (*gpio_dir_post) (mraa_gpio_context dev, mraa_gpio_dir_t dir);
 
     mraa_result_t (*gpio_write_pre) (mraa_gpio_context dev, int value);
     mraa_result_t (*gpio_write_post) (mraa_gpio_context dev, int value);

@@ -124,7 +124,7 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
 }
 
 mraa_result_t
-mraa_intel_edison_gpio_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
+mraa_intel_edison_gpio_dir_pre(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
 
     if (dev->phy_pin >= 0) {
@@ -157,7 +157,7 @@ mraa_intel_edison_gpio_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
 }
 
 mraa_result_t
-mraa_intel_edison_gpio_dir_post(mraa_gpio_context dev, gpio_dir_t dir)
+mraa_intel_edison_gpio_dir_post(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
     if (dev->phy_pin >= 0) {
         return mraa_gpio_write(tristate, 1);
@@ -454,7 +454,7 @@ mraa_intel_edison_spi_init_post(mraa_spi_context spi)
 }
 
 mraa_result_t
-mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
+mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 {
     if (dev->value_fp != -1) {
         if (close(dev->value_fp) != 0) {
@@ -507,7 +507,7 @@ mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
 }
 
 mraa_result_t
-mraa_intel_edsion_mb_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode)
+mraa_intel_edsion_mb_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 {
     if (dev->value_fp != -1) {
         if (close(dev->value_fp) != 0) {

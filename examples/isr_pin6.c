@@ -48,7 +48,7 @@ main()
 
     mraa_gpio_dir(x, MRAA_GPIO_IN);
 
-    gpio_edge_t edge = MRAA_GPIO_EDGE_BOTH;
+    mraa_gpio_edge_t edge = MRAA_GPIO_EDGE_BOTH;
 
     mraa_gpio_isr(x, edge, &interrupt, NULL);
 

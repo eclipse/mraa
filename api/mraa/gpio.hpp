@@ -147,13 +147,13 @@ class Gpio
     mraa_result_t
     edge(Edge mode)
     {
-        return mraa_gpio_edge_mode(m_gpio, (gpio_edge_t) mode);
+        return mraa_gpio_edge_mode(m_gpio, (mraa_gpio_edge_t) mode);
     }
 #if defined(SWIGPYTHON)
     mraa_result_t
     isr(Edge mode, PyObject* pyfunc, PyObject* args)
     {
-        return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, (void (*) (void*)) pyfunc, (void*) args);
+        return mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, (void (*) (void*)) pyfunc, (void*) args);
     }
 #elif defined(SWIGJAVASCRIPT)
     static void
@@ -193,13 +193,13 @@ class Gpio
 #else
         m_v8isr = v8::Persistent<v8::Function>::New(func);
 #endif
-        return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, &uvwork, this);
+        return mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, &uvwork, this);
     }
 #elif defined(SWIGJAVA)
     mraa_result_t
     isr(Edge mode, IsrCallback* cb, void* args)
     {
-        return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, generic_isr_callback, cb);
+        return mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, generic_isr_callback, cb);
     }
 #else
     /**
@@ -214,7 +214,7 @@ class Gpio
     mraa_result_t
     isr(Edge mode, void (*fptr)(void*), void* args)
     {
-        return mraa_gpio_isr(m_gpio, (gpio_edge_t) mode, fptr, args);
+        return mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, fptr, args);
     }
 #endif
     /**
@@ -245,7 +245,7 @@ class Gpio
     mraa_result_t
     mode(Mode mode)
     {
-        return mraa_gpio_mode(m_gpio, (gpio_mode_t) mode);
+        return mraa_gpio_mode(m_gpio, (mraa_gpio_mode_t) mode);
     }
     /**
      * Change Gpio direction
@@ -256,7 +256,7 @@ class Gpio
     mraa_result_t
     dir(Dir dir)
     {
-        return mraa_gpio_dir(m_gpio, (gpio_dir_t) dir);
+        return mraa_gpio_dir(m_gpio, (mraa_gpio_dir_t) dir);
     }
     /**
      * Read value from Gpio

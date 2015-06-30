@@ -47,7 +47,7 @@ static unsigned int pullup_map[] = { 33, 29, 35, 17, 37, 19, 21, 39, 41, 23,
 static mraa_gpio_context agpioOutputen[MRAA_INTEL_GALILEO_GEN_2_PINCOUNT];
 
 mraa_result_t
-mraa_intel_galileo_gen2_dir_pre(mraa_gpio_context dev, gpio_dir_t dir)
+mraa_intel_galileo_gen2_dir_pre(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
     if (dev->phy_pin >= 0) {
         int pin = dev->phy_pin;
@@ -140,7 +140,7 @@ mraa_intel_galileo_gen2_pwm_period_replace(mraa_pwm_context dev, int period)
 }
 
 mraa_result_t
-mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, gpio_mode_t mode)
+mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 {
     if (dev->value_fp != -1) {
         close(dev->value_fp);

@@ -63,7 +63,7 @@ typedef enum {
     MRAA_GPIO_PULLUP = 1,   /**< Resistive High */
     MRAA_GPIO_PULLDOWN = 2, /**< Resistive Low */
     MRAA_GPIO_HIZ = 3       /**< High Z State */
-} gpio_mode_t;
+} mraa_gpio_mode_t;
 
 /**
  * Gpio Direction options
@@ -73,7 +73,7 @@ typedef enum {
     MRAA_GPIO_IN = 1,       /**< Input */
     MRAA_GPIO_OUT_HIGH = 2, /**< Output. Init High */
     MRAA_GPIO_OUT_LOW = 3   /**< Output. Init Low */
-} gpio_dir_t;
+} mraa_gpio_dir_t;
 
 /**
  * Gpio Edge types for interupts
@@ -83,7 +83,7 @@ typedef enum {
     MRAA_GPIO_EDGE_BOTH = 1,   /**< Interupt on rising & falling */
     MRAA_GPIO_EDGE_RISING = 2, /**< Interupt on rising only */
     MRAA_GPIO_EDGE_FALLING = 3 /**< Interupt on falling only */
-} gpio_edge_t;
+} mraa_gpio_edge_t;
 
 /**
  * Initialise gpio_context, based on board number
@@ -108,7 +108,7 @@ mraa_gpio_context mraa_gpio_init_raw(int gpiopin);
  * @param mode The edge mode to set the gpio into
  * @return Result of operation
  */
-mraa_result_t mraa_gpio_edge_mode(mraa_gpio_context dev, gpio_edge_t mode);
+mraa_result_t mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode);
 
 /**
  * Set an interupt on pin
@@ -120,7 +120,7 @@ mraa_result_t mraa_gpio_edge_mode(mraa_gpio_context dev, gpio_edge_t mode);
  * @param args Arguments passed to the interrupt handler (fptr)
  * @return Result of operation
  */
-mraa_result_t mraa_gpio_isr(mraa_gpio_context dev, gpio_edge_t edge, void (*fptr)(void*), void* args);
+mraa_result_t mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t edge, void (*fptr)(void*), void* args);
 
 /**
  * Stop the current interupt watcher on this Gpio, and set the Gpio edge mode
@@ -138,7 +138,7 @@ mraa_result_t mraa_gpio_isr_exit(mraa_gpio_context dev);
  * @param mode The Gpio Output Mode
  * @return Result of operation
  */
-mraa_result_t mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode);
+mraa_result_t mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode);
 
 /**
  * Set Gpio direction
@@ -147,7 +147,7 @@ mraa_result_t mraa_gpio_mode(mraa_gpio_context dev, gpio_mode_t mode);
  * @param dir The direction of the Gpio
  * @return Result of operation
  */
-mraa_result_t mraa_gpio_dir(mraa_gpio_context dev, gpio_dir_t dir);
+mraa_result_t mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir);
 
 /**
  * Close the Gpio context
