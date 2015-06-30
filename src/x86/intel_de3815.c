@@ -22,8 +22,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "common.h"
 #include "x86/intel_de3815.h"
@@ -31,6 +35,7 @@
 #define PLATFORM_NAME "Intel DE3815"
 #define MAX_SIZE 64
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
+#define I2CNAME "designware"
 
 mraa_board_t*
 mraa_intel_de3815()
@@ -115,15 +120,51 @@ mraa_intel_de3815()
     b->pins[17].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     // BUS DEFINITIONS
-    b->i2c_bus_count = 2;
-    b->def_i2c_bus = 0;
-    b->i2c_bus[0].bus_id = 0;
-    b->i2c_bus[0].sda = 12;
-    b->i2c_bus[0].scl = 13;
+    int fd;
+    if (mraa_file_exist("/dev/i2c-0")) {
+        b->i2c_bus_count = 2;
+        int i = 0;
+        int suc = 0;
+        for (i = 0; i < 8; i++) {
+            char path[MAX_SIZE];
+            snprintf(path, MAX_SIZE, "/sys/class/i2c-dev/i2c-%u/name", i);
+            fd = open(path, O_RDONLY);
+            off_t size = lseek(fd, 0, SEEK_END);
+            char value[MAX_SIZE];
+            lseek(fd, 0, SEEK_SET);
+            ssize_t r = read(fd, value, size);
+            if (r > 0) {
+                if (strcasestr(value, I2CNAME) != NULL) {
+                    suc = 1;
+                    b->i2c_bus_count = 2;
+                    b->def_i2c_bus = 0;
+                    b->i2c_bus[0].bus_id = i;
+                    b->i2c_bus[0].sda = 12;
+                    b->i2c_bus[0].scl = 13;
 
-    b->i2c_bus[1].bus_id = 1;
-    b->i2c_bus[1].sda = 14;
-    b->i2c_bus[1].scl = 15;
+                    b->i2c_bus[1].bus_id = i+1;
+                    b->i2c_bus[1].sda = 14;
+                    b->i2c_bus[1].scl = 15;
+                    break;
+                }
+            } else {
+                syslog(LOG_ERR, "mraa: sysfs i2cdev failed");
+                break;
+            }
+            close(fd);
+        }
+
+        if (!suc) {
+            syslog(LOG_WARNING, "mraa: no i2c-dev detected, load i2c-dev");
+            b->i2c_bus_count = 0;
+            b->def_i2c_bus = 0;
+        }
+    } else {
+        syslog(LOG_WARNING, "mraa: no i2c-dev detected, load i2c-dev");
+        b->i2c_bus_count = 0;
+        b->def_i2c_bus = 0;
+    }
+    close(fd);
 
     b->spi_bus_count = 1;
     b->def_spi_bus = 0;
