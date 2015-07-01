@@ -677,7 +677,10 @@ mraa_intel_edison_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
         }
 
         struct stat fd_stat;
-        fstat(mmap_fd, &fd_stat);
+        if (fstat(mmap_fd, &fd_stat) != 0) {
+            syslog(LOG_ERR, "edison map: unable to access resource0 file");
+            return MRAA_ERROR_INVALID_HANDLE;
+        }
         mmap_size = fd_stat.st_size;
 
         mmap_reg =
