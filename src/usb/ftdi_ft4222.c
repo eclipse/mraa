@@ -332,6 +332,7 @@ mraa_ftdi_ft4222(mraa_board_t* board)
     int pinIndex = 0;
     int numUsbGpio = 0;
     int numUsbPins = numUsbGpio + 2; // Add SDA and SCL
+    sub_plat->platform_type = MRAA_FTDI_FT4222;
     sub_plat->platform_name = PLATFORM_NAME;
     sub_plat->phy_pin_count = numUsbPins;
     sub_plat->gpio_count = numUsbGpio; 
