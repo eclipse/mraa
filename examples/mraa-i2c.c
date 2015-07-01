@@ -66,7 +66,7 @@ print_bus(mraa_board_t* board)
     int i, bus;
     for (i = 0; i < board->i2c_bus_count; ++i) {
         char* busType;
-        switch (mraa_get_platform_type()) {
+        switch (board->platform_type) {
         case MRAA_INTEL_GALILEO_GEN1:
         case MRAA_INTEL_GALILEO_GEN2:
         case MRAA_INTEL_EDISON_FAB_C:
@@ -86,9 +86,13 @@ print_bus(mraa_board_t* board)
             busType = "unknown";
             break;
         }
-        fprintf(stdout, "Bus %2d: id=%02d type=%s ", bus, plat->i2c_bus[bus].bus_id, busType);
-        if (i == plat->def_i2c_bus)
+        int id = board->i2c_bus[bus].bus_id;
+        fprintf(stdout, "Bus %3d: id=%02d type=%s ", bus, id, busType);
+        if (i == board->def_i2c_bus)
             fprintf(stdout, " default", i);
+        if (id == -1)
+            fprintf(stdout, " disabled", i);
+
         fprintf(stdout, "\n");
     }
 }
