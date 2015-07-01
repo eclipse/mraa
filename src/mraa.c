@@ -410,6 +410,8 @@ mraa_link_targets(const char* filename, const char* targetname)
         if (nchars < 0) {
             free(buffer);
             return 0;
+        } else {
+            buffer[nchars] = '\0';
         }
         if (nchars >= size) {
             size *= 2;
