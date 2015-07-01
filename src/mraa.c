@@ -46,7 +46,6 @@
 #include "version.h"
 
 mraa_board_t* plat = NULL;
-static mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
 mraa_adv_func_t* advance_func;
 
 const char*
@@ -99,6 +98,7 @@ mraa_init()
     advance_func = (mraa_adv_func_t*) malloc(sizeof(mraa_adv_func_t));
     memset(advance_func, 0, sizeof(mraa_adv_func_t));
 
+    mraa_platform_t platform_type;
 #if defined(X86PLAT)
     // Use runtime x86 platform detection
     platform_type = mraa_x86_platform();
@@ -109,16 +109,23 @@ mraa_init()
 #error mraa_ARCH NOTHING
 #endif
 
+    if (plat != NULL)
+        plat->platform_type = platform_type;
+
 #ifdef USBPLAT
     // This is a platform extender so create null base platform if one doesn't already exist
     if (plat == NULL) {
         plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
-        plat->platform_name = "Unknown platform";
         if (plat != NULL) {
-            int usb_platform_type = mraa_usb_platform_extender(plat);
-            if (platform_type == MRAA_UNKNOWN_PLATFORM) {
-                platform_type = usb_platform_type;
-            }
+            plat->platform_type = MRAA_UNKNOWN_PLATFORM;
+            plat->platform_name = "Unknown platform";
+        }
+    }
+    // Now detect sub platform
+    if (plat != NULL) {
+        mraa_platform_t usb_platform_type = mraa_usb_platform_extender(plat);
+        if (plat->platform_type == MRAA_UNKNOWN_PLATFORM) {
+            plat->platform_type = usb_platform_type;
         }
     }
     if (plat == NULL) {
@@ -127,7 +134,7 @@ mraa_init()
     }
 #endif
 
-    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), platform_type);
+    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
     return MRAA_SUCCESS;
 }
 
@@ -288,7 +295,9 @@ mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
 mraa_platform_t
 mraa_get_platform_type()
 {
-    return platform_type;
+    if (plat == NULL)
+        return MRAA_UNKNOWN_PLATFORM;
+    return plat->platform_type;
 }
 
 unsigned int
@@ -547,7 +556,7 @@ mraa_find_i2c_bus(const char* devname, int startfrom)
 mraa_boolean_t
 mraa_is_on_sub_platform(int pin_or_bus)
 {
-    return (pin_or_bus | MRAA_SUB_PLATFORM_MASK) != 0;
+    return (pin_or_bus & MRAA_SUB_PLATFORM_MASK) != 0;
 }
 
 int 
