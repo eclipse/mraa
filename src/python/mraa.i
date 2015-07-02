@@ -49,6 +49,7 @@ class I2c;
 {
   // need to loop over length
   $result = PyByteArray_FromStringAndSize((char*) $1, arg2);
+  free($1);
 }
 
 class Spi;
@@ -56,6 +57,7 @@ class Spi;
 {
   // need to loop over length
   $result = PyByteArray_FromStringAndSize((char*) $1, arg3);
+  free($1);
 }
 }
 
