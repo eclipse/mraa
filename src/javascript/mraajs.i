@@ -47,6 +47,7 @@ class Spi;
 %#else
   $result = node::Buffer::New((char*) $1, arg3)->handle_;
 %#endif
+  free($1);
 }
 }
 
