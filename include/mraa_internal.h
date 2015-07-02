@@ -64,7 +64,7 @@ mraa_platform_t mraa_arm_platform();
  *
  * @return mraa_platform_t of the detected platform extender
  */
-mraa_platform_t mraa_usb_platform_extender();
+mraa_platform_t mraa_usb_platform_extender(mraa_board_t* board);
 
 /**
  * helper function to check if file exists

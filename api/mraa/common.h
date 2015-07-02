@@ -29,6 +29,14 @@
 #define MRAA_PLATFORM_NAME_MAX_SIZE 64
 #define MRAA_PIN_NAME_SIZE 12
 
+#define MRAA_SUB_PLATFORM_BIT_SHIFT 9
+#define MRAA_SUB_PLATFORM_MASK (1<<MRAA_SUB_PLATFORM_BIT_SHIFT)
+#define MRAA_IS_ON_SUB_PLATFORM(pin_or_bus) (((pin_or_bus)|MRAA_SUB_PLATFORM_MASK) != 0)
+#define MRAA_USE_SUB_PLATFORM(pin_or_bus) ((pin_or_bus)|MRAA_SUB_PLATFORM_MASK)
+#define MRAA_GET_SUB_PLATFORM_INDEX(pin_or_bus) ((pin_or_bus)&(~MRAA_SUB_PLATFORM_MASK))
+
+
+
 /** @file
  *
  * This file defines the basic shared values for libmraa

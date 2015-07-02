@@ -44,13 +44,10 @@
 #include "mraa_internal.h"
 #include "gpio.h"
 #include "version.h"
-#include "mraa_func.h"
-#include "i2c/i2c_std_drv.h"
 
 mraa_board_t* plat = NULL;
 static mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
 mraa_adv_func_t* advance_func;
-mraa_func_t* mraa_drv_api_func_table;
 
 const char*
 mraa_get_version()
@@ -101,18 +98,17 @@ mraa_init()
 
     advance_func = (mraa_adv_func_t*) malloc(sizeof(mraa_adv_func_t));
     memset(advance_func, 0, sizeof(mraa_adv_func_t));
-    mraa_drv_api_func_table = (mraa_func_t*) malloc(sizeof(mraa_func_t) * MRAA_DRV_API_MAX_ENTRIES);
-    mraa_drv_api_func_table[MRAA_DRV_API_STD].i2c = mraa_i2c_drv_create_func_table();
 
 #ifdef X86PLAT
     // Use runtime x86 platform detection
     platform_type = mraa_x86_platform();
 #ifdef USBPLAT
-    // Ths is a platform extender so create null base platform is one doesn't already exist
+    // This is a platform extender so create null base platform if one doesn't already exist
     if (plat == NULL) {
         plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
+        plat->platform_name = "Null platform";
         if (plat != NULL) {
-            int usb_platform_type = mraa_usb_platform_extender();
+            int usb_platform_type = mraa_usb_platform_extender(plat);
             if (platform_type == MRAA_UNKNOWN_PLATFORM)
                 platform_type = usb_platform_type;
         }
