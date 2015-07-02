@@ -60,6 +60,13 @@ mraa_platform_t mraa_x86_platform();
 mraa_platform_t mraa_arm_platform();
 
 /**
+ * runtime detect running usb platform extender
+ *
+ * @return mraa_platform_t of the detected platform extender
+ */
+mraa_platform_t mraa_usb_platform_extender();
+
+/**
  * helper function to check if file exists
  *
  * @param filename to check

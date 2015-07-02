@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "linux/i2c-dev.h"
 #include "common.h"
 #include "ftd2xx.h"
 #include "libft4222.h"
@@ -31,11 +32,13 @@
 
 #define PLATFORM_NAME "FTDI FT4222"
 
+extern mraa_board_t* plat;
+extern mraa_func_t* mraa_drv_api_func_table;
 static FT_HANDLE ftHandle = (FT_HANDLE)NULL;
 
 
 mraa_result_t
-mraa_ftdi_ft4222_init(unsigned int* versionChip, unsigned int* versionLib)
+mraa_ftdi_ft4222_init()
 {
     mraa_result_t mraaStatus = MRAA_SUCCESS;
     FT_STATUS ftStatus;
@@ -96,6 +99,8 @@ mraa_ftdi_ft4222_init(unsigned int* versionChip, unsigned int* versionLib)
 init_exit:
     if (devInfo != NULL);
         free(devInfo);
+    if (mraaStatus == MRAA_SUCCESS)
+        syslog(LOG_NOTICE, "mraa_ftdi_ft4222_init completed successfully\n");
     return mraaStatus;
 }
 
@@ -109,6 +114,7 @@ mraa_ftdi_ft4222_get_version(unsigned int* versionChip, unsigned int* versionLib
         if (FT4222_OK == ft4222Status){
             *versionChip = (unsigned int)ft4222Version.chipVersion;
             *versionLib = (unsigned int)ft4222Version.dllVersion;
+            syslog(LOG_NOTICE, "FT4222_GetVersion %08X %08X\n", *versionChip, *versionLib);
             return MRAA_SUCCESS;
         } else {
             syslog(LOG_ERR, "libmraa: FT4222_GetVersion failed (error %d)\n", (int)ft4222Status);
@@ -121,17 +127,15 @@ mraa_ftdi_ft4222_get_version(unsigned int* versionChip, unsigned int* versionLib
 }
 
 
-
-
-static mraa_result_t 
-mraa_ftdi_ft4222_i2c_init_bus_replace(mraa_i2c_context i2c_dev)
+mraa_i2c_context
+mraa_ftdi_ft4222_i2c_init_raw(unsigned int bus)
 {
     // Tell the FT4222 to be an I2C Master.
     FT4222_STATUS ft4222Status = FT4222_I2CMaster_Init(ftHandle, 400);
     if (FT4222_OK != ft4222Status)
     {
         syslog(LOG_ERR, "FT4222_I2CMaster_Init failed (error %d)!\n", ft4222Status);
-        return MRAA_ERROR_NO_RESOURCES;
+        return NULL;
     }
     
     // Reset the I2CM registers to a known state.
@@ -139,15 +143,30 @@ mraa_ftdi_ft4222_i2c_init_bus_replace(mraa_i2c_context i2c_dev)
     if (FT4222_OK != ft4222Status)
     {
         syslog(LOG_ERR, "FT4222_I2CMaster_Reset failed (error %d)!\n", ft4222Status);
-        return MRAA_ERROR_NO_RESOURCES;
+        return NULL;
     }
 
-    return MRAA_SUCCESS;
+    mraa_i2c_context dev = (mraa_i2c_context) malloc(sizeof(struct _i2c));
+    if (dev == NULL) {
+        syslog(LOG_CRIT, "i2c: Failed to allocate memory for context");
+        return NULL;
+    }
+
+    dev->handle = ftHandle;
+    dev->fh = -1; // We don't use file descriptors
+    dev->funcs = I2C_FUNC_I2C; // Advertise minimal i2c support as per https://www.kernel.org/doc/Documentation/i2c/functionality
+    return dev;
+}
+
+static mraa_result_t
+mraa_ftdi_ft4222_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
+{
+    return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
 }
 
 
 static mraa_result_t
-mraa_ftdi_ft4222_i2c_address_replace(mraa_i2c_context dev, uint8_t addr)
+mraa_ftdi_ft4222_i2c_address(mraa_i2c_context dev, uint8_t addr)
 {
     dev->addr = (int) addr;
     return MRAA_SUCCESS;
@@ -155,10 +174,11 @@ mraa_ftdi_ft4222_i2c_address_replace(mraa_i2c_context dev, uint8_t addr)
 
 
 static int
-mraa_ftdi_ft4222_i2c_read_replace(mraa_i2c_context dev, uint8_t* data, int length)
+mraa_ftdi_ft4222_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 {
     uint16 bytesRead = 0;
-    FT4222_STATUS ft4222Status = FT4222_I2CMaster_Read(ftHandle, dev->addr, data, length, &bytesRead);
+    syslog(LOG_NOTICE, "FT4222_I2CMaster_Read(%02X, %d)", dev->addr, length);
+    FT4222_STATUS ft4222Status = FT4222_I2CMaster_Read(dev->handle, dev->addr, data, length, &bytesRead);
     if (FT4222_OK != ft4222Status)
     {
         syslog(LOG_ERR, "FT4222_I2CMaster_Read failed (error %d)\n", (int)ft4222Status);
@@ -167,84 +187,161 @@ mraa_ftdi_ft4222_i2c_read_replace(mraa_i2c_context dev, uint8_t* data, int lengt
     return bytesRead;
 }
 
+static uint8_t
+mraa_ftdi_ft4222_i2c_read_byte(mraa_i2c_context dev)
+{
+    return 0;
+}
 
+static uint8_t
+mraa_ftdi_ft4222_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
+{
+    return 0;
+}
+
+static uint16_t
+mraa_ftdi_ft4222_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
+{
+    return 0;
+}
 
 static int
-mraa_ftdi_ft4222_i2c_write(mraa_i2c_context dev, uint8_t* data, int bytesToWrite)
+mraa_ftdi_ft4222_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* data, int length)
 {
-    uint16 bytesWritten = 0;
-    FT4222_STATUS ft4222Status = FT4222_I2CMaster_Write(ftHandle, dev->addr, data, bytesToWrite, &bytesWritten);
-    if (FT4222_OK != ft4222Status)
-    {
-        syslog(LOG_ERR, "FT4222_I2CMaster_Write failed (error %d)\n", (int)ft4222Status);
-        return 0;
-    }
-
-    if (bytesWritten != bytesToWrite)
-        syslog(LOG_WARNING, "FT4222_I2CMaster_Write wrote %u of %u bytes.\n", bytesWritten, bytesToWrite);
-
-   return (int)bytesWritten;
+    return -1;
 }
 
 
 static mraa_result_t
-mraa_ftdi_ft4222_i2c_write_byte_replace(mraa_i2c_context dev, uint8_t data)
+mraa_ftdi_ft4222_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWrite)
 {
-    return mraa_ftdi_ft4222_i2c_write(dev, &data, 1) == 1 ? MRAA_SUCCESS : MRAA_ERROR_UNSPECIFIED;
+    uint16 bytesWritten = 0;
+    syslog(LOG_NOTICE, "FT4222_I2CMaster_Write(%#02X, %#02X, %d)", dev->addr, *data, bytesToWrite);
+    FT4222_STATUS ft4222Status = FT4222_I2CMaster_Write(dev->handle, dev->addr, (uint8_t*)data, bytesToWrite, &bytesWritten);
+    if (FT4222_OK != ft4222Status)
+    {
+        syslog(LOG_ERR, "FT4222_I2CMaster_Write failed (error %d)\n", (int)ft4222Status);
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (bytesWritten != bytesToWrite)
+        syslog(LOG_ERR, "FT4222_I2CMaster_Write wrote %u of %u bytes.\n", bytesWritten, bytesToWrite);
+
+   return bytesToWrite == bytesWritten ? MRAA_SUCCESS : MRAA_ERROR_INVALID_HANDLE;
 }
 
+
+static mraa_result_t
+mraa_ftdi_ft4222_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
+{
+    return mraa_ftdi_ft4222_i2c_write(dev, &data, 1);
+}
+
+static mraa_result_t
+mraa_ftdi_ft4222_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
+{
+    mraa_result_t status = mraa_ftdi_ft4222_i2c_write_byte(dev, command);
+    if (status == MRAA_SUCCESS)
+        return mraa_ftdi_ft4222_i2c_write_byte(dev, data);
+    else
+        return status;
+}
+
+static mraa_result_t
+mraa_ftdi_ft4222_i2c_write_word_data(mraa_i2c_context dev, const uint16_t data, const uint8_t command)
+{
+    mraa_result_t status = mraa_ftdi_ft4222_i2c_write_byte(dev, command);
+    if (status == MRAA_SUCCESS) 
+        return mraa_ftdi_ft4222_i2c_write(dev, (const uint8_t*)&data, 2);
+    else
+        return status;
+
+}
+
+static mraa_result_t
+mraa_ftdi_ft4222_i2c_stop(mraa_i2c_context dev)
+{
+    return MRAA_SUCCESS;
+}
+
+
+
+
+mraa_i2c_func_t*
+mraa_i2c_ft4222_create_func_table()
+{
+    mraa_i2c_func_t* func_table = (mraa_i2c_func_t*) calloc(1, sizeof(mraa_i2c_func_t));
+    if (func_table != NULL) {
+        func_table->i2c_init_raw = &mraa_ftdi_ft4222_i2c_init_raw;
+        func_table->i2c_frequency = &mraa_ftdi_ft4222_i2c_frequency;
+        func_table->i2c_address = &mraa_ftdi_ft4222_i2c_address;
+        func_table->i2c_read = &mraa_ftdi_ft4222_i2c_read;
+        func_table->i2c_read_byte = &mraa_ftdi_ft4222_i2c_read_byte;
+        func_table->i2c_read_byte_data = &mraa_ftdi_ft4222_i2c_read_byte_data;
+        func_table->i2c_read_word_data = &mraa_ftdi_ft4222_i2c_read_word_data;
+        func_table->i2c_read_bytes_data = &mraa_ftdi_ft4222_i2c_read_bytes_data;
+        func_table->i2c_write = &mraa_ftdi_ft4222_i2c_write;
+        func_table->i2c_write_byte = &mraa_ftdi_ft4222_i2c_write_byte;
+        func_table->i2c_write_byte_data = &mraa_ftdi_ft4222_i2c_write_byte_data;
+        func_table->i2c_write_word_data = &mraa_ftdi_ft4222_i2c_write_word_data;
+        func_table->i2c_stop = &mraa_ftdi_ft4222_i2c_stop;    
+    }
+    return func_table;
+}
 
 mraa_board_t*
 mraa_ftdi_ft4222()
 {
-    mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
-    if (b == NULL) {
-        return NULL;
-    }
-
+    if (plat == NULL)
+        return NULL;    
     int pinIndex = 0;
-    int numGpio = 0;
-    int numPins = numGpio + 2; // Add SDA and SCL
-    b->platform_name = PLATFORM_NAME;
-    b->phy_pin_count = numPins;
-    b->gpio_count = numGpio; 
-    b->aio_count = 0;
-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * numPins);
-    if (b->pins == NULL) {
+    int numUsbGpio = 0;
+    int numUsbPins = numUsbGpio + 2; // Add SDA and SCL
+    int numBasePins = plat->phy_pin_count;
+    plat->platform_name = PLATFORM_NAME;
+    mraa_pininfo_t* basePins = plat->pins;
+    plat->phy_pin_count += numUsbPins;
+    plat->gpio_count += numUsbGpio; 
+    mraa_pininfo_t* baseAndExtendedPins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * plat->phy_pin_count);
+    if (baseAndExtendedPins == NULL) {
         return NULL;
     }
+    if (basePins != NULL) {
+        memcpy(baseAndExtendedPins, basePins, sizeof(mraa_pininfo_t) * numBasePins);
+        free(basePins);
+    }
+    plat->pins = baseAndExtendedPins;
 
     // Virtual gpio pins on i2c I/O expander.
     mraa_pincapabilities_t pinCapsGpio = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    for (pinIndex=0; pinIndex < numGpio; ++pinIndex) {
+    for (pinIndex=numBasePins; pinIndex < numBasePins + numUsbGpio; ++pinIndex) {
         char name[8];
         sprintf(name, "Pin%d", pinIndex);
-        strncpy(b->pins[pinIndex].name, name, 8);
-        b->pins[pinIndex].capabilites = pinCapsGpio;
+        strncpy(plat->pins[pinIndex].name, name, 8);
+        plat->pins[pinIndex].capabilites = pinCapsGpio;
     }
+
+    mraa_drv_api_t drv_type = MRAA_DRV_API_FT4222;
+    int bus = 0;
+    plat->i2c_bus_count = 1;
+    plat->def_i2c_bus = bus;
+    plat->i2c_bus[bus].bus_id = bus;
+    plat->i2c_bus[bus].drv_type = drv_type;
 
     // i2c pins (these are virtual, entries are required to configure i2c layer)
     mraa_pincapabilities_t pinCapsI2c = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
-    int bus = 0;
-    b->i2c_bus[bus].scl = pinIndex;
-    b->i2c_bus_count = 1;
-    b->def_i2c_bus = bus;
-    b->i2c_bus[bus].bus_id = bus;
-    strncpy(b->pins[pinIndex].name, "SDA", 8);
-    b->pins[pinIndex].capabilites = pinCapsI2c;
-    b->pins[pinIndex].i2c.mux_total = 0;
-    b->i2c_bus[bus].sda = pinIndex;
+    strncpy(plat->pins[pinIndex].name, "SDA", 8);
+    plat->pins[pinIndex].capabilites = pinCapsI2c;
+    plat->pins[pinIndex].i2c.mux_total = 0;
+    plat->i2c_bus[bus].sda = pinIndex;
     pinIndex++;
-    strncpy(b->pins[pinIndex].name, "SCL", 8);
-    b->pins[pinIndex].capabilites = pinCapsI2c;
-    b->pins[pinIndex].i2c.mux_total = 0;
+    strncpy(plat->pins[pinIndex].name, "SCL", 8);
+    plat->pins[pinIndex].capabilites = pinCapsI2c;
+    plat->pins[pinIndex].i2c.mux_total = 0;
+    plat->i2c_bus[bus].scl = pinIndex;
 
     // Set override functions
-    advance_func->i2c_init_bus_replace = &mraa_ftdi_ft4222_i2c_init_bus_replace;
-    advance_func->i2c_address_replace = &mraa_ftdi_ft4222_i2c_address_replace;
-    advance_func->i2c_read_replace = &mraa_ftdi_ft4222_i2c_read_replace;
-    advance_func->i2c_write_byte_replace = &mraa_ftdi_ft4222_i2c_write_byte_replace;
-
-    return b;
+    mraa_drv_api_func_table[drv_type].i2c = mraa_i2c_ft4222_create_func_table();
+    return plat;
 }
 

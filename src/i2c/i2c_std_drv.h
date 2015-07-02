@@ -1,6 +1,9 @@
 /*
- * Author: Henry Bruce <henry.bruce@intel.com>
- * Copyright (c) 2015 Intel Corporation.
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Copyright (c) 2014 Intel Corporation.
+ *
+ * Code is modified from the RoadNarrows-robotics i2c library (distributed under
+ * the MIT license, license is included verbatim under src/i2c/LICENSE)
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -21,31 +24,11 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+#pragma once
 
-#include <stdlib.h>
-#include <string.h>
+#include "mraa_func.h"
 
-#include "mraa_internal.h"
-#include "usb/ftdi_ft4222.h"
+mraa_i2c_func_t*
+mraa_i2c_drv_create_func_table();
 
 
-mraa_platform_t
-mraa_usb_platform_extender()
-{
-    mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
-    if (mraa_ftdi_ft4222_init() == MRAA_SUCCESS) {
-        unsigned int versionChip, versionLib;
-        if (mraa_ftdi_ft4222_get_version(&versionChip, &versionLib) == MRAA_SUCCESS) {
-            // TODO: Add ft4222 version checks
-            platform_type = MRAA_FTDI_FT4222;        
-        }
-    }  
-    switch (platform_type) {
-        case MRAA_FTDI_FT4222:
-            mraa_ftdi_ft4222();
-            break;
-        default:
-            syslog(LOG_ERR, "Unknown USB Platform Extender, currently not supported by MRAA");
-    }
-    return platform_type;
-}

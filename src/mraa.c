@@ -34,10 +34,13 @@
 #include "mraa_internal.h"
 #include "gpio.h"
 #include "version.h"
+#include "mraa_func.h"
+#include "i2c/i2c_std_drv.h"
 
 mraa_board_t* plat = NULL;
 static mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
 mraa_adv_func_t* advance_func;
+mraa_func_t* mraa_drv_api_func_table;
 
 const char*
 mraa_get_version()
@@ -85,31 +88,39 @@ mraa_init()
     Py_InitializeEx(0);
     PyEval_InitThreads();
 #endif
+
     advance_func = (mraa_adv_func_t*) malloc(sizeof(mraa_adv_func_t));
     memset(advance_func, 0, sizeof(mraa_adv_func_t));
+    mraa_drv_api_func_table = (mraa_func_t*) malloc(sizeof(mraa_func_t) * MRAA_DRV_API_MAX_ENTRIES);
+    mraa_drv_api_func_table[MRAA_DRV_API_STD].i2c = mraa_i2c_drv_create_func_table();
 
-#ifdef USBPLAT
-    platform_type = mraa_usb_platform();
-#endif
-
-    if (platform_type == MRAA_UNKNOWN_PLATFORM) {
 #ifdef X86PLAT
-        // Use runtime x86 platform detection
-        platform_type = mraa_x86_platform();
+    // Use runtime x86 platform detection
+    platform_type = mraa_x86_platform();
+#ifdef USBPLAT
+    // Ths is a platform extender so create null base platform is one doesn't already exist
+    if (plat == NULL) {
+        plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
+        if (plat != NULL) {
+            int usb_platform_type = mraa_usb_platform_extender();
+            if (platform_type == MRAA_UNKNOWN_PLATFORM)
+                platform_type = usb_platform_type;
+        }
+    }
+#endif
 #elif ARMPLAT
-        // Use runtime ARM platform detection
-        platform_type = mraa_arm_platform();
+    // Use runtime ARM platform detection
+    platform_type = mraa_arm_platform();
 #else
 #error mraa_ARCH NOTHING
 #endif
-    }
 
     if (plat == NULL) {
         printf("mraa: FATAL error, failed to initialise platform\n");
         return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
     }
 
-    syslog(LOG_INFO, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), platform_type);
+    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), platform_type);
     return MRAA_SUCCESS;
 }
 

@@ -27,6 +27,7 @@
 
 #include "common.h"
 #include "mraa.h"
+#include "mraa_func.h"
 
 // general status failures for internal functions
 #define MRAA_PLATFORM_NO_INIT -3
@@ -60,6 +61,8 @@ struct _i2c {
     int fh; /**< the file handle to the /dev/i2c-* device */
     int addr; /**< the address of the i2c slave */
     unsigned long funcs;
+    void *handle;
+    mraa_i2c_func_t* func_table;    
     /*@}*/
 };
 
@@ -189,6 +192,7 @@ typedef struct {
     unsigned int bus_id; /**< ID as exposed in the system */
     unsigned int scl; /**< i2c SCL */
     unsigned int sda; /**< i2c SDA */
+    mraa_drv_api_t drv_type; /**< Driver type */
     /*@}*/
 } mraa_i2c_bus_t;
 
