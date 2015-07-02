@@ -231,6 +231,16 @@ typedef enum {
 	MRAA_UART_PARITY_SPACE = 4
 } mraa_uart_parity_t;
 
+/**
+ * Enum representing different driver api types
+ */
+typedef enum {
+    MRAA_DRV_API_STD = 0,     /**< Standard Linux i2c driver and sysfs access */
+    MRAA_DRV_API_FT4222 = 1,  /**< FTDI FT4222 USB to i2c bridge */
+    MRAA_DRV_API_MAX_ENTRIES
+} mraa_drv_api_t;
+
+
 #ifdef __cplusplus
 }
 #endif

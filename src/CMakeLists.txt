@@ -12,6 +12,7 @@ set (mraa_LIB_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/mraa.c
   ${PROJECT_SOURCE_DIR}/src/gpio/gpio.c
   ${PROJECT_SOURCE_DIR}/src/i2c/i2c.c
+  ${PROJECT_SOURCE_DIR}/src/i2c/i2c_std_drv.c
   ${PROJECT_SOURCE_DIR}/src/pwm/pwm.c
   ${PROJECT_SOURCE_DIR}/src/spi/spi.c
   ${PROJECT_SOURCE_DIR}/src/aio/aio.c
