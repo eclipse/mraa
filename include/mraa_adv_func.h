@@ -48,11 +48,21 @@ typedef struct {
 
     mraa_result_t (*i2c_init_pre) (unsigned int bus);
     mraa_result_t (*i2c_init_bus_replace) (mraa_i2c_context dev);
+    mraa_i2c_context (*i2c_init_raw_replace) (unsigned int bus);
     mraa_result_t (*i2c_init_post) (mraa_i2c_context dev);
     mraa_result_t (*i2c_set_frequency_replace) (mraa_i2c_context dev, mraa_i2c_mode_t mode);
     mraa_result_t (*i2c_address_replace) (mraa_i2c_context dev, uint8_t addr);
     int (*i2c_read_replace) (mraa_i2c_context dev, uint8_t* data, int length);
+    uint8_t (*i2c_read_byte_replace) (mraa_i2c_context dev);
+    uint8_t (*i2c_read_byte_data_replace) (mraa_i2c_context dev, const uint8_t command);
+    uint16_t (*i2c_read_word_data_replace) (mraa_i2c_context dev, const uint8_t command);
+    int (*i2c_read_bytes_data_replace) (mraa_i2c_context dev, uint8_t command, uint8_t* data, int length);
+    mraa_result_t (*i2c_write_replace) (mraa_i2c_context dev, const uint8_t* data, int length);
     mraa_result_t (*i2c_write_byte_replace) (mraa_i2c_context dev, uint8_t data);
+    mraa_result_t (*i2c_write_byte_data_replace) (mraa_i2c_context dev, const uint8_t data, const uint8_t command);
+    mraa_result_t (*i2c_write_word_data_replace) (mraa_i2c_context dev, const uint16_t data, const uint8_t command);
+    mraa_result_t (*i2c_stop_replace) (mraa_i2c_context dev);
+
 
 
     mraa_result_t (*aio_get_valid_fp) (mraa_aio_context dev);
