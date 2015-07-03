@@ -78,12 +78,14 @@ mraa_ftdi_ft4222_init()
         goto init_exit;
     }
 
-    syslog(LOG_INFO, "FT_GetDeviceInfoList returned %d devices\n", numDevs);
-    DWORD locationId;
-    int bus = 0;
-    if (numDevs > bus && devInfo[bus].Type == FT_DEVICE_4222H_3) {
-       locationId = devInfo[bus].LocId;
-    } else {
+    syslog(LOG_NOTICE, "FT_GetDeviceInfoList returned %d devices\n", numDevs);
+    DWORD locationId = 0;
+    for (i = 0; i < numDevs && locationId == 0; ++i) {
+printf("%d: type = %d, location = %d\n", i, devInfo[i].Type, devInfo[i].LocId);
+        if (devInfo[i].Type == FT_DEVICE_4222H_0 || devInfo[i].Type == FT_DEVICE_4222H_3)
+           locationId = devInfo[i].LocId;
+    } 
+    if (locationId == 0) {
         syslog(LOG_ERR, "FT_GetDeviceInfoList contains no valid devices\n");
         mraaStatus = MRAA_ERROR_NO_RESOURCES;
         goto init_exit;
@@ -322,17 +324,14 @@ mraa_i2c_ft4222_create_func_table()
 }
 
 mraa_board_t*
-mraa_ftdi_ft4222(mraa_board_t* board)
+mraa_ftdi_ft4222()
 {
-    if (plat == NULL)
-        return NULL;
     mraa_board_t* sub_plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (sub_plat == NULL)
         return NULL;
     int pinIndex = 0;
     int numUsbGpio = 0;
     int numUsbPins = numUsbGpio + 2; // Add SDA and SCL
-    sub_plat->platform_type = MRAA_FTDI_FT4222;
     sub_plat->platform_name = PLATFORM_NAME;
     sub_plat->phy_pin_count = numUsbPins;
     sub_plat->gpio_count = numUsbGpio; 
@@ -372,7 +371,6 @@ mraa_ftdi_ft4222(mraa_board_t* board)
     // Set override functions
     sub_plat->adv_func = mraa_i2c_ft4222_create_func_table();
 
-    board->sub_platform = sub_plat;    
     return sub_plat;
 }
 
