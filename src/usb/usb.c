@@ -34,6 +34,7 @@
 mraa_platform_t
 mraa_usb_platform_extender(mraa_board_t* board)
 {
+    mraa_board_t* sub_plat = NULL;
     mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
 #ifdef FTDI4222
     if (mraa_ftdi_ft4222_init() == MRAA_SUCCESS) {
@@ -47,13 +48,15 @@ mraa_usb_platform_extender(mraa_board_t* board)
     switch (platform_type) {
 #ifdef FTDI4222
         case MRAA_FTDI_FT4222:
-            mraa_ftdi_ft4222(board);
+            sub_plat = mraa_ftdi_ft4222();
             break;
 #endif
         default:
             syslog(LOG_ERR, "Unknown USB Platform Extender, currently not supported by MRAA");
     }
 
+    sub_plat->platform_type = platform_type;
+    board->sub_platform = sub_plat;
     return platform_type;
 }
 
