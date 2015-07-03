@@ -247,7 +247,7 @@ typedef struct _board_t {
     int pwm_default_period; /**< The default PWM period is US */
     int pwm_max_period; /**< Maximum period in us */
     int pwm_min_period; /**< Minimum period in us */
-    mraa_platform_t platform_type;
+    mraa_platform_t platform_type; /**< Platform type */
     const char* platform_name; /**< Platform Name pointer */
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
     mraa_adv_func_t* adv_func;    /**< Pointer to advanced function disptach table */

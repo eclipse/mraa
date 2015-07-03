@@ -102,6 +102,9 @@ mraa_init()
 #if defined(X86PLAT)
     // Use runtime x86 platform detection
     platform_type = mraa_x86_platform();
+    // x86 platforms have advanced_func stable in board config structure
+    free(advance_func);
+    advance_func = plat->adv_func;
 #elif defined(ARMPLAT)
     // Use runtime ARM platform detection
     platform_type = mraa_arm_platform();
