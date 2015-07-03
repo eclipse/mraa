@@ -85,7 +85,7 @@ mraa_get_pin_index(mraa_board_t* board, char* name, int* pin_index)
 mraa_board_t*
 mraa_intel_minnow_max()
 {
-    mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
+    mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
 
     struct utsname running_uname;
     int uname_major, uname_minor, max_pins[27];
@@ -100,6 +100,7 @@ mraa_intel_minnow_max()
     b->aio_count = 0;
     b->adc_raw = 0;
     b->adc_supported = 0;
+    b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_MINNOW_MAX_PINCOUNT);
     if (b->pins == NULL) {

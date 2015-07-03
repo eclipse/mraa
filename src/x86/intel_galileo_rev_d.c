@@ -143,7 +143,7 @@ mraa_intel_galileo_g1_spi_lsbmode_replace(mraa_spi_context dev, mraa_boolean_t l
 mraa_board_t*
 mraa_intel_galileo_rev_d()
 {
-    mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
+    mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
         return NULL;
     }
@@ -160,8 +160,13 @@ mraa_intel_galileo_rev_d()
     b->pwm_max_period = 7968;
     b->pwm_min_period = 1;
 
+    mraa_adv_func_t* advance_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+    if (advance_func == NULL) {
+        return NULL;
+    }
     advance_func->gpio_mmap_setup = &mraa_intel_galileo_g1_mmap_setup;
     advance_func->spi_lsbmode_replace = &mraa_intel_galileo_g1_spi_lsbmode_replace;
+    b->adv_func = advance_func;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_GALILEO_REV_D_PINCOUNT);
     if (b->pins == NULL) {
