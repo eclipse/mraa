@@ -34,13 +34,13 @@ bus #7.
 | 2           | 2             | GND        |            |                      |
 | 3           | 3             | 5v         |            |                      |
 | 4           | 4             | 3.3v       |            |                      |
-| 5           | 5             | SPI_CS     | 220        | SPI (not supported)  |
+| 5           | 5             | SPI_CS     | 220        | SPI (via low_speed)  |
 | 6           | 6             | UART1_TXD  | 225        | UART1                |
-| 7           | 7             | SPI_MISO   | 221        | SPI (not supported)  |
+| 7           | 7             | SPI_MISO   | 221        | SPI (via low_speed)  |
 | 8           | 8             | UART1_RXD  | 224        | UART1                |
-| 9           | 9             | SPI_MOSI   | 222        | SPI (not supported)  |
+| 9           | 9             | SPI_MOSI   | 222        | SPI (via low_speed)  |
 | 10          | 10            | UART1_CTS  | 227        | GPIO                 |
-| 11          | 11            | SPI_CLK    | 223        | SPI (not supported)  |
+| 11          | 11            | SPI_CLK    | 223        | SPI (via low_speed)  |
 | 12          | 12            | UART1_RTS  | 226        | GPIO                 |
 | 13          | 13            | I2C_SCL    | 243        | /dev/i2c-7           |
 | 14          | 14            | I2S_CLK    | 216        | GPIO                 |
