@@ -33,6 +33,7 @@
 #define PLATFORM_NAME "MinnowBoard MAX"
 #define I2C_BUS_COUNT 10
 #define I2C_BUS_DEFAULT 7
+#define MAX_LENGTH 8
 
 int arch_nr_gpios_adjust = 0x100;
 
@@ -42,7 +43,7 @@ mraa_set_pininfo(mraa_board_t* board, int mraa_index, char* name, mraa_pincapabi
     if (mraa_index < board->phy_pin_count) {
         // adjust mraa_index for ARCH_NR_GPIOS value
         mraa_pininfo_t* pin_info = &board->pins[mraa_index];
-        strncpy(pin_info->name, name, 7);
+        strncpy(pin_info->name, name, MAX_LENGTH);
         pin_info->capabilites = caps;
         if (caps.gpio) {
             pin_info->gpio.pinmap = sysfs_pin | arch_nr_gpios_adjust;
@@ -73,7 +74,7 @@ mraa_get_pin_index(mraa_board_t* board, char* name, int* pin_index)
 {
     int i;
     for (i = 0; i < board->phy_pin_count; ++i) {
-        if (strcmp(name, board->pins[i].name) == 0) {
+        if (strncmp(name, board->pins[i].name, MAX_LENGTH) == 0) {
             *pin_index = i;
             return MRAA_SUCCESS;
         }
