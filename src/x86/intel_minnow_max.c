@@ -131,7 +131,7 @@ mraa_intel_minnow_max()
     mraa_set_pininfo(b, 8, "UART1RX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 224);
     mraa_set_pininfo(b, 9, "SPIMOSI", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 222);
     mraa_set_pininfo(b, 10, "UART1CT", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 227);
-    mraa_set_pininfo(b, 11, "SPI_CLK", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 223);
+    mraa_set_pininfo(b, 11, "SPI_CLK", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 223);
     mraa_set_pininfo(b, 12, "UART1RT", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 226);
     mraa_set_pininfo(b, 13, "I2C_SCL", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, 243);
     mraa_set_pininfo(b, 14, "I2S_CLK", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 216);
