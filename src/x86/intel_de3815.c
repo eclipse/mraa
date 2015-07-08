@@ -126,15 +126,31 @@ mraa_intel_de3815()
         int i = 0;
         int suc = 0;
         for (i = 0; i < 9; i++) {
+            off_t size, err;
             char path[MAX_SIZE];
+            char value[MAX_SIZE];
             snprintf(path, MAX_SIZE, "/sys/class/i2c-dev/i2c-%u/name", i);
             fd = open(path, O_RDONLY);
             if (fd < 0) {
                 break;
             }
-            off_t size = lseek(fd, 0, SEEK_END);
-            char value[MAX_SIZE];
-            lseek(fd, 0, SEEK_SET);
+            size = lseek(fd, 0, SEEK_END);
+            if (size < 0) {
+                syslog(LOG_WARNING, "mraa: failed to seek i2c filename file");
+                close(fd);
+                break;
+            }
+            err = lseek(fd, 0, SEEK_SET);
+            if (err < 0) {
+                syslog(LOG_WARNING, "mraa: failed to seek i2c filename file");
+                close(fd);
+                break;
+            }
+            if (size >= MAX_SIZE) {
+                syslog(LOG_NOTICE, "mraa: i2c filename file too big, skipping");
+                close(fd);
+                break;
+            }
             ssize_t r = read(fd, value, size);
             if (r > 0) {
                 if (strcasestr(value, I2CNAME) != NULL) {
