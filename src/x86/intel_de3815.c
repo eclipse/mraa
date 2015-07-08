@@ -129,6 +129,9 @@ mraa_intel_de3815()
             char path[MAX_SIZE];
             snprintf(path, MAX_SIZE, "/sys/class/i2c-dev/i2c-%u/name", i);
             fd = open(path, O_RDONLY);
+            if (fd < 0) {
+                break;
+            }
             off_t size = lseek(fd, 0, SEEK_END);
             char value[MAX_SIZE];
             lseek(fd, 0, SEEK_SET);
