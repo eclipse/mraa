@@ -116,7 +116,7 @@ gpio_get(int pin, int* level, mraa_boolean_t raw)
         if (raw != 0) {
             if (mraa_gpio_use_mmaped(gpio, 1) != MRAA_SUCCESS) {
                 fprintf(stdout,
-                        "mmapped access to gpio not supported, falling back to normal mode\n", pin);
+                        "mmapped access to gpio %d not supported, falling back to normal mode\n", pin);
             }
         }
         *level = mraa_gpio_read(gpio);
