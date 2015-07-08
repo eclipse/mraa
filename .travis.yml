@@ -1,0 +1,9 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y -qq swig python git
+script:
+  - mkdir build && cd build && cmake -DBUILDSWIGPYTHON=ON .. && make && make test
