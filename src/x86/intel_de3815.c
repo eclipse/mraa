@@ -125,7 +125,7 @@ mraa_intel_de3815()
         b->i2c_bus_count = 2;
         int i = 0;
         int suc = 0;
-        for (i = 0; i < 8; i++) {
+        for (i = 0; i < 9; i++) {
             char path[MAX_SIZE];
             snprintf(path, MAX_SIZE, "/sys/class/i2c-dev/i2c-%u/name", i);
             fd = open(path, O_RDONLY);
