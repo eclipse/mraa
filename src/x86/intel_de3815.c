@@ -161,13 +161,15 @@ mraa_intel_de3815()
                     b->i2c_bus[0].sda = 12;
                     b->i2c_bus[0].scl = 13;
 
-                    b->i2c_bus[1].bus_id = i+1;
+                    b->i2c_bus[1].bus_id = i + 1;
                     b->i2c_bus[1].sda = 14;
                     b->i2c_bus[1].scl = 15;
+                    close(fd);
                     break;
                 }
             } else {
                 syslog(LOG_ERR, "mraa: sysfs i2cdev failed");
+                close(fd);
                 break;
             }
             close(fd);
@@ -183,7 +185,6 @@ mraa_intel_de3815()
         b->i2c_bus_count = 0;
         b->def_i2c_bus = 0;
     }
-    close(fd);
 
     b->spi_bus_count = 1;
     b->def_spi_bus = 0;
