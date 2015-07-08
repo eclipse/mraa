@@ -68,6 +68,13 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.7.3**
+  * DE3815 i2c fix when using different kernels
+  * Fixed various memory leaks in SWIG wrappers
+  * gpio enums all prefixed with mraa_
+  * Fix SPI CS pin caps causing mux_total to be > 0
+  * Improved error checking/handling
+
 **0.7.2**
   * Fix node.js npm builds with binding.gyp that didn't use --target-arch
 
