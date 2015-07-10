@@ -31,9 +31,9 @@
 #include "x86/intel_minnow_max.h"
 
 #define PLATFORM_NAME "MinnowBoard MAX"
-#define I2C_BUS_COUNT 10
 #define I2C_BUS_DEFAULT 7
 #define MAX_LENGTH 8
+#define I2CNAME "designware"
 
 int arch_nr_gpios_adjust = 0x100;
 
@@ -151,24 +151,22 @@ mraa_intel_minnow_max()
     mraa_set_pininfo(b, 25, "S5_4", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 84);
     mraa_set_pininfo(b, 26, "IBL8254", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 208);
 
-    // Set number of i2c adaptors
-    // Got this from running 'i2cdetect -l'
-    b->i2c_bus_count = I2C_BUS_COUNT;
-
-    // Disable all i2c adaptors
-    int ici;
-    for (ici = 0; ici < b->i2c_bus_count; ici++) {
-        b->i2c_bus[ici].bus_id = -1;
-    }
+    // Set number of i2c adaptors usable from userspace
+    b->i2c_bus_count = 2;
 
     // Configure i2c adaptor #7 and make it the default
     int pin_index_sda, pin_index_scl;
     if (mraa_get_pin_index(b, "I2C_SDA", &pin_index_sda) == MRAA_SUCCESS &&
         mraa_get_pin_index(b, "I2C_SCL", &pin_index_scl) == MRAA_SUCCESS) {
-        b->def_i2c_bus = I2C_BUS_DEFAULT;
-        b->i2c_bus[b->def_i2c_bus].bus_id = b->def_i2c_bus;
-        b->i2c_bus[b->def_i2c_bus].sda = pin_index_sda;
-        b->i2c_bus[b->def_i2c_bus].scl = pin_index_scl;
+        int bus = mraa_find_i2c_bus(I2CNAME, 0);
+        if (bus == -1) {
+            b->i2c_bus_count = 0;
+        } else {
+            b->def_i2c_bus = bus;
+            b->i2c_bus[b->def_i2c_bus].bus_id = b->def_i2c_bus;
+            b->i2c_bus[b->def_i2c_bus].sda = pin_index_sda;
+            b->i2c_bus[b->def_i2c_bus].scl = pin_index_scl;
+        }
     }
 
     // Configure PWM

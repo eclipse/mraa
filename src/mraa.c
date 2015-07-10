@@ -23,13 +23,23 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#define _GNU_SOURCE
+#if !defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 600
+#define _XOPEN_SOURCE 600 /* Get nftw() and S_IFSOCK declarations */
+#endif
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <sched.h>
 #include <string.h>
 #include <pwd.h>
 #include <glob.h>
-
+#include <ftw.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "mraa_internal.h"
 #include "gpio.h"
@@ -425,4 +435,78 @@ mraa_link_targets(const char* filename, const char* targetname)
         free(buffer);
         return 0;
     }
+}
+
+static int num_i2c_devices = 0;
+
+static int
+mraa_count_files(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
+{
+    switch (sb->st_mode & S_IFMT) {
+        case S_IFLNK:
+            num_i2c_devices++;
+            break;
+    }
+    return 0;
+}
+
+int
+mraa_find_i2c_bus(const char* devname, int startfrom)
+{
+    char path[64], value[64];
+    int fd;
+    int i = startfrom;
+    int ret = -1;
+
+    // because feeding mraa_find_i2c_bus result back into the function is
+    // useful treat -1 as 0
+    if (startfrom < 0) {
+        startfrom = 0;
+    }
+
+    // find how many i2c buses we have if we haven't already
+    if (num_i2c_devices == 0) {
+        if (nftw("/sys/class/i2c-dev/", &mraa_count_files, 20, FTW_PHYS) == -1) {
+            return -1;
+        }
+    }
+
+    // i2c devices are numbered numerically so 0 must exist otherwise there is
+    // no i2c-dev loaded
+    if (mraa_file_exist("/sys/class/i2c-dev/i2c-0")) {
+        for (i; i < num_i2c_devices; i++) {
+            off_t size, err;
+            snprintf(path, 64, "/sys/class/i2c-dev/i2c-%u/name", i);
+            fd = open(path, O_RDONLY);
+            if (fd < 0) {
+                break;
+            }
+            size = lseek(fd, 0, SEEK_END);
+            if (size < 0) {
+                syslog(LOG_WARNING, "mraa: failed to seek i2c filename file");
+                close(fd);
+                break;
+            }
+            err = lseek(fd, 0, SEEK_SET);
+            if (err < 0) {
+                syslog(LOG_WARNING, "mraa: failed to seek i2c filename file");
+                close(fd);
+                break;
+            }
+            ssize_t r = read(fd, value, size);
+            if (r > 0) {
+                if (strcasestr(value, devname) != NULL) {
+                    close(fd);
+                    return i;
+                }
+            } else {
+                syslog(LOG_ERR, "mraa: sysfs i2cdev failed");
+            }
+            close(fd);
+        }
+    } else {
+        syslog(LOG_WARNING, "mraa: no i2c-dev detected, load i2c-dev");
+    }
+
+    return ret;
 }

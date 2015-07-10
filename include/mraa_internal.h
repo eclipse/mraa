@@ -105,6 +105,16 @@ mraa_boolean_t mraa_file_contains_both(const char* filename, const char* content
  */
 mraa_boolean_t mraa_link_targets(const char* filename, const char* targetname);
 
+/**
+ * helper function to find the first i2c bus containing devname starting from
+ * i2c-n where n is startfrom
+ *
+ * @param device name to match
+ * @param i2c-dev number to start search from
+ * @return the matching i2c-dev bus id or -1
+ */
+int mraa_find_i2c_bus(const char* devname, int startfrom);
+
 #ifdef __cplusplus
 }
 #endif

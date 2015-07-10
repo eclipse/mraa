@@ -22,7 +22,6 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#define _GNU_SOURCE
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -33,7 +32,6 @@
 #include "x86/intel_de3815.h"
 
 #define PLATFORM_NAME "Intel DE3815"
-#define MAX_SIZE 64
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
 #define I2CNAME "designware"
 
@@ -119,72 +117,24 @@ mraa_intel_de3815()
     strncpy(b->pins[17].name, "SMB_SDA", 8);
     b->pins[17].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
-    // BUS DEFINITIONS
-    int fd;
-    if (mraa_file_exist("/dev/i2c-0")) {
-        b->i2c_bus_count = 2;
-        int i = 0;
-        int suc = 0;
-        for (i = 0; i < 9; i++) {
-            off_t size, err;
-            char path[MAX_SIZE];
-            char value[MAX_SIZE];
-            snprintf(path, MAX_SIZE, "/sys/class/i2c-dev/i2c-%u/name", i);
-            fd = open(path, O_RDONLY);
-            if (fd < 0) {
-                break;
-            }
-            size = lseek(fd, 0, SEEK_END);
-            if (size < 0) {
-                syslog(LOG_WARNING, "mraa: failed to seek i2c filename file");
-                close(fd);
-                break;
-            }
-            err = lseek(fd, 0, SEEK_SET);
-            if (err < 0) {
-                syslog(LOG_WARNING, "mraa: failed to seek i2c filename file");
-                close(fd);
-                break;
-            }
-            if (size >= MAX_SIZE) {
-                syslog(LOG_NOTICE, "mraa: i2c filename file too big, skipping");
-                close(fd);
-                break;
-            }
-            ssize_t r = read(fd, value, size);
-            if (r > 0) {
-                if (strcasestr(value, I2CNAME) != NULL) {
-                    suc = 1;
-                    b->i2c_bus_count = 2;
-                    b->def_i2c_bus = 0;
-                    b->i2c_bus[0].bus_id = i;
-                    b->i2c_bus[0].sda = 12;
-                    b->i2c_bus[0].scl = 13;
-
-                    b->i2c_bus[1].bus_id = i + 1;
-                    b->i2c_bus[1].sda = 14;
-                    b->i2c_bus[1].scl = 15;
-                    close(fd);
-                    break;
-                }
-            } else {
-                syslog(LOG_ERR, "mraa: sysfs i2cdev failed");
-                close(fd);
-                break;
-            }
-            close(fd);
+    b->i2c_bus_count = 0;
+    int i2c_num = -1;
+    int i;
+    for (i = 0; i < 2; i++) {
+        i2c_num = mraa_find_i2c_bus(I2CNAME, i2c_num + 1);
+        if (i2c_num == -1) {
+            break;
         }
-
-        if (!suc) {
-            syslog(LOG_WARNING, "mraa: no i2c-dev detected, load i2c-dev");
-            b->i2c_bus_count = 0;
-            b->def_i2c_bus = 0;
-        }
-    } else {
-        syslog(LOG_WARNING, "mraa: no i2c-dev detected, load i2c-dev");
-        b->i2c_bus_count = 0;
-        b->def_i2c_bus = 0;
+        b->i2c_bus_count++;
+        b->i2c_bus[i].bus_id = i2c_num;
+        b->i2c_bus[i].sda = 12 + i;
+        b->i2c_bus[i].scl = 13 + i;
     }
+
+    if (b->i2c_bus_count > 0) {
+        b->def_i2c_bus = b->i2c_bus[0].bus_id;
+    }
+
 
     b->spi_bus_count = 1;
     b->def_spi_bus = 0;
