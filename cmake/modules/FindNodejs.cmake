@@ -1,4 +1,4 @@
-find_program (NODE_EXECUTABLE NAMES node
+find_program (NODE_EXECUTABLE NAMES node nodejs
     HINTS
     $ENV{NODE_DIR}
     PATH_SUFFIXES bin
