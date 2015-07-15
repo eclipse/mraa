@@ -453,7 +453,7 @@ mraa_count_files(const char* path, const struct stat* sb, int flag, struct FTW* 
 int
 mraa_find_i2c_bus(const char* devname, int startfrom)
 {
-    char path[64], value[64];
+    char path[64];
     int fd;
     int i = startfrom;
     int ret = -1;
@@ -493,15 +493,23 @@ mraa_find_i2c_bus(const char* devname, int startfrom)
                 close(fd);
                 break;
             }
+            char* value = malloc(size);
+            if (value == NULL) {
+                syslog(LOG_ERR, "mraa: failed to allocate memory for i2c file");
+                close(fd);
+                break;
+            }
             ssize_t r = read(fd, value, size);
             if (r > 0) {
                 if (strcasestr(value, devname) != NULL) {
+                    free(value);
                     close(fd);
                     return i;
                 }
             } else {
                 syslog(LOG_ERR, "mraa: sysfs i2cdev failed");
             }
+            free(value);
             close(fd);
         }
     } else {
