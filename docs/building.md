@@ -117,7 +117,11 @@ tar caf mraa.tar.bz2 cov-int
 ~~~~~~~~~~~~~
 
 ## Building Java bindings
-Have JAVA_HOME set to JDK install directory. Then use the cmake configuration flag:
+Have JAVA_HOME set to JDK install directory. Most distributions set this from /etc/profile.d/ and have a way of switching between alternatives. We support both OpenJDK and Oracle's JDK. On Arch Linux with openjdk8 you'll have to set this yourself like this:
+~~~~~~~~~~~~~{.sh}
+export JAVA_HOME=/usr/lib/jvm/default/
+~~~~~~~~~~~~~
+Then use the cmake configuration flag:
  -DBUILDSWIGJAVA=ON
 To compile Example.java
 ~~~~~~~~~~~~~{.sh}
