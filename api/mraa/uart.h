@@ -34,7 +34,7 @@
  * libmraa. It allows the exposure of UART pins on supported boards.
  * With functionality to expand at a later date.
  *
- * @snippet uart_setup.c Interesting
+ * @snippet uart.c Interesting
  */
 
 #ifdef __cplusplus

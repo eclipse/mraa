@@ -1,6 +1,7 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Copyright (c) 2014, 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -33,10 +34,17 @@ main(int argc, char** argv)
     uart = mraa_uart_init(0);
 
     if (uart == NULL) {
-        fprintf(stdout, "UART failed to setup\n");
+        fprintf(stderr, "UART failed to setup\n");
+        return EXIT_FAILURE;
     }
 
+    char buffer[] = "Hello Mraa!";
+    mraa_uart_write(uart, buffer, sizeof(buffer));
+
+    mraa_uart_stop(uart);
+
     mraa_deinit();
-    return 0;
+
+    return EXIT_SUCCESS;
 }
 //! [Interesting]
