@@ -211,6 +211,12 @@ mraa_uart_init_raw(const char* path)
     // handling, such as flow control or line editing semantics.
     // cfmakeraw is not POSIX!
     cfmakeraw(&termio);
+    if (tcsetattr(dev->fd, TCSAFLUSH, &termio) < 0) {
+        syslog(LOG_ERR, "uart: tcsetattr() failed after cfmakeraw()");
+        close(dev->fd);
+        free(dev);
+        return NULL;
+    }
 
     if (mraa_uart_set_baudrate(dev, 9600) != MRAA_SUCCESS) {
         close(dev->fd);
