@@ -55,8 +55,10 @@ mraa_usb_platform_extender(mraa_board_t* board)
             syslog(LOG_ERR, "Unknown USB Platform Extender, currently not supported by MRAA");
     }
 
-    sub_plat->platform_type = platform_type;
-    board->sub_platform = sub_plat;
+    if (sub_plat != NULL) {
+        sub_plat->platform_type = platform_type;
+        board->sub_platform = sub_plat;
+    }
     return platform_type;
 }
 
