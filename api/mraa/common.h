@@ -151,6 +151,13 @@ void mraa_result_print(mraa_result_t result);
 mraa_platform_t mraa_get_platform_type();
 
 /**
+ * Get sub platform type, board must be initialised.
+ *
+ * @return mraa_platform_t Platform type enum
+ */
+mraa_platform_t mraa_get_sub_platform_type();
+
+/**
  * Get platform pincount, board must be initialised.
  *
  * @return uint of physical pin count on the in-use platform
