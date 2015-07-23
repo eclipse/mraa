@@ -305,6 +305,16 @@ mraa_get_platform_type()
     return plat->platform_type;
 }
 
+
+mraa_platform_t
+mraa_get_sub_platform_type()
+{
+    if (plat == NULL || plat->sub_platform == NULL)
+        return MRAA_UNKNOWN_PLATFORM;
+    return plat->sub_platform->platform_type;
+}
+
+
 unsigned int
 mraa_adc_raw_bits()
 {
