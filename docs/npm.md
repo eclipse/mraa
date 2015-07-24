@@ -43,3 +43,7 @@ version (or close to) in your $PATH.
 node-gyp configure --python=/usr/bin/python2
 node-gyp build --python=/usr/bin/python2 --verbose
 ~~~~~~~~~~~
+
+Note that no cross compilation is available without modifying the --arch flag
+manually. If you want to cross compile, it's recommended to use cmake.
+
