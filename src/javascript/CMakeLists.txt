@@ -31,7 +31,11 @@ mraa_create_install_package_json (package.json lib/node_modules/mraa)
 
 macro (mraa_CREATE_BINDING_GYP generated_file)
   set (mraa_LIB_SRCS_GYP "")
-  foreach (srcfile ${mraa_LIB_SRCS_NOAUTO})
+  set (mraa_NPM_SRCS ${mraa_LIB_SRCS_NOAUTO}
+                     ${mraa_LIB_ARM_SRCS_NOAUTO}
+                     ${mraa_LIB_X86_SRCS_NOAUTO}
+  )
+  foreach (srcfile ${mraa_NPM_SRCS})
     file (RELATIVE_PATH rel ${CMAKE_SOURCE_DIR} ${srcfile})
     set (mraa_LIB_SRCS_GYP "'${rel}',\n${mraa_LIB_SRCS_GYP}")
   endforeach (srcfile)
