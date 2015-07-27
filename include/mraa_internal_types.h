@@ -169,9 +169,7 @@ typedef struct {
 
 typedef struct {
     /*@{*/
-    char mem_dev[32]; /**< Memory device to use /dev/uio0 etc */
-    unsigned int mem_sz; /** Size of memory to map */
-    unsigned int bit_pos; /** Position of value bit */
+    uint8_t bit_pos; /** Position of value bit */
     mraa_pin_t gpio; /** GPio context containing none mmap info */
     /*@}*/
 } mraa_mmap_pin_t;

@@ -206,13 +206,11 @@ mraa_intel_galileo_rev_d()
     b->pins[2].gpio.mux[0].pin = 31;
     b->pins[2].gpio.mux[0].value = 1;
     b->pins[2].mmap.gpio.pinmap = 14;
-    strncpy(b->pins[2].mmap.mem_dev, "/dev/uio0", 12);
     b->pins[2].mmap.gpio.mux_total = 2;
     b->pins[2].mmap.gpio.mux[0].pin = 31;
     b->pins[2].mmap.gpio.mux[0].value = 0;
     b->pins[2].mmap.gpio.mux[1].pin = 14;
     b->pins[2].mmap.gpio.mux[1].value = 0;
-    b->pins[2].mmap.mem_sz = 0x1000;
     b->pins[2].mmap.bit_pos = 6;
 
     strncpy(b->pins[3].name, "IO3", 8);
@@ -222,13 +220,11 @@ mraa_intel_galileo_rev_d()
     b->pins[3].gpio.mux[0].pin = 30;
     b->pins[3].gpio.mux[0].value = 1;
     b->pins[3].mmap.gpio.pinmap = 15;
-    strncpy(b->pins[3].mmap.mem_dev, "/dev/uio0", 12);
     b->pins[3].mmap.gpio.mux_total = 2;
     b->pins[3].mmap.gpio.mux[0].pin = 30;
     b->pins[3].mmap.gpio.mux[0].value = 0;
     b->pins[3].mmap.gpio.mux[1].pin = 15;
     b->pins[3].mmap.gpio.mux[1].value = 0;
-    b->pins[3].mmap.mem_sz = 0x1000;
     b->pins[3].mmap.bit_pos = 7;
     b->pins[3].pwm.pinmap = 3;
     b->pins[3].pwm.parent_id = 0;
