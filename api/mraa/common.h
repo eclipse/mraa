@@ -151,13 +151,6 @@ void mraa_result_print(mraa_result_t result);
 mraa_platform_t mraa_get_platform_type();
 
 /**
- * Get sub platform type, board must be initialised.
- *
- * @return mraa_platform_t Platform type enum
- */
-mraa_platform_t mraa_get_sub_platform_type();
-
-/**
  * Get platform pincount, board must be initialised.
  *
  * @return uint of physical pin count on the in-use platform
@@ -194,6 +187,27 @@ char* mraa_get_pin_name(int pin);
  * @return int default i2c bus index
  */
 int mraa_get_default_2c_bus();
+
+/**
+ * Select main platform for platform info calls.
+ *
+ * @return mraa_boolean_t 1 if main platform is available, 0 otherwise
+ */
+mraa_boolean_t mraa_select_main_platform();
+
+/**
+ * Select sub platform for platform info calls.
+ *
+ * @return mraa_boolean_t 1 if sub platform is available, 0 otherwise
+ */
+mraa_boolean_t mraa_select_sub_platform();
+	
+/**
+ * Check if sub platform is currently available and selected for platform info calls.
+ *
+ * @return mraa_boolean_t 1 if sub platform is selected, 0 otherwise
+ */
+mraa_boolean_t mraa_is_sub_platform_selected();
 
 /**
  * Check if pin or bus id includes sub platform mask.
