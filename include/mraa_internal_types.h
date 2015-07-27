@@ -40,8 +40,8 @@
  */
 struct _gpio {
     /*@{*/
-    int pin; /**< the pin number, as known to the os. */
-    int phy_pin; /**< pin passed to clean init. -1 none and raw*/
+    uint16_t pin; /**< the pin number, as known to the os. */
+    uint8_t phy_pin; /**< pin passed to clean init. -1 none and raw*/
     int value_fp; /**< the file pointer to the value of the gpio */
     void (* isr)(void *); /**< the interupt service request */
     void *isr_args; /**< args return when interupt service request triggered */
@@ -60,9 +60,9 @@ struct _gpio {
  */
 struct _i2c {
     /*@{*/
-    int busnum; /**< the bus number of the /dev/i2c-* device */
+    uint8_t busnum; /**< the bus number of the /dev/i2c-* device */
     int fh; /**< the file handle to the /dev/i2c-* device */
-    int addr; /**< the address of the i2c slave */
+    uint8_t addr; /**< the address of the i2c slave */
     unsigned long funcs; /**< /dev/i2c-* device capabilities as per https://www.kernel.org/doc/Documentation/i2c/functionality */
     void *handle; /**< generic handle for non-standard drivers that don't use file descriptors  */
     mraa_adv_func_t* advance_func; /**< override function table */
@@ -88,8 +88,8 @@ struct _spi {
  */
 struct _pwm {
     /*@{*/
-    int pin; /**< the pin number, as known to the os. */
-    int chipid; /**< the chip id, which the pwm resides */
+    uint16_t pin; /**< the pin number, as known to the os. */
+    uint8_t chipid; /**< the chip id, which the pwm resides */
     int duty_fp; /**< File pointer to duty file */
     int period;  /**< Cache the period to speed up setting duty */
     mraa_boolean_t owner; /**< Owner of pwm context*/
@@ -102,9 +102,9 @@ struct _pwm {
  */
 struct _aio {
     /*@{*/
-    unsigned int channel; /**< the channel as on board and ADC module */
+    uint8_t channel; /**< the channel as on board and ADC module */
     int adc_in_fp; /**< File Pointer to raw sysfs */
-    int value_bit; /**< 10 bits by default. Can be increased if board */
+    uint8_t value_bit; /**< 10 bits by default. Can be increased if board */
     mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
 };
@@ -142,8 +142,8 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
-    unsigned int pin;   /**< Raw GPIO pin id */
-    unsigned int value; /**< Raw GPIO value */
+    uint16_t pin;   /**< Raw GPIO pin id, on linux 3.18+ MAX_GPIOS is 512 */
+    mraa_boolean_t value; /**< Raw GPIO value */
     /*@}*/
 } mraa_mux_t;
 
@@ -157,12 +157,12 @@ typedef struct {
 
 typedef struct {
     /*@{*/
-    unsigned int pinmap; /**< sysfs pin */
+    uint16_t pinmap; /**< sysfs pin */
     unsigned int parent_id; /** parent chip id */
-    unsigned int mux_total; /** Numfer of muxes needed for operation of pin */
-    mraa_mux_t mux[6]; /** Array holding information about mux */
-    unsigned int output_enable; /** Output Enable GPIO, for level shifting */
-    unsigned int pullup_enable; /** Pull-Up enable GPIO, inputs */
+    uint8_t mux_total; /** Numfer of muxes needed for operation of pin */
+    mraa_mux_t mux[4]; /** Array holding information about mux */
+    uint16_t output_enable; /** Output Enable GPIO, for level shifting */
+    uint16_t pullup_enable; /** Pull-Up enable GPIO, inputs */
     mraa_pin_cap_complex_t complex_cap;
     /*@}*/
 } mraa_pin_t;
@@ -198,10 +198,9 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
-    unsigned int bus_id; /**< ID as exposed in the system */
-    unsigned int scl; /**< i2c SCL */
-    unsigned int sda; /**< i2c SDA */
-    // mraa_drv_api_t drv_type; /**< Driver type */
+    uint8_t bus_id; /**< ID as exposed in the system */
+    uint8_t scl; /**< i2c SCL */
+    uint8_t sda; /**< i2c SDA */
     /*@}*/
 } mraa_i2c_bus_t;
 
@@ -210,13 +209,13 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
-    unsigned int bus_id; /**< The Bus ID as exposed to the system. */
-    unsigned int slave_s; /**< Slave select */
+    uint8_t bus_id; /**< The Bus ID as exposed to the system. */
+    uint8_t slave_s; /**< Slave select */
     mraa_boolean_t three_wire; /**< Is the bus only a three wire system */
-    unsigned int sclk; /**< Serial Clock */
-    unsigned int mosi; /**< Master Out, Slave In. */
-    unsigned int miso; /**< Master In, Slave Out. */
-    unsigned int cs; /**< Chip Select, used when the board is a spi slave */
+    uint8_t sclk; /**< Serial Clock */
+    uint8_t mosi; /**< Master Out, Slave In. */
+    uint8_t miso; /**< Master In, Slave Out. */
+    uint8_t cs; /**< Chip Select, used when the board is a spi slave */
     /*@}*/
 } mraa_spi_bus_t;
 
@@ -225,9 +224,9 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
-    unsigned int index; /**< ID as exposed in the system */
-    int rx; /**< uart rx */
-    int tx; /**< uart tx */
+    uint8_t index; /**< ID as exposed in the system */
+    uint8_t rx; /**< uart rx */
+    uint8_t tx; /**< uart tx */
     const char* device_path; /**< To store "/dev/ttyS1" for example */
     /*@}*/
 } mraa_uart_dev_t;
@@ -238,28 +237,34 @@ typedef struct {
 
 typedef struct _board_t {
     /*@{*/
-    unsigned int phy_pin_count; /**< The Total IO pins on board */
-    unsigned int gpio_count; /**< GPIO Count */
-    unsigned int aio_count;  /**< Analog side Count */
-    unsigned int i2c_bus_count; /**< Usable i2c Count */
-    mraa_i2c_bus_t  i2c_bus[12]; /**< Array of i2c */
-    unsigned int def_i2c_bus; /**< Position in array of default i2c bus */
-    unsigned int spi_bus_count; /**< Usable spi Count */
-    mraa_spi_bus_t spi_bus[12];       /**< Array of spi */
-    unsigned int def_spi_bus; /**< Position in array of defult spi bus */
-    unsigned int adc_raw; /**< ADC raw bit value */
-    unsigned int adc_supported; /**< ADC supported bit value */
-    unsigned int def_uart_dev; /**< Position in array of defult uart */
-    unsigned int uart_dev_count; /**< Usable spi Count */
-    mraa_uart_dev_t uart_dev[6]; /**< Array of UARTs */
-    int pwm_default_period; /**< The default PWM period is US */
-    int pwm_max_period; /**< Maximum period in us */
-    int pwm_min_period; /**< Minimum period in us */
-    mraa_platform_t platform_type; /**< Platform type */
-    const char* platform_name; /**< Platform Name pointer */
+    uint8_t phy_pin_count; /**< The Total IO pins on board */
+    uint8_t gpio_count; /**< GPIO Count */
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
+
+    uint8_t i2c_bus_count; /**< Usable i2c Count */
+    uint8_t def_i2c_bus; /**< Position in array of default i2c bus */
+    mraa_i2c_bus_t i2c_bus[12]; /**< Array of i2c */
+
+    uint8_t spi_bus_count; /**< Usable spi Count */
+    uint8_t def_spi_bus; /**< Position in array of defult spi bus */
+    mraa_spi_bus_t spi_bus[12]; /**< Array of spi */
+
+    uint8_t uart_dev_count; /**< Usable spi Count */
+    uint8_t def_uart_dev; /**< Position in array of defult uart */
+    mraa_uart_dev_t uart_dev[6]; /**< Array of UARTs */
+    mraa_platform_t platform_type; /**< Platform type */
     mraa_adv_func_t* adv_func;    /**< Pointer to advanced function disptach table */
     struct _board_t* sub_platform;     /**< Pointer to sub platform */
+
+    uint8_t aio_count;  /**< Analog side Count */
+    uint8_t adc_raw; /**< ADC raw bit value */
+    uint8_t adc_supported; /**< ADC supported bit value */
+
+    uint32_t pwm_default_period; /**< The default PWM period is US */
+    uint32_t pwm_max_period; /**< Maximum period in us */
+    uint32_t pwm_min_period; /**< Minimum period in us */
+
+    const char* platform_name; /**< Platform Name pointer */
     /*@}*/
 } mraa_board_t;
 
