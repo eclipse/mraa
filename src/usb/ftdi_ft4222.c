@@ -24,6 +24,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <errno.h>
 #include "linux/i2c-dev.h"
 #include "common.h"
 #include "ftd2xx.h"
@@ -37,6 +39,8 @@
 
 static FT_HANDLE ftHandle = (FT_HANDLE)NULL;
 static int bus_speed = 400;
+static int numI2cGpioExapnderPins = 8;
+static int numUsbGpio = 0;
 
 
 mraa_result_t
@@ -362,13 +366,13 @@ mraa_ftdi_ft4222_gpio_init_internal_replace(int pin)
 static mraa_result_t
 mraa_ftdi_ft4222_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    return MRAA_SUCCESS;
 }
 
 static mraa_result_t
 mraa_ftdi_ft4222_gpio_edge_mode_replace(mraa_gpio_context dev, mraa_gpio_edge_t mode)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    return MRAA_SUCCESS;
 }
 
 static int
@@ -409,11 +413,38 @@ mraa_ftdi_ft4222_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
         return mraa_ftdi_ft4222_gpio_write_replace(dev, 1);
     case MRAA_GPIO_OUT_LOW:        
         return mraa_ftdi_ft4222_gpio_write_replace(dev, 0);
-    default:
-        return MRAA_SUCCESS;
+    default:;
     }
+    return MRAA_SUCCESS;    
 }
     
+void mraa_ftdi_ft4222_sleep_ms(unsigned long mseconds)
+{
+	struct timespec sleepTime;
+
+	sleepTime.tv_sec = mseconds / 1000; // Number of seconds
+	sleepTime.tv_nsec = ( mseconds % 1000 ) * 1000000; // Convert fractional seconds to nanoseconds
+
+	// Iterate nanosleep in a loop until the total sleep time is the original
+	// value of the seconds parameter
+	while ( ( nanosleep( &sleepTime, &sleepTime ) != 0 ) && ( errno == EINTR ) );
+}
+
+static void* 
+mraa_ftdi_ft4222_gpio_interrupt_handler_replace(mraa_gpio_context dev)
+{
+    int prev_level = mraa_ftdi_ft4222_gpio_read_replace(dev);
+    while (1) {
+        int level = mraa_ftdi_ft4222_gpio_read_replace(dev);
+        if (level != prev_level) {
+            dev->isr(dev->isr_args);            
+            prev_level = level;
+        }
+        // printf("mraa_ftdi_ft4222_gpio_interrupt_handler_replace\n");
+        mraa_ftdi_ft4222_sleep_ms(100);
+    }
+    return NULL;
+}
 
 static void
 mraa_ftdi_ft4222_populate_i2c_func_table(mraa_adv_func_t* func_table)
@@ -442,6 +473,7 @@ mraa_ftdi_ft4222_populate_gpio_func_table(mraa_adv_func_t* func_table)
     func_table->gpio_dir_replace = &mraa_ftdi_ft4222_gpio_dir_replace;
     func_table->gpio_read_replace = &mraa_ftdi_ft4222_gpio_read_replace;    
     func_table->gpio_write_replace = &mraa_ftdi_ft4222_gpio_write_replace;        
+    func_table->gpio_interrupt_handler_replace = &mraa_ftdi_ft4222_gpio_interrupt_handler_replace;
 }
 
 
@@ -453,7 +485,7 @@ mraa_ftdi_ft4222()
         return NULL;
     mraa_boolean_t haveGpio = mraa_ftdi_ft4222_detect_io_expander();
     int pinIndex = 0;
-    int numUsbGpio = haveGpio ? 8 : 0;
+    numUsbGpio = haveGpio ? numI2cGpioExapnderPins : 0;
     int numUsbPins = numUsbGpio + 2; // Add SDA and SCL
     sub_plat->platform_name = PLATFORM_NAME;
     sub_plat->phy_pin_count = numUsbPins;

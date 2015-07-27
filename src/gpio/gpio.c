@@ -63,13 +63,14 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
     char bu[MAX_SIZE];
     int length;
 
-    mraa_gpio_context dev = (mraa_gpio_context) malloc(sizeof(struct _gpio));
+    mraa_gpio_context dev = (mraa_gpio_context) calloc(1, sizeof(struct _gpio));
     if (dev == NULL) {
         syslog(LOG_CRIT, "gpio: Failed to allocate memory for context");
         return NULL;
     }
     
     dev->advance_func = func_table;
+    dev->pin = pin;    
     
     if (IS_FUNC_DEFINED(dev, gpio_init_internal_replace)) {
         status = dev->advance_func->gpio_init_internal_replace(pin);
@@ -85,10 +86,8 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
             goto init_internal_cleanup;
     }
 
-    memset(dev, 0, sizeof(struct _gpio));
     dev->value_fp = -1;
     dev->isr_value_fp = -1;
-    dev->pin = pin;
     dev->phy_pin = -1;
 
     // then check to make sure the pin is exported.
@@ -214,6 +213,9 @@ static void*
 mraa_gpio_interrupt_handler(void* arg)
 {
     mraa_gpio_context dev = (mraa_gpio_context) arg;
+    if (IS_FUNC_DEFINED(dev, gpio_interrupt_handler_replace))
+        return dev->advance_func->gpio_interrupt_handler_replace(dev);
+    
     mraa_result_t ret;
 
     // open gpio value with open(3)
