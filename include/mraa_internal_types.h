@@ -50,6 +50,7 @@ struct _gpio {
     mraa_boolean_t owner; /**< If this context originally exported the pin */
     mraa_result_t (*mmap_write) (mraa_gpio_context dev, int value);
     int (*mmap_read) (mraa_gpio_context dev);
+    mraa_adv_func_t* advance_func; /**< override function table  */    
     /*@}*/
 };
 
@@ -63,7 +64,7 @@ struct _i2c {
     int addr; /**< the address of the i2c slave */
     unsigned long funcs; /**< /dev/i2c-* device capabilities as per https://www.kernel.org/doc/Documentation/i2c/functionality */
     void *handle; /**< generic handle for non-standard drivers that don't use file descriptors  */
-    mraa_adv_func_t* func_table;
+    mraa_adv_func_t* advance_func; /**< override function table  */
     /*@}*/
 };
 
