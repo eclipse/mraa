@@ -37,9 +37,6 @@
 #include <sys/ioctl.h>
 #include "linux/i2c-dev.h"
 
-// FIXME: Nasty macro to test for presence of function in context structure function table
-#define IS_FUNC_DEFINED(dev, func)   (dev != NULL && dev->func_table != NULL && dev->func_table->func != NULL)
-
 
 typedef union i2c_smbus_data_union {
     uint8_t byte;        ///< data byte
@@ -56,7 +53,7 @@ typedef struct i2c_smbus_ioctl_data_struct {
 } i2c_smbus_ioctl_data_t;
 
 
-static mraa_adv_func_t* func_table;
+// static mraa_adv_func_t* func_table;
 
 int
 mraa_i2c_smbus_access(int fh, uint8_t read_write, uint8_t command, int size, i2c_smbus_data_t* data)
@@ -70,6 +67,66 @@ mraa_i2c_smbus_access(int fh, uint8_t read_write, uint8_t command, int size, i2c
 
     return ioctl(fh, I2C_SMBUS, &args);
 }
+
+static mraa_i2c_context 
+mraa_i2c_init_internal(mraa_adv_func_t* advance_func, unsigned int bus)
+{
+    mraa_result_t status = MRAA_SUCCESS;
+
+    if (advance_func == NULL)
+        return NULL;
+
+    mraa_i2c_context dev = (mraa_i2c_context) malloc(sizeof(struct _i2c));
+    if (dev == NULL) {
+        syslog(LOG_CRIT, "i2c: Failed to allocate memory for context");
+        return NULL;
+    }
+    
+    dev->advance_func = advance_func;
+    dev->busnum = bus;
+
+    if (IS_FUNC_DEFINED(dev, i2c_init_pre)) {
+        status = advance_func->i2c_init_pre(bus);
+        if (status != MRAA_SUCCESS)
+            goto init_internal_cleanup;
+    }
+
+    if (IS_FUNC_DEFINED(dev, i2c_init_bus_replace)) {
+        status = dev->advance_func->i2c_init_bus_replace(dev);
+        if (status != MRAA_SUCCESS)
+            goto init_internal_cleanup;
+    } else {
+        char filepath[32];
+        snprintf(filepath, 32, "/dev/i2c-%u", bus);
+        if ((dev->fh = open(filepath, O_RDWR)) < 1) {
+            syslog(LOG_ERR, "i2c: Failed to open requested i2c port %s", filepath);
+            status = MRAA_ERROR_NO_RESOURCES;
+            goto init_internal_cleanup;
+        }
+
+        if (ioctl(dev->fh, I2C_FUNCS, &dev->funcs) < 0) {
+            syslog(LOG_CRIT, "i2c: Failed to get I2C_FUNC map from device");
+            dev->funcs = 0;
+        }
+    } 
+
+    if (IS_FUNC_DEFINED(dev, i2c_init_post)) {
+        status = dev->advance_func->i2c_init_post(dev);
+        if (status != MRAA_SUCCESS)
+            goto init_internal_cleanup;
+    }
+
+
+init_internal_cleanup:
+    if (status == MRAA_SUCCESS) {
+        return dev;
+	} else {
+        if (dev != NULL)
+            free(dev);
+        return NULL;
+   }
+}
+
 
 mraa_i2c_context
 mraa_i2c_init(int bus)
@@ -120,61 +177,25 @@ mraa_i2c_init(int bus)
         }
     }
 
-    // FIXME: use global func_table variable to access advanced function table without changing i2c_init_raw() signature
-    func_table = board->adv_func;
-    return mraa_i2c_init_raw((unsigned int) board->i2c_bus[bus].bus_id);
+    return mraa_i2c_init_internal(board->adv_func, (unsigned int) board->i2c_bus[bus].bus_id);
 }
 
-mraa_i2c_context
-mraa_i2c_init_raw(unsigned int bus)
+
+mraa_i2c_context 
+mraa_i2c_init_raw(unsigned int bus) 
 {
-    mraa_i2c_context dev = (mraa_i2c_context) malloc(sizeof(struct _i2c));
-    if (dev == NULL) {
-        syslog(LOG_CRIT, "i2c: Failed to allocate memory for context");
+    if (plat == NULL)
         return NULL;
-    }
-    
-    dev->func_table = func_table;
-    dev->busnum = bus;
-
-    if (IS_FUNC_DEFINED(dev, i2c_init_pre)) {
-        if (func_table->i2c_init_pre(bus) != MRAA_SUCCESS)
-            return NULL;
-    }
-    if (!IS_FUNC_DEFINED(dev, i2c_init_bus_replace)) {
-        char filepath[32];
-        snprintf(filepath, 32, "/dev/i2c-%u", bus);
-        if ((dev->fh = open(filepath, O_RDWR)) < 1) {
-            syslog(LOG_ERR, "i2c: Failed to open requested i2c port %s", filepath);
-        }
-        syslog(LOG_DEBUG, "i2c: Opened i2c bus %s", filepath);
-
-        if (ioctl(dev->fh, I2C_FUNCS, &dev->funcs) < 0) {
-            syslog(LOG_CRIT, "i2c: Failed to get I2C_FUNC map from device");
-            dev->funcs = 0;
-        }
-    } else {
-        if (dev->func_table->i2c_init_bus_replace(dev) != MRAA_SUCCESS) {
-            free(dev);
-            return NULL;
-        }
-    }
-
-    if (IS_FUNC_DEFINED(dev, i2c_init_post)) {
-        mraa_result_t ret = dev->func_table->i2c_init_post(dev);
-        if (ret != MRAA_SUCCESS) {
-            free(dev);
-            return NULL;
-        }
-    }
-    return dev;
+    else
+        return mraa_i2c_init_internal(plat->adv_func, bus);
 }
+
 
 mraa_result_t
 mraa_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 {
     if (IS_FUNC_DEFINED(dev, i2c_set_frequency_replace)) {
-        return dev->func_table->i2c_set_frequency_replace(dev, mode);
+        return dev->advance_func->i2c_set_frequency_replace(dev, mode);
     }
     return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
 }
@@ -183,11 +204,10 @@ int
 mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 {
     int bytes_read = 0;
-    if (!IS_FUNC_DEFINED(dev, i2c_read_replace)) {
-        // this is the read(3) syscall not mraa_i2c_read()
+    if (IS_FUNC_DEFINED(dev, i2c_read_replace))
+        bytes_read = dev->advance_func->i2c_read_replace(dev, data, length);
+    else
         bytes_read = read(dev->fh, data, length);
-    } else
-        bytes_read = dev->func_table->i2c_read_replace(dev, data, length);
    if (bytes_read == length)
       return length;
    else
@@ -275,14 +295,15 @@ mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length)
 mraa_result_t
 mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data)
 {
-    if (!IS_FUNC_DEFINED(dev, i2c_write_byte_replace)) {
+    if (IS_FUNC_DEFINED(dev, i2c_write_byte_replace)) {
+        return dev->advance_func->i2c_write_byte_replace(dev, data);
+    } else {
         if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, data, I2C_SMBUS_BYTE, NULL) < 0) {
             syslog(LOG_ERR, "i2c: Failed to write");
             return MRAA_ERROR_INVALID_HANDLE;
         }
         return MRAA_SUCCESS;
-    } else
-        return dev->func_table->i2c_write_byte_replace(dev, data);
+    }
 }
 
 mraa_result_t
@@ -315,15 +336,17 @@ mraa_result_t
 mraa_i2c_address(mraa_i2c_context dev, uint8_t addr)
 {
     dev->addr = (int) addr;
-    if (dev->func_table->i2c_init_bus_replace == NULL) {
+    if (IS_FUNC_DEFINED(dev, i2c_address_replace)) {
+        return dev->advance_func->i2c_address_replace(dev, addr);
+    } else {
         if (ioctl(dev->fh, I2C_SLAVE_FORCE, addr) < 0) {
             syslog(LOG_ERR, "i2c: Failed to set slave address %d", addr);
             return MRAA_ERROR_INVALID_HANDLE;
         }
         return MRAA_SUCCESS;
-    } else
-        return dev->func_table->i2c_address_replace(dev, addr);
+    }
 }
+
 
 mraa_result_t
 mraa_i2c_stop(mraa_i2c_context dev)
@@ -331,3 +354,4 @@ mraa_i2c_stop(mraa_i2c_context dev)
     free(dev);
     return MRAA_SUCCESS;
 }
+
