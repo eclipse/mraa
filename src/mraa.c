@@ -466,6 +466,7 @@ mraa_get_platform_pin_count(uint8_t platform_offset)
 char*
 mraa_get_pin_name(int pin)
 {
+#ifdef BIGPLAT
     if (plat == NULL)
         return 0;
 
@@ -482,6 +483,9 @@ mraa_get_pin_name(int pin)
     if (pin > (current_plat->phy_pin_count - 1) || pin < 0)
         return NULL;
     return (char*) current_plat->pins[pin].name;
+#else
+    return "UNAVAILABLE";
+#endif
 }
 
 int

@@ -181,7 +181,9 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
+#ifdef BIGPLAT
     char name[MRAA_PIN_NAME_SIZE]; /**< Pin's real world name */
+#endif
     mraa_pincapabilities_t capabilites; /**< Pin Capabiliites */
     mraa_pin_t gpio; /**< GPIO structure */
     mraa_pin_t pwm;  /**< PWM structure */
