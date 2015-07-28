@@ -258,6 +258,13 @@ mraa_result_print(mraa_result_t result)
 }
 
 
+mraa_boolean_t 
+mraa_has_sub_platform()
+{
+    return (plat != NULL) && (plat->sub_platform != NULL);
+}
+
+
 mraa_boolean_t
 mraa_select_main_platform()
 {
