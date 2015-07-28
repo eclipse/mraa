@@ -271,7 +271,18 @@ mraa_ftdi_ft4222_i2c_init_bus_replace(mraa_i2c_context dev)
 static mraa_result_t
 mraa_ftdi_ft4222_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 {
-    return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    switch (mode) {
+    case MRAA_I2C_STD: /**< up to 100Khz */
+        bus_speed = 100;
+        break;
+    MRAA_I2C_FAST: /**< up to 400Khz */
+        bus_speed = 400;
+        break;
+    MRAA_I2C_HIGH: /**< up to 3.4Mhz */
+        bus_speed = 3400;
+        break;
+    }
+    return MRAA_SUCCESS;
 }
 
 
