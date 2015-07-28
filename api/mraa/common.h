@@ -189,6 +189,14 @@ char* mraa_get_pin_name(int pin);
 int mraa_get_default_2c_bus();
 
 /**
+ * Detect presence of sub platform.
+ *
+ * @return mraa_boolean_t 1 if sub platform is present and initialized, 0 otherwise
+ */
+mraa_boolean_t mraa_has_sub_platform();
+
+
+/**
  * Select main platform for platform info calls.
  *
  * @return mraa_boolean_t 1 if main platform is available, 0 otherwise
