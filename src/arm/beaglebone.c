@@ -377,6 +377,12 @@ mraa_beaglebone()
     unsigned int uart3_enabled = 0;
     unsigned int uart4_enabled = 0;
     unsigned int uart5_enabled = 0;
+    unsigned int ehrpwm0a_enabled = 0;
+    unsigned int ehrpwm0b_enabled = 0;
+    unsigned int ehrpwm1a_enabled = 0;
+    unsigned int ehrpwm1b_enabled = 0;
+    unsigned int ehrpwm2a_enabled = 0;
+    unsigned int ehrpwm2b_enabled = 0;
     unsigned int is_rev_c = 0;
     size_t len = 0;
     char* line = NULL;
@@ -445,6 +451,36 @@ mraa_beaglebone()
         uart5_enabled = 1;
     else
         uart5_enabled = 0;
+
+    if (mraa_file_exist("/sys/class/pwm/pwm0"))
+        ehrpwm0a_enabled = 1;
+    else
+        ehrpwm0a_enabled = 0;
+
+    if (mraa_file_exist("/sys/class/pwm/pwm1"))
+        ehrpwm0b_enabled = 1;
+    else
+        ehrpwm0b_enabled = 0;
+
+    if (mraa_file_exist("/sys/class/pwm/pwm3"))
+        ehrpwm1a_enabled = 1;
+    else
+        ehrpwm1a_enabled = 0;
+
+    if (mraa_file_exist("/sys/class/pwm/pwm4"))
+        ehrpwm1b_enabled = 1;
+    else
+        ehrpwm1b_enabled = 0;
+
+    if (mraa_file_exist("/sys/class/pwm/pwm5"))
+        ehrpwm2a_enabled = 1;
+    else
+        ehrpwm2a_enabled = 0;
+
+    if (mraa_file_exist("/sys/class/pwm/pwm6"))
+        ehrpwm2b_enabled = 1;
+    else
+        ehrpwm2b_enabled = 0;
 
     mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
     if (b == NULL)
@@ -570,11 +606,17 @@ mraa_beaglebone()
     b->pins[12].gpio.parent_id = 0;
     b->pins[12].gpio.mux_total = 0;
 
-    strncpy(b->pins[13].name, "GPIO23", MRAA_PIN_NAME_SIZE);
-    b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    if (ehrpwm2b_enabled == 1) {
+        strncpy(b->pins[13].name, "EHRPWM2B", MRAA_PIN_NAME_SIZE);
+        b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+    } else {
+        strncpy(b->pins[13].name, "GPIO23", MRAA_PIN_NAME_SIZE);
+        b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    }
     b->pins[13].gpio.pinmap = 23;
     b->pins[13].gpio.parent_id = 0;
     b->pins[13].gpio.mux_total = 0;
+    b->pins[13].pwm.mux_total = 0;
 
     strncpy(b->pins[14].name, "GPIO26", MRAA_PIN_NAME_SIZE);
     b->pins[14].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
@@ -607,12 +649,17 @@ mraa_beaglebone()
     b->pins[18].gpio.parent_id = 0;
     b->pins[18].gpio.mux_total = 0;
 
-    // TODO PWM_2A
-    strncpy(b->pins[19].name, "GPIO22", MRAA_PIN_NAME_SIZE);
-    b->pins[19].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    if (ehrpwm2a_enabled == 1) {
+        strncpy(b->pins[19].name, "EHRPWM2A", MRAA_PIN_NAME_SIZE);
+        b->pins[19].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+    } else {
+        strncpy(b->pins[19].name, "GPIO22", MRAA_PIN_NAME_SIZE);
+        b->pins[19].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    }
     b->pins[19].gpio.pinmap = 22;
     b->pins[19].gpio.parent_id = 0;
     b->pins[19].gpio.mux_total = 0;
+    b->pins[19].pwm.mux_total = 0;
 
     if (emmc_enabled == 1) {
         strncpy(b->pins[20].name, "MMC1_CMD", MRAA_PIN_NAME_SIZE);
@@ -992,26 +1039,36 @@ mraa_beaglebone()
     b->pins[59].gpio.mux_total = 0;
     b->pins[59].uart.mux_total = 0;
 
-    // TODO PWM_1A
-    strncpy(b->pins[60].name, "GPIO40", MRAA_PIN_NAME_SIZE);
-    b->pins[60].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    if (ehrpwm1a_enabled == 1) {
+        strncpy(b->pins[60].name, "EHRPWM1A", MRAA_PIN_NAME_SIZE);
+        b->pins[60].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+    } else {
+        strncpy(b->pins[60].name, "GPIO50", MRAA_PIN_NAME_SIZE);
+        b->pins[60].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    }
     b->pins[60].gpio.pinmap = 50;
     b->pins[60].gpio.parent_id = 0;
     b->pins[60].gpio.mux_total = 0;
+    b->pins[60].pwm.mux_total = 0;
 
-    // TODO PWM_TRIP2_IN is this PWM?????
+    // TODO PWM_TRIP2_IN (not a PWM output, but used for sync cf ref. manual)
     strncpy(b->pins[61].name, "GPIO48", MRAA_PIN_NAME_SIZE);
     b->pins[61].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[61].gpio.pinmap = 48;
     b->pins[61].gpio.parent_id = 0;
     b->pins[61].gpio.mux_total = 0;
 
-    // TODO PWM_1B
-    strncpy(b->pins[62].name, "GPIO51", MRAA_PIN_NAME_SIZE);
-    b->pins[62].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    if (ehrpwm1b_enabled == 1) {
+        strncpy(b->pins[62].name, "EHRPWM1B", MRAA_PIN_NAME_SIZE);
+        b->pins[62].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+    } else {
+        strncpy(b->pins[62].name, "GPIO51", MRAA_PIN_NAME_SIZE);
+        b->pins[62].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    }
     b->pins[62].gpio.pinmap = 51;
     b->pins[62].gpio.parent_id = 0;
     b->pins[62].gpio.mux_total = 0;
+    b->pins[62].pwm.mux_total = 0;
 
     if ((i2c0_enabled == 1) || (spi0_enabled == 1)) {
         if (i2c0_enabled == 1) {
@@ -1077,18 +1134,22 @@ mraa_beaglebone()
     b->pins[66].gpio.mux_total = 0;
     b->pins[66].i2c.mux_total = 0;
 
-    if ((spi0_enabled == 1) || uart2_enabled == 1) {
+    if ((spi0_enabled == 1) || uart2_enabled == 1 || ehrpwm0b_enabled == 1) {
         if (uart2_enabled == 1) {
             strncpy(b->pins[67].name, "UART2_TX", MRAA_PIN_NAME_SIZE);
-            b->pins[67].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 1 };
+            b->pins[67].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
         }
         if (spi0_enabled == 1) {
             strncpy(b->pins[67].name, "SPI0D0", MRAA_PIN_NAME_SIZE);
             b->pins[67].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
         }
+        if (ehrpwm0b_enabled == 1) {
+            strncpy(b->pins[67].name, "EHRPWM0B", MRAA_PIN_NAME_SIZE);
+            b->pins[67].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+        }
     } else {
         strncpy(b->pins[67].name, "GPIO3", MRAA_PIN_NAME_SIZE);
-        b->pins[67].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 1 };
+        b->pins[67].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 1, 0, 0, 1 };
     }
     b->pins[67].gpio.pinmap = 3;
     b->pins[67].gpio.parent_id = 0;
@@ -1096,8 +1157,7 @@ mraa_beaglebone()
     b->pins[67].spi.mux_total = 0;
     b->pins[67].uart.mux_total = 0;
 
-
-    if ((spi0_enabled == 1) || uart2_enabled == 1) {
+    if ((spi0_enabled == 1) || uart2_enabled == 1 || ehrpwm0a_enabled == 1) {
         if (uart2_enabled == 1) {
             strncpy(b->pins[68].name, "UART2_RX", MRAA_PIN_NAME_SIZE);
             b->pins[68].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 1 };
@@ -1106,9 +1166,13 @@ mraa_beaglebone()
             strncpy(b->pins[68].name, "SPI0CLK", MRAA_PIN_NAME_SIZE);
             b->pins[68].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
         }
+        if (ehrpwm0a_enabled == 1) {
+            strncpy(b->pins[68].name, "EHRPWM0A", MRAA_PIN_NAME_SIZE);
+            b->pins[68].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+        }
     } else {
         strncpy(b->pins[68].name, "GPIO2", MRAA_PIN_NAME_SIZE);
-        b->pins[68].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 1 };
+        b->pins[68].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 1, 0, 0, 1 };
     }
     b->pins[68].gpio.pinmap = 2;
     b->pins[68].gpio.parent_id = 0;
