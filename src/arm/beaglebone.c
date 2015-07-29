@@ -31,6 +31,8 @@
 #include "common.h"
 #include "arm/beaglebone.h"
 
+#define NUM2STR(x) #x
+
 #define PLATFORM_NAME_BEAGLEBONE_BLACK_REV_B "Beaglebone Black Rev. B"
 #define PLATFORM_NAME_BEAGLEBONE_BLACK_REV_C "Beaglebone Black Rev. C"
 
@@ -38,9 +40,10 @@
 #define SYSFS_CLASS_PWM "/sys/class/pwm/"
 #define SYSFS_CLASS_MMC "/sys/class/mmc_host/"
 #define SYSFS_PWM_OVERLAY "am33xx_pwm"
-#define UART_OVERLAY "ADAFRUIT-UART%d"
+#define UART_OVERLAY(x) "ADAFRUIT-UART" NUM2STR(x)
 //#define ADAFRUIT_SPI_OVERLAY "ADAFRUIT-SPI%d"
-#define SPI_OVERLAY "BB-SPI%d-01"
+#define SPI_OVERLAY(x) "BB-SPI" NUM2STR(x) "-01"
+#define I2C_OVERLAY(x) "ADAFRUIT-I2C" NUM2STR(x)
 #define MAX_SIZE 64
 
 #define MMAP_PATH "/dev/mem"
@@ -197,7 +200,7 @@ mraa_beaglebone_uart_init_pre(int index)
             syslog(LOG_ERR, "uart: Failed to open %s for writing, check access rights for user", capepath);
             return ret;
         }
-        if (fprintf(fh, UART_OVERLAY, index + 1) < 0) {
+        if (fprintf(fh, UART_OVERLAY(index + 1)) < 0) {
             syslog(LOG_ERR, "uart: Failed to write to CapeManager");
         }
         fclose(fh);
@@ -247,10 +250,10 @@ mraa_beaglebone_spi_init_pre(int index)
             syslog(LOG_ERR, "spi: Failed to open %s for writing, check access rights for user", capepath);
             return ret;
         }
-        if (fprintf(fh, SPI_OVERLAY, index) < 0) {
+        if (fprintf(fh, SPI_OVERLAY(index)) < 0) {
             syslog(LOG_ERR,
                    "spi: Failed to write to CapeManager, check that /lib/firmware/%s exists",
-                   SPI_OVERLAY, index);
+                   SPI_OVERLAY(index));
         }
         fclose(fh);
         free(capepath);
@@ -259,7 +262,7 @@ mraa_beaglebone_spi_init_pre(int index)
         plat->spi_bus[index].bus_id = deviceindex;
         ret = MRAA_SUCCESS;
     } else {
-        syslog(LOG_ERR, "spi: Device not initialized, check that /lib/firmware/%s exists", SPI_OVERLAY, index);
+        syslog(LOG_ERR, "spi: Device not initialized, check that /lib/firmware/%s exists", SPI_OVERLAY(index));
         syslog(LOG_ERR, "spi: Check http://elinux.org/BeagleBone_Black_Enable_SPIDEV for details");
     }
     return ret;
@@ -286,9 +289,9 @@ mraa_beaglebone_i2c_init_pre(unsigned int bus)
             return ret;
         }
         if (fprintf(fh, "ADAFRUIT-I2C%d", bus) < 0) {
-            syslog(LOG_ERR, "i2c: Failed to write to CapeManager, check that "
-                            "/lib/firmware/ADAFRUIT-I2C%d exists",
-                   index);
+            syslog(LOG_ERR,
+                   "i2c: Failed to write to CapeManager, check that /lib/firmware/%s exists",
+                   I2C_OVERLAY(index));
         }
         fclose(fh);
     }
@@ -296,7 +299,8 @@ mraa_beaglebone_i2c_init_pre(unsigned int bus)
         ret = MRAA_SUCCESS;
     else {
         syslog(LOG_ERR,
-               "i2c: Device not initialized, check that /lib/firmware/ADAFRUIT-I2C%d exists", index);
+               "i2c: Device not initialized, check that /lib/firmware/%s exists",
+               I2C_OVERLAY(index));
     }
     return ret;
 }
