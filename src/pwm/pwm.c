@@ -274,7 +274,7 @@ mraa_pwm_write(mraa_pwm_context dev, float percentage)
     }
 
     if (percentage > 1.0f) {
-        syslog(LOG_WARNING, "pwm: number greater than 1 entered, defaulting to 100%");
+        syslog(LOG_WARNING, "pwm: number greater than 1 entered, defaulting to 100%%");
         return mraa_pwm_write_duty(dev, dev->period);
     }
     return mraa_pwm_write_duty(dev, percentage * dev->period);
