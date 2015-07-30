@@ -433,8 +433,9 @@ mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 mraa_result_t
 mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
-    if (IS_FUNC_DEFINED(dev, gpio_dir_replace))
+    if (IS_FUNC_DEFINED(dev, gpio_dir_replace)) {
         return dev->advance_func->gpio_dir_replace(dev, dir);
+    }
     
     if (IS_FUNC_DEFINED(dev, gpio_dir_pre)) {
         mraa_result_t pre_ret = (dev->advance_func->gpio_dir_pre(dev, dir));
@@ -474,7 +475,7 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
         case MRAA_GPIO_OUT:
             length = snprintf(bu, sizeof(bu), "out");
             break;
-        case MRAA_GPIO_IN:printf("gpio_init_internal_replace not defined\n");
+        case MRAA_GPIO_IN:
             length = snprintf(bu, sizeof(bu), "in");
             break;
         case MRAA_GPIO_OUT_HIGH:
