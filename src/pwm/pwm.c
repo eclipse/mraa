@@ -38,6 +38,9 @@ mraa_pwm_setup_duty_fp(mraa_pwm_context dev)
 {
     char bu[MAX_SIZE];
     snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev->chipid, dev->pin);
+    if (!mraa_file_exist(bu)) {
+        snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwm%d/duty_ns", dev->pin);
+    }
 
     dev->duty_fp = open(bu, O_RDWR);
     if (dev->duty_fp == -1) {
@@ -58,6 +61,9 @@ mraa_pwm_write_period(mraa_pwm_context dev, int period)
     }
     char bu[MAX_SIZE];
     snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
+    if (!mraa_file_exist(bu)) {
+        snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwm%d/period_ns", dev->pin);
+    }
 
     int period_f = open(bu, O_RDWR);
     if (period_f == -1) {
@@ -97,6 +103,9 @@ mraa_pwm_read_period(mraa_pwm_context dev)
     char bu[MAX_SIZE];
     char output[MAX_SIZE];
     snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
+    if (!mraa_file_exist(bu)) {
+        snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwm%d/period_ns", dev->pin);
+    }
 
     int period_f = open(bu, O_RDWR);
     if (period_f == -1) {
@@ -235,6 +244,10 @@ mraa_pwm_init_raw(int chipin, int pin)
 
     char directory[MAX_SIZE];
     snprintf(directory, MAX_SIZE, SYSFS_PWM "/pwmchip%d/pwm%d", dev->chipid, dev->pin);
+    if (!mraa_file_exist(directory)) {
+        snprintf(directory, MAX_SIZE, SYSFS_PWM "/pwm%d", dev->pin);
+    }
+
     struct stat dir;
     if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
         syslog(LOG_NOTICE, "pwm: Pin already exported, continuing");
@@ -242,6 +255,10 @@ mraa_pwm_init_raw(int chipin, int pin)
     } else {
         char buffer[MAX_SIZE];
         snprintf(buffer, MAX_SIZE, "/sys/class/pwm/pwmchip%d/export", dev->chipid);
+        if (!mraa_file_exist(buffer)) {
+            snprintf(buffer, MAX_SIZE, "/sys/class/pwm/export");
+        }
+
         int export_f = open(buffer, O_WRONLY);
         if (export_f == -1) {
             syslog(LOG_ERR, "pwm: Failed to open export for writing");
@@ -341,6 +358,9 @@ mraa_pwm_enable(mraa_pwm_context dev, int enable)
     }
     char bu[MAX_SIZE];
     snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/enable", dev->chipid, dev->pin);
+    if (!mraa_file_exist(bu)) {
+        snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwm%d/run", dev->pin);
+    }
 
     int enable_f = open(bu, O_RDWR);
 
@@ -364,6 +384,9 @@ mraa_pwm_unexport_force(mraa_pwm_context dev)
 {
     char filepath[MAX_SIZE];
     snprintf(filepath, MAX_SIZE, "/sys/class/pwm/pwmchip%d/unexport", dev->chipid);
+    if (!mraa_file_exist(filepath)) {
+        snprintf(filepath, MAX_SIZE, "/sys/class/pwm/unexport");
+    }
 
     int unexport_f = open(filepath, O_WRONLY);
     if (unexport_f == -1) {
