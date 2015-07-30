@@ -620,6 +620,7 @@ mraa_beaglebone()
     b->pins[13].gpio.pinmap = 23;
     b->pins[13].gpio.parent_id = 0;
     b->pins[13].gpio.mux_total = 0;
+    b->pins[13].pwm.pinmap = 6;
     b->pins[13].pwm.mux_total = 0;
 
     strncpy(b->pins[14].name, "GPIO26", MRAA_PIN_NAME_SIZE);
@@ -663,6 +664,7 @@ mraa_beaglebone()
     b->pins[19].gpio.pinmap = 22;
     b->pins[19].gpio.parent_id = 0;
     b->pins[19].gpio.mux_total = 0;
+    b->pins[19].pwm.pinmap = 5;
     b->pins[19].pwm.mux_total = 0;
 
     if (emmc_enabled == 1) {
@@ -1053,6 +1055,7 @@ mraa_beaglebone()
     b->pins[60].gpio.pinmap = 50;
     b->pins[60].gpio.parent_id = 0;
     b->pins[60].gpio.mux_total = 0;
+    b->pins[60].pwm.pinmap = 3;
     b->pins[60].pwm.mux_total = 0;
 
     // TODO PWM_TRIP2_IN (not a PWM output, but used for sync cf ref. manual)
@@ -1072,6 +1075,7 @@ mraa_beaglebone()
     b->pins[62].gpio.pinmap = 51;
     b->pins[62].gpio.parent_id = 0;
     b->pins[62].gpio.mux_total = 0;
+    b->pins[62].pwm.pinmap = 4;
     b->pins[62].pwm.mux_total = 0;
 
     if ((i2c0_enabled == 1) || (spi0_enabled == 1)) {
@@ -1160,6 +1164,8 @@ mraa_beaglebone()
     b->pins[67].gpio.mux_total = 0;
     b->pins[67].spi.mux_total = 0;
     b->pins[67].uart.mux_total = 0;
+    b->pins[67].pwm.pinmap = 1;
+    b->pins[67].pwm.mux_total = 0;
 
     if ((spi0_enabled == 1) || uart2_enabled == 1 || ehrpwm0a_enabled == 1) {
         if (uart2_enabled == 1) {
@@ -1183,6 +1189,8 @@ mraa_beaglebone()
     b->pins[68].gpio.mux_total = 0;
     b->pins[68].spi.mux_total = 0;
     b->pins[68].uart.mux_total = 0;
+    b->pins[68].pwm.pinmap = 0;
+    b->pins[68].pwm.mux_total = 0;
 
     // TODO PWM0_SYNCO ?? PWM
     strncpy(b->pins[69].name, "GPIO49", MRAA_PIN_NAME_SIZE);
