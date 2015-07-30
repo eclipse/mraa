@@ -194,7 +194,6 @@ mraa_beaglebone_uart_init_pre(int index)
         FILE* fh;
         fh = fopen(capepath, "w");
         if (fh == NULL) {
-            free(capepath);
             syslog(LOG_ERR, "uart: Failed to open %s for writing, check access rights for user", capepath);
             return ret;
         }
@@ -245,7 +244,6 @@ mraa_beaglebone_spi_init_pre(int index)
         FILE* fh;
         fh = fopen(capepath, "w");
         if (fh == NULL) {
-            free(capepath);
             syslog(LOG_ERR, "spi: Failed to open %s for writing, check access rights for user", capepath);
             return ret;
         }
@@ -284,7 +282,6 @@ mraa_beaglebone_i2c_init_pre(unsigned int bus)
         FILE* fh;
         fh = fopen(capepath, "w");
         if (fh == NULL) {
-            free(capepath);
             syslog(LOG_ERR, "i2c: Failed to open %s for writing, check access rights for user", capepath);
             return ret;
         }
@@ -327,7 +324,6 @@ mraa_beaglebone_pwm_init_replace(int pin)
         }
         fh = fopen(capepath, "w");
         if (fh == NULL) {
-            free(capepath);
             syslog(LOG_ERR, "pwm: Failed to open %s for writing, check access rights for user", capepath);
             return NULL;
         }
