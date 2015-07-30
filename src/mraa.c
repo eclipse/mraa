@@ -139,8 +139,13 @@ mraa_init()
     }
 #endif
 
-    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
     current_plat = plat;
+    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
+    if (mraa_has_sub_platform()) {
+        mraa_select_sub_platform();
+        syslog(LOG_NOTICE, "libmraa initialised for sub-platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());    
+        mraa_select_main_platform();
+    }
     return MRAA_SUCCESS;
 }
 
