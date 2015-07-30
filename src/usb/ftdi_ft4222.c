@@ -168,7 +168,7 @@ mraa_ftdi_ft4222_i2c_read_internal(FT_HANDLE handle, uint8_t addr, uint8_t* data
 {
     uint16 bytesRead = 0;
 	uint8 controllerStatus;
-    syslog(LOG_NOTICE, "FT4222_I2CMaster_Read(%#02X, %#02X)", addr, length);
+    // syslog(LOG_NOTICE, "FT4222_I2CMaster_Read(%#02X, %#02X)", addr, length);
     FT4222_STATUS ft4222Status = FT4222_I2CMaster_Read(handle, addr, data, length, &bytesRead);
 	ft4222Status = FT4222_I2CMaster_GetStatus(ftHandle, &controllerStatus);
     if (FT4222_OK != ft4222Status || I2CM_ERROR(controllerStatus))
@@ -184,7 +184,7 @@ mraa_ftdi_ft4222_i2c_write_internal(FT_HANDLE handle, uint8_t addr, const uint8_
 {
     uint16 bytesWritten = 0;
 	uint8 controllerStatus;
-    syslog(LOG_NOTICE, "FT4222_I2CMaster_Write(%#02X, %#02X, %d)", addr, *data, bytesToWrite);
+    // syslog(LOG_NOTICE, "FT4222_I2CMaster_Write(%#02X, %#02X, %d)", addr, *data, bytesToWrite);
     FT4222_STATUS ft4222Status = FT4222_I2CMaster_Write(handle, addr, (uint8_t*)data, bytesToWrite, &bytesWritten);
 	ft4222Status = FT4222_I2CMaster_GetStatus(ftHandle, &controllerStatus);
     if (FT4222_OK != ft4222Status || I2CM_ERROR(controllerStatus))
@@ -211,7 +211,7 @@ mraa_ftdi_ft4222_detect_io_expander()
 
 
 /******************* I2C functions *******************/
-mraa_i2c_context
+static mraa_i2c_context
 mraa_ftdi_ft4222_i2c_init_raw(unsigned int bus)
 {
     // Tell the FT4222 to be an I2C Master.
@@ -429,7 +429,8 @@ mraa_ftdi_ft4222_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
     return MRAA_SUCCESS;    
 }
     
-void mraa_ftdi_ft4222_sleep_ms(unsigned long mseconds)
+static void 
+mraa_ftdi_ft4222_sleep_ms(unsigned long mseconds)
 {
 	struct timespec sleepTime;
 
