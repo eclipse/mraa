@@ -131,3 +131,20 @@ To run, make sure libmraajava.so is in LD_LIBRARY_PATH
  ~~~~~~~~~~~~~{.sh}
 jave -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example
 ~~~~~~~~~~~~~
+
+## Building an IPK/RPM package using cpack
+
+You can get cpack to generate an IPK or RPM package fairly easily if you have
+the correct packaging tools
+
+~~~~~~~~~~~~~{.sh}
+cmake -DIPK=ON -DCMAKE_INSTAL_PREFIX=/usr ..
+make package
+~~~~~~~~~~~~~
+
+To use RPM simply enable the RPM option. You'll need rpmbuild installed on your
+build machine.
+
+~~~~~~~~~~~~~{.sh}
+cmake -DRPM=ON -DCMAKE_INSTAL_PREFIX=/usr ..
+~~~~~~~~~~~~~
