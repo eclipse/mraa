@@ -52,7 +52,8 @@ mraa_usb_platform_extender(mraa_board_t* board)
             break;
 #endif
         default:
-            syslog(LOG_ERR, "Unknown USB Platform Extender, currently not supported by MRAA");
+            // this is not an error but more that we didn't find a USB platform extender we recognise
+            syslog(LOG_DEBUG, "Unknown USB Platform Extender, currently not supported by MRAA");
     }
 
     if (sub_plat != NULL) {
