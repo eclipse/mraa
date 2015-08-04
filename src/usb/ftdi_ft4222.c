@@ -306,11 +306,6 @@ mraa_ftdi_ft4222_i2c_read_byte(mraa_i2c_context dev)
     return 0;
 }
 
-static uint8_t
-mraa_ftdi_ft4222_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
-{
-    return 0;
-}
 
 static uint16_t
 mraa_ftdi_ft4222_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
@@ -337,6 +332,19 @@ static mraa_result_t
 mraa_ftdi_ft4222_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
 {
     return mraa_ftdi_ft4222_i2c_write(dev, &data, 1);
+}
+
+
+static uint8_t
+mraa_ftdi_ft4222_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
+{
+    const uint8_t reg_addr = command;
+    uint8_t data;    
+    if (mraa_ftdi_ft4222_i2c_write(dev, &reg_addr, 1) != MRAA_SUCCESS)
+        return 0;
+    if (mraa_ftdi_ft4222_i2c_read(dev, &data, 1) != 1)
+        return 0;
+    return data;
 }
 
 static mraa_result_t

@@ -146,6 +146,7 @@ mraa_i2c_init(int bus)
         }
         bus = mraa_get_sub_platform_index(bus);
     }
+    syslog(LOG_NOTICE, "i2c: Selected bus %d", bus);    
 
     if (board->i2c_bus_count == 0) {
         syslog(LOG_ERR, "No i2c buses defined in platform");
@@ -184,10 +185,7 @@ mraa_i2c_init(int bus)
 mraa_i2c_context 
 mraa_i2c_init_raw(unsigned int bus) 
 {
-    if (plat == NULL)
-        return NULL;
-    else
-        return mraa_i2c_init_internal(plat->adv_func, bus);
+    return mraa_i2c_init_internal(plat == NULL ? NULL : plat->adv_func, bus);
 }
 
 
@@ -229,8 +227,9 @@ mraa_i2c_read_byte(mraa_i2c_context dev)
 uint8_t
 mraa_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
+    if (IS_FUNC_DEFINED(dev, i2c_read_byte_data_replace))
+        return dev->advance_func->i2c_read_byte_data_replace(dev, command);
     i2c_smbus_data_t d;
-
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_READ, command, I2C_SMBUS_BYTE_DATA, &d) < 0) {
         syslog(LOG_ERR, "i2c: Failed to write");
         return 0;
@@ -309,8 +308,9 @@ mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data)
 mraa_result_t
 mraa_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
 {
+    if (IS_FUNC_DEFINED(dev, i2c_write_byte_data_replace))
+        return dev->advance_func->i2c_write_byte_data_replace(dev, data, command);
     i2c_smbus_data_t d;
-
     d.byte = data;
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, command, I2C_SMBUS_BYTE_DATA, &d) < 0) {
         syslog(LOG_ERR, "i2c: Failed to write");
@@ -322,8 +322,9 @@ mraa_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t
 mraa_result_t
 mraa_i2c_write_word_data(mraa_i2c_context dev, const uint16_t data, const uint8_t command)
 {
+    if (IS_FUNC_DEFINED(dev, i2c_write_word_data_replace))
+        return dev->advance_func->i2c_write_word_data_replace(dev, data, command);
     i2c_smbus_data_t d;
-
     d.word = data;
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, command, I2C_SMBUS_WORD_DATA, &d) < 0) {
         syslog(LOG_ERR, "i2c: Failed to write");
