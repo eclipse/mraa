@@ -132,7 +132,7 @@ mraa_gpio_init(int pin)
         return NULL;
     }
     
-    if (mraa_is_on_sub_platform(pin)) {
+    if (mraa_is_sub_platform_id(pin)) {
         syslog(LOG_NOTICE, "gpio: Using sub platform");
         board = board->sub_platform;
         if (board == NULL) {

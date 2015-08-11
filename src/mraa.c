@@ -611,13 +611,13 @@ mraa_find_i2c_bus(const char* devname, int startfrom)
 }
 
 mraa_boolean_t
-mraa_is_on_sub_platform(int pin_or_bus)
+mraa_is_sub_platform_id(int pin_or_bus)
 {
     return (pin_or_bus & MRAA_SUB_PLATFORM_MASK) != 0;
 }
 
 int 
-mraa_use_sub_platform(int pin_or_bus)
+mraa_get_sub_platform_id(int pin_or_bus)
 {
     return pin_or_bus | MRAA_SUB_PLATFORM_MASK;
 }

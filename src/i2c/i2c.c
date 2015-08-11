@@ -137,7 +137,7 @@ mraa_i2c_init(int bus)
         return NULL;
     }
 
-    if (mraa_is_on_sub_platform(bus)) {
+    if (mraa_is_sub_platform_id(bus)) {
         syslog(LOG_NOTICE, "i2c: Using sub platform");
         board = board->sub_platform;
         if (board == NULL) {
