@@ -10,7 +10,7 @@ include_directories(
 set_source_files_properties (mraa.i PROPERTIES CPLUSPLUS ON)
 set_source_files_properties (mraa.i PROPERTIES SWIG_FLAGS "-I${CMAKE_BINARY_DIR}/src")
 swig_add_module (python-mraa python mraa.i ${mraa_LIB_SRCS})
-swig_link_libraries (python-mraa ${PYTHON_LIBRARIES})
+swig_link_libraries (python-mraa ${PYTHON_LIBRARIES} ${mraa_LIBS})
 
 if (DOXYGEN_FOUND)
   foreach (_file ${DOCCLASSES})

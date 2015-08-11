@@ -16,7 +16,7 @@ set (JAVAC $ENV{JAVA_HOME}/bin/javac)
 set (JAR $ENV{JAVA_HOME}/bin/jar)
 
 swig_add_module (mraajava java mraajava.i ${mraa_LIB_SRCS})
-swig_link_libraries (mraajava ${JAVA_LIBRARIES})
+swig_link_libraries (mraajava ${JAVA_LIBRARIES} ${mraa_LIBS})
 
 add_custom_command (TARGET mraajava
   POST_BUILD

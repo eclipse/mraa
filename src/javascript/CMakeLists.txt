@@ -15,7 +15,7 @@ set_property (SOURCE mraajs.i PROPERTY SWIG_FLAGS "-node"
 set_source_files_properties (mraajs.i PROPERTIES CPLUSPLUS ON)
 
 swig_add_module (mraajs javascript mraajs.i ${mraa_LIB_SRCS})
-swig_link_libraries (mraajs ${NODE_LIBRARIES})
+swig_link_libraries (mraajs ${NODE_LIBRARIES} ${mraa_LIBS})
 
 set_target_properties (mraajs PROPERTIES
   COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_NODE_EXTENSION -DSWIGJAVASCRIPT=${SWIG_FOUND}"
