@@ -296,12 +296,10 @@ mraa_is_sub_platform_selected()
     return (plat->sub_platform != NULL) &&  (current_plat == plat->sub_platform);
 }
 
-
-
 mraa_boolean_t
 mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
 {
-    if (current_plat == NULL) {
+    if (current_plat == NULL || current_plat->platform_type == MRAA_UNKNOWN_PLATFORM) {
         return 0;
     }
     if (pin > (current_plat->phy_pin_count - 1) || pin < 0)
