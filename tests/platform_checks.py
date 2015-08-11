@@ -22,8 +22,10 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import unittest as u
+from __future__ import print_function
+
 import mraa as m
+import unittest as u
 
 @u.skipIf(m.init() != m.ERROR_PLATFORM_ALREADY_INITIALISED, "mraa_init() not valid")
 class PlatformChecks(u.TestCase):
@@ -33,12 +35,12 @@ class PlatformChecks(u.TestCase):
 
   def test_mraa_check_platform_ADC_max_resolution(self):
     self.p_ADC_mres = m.adcRawBits()
-    print "Platform ADC max. resolution is: " + str(self.p_ADC_mres) + " bits"
+    print("Platform ADC max. resolution is: " + str(self.p_ADC_mres) + " bits")
     self.assertEqual(self.p_ADC_mres, 12, "Wrong ADC max. resolution. Check platform ...")
 
   def test_mraa_check_platform_ADC_resolution(self):
     self.p_ADC_res = m.adcSupportedBits()
-    print "Platform ADC resolution is: " + str(self.p_ADC_res) + " bits"
+    print("Platform ADC resolution is: " + str(self.p_ADC_res) + " bits")
     self.assertEqual(self.p_ADC_res, 10, "Wrong ADC suported resolution. Check platform ...")
 
 if __name__ == "__main__":
