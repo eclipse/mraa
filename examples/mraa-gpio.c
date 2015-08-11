@@ -66,7 +66,7 @@ list_platform_pins()
     int i;
     for (i = 0; i < pin_count; ++i) {
         if (strcmp(mraa_get_pin_name(i), "INVALID") != 0) {
-            int pin_id = mraa_is_sub_platform_selected() ? mraa_use_sub_platform(i) : i;
+            int pin_id = mraa_is_sub_platform_selected() ? mraa_get_sub_platform_id(i) : i;
             fprintf(stdout, "%02d ", pin_id);
             fprintf(stdout, "%*s: ", (MRAA_PIN_NAME_SIZE - 1), mraa_get_pin_name(i));
             if (mraa_pin_mode_test(i, MRAA_PIN_GPIO))

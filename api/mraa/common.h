@@ -224,25 +224,25 @@ mraa_boolean_t mraa_is_sub_platform_selected();
  *
  * @return mraa_boolean_t 1 if pin or bus is for sub platform, 0 otherwise
  */
-mraa_boolean_t mraa_is_on_sub_platform(int pin_or_bus);
+mraa_boolean_t mraa_is_sub_platform_id(int pin_or_bus_id);
 
 /**
- * Convert pin or bus id to corresponding sub platform id.
+ * Convert pin or bus index to corresponding sub platform id.
  *
- * @param int pin or bus number
+ * @param int pin or bus index
  *
  * @return int sub platform pin or bus number
  */
-int mraa_use_sub_platform(int pin_or_bus);
+int mraa_get_sub_platform_id(int pin_or_bus_index);
 
 /**
- * Convert pin or bus sub platform id to base platform id.
+ * Convert pin or bus sub platform id to index.
  *
- * @param int sub platform pin or bus number
+ * @param int sub platform pin or bus id
  *
- * @return int base platform pin or bus number
+ * @return int pin or bus index
  */
-int mraa_get_sub_platform_index(int pin_or_bus);
+int mraa_get_sub_platform_index(int pin_or_bus_id);
 
 
 
