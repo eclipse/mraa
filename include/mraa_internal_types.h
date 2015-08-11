@@ -27,6 +27,8 @@
 
 #include "common.h"
 #include "mraa.h"
+#include "mraa_func.h"
+#include "mraa_adv_func.h"
 
 // general status failures for internal functions
 #define MRAA_PLATFORM_NO_INIT -3
@@ -48,6 +50,7 @@ struct _gpio {
     mraa_boolean_t owner; /**< If this context originally exported the pin */
     mraa_result_t (*mmap_write) (mraa_gpio_context dev, int value);
     int (*mmap_read) (mraa_gpio_context dev);
+    mraa_adv_func_t* advance_func; /**< override function table  */    
     /*@}*/
 };
 
@@ -59,7 +62,9 @@ struct _i2c {
     int busnum; /**< the bus number of the /dev/i2c-* device */
     int fh; /**< the file handle to the /dev/i2c-* device */
     int addr; /**< the address of the i2c slave */
-    unsigned long funcs;
+    unsigned long funcs; /**< /dev/i2c-* device capabilities as per https://www.kernel.org/doc/Documentation/i2c/functionality */
+    void *handle; /**< generic handle for non-standard drivers that don't use file descriptors  */
+    mraa_adv_func_t* advance_func; /**< override function table  */
     /*@}*/
 };
 
@@ -189,6 +194,7 @@ typedef struct {
     unsigned int bus_id; /**< ID as exposed in the system */
     unsigned int scl; /**< i2c SCL */
     unsigned int sda; /**< i2c SDA */
+    // mraa_drv_api_t drv_type; /**< Driver type */
     /*@}*/
 } mraa_i2c_bus_t;
 
@@ -222,7 +228,8 @@ typedef struct {
 /**
  * A Structure representing a platform/board.
  */
-typedef struct {
+
+typedef struct _board_t {
     /*@{*/
     unsigned int phy_pin_count; /**< The Total IO pins on board */
     unsigned int gpio_count; /**< GPIO Count */
@@ -241,7 +248,12 @@ typedef struct {
     int pwm_default_period; /**< The default PWM period is US */
     int pwm_max_period; /**< Maximum period in us */
     int pwm_min_period; /**< Minimum period in us */
+    mraa_platform_t platform_type; /**< Platform type */
     const char* platform_name; /**< Platform Name pointer */
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
+    mraa_adv_func_t* adv_func;    /**< Pointer to advanced function disptach table */
+    struct _board_t* sub_platform;     /**< Pointer to sub platform */
     /*@}*/
 } mraa_board_t;
+
+
