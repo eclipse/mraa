@@ -193,60 +193,105 @@ void i2c_detect_devices(int bus)
 }
 
 
+int
+process_command(int argc, char** argv)
+{
+    if (strcmp(argv[1], "help") == 0) {
+        print_help();
+        return 0;
+    } else if (strcmp(argv[1], "version") == 0) {
+        print_version();
+        return 0;            
+    } else if (strcmp(argv[1], "list") == 0) {
+        print_busses();
+                    return 0;
+    } else if (strcmp(argv[1], "detect") == 0) {
+        if (argc == 3) {
+            int bus = strtol(argv[2], NULL, 0);
+            i2c_detect_devices(bus);
+            return 0;                
+        } else {
+            print_command_error();
+            return 1;
+        }
+    } else if ((strcmp(argv[1], "get") == 0)) {
+        if (argc == 5) {
+            int bus = strtol(argv[2], NULL, 0);
+            uint8_t device_address = strtol(argv[3], NULL, 0);
+            uint8_t register_address = strtol(argv[4], NULL, 0);
+            // fprintf(stdout, "Device %02X, Register = %02X\n", device_address, register_address);
+            uint8_t data;
+            if (i2c_get(bus, device_address, register_address, &data) == MRAA_SUCCESS) {
+                fprintf(stdout, "Register %#02X = %#02X\n", register_address, data);
+                return 0;
+            } else {
+                fprintf(stdout, "i2c get failed\n");
+                return 1;
+            }
+        } else {
+            print_command_error();
+            return 1;
+        }
+    } else if ((strcmp(argv[1], "set") == 0)) {
+        if (argc == 6) {
+            int bus = strtol(argv[2], NULL, 0);
+            uint8_t device_address = strtol(argv[3], NULL, 0);
+            uint8_t register_address = strtol(argv[4], NULL, 0);
+            uint8_t value = strtol(argv[5], NULL, 0);
+            fprintf(stdout, "Device %02X, Register = %02X, Value = %02X\n", device_address, register_address, value);
+            if (i2c_set(bus, device_address, register_address, value) != MRAA_SUCCESS) {
+                fprintf(stdout, "i2c set failed\n");
+                return 0;
+            }
+            return 1;
+        } else {
+            print_command_error();
+            return 1;
+        }
+    } else {
+        print_command_error();
+        return 1;
+    }
+
+}
+
+void
+run_interactive_mode()
+{
+    char command[80];
+    while (1) {
+        int i, argc = 1;    
+        char **argv;
+        char *arg;
+        argv[0] = "mraa-i2c";
+        fprintf(stdout, "Command: ");
+        fgets(command, 80, stdin);
+        command[strlen(command) - 1] = 0;
+        if (strcmp(command, "q") == 0)
+            return;
+        char *str = strtok(command, " ");
+        while (str != NULL) {
+            // fprintf(stdout, "%s\n", str);
+            arg = malloc(strlen(str) + 1);
+            argv[argc++] = strcpy(arg, str);
+            str = strtok(NULL, " ");
+        }
+        process_command(argc, argv);    
+        for (i=1; i<argc; ++i)
+            free(argv[i]);
+
+   }
+}
 
 int
 main(int argc, char** argv)
 {
     mraa_set_log_level(7);
     if (argc == 1) {
-        print_command_error();
-    }
-
-    if (argc > 1) {
-        if (strcmp(argv[1], "help") == 0) {
-            print_help();
-        } else if (strcmp(argv[1], "version") == 0) {
-            print_version();
-        } else if (strcmp(argv[1], "list") == 0) {
-            print_busses();
-        } else if (strcmp(argv[1], "detect") == 0) {
-            if (argc == 3) {
-                int bus = strtol(argv[2], NULL, 0);
-                i2c_detect_devices(bus);
-            } else {
-                print_command_error();
-            }
-        } else if ((strcmp(argv[1], "get") == 0)) {
-            if (argc == 5) {
-                int bus = strtol(argv[2], NULL, 0);
-                uint8_t device_address = strtol(argv[3], NULL, 0);
-                uint8_t register_address = strtol(argv[4], NULL, 0);
-                // fprintf(stdout, "Device %02X, Register = %02X\n", device_address, register_address);
-                uint8_t data;
-                if (i2c_get(bus, device_address, register_address, &data) == MRAA_SUCCESS) {
-                    fprintf(stdout, "Register %#02X = %#02X\n", register_address, data);
-                } else {
-                    fprintf(stdout, "i2c get failed\n");
-                }
-            } else {
-                print_command_error();
-            }
-        } else if ((strcmp(argv[1], "set") == 0)) {
-            if (argc == 6) {
-                int bus = strtol(argv[2], NULL, 0);
-                uint8_t device_address = strtol(argv[3], NULL, 0);
-                uint8_t register_address = strtol(argv[4], NULL, 0);
-                uint8_t value = strtol(argv[5], NULL, 0);
-                fprintf(stdout, "Device %02X, Register = %02X, Value = %02X\n", device_address, register_address, value);
-                if (i2c_set(bus, device_address, register_address, value) != MRAA_SUCCESS) {
-                    fprintf(stdout, "i2c set failed\n");
-                }
-            } else {
-                print_command_error();
-            }
-        }
-
-    }
-    return 0;
+        run_interactive_mode();
+        return 0;
+    } else
+        return process_command(argc, argv);
+    
 }
 
