@@ -22,13 +22,15 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import unittest as u
+from __future__ import print_function
+
 import mraa as m
+import unittest as u
 
 class GeneralChecks(u.TestCase):
   def test_mraa_version(self):
     self.version = m.getVersion()
-    print "Version is: " + self.version
+    print("Version is: " + self.version)
     self.assertIsNotNone(self.version)
 
 if __name__ == "__main__":
