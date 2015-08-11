@@ -80,7 +80,7 @@ print_bus(mraa_board_t* board)
             break;
         case MRAA_FTDI_FT4222:
             busType = "ft4222";
-            bus = mraa_use_sub_platform(i);
+            bus = mraa_get_sub_platform_id(i);
             break;
         default:
             busType = "unknown";
