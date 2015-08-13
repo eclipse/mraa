@@ -46,7 +46,7 @@
 #include "version.h"
 
 mraa_board_t* plat = NULL;
-static mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
+static mraa_board_t* current_plat = NULL;
 mraa_adv_func_t* advance_func;
 
 const char*
@@ -95,12 +95,18 @@ mraa_init()
     Py_InitializeEx(0);
     PyEval_InitThreads();
 #endif
+
     advance_func = (mraa_adv_func_t*) malloc(sizeof(mraa_adv_func_t));
     memset(advance_func, 0, sizeof(mraa_adv_func_t));
 
+    mraa_platform_t platform_type;
 #if defined(X86PLAT)
     // Use runtime x86 platform detection
     platform_type = mraa_x86_platform();
+    // x86 platforms have advanced_func table in board config structure
+    free(advance_func);
+    if (plat != NULL)
+        advance_func = plat->adv_func;
 #elif defined(ARMPLAT)
     // Use runtime ARM platform detection
     platform_type = mraa_arm_platform();
@@ -108,12 +114,40 @@ mraa_init()
 #error mraa_ARCH NOTHING
 #endif
 
+    if (plat != NULL)
+        plat->platform_type = platform_type;
+
+#if defined(USBPLAT)
+    // This is a platform extender so create null base platform if one doesn't already exist
+    if (plat == NULL) {
+        plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
+        if (plat != NULL) {
+            plat->platform_type = MRAA_UNKNOWN_PLATFORM;
+            plat->platform_name = "Unknown platform";
+        }
+    }
+    // Now detect sub platform
+    if (plat != NULL) {
+        mraa_platform_t usb_platform_type = mraa_usb_platform_extender(plat);
+        if (plat->platform_type == MRAA_UNKNOWN_PLATFORM && usb_platform_type != MRAA_UNKNOWN_PLATFORM) {
+            plat->platform_type = usb_platform_type;
+        } else {
+            return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
+        }
+    }
     if (plat == NULL) {
         printf("mraa: FATAL error, failed to initialise platform\n");
         return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
     }
+#endif
 
-    syslog(LOG_INFO, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), platform_type);
+    current_plat = plat;
+    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
+    if (mraa_has_sub_platform()) {
+        mraa_select_sub_platform();
+        syslog(LOG_NOTICE, "libmraa initialised for sub-platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());    
+        mraa_select_main_platform();
+    }
     return MRAA_SUCCESS;
 }
 
@@ -124,7 +158,15 @@ mraa_deinit()
         if (plat->pins != NULL) {
             free(plat->pins);
         }
+        mraa_board_t* sub_plat = plat->sub_platform;
+        if (sub_plat != NULL) {        
+            if (sub_plat->pins != NULL) {
+                free(sub_plat->pins);
+            }
+            free(sub_plat);        
+        }
         free(plat);
+        
     }
     closelog();
 }
@@ -222,46 +264,80 @@ mraa_result_print(mraa_result_t result)
     }
 }
 
+
+mraa_boolean_t 
+mraa_has_sub_platform()
+{
+    return (plat != NULL) && (plat->sub_platform != NULL);
+}
+
+
+mraa_boolean_t
+mraa_select_main_platform()
+{
+    if (plat != NULL) {
+        current_plat = plat;
+        return 1;
+    } else
+        return 0;
+}
+
+mraa_boolean_t
+mraa_select_sub_platform()
+{
+    if (plat->sub_platform != NULL) {
+        current_plat = plat->sub_platform;
+        return 1;
+    } else
+        return 0;
+}
+
+mraa_boolean_t
+mraa_is_sub_platform_selected()
+{
+    return (plat->sub_platform != NULL) &&  (current_plat == plat->sub_platform);
+}
+
 mraa_boolean_t
 mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
 {
-    if (plat == NULL) {
+    if (current_plat == NULL || current_plat->platform_type == MRAA_UNKNOWN_PLATFORM) {
         return 0;
     }
-    if (pin > (plat->phy_pin_count - 1) || pin < 0)
+    if (pin > (current_plat->phy_pin_count - 1) || pin < 0)
         return 0;
 
     switch (mode) {
         case MRAA_PIN_VALID:
-            if (plat->pins[pin].capabilites.valid == 1)
+            if (current_plat->pins[pin].capabilites.valid == 1)
                 return 1;
             break;
         case MRAA_PIN_GPIO:
-            if (plat->pins[pin].capabilites.gpio == 1)
+            if (current_plat->pins[pin].capabilites.gpio == 1)
                 return 1;
             break;
         case MRAA_PIN_PWM:
-            if (plat->pins[pin].capabilites.pwm == 1)
+            if (current_plat->pins[pin].capabilites.pwm == 1)
                 return 1;
             break;
         case MRAA_PIN_FAST_GPIO:
-            if (plat->pins[pin].capabilites.fast_gpio == 1)
+            if (current_plat->pins[pin].capabilites.fast_gpio == 1)
                 return 1;
             break;
         case MRAA_PIN_SPI:
-            if (plat->pins[pin].capabilites.spi == 1)
+            if (current_plat->pins[pin].capabilites.spi == 1)
                 return 1;
             break;
         case MRAA_PIN_I2C:
-            if (plat->pins[pin].capabilites.i2c == 1)
+            if (current_plat->pins[pin].capabilites.i2c == 1)
                 return 1;
             break;
         case MRAA_PIN_AIO:
-            if (plat->pins[pin].capabilites.aio == 1)
+            if (current_plat->pins[pin].capabilites.aio == 1)
                 return 1;
             break;
         case MRAA_PIN_UART:
-            if (plat->pins[pin].capabilites.uart == 1)
+            if (current_plat->pins[pin].capabilites.uart == 1)
                 return 1;
             break;
         default:
@@ -274,61 +350,76 @@ mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
 mraa_platform_t
 mraa_get_platform_type()
 {
-    return platform_type;
+    if (current_plat == NULL)
+        return MRAA_UNKNOWN_PLATFORM;
+    return current_plat->platform_type;
 }
+
+
 
 unsigned int
 mraa_adc_raw_bits()
 {
-    if (plat == NULL)
+    if (current_plat == NULL)
         return 0;
 
-    if (plat->aio_count == 0)
+    if (current_plat->aio_count == 0)
         return 0;
 
-    return plat->adc_raw;
+    return current_plat->adc_raw;
 }
 
 unsigned int
 mraa_adc_supported_bits()
 {
-    if (plat == NULL)
+    if (current_plat == NULL)
         return 0;
 
-    if (plat->aio_count == 0)
+    if (current_plat->aio_count == 0)
         return 0;
 
-    return plat->adc_supported;
+    return current_plat->adc_supported;
 }
 
 char*
 mraa_get_platform_name()
 {
-    if (plat == NULL) {
+    if (current_plat == NULL) {
         return NULL;
     }
-    return (char*) plat->platform_name;
+    return (char*) current_plat->platform_name;
 }
 
 unsigned int
 mraa_get_pin_count()
 {
-    if (plat == NULL) {
+    if (current_plat == NULL) {
         return 0;
     }
-    return plat->phy_pin_count;
+    return current_plat->phy_pin_count;
 }
 
 char*
 mraa_get_pin_name(int pin)
 {
-    if (plat == NULL) {
+    if (current_plat == NULL) {
         return NULL;
     }
-    if (pin > (plat->phy_pin_count - 1) || pin < 0)
+    if (pin > (current_plat->phy_pin_count - 1) || pin < 0)
         return NULL;
-    return (char*) plat->pins[pin].name;
+    return (char*) current_plat->pins[pin].name;
 }
+
+int
+mraa_get_default_i2c_bus()
+{
+    if (current_plat == NULL) {
+        return -1;
+    } else
+        return current_plat->def_i2c_bus;
+}
+
+
 
 mraa_boolean_t
 mraa_file_exist(const char* filename)
@@ -523,4 +614,22 @@ mraa_find_i2c_bus(const char* devname, int startfrom)
     }
 
     return ret;
+}
+
+mraa_boolean_t
+mraa_is_sub_platform_id(int pin_or_bus)
+{
+    return (pin_or_bus & MRAA_SUB_PLATFORM_MASK) != 0;
+}
+
+int 
+mraa_get_sub_platform_id(int pin_or_bus)
+{
+    return pin_or_bus | MRAA_SUB_PLATFORM_MASK;
+}
+
+int 
+mraa_get_sub_platform_index(int pin_or_bus)
+{
+    return pin_or_bus & (~MRAA_SUB_PLATFORM_MASK);
 }

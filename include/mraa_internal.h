@@ -34,8 +34,10 @@ extern "C" {
 #include "mraa_internal_types.h"
 #include "mraa_adv_func.h"
 
-extern mraa_adv_func_t* advance_func;
 extern mraa_board_t* plat;
+// TODO: Remove global advance_func and use module context instead
+extern mraa_adv_func_t* advance_func;
+
 
 /**
  * Takes in pin information and sets up the multiplexors.
@@ -58,6 +60,13 @@ mraa_platform_t mraa_x86_platform();
  * @return mraa_platform_t of the init'ed platform
  */
 mraa_platform_t mraa_arm_platform();
+
+/**
+ * runtime detect running usb platform extender
+ *
+ * @return mraa_platform_t of the detected platform extender
+ */
+mraa_platform_t mraa_usb_platform_extender(mraa_board_t* board);
 
 /**
  * helper function to check if file exists

@@ -52,69 +52,42 @@ mraa_gpio_get_valfp(mraa_gpio_context dev)
     return MRAA_SUCCESS;
 }
 
-mraa_gpio_context
-mraa_gpio_init(int pin)
+
+static mraa_gpio_context
+mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
 {
-    if (plat == NULL) {
-        syslog(LOG_ERR, "gpio: platform not initialised");
-        return NULL;
-    }
-    if (pin < 0 || pin > plat->phy_pin_count) {
-        syslog(LOG_ERR, "gpio: pin %i beyond platform definition", pin);
-        return NULL;
-    }
-    if (plat->pins[pin].capabilites.gpio != 1) {
-        syslog(LOG_ERR, "gpio: pin %i not capable of gpio", pin);
-        return NULL;
-    }
-    if (plat->pins[pin].gpio.mux_total > 0) {
-        if (mraa_setup_mux_mapped(plat->pins[pin].gpio) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "gpio: unable to setup muxes");
-            return NULL;
-        }
-    }
-
-    mraa_gpio_context r = mraa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
-    if (r == NULL) {
-        syslog(LOG_CRIT, "gpio: mraa_gpio_init_raw(%d) returned error", pin);
-        return NULL;
-    }
-    r->phy_pin = pin;
-
-    if (advance_func->gpio_init_post != NULL) {
-        mraa_result_t ret = advance_func->gpio_init_post(r);
-        if (ret != MRAA_SUCCESS) {
-            free(r);
-            return NULL;
-        }
-    }
-    return r;
-}
-
-mraa_gpio_context
-mraa_gpio_init_raw(int pin)
-{
-    if (advance_func->gpio_init_pre != NULL) {
-        if (advance_func->gpio_init_pre(pin) != MRAA_SUCCESS)
-            return NULL;
-    }
-
     if (pin < 0)
         return NULL;
 
+    mraa_result_t status = MRAA_SUCCESS;
     char bu[MAX_SIZE];
     int length;
 
-    mraa_gpio_context dev = (mraa_gpio_context) malloc(sizeof(struct _gpio));
+    mraa_gpio_context dev = (mraa_gpio_context) calloc(1, sizeof(struct _gpio));
     if (dev == NULL) {
         syslog(LOG_CRIT, "gpio: Failed to allocate memory for context");
         return NULL;
     }
+    
+    dev->advance_func = func_table;
+    dev->pin = pin;    
+    
+    if (IS_FUNC_DEFINED(dev, gpio_init_internal_replace)) {
+        status = dev->advance_func->gpio_init_internal_replace(pin);
+        if (status == MRAA_SUCCESS)
+            return dev;
+        else
+            goto init_internal_cleanup;
+    }
+        
+    if (IS_FUNC_DEFINED(dev, gpio_init_pre)) {
+        status = dev->advance_func->gpio_init_pre(pin);
+        if (status != MRAA_SUCCESS)
+            goto init_internal_cleanup;
+    }
 
-    memset(dev, 0, sizeof(struct _gpio));
     dev->value_fp = -1;
     dev->isr_value_fp = -1;
-    dev->pin = pin;
     dev->phy_pin = -1;
 
     // then check to make sure the pin is exported.
@@ -127,21 +100,84 @@ mraa_gpio_init_raw(int pin)
         int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
         if (export == -1) {
             syslog(LOG_ERR, "gpio: Failed to open export for writing");
-            free(dev);
-            return NULL;
+            status = MRAA_ERROR_NO_RESOURCES;
+            goto init_internal_cleanup;
         }
         length = snprintf(bu, sizeof(bu), "%d", dev->pin);
         if (write(export, bu, length * sizeof(char)) == -1) {
             syslog(LOG_ERR, "gpio: Failed to write %d to export", dev->pin);
             close(export);
-            free(dev);
-            return NULL;
+            status = MRAA_ERROR_NO_RESOURCES;
+            goto init_internal_cleanup;
         }
         dev->owner = 1;
         close(export);
     }
 
+init_internal_cleanup:
+    if (status != MRAA_SUCCESS) {
+        if (dev != NULL)
+            free(dev);
+        return NULL;
+    }
     return dev;
+}
+
+mraa_gpio_context
+mraa_gpio_init(int pin)
+{
+    mraa_board_t* board = plat;
+    if (board == NULL) {
+        syslog(LOG_ERR, "gpio: platform not initialised");
+        return NULL;
+    }
+    
+    if (mraa_is_sub_platform_id(pin)) {
+        syslog(LOG_NOTICE, "gpio: Using sub platform");
+        board = board->sub_platform;
+        if (board == NULL) {
+            syslog(LOG_ERR, "gpio: Sub platform Not Initialised");
+            return NULL;
+        }
+        pin = mraa_get_sub_platform_index(pin);
+    }
+    
+    if (pin < 0 || pin > board->phy_pin_count) {
+        syslog(LOG_ERR, "gpio: pin %i beyond platform definition", pin);
+        return NULL;
+    }
+    if (board->pins[pin].capabilites.gpio != 1) {
+        syslog(LOG_ERR, "gpio: pin %i not capable of gpio", pin);
+        return NULL;
+    }
+    if (board->pins[pin].gpio.mux_total > 0) {
+        if (mraa_setup_mux_mapped(board->pins[pin].gpio) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "gpio: unable to setup muxes");
+            return NULL;
+        }
+    }
+
+    mraa_gpio_context r = mraa_gpio_init_internal(board->adv_func, board->pins[pin].gpio.pinmap);
+    if (r == NULL) {
+        syslog(LOG_CRIT, "gpio: mraa_gpio_init_raw(%d) returned error", pin);
+        return NULL;
+    }
+    r->phy_pin = pin;
+
+    if (IS_FUNC_DEFINED(r, gpio_init_post)) {
+        mraa_result_t ret = r->advance_func->gpio_init_post(r);
+        if (ret != MRAA_SUCCESS) {
+            free(r);
+            return NULL;
+        }
+    }
+    return r;
+}
+
+mraa_gpio_context
+mraa_gpio_init_raw(int pin)
+{
+    return mraa_gpio_init_internal(plat == NULL ? NULL : plat->adv_func , pin);
 }
 
 
@@ -177,6 +213,9 @@ static void*
 mraa_gpio_interrupt_handler(void* arg)
 {
     mraa_gpio_context dev = (mraa_gpio_context) arg;
+    if (IS_FUNC_DEFINED(dev, gpio_interrupt_handler_replace))
+        return dev->advance_func->gpio_interrupt_handler_replace(dev);
+    
     mraa_result_t ret;
 
     // open gpio value with open(3)
@@ -232,6 +271,9 @@ mraa_gpio_interrupt_handler(void* arg)
 mraa_result_t
 mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode)
 {
+    if (IS_FUNC_DEFINED(dev, gpio_edge_mode_replace))
+        return dev->advance_func->gpio_edge_mode_replace(dev, mode);
+    
     if (dev->value_fp != -1) {
         close(dev->value_fp);
         dev->value_fp = -1;
@@ -334,10 +376,10 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
 mraa_result_t
 mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 {
-    if (advance_func->gpio_mode_replace != NULL)
-        return advance_func->gpio_mode_replace(dev, mode);
+    if (IS_FUNC_DEFINED(dev, gpio_mode_replace))
+        return dev->advance_func->gpio_mode_replace(dev, mode);
 
-    if (advance_func->gpio_mode_pre != NULL) {
+    if (IS_FUNC_DEFINED(dev, gpio_mode_pre)) {
         mraa_result_t pre_ret = (advance_func->gpio_mode_pre(dev, mode));
         if (pre_ret != MRAA_SUCCESS)
             return pre_ret;
@@ -383,19 +425,20 @@ mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
     }
 
     close(drive);
-    if (advance_func->gpio_mode_post != NULL)
-        return advance_func->gpio_mode_post(dev, mode);
+    if (IS_FUNC_DEFINED(dev, gpio_mode_post))    
+        return dev->advance_func->gpio_mode_post(dev, mode);
     return MRAA_SUCCESS;
 }
 
 mraa_result_t
 mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
-    if (advance_func->gpio_dir_replace != NULL) {
-        return advance_func->gpio_dir_replace(dev, dir);
+    if (IS_FUNC_DEFINED(dev, gpio_dir_replace)) {
+        return dev->advance_func->gpio_dir_replace(dev, dir);
     }
-    if (advance_func->gpio_dir_pre != NULL) {
-        mraa_result_t pre_ret = (advance_func->gpio_dir_pre(dev, dir));
+    
+    if (IS_FUNC_DEFINED(dev, gpio_dir_pre)) {
+        mraa_result_t pre_ret = (dev->advance_func->gpio_dir_pre(dev, dir));
         if (pre_ret != MRAA_SUCCESS) {
             return pre_ret;
         }
@@ -452,8 +495,8 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
     }
 
     close(direction);
-    if (advance_func->gpio_dir_post != NULL)
-        return advance_func->gpio_dir_post(dev, dir);
+    if (IS_FUNC_DEFINED(dev, gpio_dir_post))
+        return dev->advance_func->gpio_dir_post(dev, dir);
     return MRAA_SUCCESS;
 }
 
@@ -462,6 +505,9 @@ mraa_gpio_read(mraa_gpio_context dev)
 {
     if (dev == NULL)
         return -1;
+
+    if (IS_FUNC_DEFINED(dev, gpio_read_replace))
+        return dev->advance_func->gpio_read_replace(dev);
 
     if (dev->mmap_read != NULL)
         return dev->mmap_read(dev);

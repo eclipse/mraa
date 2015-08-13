@@ -34,6 +34,8 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/arm/banana.c
 )
 
+set (mraa_LIBS ${CMAKE_THREAD_LIBS_INIT})
+
 if (X86PLAT)
   add_subdirectory(x86)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DX86PLAT=1")
@@ -43,6 +45,30 @@ if (ARMPLAT)
   add_subdirectory(arm)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DARMPLAT=1")
 endif()
+
+if (USBPLAT)
+  message (INFO " - Adding USB platforms")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSBPLAT=1")
+  find_package (Ftd2xx)
+  if (FTDID2xx)
+    if (${LIBFTD2XX_FOUND})
+      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFTDID2XX=1")
+      set (mraa_LIBS ${mraa_LIBS} ${LIBFTD2XX_LIBRARIES})
+    else ()
+      message (WARNING " - Enabled FTDID2xx support but library not found")
+    endif ()
+  endif ()
+  find_package (Ftd4222)
+  if (FTDI4222)
+    if (${LIBFT4222_FOUND})
+      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFTDI4222=1")
+      set (mraa_LIBS ${mraa_LIBS} ${LIBFT4222_LIBRARIES})
+    else ()
+      message (WARNING " - Enabled FTDI4222 support but library not found")
+    endif ()
+  endif ()
+  add_subdirectory(usb)
+endif ()
 
 set (mraa_LIB_SRCS
   ${mraa_LIB_PLAT_SRCS_NOAUTO}
@@ -56,7 +82,9 @@ set (mraa_LIB_GLOB_HEADERS
 )
 
 add_library (mraa SHARED ${mraa_LIB_SRCS})
-target_link_libraries (mraa ${CMAKE_THREAD_LIBS_INIT})
+
+
+target_link_libraries (mraa ${mraa_LIBS})
 
 set_target_properties(
    mraa

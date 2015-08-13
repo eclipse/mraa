@@ -760,15 +760,19 @@ mraa_intel_edison_miniboard(mraa_board_t* b)
         return MRAA_ERROR_UNSPECIFIED;
     }
 
-    advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
-
-    advance_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
-    advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
-    advance_func->i2c_set_frequency_replace = &mraa_intel_edison_i2c_freq;
-    advance_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
-    advance_func->gpio_mode_replace = &mraa_intel_edsion_mb_gpio_mode;
-    advance_func->uart_init_pre = &mraa_intel_edison_uart_init_pre;
-    advance_func->gpio_mmap_setup = &mraa_intel_edison_mmap_setup;
+    mraa_adv_func_t* adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+    if (adv_func == NULL) {
+        return MRAA_ERROR_UNSPECIFIED;
+    }
+    adv_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
+    adv_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
+    adv_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
+    adv_func->i2c_set_frequency_replace = &mraa_intel_edison_i2c_freq;
+    adv_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
+    adv_func->gpio_mode_replace = &mraa_intel_edsion_mb_gpio_mode;
+    adv_func->uart_init_pre = &mraa_intel_edison_uart_init_pre;
+    adv_func->gpio_mmap_setup = &mraa_intel_edison_mmap_setup;
+    b->adv_func = adv_func;
 
     int pos = 0;
     strncpy(b->pins[pos].name, "J17-1", 8);
@@ -1116,7 +1120,7 @@ mraa_intel_edison_miniboard(mraa_board_t* b)
 mraa_board_t*
 mraa_intel_edison_fab_c()
 {
-    mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
+    mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
         return NULL;
     }
@@ -1137,24 +1141,29 @@ mraa_intel_edison_fab_c()
     b->gpio_count = 14;
     b->aio_count = 6;
 
-    advance_func->gpio_dir_pre = &mraa_intel_edison_gpio_dir_pre;
-    advance_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
-    advance_func->gpio_close_pre = &mraa_intel_edison_gpio_close_pre;
-    advance_func->gpio_dir_post = &mraa_intel_edison_gpio_dir_post;
-    advance_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
-    advance_func->i2c_set_frequency_replace = &mraa_intel_edison_i2c_freq;
-    advance_func->aio_get_valid_fp = &mraa_intel_edison_aio_get_fp;
-    advance_func->aio_init_pre = &mraa_intel_edison_aio_init_pre;
-    advance_func->aio_init_post = &mraa_intel_edison_aio_init_post;
-    advance_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
-    advance_func->pwm_init_post = &mraa_intel_edison_pwm_init_post;
-    advance_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
-    advance_func->spi_init_post = &mraa_intel_edison_spi_init_post;
-    advance_func->gpio_mode_replace = &mraa_intel_edison_gpio_mode_replace;
-    advance_func->uart_init_pre = &mraa_intel_edison_uart_init_pre;
-    advance_func->uart_init_post = &mraa_intel_edison_uart_init_post;
-    advance_func->gpio_mmap_setup = &mraa_intel_edison_mmap_setup;
-    advance_func->spi_lsbmode_replace = &mraa_intel_edison_spi_lsbmode_replace;
+    mraa_adv_func_t* adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+    if (adv_func == NULL) {
+        return NULL;
+    }
+    adv_func->gpio_dir_pre = &mraa_intel_edison_gpio_dir_pre;
+    adv_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
+    adv_func->gpio_close_pre = &mraa_intel_edison_gpio_close_pre;
+    adv_func->gpio_dir_post = &mraa_intel_edison_gpio_dir_post;
+    adv_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
+    adv_func->i2c_set_frequency_replace = &mraa_intel_edison_i2c_freq;
+    adv_func->aio_get_valid_fp = &mraa_intel_edison_aio_get_fp;
+    adv_func->aio_init_pre = &mraa_intel_edison_aio_init_pre;
+    adv_func->aio_init_post = &mraa_intel_edison_aio_init_post;
+    adv_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
+    adv_func->pwm_init_post = &mraa_intel_edison_pwm_init_post;
+    adv_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
+    adv_func->spi_init_post = &mraa_intel_edison_spi_init_post;
+    adv_func->gpio_mode_replace = &mraa_intel_edison_gpio_mode_replace;
+    adv_func->uart_init_pre = &mraa_intel_edison_uart_init_pre;
+    adv_func->uart_init_post = &mraa_intel_edison_uart_init_post;
+    adv_func->gpio_mmap_setup = &mraa_intel_edison_mmap_setup;
+    adv_func->spi_lsbmode_replace = &mraa_intel_edison_spi_lsbmode_replace;
+    b->adv_func = adv_func;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_EDISON_PINCOUNT);
     if (b->pins == NULL) {

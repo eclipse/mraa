@@ -29,6 +29,11 @@
 #define MRAA_PLATFORM_NAME_MAX_SIZE 64
 #define MRAA_PIN_NAME_SIZE 12
 
+#define MRAA_SUB_PLATFORM_BIT_SHIFT 9
+#define MRAA_SUB_PLATFORM_MASK (1<<MRAA_SUB_PLATFORM_BIT_SHIFT)
+
+
+
 /** @file
  *
  * This file defines the basic shared values for libmraa
@@ -160,6 +165,71 @@ unsigned int mraa_get_pin_count();
 * @return char* of pin name
 */
 char* mraa_get_pin_name(int pin);
+
+/**
+ * Get default i2c bus, board must be initialised.
+ *
+ * @return int default i2c bus index
+ */
+int mraa_get_default_2c_bus();
+
+/**
+ * Detect presence of sub platform.
+ *
+ * @return mraa_boolean_t 1 if sub platform is present and initialized, 0 otherwise
+ */
+mraa_boolean_t mraa_has_sub_platform();
+
+
+/**
+ * Select main platform for platform info calls.
+ *
+ * @return mraa_boolean_t 1 if main platform is available, 0 otherwise
+ */
+mraa_boolean_t mraa_select_main_platform();
+
+/**
+ * Select sub platform for platform info calls.
+ *
+ * @return mraa_boolean_t 1 if sub platform is available, 0 otherwise
+ */
+mraa_boolean_t mraa_select_sub_platform();
+	
+/**
+ * Check if sub platform is currently available and selected for platform info calls.
+ *
+ * @return mraa_boolean_t 1 if sub platform is selected, 0 otherwise
+ */
+mraa_boolean_t mraa_is_sub_platform_selected();
+
+/**
+ * Check if pin or bus id includes sub platform mask.
+ *
+ * @param int pin or bus number
+ *
+ * @return mraa_boolean_t 1 if pin or bus is for sub platform, 0 otherwise
+ */
+mraa_boolean_t mraa_is_sub_platform_id(int pin_or_bus_id);
+
+/**
+ * Convert pin or bus index to corresponding sub platform id.
+ *
+ * @param int pin or bus index
+ *
+ * @return int sub platform pin or bus number
+ */
+int mraa_get_sub_platform_id(int pin_or_bus_index);
+
+/**
+ * Convert pin or bus sub platform id to index.
+ *
+ * @param int sub platform pin or bus id
+ *
+ * @return int pin or bus index
+ */
+int mraa_get_sub_platform_index(int pin_or_bus_id);
+
+
 
 #ifdef __cplusplus
 }

@@ -10,9 +10,13 @@ add_executable (mmap-io2 mmap-io2.c)
 add_executable (blink_onboard blink_onboard.c)
 add_executable (uart uart.c)
 add_executable (mraa-gpio mraa-gpio.c)
+add_executable (mraa-i2c mraa-i2c.c)
 add_executable (spi_max7219 spi_max7219.c)
 
 include_directories(${PROJECT_SOURCE_DIR}/api)
+# FIXME Hack to access mraa internal types used by mraa-i2c
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/api/mraa)
 
 target_link_libraries (hellomraa mraa)
 target_link_libraries (i2c_HMC5883L mraa m)
@@ -26,6 +30,7 @@ target_link_libraries (mmap-io2 mraa)
 target_link_libraries (blink_onboard mraa)
 target_link_libraries (uart mraa)
 target_link_libraries (mraa-gpio mraa)
+target_link_libraries (mraa-i2c mraa)
 target_link_libraries (spi_max7219 mraa)
 
 add_subdirectory (c++)

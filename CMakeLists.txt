@@ -54,6 +54,9 @@ option (BUILDSWIG "Build swig modules." ON)
 option (BUILDSWIGPYTHON "Build swig python modules." ON)
 option (BUILDSWIGNODE "Build swig node modules." ON)
 option (BUILDSWIGJAVA "Build Java API." OFF)
+option (USBPLAT "Detection USB platform." ON)
+option (FTDID2XX "Build with FTDI D2xx subplatform support." OFF)
+option (FTDI4222 "Build with FTDI FT4222 subplatform support." OFF)
 option (IPK "Generate IPK using CPack" OFF)
 option (RPM "Generate RPM using CPack" OFF)
 option (BUILDPYTHON3 "Use python3 for building/installing" OFF)
@@ -151,6 +154,7 @@ endif()
 
 if (RPM)
   message (INFO " - Enabled RPM packaging for ${DETECTED_ARCH}")
+  set(CMAKE_INSTALL_PREFIX "/usr")
   set(CPACK_PACKAGE_VERSION ${VERSION})
   set(CPACK_GENERATOR "RPM")
   set(CPACK_PACKAGE_NAME "libmraa${mraa_VERSION_MAJOR}")
@@ -160,12 +164,14 @@ if (RPM)
   set(CPACK_PACKAGE_CONTACT "Intel IoT-Devkit")
   set(CPACK_PACKAGE_VENDOR "Intel IoT-Devkit")
   set(CPACK_RPM_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME}-devel")
-  EXECUTE_PROCESS(COMMAND rpm --showrc
-    COMMAND grep -E "dist[[:space:]]*\\."
-    COMMAND sed -e "s/^.*dist\\s*\\.//"
-    COMMAND tr \\n \\t
-    COMMAND sed  -e s/\\t//
-    OUTPUT_VARIABLE DIST_TAG)
+  # Get distro tag (e.g. 'fc20') by parsing output of rpm --showrc
+  EXECUTE_PROCESS(
+    COMMAND rpm --showrc
+    COMMAND grep -w dist
+    COMMAND sed -e "s/\\t./ /"
+    COMMAND awk "{printf \"%s\", \$NF}"
+    OUTPUT_VARIABLE DIST_TAG
+  )
   set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${DIST_TAG}.${DETECTED_ARCH}")
   include(CPack)
 endif()
