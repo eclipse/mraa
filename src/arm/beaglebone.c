@@ -196,15 +196,15 @@ mraa_beaglebone_uart_init_pre(int index)
         }
         FILE* fh;
         fh = fopen(capepath, "w");
+        free(capepath);
         if (fh == NULL) {
-            syslog(LOG_ERR, "uart: Failed to open %s for writing, check access rights for user", capepath);
+            syslog(LOG_ERR, "uart: Failed to open capepath for writing, check access rights for user");
             return ret;
         }
         if (fprintf(fh, UART_OVERLAY(index + 1)) < 0) {
             syslog(LOG_ERR, "uart: Failed to write to CapeManager");
         }
         fclose(fh);
-        free(capepath);
     }
     if (mraa_file_exist(devpath))
         ret = MRAA_SUCCESS;
@@ -246,8 +246,9 @@ mraa_beaglebone_spi_init_pre(int index)
         }
         FILE* fh;
         fh = fopen(capepath, "w");
+        free(capepath);
         if (fh == NULL) {
-            syslog(LOG_ERR, "spi: Failed to open %s for writing, check access rights for user", capepath);
+            syslog(LOG_ERR, "spi: Failed to open capepath for writing, check access rights for user");
             return ret;
         }
         if (fprintf(fh, SPI_OVERLAY(index)) < 0) {
@@ -256,7 +257,6 @@ mraa_beaglebone_spi_init_pre(int index)
                    SPI_OVERLAY(index));
         }
         fclose(fh);
-        free(capepath);
     }
     if (mraa_file_exist(devpath)) {
         plat->spi_bus[index].bus_id = deviceindex;
@@ -284,8 +284,9 @@ mraa_beaglebone_i2c_init_pre(unsigned int bus)
         }
         FILE* fh;
         fh = fopen(capepath, "w");
+        free(capepath);
         if (fh == NULL) {
-            syslog(LOG_ERR, "i2c: Failed to open %s for writing, check access rights for user", capepath);
+            syslog(LOG_ERR, "i2c: Failed to open capepath for writing, check access rights for user");
             return ret;
         }
         if (fprintf(fh, "ADAFRUIT-I2C%d", bus) < 0) {
@@ -327,8 +328,9 @@ mraa_beaglebone_pwm_init_replace(int pin)
             return NULL;
         }
         fh = fopen(capepath, "w");
+        free(capepath);
         if (fh == NULL) {
-            syslog(LOG_ERR, "pwm: Failed to open %s for writing, check access rights for user", capepath);
+            syslog(LOG_ERR, "pwm: Failed to open %s for writing, check access rights for user");
             return NULL;
         }
         if (fprintf(fh, SYSFS_PWM_OVERLAY) < 0) {
