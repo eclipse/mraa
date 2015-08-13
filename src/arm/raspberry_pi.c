@@ -212,6 +212,7 @@ mraa_raspberry_pi()
     if (b == NULL) {
         return NULL;
     }
+    b->phy_pin_count = 0;
 
     size_t len = 100;
     char* line = malloc(len);
@@ -267,6 +268,11 @@ mraa_raspberry_pi()
     b->pwm_max_period = 2147483;
     b->pwm_min_period = 1;
 
+    if (b->phy_pin_count == 0) {
+        free(b);
+        syslog(LOG_ERR, "raspberrypi: Failed to detect platform revision");
+	return NULL;
+    }
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * b->phy_pin_count);
 
     advance_func->spi_init_pre = &mraa_raspberry_pi_spi_init_pre;
