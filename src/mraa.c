@@ -355,8 +355,14 @@ mraa_file_contains(const char* filename, const char* content)
     if (file != NULL) {
         size_t len = 1024;
         char* line = malloc(len);
+        if (line == NULL) {
+            close(file);
+            return 0;
+        }
         FILE* fh = fopen(file, "r");
         if (fh == NULL) {
+            close(file);
+            free(line);
             return 0;
         }
         while ((getline(&line, &len, fh) != -1) && (found == 0)) {
@@ -384,8 +390,14 @@ mraa_file_contains_both(const char* filename, const char* content, const char* c
     if (file != NULL) {
         size_t len = 1024;
         char* line = malloc(len);
+        if (line == NULL) {
+            close(file);
+            return 0;
+        }
         FILE* fh = fopen(file, "r");
         if (fh == NULL) {
+            close(file);
+            free(line);
             return 0;
         }
         while ((getline(&line, &len, fh) != -1) && (found == 0)) {
