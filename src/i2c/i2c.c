@@ -123,6 +123,7 @@ mraa_i2c_init_raw(unsigned int bus)
     if ((dev->fh = open(filepath, O_RDWR)) < 1) {
         syslog(LOG_ERR, "i2c: Failed to open requested i2c port %s", filepath);
     }
+    syslog(LOG_DEBUG, "i2c: Opened i2c bus %s", filepath);
 
     if (ioctl(dev->fh, I2C_FUNCS, &dev->funcs) < 0) {
         syslog(LOG_CRIT, "i2c: Failed to get I2C_FUNC map from device");
