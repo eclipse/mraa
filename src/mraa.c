@@ -60,8 +60,10 @@ mraa_set_log_level(int level)
 {
     if (level <= 7 && level >= 0) {
         setlogmask(LOG_UPTO(level));
+        syslog(LOG_DEBUG, "Loglevel %d is set", level);
         return MRAA_SUCCESS;
     }
+    syslog(LOG_NOTICE, "Invalid loglevel %d requested", level);
     return MRAA_ERROR_INVALID_PARAMETER;
 }
 
