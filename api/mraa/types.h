@@ -47,6 +47,7 @@ typedef enum {
     MRAA_BANANA = 7,                /**< Allwinner A20 based Banana Pi and Banana Pro */
     MRAA_FTDI_FT4222 = 8,           /**< FTDI FT4222 USB to i2c bridge */
 
+    MRAA_NULL_PLATFORM = 98,        /**< Platform with no capabilities that hosts a sub platform  */
     MRAA_UNKNOWN_PLATFORM =
     99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
 } mraa_platform_t;
