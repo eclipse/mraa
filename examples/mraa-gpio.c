@@ -60,13 +60,13 @@ print_command_error()
 }
 
 int
-list_platform_pins()
+list_platform_pins(uint8_t platform_offset)
 {
-    int pin_count = mraa_get_pin_count();
+    int pin_count = mraa_get_platform_pin_count(platform_offset);
     int i;
     for (i = 0; i < pin_count; ++i) {
         if (strcmp(mraa_get_pin_name(i), "INVALID") != 0) {
-            int pin_id = mraa_is_sub_platform_selected() ? mraa_get_sub_platform_id(i) : i;
+            int pin_id = platform_offset > 0 ? mraa_get_sub_platform_id(i) : i;
             fprintf(stdout, "%02d ", pin_id);
             fprintf(stdout, "%*s: ", (MRAA_PIN_NAME_SIZE - 1), mraa_get_pin_name(i));
             if (mraa_pin_mode_test(i, MRAA_PIN_GPIO))
@@ -91,14 +91,11 @@ int
 list_pins()
 {
     int pin_count = 0;
-    mraa_select_main_platform();
-    pin_count += list_platform_pins();
-    mraa_select_sub_platform();
-    pin_count += list_platform_pins();    
+    pin_count += list_platform_pins(MRAA_MAIN_PLATFORM_OFFSET);
+    pin_count += list_platform_pins(MRAA_SUB_PLATFORM_OFFSET);    
     if (pin_count == 0) {
         fprintf(stdout, "No Pins\n");
     }
-    mraa_select_main_platform();        
 }
 
 
