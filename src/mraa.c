@@ -45,8 +45,11 @@
 #include "gpio.h"
 #include "version.h"
 
+#define MAX_PLATFORM_NAME_LENGTH 128
 mraa_board_t* plat = NULL;
-static mraa_board_t* current_plat = NULL;
+// static mraa_board_t* current_plat = NULL;
+
+static char platform_name[MAX_PLATFORM_NAME_LENGTH];
 mraa_adv_func_t* advance_func;
 
 const char*
@@ -124,8 +127,8 @@ mraa_init()
     if (plat == NULL) {
         plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
         if (plat != NULL) {
-            plat->platform_type = MRAA_UNKNOWN_PLATFORM;
-            plat->platform_name = "Unknown platform";
+            plat->platform_type = MRAA_NULL_PLATFORM;
+            plat->platform_name = "Null platform";
         }
     }
     // Now detect sub platform
@@ -143,13 +146,7 @@ mraa_init()
     }
 #endif
 
-    current_plat = plat;
     syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
-    if (mraa_has_sub_platform()) {
-        mraa_select_sub_platform();
-        syslog(LOG_NOTICE, "libmraa initialised for sub-platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());    
-        mraa_select_main_platform();
-    }
     return MRAA_SUCCESS;
 }
 
@@ -275,34 +272,21 @@ mraa_has_sub_platform()
 
 
 mraa_boolean_t
-mraa_select_main_platform()
-{
-    if (plat != NULL) {
-        current_plat = plat;
-        return 1;
-    } else
-        return 0;
-}
-
-mraa_boolean_t
-mraa_select_sub_platform()
-{
-    if (plat->sub_platform != NULL) {
-        current_plat = plat->sub_platform;
-        return 1;
-    } else
-        return 0;
-}
-
-mraa_boolean_t
-mraa_is_sub_platform_selected()
-{
-    return (plat->sub_platform != NULL) &&  (current_plat == plat->sub_platform);
-}
-
-mraa_boolean_t
 mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
 {
+    if (plat == NULL)
+        return 0;
+
+    mraa_board_t* current_plat = plat;
+    if (mraa_is_sub_platform_id(pin)) {
+        current_plat = plat->sub_platform;
+        if (current_plat == NULL) {
+            syslog(LOG_ERR, "mraa_pin_mode_test: Sub platform Not Initialised");
+            return 0;
+        }
+        pin = mraa_get_sub_platform_index(pin);
+    }
+
     if (current_plat == NULL || current_plat->platform_type == MRAA_UNKNOWN_PLATFORM) {
         return 0;
     }
@@ -352,44 +336,89 @@ mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
 mraa_platform_t
 mraa_get_platform_type()
 {
-    if (current_plat == NULL)
+    if (plat == NULL)
         return MRAA_UNKNOWN_PLATFORM;
-    return current_plat->platform_type;
+    return plat->platform_type;
 }
 
-
+int
+mraa_get_platform_combined_type()
+{
+    int type = mraa_get_platform_type();
+    int sub_type = mraa_has_sub_platform() ? plat->sub_platform->platform_type : MRAA_UNKNOWN_PLATFORM;
+    return type | (sub_type << 8);
+}
 
 unsigned int
 mraa_adc_raw_bits()
 {
-    if (current_plat == NULL)
+    if (plat == NULL)
         return 0;
 
-    if (current_plat->aio_count == 0)
+    if (plat->aio_count == 0)
         return 0;
 
-    return current_plat->adc_raw;
+    return plat->adc_raw;
 }
+
+unsigned int
+mraa_get_platform_adc_raw_bits(uint8_t platform_offset)
+{
+    if (platform_offset == MRAA_MAIN_PLATFORM_OFFSET)
+        return mraa_adc_raw_bits();
+    else {
+        if (!mraa_has_sub_platform())
+            return 0;
+
+        if (plat->sub_platform->aio_count == 0)
+            return 0;
+
+        return plat->sub_platform->adc_raw;
+    }
+}
+
 
 unsigned int
 mraa_adc_supported_bits()
 {
-    if (current_plat == NULL)
+    if (plat == NULL)
         return 0;
 
-    if (current_plat->aio_count == 0)
+    if (plat->aio_count == 0)
         return 0;
 
-    return current_plat->adc_supported;
+    return plat->adc_supported;
 }
+
+unsigned int
+mraa_get_platform_adc_supported_bits(int platform_offset)
+{
+    if (platform_offset == MRAA_MAIN_PLATFORM_OFFSET)
+        return mraa_adc_supported_bits();
+    else {
+        if (!mraa_has_sub_platform())
+            return 0;
+
+        if (plat->sub_platform->aio_count == 0)
+            return 0;
+
+        return plat->sub_platform->adc_supported;
+    }
+}
+
 
 char*
 mraa_get_platform_name()
 {
-    if (current_plat == NULL) {
+    if (plat == NULL) {
         return NULL;
     }
-    return (char*) current_plat->platform_name;
+    strncpy(platform_name, plat->platform_name, MAX_PLATFORM_NAME_LENGTH);
+    if (mraa_has_sub_platform()) {
+        strncat(platform_name, " + ", MAX_PLATFORM_NAME_LENGTH);
+        strncat(platform_name, plat->sub_platform->platform_name, MAX_PLATFORM_NAME_LENGTH);        
+    }
+    return platform_name;
 }
 
 int
@@ -418,32 +447,61 @@ mraa_get_i2c_bus_id(unsigned i2c_bus)
 unsigned int
 mraa_get_pin_count()
 {
-    if (current_plat == NULL) {
+    if (plat == NULL) {
         return 0;
     }
-    return current_plat->phy_pin_count;
+    return plat->phy_pin_count;
 }
+
+unsigned int
+mraa_get_platform_pin_count(uint8_t platform_offset)
+{
+    if (platform_offset == MRAA_MAIN_PLATFORM_OFFSET)
+        return mraa_get_pin_count();
+    else {
+        if (mraa_has_sub_platform())
+           return plat->sub_platform->phy_pin_count;
+        else
+           return 0;
+    }
+}
+
 
 char*
 mraa_get_pin_name(int pin)
 {
-    if (current_plat == NULL) {
-        return NULL;
+    if (plat == NULL)
+        return 0;
+
+    mraa_board_t* current_plat = plat;
+    if (mraa_is_sub_platform_id(pin)) {
+        current_plat = plat->sub_platform;
+        if (current_plat == NULL) {
+            syslog(LOG_ERR, "mraa_get_pin_name: Sub platform Not Initialised");
+            return 0;
+        }
+        pin = mraa_get_sub_platform_index(pin);
     }
+
     if (pin > (current_plat->phy_pin_count - 1) || pin < 0)
         return NULL;
     return (char*) current_plat->pins[pin].name;
 }
 
 int
-mraa_get_default_i2c_bus()
+mraa_get_default_i2c_bus(uint8_t platform_offset)
 {
-    if (current_plat == NULL) {
+    if (plat == NULL) 
         return -1;
-    } else
-        return current_plat->def_i2c_bus;
+    if (platform_offset == MRAA_MAIN_PLATFORM_OFFSET) {
+        return plat->def_i2c_bus;
+    } else {
+        if (mraa_has_sub_platform())
+           return plat->sub_platform->def_i2c_bus;
+        else
+           return -1;
+    }
 }
-
 
 
 mraa_boolean_t
