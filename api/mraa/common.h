@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <stdint.h>
 #include "types.h"
 
 #define MRAA_PLATFORM_NAME_MAX_SIZE 64
@@ -32,6 +33,8 @@
 #define MRAA_SUB_PLATFORM_BIT_SHIFT 9
 #define MRAA_SUB_PLATFORM_MASK (1<<MRAA_SUB_PLATFORM_BIT_SHIFT)
 
+#define MRAA_MAIN_PLATFORM_OFFSET 0
+#define MRAA_SUB_PLATFORM_OFFSET 1
 
 
 /** @file
@@ -95,11 +98,27 @@ mraa_boolean_t mraa_pin_mode_test(int pin, mraa_pinmodes_t mode);
 unsigned int mraa_adc_raw_bits();
 
 /**
+ * Check the specified board's bit size when reading the value
+ *
+ * @param specified platform offset; 0 for main platform, 1 foor sub platform
+ * @return raw bits being read from kernel module. zero if no ADC
+ */
+unsigned int mraa_get_platform_adc_raw_bits(uint8_t platform_offset);
+
+/**
  * Return value that the raw value should be shifted to. Zero if no ADC
  *
  * @return return actual bit size the adc value should be understood as.
  */
 unsigned int mraa_adc_supported_bits();
+
+/**
+ * Return value that the raw value should be shifted to. Zero if no ADC
+ *
+ * @param specified platform offset; 0 for main platform, 1 foor sub platform
+ * @return return actual bit size the adc value should be understood as.
+ */
+unsigned int mraa_get_platform_adc_supported_bits(int platform_offset);
 
 /**
  * Sets the log level to use from 0-7 where 7 is very verbose. These are the
@@ -151,11 +170,28 @@ void mraa_result_print(mraa_result_t result);
 mraa_platform_t mraa_get_platform_type();
 
 /**
+ * Get combined platform type, board must be initialised.
+ * The combined type is represented as
+ * (sub_platform_type << 8) | main_platform_type
+ *
+ * @return int combined platform type
+ */
+int mraa_get_platform_combined_type();
+
+/**
  * Get platform pincount, board must be initialised.
  *
  * @return uint of physical pin count on the in-use platform
  */
 unsigned int mraa_get_pin_count();
+
+/**
+ * Get specified platform pincount, board must be initialised.
+ *
+ * @param specified platform offset; 0 for main platform, 1 foor sub platform
+ * @return uint of physical pin count on the in-use platform
+ */
+unsigned int mraa_get_platform_pin_count(uint8_t platform_offset);
 
 /**
 * Get name of pin, board must be initialised.
@@ -171,7 +207,7 @@ char* mraa_get_pin_name(int pin);
  *
  * @return int default i2c bus index
  */
-int mraa_get_default_2c_bus();
+int mraa_get_default_i2c_bus(uint8_t platform_offset);
 
 /**
  * Detect presence of sub platform.
@@ -180,27 +216,6 @@ int mraa_get_default_2c_bus();
  */
 mraa_boolean_t mraa_has_sub_platform();
 
-
-/**
- * Select main platform for platform info calls.
- *
- * @return mraa_boolean_t 1 if main platform is available, 0 otherwise
- */
-mraa_boolean_t mraa_select_main_platform();
-
-/**
- * Select sub platform for platform info calls.
- *
- * @return mraa_boolean_t 1 if sub platform is available, 0 otherwise
- */
-mraa_boolean_t mraa_select_sub_platform();
-	
-/**
- * Check if sub platform is currently available and selected for platform info calls.
- *
- * @return mraa_boolean_t 1 if sub platform is selected, 0 otherwise
- */
-mraa_boolean_t mraa_is_sub_platform_selected();
 
 /**
  * Check if pin or bus id includes sub platform mask.
