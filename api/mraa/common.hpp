@@ -227,40 +227,6 @@ hasSubPlatform()
 }
 
 
-/**
- * Select main platform for platform info calls.
- *
- * @return bool true if main platform is available, false otherwise
- */
-inline bool
-selectMainPlatform()
-{
-    return static_cast<bool>(mraa_select_main_platform());
-}
-
-/**
- * Select sub platform for platform info calls.
- *
- * @return mraa_boolean_t true if sub platform is available, 0 otherwise
- */
-inline bool
-selectSubPlatform()
-{
-    return static_cast<bool>(mraa_select_sub_platform());
-}
-
-    
-/**
- * Check if sub platform is currently available and selected for platform info calls.
- *
- * @return bool true if sub platform is selected, false otherwise
- */
-inline bool
-isSubPlatformSelected()
-{
-    return static_cast<bool>(mraa_is_sub_platform_selected());
-}
-
 
 /**
  * Check if pin or bus id includes sub platform mask.
