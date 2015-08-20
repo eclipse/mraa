@@ -102,7 +102,7 @@ void
 print_busses()
 {
    print_bus(plat);
-   if (plat->sub_platform != NULL)
+   if (mraa_has_sub_platform())
       print_bus(plat->sub_platform);
 }
 
@@ -261,7 +261,7 @@ run_interactive_mode()
     char command[80];
     while (1) {
         int i, argc = 1;    
-        char **argv;
+        char *argv[32];
         char *arg;
         argv[0] = "mraa-i2c";
         fprintf(stdout, "Command: ");
