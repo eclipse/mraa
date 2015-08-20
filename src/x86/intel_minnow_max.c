@@ -163,9 +163,9 @@ mraa_intel_minnow_max()
             b->i2c_bus_count = 0;
         } else {
             b->def_i2c_bus = bus;
-            b->i2c_bus[b->def_i2c_bus].bus_id = b->def_i2c_bus;
-            b->i2c_bus[b->def_i2c_bus].sda = pin_index_sda;
-            b->i2c_bus[b->def_i2c_bus].scl = pin_index_scl;
+            b->i2c_bus[0].bus_id = b->def_i2c_bus;
+            b->i2c_bus[0].sda = pin_index_sda;
+            b->i2c_bus[0].scl = pin_index_scl;
         }
     }
 
