@@ -33,7 +33,9 @@ if (DOXYGEN_FOUND)
   endforeach ()
 endif ()
 
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.jar
-  ${CMAKE_CURRENT_BINARY_DIR}/libmraajava.so
-  DESTINATION lib
+install (FILES	${CMAKE_CURRENT_BINARY_DIR}/libmraajava.so 
+	 	DESTINATION lib/iotdk/i386
+) 	
+install (FILES	${CMAKE_CURRENT_BINARY_DIR}/mraa.jar
+		DESTINATION lib/iotdk/ext
 )
