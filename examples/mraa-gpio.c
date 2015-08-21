@@ -203,8 +203,11 @@ main(int argc, char** argv)
                 if (gpio_isr_start(&gpio_info) == MRAA_SUCCESS) {
                     fprintf(stdout, "Monitoring level changes to pin %d. Press RETURN to exit.\n", pin);
                     gpio_isr_handler(&gpio_info);
-                    while (getchar() != '\n')
-                        ;
+                    char aux = 0;
+                    do {
+                        fflush(stdin);
+                        fscanf(stdin, "%c", &aux);
+                    } while (aux != '\n');
                     gpio_isr_stop(&gpio_info);
                 } else {
                     fprintf(stdout, "Failed to register ISR for pin %d\n", pin);
