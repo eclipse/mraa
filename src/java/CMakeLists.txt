@@ -34,8 +34,8 @@ if (DOXYGEN_FOUND)
 endif ()
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/libmraajava.so
-		DESTINATION lib/mraa/lib
+		DESTINATION lib/java
 )
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.jar
-		DESTINATION lib/mraa/ext
+		DESTINATION lib/java
 )
