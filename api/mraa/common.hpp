@@ -165,6 +165,30 @@ getPinCount()
 }
 
 /**
+ * Get platform usable I2C bus count, board must be initialised.
+ *
+ * @return number f usable I2C bus count on the current platform. Function will
+ * return -1 on failure
+ */
+inline int
+getI2cBusCount()
+{
+    return mraa_get_i2c_bus_count();
+}
+
+/**
+ * Get I2C adapter number in sysfs.
+ *
+ * @param i2c_bus the logical I2C bus number
+ * @return I2C adapter number in sysfs. Function will return -1 on failure
+ */
+inline int
+getI2cBusId(unsigned int i2c_bus)
+{
+    return mraa_get_i2c_bus_id(i2c_bus);
+}
+
+/**
 * Get name of pin, board must be initialised.
 *
 * @param pin number
