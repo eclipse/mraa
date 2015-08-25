@@ -42,6 +42,7 @@ Intel(R) breakout board
 
 - Both I2C buses are available 1 & 6
 - IO on the miniboard is 1.8V
+- Requesting GPIO 4 will break your FTDI UART console, so bear in mind when trying to use it
 
 Please see the following table on how the physical pins map to mraa pin numbers
 
