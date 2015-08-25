@@ -312,6 +312,29 @@ mraa_get_platform_name()
     return (char*) plat->platform_name;
 }
 
+int
+mraa_get_i2c_bus_count()
+{
+    if (plat == NULL) {
+        return -1;
+    }
+    return plat->i2c_bus_count;
+}
+
+int
+mraa_get_i2c_bus_id(unsigned i2c_bus)
+{
+    if (plat == NULL) {
+        return -1;
+    }
+
+    if (i2c_bus >= plat->i2c_bus_count) {
+        return -1;
+    }
+
+    return plat->i2c_bus[i2c_bus].bus_id;
+}
+
 unsigned int
 mraa_get_pin_count()
 {

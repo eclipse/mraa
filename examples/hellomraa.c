@@ -32,8 +32,16 @@ int
 main(int argc, char** argv)
 {
     char* board_name = mraa_get_platform_name();
+    int i2c_bus, i, i2c_adapter;
 
     fprintf(stdout, "hello mraa\n Version: %s\n Running on %s\n", mraa_get_version(), board_name);
+
+    i2c_bus = mraa_get_i2c_bus_count();
+
+    for (i = 0; i < i2c_bus; i++) {
+        i2c_adapter = mraa_get_i2c_bus_id(i);
+        fprintf(stdout, "I2C[%d] adapter=%d\n", i, i2c_adapter);
+    }
 
     mraa_deinit();
 
