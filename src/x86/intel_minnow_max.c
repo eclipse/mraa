@@ -152,7 +152,7 @@ mraa_intel_minnow_max()
     mraa_set_pininfo(b, 26, "IBL8254", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 208);
 
     // Set number of i2c adaptors usable from userspace
-    b->i2c_bus_count = 2;
+    b->i2c_bus_count = 1;
 
     // Configure i2c adaptor #7 and make it the default
     int pin_index_sda, pin_index_scl;
