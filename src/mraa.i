@@ -19,6 +19,7 @@
 
 %{
     #include "common.hpp"
+    #include "types.hpp"
     #include "gpio.hpp"
     #include "pwm.hpp"
     #include "i2c.hpp"
@@ -37,9 +38,9 @@
     }
 }
 
-%include "common.hpp"
+%include "types.hpp"
 
-%include "types.h"
+%include "common.hpp"
 
 %ignore Gpio::nop(uv_work_t* req);
 %ignore Gpio::v8isr(uv_work_t* req);

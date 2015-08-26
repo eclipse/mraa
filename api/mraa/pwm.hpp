@@ -25,6 +25,7 @@
 #pragma once
 
 #include "pwm.h"
+#include "types.hpp"
 #include <stdexcept>
 
 namespace mraa
@@ -81,10 +82,10 @@ class Pwm
      * 1.0f
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     write(float percentage)
     {
-        return mraa_pwm_write(m_pwm, percentage);
+        return (Result) mraa_pwm_write(m_pwm, percentage);
     }
     /**
      * Read the ouput duty-cycle percentage, as a float
@@ -105,10 +106,10 @@ class Pwm
      * @param period Period represented as a float in seconds
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     period(float period)
     {
-        return mraa_pwm_period(m_pwm, period);
+        return (Result) mraa_pwm_period(m_pwm, period);
     }
     /**
      * Set period, milliseconds
@@ -116,10 +117,10 @@ class Pwm
      * @param ms milliseconds for period
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     period_ms(int ms)
     {
-        return mraa_pwm_period_ms(m_pwm, ms);
+        return (Result) mraa_pwm_period_ms(m_pwm, ms);
     }
     /**
      * Set period, microseconds
@@ -127,10 +128,10 @@ class Pwm
      * @param us microseconds as period
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     period_us(int us)
     {
-        return mraa_pwm_period_us(m_pwm, us);
+        return (Result) mraa_pwm_period_us(m_pwm, us);
     }
     /**
      * Set pulsewidth, As represnted by seconds in a (float)
@@ -138,10 +139,10 @@ class Pwm
      * @param seconds The duration of a pulse
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     pulsewidth(float seconds)
     {
-        return mraa_pwm_pulsewidth(m_pwm, seconds);
+        return (Result) mraa_pwm_pulsewidth(m_pwm, seconds);
     }
     /**
      * Set pulsewidth, milliseconds
@@ -149,10 +150,10 @@ class Pwm
      * @param ms milliseconds for pulsewidth
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     pulsewidth_ms(int ms)
     {
-        return mraa_pwm_pulsewidth_ms(m_pwm, ms);
+        return (Result) mraa_pwm_pulsewidth_ms(m_pwm, ms);
     }
     /**
      * The pulsewidth, microseconds
@@ -160,10 +161,10 @@ class Pwm
      * @param us microseconds for pulsewidth
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     pulsewidth_us(int us)
     {
-        return mraa_pwm_pulsewidth_us(m_pwm, us);
+        return (Result) mraa_pwm_pulsewidth_us(m_pwm, us);
     }
     /**
      * Set the enable status of the PWM pin. None zero will assume on with
@@ -172,13 +173,13 @@ class Pwm
      * @param enable enable status of pin
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     enable(bool enable)
     {
         if (enable)
-            return mraa_pwm_enable(m_pwm, 1);
+            return (Result) mraa_pwm_enable(m_pwm, 1);
         else
-            return mraa_pwm_enable(m_pwm, 0);
+            return (Result) mraa_pwm_enable(m_pwm, 0);
     }
     /**
      * Set the period and duty of a PWM object.
@@ -187,10 +188,10 @@ class Pwm
      * @param duty represnted in ms as float.
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     config_ms(int period, float duty)
     {
-        return mraa_pwm_config_ms(m_pwm, period, duty);
+        return (Result) mraa_pwm_config_ms(m_pwm, period, duty);
     }
     /**
      * Set the period and duty (percent) of a PWM object.
@@ -199,10 +200,10 @@ class Pwm
      * @param duty percentage i.e. 50% = 0.5f
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     config_percent(int period, float duty)
     {
-        return mraa_pwm_config_percent(m_pwm, period, duty);
+        return (Result) mraa_pwm_config_percent(m_pwm, period, duty);
     }
     /**
      * Get the maximum pwm period in us

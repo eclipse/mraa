@@ -25,6 +25,7 @@
 #pragma once
 
 #include "spi.h"
+#include "types.hpp"
 #include <stdexcept>
 
 namespace mraa
@@ -83,10 +84,10 @@ class Spi
      * @param mode the mode. See Linux spidev doc
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     mode(Spi_Mode mode)
     {
-        return mraa_spi_mode(m_spi, (mraa_spi_mode_t) mode);
+        return (Result) mraa_spi_mode(m_spi, (mraa_spi_mode_t) mode);
     }
 
     /**
@@ -95,10 +96,10 @@ class Spi
      * @param hz the frequency to set in hz
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     frequency(int hz)
     {
-        return mraa_spi_frequency(m_spi, hz);
+        return (Result) mraa_spi_frequency(m_spi, hz);
     }
 
     /**
@@ -167,10 +168,10 @@ class Spi
      * @param length size of buffer to send
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     transfer(uint8_t* txBuf, uint8_t* rxBuf, int length)
     {
-        return mraa_spi_transfer_buf(m_spi, txBuf, rxBuf, length);
+        return (Result) mraa_spi_transfer_buf(m_spi, txBuf, rxBuf, length);
     }
 
     /**
@@ -182,10 +183,10 @@ class Spi
      * @param length size of buffer to send
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     transfer_word(uint16_t* txBuf, uint16_t* rxBuf, int length)
     {
-        return mraa_spi_transfer_buf_word(m_spi, txBuf, rxBuf, length);
+        return (Result) mraa_spi_transfer_buf_word(m_spi, txBuf, rxBuf, length);
     }
 #endif
 
@@ -195,10 +196,10 @@ class Spi
      * @param lsb Use least significant bit transmission - 0 for msbi
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     lsbmode(bool lsb)
     {
-        return mraa_spi_lsbmode(m_spi, (mraa_boolean_t) lsb);
+        return (Result) mraa_spi_lsbmode(m_spi, (mraa_boolean_t) lsb);
     }
 
     /**
@@ -207,10 +208,10 @@ class Spi
      * @param bits bits per word
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     bitPerWord(unsigned int bits)
     {
-        return mraa_spi_bit_per_word(m_spi, bits);
+        return (Result) mraa_spi_bit_per_word(m_spi, bits);
     }
 
   private:

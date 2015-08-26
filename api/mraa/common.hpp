@@ -25,6 +25,7 @@
 #pragma once
 
 #include "common.h"
+#include "types.hpp"
 #include <string>
 
 /**
@@ -51,10 +52,10 @@ namespace mraa
  *
  * @return Result of operation
  */
-inline mraa_result_t
+inline Result
 init()
 {
-    return mraa_init();
+    return (Result) mraa_init();
 }
 
 /**
@@ -87,23 +88,23 @@ setPriority(const unsigned int priority)
 /**
  * Get platform type, board must be initialised.
  *
- * @return mraa_platform_t Platform type enum
+ * @return mraa::platform Platform type enum
  */
-inline mraa_platform_t
+inline Platform
 getPlatformType()
 {
-    return mraa_get_platform_type();
+    return (Platform) mraa_get_platform_type();
 }
 
 /**
- * Print a textual representation of the mraa_result_t
+ * Print a textual representation of the mraa::Result
  *
- * @param result the result to print
+ * @param Result the Result to print
  */
 inline void
-printError(mraa_result_t result)
+printError(Result result)
 {
-    mraa_result_print(result);
+    mraa_result_print((mraa_result_t) result);
 }
 
 /**
@@ -114,9 +115,9 @@ printError(mraa_result_t result)
  * @return boolean if the mode is supported, 0=false.
  */
 inline bool
-pinModeTest(int pin, mraa_pinmodes_t mode)
+pinModeTest(int pin, Pinmodes mode)
 {
-    return (bool) mraa_pin_mode_test(pin, mode);
+    return (bool) mraa_pin_mode_test(pin, (mraa_pinmodes_t) mode);
 }
 
 /**
@@ -209,9 +210,9 @@ getPinName(int pin)
  * @param level
  * @return Result of operation
  */
-inline mraa_result_t
+inline Result
 setLogLevel(int level)
 {
-    return mraa_set_log_level(level);
+    return (Result) mraa_set_log_level(level);
 }
 }
