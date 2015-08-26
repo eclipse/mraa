@@ -44,8 +44,7 @@ mraa_intel_de3815()
     }
 
     b->platform_name = PLATFORM_NAME;
-    b->phy_pin_count = 18;
-    // b->gpio_count = 14;
+    b->phy_pin_count = MRAA_INTEL_DE3815_PINCOUNT;
     b->aio_count = 0;
     b->adc_raw = 0;
     b->adc_supported = 0;
