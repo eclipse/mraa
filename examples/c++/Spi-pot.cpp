@@ -66,7 +66,7 @@ main()
         }
         for (i = 130; i > 90; i--) {
             data[1] = i;
-            if (spi->transfer(data, rxBuf, 2) == MRAA_SUCCESS) {
+            if (spi->transfer(data, rxBuf, 2) == mraa::SUCCESS) {
                 printf("Writing -%i", i);
                 printf("RECIVED-%i-%i\n", rxBuf[0], rxBuf[1]);
             }
@@ -76,5 +76,5 @@ main()
     delete spi;
     //! [Interesting]
 
-    return MRAA_SUCCESS;
+    return mraa::SUCCESS;
 }

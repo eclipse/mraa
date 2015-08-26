@@ -25,6 +25,7 @@
 #pragma once
 
 #include "i2c.h"
+#include "types.hpp"
 #include <stdexcept>
 
 namespace mraa
@@ -80,10 +81,10 @@ class I2c
      * @param mode Frequency to set the bus to
      * @return Result of operation
      */
-    mraa_result_t
-    frequency(mraa_i2c_mode_t mode)
+    Result
+    frequency(I2cMode mode)
     {
-        return mraa_i2c_frequency(m_i2c, mode);
+        return (Result) mraa_i2c_frequency(m_i2c, (mraa_i2c_mode_t) mode);
     }
 
     /**
@@ -93,10 +94,10 @@ class I2c
      * @param address Communicate to the i2c slave on this address
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     address(uint8_t address)
     {
-        return mraa_i2c_address(m_i2c, address);
+        return (Result) mraa_i2c_address(m_i2c, address);
     }
 
     /**
@@ -168,10 +169,10 @@ class I2c
      * @param data The byte to send on the bus
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     writeByte(uint8_t data)
     {
-        return mraa_i2c_write_byte(m_i2c, data);
+        return (Result) mraa_i2c_write_byte(m_i2c, data);
     }
 
     /**
@@ -182,10 +183,10 @@ class I2c
      * @param length Size of buffer to send
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     write(const uint8_t* data, int length)
     {
-        return mraa_i2c_write(m_i2c, data, length);
+        return (Result) mraa_i2c_write(m_i2c, data, length);
     }
 
     /**
@@ -195,10 +196,10 @@ class I2c
      * @param data Value to write to register
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     writeReg(uint8_t reg, uint8_t data)
     {
-        return mraa_i2c_write_byte_data(m_i2c, data, reg);
+        return (Result) mraa_i2c_write_byte_data(m_i2c, data, reg);
     }
 
     /**
@@ -208,10 +209,10 @@ class I2c
      * @param data Value to write to register
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     writeWordReg(uint8_t reg, uint16_t data)
     {
-        return mraa_i2c_write_word_data(m_i2c, data, reg);
+        return (Result) mraa_i2c_write_word_data(m_i2c, data, reg);
     }
 
   private:

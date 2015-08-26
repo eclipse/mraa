@@ -170,10 +170,10 @@ class Uart
      *
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     flush()
     {
-        return mraa_uart_flush(m_uart);
+        return (Result) mraa_uart_flush(m_uart);
     }
 
     /**
@@ -184,26 +184,26 @@ class Uart
      * @param baud unsigned int of baudrate i.e. 9600
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     setBaudRate(unsigned int baud)
     {
-        return mraa_uart_set_baudrate(m_uart, baud);
+        return (Result) mraa_uart_set_baudrate(m_uart, baud);
     }
 
     /**
      * Set the transfer mode
      * For example setting the mode to 8N1 would be
-     * "dev.setMode(8,MRAA_UART_PARITY_NONE , 1)"
+     * "dev.setMode(8,UART_PARITY_NONE , 1)"
      *
      * @param bytesize data bits
      * @param parity Parity bit setting
      * @param stopbits stop bits
      * @return Result of operation
      */
-    mraa_result_t
-    setMode(int bytesize, mraa_uart_parity_t parity, int stopbits)
+    Result
+    setMode(int bytesize, UartParity parity, int stopbits)
     {
-        return mraa_uart_set_mode(m_uart, bytesize, parity, stopbits);
+        return (Result) mraa_uart_set_mode(m_uart, bytesize, (mraa_uart_parity_t) parity, stopbits);
     }
 
     /**
@@ -213,10 +213,10 @@ class Uart
      * @param rtscts RTS/CTS out of band hardware flow control
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     setFlowcontrol(bool xonxoff, bool rtscts)
     {
-        return mraa_uart_set_flowcontrol(m_uart, xonxoff, rtscts);
+        return (Result) mraa_uart_set_flowcontrol(m_uart, xonxoff, rtscts);
     }
 
     /**
@@ -228,10 +228,10 @@ class Uart
      * @param interchar inbetween char timeout
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     setTimeout(int read, int write, int interchar)
     {
-        return mraa_uart_set_timeout(m_uart, read, write, interchar);
+        return (Result) mraa_uart_set_timeout(m_uart, read, write, interchar);
     }
 
   private:
