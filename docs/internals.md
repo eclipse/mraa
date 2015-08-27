@@ -114,6 +114,11 @@ set the pinmapper correctly for uart to work on some platforms.
 
 ### pwm ###
 
+Internally everything with PWM in mraa is in microseconds because that's what
+the linux kernel uses and is probably all the granularity we'll ever
+need/achieve with the kind of hardware we're targetting. Board configuration
+pwm max/min values are always set in microseconds.
+
 ### aio ###
 
 AIO pins are numbered after GPIO pins. This means that on Arduino style boards
