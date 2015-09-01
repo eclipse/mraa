@@ -183,7 +183,11 @@ mraa_intel_minnow_max()
     b->spi_bus[0].miso = 7;
     b->spi_bus[0].sclk = 11;
 
-    b->uart_dev_count = 0;
+    b->uart_dev_count = 1;
+    b->def_uart_dev = 0;
+    b->uart_dev[0].rx = -1;
+    b->uart_dev[0].tx = -1;
+    b->uart_dev[0].device_path = "/dev/ttyS0";
 
     return b;
 error:
