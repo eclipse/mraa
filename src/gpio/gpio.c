@@ -320,11 +320,6 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
         }
     }
 
-#ifdef SWIGPYTHON
-    // Dereference our Python call back function
-    Py_DECREF(dev->isr);
-#endif
-
     // assume our thread will exit either way we just lost it's handle
     dev->thread_id = 0;
     dev->isr_value_fp = -1;
