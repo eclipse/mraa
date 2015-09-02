@@ -253,7 +253,7 @@ mraa_uart_flush(mraa_uart_context dev)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    if (!tcdrain(dev->fd)) {
+    if (tcdrain(dev->fd) == -1) {
         return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
     }
 
