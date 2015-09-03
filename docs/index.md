@@ -45,6 +45,7 @@ Specific platform information for supported platforms is documented here:
 - @ref rasppi
 - @ref bananapi
 - @ref beaglebone
+- @ref nuc5
 
 ## DEBUGGING
 

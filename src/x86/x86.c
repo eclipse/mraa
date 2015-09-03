@@ -31,6 +31,7 @@
 #include "x86/intel_edison_fab_c.h"
 #include "x86/intel_de3815.h"
 #include "x86/intel_minnow_max.h"
+#include "x86/intel_nuc5.h"
 
 mraa_platform_t
 mraa_x86_platform()
@@ -54,6 +55,9 @@ mraa_x86_platform()
             } else if (strncmp(line, "DE3815", 6) == 0) {
                 platform_type = MRAA_INTEL_DE3815;
                 plat = mraa_intel_de3815();
+            } else if (strncmp(line, "NUC5i5MYBE", 10) == 0 || strncmp(line, "NUC5i3MYBE", 10) == 0) {
+                platform_type = MRAA_INTEL_NUC5;
+                plat = mraa_intel_nuc5();
             } else if (strncmp(line, "NOTEBOOK", 8) == 0) {
                 platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
                 plat = mraa_intel_minnow_max();
