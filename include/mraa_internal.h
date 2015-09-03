@@ -35,9 +35,6 @@ extern "C" {
 #include "mraa_adv_func.h"
 
 extern mraa_board_t* plat;
-// TODO: Remove global advance_func and use module context instead
-extern mraa_adv_func_t* advance_func;
-
 
 /**
  * Takes in pin information and sets up the multiplexors.

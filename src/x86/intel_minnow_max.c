@@ -97,9 +97,6 @@ mraa_intel_minnow_max()
     b->platform_name = PLATFORM_NAME;
     b->phy_pin_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
     b->gpio_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
-    b->aio_count = 0;
-    b->adc_raw = 0;
-    b->adc_supported = 0;
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_MINNOW_MAX_PINCOUNT);
@@ -107,7 +104,15 @@ mraa_intel_minnow_max()
         goto error;
     }
 
+    b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+    if (b->adv_func == NULL) {
+        free(b->pins);
+        goto error;
+    }
+
     if (uname(&running_uname) != 0) {
+        free(b->pins);
+        free(b->adv_func);
         goto error;
     }
 

@@ -513,11 +513,20 @@ mraa_beaglebone()
     b->pwm_min_period = 1;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * b->phy_pin_count);
+    if (b->pins == NULL) {
+        goto error;
+    }
 
-    advance_func->uart_init_pre = &mraa_beaglebone_uart_init_pre;
-    advance_func->spi_init_pre = &mraa_beaglebone_spi_init_pre;
-    advance_func->i2c_init_pre = &mraa_beaglebone_i2c_init_pre;
-    advance_func->pwm_init_replace = &mraa_beaglebone_pwm_init_replace;
+    b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+    if (b->adv_func == NULL) {
+        free(b->pins);
+        goto error;
+    }
+
+    b->adv_func->uart_init_pre = &mraa_beaglebone_uart_init_pre;
+    b->adv_func->spi_init_pre = &mraa_beaglebone_spi_init_pre;
+    b->adv_func->i2c_init_pre = &mraa_beaglebone_i2c_init_pre;
+    b->adv_func->pwm_init_replace = &mraa_beaglebone_pwm_init_replace;
 
     strncpy(b->pins[0].name, "INVALID", MRAA_PIN_NAME_SIZE);
     b->pins[0].capabilites = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };

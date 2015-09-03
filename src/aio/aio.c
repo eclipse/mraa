@@ -1,6 +1,7 @@
 /*
  * Author: Nandkishor Sonar
- * Copyright (c) 2014 Intel Corporation.
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Copyright (c) 2014, 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -36,8 +37,9 @@ static int raw_bits;
 static mraa_result_t
 aio_get_valid_fp(mraa_aio_context dev)
 {
-    if (advance_func->aio_get_valid_fp != NULL)
-        return advance_func->aio_get_valid_fp(dev);
+    if (IS_FUNC_DEFINED(dev, aio_get_valid_fp)) {
+        return dev->advance_func->aio_get_valid_fp(dev);
+    }
 
     char file_path[64] = "";
 
@@ -53,6 +55,16 @@ aio_get_valid_fp(mraa_aio_context dev)
     return MRAA_SUCCESS;
 }
 
+static mraa_aio_context
+mraa_aio_init_internal(mraa_adv_func_t* func_table)
+{
+    mraa_aio_context dev = malloc(sizeof(struct _aio));
+    if (dev == NULL) {
+        return NULL;
+    }
+    dev->advance_func = func_table;
+}
+
 mraa_aio_context
 mraa_aio_init(unsigned int aio)
 {
@@ -60,8 +72,23 @@ mraa_aio_init(unsigned int aio)
         syslog(LOG_ERR, "aio: Platform not initialised");
         return NULL;
     }
-    if (advance_func->aio_init_pre != NULL) {
-        mraa_result_t pre_ret = (advance_func->aio_init_pre(aio));
+    if (mraa_is_sub_platform_id(aio)) {
+        syslog(LOG_NOTICE, "aio: Using sub platform is not supported");
+        return NULL;
+    }
+
+    // Create ADC device connected to specified channel
+    mraa_aio_context dev = mraa_aio_init_internal(plat->adv_func);
+    if (dev == NULL) {
+        syslog(LOG_ERR, "aio: Insufficient memory for specified input channel %d", aio);
+        return NULL;
+    }
+    int pin = aio + plat->gpio_count;
+    dev->channel = plat->pins[pin].aio.pinmap;
+    dev->value_bit = DEFAULT_BITS;
+
+    if (IS_FUNC_DEFINED(dev, aio_init_pre)) {
+        mraa_result_t pre_ret = (dev->advance_func->aio_init_pre(aio));
         if (pre_ret != MRAA_SUCCESS)
             return NULL;
     }
@@ -69,8 +96,6 @@ mraa_aio_init(unsigned int aio)
         syslog(LOG_ERR, "aio: requested channel out of range");
         return NULL;
     }
-
-    int pin = aio + plat->gpio_count;
 
     if (plat->pins[pin].capabilites.aio != 1) {
         syslog(LOG_ERR, "aio: pin uncapable of aio");
@@ -84,17 +109,6 @@ mraa_aio_init(unsigned int aio)
         }
     }
 
-    // Create ADC device connected to specified channel
-    mraa_aio_context dev = malloc(sizeof(struct _aio));
-    if (dev == NULL) {
-        syslog(LOG_ERR, "aio: Insufficient memory for specified input channel "
-                        "%d\n",
-               aio);
-        return NULL;
-    }
-    dev->channel = plat->pins[pin].aio.pinmap;
-    dev->value_bit = DEFAULT_BITS;
-
     // Open valid  analog input file and get the pointer.
     if (MRAA_SUCCESS != aio_get_valid_fp(dev)) {
         free(dev);
@@ -102,8 +116,8 @@ mraa_aio_init(unsigned int aio)
     }
     raw_bits = mraa_adc_raw_bits();
 
-    if (advance_func->aio_init_post != NULL) {
-        mraa_result_t ret = advance_func->aio_init_post(dev);
+    if (IS_FUNC_DEFINED(dev, aio_init_post)) {
+        mraa_result_t ret = dev->advance_func->aio_init_post(dev);
         if (ret != MRAA_SUCCESS) {
             free(dev);
             return NULL;

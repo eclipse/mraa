@@ -1,6 +1,7 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Copyright (c) 2014, 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -36,11 +37,27 @@
 #define MAX_SIZE 64
 #define SPI_MAX_LENGTH 4096
 
+static mraa_spi_context
+mraa_spi_init_internal(mraa_adv_func_t* func_table)
+{
+    mraa_spi_context dev = (mraa_spi_context) calloc(1, sizeof(struct _spi));
+    if (dev == NULL) {
+        return NULL;
+    }
+    dev->advance_func = func_table;
+
+    return dev;
+}
+
 mraa_spi_context
 mraa_spi_init(int bus)
 {
     if (plat == NULL) {
         syslog(LOG_ERR, "spi: Platform Not Initialised");
+        return NULL;
+    }
+    if (mraa_is_sub_platform_id(bus)) {
+        syslog(LOG_ERR, "spi: Spi module doesn't support subplatforms");
         return NULL;
     }
     if (plat->spi_bus_count == 0) {
@@ -54,9 +71,10 @@ mraa_spi_init(int bus)
         syslog(LOG_ERR, "spi: requested bus above spi bus count");
         return NULL;
     }
-    if (advance_func->spi_init_pre != NULL) {
-        if (advance_func->spi_init_pre(bus) != MRAA_SUCCESS)
+    if (plat->adv_func->spi_init_pre != NULL) {
+        if (plat->adv_func->spi_init_pre(bus) != MRAA_SUCCESS) {
             return NULL;
+        }
     }
 
     int pos = plat->spi_bus[bus].sclk;
@@ -92,8 +110,8 @@ mraa_spi_init(int bus)
     }
     mraa_spi_context dev = mraa_spi_init_raw(plat->spi_bus[bus].bus_id, plat->spi_bus[bus].slave_s);
 
-    if (advance_func->spi_init_post != NULL) {
-        mraa_result_t ret = advance_func->spi_init_post(dev);
+    if (plat->adv_func->spi_init_post != NULL) {
+        mraa_result_t ret = plat->adv_func->spi_init_post(dev);
         if (ret != MRAA_SUCCESS) {
             free(dev);
             return NULL;
@@ -106,12 +124,11 @@ mraa_spi_init(int bus)
 mraa_spi_context
 mraa_spi_init_raw(unsigned int bus, unsigned int cs)
 {
-    mraa_spi_context dev = (mraa_spi_context) malloc(sizeof(struct _spi));
+    mraa_spi_context dev = mraa_spi_init_internal(plat == NULL ? NULL : plat->adv_func);
     if (dev == NULL) {
         syslog(LOG_CRIT, "spi: Failed to allocate memory for context");
         return NULL;
     }
-    memset(dev, 0, sizeof(struct _spi));
 
     char path[MAX_SIZE];
     sprintf(path, "/dev/spidev%u.%u", bus, cs);
@@ -196,8 +213,8 @@ mraa_spi_frequency(mraa_spi_context dev, int hz)
 mraa_result_t
 mraa_spi_lsbmode(mraa_spi_context dev, mraa_boolean_t lsb)
 {
-    if (advance_func->spi_lsbmode_replace != NULL) {
-        return advance_func->spi_lsbmode_replace(dev, lsb);
+    if (IS_FUNC_DEFINED(dev, spi_lsbmode_replace)) {
+        return dev->advance_func->spi_lsbmode_replace(dev, lsb);
     }
 
     uint8_t lsb_mode = (uint8_t) lsb;

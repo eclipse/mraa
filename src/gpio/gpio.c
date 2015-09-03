@@ -1,7 +1,7 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Copyright (c) 2014, 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -52,7 +52,6 @@ mraa_gpio_get_valfp(mraa_gpio_context dev)
     return MRAA_SUCCESS;
 }
 
-
 static mraa_gpio_context
 mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
 {
@@ -68,10 +67,10 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
         syslog(LOG_CRIT, "gpio: Failed to allocate memory for context");
         return NULL;
     }
-    
+
     dev->advance_func = func_table;
-    dev->pin = pin;    
-    
+    dev->pin = pin;
+
     if (IS_FUNC_DEFINED(dev, gpio_init_internal_replace)) {
         status = dev->advance_func->gpio_init_internal_replace(pin);
         if (status == MRAA_SUCCESS)
@@ -79,7 +78,7 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
         else
             goto init_internal_cleanup;
     }
-        
+
     if (IS_FUNC_DEFINED(dev, gpio_init_pre)) {
         status = dev->advance_func->gpio_init_pre(pin);
         if (status != MRAA_SUCCESS)
@@ -131,7 +130,7 @@ mraa_gpio_init(int pin)
         syslog(LOG_ERR, "gpio: platform not initialised");
         return NULL;
     }
-    
+
     if (mraa_is_sub_platform_id(pin)) {
         syslog(LOG_NOTICE, "gpio: Using sub platform");
         board = board->sub_platform;
@@ -141,7 +140,7 @@ mraa_gpio_init(int pin)
         }
         pin = mraa_get_sub_platform_index(pin);
     }
-    
+
     if (pin < 0 || pin > board->phy_pin_count) {
         syslog(LOG_ERR, "gpio: pin %i beyond platform definition", pin);
         return NULL;
@@ -215,7 +214,7 @@ mraa_gpio_interrupt_handler(void* arg)
     mraa_gpio_context dev = (mraa_gpio_context) arg;
     if (IS_FUNC_DEFINED(dev, gpio_interrupt_handler_replace))
         return dev->advance_func->gpio_interrupt_handler_replace(dev);
-    
+
     mraa_result_t ret;
 
     // open gpio value with open(3)
@@ -273,7 +272,7 @@ mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode)
 {
     if (IS_FUNC_DEFINED(dev, gpio_edge_mode_replace))
         return dev->advance_func->gpio_edge_mode_replace(dev, mode);
-    
+
     if (dev->value_fp != -1) {
         close(dev->value_fp);
         dev->value_fp = -1;
@@ -375,7 +374,7 @@ mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
         return dev->advance_func->gpio_mode_replace(dev, mode);
 
     if (IS_FUNC_DEFINED(dev, gpio_mode_pre)) {
-        mraa_result_t pre_ret = (advance_func->gpio_mode_pre(dev, mode));
+        mraa_result_t pre_ret = (dev->advance_func->gpio_mode_pre(dev, mode));
         if (pre_ret != MRAA_SUCCESS)
             return pre_ret;
     }
@@ -420,7 +419,7 @@ mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
     }
 
     close(drive);
-    if (IS_FUNC_DEFINED(dev, gpio_mode_post))    
+    if (IS_FUNC_DEFINED(dev, gpio_mode_post))
         return dev->advance_func->gpio_mode_post(dev, mode);
     return MRAA_SUCCESS;
 }
@@ -431,7 +430,7 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
     if (IS_FUNC_DEFINED(dev, gpio_dir_replace)) {
         return dev->advance_func->gpio_dir_replace(dev, dir);
     }
-    
+
     if (IS_FUNC_DEFINED(dev, gpio_dir_pre)) {
         mraa_result_t pre_ret = (dev->advance_func->gpio_dir_pre(dev, dir));
         if (pre_ret != MRAA_SUCCESS) {
@@ -535,8 +534,8 @@ mraa_gpio_write(mraa_gpio_context dev, int value)
     if (dev->mmap_write != NULL)
         return dev->mmap_write(dev, value);
 
-    if (advance_func->gpio_write_pre != NULL) {
-        mraa_result_t pre_ret = (advance_func->gpio_write_pre(dev, value));
+    if (IS_FUNC_DEFINED(dev, gpio_write_pre)) {
+        mraa_result_t pre_ret = (dev->advance_func->gpio_write_pre(dev, value));
         if (pre_ret != MRAA_SUCCESS)
             return pre_ret;
     }
@@ -557,8 +556,8 @@ mraa_gpio_write(mraa_gpio_context dev, int value)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    if (advance_func->gpio_write_post != NULL)
-        return advance_func->gpio_write_post(dev, value);
+    if (IS_FUNC_DEFINED(dev, gpio_write_post))
+        return dev->advance_func->gpio_write_post(dev, value);
     return MRAA_SUCCESS;
 }
 
@@ -597,8 +596,8 @@ mraa_gpio_close(mraa_gpio_context dev)
 {
     mraa_result_t result = MRAA_SUCCESS;
 
-    if (advance_func->gpio_close_pre != NULL) {
-        result = advance_func->gpio_close_pre(dev);
+    if (IS_FUNC_DEFINED(dev, gpio_close_pre)) {
+        result = dev->advance_func->gpio_close_pre(dev);
     }
 
     if (dev->value_fp != -1) {
@@ -623,8 +622,8 @@ mraa_gpio_owner(mraa_gpio_context dev, mraa_boolean_t own)
 mraa_result_t
 mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap_en)
 {
-    if (advance_func->gpio_mmap_setup != NULL) {
-        return advance_func->gpio_mmap_setup(dev, mmap_en);
+    if (IS_FUNC_DEFINED(dev, gpio_mmap_setup)) {
+        return dev->advance_func->gpio_mmap_setup(dev, mmap_en);
     }
 
     syslog(LOG_ERR, "gpio: mmap not implemented on this platform");

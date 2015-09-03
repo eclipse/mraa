@@ -57,6 +57,12 @@ mraa_intel_de3815()
         goto error;
     }
 
+    b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+    if (b->adv_func == NULL) {
+        free(b->pins);
+        goto error;
+    }
+
     strncpy(b->pins[0].name, "1.8v", 8);
     b->pins[0].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 

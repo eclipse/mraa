@@ -335,21 +335,21 @@ mraa_intel_galileo_gen2()
     b->pwm_max_period = 41666;
     b->pwm_min_period = 666;
 
-    mraa_adv_func_t* advance_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
-    if (advance_func == NULL) {
-        return NULL;
+    b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+    if (b->adv_func == NULL) {
+        goto error;
     }
-    advance_func->gpio_close_pre = &mraa_intel_galileo_gen2_gpio_close_pre;
-    advance_func->gpio_dir_pre = &mraa_intel_galileo_gen2_dir_pre;
-    advance_func->i2c_init_pre = &mraa_intel_galileo_gen2_i2c_init_pre;
-    advance_func->pwm_period_replace = &mraa_intel_galileo_gen2_pwm_period_replace;
-    advance_func->gpio_mode_replace = &mraa_intel_galileo_gen2_gpio_mode_replace;
-    advance_func->uart_init_pre = &mraa_intel_galileo_gen2_uart_init_pre;
-    advance_func->gpio_mmap_setup = &mraa_intel_galileo_g2_mmap_setup;
-    b->adv_func = advance_func;
+    b->adv_func->gpio_close_pre = &mraa_intel_galileo_gen2_gpio_close_pre;
+    b->adv_func->gpio_dir_pre = &mraa_intel_galileo_gen2_dir_pre;
+    b->adv_func->i2c_init_pre = &mraa_intel_galileo_gen2_i2c_init_pre;
+    b->adv_func->pwm_period_replace = &mraa_intel_galileo_gen2_pwm_period_replace;
+    b->adv_func->gpio_mode_replace = &mraa_intel_galileo_gen2_gpio_mode_replace;
+    b->adv_func->uart_init_pre = &mraa_intel_galileo_gen2_uart_init_pre;
+    b->adv_func->gpio_mmap_setup = &mraa_intel_galileo_g2_mmap_setup;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_GALILEO_GEN_2_PINCOUNT);
     if (b->pins == NULL) {
+        free(b->adv_func);
         goto error;
     }
 

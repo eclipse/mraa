@@ -68,7 +68,7 @@ mraa_i2c_smbus_access(int fh, uint8_t read_write, uint8_t command, int size, i2c
     return ioctl(fh, I2C_SMBUS, &args);
 }
 
-static mraa_i2c_context 
+static mraa_i2c_context
 mraa_i2c_init_internal(mraa_adv_func_t* advance_func, unsigned int bus)
 {
     mraa_result_t status = MRAA_SUCCESS;
@@ -81,7 +81,7 @@ mraa_i2c_init_internal(mraa_adv_func_t* advance_func, unsigned int bus)
         syslog(LOG_CRIT, "i2c: Failed to allocate memory for context");
         return NULL;
     }
-    
+
     dev->advance_func = advance_func;
     dev->busnum = bus;
 
@@ -108,7 +108,7 @@ mraa_i2c_init_internal(mraa_adv_func_t* advance_func, unsigned int bus)
             syslog(LOG_CRIT, "i2c: Failed to get I2C_FUNC map from device");
             dev->funcs = 0;
         }
-    } 
+    }
 
     if (IS_FUNC_DEFINED(dev, i2c_init_post)) {
         status = dev->advance_func->i2c_init_post(dev);
@@ -182,8 +182,8 @@ mraa_i2c_init(int bus)
 }
 
 
-mraa_i2c_context 
-mraa_i2c_init_raw(unsigned int bus) 
+mraa_i2c_context
+mraa_i2c_init_raw(unsigned int bus)
 {
     return mraa_i2c_init_internal(plat == NULL ? NULL : plat->adv_func, bus);
 }
