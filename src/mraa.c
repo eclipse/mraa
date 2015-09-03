@@ -108,10 +108,6 @@ mraa_init()
 #if defined(X86PLAT)
     // Use runtime x86 platform detection
     platform_type = mraa_x86_platform();
-    // x86 platforms have advanced_func table in board config structure
-    free(advance_func);
-    if (plat != NULL)
-        advance_func = plat->adv_func;
 #elif defined(ARMPLAT)
     // Use runtime ARM platform detection
     platform_type = mraa_arm_platform();
@@ -158,14 +154,14 @@ mraa_deinit()
             free(plat->pins);
         }
         mraa_board_t* sub_plat = plat->sub_platform;
-        if (sub_plat != NULL) {        
+        if (sub_plat != NULL) {
             if (sub_plat->pins != NULL) {
                 free(sub_plat->pins);
             }
-            free(sub_plat);        
+            free(sub_plat);
         }
         free(plat);
-        
+
     }
     closelog();
 }
@@ -264,12 +260,11 @@ mraa_result_print(mraa_result_t result)
 }
 
 
-mraa_boolean_t 
+mraa_boolean_t
 mraa_has_sub_platform()
 {
     return (plat != NULL) && (plat->sub_platform != NULL);
 }
-
 
 mraa_boolean_t
 mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
@@ -416,7 +411,7 @@ mraa_get_platform_name()
     strncpy(platform_name, plat->platform_name, MAX_PLATFORM_NAME_LENGTH);
     if (mraa_has_sub_platform()) {
         strncat(platform_name, " + ", MAX_PLATFORM_NAME_LENGTH);
-        strncat(platform_name, plat->sub_platform->platform_name, MAX_PLATFORM_NAME_LENGTH);        
+        strncat(platform_name, plat->sub_platform->platform_name, MAX_PLATFORM_NAME_LENGTH);
     }
     return platform_name;
 }
@@ -491,7 +486,7 @@ mraa_get_pin_name(int pin)
 int
 mraa_get_default_i2c_bus(uint8_t platform_offset)
 {
-    if (plat == NULL) 
+    if (plat == NULL)
         return -1;
     if (platform_offset == MRAA_MAIN_PLATFORM_OFFSET) {
         return plat->def_i2c_bus;
@@ -717,13 +712,13 @@ mraa_is_sub_platform_id(int pin_or_bus)
     return (pin_or_bus & MRAA_SUB_PLATFORM_MASK) != 0;
 }
 
-int 
+int
 mraa_get_sub_platform_id(int pin_or_bus)
 {
     return pin_or_bus | MRAA_SUB_PLATFORM_MASK;
 }
 
-int 
+int
 mraa_get_sub_platform_index(int pin_or_bus)
 {
     return pin_or_bus & (~MRAA_SUB_PLATFORM_MASK);

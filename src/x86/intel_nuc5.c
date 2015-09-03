@@ -38,22 +38,22 @@
 mraa_board_t*
 mraa_intel_nuc5()
 {
-    mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
+    mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
         return NULL;
     }
 
     b->platform_name = PLATFORM_NAME;
     b->phy_pin_count = MRAA_INTEL_NUC5_PINCOUNT;
-    b->aio_count = 0;
-    b->adc_raw = 0;
-    b->adc_supported = 0;
-    b->pwm_default_period = 0;
-    b->pwm_max_period = 0;
-    b->pwm_min_period = 0;
+
+    b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+    if (b->adv_func == NULL) {
+        goto error;
+    }
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_NUC5_PINCOUNT);
     if (b->pins == NULL) {
+        free(b->adv_func);
         goto error;
     }
 
@@ -133,11 +133,6 @@ mraa_intel_nuc5()
     if (b->i2c_bus_count > 0) {
         b->def_i2c_bus = b->i2c_bus[0].bus_id;
     }
-
-
-    b->spi_bus_count = 0;
-    b->def_spi_bus = 0;
-    b->uart_dev_count = 0;
 
     return b;
 error:

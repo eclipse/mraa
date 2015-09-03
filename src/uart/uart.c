@@ -107,6 +107,21 @@ uint2speed(unsigned int speed)
     }
 }
 
+static mraa_uart_context
+mraa_uart_init_internal(mraa_adv_func_t* func_table)
+{
+    mraa_uart_context dev = (mraa_uart_context) calloc(1, sizeof(struct _uart));
+    if (dev == NULL) {
+        syslog(LOG_CRIT, "uart: Failed to allocate memory for context");
+        return NULL;
+    }
+    dev->index = -1;
+    dev->fd = -1;
+    dev->advance_func = func_table;
+
+    return dev;
+}
+
 mraa_uart_context
 mraa_uart_init(int index)
 {
@@ -115,8 +130,13 @@ mraa_uart_init(int index)
         return NULL;
     }
 
-    if (advance_func->uart_init_pre != NULL) {
-        if (advance_func->uart_init_pre(index) != MRAA_SUCCESS) {
+    if (mraa_is_sub_platform_id(index)) {
+        syslog(LOG_NOTICE, "pwm: Using sub platform is not supported");
+        return NULL;
+    }
+
+    if (plat->adv_func->uart_init_pre != NULL) {
+        if (plat->adv_func->uart_init_pre(index) != MRAA_SUCCESS) {
             syslog(LOG_ERR, "uart: failure in pre-init platform hook");
             return NULL;
         }
@@ -158,8 +178,8 @@ mraa_uart_init(int index)
     }
     dev->index = index; //Set the board Index.
 
-    if (advance_func->uart_init_post != NULL) {
-        mraa_result_t ret = advance_func->uart_init_post(dev);
+    if (IS_FUNC_DEFINED(dev, uart_init_post)) {
+        mraa_result_t ret = dev->advance_func->uart_init_post(dev);
         if (ret != MRAA_SUCCESS) {
             free(dev);
             return NULL;
@@ -172,15 +192,11 @@ mraa_uart_init(int index)
 mraa_uart_context
 mraa_uart_init_raw(const char* path)
 {
-    mraa_uart_context dev = (mraa_uart_context) malloc(sizeof(struct _uart));
+    mraa_uart_context dev = mraa_uart_init_internal(plat == NULL ? NULL : plat->adv_func);
     if (dev == NULL) {
-        syslog(LOG_CRIT, "uart: Failed to allocate memory for context");
+        syslog(LOG_ERR, "uart: Failed to allocate memory for context");
         return NULL;
     }
-    memset(dev, 0, sizeof(struct _uart));
-
-    dev->index = -1;
-    dev->fd = -1;
     dev->path = path;
 
     if (!dev->path) {

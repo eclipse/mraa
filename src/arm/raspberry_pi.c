@@ -271,13 +271,25 @@ mraa_raspberry_pi()
     if (b->phy_pin_count == 0) {
         free(b);
         syslog(LOG_ERR, "raspberrypi: Failed to detect platform revision");
-	return NULL;
+        return NULL;
     }
-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * b->phy_pin_count);
 
-    advance_func->spi_init_pre = &mraa_raspberry_pi_spi_init_pre;
-    advance_func->i2c_init_pre = &mraa_raspberry_pi_i2c_init_pre;
-    advance_func->gpio_mmap_setup = &mraa_raspberry_pi_mmap_setup;
+    b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+    if (b->adv_func == NULL) {
+        free(b);
+        return NULL;
+    }
+
+    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * b->phy_pin_count);
+    if (b->pins == NULL) {
+        free(b->adv_func);
+        free(b);
+        return NULL;
+    }
+
+    b->adv_func->spi_init_pre = &mraa_raspberry_pi_spi_init_pre;
+    b->adv_func->i2c_init_pre = &mraa_raspberry_pi_i2c_init_pre;
+    b->adv_func->gpio_mmap_setup = &mraa_raspberry_pi_mmap_setup;
 
     strncpy(b->pins[0].name, "INVALID", MRAA_PIN_NAME_SIZE);
     b->pins[0].capabilites = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };

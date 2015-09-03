@@ -1,6 +1,7 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Copyright (c) 2014, 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -49,8 +50,8 @@ mraa_pwm_setup_duty_fp(mraa_pwm_context dev)
 static mraa_result_t
 mraa_pwm_write_period(mraa_pwm_context dev, int period)
 {
-    if (advance_func->pwm_period_replace != NULL) {
-        mraa_result_t result = advance_func->pwm_period_replace(dev, period);
+    if (IS_FUNC_DEFINED(dev, pwm_period_replace)) {
+        mraa_result_t result = dev->advance_func->pwm_period_replace(dev, period);
         if (result == MRAA_SUCCESS) {
             dev->period = period;
         }
@@ -158,24 +159,44 @@ mraa_pwm_read_duty(mraa_pwm_context dev)
     return (int) ret;
 }
 
+static mraa_pwm_context
+mraa_pwm_init_internal(mraa_adv_func_t* func_table, int chipin, int pin)
+{
+    mraa_pwm_context dev = (mraa_pwm_context) malloc(sizeof(struct _pwm));
+    if (dev == NULL) {
+        return NULL;
+    }
+    dev->duty_fp = -1;
+    dev->chipid = chipin;
+    dev->pin = pin;
+    dev->period = -1;
+    dev->advance_func = func_table;
+
+    return dev;
+}
+
 mraa_pwm_context
 mraa_pwm_init(int pin)
 {
-    if (advance_func->pwm_init_replace != NULL) {
-        return advance_func->pwm_init_replace(pin);
-    }
-
-    if (advance_func->pwm_init_pre != NULL) {
-        if (advance_func->pwm_init_pre(pin) != MRAA_SUCCESS)
-            return NULL;
-    }
     if (plat == NULL) {
         syslog(LOG_ERR, "pwm: Platform Not Initialised");
+        return NULL;
+    }
+    if (mraa_is_sub_platform_id(pin)) {
+        syslog(LOG_NOTICE, "pwm: Using sub platform is not supported");
         return NULL;
     }
     if (plat->pins[pin].capabilites.pwm != 1) {
         syslog(LOG_ERR, "pwm: pin not capable of pwm");
         return NULL;
+    }
+
+    if (plat->adv_func->pwm_init_replace != NULL) {
+        return plat->adv_func->pwm_init_replace(pin);
+    }
+    if (plat->adv_func->pwm_init_pre != NULL) {
+        if (plat->adv_func->pwm_init_pre(pin) != MRAA_SUCCESS)
+            return NULL;
     }
 
     if (plat->pins[pin].capabilites.gpio == 1) {
@@ -210,9 +231,9 @@ mraa_pwm_init(int pin)
     int chip = plat->pins[pin].pwm.parent_id;
     int pinn = plat->pins[pin].pwm.pinmap;
 
-    if (advance_func->pwm_init_post != NULL) {
+    if (plat->adv_func->pwm_init_post != NULL) {
         mraa_pwm_context pret = mraa_pwm_init_raw(chip, pinn);
-        mraa_result_t ret = advance_func->pwm_init_post(pret);
+        mraa_result_t ret = plat->adv_func->pwm_init_post(pret);
         if (ret != MRAA_SUCCESS) {
             free(pret);
             return NULL;
@@ -225,13 +246,9 @@ mraa_pwm_init(int pin)
 mraa_pwm_context
 mraa_pwm_init_raw(int chipin, int pin)
 {
-    mraa_pwm_context dev = (mraa_pwm_context) malloc(sizeof(struct _pwm));
+    mraa_pwm_context dev = mraa_pwm_init_internal(plat == NULL ? NULL : plat->adv_func , chipin, pin);
     if (dev == NULL)
         return NULL;
-    dev->duty_fp = -1;
-    dev->chipid = chipin;
-    dev->pin = pin;
-    dev->period = -1;
 
     char directory[MAX_SIZE];
     snprintf(directory, MAX_SIZE, SYSFS_PWM "/pwmchip%d/pwm%d", dev->chipid, dev->pin);

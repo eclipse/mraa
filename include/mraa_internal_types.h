@@ -50,7 +50,7 @@ struct _gpio {
     mraa_boolean_t owner; /**< If this context originally exported the pin */
     mraa_result_t (*mmap_write) (mraa_gpio_context dev, int value);
     int (*mmap_read) (mraa_gpio_context dev);
-    mraa_adv_func_t* advance_func; /**< override function table  */    
+    mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
 };
 
@@ -64,7 +64,7 @@ struct _i2c {
     int addr; /**< the address of the i2c slave */
     unsigned long funcs; /**< /dev/i2c-* device capabilities as per https://www.kernel.org/doc/Documentation/i2c/functionality */
     void *handle; /**< generic handle for non-standard drivers that don't use file descriptors  */
-    mraa_adv_func_t* advance_func; /**< override function table  */
+    mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
 };
 
@@ -78,6 +78,7 @@ struct _spi {
     int clock;          /**< clock to run transactions at */
     mraa_boolean_t lsb; /**< least significant bit mode */
     unsigned int bpw;   /**< Bits per word */
+    mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
 };
 
@@ -91,6 +92,7 @@ struct _pwm {
     int duty_fp; /**< File pointer to duty file */
     int period;  /**< Cache the period to speed up setting duty */
     mraa_boolean_t owner; /**< Owner of pwm context*/
+    mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
 };
 
@@ -98,9 +100,12 @@ struct _pwm {
  * A structure representing a Analog Input Channel
  */
 struct _aio {
+    /*@{*/
     unsigned int channel; /**< the channel as on board and ADC module */
     int adc_in_fp; /**< File Pointer to raw sysfs */
     int value_bit; /**< 10 bits by default. Can be increased if board */
+    mraa_adv_func_t* advance_func; /**< override function table */
+    /*@}*/
 };
 
 /**
@@ -111,6 +116,7 @@ struct _uart {
     int index; /**< the uart index, as known to the os. */
     const char* path; /**< the uart device path. */
     int fd; /**< file descriptor for device. */
+    mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
 };
 
