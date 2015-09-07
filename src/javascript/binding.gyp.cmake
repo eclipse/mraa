@@ -16,8 +16,11 @@
       'cflags_cc!': [ '-fno-rtti', '-fno-exceptions' ],
       'cflags!': [ '-fno-exceptions' ],
       'conditions' : [
-          [ 'arch=="x64"' or 'arch=="ia32"',
+          [ 'arch=="x64"',
             { 'defines' : [ 'X86PLAT=ON' ], },
+          ],
+          [ 'arch=="ia32"',
+            { 'defines' : [ 'X86PLAT=ON'], },
           ],
           [ 'arch=="arm"',
             { 'defines' : [ 'ARMPLAT=ON'], },
