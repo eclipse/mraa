@@ -247,46 +247,6 @@ mraa_intel_edison_i2c_init_pre(unsigned int bus)
     return MRAA_SUCCESS;
 }
 
-static mraa_result_t
-mraa_intel_edison_misc_spi()
-{
-    mraa_gpio_write(tristate, 0);
-
-    mraa_gpio_context io10_p1 = mraa_gpio_init_raw(263);
-    mraa_gpio_context io10_p2 = mraa_gpio_init_raw(240);
-    mraa_gpio_context io11_p1 = mraa_gpio_init_raw(262);
-    mraa_gpio_context io11_p2 = mraa_gpio_init_raw(241);
-    mraa_gpio_context io12_p1 = mraa_gpio_init_raw(242);
-    mraa_gpio_context io13_p1 = mraa_gpio_init_raw(243);
-    mraa_gpio_dir(io10_p1, MRAA_GPIO_OUT);
-    mraa_gpio_dir(io10_p2, MRAA_GPIO_OUT);
-    mraa_gpio_dir(io11_p1, MRAA_GPIO_OUT);
-    mraa_gpio_dir(io11_p2, MRAA_GPIO_OUT);
-    mraa_gpio_dir(io12_p1, MRAA_GPIO_OUT);
-    mraa_gpio_dir(io13_p1, MRAA_GPIO_OUT);
-
-    mraa_gpio_write(io10_p1, 1);
-    mraa_gpio_write(io10_p2, 0);
-    mraa_gpio_write(io11_p1, 1);
-    mraa_gpio_write(io11_p2, 0);
-    mraa_gpio_write(io12_p1, 0);
-    mraa_gpio_write(io13_p1, 0);
-
-    mraa_gpio_close(io10_p1);
-    mraa_gpio_close(io10_p2);
-    mraa_gpio_close(io11_p1);
-    mraa_gpio_close(io11_p2);
-    mraa_gpio_close(io12_p1);
-    mraa_gpio_close(io13_p1);
-
-    mraa_intel_edison_pinmode_change(115, 1);
-    mraa_intel_edison_pinmode_change(114, 1);
-    mraa_intel_edison_pinmode_change(109, 1);
-    mraa_gpio_write(tristate, 1);
-
-    return MRAA_SUCCESS;
-}
-
 mraa_result_t
 mraa_intel_edison_aio_get_fp(mraa_aio_context dev)
 {
@@ -1171,7 +1131,7 @@ mraa_intel_edison_fab_c()
     }
 
     mraa_gpio_dir(tristate, MRAA_GPIO_OUT);
-    mraa_intel_edison_misc_spi();
+    mraa_gpio_write(tristate, 1);
 
     b->adc_raw = 12;
     b->adc_supported = 10;
