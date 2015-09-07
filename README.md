@@ -30,6 +30,10 @@ ARM
 * [Bannana Pi](../master/docs/banana_pi.md)
 * [Beaglebone Black](../master/docs/beaglebone.md)
 
+USB
+---
+* [FT4222](../master/docs/ftdi_ft4222.md)
+
 Installing on your board
 ========
 
