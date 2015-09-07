@@ -18,7 +18,7 @@ include (GetGitRevisionDescription)
 git_describe (VERSION "--tags")
 if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND" OR "x_${VERSION}" STREQUAL "x_HEAD-HASH-NOTFOUND")
   message (WARNING " - Install git to compile a production libmraa!")
-  set (VERSION "v0.7.4-dirty")
+  set (VERSION "v0.7.5-dirty")
 endif ()
 
 message (INFO " - libmraa Version ${VERSION}")

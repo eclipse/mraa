@@ -69,6 +69,10 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.7.5**
+  * 5th Generation NUC i2c support
+  * NPM 0.10.x ia32 fix
+
 **0.7.4**
   * Minnowboard i2c fix
   * Add NPM arm support
