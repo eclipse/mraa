@@ -49,15 +49,15 @@ main()
         std::terminate();
     }
 
-    if (dev->setBaudRate(115200) != MRAA_SUCCESS) {
+    if (dev->setBaudRate(115200) != mraa::SUCCESS) {
         std::cout << "Error setting parity on UART" << std::endl;
     }
 
-    if (dev->setMode(8, MRAA_UART_PARITY_NONE, 1) != MRAA_SUCCESS) {
+    if (dev->setMode(8, mraa::UART_PARITY_NONE, 1) != mraa::SUCCESS) {
         std::cout << "Error setting parity on UART" << std::endl;
     }
 
-    if (dev->setFlowcontrol(false, false) != MRAA_SUCCESS) {
+    if (dev->setFlowcontrol(false, false) != mraa::SUCCESS) {
         std::cout << "Error setting flow control UART" << std::endl;
     }
 
@@ -66,5 +66,5 @@ main()
 
     delete dev;
 
-    return MRAA_SUCCESS;
+    return mraa::SUCCESS;
 }

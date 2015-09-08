@@ -25,6 +25,7 @@
 #pragma once
 
 #include "gpio.h"
+#include "types.hpp"
 #include <stdexcept>
 
 #if defined(SWIGJAVASCRIPT)
@@ -72,6 +73,7 @@ typedef enum {
 
 class IsrCallback
 {
+  friend class Gpio;
   public:
     virtual ~IsrCallback()
     {
@@ -81,15 +83,14 @@ class IsrCallback
     { /* empty, overloaded in Java*/
     }
 
-  private:
+  protected:
+    static void
+    generic_isr_callback(void* data)
+    {
+        IsrCallback* callback = (IsrCallback*) data;
+        callback->run();
+    }
 };
-
-void
-generic_isr_callback(void* data)
-{
-    IsrCallback* callback = (IsrCallback*) data;
-    callback->run();
-}
 #endif
 
 /**
@@ -144,16 +145,16 @@ class Gpio
      * @param mode The edge mode to set
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     edge(Edge mode)
     {
-        return mraa_gpio_edge_mode(m_gpio, (mraa_gpio_edge_t) mode);
+        return (Result) mraa_gpio_edge_mode(m_gpio, (mraa_gpio_edge_t) mode);
     }
 #if defined(SWIGPYTHON)
-    mraa_result_t
+    Result
     isr(Edge mode, PyObject* pyfunc, PyObject* args)
     {
-        return mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, (void (*) (void*)) pyfunc, (void*) args);
+        return (Result) mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, (void (*) (void*)) pyfunc, (void*) args);
     }
 #elif defined(SWIGJAVASCRIPT)
     static void
@@ -185,7 +186,7 @@ class Gpio
         uv_queue_work(uv_default_loop(), req, nop, v8isr);
     }
 
-    mraa_result_t
+    Result
     isr(Edge mode, v8::Handle<v8::Function> func)
     {
 #if NODE_MODULE_VERSION >= 0x000D
@@ -193,13 +194,13 @@ class Gpio
 #else
         m_v8isr = v8::Persistent<v8::Function>::New(func);
 #endif
-        return mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, &uvwork, this);
+        return (Result) mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, &uvwork, this);
     }
 #elif defined(SWIGJAVA)
-    mraa_result_t
-    isr(Edge mode, IsrCallback* cb, void* args)
+    Result
+    isr(Edge mode, IsrCallback* cb)
     {
-        return mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, generic_isr_callback, cb);
+        return (Result) mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, &IsrCallback::generic_isr_callback, cb);
     }
 #else
     /**
@@ -211,10 +212,10 @@ class Gpio
      * @param args Arguments passed to the interrupt handler (fptr)
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     isr(Edge mode, void (*fptr)(void*), void* args)
     {
-        return mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, fptr, args);
+        return (Result) mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, fptr, args);
     }
 #endif
     /**
@@ -223,7 +224,7 @@ class Gpio
      *
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     isrExit()
     {
 #if defined(SWIGJAVASCRIPT)
@@ -234,7 +235,7 @@ class Gpio
         m_v8isr.Clear();
 #endif
 #endif
-        return mraa_gpio_isr_exit(m_gpio);
+        return (Result) mraa_gpio_isr_exit(m_gpio);
     }
     /**
      * Change Gpio mode
@@ -242,10 +243,10 @@ class Gpio
      * @param mode The mode to change the gpio into
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     mode(Mode mode)
     {
-        return mraa_gpio_mode(m_gpio, (mraa_gpio_mode_t) mode);
+        return (Result )mraa_gpio_mode(m_gpio, (mraa_gpio_mode_t) mode);
     }
     /**
      * Change Gpio direction
@@ -253,10 +254,10 @@ class Gpio
      * @param dir The direction to change the gpio into
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     dir(Dir dir)
     {
-        return mraa_gpio_dir(m_gpio, (mraa_gpio_dir_t) dir);
+        return (Result )mraa_gpio_dir(m_gpio, (mraa_gpio_dir_t) dir);
     }
     /**
      * Read value from Gpio
@@ -274,10 +275,10 @@ class Gpio
      * @param value Value to write to Gpio
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     write(int value)
     {
-        return mraa_gpio_write(m_gpio, value);
+        return (Result) mraa_gpio_write(m_gpio, value);
     }
     /**
      * Enable use of mmap i/o if available.
@@ -285,10 +286,10 @@ class Gpio
      * @param enable true to use mmap
      * @return Result of operation
      */
-    mraa_result_t
+    Result
     useMmap(bool enable)
     {
-        return mraa_gpio_use_mmaped(m_gpio, (mraa_boolean_t) enable);
+        return (Result) mraa_gpio_use_mmaped(m_gpio, (mraa_boolean_t) enable);
     }
     /**
      * Get pin number of Gpio. If raw param is True will return the

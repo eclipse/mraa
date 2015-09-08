@@ -58,10 +58,10 @@ main(int argc, char** argv)
     //! [Interesting]
     mraa::Gpio* gpio = new mraa::Gpio(iopin);
     if (gpio == NULL) {
-        return MRAA_ERROR_UNSPECIFIED;
+        return mraa::ERROR_UNSPECIFIED;
     }
-    mraa_result_t response = gpio->dir(mraa::DIR_OUT);
-    if (response != MRAA_SUCCESS) {
+    mraa::Result response = gpio->dir(mraa::DIR_OUT);
+    if (response != mraa::SUCCESS) {
         mraa::printError(response);
         return 1;
     }
