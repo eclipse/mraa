@@ -91,21 +91,26 @@ mraa_aio_init(unsigned int aio)
 
     if (IS_FUNC_DEFINED(dev, aio_init_pre)) {
         mraa_result_t pre_ret = (dev->advance_func->aio_init_pre(aio));
-        if (pre_ret != MRAA_SUCCESS)
+        if (pre_ret != MRAA_SUCCESS) {
+            free(dev);
             return NULL;
+        }
     }
     if (aio > plat->aio_count) {
         syslog(LOG_ERR, "aio: requested channel out of range");
+        free(dev);
         return NULL;
     }
 
     if (plat->pins[pin].capabilites.aio != 1) {
         syslog(LOG_ERR, "aio: pin uncapable of aio");
+        free(dev);
         return NULL;
     }
 
     if (plat->pins[pin].aio.mux_total > 0) {
         if (mraa_setup_mux_mapped(plat->pins[pin].aio) != MRAA_SUCCESS) {
+            free(dev);
             syslog(LOG_ERR, "aio: unable to setup multiplexers for pin");
             return NULL;
         }
