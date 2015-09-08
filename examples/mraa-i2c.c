@@ -87,9 +87,9 @@ print_bus(mraa_board_t* board)
         int id = board->i2c_bus[bus].bus_id;
         fprintf(stdout, "Bus %3d: id=%02d type=%s ", bus, id, busType);
         if (i == board->def_i2c_bus)
-            fprintf(stdout, " default", i);
+            fprintf(stdout, " default");
         if (id == -1)
-            fprintf(stdout, " disabled", i);
+            fprintf(stdout, " disabled");
 
         fprintf(stdout, "\n");
     }
@@ -167,7 +167,7 @@ i2c_detect_devices(int bus)
         if (i2c_get(bus, addr, 0, &value) == MRAA_SUCCESS)
             printf("%02x ", addr);
         else
-            printf("-- ", addr);
+            printf("-- ");
         if ((addr + 1) % 16 == 0)
             printf("\n");
     }
