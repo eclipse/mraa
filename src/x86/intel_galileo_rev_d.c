@@ -162,7 +162,7 @@ mraa_intel_galileo_rev_d()
 
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
     if (b->adv_func == NULL) {
-        return NULL;
+        goto error;
     }
     b->adv_func->gpio_mmap_setup = &mraa_intel_galileo_g1_mmap_setup;
     b->adv_func->spi_lsbmode_replace = &mraa_intel_galileo_g1_spi_lsbmode_replace;
