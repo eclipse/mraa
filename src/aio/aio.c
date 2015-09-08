@@ -63,6 +63,8 @@ mraa_aio_init_internal(mraa_adv_func_t* func_table)
         return NULL;
     }
     dev->advance_func = func_table;
+
+    return dev;
 }
 
 mraa_aio_context
