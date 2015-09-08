@@ -73,6 +73,7 @@ typedef enum {
 
 class IsrCallback
 {
+  friend class Gpio;
   public:
     virtual ~IsrCallback()
     {
@@ -82,15 +83,14 @@ class IsrCallback
     { /* empty, overloaded in Java*/
     }
 
-  private:
+  protected:
+    static void
+    generic_isr_callback(void* data)
+    {
+        IsrCallback* callback = (IsrCallback*) data;
+        callback->run();
+    }
 };
-
-void
-generic_isr_callback(void* data)
-{
-    IsrCallback* callback = (IsrCallback*) data;
-    callback->run();
-}
 #endif
 
 /**
@@ -198,9 +198,9 @@ class Gpio
     }
 #elif defined(SWIGJAVA)
     Result
-    isr(Edge mode, IsrCallback* cb, void* args)
+    isr(Edge mode, IsrCallback* cb)
     {
-        return (Result) mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, generic_isr_callback, cb);
+        return (Result) mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, &IsrCallback::generic_isr_callback, cb);
     }
 #else
     /**
