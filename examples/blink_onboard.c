@@ -40,7 +40,7 @@ main(int argc, char** argv)
         case MRAA_INTEL_GALILEO_GEN1:
             gpio = mraa_gpio_init_raw(3);
             break;
-        case MRAA_INTEL_MINNOWBOARD_MAX:
+        case MRAA_INTEL_MINNOWBOARD_BYT_COMPATIBLE:
             // there is no onboard LED that we can flash on the minnowboard max
             // but on the calamari lure pin 21 is an LED. If you don't have the
             // lure put an LED on pin 21
@@ -59,7 +59,7 @@ main(int argc, char** argv)
     }
 
     // on platforms with physical button use gpio_in
-    if (platform == MRAA_INTEL_MINNOWBOARD_MAX) {
+    if (platform == MRAA_INTEL_MINNOWBOARD_BYT_COMPATIBLE) {
         gpio_in = mraa_gpio_init(14);
         if (gpio_in != NULL) {
             mraa_gpio_dir(gpio_in, MRAA_GPIO_IN);

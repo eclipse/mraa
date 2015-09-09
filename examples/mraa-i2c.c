@@ -69,7 +69,7 @@ print_bus(mraa_board_t* board)
             case MRAA_INTEL_GALILEO_GEN2:
             case MRAA_INTEL_EDISON_FAB_C:
             case MRAA_INTEL_DE3815:
-            case MRAA_INTEL_MINNOWBOARD_MAX:
+            case MRAA_INTEL_MINNOWBOARD_BYT_COMPATIBLE:
             case MRAA_RASPBERRY_PI:
             case MRAA_BEAGLEBONE:
             case MRAA_BANANA:
