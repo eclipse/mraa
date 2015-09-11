@@ -262,7 +262,8 @@ getSubPlatformId(int pin_or_bus_index)
  *
  * @return int pin or bus index
  */
-int getSubPlatformIndex(int pin_or_bus_id)
+inline int
+getSubPlatformIndex(int pin_or_bus_id)
 {
     return mraa_get_sub_platform_index(pin_or_bus_id);
 }
