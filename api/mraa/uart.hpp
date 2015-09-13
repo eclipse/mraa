@@ -27,6 +27,7 @@
 #pragma once
 
 #include "uart.h"
+#include "types.hpp"
 #include <stdexcept>
 #include <cstring>
 
