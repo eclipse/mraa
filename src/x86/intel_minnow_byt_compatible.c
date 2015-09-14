@@ -1,5 +1,6 @@
 /*
  * Author: Henry Bruce <henry.bruce@intel.com>
+ * 	   Evan Steele <evan.steele@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -28,9 +29,9 @@
 #include <ctype.h>
 
 #include "common.h"
-#include "x86/intel_minnow_max.h"
+#include "x86/intel_minnow_byt_compatible.h"
 
-#define PLATFORM_NAME "MinnowBoard MAX"
+#define PLATFORM_NAME "MinnowBoard"
 #define I2C_BUS_DEFAULT 7
 #define MAX_LENGTH 8
 #define I2CNAME "designware"
@@ -83,7 +84,7 @@ mraa_get_pin_index(mraa_board_t* board, char* name, int* pin_index)
 }
 
 mraa_board_t*
-mraa_intel_minnow_max()
+mraa_intel_minnowboard_byt_compatible()
 {
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
 
@@ -103,7 +104,7 @@ mraa_intel_minnow_max()
     if (b->pins == NULL) {
         goto error;
     }
-
+	
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
     if (b->adv_func == NULL) {
         free(b->pins);
@@ -115,7 +116,6 @@ mraa_intel_minnow_max()
         free(b->adv_func);
         goto error;
     }
-
     sscanf(running_uname.release, "%d.%d", &uname_major, &uname_minor);
 
     /* if we are on Linux 3.17 or lower they use a 256 max and number the GPIOs down
@@ -194,10 +194,9 @@ mraa_intel_minnow_max()
     b->uart_dev[0].rx = -1;
     b->uart_dev[0].tx = -1;
     b->uart_dev[0].device_path = "/dev/ttyS0";
-
     return b;
 error:
-    syslog(LOG_CRIT, "minnowmax: Platform failed to initialise");
+    syslog(LOG_CRIT, "minnow: Platform failed to initialise");
     free(b);
     return NULL;
 }

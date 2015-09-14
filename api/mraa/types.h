@@ -41,7 +41,7 @@ typedef enum {
     MRAA_INTEL_GALILEO_GEN2 = 1,    /**< The Generation 2 Galileo platform (RevG/H) */
     MRAA_INTEL_EDISON_FAB_C = 2,    /**< The Intel Edison (FAB C) */
     MRAA_INTEL_DE3815 = 3,          /**< The Intel DE3815 Baytrail NUC */
-    MRAA_INTEL_MINNOWBOARD_MAX = 4, /**< The Intel Minnow Board Max */
+    MRAA_INTEL_MINNOWBOARD_BYT_COMPATIBLE = 4, /**< The Intel Minnow Board Baytrail/MAX/Turbot */
     MRAA_RASPBERRY_PI = 5,          /**< The different Raspberry PI Models -like  A,B,A+,B+ */
     MRAA_BEAGLEBONE = 6,            /**< The different BeagleBone Black Modes B/C */
     MRAA_BANANA = 7,                /**< Allwinner A20 based Banana Pi and Banana Pro */
