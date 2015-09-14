@@ -35,5 +35,23 @@
   $2 = JCALL1(GetArrayLength, jenv, $input);
 }
 
+%typemap(jtype) uint8_t * "byte[]"
+%typemap(jstype) uint8_t * "byte[]"
+%typemap(jni) uint8_t * "jbyteArray"
+%typemap(javaout) uint8_t * {
+    return $jnicall;
+}
+
+namespace mraa {
+class Spi;
+%typemap(out) uint8_t*
+{
+  // need to loop over length
+  $result = JCALL1(NewByteArray, jenv, arg3);
+  JCALL4(SetByteArrayRegion, jenv, $result, 0, arg3, (jbyte *) $1);
+  free($1);
+}
+}
+
 %feature("director") IsrCallback;
 %include ../mraa.i
