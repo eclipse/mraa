@@ -34,7 +34,7 @@ extern "C" {
 #define MRAA_INTEL_MINNOW_MAX_PINCOUNT (26 + 1)
 
 mraa_board_t*
-mraa_intel_minnow_max();
+mraa_intel_minnowboard_byt_compatible();
 
 #ifdef __cplusplus
 }

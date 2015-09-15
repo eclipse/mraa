@@ -1,5 +1,6 @@
 /*
  * Author: Henry Bruce <henry.bruce@intel.com>
+ * 	   Evan Steele <evan.steele@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -28,7 +29,7 @@
 #include <ctype.h>
 
 #include "common.h"
-#include "x86/intel_minnow_max.h"
+#include "x86/intel_minnow_byt_compatible.h"
 
 #define PLATFORM_NAME "MinnowBoard MAX"
 #define I2C_BUS_DEFAULT 7
@@ -83,7 +84,7 @@ mraa_get_pin_index(mraa_board_t* board, char* name, int* pin_index)
 }
 
 mraa_board_t*
-mraa_intel_minnow_max()
+mraa_intel_minnowboard_byt_compatible()
 {
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
 

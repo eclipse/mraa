@@ -30,8 +30,8 @@
 #include "x86/intel_galileo_rev_g.h"
 #include "x86/intel_edison_fab_c.h"
 #include "x86/intel_de3815.h"
-#include "x86/intel_minnow_max.h"
 #include "x86/intel_nuc5.h"
+#include "x86/intel_minnow_byt_compatible.h"
 
 mraa_platform_t
 mraa_x86_platform()
@@ -60,14 +60,17 @@ mraa_x86_platform()
                 plat = mraa_intel_nuc5();
             } else if (strncmp(line, "NOTEBOOK", 8) == 0) {
                 platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
-                plat = mraa_intel_minnow_max();
+                plat = mraa_intel_minnowboard_byt_compatible();
             } else if (strncasecmp(line, "MinnowBoard MAX", 15) == 0) {
                 platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
-                plat = mraa_intel_minnow_max();
+                plat = mraa_intel_minnowboard_byt_compatible();
             } else if (strncasecmp(line, "Galileo", 7) == 0) {
                 platform_type = MRAA_INTEL_GALILEO_GEN1;
                 plat = mraa_intel_galileo_rev_d();
-            } else {
+            } else if (strncasecmp(line, "MinnowBoard Compatible", 22) == 0) {
+		platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
+		plat = mraa_intel_minnowboard_byt_compatible();
+	    } else {
                 syslog(LOG_ERR, "Platform not supported, not initialising");
                 platform_type = MRAA_UNKNOWN_PLATFORM;
             }
