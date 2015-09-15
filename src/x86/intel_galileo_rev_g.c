@@ -320,7 +320,7 @@ mraa_intel_galileo_g2_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
 mraa_board_t*
 mraa_intel_galileo_gen2()
 {
-    mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
+    mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
         return NULL;
     }
