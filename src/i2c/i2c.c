@@ -336,6 +336,10 @@ mraa_i2c_write_word_data(mraa_i2c_context dev, const uint16_t data, const uint8_
 mraa_result_t
 mraa_i2c_address(mraa_i2c_context dev, uint8_t addr)
 {
+    if (dev == NULL) {
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
     dev->addr = (int) addr;
     if (IS_FUNC_DEFINED(dev, i2c_address_replace)) {
         return dev->advance_func->i2c_address_replace(dev, addr);
