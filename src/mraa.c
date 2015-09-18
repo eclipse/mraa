@@ -411,7 +411,7 @@ mraa_get_platform_name()
     if (mraa_has_sub_platform()) {
         snprintf(platform_name, MAX_PLATFORM_NAME_LENGTH, "%s + %s", plat->platform_name, plat->sub_platform->platform_name);
     } else {
-        strncpy(platform_name, plat->platform_name, MAX_PLATFORM_NAME_LENGTH);
+        strncpy(platform_name, plat->platform_name, MAX_PLATFORM_NAME_LENGTH-1);
     }
 
     return platform_name;
