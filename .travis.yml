@@ -3,7 +3,10 @@ compiler:
   - gcc
   - clang
 install:
+  - sudo add-apt-repository --yes ppa:kalakris/cmake
+  - sudo add-apt-repository --yes ppa:fenics-packages/fenics-exp/swig
   - sudo apt-get update -qq
-  - sudo apt-get install -y -qq swig python git
+  - sudo apt-get install -y -qq swig3.0 python git cmake
+  - sudo ln -s /usr/bin/swig3.0 /usr/bin/swig
 script:
-  - mkdir build && cd build && cmake -DBUILDSWIGPYTHON=ON .. && make && make test
+  - mkdir build && cd build && cmake -DNODE_ROOT_DIR:PATH=/home/travis/.nvm/v0.10.36/include .. && make && make test
