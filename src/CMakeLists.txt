@@ -82,6 +82,11 @@ if (ARMPLAT)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DARMPLAT=1")
 endif()
 
+if (MIPSPLAT)
+  add_subdirectory(mips)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMIPSPLAT=1")
+endif()
+
 if (USBPLAT)
   message (INFO " - Adding USB platforms")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSBPLAT=1")

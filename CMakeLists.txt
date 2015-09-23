@@ -95,8 +95,10 @@ if (DETECTED_ARCH STREQUAL "i586" OR DETECTED_ARCH STREQUAL "x86_64"
   set (X86PLAT ON)
 elseif (DETECTED_ARCH MATCHES "arm.*")
   set (ARMPLAT ON)
+elseif (DETECTED_ARCH STREQUAL "mips")
+  set (MIPSPLAT ON)
 else ()
-  message(FATAL_ERROR "Only x86 and arm platforms currently supported")
+  message(FATAL_ERROR "Only x86,ARM & mips platforms currently supported")
 endif()
 
 if (BUILDSWIGPYTHON OR BUILDTESTS)
