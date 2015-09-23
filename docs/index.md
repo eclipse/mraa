@@ -47,6 +47,7 @@ Specific platform information for supported platforms is documented here:
 - @ref beaglebone
 - @ref nuc5
 - @ref up
+- @ref vocore
 - @ref ft4222
 
 ## DEBUGGING
