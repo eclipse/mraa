@@ -22,20 +22,19 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdlib.h>
+#pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "mraa_internal.h"
-#include "mips/vocore.h"
 
-mraa_platform_t
-mraa_mips_platform()
-{
-    mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
+#define MRAA_VOCORE_PIN_COUNT 36
 
-    //For the Time being, Will always be VoCore when running ARM
-    //The mips platforms seem to use DTS so the detection should be clean
-    platform_type = MRAA_VOCORE;
-    plat = mraa_vocore();
+mraa_board_t*
+mraa_vocore();
 
-    return platform_type;
+#ifdef __cplusplus
 }
+#endif
