@@ -37,6 +37,8 @@ set(archdetect_c_code "
     #else
         #error cmake_ARCH arm
     #endif
+#elif defined(__mips) || defined(__mips__)
+    #error cmake_ARCH mips
 #elif defined(__i586) || defined(__i586__)
     #error cmake_ARCH i586
 #elif defined(__i386) || defined(__i386__) || defined(_M_IX86)
