@@ -12,6 +12,7 @@ add_executable (uart uart.c)
 add_executable (mraa-gpio mraa-gpio.c)
 add_executable (mraa-i2c mraa-i2c.c)
 add_executable (spi_max7219 spi_max7219.c)
+add_executable (iio_driver iio_driver.c)
 
 include_directories(${PROJECT_SOURCE_DIR}/api)
 # FIXME Hack to access mraa internal types used by mraa-i2c
@@ -32,6 +33,7 @@ target_link_libraries (uart mraa)
 target_link_libraries (mraa-gpio mraa)
 target_link_libraries (mraa-i2c mraa)
 target_link_libraries (spi_max7219 mraa)
+target_link_libraries (iio_driver mraa)
 
 add_subdirectory (c++)
 
