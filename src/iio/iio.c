@@ -28,20 +28,36 @@
 mraa_iio_context
 mraa_iio_init(int device)
 {
-    mraa_iio_context dev = (mraa_iio_context) calloc(1, sizeof(struct _iio));
-    if (dev == NULL) {
-        syslog(LOG_CRIT, "iio: Failed to allocate memory for context");
+    if (device > plat->iio_device_count) {
         return NULL;
     }
-
-    return dev;
+    return &plat->iio_devices[device];
 }
 
+int
+mraa_iio_get_channel_count(mraa_iio_context dev)
+{
+    return 1;
+}
 
 mraa_result_t
-mraa_iio_read(mraa_iio_context dev, uint32_t* data, int length)
+mraa_iio_read(mraa_iio_context dev, int channel, const char* attribute, float* data)
 {
-   return 0;
+    char buf[64];
+    snprintf(buf, 64, "/sys/bus/iio/devices/iio:device%d/in_voltage%d_%s", dev->num, channel, attribute);
+    int fd = open(buf, O_RDONLY);
+    if (fd != -1) {
+        int len = read(fd, &buf, 64);
+        *data = strtol(buf, NULL, 10);
+        return MRAA_SUCCESS;
+    }
+    return MRAA_ERROR_UNSPECIFIED;
+}
+
+mraa_result_t
+mraa_iio_write(mraa_iio_context dev, int channel, const char* attribute)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
 mraa_result_t

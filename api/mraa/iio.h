@@ -59,7 +59,16 @@ mraa_iio_context mraa_iio_init(int device);
 
 /**
  */
-mraa_result_t mraa_iio_read(mraa_iio_context dev, uint32_t *data, int length);
+int mraa_iio_get_channel_count(mraa_iio_context dev);
+
+/**
+ */
+mraa_result_t mraa_iio_read(mraa_iio_context dev, int channel, const char* attribute, float* data);
+
+/**
+ *
+ */
+mraa_result_t mraa_iio_write(mraa_iio_context dev, int channel, const char* attribute);
 
 /**
  * De-inits an mraa_iio_context device
