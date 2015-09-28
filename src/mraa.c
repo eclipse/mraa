@@ -171,12 +171,14 @@ mraa_init()
     for (i=0; i < num_iio_devices; i++) {
         device = &plat->iio_devices[i];
         device->num = i;
-        snprintf(filepath, 64, "/sys/bus/iio/devices/iio:device%d", i);
+        snprintf(filepath, 64, "/sys/bus/iio/devices/iio:device%d/name", i);
         fd = open(filepath, O_RDONLY);
         if (fd != -1) {
             len = read(fd, &name, 64);
-            device->name = malloc((sizeof(char) * len) + sizeof(char));
-            strncpy(device->name, name, len);
+            if (len > 1) {
+                device->name = malloc((sizeof(char) * len) + sizeof(char));
+                strncpy(device->name, name, len);
+            }
         }
     }
 
