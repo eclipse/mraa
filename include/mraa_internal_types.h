@@ -122,6 +122,13 @@ struct _uart {
 };
 
 /**
+ * A structure reprensting an IIO device
+ */
+struct _iio {
+    int num; /**< IIO device number */
+};
+
+/**
  * A bitfield representing the capabilities of a pin.
  */
 typedef struct {
