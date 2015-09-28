@@ -52,6 +52,9 @@ mraa_board_t* plat = NULL;
 static char platform_name[MAX_PLATFORM_NAME_LENGTH];
 mraa_adv_func_t* advance_func;
 
+static int num_i2c_devices = 0;
+static int num_iio_devices = 0;
+
 const char*
 mraa_get_version()
 {
@@ -68,6 +71,17 @@ mraa_set_log_level(int level)
     }
     syslog(LOG_NOTICE, "Invalid loglevel %d requested", level);
     return MRAA_ERROR_INVALID_PARAMETER;
+}
+
+static int
+mraa_count_iio_devices(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
+{
+    switch (sb->st_mode & S_IFMT) {
+        case S_IFLNK:
+            num_iio_devices++;
+            break;
+    }
+    return 0;
 }
 
 #if (defined SWIGPYTHON) || (defined SWIG)
@@ -141,6 +155,30 @@ mraa_init()
         return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
     }
 #endif
+
+    // Now detect IIO devices, linux only
+    // find how many i2c buses we have if we haven't already
+    if (num_iio_devices == 0) {
+        if (nftw("/sys/bus/iio/devices", &mraa_count_iio_devices, 20, FTW_PHYS) == -1) {
+            return MRAA_ERROR_UNSPECIFIED;
+        }
+    }
+    char name[64], filepath[64];
+    int fd, len, i;
+    plat->iio_device_count = num_iio_devices;
+    plat->iio_devices = calloc(num_iio_devices, sizeof(struct _iio));
+    struct _iio* device;
+    for (i=0; i < num_iio_devices; i++) {
+        device = &plat->iio_devices[i];
+        device->num = i;
+        snprintf(filepath, 64, "/sys/bus/iio/devices/iio:device%d", i);
+        fd = open(filepath, O_RDONLY);
+        if (fd != -1) {
+            len = read(fd, &name, 64);
+            device->name = malloc((sizeof(char) * len) + sizeof(char));
+            strncpy(device->name, name, len);
+        }
+    }
 
     syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
     return MRAA_SUCCESS;
@@ -625,10 +663,8 @@ mraa_link_targets(const char* filename, const char* targetname)
     }
 }
 
-static int num_i2c_devices = 0;
-
 static int
-mraa_count_files(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
+mraa_count_i2c_files(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
 {
     switch (sb->st_mode & S_IFMT) {
         case S_IFLNK:
@@ -654,7 +690,7 @@ mraa_find_i2c_bus(const char* devname, int startfrom)
 
     // find how many i2c buses we have if we haven't already
     if (num_i2c_devices == 0) {
-        if (nftw("/sys/class/i2c-dev/", &mraa_count_files, 20, FTW_PHYS) == -1) {
+        if (nftw("/sys/class/i2c-dev/", &mraa_count_i2c_files, 20, FTW_PHYS) == -1) {
             return -1;
         }
     }
@@ -723,4 +759,23 @@ int
 mraa_get_sub_platform_index(int pin_or_bus)
 {
     return pin_or_bus & (~MRAA_SUB_PLATFORM_MASK);
+}
+
+int
+mraa_get_iio_device_count()
+{
+    return plat->iio_device_count;
+}
+
+int
+mraa_find_iio_device(const char* devicename)
+{
+    int i = 0;
+    for (i; i < plat->iio_device_count; i++) {
+#if 0
+        if (!strcmp() {
+        }
+#endif
+    }
+    return 0;
 }
