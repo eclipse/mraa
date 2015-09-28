@@ -125,6 +125,7 @@ struct _uart {
  */
 struct _iio {
     int num; /**< IIO device number */
+    char* name; /**< IIO device name */
 };
 
 /**
@@ -266,6 +267,8 @@ typedef struct _board_t {
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
     mraa_adv_func_t* adv_func;    /**< Pointer to advanced function disptach table */
     struct _board_t* sub_platform;     /**< Pointer to sub platform */
+    struct _iio* iio_devices; /**< Pointer to IIO devices */
+    uint8_t iio_device_count; /**< IIO device count */
     /*@}*/
 } mraa_board_t;
 
