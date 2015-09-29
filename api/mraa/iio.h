@@ -61,14 +61,18 @@ mraa_iio_context mraa_iio_init(int device);
  */
 int mraa_iio_get_channel_count(mraa_iio_context dev);
 
+int mraa_iio_get_attr_count(mraa_iio_context dev, int channel);
+
+const char* mraa_iio_get_device_name(mraa_iio_context dev);
+
 /**
  */
-mraa_result_t mraa_iio_read(mraa_iio_context dev, int channel, const char* attribute, float* data);
+mraa_result_t mraa_iio_read(mraa_iio_context dev, const char* attribute, float* data);
 
 /**
  *
  */
-mraa_result_t mraa_iio_write(mraa_iio_context dev, int channel, const char* attribute);
+mraa_result_t mraa_iio_write(mraa_iio_context dev, const char* attribute);
 
 /**
  * De-inits an mraa_iio_context device
