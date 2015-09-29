@@ -121,11 +121,13 @@ struct _uart {
 };
 
 /**
- * A structure reprensting an IIO device
+ * A structure representing an IIO device
  */
 struct _iio {
     int num; /**< IIO device number */
     char* name; /**< IIO device name */
+    int channum;
+    int attrnum;
 };
 
 /**
