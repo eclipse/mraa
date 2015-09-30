@@ -1,6 +1,8 @@
 /*
- * Author: Alexander Komarov <alexander.komarov@intel.com>
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
+ * Author: Petre Eftime <petre.p.eftime@intel.com>
+ * Copyright (c) 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,6 +24,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+//! [Interesting]
+import mraa.mraa;
+
 public class Example {
   static {
     try {
@@ -34,8 +39,11 @@ public class Example {
     }
   }
   public static void main(String argv[]) {
-    mraa.mraa.init();
-    System.out.println(mraa.mraa.getVersion());
+    String board = mraa.getPlatformName();
+    String version = mraa.getVersion();
+    System.out.println("hello mraa");
+    System.out.println(String.format("Version: %s", version));
+    System.out.println(String.format("Running on %s", board));
   };
 }
-;
+//! [Interesting]
