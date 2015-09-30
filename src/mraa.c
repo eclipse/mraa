@@ -176,6 +176,7 @@ mraa_init()
         if (fd != -1) {
             len = read(fd, &name, 64);
             if (len > 1) {
+                // use strndup
                 device->name = malloc((sizeof(char) * len) + sizeof(char));
                 strncpy(device->name, name, len);
             }
@@ -775,6 +776,7 @@ mraa_find_iio_device(const char* devicename)
     int i = 0;
     for (i; i < plat->iio_device_count; i++) {
 #if 0
+        // compare with devices array
         if (!strcmp() {
         }
 #endif

@@ -36,55 +36,7 @@ mraa_iio_init(int device)
         return NULL;
     }
 
-    mraa_iio_context dev = &plat->iio_devices[device];
-
-    char* buf;
-    char sep[] = "_";
-    char* splitbuf;
-    DIR* dir;
-    struct dirent *ent;
-    if ((dir = opendir (IIO_SYSFS_DEVICE "0/")) != NULL) {
-        while ((ent = readdir (dir)) != NULL) {
-            if (strlen(ent->d_name) > 3) {
-                if (strncmp(ent->d_name, "in_", 3) == 0) {
-                    dev->attrnum++;
-                    buf = strndup(&ent->d_name[3], 64);
-                    splitbuf = strsep(&buf, sep);
-                    if (buf == NULL) {
-                        return NULL;
-                    }
-                    int num = atoi(&splitbuf[strlen(splitbuf)-1]);
-                    if (dev->channum < num) {
-                        dev->channum = num;
-                    }
-                    free(splitbuf);
-                }
-                else if (strncmp(ent->d_name, "out_", 4) == 0) {
-                    dev->attrnum++;
-                }
-            }
-        }
-        closedir (dir);
-    } else {
-        return NULL;
-    }
-
-    return dev;
-}
-
-// -1 is the device 'channel'
-int
-mraa_iio_get_attr_count(mraa_iio_context dev, int channel)
-{
-    // search is 0 indexed
-    return dev->attrnum + 1;
-}
-
-int
-mraa_iio_get_channel_count(mraa_iio_context dev)
-{
-    // search is 0 indexed
-    return dev->channum + 1;
+    return &plat->iio_devices[device];
 }
 
 const char*
@@ -93,19 +45,11 @@ mraa_iio_get_device_name(mraa_iio_context dev)
     return dev->name;
 }
 
-#if 0
 mraa_result_t
-mraa_iio_get_attr_data(mraa_iio_context dev, mraa_iio_channel* chan)
-{
-    return MRAA_FEATURE_NOT_IMPLEMENTED;
-}
-#endif
-
-mraa_result_t
-mraa_iio_read(mraa_iio_context dev, const char* attribute, float* data)
+mraa_iio_read(mraa_iio_context dev, const char* attr_chan, float* data)
 {
     char buf[64];
-    snprintf(buf, 64, IIO_SYSFS_DEVICE, "%d/%s", dev->num, attribute);
+    snprintf(buf, 64, IIO_SYSFS_DEVICE, "%d/%s", dev->num, attr_chan);
     int fd = open(buf, O_RDONLY);
     if (fd != -1) {
         int len = read(fd, &buf, 64);
@@ -116,15 +60,16 @@ mraa_iio_read(mraa_iio_context dev, const char* attribute, float* data)
 }
 
 mraa_result_t
-mraa_iio_write(mraa_iio_context dev, const char* attribute)
+mraa_iio_write(mraa_iio_context dev, const char* attr_chan)
 {
     return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
+#if 0
 mraa_result_t
 mraa_iio_stop(mraa_iio_context dev)
 {
-    free(dev);
     return MRAA_SUCCESS;
 }
+#endif
 
