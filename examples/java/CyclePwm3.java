@@ -24,31 +24,34 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-public class CyclePwm3 {
-  static {
-    try {
-      System.loadLibrary("mraajava");
-    } catch (UnsatisfiedLinkError e) {
-      System.err.println(
-          "Native code library failed to load. See the chapter on Dynamic Linking Problems in the SWIG Java documentation for help.\n" +
-          e);
-      System.exit(1);
-    }
-  }
-  public static void main(String argv[]) throws InterruptedException {
-    mraa.mraa.init();
-    mraa.Pwm pwm = new mraa.Pwm(3);
-    pwm.period_us(200);
-    pwm.enable(true);
+import mraa.Pwm;
 
-    float value = 0;
-    while (true) {
-      value += 0.01;
-      pwm.write(value);
-      Thread.sleep(50);
-      if (value >= 1) {
-        value = 0;
-      }
+public class CyclePwm3 {
+    static {
+        try {
+            System.loadLibrary("mraajava");
+        } catch (UnsatisfiedLinkError e) {
+            System.err.println(
+                    "Native code library failed to load. See the chapter on Dynamic Linking Problems in the SWIG Java documentation for help.\n" +
+                            e);
+            System.exit(1);
+        }
     }
-  }
+    public static void main(String argv[]) throws InterruptedException {
+        //! [Interesting]
+        Pwm pwm = new mraa.Pwm(3);
+        pwm.period_us(200);
+        pwm.enable(true);
+
+        float value = 0;
+        while (true) {
+            value += 0.01;
+            pwm.write(value);
+            Thread.sleep(50);
+            if (value >= 1) {
+                value = 0;
+            }
+        }
+        //! [Interesting]
+    }
 }
