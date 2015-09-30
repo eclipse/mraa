@@ -22,6 +22,11 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import mraa.Dir;
+import mraa.Edge;
+import mraa.Gpio;
+import mraa.IsrCallback;
+
 public class Isr {
     static {
         try {
@@ -34,18 +39,17 @@ public class Isr {
         }
     }
     public static void main(String argv[]) throws InterruptedException {
-        mraa.mraa.init();
+        Gpio gpio = new Gpio(6);
 
-        mraa.Gpio gpio = new mraa.Gpio(7);
+        IsrCallback callback = new JavaCallback();
 
-        mraa.IsrCallback callback = new JavaCallback();
-
-        gpio.isr(mraa.Edge.EDGE_RISING, callback);
-        Thread.sleep(0);
+        gpio.isr(Edge.EDGE_RISING, callback);
+        while (true)
+            Thread.sleep(999999);
     };
 }
 
-class JavaCallback extends mraa.IsrCallback {
+class JavaCallback extends IsrCallback {
     public JavaCallback() { super(); }
 
     public void run() { System.out.println("JavaCallback.run()"); }
