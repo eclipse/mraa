@@ -37,15 +37,10 @@ main()
     }
 
     float iio_value;
-    fprintf(stdout, "IIO device has %d channels and %d attributes\n",
-            mraa_iio_get_channel_count(iio_device0),
-            mraa_iio_get_attr_count(iio_device0, 0));
     mraa_result_t ret = mraa_iio_read(iio_device0, "in_voltage0_raw", &iio_value);
     if (ret == MRAA_SUCCESS) {
         fprintf(stdout, "IIO read %f\n", iio_value);
     }
-
-    mraa_iio_stop(iio_device0);
 
     return EXIT_SUCCESS;
 }
