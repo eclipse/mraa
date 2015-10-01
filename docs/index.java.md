@@ -30,6 +30,9 @@ functionality.
 | @ref common.h "common" | @ref mraa::mraa "mraa class" |
 </center>
 
+### Hello Mraa
+@snippet HelloEdison.java Interesting
+
 ## Supported platforms
 
 Specific platform information for supported platforms is documented here:
