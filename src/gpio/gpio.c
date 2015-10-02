@@ -235,7 +235,7 @@ mraa_gpio_interrupt_handler(void* arg)
 #ifdef SWIGPYTHON
             // In order to call a python object (all python functions are objects) we
             // need to aquire the GIL (Global Interpreter Lock). This may not always be
-            // nessecary but especially if doing IO (like print()) python will segfault
+            // necessary but especially if doing IO (like print()) python will segfault
             // if we do not hold a lock on the GIL
             PyGILState_STATE gilstate = PyGILState_Ensure();
             PyObject* arglist;
