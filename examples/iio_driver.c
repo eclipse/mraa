@@ -23,14 +23,53 @@
  */
 
 #include <unistd.h>
-//! [Interesting]
 #include "mraa/iio.h"
+
+static void
+printword(uint16_t input, mraa_iio_channel *chan)
+{
+    int16_t res;
+    if (!chan->lendian) {
+            input = be16toh(input);
+    } else {
+            input = le16toh(input);
+    }
+
+    // currently we don't treat scales
+    chan->scale = 1.0f;
+
+    input >>= chan->shift;
+    input &= chan->mask;
+    if (chan->signedd) {
+        res = (int16_t)(input << (16 - chan->bits_used)) >> (16 - chan->bits_used);
+    } else {
+        res = input;
+    }
+    printf("chan %d == %05f\n", chan->index, ((float)res + chan->offset) * chan->scale);
+}
+
+mraa_iio_context iio_device0;
+
+void
+interrupt(char* data)
+{
+    mraa_iio_channel* channels = mraa_iio_get_channels(iio_device0);
+    int i = 0;
+
+    for (i; i < mraa_iio_get_channel_count(iio_device0); i++) {
+        printf("channel bytes %d\n", channels[i].bytes);
+        switch (channels[i].bytes) {
+            case 2:
+                printword(*(uint16_t *)(data + channels[i].location), &channels[i]);
+        }
+    }
+    printf("data %s\n", (char*) data);
+}
 
 int
 main()
 {
-    mraa_iio_context iio_device0;
-
+    //! [Interesting]
     iio_device0 = mraa_iio_init(0);
     if (iio_device0 == NULL) {
         return EXIT_FAILURE;
@@ -42,6 +81,11 @@ main()
         fprintf(stdout, "IIO read %f\n", iio_value);
     }
 
-    return EXIT_SUCCESS;
+    if (mraa_iio_trigger_buffer(iio_device0, interrupt, NULL) == MRAA_SUCCESS) {
+        sleep(100);
+        return EXIT_SUCCESS;
+    }
+
+    //! [Interesting]
+    return EXIT_FAILURE;
 }
-//! [Interesting]
