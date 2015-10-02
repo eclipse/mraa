@@ -47,6 +47,7 @@ struct _gpio {
     void *isr_args; /**< args return when interupt service request triggered */
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */
+    mraa_boolean_t isr_thread_terminating; /**< is the isr thread being terminated? */
     mraa_boolean_t owner; /**< If this context originally exported the pin */
     mraa_result_t (*mmap_write) (mraa_gpio_context dev, int value);
     int (*mmap_read) (mraa_gpio_context dev);
