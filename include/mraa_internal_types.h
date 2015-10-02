@@ -29,6 +29,7 @@
 #include "mraa.h"
 #include "mraa_func.h"
 #include "mraa_adv_func.h"
+#include "iio.h"
 
 // general status failures for internal functions
 #define MRAA_PLATFORM_NO_INIT -3
@@ -126,8 +127,13 @@ struct _uart {
 struct _iio {
     int num; /**< IIO device number */
     char* name; /**< IIO device name */
-    int channum;
-    int attrnum;
+    int fp; /**< IIO device in /dev */
+    void (* isr)(char* data); /**< the interupt service request */
+    void *isr_args; /**< args return when interupt service request triggered */
+    int chan_num;
+    pthread_t thread_id; /**< the isr handler thread id */
+    mraa_iio_channel* channels;
+    int datasize;
 };
 
 /**
