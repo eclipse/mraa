@@ -247,6 +247,16 @@ mraa_gpio_interrupt_handler(void* arg)
                 ret = PyEval_CallObject((PyObject*) dev->isr, arglist);
                 if (ret == NULL) {
                     syslog(LOG_ERR, "gpio: PyEval_CallObject failed");
+                    PyObject *pvalue, *ptype, *ptraceback;
+                    PyErr_Fetch(&pvalue, &ptype, &ptraceback);
+                    syslog(LOG_ERR, "gpio: the error was %s:%s:%s",
+                           PyString_AsString(PyObject_Str(pvalue)),
+                           PyString_AsString(PyObject_Str(ptype)),
+                           PyString_AsString(PyObject_Str(ptraceback))
+                    );
+                    Py_XDECREF(pvalue);
+                    Py_XDECREF(ptype);
+                    Py_XDECREF(ptraceback);
                 } else {
                     Py_DECREF(ret);
                 }
