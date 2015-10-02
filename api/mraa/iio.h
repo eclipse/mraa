@@ -24,6 +24,23 @@
 
 #pragma once
 
+#include "common.h"
+
+typedef struct {
+    int index;
+    int enabled;
+    char* type;
+    mraa_boolean_t lendian;
+    int signedd;
+    unsigned int offset;
+    uint64_t mask;
+    unsigned int bits_used;
+    unsigned int bytes;
+    unsigned int shift;
+    unsigned int location;
+    float scale;
+} mraa_iio_channel;
+
 /**
  * @file
  * @brief iio
@@ -57,13 +74,15 @@ typedef struct _iio* mraa_iio_context;
  */
 mraa_iio_context mraa_iio_init(int device);
 
-/**
- */
-int mraa_iio_get_channel_count(mraa_iio_context dev);
-
-int mraa_iio_get_attr_count(mraa_iio_context dev, int channel);
+mraa_result_t mraa_iio_trigger_buffer(mraa_iio_context dev, void (*fptr)(char* data), void* args);
 
 const char* mraa_iio_get_device_name(mraa_iio_context dev);
+
+int mraa_iio_read_size(mraa_iio_context dev);
+
+mraa_iio_channel* mraa_iio_get_channels(mraa_iio_context dev);
+
+int mraa_iio_get_channel_count(mraa_iio_context dev);
 
 /**
  */
@@ -73,6 +92,8 @@ mraa_result_t mraa_iio_read(mraa_iio_context dev, const char* attribute, float* 
  *
  */
 mraa_result_t mraa_iio_write(mraa_iio_context dev, const char* attribute);
+
+mraa_result_t mraa_iio_get_channel_data(mraa_iio_context dev);
 
 /**
  * De-inits an mraa_iio_context device

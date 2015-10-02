@@ -132,7 +132,6 @@ mraa_init()
     if (plat != NULL)
         plat->platform_type = platform_type;
 
-#if defined(USBPLAT)
     // This is a platform extender so create null base platform if one doesn't already exist
     if (plat == NULL) {
         plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
@@ -141,6 +140,7 @@ mraa_init()
             plat->platform_name = "Null platform";
         }
     }
+#if defined(USBPLAT)
     // Now detect sub platform
     if (plat != NULL) {
         mraa_platform_t usb_platform_type = mraa_usb_platform_extender(plat);
