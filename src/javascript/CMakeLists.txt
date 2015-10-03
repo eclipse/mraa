@@ -27,7 +27,7 @@ set_target_properties (mraajs PROPERTIES
 if (${V8_VERSION_MAJOR} GREATER 3)
   # Node 0.12.x V8 engine major version is '3'. 
   # Node 2.1.0  V8 engine major version is '4'.
-  message (INFO " - requiring C++11 since using node.js with V8 ${V8_VERSION_STRING} >= 4.0.0.0 ")
+  message (INFO " - requiring a compiler with C++11 language option (like GCC 4.7 or above) since using node.js ${NODE_VERSION} with V8 ${V8_VERSION_STRING} >= 4.0.0.0 ")
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
       if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7")
         message(FATAL_ERROR " **ERROR** GCC 4.7 or above is required to compile mraajs ")
