@@ -42,7 +42,7 @@ namespace mraa {
 class Spi;
 %typemap(out) uint8_t*
 {
-%#if SWIG_V8_VERSION > 0x040463 // xbolshe: todo: need to check and correct this version
+%#if SWIG_V8_VERSION > 0x040000
    v8::MaybeLocal<v8::Object> objret = node::Buffer::New(v8::Isolate::GetCurrent(), (char*) $1, arg3);
    free($1);
    if(!objret.ToLocal(&$result)) {
@@ -84,7 +84,7 @@ class Spi;
        SWIG_exception_fail(SWIG_ERROR, "Uart write failed");
        SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
-%#if SWIG_V8_VERSION > 0x040463 // xbolshe: todo: need to check and correct this version
+%#if SWIG_V8_VERSION > 0x040000
    v8::MaybeLocal<v8::Object> objret = node::Buffer::New(v8::Isolate::GetCurrent(), (char*) $1, result);
    free($1);
    if(!objret.ToLocal(&$result)) {
@@ -122,7 +122,7 @@ class Spi;
        SWIG_exception_fail(SWIG_ERROR, "I2c write failed");
        SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
-%#if SWIG_V8_VERSION > 0x040463 // xbolshe: todo: need to check and correct this version
+%#if SWIG_V8_VERSION > 0x040000
    v8::MaybeLocal<v8::Object> objret = node::Buffer::New(v8::Isolate::GetCurrent(), (char*) $1, result);
    free($1);
    if(!objret.ToLocal(&$result)) {
