@@ -24,7 +24,7 @@ set_target_properties (mraajs PROPERTIES
   SUFFIX ".node"
 )
 
-if (${V8_VERSION_STRING} GREATER 3)
+if (${V8_VERSION_MAJOR} GREATER 3)
   # Node 0.12.x V8 engine major version is '3'. 
   # Node 2.1.0  V8 engine major version is '4'.
   message (INFO " - requiring C++11 since using node.js with V8 ${V8_VERSION_STRING} >= 4.0.0.0 ")
