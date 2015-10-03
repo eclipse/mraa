@@ -23,6 +23,20 @@ set_target_properties (mraajs PROPERTIES
   OUTPUT_NAME mraa
   SUFFIX ".node"
 )
+
+if (${V8_VERSION_MAJOR} GREATER 3)
+  # Node 0.12.x V8 engine major version is '3'. 
+  # Node 2.1.0  V8 engine major version is '4'.
+  message (INFO " - requiring a compiler with C++11 language option (like GCC 4.7 or above) since using node.js ${NODE_VERSION} with V8 ${V8_VERSION_STRING} >= 4.0.0.0 ")
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+      if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7")
+        message(FATAL_ERROR " **ERROR** GCC 4.7 or above is required to compile mraajs ")
+      endif()
+  endif()
+  set_property (TARGET mraajs PROPERTY CXX_STANDARD 11)
+  set_property (TARGET mraajs PROPERTY CXX_STANDARD_REQUIRED ON)
+endif ()
+
 macro (mraa_CREATE_INSTALL_PACKAGE_JSON generated_file install_location)
   configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
   install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} DESTINATION ${install_location})
