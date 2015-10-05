@@ -1,8 +1,6 @@
 /*
- * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright (c) 2014 Intel Corporation.
- * Author: Jakub Kramarz <jkramarz@virtuslab.com>
- * Copyright (c) 2015 VirtusLab
+ * Author: Brendan Le Foll
+ * Copyright (c) 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -24,34 +22,36 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import mraa.Pwm;
+#include <unistd.h>
 
-public class CyclePwm3 {
-    static {
-        try {
-            System.loadLibrary("mraajava");
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println(
-                    "Native code library failed to load. See the chapter on Dynamic Linking Problems in the SWIG Java documentation for help.\n" +
-                            e);
-            System.exit(1);
-        }
-    }
-    public static void main(String argv[]) throws InterruptedException {
-        //! [Interesting]
-        Pwm pwm = new mraa.Pwm(3);
-        pwm.period_us(200);
-        pwm.enable(true);
+#include "mraa.hpp"
 
-        float value = 0;
-        while (true) {
-            value += 0.01;
-            pwm.write(value);
-            Thread.sleep(50);
-            if (value >= 1) {
-                value = 0;
-            }
+static volatile int counter = 0;
+static volatile int oldcounter = 0;
+
+void
+interrupt(void* args)
+{
+    ++counter;
+}
+
+int
+main()
+{
+    mraa::Gpio* x = new mraa::Gpio(6);
+
+    x->dir(mraa::DIR_IN);
+
+    x->isr(mraa::EDGE_BOTH, &interrupt, NULL);
+
+    for (;;) {
+        if (counter != oldcounter) {
+            fprintf(stdout, "timeout counter == %d\n", counter);
+            oldcounter = counter;
         }
-        //! [Interesting]
+        // got to relieve our poor CPU!
+        sleep(1);
     }
+
+    return EXIT_SUCCESS;
 }

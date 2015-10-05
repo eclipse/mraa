@@ -42,12 +42,20 @@ namespace mraa {
 class Spi;
 %typemap(out) uint8_t*
 {
-%#if SWIG_V8_VERSION > 0x032870
+%#if SWIG_V8_VERSION > 0x040000
+   v8::MaybeLocal<v8::Object> objret = node::Buffer::New(v8::Isolate::GetCurrent(), (char*) $1, arg3);
+   free($1);
+   if(!objret.ToLocal(&$result)) {
+      SWIG_exception_fail(SWIG_ERROR, "Spi buffer failed");
+      SWIGV8_RETURN(SWIGV8_UNDEFINED());
+   }
+%#elif SWIG_V8_VERSION > 0x032870
   $result = node::Buffer::New((char*) $1, arg3);
+  free($1);
 %#else
   $result = node::Buffer::New((char*) $1, arg3)->handle_;
-%#endif
   free($1);
+%#endif
 }
 }
 
@@ -73,15 +81,24 @@ class Spi;
 %typemap(argout) (char* data, int length) {
    if (result < 0) {      /* Check for I/O error */
        free($1);
-       SWIG_exception_fail(SWIG_ERROR, "I2c write failed");
+       SWIG_exception_fail(SWIG_ERROR, "Uart write failed");
        SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
-%#if SWIG_V8_VERSION > 0x032870
+%#if SWIG_V8_VERSION > 0x040000
+   v8::MaybeLocal<v8::Object> objret = node::Buffer::New(v8::Isolate::GetCurrent(), (char*) $1, result);
+   free($1);
+   if(!objret.ToLocal(&$result)) {
+      SWIG_exception_fail(SWIG_ERROR, "Uart buffer failed");
+      SWIGV8_RETURN(SWIGV8_UNDEFINED());
+   }
+%#elif SWIG_V8_VERSION > 0x032870
    $result = node::Buffer::New((char*) $1, result);
+   free($1);
 %#else
    $result = node::Buffer::New((char*) $1, result)->handle_;
-%#endif
    free($1);
+%#endif
+
 }
 
 //I2c::read()
@@ -105,12 +122,20 @@ class Spi;
        SWIG_exception_fail(SWIG_ERROR, "I2c write failed");
        SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
-%#if SWIG_V8_VERSION > 0x032870
+%#if SWIG_V8_VERSION > 0x040000
+   v8::MaybeLocal<v8::Object> objret = node::Buffer::New(v8::Isolate::GetCurrent(), (char*) $1, result);
+   free($1);
+   if(!objret.ToLocal(&$result)) {
+      SWIG_exception_fail(SWIG_ERROR, "I2c buffer failed");
+      SWIGV8_RETURN(SWIGV8_UNDEFINED());
+   }
+%#elif SWIG_V8_VERSION > 0x032870
    $result = node::Buffer::New((char*) $1, result);
+   free($1);
 %#else
    $result = node::Buffer::New((char*) $1, result)->handle_;
-%#endif
    free($1);
+%#endif
 }
 
 %include ../mraa.i

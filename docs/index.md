@@ -1,14 +1,14 @@
 libmraa - Low Level Skeleton Library for Communication on GNU/Linux platforms
 ==============
 
-Libmraa is a C/C++ library with bindings to javascript & python to interface
-with the IO on Galileo, Edison & other platforms, with a structured and sane
-API where port names/numbering matches the board that you are on. Use of
-libmraa does not tie you to specific hardware with board detection done at
+Libmraa is a C/C++ library with bindings to Python, Javascript and Java to
+interface with the I/O on Galileo, Edison & other platforms, with a structured
+and sane API where port names/numbering matches the board that you are on. Use
+of libmraa does not tie you to specific hardware with board detection done at
 runtime you can create portable code that will work across the supported
 platforms.
 
-The intent is to make it easier for developers and sensor manufacturers to map 
+The intent is to make it easier for developers and sensor manufacturers to map
 their sensors & actuators on top of supported hardware and to allow control of
 low level communication protocol by high level languages & constructs.
 
@@ -69,6 +69,12 @@ use.
 This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
+
+**0.8.0**
+  * Better java support
+  * Support for FT4222 subplatforms
+  * New types.hpp improves C++ & SWIG APIs
+  * Added support for minnowboard max compatible boards
 
 **0.7.5**
   * 5th Generation NUC i2c support

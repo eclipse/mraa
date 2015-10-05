@@ -408,11 +408,12 @@ mraa_get_platform_name()
     if (plat == NULL) {
         return NULL;
     }
-    strncpy(platform_name, plat->platform_name, MAX_PLATFORM_NAME_LENGTH);
     if (mraa_has_sub_platform()) {
-        strncat(platform_name, " + ", MAX_PLATFORM_NAME_LENGTH);
-        strncat(platform_name, plat->sub_platform->platform_name, MAX_PLATFORM_NAME_LENGTH);
+        snprintf(platform_name, MAX_PLATFORM_NAME_LENGTH, "%s + %s", plat->platform_name, plat->sub_platform->platform_name);
+    } else {
+        strncpy(platform_name, plat->platform_name, MAX_PLATFORM_NAME_LENGTH-1);
     }
+
     return platform_name;
 }
 

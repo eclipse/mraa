@@ -1,8 +1,8 @@
 /*
+ * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright (c) 2014 Intel Corporation.
- * Author: Jakub Kramarz <jkramarz@virtuslab.com>
- * Copyright (c) 2015 VirtusLab
+ * Author: Petre Eftime <petre.p.eftime@intel.com>
+ * Copyright (c) 2014, 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -24,34 +24,33 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import mraa.Pwm;
 
-public class CyclePwm3 {
-    static {
-        try {
-            System.loadLibrary("mraajava");
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println(
-                    "Native code library failed to load. See the chapter on Dynamic Linking Problems in the SWIG Java documentation for help.\n" +
-                            e);
+import mraa.Result;
+import mraa.Uart;
+import mraa.UartParity;
+
+public class UartExample {
+
+    public static void main(String[] args) {
+        //! [Interesting]
+        Uart uart = new Uart(0);
+
+        if (uart.setBaudRate(115200) != Result.SUCCESS) {
+            System.err.println("Error setting baud rate");
             System.exit(1);
         }
-    }
-    public static void main(String argv[]) throws InterruptedException {
-        //! [Interesting]
-        Pwm pwm = new mraa.Pwm(3);
-        pwm.period_us(200);
-        pwm.enable(true);
 
-        float value = 0;
-        while (true) {
-            value += 0.01;
-            pwm.write(value);
-            Thread.sleep(50);
-            if (value >= 1) {
-                value = 0;
-            }
+        if (uart.setMode(8, UartParity.UART_PARITY_NONE, 1) != Result.SUCCESS) {
+            System.err.println("Error setting mode");
+            System.exit(1);
         }
+
+        if (uart.setFlowcontrol(false, false) != Result.SUCCESS) {
+            System.err.println("Error setting flow control");
+            System.exit(1);
+        }
+
+        uart.writeStr("Hello monkeys");
         //! [Interesting]
     }
 }

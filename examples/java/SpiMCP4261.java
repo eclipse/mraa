@@ -1,8 +1,8 @@
 /*
- * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Author: Alexander Komarov <alexander.komarov@intel.com>
  * Copyright (c) 2014 Intel Corporation.
- * Author: Jakub Kramarz <jkramarz@virtuslab.com>
- * Copyright (c) 2015 VirtusLab
+ * Author: Petre Eftime <petre.p.eftime@intel.com>
+ * Copyright (c) 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -24,9 +24,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import mraa.Pwm;
+import mraa.Spi;
 
-public class CyclePwm3 {
+public class SpiMCP4261 {
     static {
         try {
             System.loadLibrary("mraajava");
@@ -39,19 +39,26 @@ public class CyclePwm3 {
     }
     public static void main(String argv[]) throws InterruptedException {
         //! [Interesting]
-        Pwm pwm = new mraa.Pwm(3);
-        pwm.period_us(200);
-        pwm.enable(true);
+        Spi spi = new Spi(0);
 
-        float value = 0;
+        System.out.println("Hello, SPI initialised");
+        byte data[] = {0x00, 100};
         while (true) {
-            value += 0.01;
-            pwm.write(value);
-            Thread.sleep(50);
-            if (value >= 1) {
-                value = 0;
+            for (int i = 90; i < 130; i++) {
+                data[1] = (byte) i;
+                byte[] recv = spi.write(data);
+                System.out.println(String.format("Writing - %d", i));
+                System.out.println(String.format("Received - %d - %d", recv[0], recv[1]));
+                Thread.sleep(100);
+            }
+            for (int i = 130; i > 90; i--) {
+                data[1] = (byte) i;
+                byte[] recv = spi.write(data);
+                System.out.println(String.format("Writing - %d", i));
+                System.out.println(String.format("Received - %d - %d", recv[0], recv[1]));
+                Thread.sleep(100);
             }
         }
         //! [Interesting]
-    }
+    };
 }

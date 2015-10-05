@@ -23,6 +23,15 @@ set_target_properties (mraajs PROPERTIES
   OUTPUT_NAME mraa
   SUFFIX ".node"
 )
+
+if (${V8_VERSION_MAJOR} GREATER 3)
+  message (INFO " - Using V8 version > 3 so requiring C++11 compiler")
+  # Node 0.12.x V8 engine major version is '3'.
+  # Node 2.1.0  V8 engine major version is '4'.
+  set_property (TARGET mraajs PROPERTY CXX_STANDARD 11)
+  set_property (TARGET mraajs PROPERTY CXX_STANDARD_REQUIRED ON)
+endif ()
+
 macro (mraa_CREATE_INSTALL_PACKAGE_JSON generated_file install_location)
   configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
   install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} DESTINATION ${install_location})

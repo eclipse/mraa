@@ -1,8 +1,9 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Copyright (c) 2014 Intel Corporation.
- * Author: Jakub Kramarz <jkramarz@virtuslab.com>
- * Copyright (c) 2015 VirtusLab
+ * Author: Petre Eftime <petre.p.eftime@intel.com>
+ * Copyright (c) 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -24,9 +25,13 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import mraa.Pwm;
 
-public class CyclePwm3 {
+import mraa.Dir;
+import mraa.Gpio;
+import mraa.Result;
+import mraa.mraa;
+
+public class BlinkIO {
     static {
         try {
             System.loadLibrary("mraajava");
@@ -37,20 +42,30 @@ public class CyclePwm3 {
             System.exit(1);
         }
     }
-    public static void main(String argv[]) throws InterruptedException {
-        //! [Interesting]
-        Pwm pwm = new mraa.Pwm(3);
-        pwm.period_us(200);
-        pwm.enable(true);
 
-        float value = 0;
+    final static int DEFAULT_IOPIN = 8;
+
+    public static void main(String argv[]) throws InterruptedException {
+        int iopin = DEFAULT_IOPIN;
+        if (argv.length == 0) {
+            System.out.println("Provide an int arg if you want to flash on something other than " + DEFAULT_IOPIN);
+        } else {
+            iopin = Integer.valueOf(argv[0], DEFAULT_IOPIN);
+        }
+
+        //! [Interesting]
+        Gpio gpio = new Gpio(iopin);
+        Result result = gpio.dir(Dir.DIR_OUT);
+        if (result != Result.SUCCESS) {
+            mraa.printError(result);
+            System.exit(1);
+        }
+
         while (true) {
-            value += 0.01;
-            pwm.write(value);
-            Thread.sleep(50);
-            if (value >= 1) {
-                value = 0;
-            }
+            gpio.write(1);
+            Thread.sleep(1000);
+            gpio.write(0);
+            Thread.sleep(1000);
         }
         //! [Interesting]
     }

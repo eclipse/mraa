@@ -22,33 +22,35 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import mraa.Dir;
+import mraa.Edge;
+import mraa.Gpio;
+import mraa.IsrCallback;
+
 public class Isr {
-  static {
-    try {
-      System.loadLibrary("mraajava");
-    } catch (UnsatisfiedLinkError e) {
-      System.err.println(
-          "Native code library failed to load. See the chapter on Dynamic Linking Problems in the SWIG Java documentation for help.\n" +
-          e);
-      System.exit(1);
+    static {
+        try {
+            System.loadLibrary("mraajava");
+        } catch (UnsatisfiedLinkError e) {
+            System.err.println(
+                    "Native code library failed to load. See the chapter on Dynamic Linking Problems in the SWIG Java documentation for help.\n" +
+                            e);
+            System.exit(1);
+        }
     }
-  }
-  public static void main(String argv[]) {
-    mraa.mraa.init();
+    public static void main(String argv[]) throws InterruptedException {
+        Gpio gpio = new Gpio(6);
 
-    mraa.Gpio gpio = new mraa.Gpio(7);
+        IsrCallback callback = new JavaCallback();
 
-    mraa.IsrCallback callback = new JavaCallback();
-
-    gpio.isr(mraa.Edge.EDGE_RISING, callback, null);
-    while (true)
-      ;
-  };
+        gpio.isr(Edge.EDGE_RISING, callback);
+        while (true)
+            Thread.sleep(999999);
+    };
 }
-;
 
-class JavaCallback extends mraa.IsrCallback {
-  public JavaCallback() { super(); }
+class JavaCallback extends IsrCallback {
+    public JavaCallback() { super(); }
 
-  public void run() { System.out.println("JavaCallback.run()"); }
+    public void run() { System.out.println("JavaCallback.run()"); }
 }

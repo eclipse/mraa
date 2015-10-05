@@ -1,8 +1,8 @@
 /*
- * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Copyright (c) 2014 Intel Corporation.
- * Author: Jakub Kramarz <jkramarz@virtuslab.com>
- * Copyright (c) 2015 VirtusLab
+ * Author: Petre Eftime <petre.p.eftime@intel.com>
+ * Copyright (c) 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -24,34 +24,37 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import mraa.Pwm;
+import mraa.Gpio;
+import mraa.mraa;
 
-public class CyclePwm3 {
-    static {
-        try {
-            System.loadLibrary("mraajava");
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println(
-                    "Native code library failed to load. See the chapter on Dynamic Linking Problems in the SWIG Java documentation for help.\n" +
-                            e);
-            System.exit(1);
-        }
+public class GpioMmapped {
+  static {
+    try {
+      System.loadLibrary("mraajava");
+    } catch (UnsatisfiedLinkError e) {
+      System.err.println(
+          "Native code library failed to load. See the chapter on Dynamic Linking Problems in the SWIG Java documentation for help.\n" +
+          e);
+      System.exit(1);
     }
-    public static void main(String argv[]) throws InterruptedException {
-        //! [Interesting]
-        Pwm pwm = new mraa.Pwm(3);
-        pwm.period_us(200);
-        pwm.enable(true);
-
-        float value = 0;
-        while (true) {
-            value += 0.01;
-            pwm.write(value);
-            Thread.sleep(50);
-            if (value >= 1) {
-                value = 0;
-            }
-        }
-        //! [Interesting]
+  }
+  public static void main(String argv[]) throws InterruptedException {
+    //! [Interesting]
+    String board = mraa.getPlatformName();
+    String version = mraa.getVersion();
+    System.out.println("hello mraa");
+    System.out.println(String.format("Version: %s", version));
+    
+    Gpio gpio = new Gpio(1);
+    
+    gpio.useMmap(true);
+    
+    while (true) {
+        gpio.write(1);
+        Thread.sleep(50);
+        gpio.write(0);
+        Thread.sleep(50);
     }
+    //! [Interesting]
+  };
 }

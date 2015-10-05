@@ -53,6 +53,9 @@ class Spi;
 }
 }
 
+%ignore write(const char* data, int length);
+%ignore read(char* data, int length);
+
 %feature("director") IsrCallback;
 %include ../mraa.i
 
