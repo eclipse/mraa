@@ -29,14 +29,12 @@ static void
 printword(uint16_t input, mraa_iio_channel *chan)
 {
     int16_t res;
+
     if (!chan->lendian) {
             input = be16toh(input);
     } else {
             input = le16toh(input);
     }
-
-    // currently we don't treat scales
-    chan->scale = 1.0f;
 
     input >>= chan->shift;
     input &= chan->mask;
@@ -45,7 +43,7 @@ printword(uint16_t input, mraa_iio_channel *chan)
     } else {
         res = input;
     }
-    printf("chan %d == %05f\n", chan->index, ((float)res + chan->offset) * chan->scale);
+    printf("  value = %05f\n", chan->index, (float)res);
 }
 
 mraa_iio_context iio_device0;
@@ -57,13 +55,14 @@ interrupt(char* data)
     int i = 0;
 
     for (i; i < mraa_iio_get_channel_count(iio_device0); i++) {
-        printf("channel bytes %d\n", channels[i].bytes);
-        switch (channels[i].bytes) {
-            case 2:
-                printword(*(uint16_t *)(data + channels[i].location), &channels[i]);
+        if (channels[i].enabled) {
+            printf("channel %d - bytes %d\n", channels[i].index, channels[i].bytes);
+            switch (channels[i].bytes) {
+                case 2:
+                    printword(*(uint16_t *)(data + channels[i].location), &channels[i]);
+            }
         }
     }
-    printf("data %s\n", (char*) data);
 }
 
 int
