@@ -38,7 +38,6 @@ typedef struct {
     unsigned int bytes;
     unsigned int shift;
     unsigned int location;
-    float scale;
 } mraa_iio_channel;
 
 /**
