@@ -105,6 +105,7 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
 
                 buf[(strlen(buf)-5)] = '\0';
                 char* str = strdup(buf);
+                // grab the type of the buffer
                 snprintf(buf, MAX_SIZE, "%stype", str);
                 fd = open(buf, O_RDONLY);
                 if (fd > 0) {
@@ -119,8 +120,11 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
                         chan->location = curr_bytes - curr_bytes%chan->bytes + chan->bytes;
                     }
                     curr_bytes = chan->location + chan->bytes;
+                    // probably should be 5?
                     if (ret < 0) {
-                        // probably should be 5?
+                        // cleanup
+                        free(str);
+                        close(fd);
                         return MRAA_IO_SETUP_FAILURE;
                     }
                     chan->signedd = (signchar == 's');
@@ -130,10 +134,21 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
                     } else {
                         chan->mask = (1 << chan->bits_used) - 1;
                     }
-
                     close(fd);
                 }
-                // todo - read scale & _en attributes
+                // grab the enable flag of channel
+                snprintf(buf, MAX_SIZE, "%sen", str);
+                fd = open(buf, O_RDONLY);
+                if (fd > 0) {
+                    if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
+                        syslog(LOG_ERR, "iio: Failed to read a sensible value from sysfs");
+                        return -1;
+                    }
+                    chan->enabled = (int) strtol(readbuf, NULL, 10);
+                    close(fd);
+                }
+                // clean up str var
+                free(str);
             }
         }
     }
