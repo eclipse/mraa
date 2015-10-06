@@ -35,6 +35,7 @@ extern "C" {
 #include "mraa_adv_func.h"
 
 extern mraa_board_t* plat;
+extern mraa_iio_info_t* plat_iio;
 
 /**
  * Takes in pin information and sets up the multiplexors.
