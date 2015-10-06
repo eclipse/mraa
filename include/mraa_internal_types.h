@@ -27,7 +27,6 @@
 
 #include "common.h"
 #include "mraa.h"
-#include "mraa_func.h"
 #include "mraa_adv_func.h"
 #include "iio.h"
 
