@@ -154,7 +154,7 @@ mraa_init()
 
     plat_iio = (mraa_iio_info_t*) calloc(1, sizeof(mraa_iio_info_t));
     // Now detect IIO devices, linux only
-    // find how many i2c buses we have if we haven't already
+    // find how many iio devices we have if we haven't already
     if (num_iio_devices == 0) {
         if (nftw("/sys/bus/iio/devices", &mraa_count_iio_devices, 20, FTW_PHYS) == -1) {
             return MRAA_ERROR_UNSPECIFIED;
