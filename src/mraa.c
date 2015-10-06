@@ -47,7 +47,7 @@
 
 #define MAX_PLATFORM_NAME_LENGTH 128
 mraa_board_t* plat = NULL;
-// static mraa_board_t* current_plat = NULL;
+mraa_iio_info_t* plat_iio = NULL;
 
 static char platform_name[MAX_PLATFORM_NAME_LENGTH];
 
@@ -128,15 +128,15 @@ mraa_init()
     if (plat != NULL)
         plat->platform_type = platform_type;
 
+#if defined(USBPLAT)
     // This is a platform extender so create null base platform if one doesn't already exist
     if (plat == NULL) {
         plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
         if (plat != NULL) {
             plat->platform_type = MRAA_NULL_PLATFORM;
-            plat->platform_name = "Null platform";
+            plat->platform_name = "Unknown platform";
         }
     }
-#if defined(USBPLAT)
     // Now detect sub platform
     if (plat != NULL) {
         mraa_platform_t usb_platform_type = mraa_usb_platform_extender(plat);
@@ -152,6 +152,7 @@ mraa_init()
     }
 #endif
 
+    plat_iio = (mraa_iio_info_t*) calloc(1, sizeof(mraa_iio_info_t));
     // Now detect IIO devices, linux only
     // find how many i2c buses we have if we haven't already
     if (num_iio_devices == 0) {
@@ -161,11 +162,11 @@ mraa_init()
     }
     char name[64], filepath[64];
     int fd, len, i;
-    plat->iio_device_count = num_iio_devices;
-    plat->iio_devices = calloc(num_iio_devices, sizeof(struct _iio));
+    plat_iio->iio_device_count = num_iio_devices;
+    plat_iio->iio_devices = calloc(num_iio_devices, sizeof(struct _iio));
     struct _iio* device;
     for (i=0; i < num_iio_devices; i++) {
-        device = &plat->iio_devices[i];
+        device = &plat_iio->iio_devices[i];
         device->num = i;
         snprintf(filepath, 64, "/sys/bus/iio/devices/iio:device%d/name", i);
         fd = open(filepath, O_RDONLY);
@@ -200,6 +201,9 @@ mraa_deinit()
         }
         free(plat);
 
+    }
+    if (plat_iio != NULL) {
+        free(plat_iio);
     }
     closelog();
 }
@@ -764,14 +768,14 @@ mraa_get_sub_platform_index(int pin_or_bus)
 int
 mraa_get_iio_device_count()
 {
-    return plat->iio_device_count;
+    return plat_iio->iio_device_count;
 }
 
 int
 mraa_find_iio_device(const char* devicename)
 {
     int i = 0;
-    for (i; i < plat->iio_device_count; i++) {
+    for (i; i < plat_iio->iio_device_count; i++) {
 #if 0
         // compare with devices array
         if (!strcmp() {

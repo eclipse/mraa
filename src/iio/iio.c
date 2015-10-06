@@ -37,12 +37,12 @@
 mraa_iio_context
 mraa_iio_init(int device)
 {
-    if (device > plat->iio_device_count) {
+    if (device > plat_iio->iio_device_count) {
         return NULL;
     }
 
-    mraa_iio_get_channel_data(&plat->iio_devices[device]);
-    return &plat->iio_devices[device];
+    mraa_iio_get_channel_data(&plat_iio->iio_devices[device]);
+    return &plat_iio->iio_devices[device];
 }
 
 int
