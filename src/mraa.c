@@ -50,7 +50,6 @@ mraa_board_t* plat = NULL;
 // static mraa_board_t* current_plat = NULL;
 
 static char platform_name[MAX_PLATFORM_NAME_LENGTH];
-mraa_adv_func_t* advance_func;
 
 static int num_i2c_devices = 0;
 static int num_iio_devices = 0;
@@ -114,9 +113,6 @@ mraa_init()
     Py_InitializeEx(0);
     PyEval_InitThreads();
 #endif
-
-    advance_func = (mraa_adv_func_t*) malloc(sizeof(mraa_adv_func_t));
-    memset(advance_func, 0, sizeof(mraa_adv_func_t));
 
     mraa_platform_t platform_type;
 #if defined(X86PLAT)
