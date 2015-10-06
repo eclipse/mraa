@@ -46,6 +46,7 @@
 #include "version.h"
 
 #define MAX_PLATFORM_NAME_LENGTH 128
+#define IIO_DEVICE_WILDCARD "iio:device*"
 mraa_board_t* plat = NULL;
 mraa_iio_info_t* plat_iio = NULL;
 
@@ -75,10 +76,9 @@ mraa_set_log_level(int level)
 static int
 mraa_count_iio_devices(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
 {
-    switch (sb->st_mode & S_IFMT) {
-        case S_IFLNK:
-            num_iio_devices++;
-            break;
+    // we are only interested in files with specific names
+    if (fnmatch(IIO_DEVICE_WILDCARD, basename(path), 0) == 0) {
+        num_iio_devices++;
     }
     return 0;
 }
