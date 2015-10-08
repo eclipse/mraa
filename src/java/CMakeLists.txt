@@ -12,8 +12,8 @@ set_source_files_properties (mraajava.i PROPERTIES CPLUSPLUS ON)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
-set (JAVAC $ENV{JAVA_HOME}/bin/javac)
-set (JAR $ENV{JAVA_HOME}/bin/jar)
+set (JAVAC $ENV{JAVA_HOME_NATIVE}/bin/javac)
+set (JAR $ENV{JAVA_HOME_NATIVE}/bin/jar)
 
 swig_add_module (mraajava java mraajava.i ${mraa_LIB_SRCS})
 swig_link_libraries (mraajava ${JAVA_LIBRARIES} ${mraa_LIBS})
