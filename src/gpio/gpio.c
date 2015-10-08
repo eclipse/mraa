@@ -87,6 +87,7 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
 
     dev->value_fp = -1;
     dev->isr_value_fp = -1;
+    dev->isr_thread_terminating = 0;
     dev->phy_pin = -1;
 
     // then check to make sure the pin is exported.
@@ -229,12 +230,12 @@ mraa_gpio_interrupt_handler(void* arg)
 
     for (;;) {
         ret = mraa_gpio_wait_interrupt(dev->isr_value_fp);
-        if (ret == MRAA_SUCCESS) {
+        if (ret == MRAA_SUCCESS && !dev->isr_thread_terminating) {
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 #ifdef SWIGPYTHON
             // In order to call a python object (all python functions are objects) we
             // need to aquire the GIL (Global Interpreter Lock). This may not always be
-            // nessecary but especially if doing IO (like print()) python will segfault
+            // necessary but especially if doing IO (like print()) python will segfault
             // if we do not hold a lock on the GIL
             PyGILState_STATE gilstate = PyGILState_Ensure();
             PyObject* arglist;
@@ -246,6 +247,16 @@ mraa_gpio_interrupt_handler(void* arg)
                 ret = PyEval_CallObject((PyObject*) dev->isr, arglist);
                 if (ret == NULL) {
                     syslog(LOG_ERR, "gpio: PyEval_CallObject failed");
+                    PyObject *pvalue, *ptype, *ptraceback;
+                    PyErr_Fetch(&pvalue, &ptype, &ptraceback);
+                    syslog(LOG_ERR, "gpio: the error was %s:%s:%s",
+                           PyString_AsString(PyObject_Str(pvalue)),
+                           PyString_AsString(PyObject_Str(ptype)),
+                           PyString_AsString(PyObject_Str(ptraceback))
+                    );
+                    Py_XDECREF(pvalue);
+                    Py_XDECREF(ptype);
+                    Py_XDECREF(ptraceback);
                 } else {
                     Py_DECREF(ret);
                 }
@@ -258,7 +269,7 @@ mraa_gpio_interrupt_handler(void* arg)
 #endif
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
         } else {
-            // we must have got an error code so die nicely
+            // we must have got an error code or exit request so die nicely
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
             close(dev->isr_value_fp);
             dev->isr_value_fp = -1;
@@ -344,6 +355,8 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
     if (dev->thread_id == 0 && dev->isr_value_fp == -1) {
         return ret;
     }
+    // mark the beginning of the thread termination process for interested parties
+    dev->isr_thread_terminating = 1;
 
     // stop isr being useful
     ret = mraa_gpio_edge_mode(dev, MRAA_GPIO_EDGE_NONE);
@@ -364,6 +377,7 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
     // assume our thread will exit either way we just lost it's handle
     dev->thread_id = 0;
     dev->isr_value_fp = -1;
+    dev->isr_thread_terminating = 0;
     return ret;
 }
 
