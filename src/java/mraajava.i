@@ -63,6 +63,6 @@ class Spi;
     jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         /* initialize mraa */
         mraa_init();
-        return JNI_VERSION_1_8;
+        return JNI_VERSION_1_6;
     }
 %}
