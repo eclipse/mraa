@@ -293,20 +293,33 @@ mraa_ftdi_ft4222_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 static uint8_t
 mraa_ftdi_ft4222_i2c_read_byte(mraa_i2c_context dev)
 {
-    return 0;
+    uint8_t data;
+    if (mraa_ftdi_ft4222_i2c_read_internal(dev->handle, dev->addr, &data, 1) == 1)
+        return data;
+    else
+        return 0;
 }
 
 
 static uint16_t
 mraa_ftdi_ft4222_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
-    return 0;
+    uint8_t buf[2];
+    uint16_t data;
+    if (mraa_ftdi_ft4222_i2c_write_internal(dev->handle, dev->addr, &command, 1) != 1)
+        return 0;
+    if (mraa_ftdi_ft4222_i2c_read_internal(dev->handle, dev->addr, buf, 2) != 2)
+        return 0;
+    data = *(uint16_t*)buf;
+    return data;
 }
 
 static int
 mraa_ftdi_ft4222_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* data, int length)
 {
-    return -1;
+    if (mraa_ftdi_ft4222_i2c_write_internal(dev->handle, dev->addr, &command, 1) != 1)
+        return 0;
+    return mraa_ftdi_ft4222_i2c_read_internal(dev->handle, dev->addr, data, length);
 }
 
 
