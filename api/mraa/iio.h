@@ -77,6 +77,8 @@ mraa_result_t mraa_iio_trigger_buffer(mraa_iio_context dev, void (*fptr)(char* d
 
 const char* mraa_iio_get_device_name(mraa_iio_context dev);
 
+int mraa_iio_get_device_num_by_name(const char* name);
+
 int mraa_iio_read_size(mraa_iio_context dev);
 
 mraa_iio_channel* mraa_iio_get_channels(mraa_iio_context dev);
