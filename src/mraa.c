@@ -173,9 +173,12 @@ mraa_init()
         if (fd > 0) {
             len = read(fd, &name, 64);
             if (len > 1) {
+                // remove any trailing CR/LF symbols
+                name[strcspn(name, "\r\n")] = '\0';
+                len = strlen(name);
                 // use strndup
                 device->name = malloc((sizeof(char) * len) + sizeof(char));
-                strncpy(device->name, name, len);
+                strncpy(device->name, name, len+1);
             }
             close(fd);
         }
