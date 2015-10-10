@@ -163,6 +163,33 @@ mraa_iio_get_device_name(mraa_iio_context dev)
     return dev->name;
 }
 
+int
+mraa_iio_get_device_num_by_name(const char* name)
+{
+    int i;
+
+    if (plat_iio == NULL) {
+        syslog(LOG_ERR, "iio: platform IIO structure is not initialized");
+        return -1;
+    }
+
+    if (name == NULL) {
+        syslog(LOG_ERR, "iio: device name is NULL, unable to find its number");
+        return -1;
+    }
+
+    for (i = 0; i < plat_iio->iio_device_count; i++) {
+        struct _iio* device;
+        device = &plat_iio->iio_devices[i];
+        // we want to check for exact match
+        if (strncmp(device->name, name, strlen(device->name)+1) == 0) {
+            return device->num;
+        }
+    }
+
+    return -1;
+}
+
 mraa_result_t
 mraa_iio_read(mraa_iio_context dev, const char* attr_chan, float* data)
 {
