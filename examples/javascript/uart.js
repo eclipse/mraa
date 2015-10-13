@@ -1,6 +1,6 @@
 /*
- * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright (c) 2015 Intel Corporation.
+ * Author: Eugene Bolshakov <pub@relvarsoft.com>
+ * Copyright (c) 2015 Eugene Bolshakov
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -23,6 +23,32 @@
  */
 
 var m = require('mraa'); //require mraa
-
+console.log('MRAA Version: ' + m.getVersion());
 u = new m.Uart(0)
-console.log(u.getDevicePath())
+
+console.log("Note: connect Rx and Tx of UART with a wire before use");
+
+function sleep(delay) {
+  delay += new Date().getTime();
+  while (new Date() < delay) { }
+}
+
+console.log("Set UART parameters");
+
+u.setBaudRate(115200);
+u.setMode(8, 0, 1);
+u.setFlowcontrol(false, false);
+sleep(200);
+
+console.log("First write-read circle:");
+
+u.writeStr("test\n");
+sleep(200);
+console.log(u.readStr(6));
+sleep(200);
+
+console.log("Second write-read circle:");
+
+u.writeStr("2nd test\n");
+sleep(200);
+console.log(u.readStr(10));
