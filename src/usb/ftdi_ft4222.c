@@ -526,6 +526,7 @@ mraa_ftdi_ft4222()
         sprintf(name, "Pin%d", pinIndex);
         strncpy(sub_plat->pins[pinIndex].name, name, 8);
         sub_plat->pins[pinIndex].capabilites = pinCapsGpio;
+        sub_plat->pins[pinIndex].gpio.mux_total = 0;
     }
 
     int bus = 0;
