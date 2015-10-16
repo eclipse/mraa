@@ -47,6 +47,7 @@ printword(uint16_t input, mraa_iio_channel *chan)
 }
 
 mraa_iio_context iio_device0;
+mraa_iio_context iio_device6;
 
 void
 interrupt(char* data)
@@ -64,6 +65,21 @@ interrupt(char* data)
         }
     }
 }
+
+void event_interrupt(struct iio_event_data* data)
+{
+	int chan_type;
+	int modifier;
+	int type;
+	int direction;
+	int channel;
+	int channel2;
+	int different;
+	mraa_iio_event_extract_event(data, &chan_type, &modifier, &type, &direction, &channel, &channel2, &different);
+	
+	printf("event time %lld id %lld extracted chan_type %d modifier %d type %d direction %d channel %d channel2 %d different %d\n", data->timestamp, data->id, chan_type, modifier, type, direction, channel, channel2, different);
+}
+
 
 int
 main()
@@ -85,6 +101,25 @@ main()
         return EXIT_SUCCESS;
     }
 
+	/*
+	struct iio_event_data event;
+	iio_device6 = mraa_iio_init(6);
+    if (iio_device6 == NULL) {
+        return EXIT_FAILURE;
+    }
+	mraa_iio_event_write(iio_device6, "in_proximity2_thresh_either_en", "1");
+	
+	
+	// Blocking until event fired
+    if (mraa_iio_event_poll(iio_device6, &event) == MRAA_SUCCESS) {	
+		event_interrupt(&event); //just to show data
+	}
+	
+	if (mraa_iio_event_setup_callback(iio_device6, event_interrupt, NULL) == MRAA_SUCCESS) {
+        sleep(100);
+        return EXIT_SUCCESS;
+    }*/
+	
     //! [Interesting]
     return EXIT_FAILURE;
 }
