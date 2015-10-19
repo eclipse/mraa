@@ -25,6 +25,7 @@
 #pragma once
 
 #include "common.h"
+#include "iio_kernel_headers.h"
 
 typedef struct {
     int index;
@@ -39,6 +40,11 @@ typedef struct {
     unsigned int shift;
     unsigned int location;
 } mraa_iio_channel;
+
+typedef struct {
+    char *name;
+	int enabled;
+} mraa_iio_event;
 
 /**
  * @file
@@ -92,10 +98,21 @@ mraa_result_t mraa_iio_read(mraa_iio_context dev, const char* attribute, float* 
 /**
  *
  */
-mraa_result_t mraa_iio_write(mraa_iio_context dev, const char* attribute);
+mraa_result_t mraa_iio_write(mraa_iio_context dev, const char* attr_chan, const char* data);
 
 mraa_result_t mraa_iio_get_channel_data(mraa_iio_context dev);
 
+mraa_result_t mraa_iio_get_event_data(mraa_iio_context dev);
+
+mraa_result_t mraa_iio_event_read(mraa_iio_context dev, const char* attribute, float* data);
+
+mraa_result_t mraa_iio_event_write(mraa_iio_context dev, const char* attribute, const char* data);
+
+mraa_result_t mraa_iio_event_poll(mraa_iio_context dev, struct iio_event_data* data);
+
+mraa_result_t mraa_iio_event_setup_callback(mraa_iio_context dev, void (*fptr)(struct iio_event_data* data), void* args);
+
+mraa_result_t mraa_iio_event_extract_event(struct iio_event_data* event, int* chan_type, int* modifier, int* type, int* direction, int* channel, int* channel2, int* different);
 /**
  * De-inits an mraa_iio_context device
  *
