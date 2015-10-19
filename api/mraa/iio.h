@@ -98,7 +98,7 @@ mraa_result_t mraa_iio_read(mraa_iio_context dev, const char* attribute, float* 
 /**
  *
  */
-mraa_result_t mraa_iio_write(mraa_iio_context dev, const char* attribute);
+mraa_result_t mraa_iio_write(mraa_iio_context dev, const char* attr_chan, const char* data);
 
 mraa_result_t mraa_iio_get_channel_data(mraa_iio_context dev);
 

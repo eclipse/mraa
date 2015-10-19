@@ -208,9 +208,16 @@ mraa_iio_read(mraa_iio_context dev, const char* attr_chan, float* data)
 }
 
 mraa_result_t
-mraa_iio_write(mraa_iio_context dev, const char* attr_chan)
+mraa_iio_write(mraa_iio_context dev, const char* attr_chan, const char* data)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    char buf[128];
+    snprintf(buf, 128, IIO_SYSFS_DEVICE "%d/%s", dev->num, attr_chan);
+    int fd = open(buf, O_WRONLY);
+    if (fd != -1) {
+		write(fd, data, ( strlen(data) +1 ));
+        return MRAA_SUCCESS;
+    }
+    return MRAA_ERROR_UNSPECIFIED;
 }
 
 static mraa_result_t
