@@ -127,11 +127,15 @@ struct _iio {
     int num; /**< IIO device number */
     char* name; /**< IIO device name */
     int fp; /**< IIO device in /dev */
+	int fp_event;  /**<  event file descriptor for IIO device */
     void (* isr)(char* data); /**< the interupt service request */
     void *isr_args; /**< args return when interupt service request triggered */
+    void (* isr_event)(struct iio_event_data* data); /**< the event interupt service request */	
     int chan_num;
     pthread_t thread_id; /**< the isr handler thread id */
     mraa_iio_channel* channels;
+    int event_num;
+    mraa_iio_event* events;    
     int datasize;
 };
 
