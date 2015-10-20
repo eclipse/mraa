@@ -43,7 +43,7 @@ printword(uint16_t input, mraa_iio_channel *chan)
     } else {
         res = input;
     }
-    printf("  value = %05f\n", chan->index, (float)res);
+    printf("  value = %05f\n", (float)res);
 }
 
 mraa_iio_context iio_device0;
