@@ -24,7 +24,11 @@ Supported Platforms
    * `Intel Edison <../edison.html>`_
    * `Intel(R) NUC DE3815tykhe <../de3815.html>`_
    * `Intel(R) Minnowboard Max <../minnowmax.html>`_
-   * `Raspberry Pi <../rasspi.html>`_
+   * `Raspberry Pi <../rasppi.html>`_
+   * `Banana Pi/Pro <../bananapi.html>`_
+   * `Beaglebone Black <../beaglebone.html>`_
+   * `Intel NUC NUC5i5MYBE <../nuc5.html>`_
+   * `FTDI FT4222H <../ft4222.html>`_
 
 Compiling & Debugging libmraa
 =============================
