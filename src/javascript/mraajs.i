@@ -43,18 +43,15 @@ class Spi;
 %typemap(out) uint8_t*
 {
 %#if SWIG_V8_VERSION > 0x040000
-   v8::MaybeLocal<v8::Object> objret = node::Buffer::New(v8::Isolate::GetCurrent(), (char*) $1, arg3);
-   free($1);
+   v8::MaybeLocal<v8::Object> objret = node::Buffer::New(v8::Isolate::GetCurrent(), (char*) result, arg3);
    if(!objret.ToLocal(&$result)) {
       SWIG_exception_fail(SWIG_ERROR, "Spi buffer failed");
       SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
 %#elif SWIG_V8_VERSION > 0x032870
-  $result = node::Buffer::New((char*) $1, arg3);
-  free($1);
+  $result = node::Buffer::New((char*) result, arg3);
 %#else
-  $result = node::Buffer::New((char*) $1, arg3)->handle_;
-  free($1);
+  $result = node::Buffer::New((char*) result, arg3)->handle_;
 %#endif
 }
 }
