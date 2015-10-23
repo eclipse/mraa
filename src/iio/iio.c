@@ -79,6 +79,9 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
     int padint = 0;
     int curr_bytes = 0;
     char shortbuf, signchar;
+	
+	dev->datasize = 0;
+
     memset(buf, 0, MAX_SIZE);
     snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/" IIO_SCAN_ELEM, dev->num);
     dir = opendir(buf);
@@ -151,6 +154,11 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
                         return -1;
                     }
                     chan->enabled = (int) strtol(readbuf, NULL, 10);
+					
+					//only calculate enable buffer size for trigger buffer extract data
+					if (chan->enabled)
+						dev->datasize += chan->bytes;
+						
                     close(fd);
                 }
                 // clean up str var
@@ -158,7 +166,6 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
             }
         }
     }
-    dev->datasize = curr_bytes;
 
     return MRAA_SUCCESS;
 }
@@ -224,7 +231,7 @@ mraa_iio_write(mraa_iio_context dev, const char* attr_chan, const char* data)
 }
 
 static mraa_result_t
-mraa_iio_wait_event(int fd, char* data)
+mraa_iio_wait_event(int fd, char* data, int *read_size)
 {
     struct pollfd pfd;
 
@@ -240,7 +247,7 @@ mraa_iio_wait_event(int fd, char* data)
     int x = poll(&pfd, 1, -1);
 
     memset(data, 0, 100);
-    read(fd, data, 100);
+    *read_size = read(fd, data, 100);
 
     return MRAA_SUCCESS;
 }
@@ -249,12 +256,16 @@ static void*
 mraa_iio_trigger_handler(void* arg)
 {
     mraa_iio_context dev = (mraa_iio_context) arg;
+		int i;
     char data[MAX_SIZE*100];
+		int read_size;
 
     for (;;) {
-        if (mraa_iio_wait_event(dev->fp, &data[0]) == MRAA_SUCCESS) {
+        if (mraa_iio_wait_event(dev->fp, &data[0], &read_size) == MRAA_SUCCESS) {
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
-            dev->isr(&data);
+			//only can process if readsize >= enabled channel's datasize
+			for (i=0; i<(read_size/dev->datasize); i++)
+				dev->isr(&data);
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
         } else {
             // we must have got an error code so die nicely
