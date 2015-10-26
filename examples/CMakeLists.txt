@@ -37,6 +37,11 @@ add_subdirectory (c++)
 
 install (DIRECTORY ${PROJECT_SOURCE_DIR}/examples/ DESTINATION share/mraa/examples)
 
-if (INSTALLGPIOTOOL)
+if (INSTALLGPIOTOOL OR INSTALLTOOLS)
    install (TARGETS mraa-gpio DESTINATION bin)
+endif()
+
+if (INSTALLTOOLS)
+   install (TARGETS mraa-gpio DESTINATION bin)
+   install (TARGETS mraa-i2c DESTINATION bin)
 endif()
