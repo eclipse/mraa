@@ -246,6 +246,8 @@ mraa_gpio_interrupt_handler(void* arg)
             } else {
                 ret = PyEval_CallObject((PyObject*) dev->isr, arglist);
                 if (ret == NULL) {
+// code is python2 only
+#if PY_VERSION_HEX < 0x0300000
                     syslog(LOG_ERR, "gpio: PyEval_CallObject failed");
                     PyObject *pvalue, *ptype, *ptraceback;
                     PyErr_Fetch(&pvalue, &ptype, &ptraceback);
@@ -257,6 +259,7 @@ mraa_gpio_interrupt_handler(void* arg)
                     Py_XDECREF(pvalue);
                     Py_XDECREF(ptype);
                     Py_XDECREF(ptraceback);
+#endif
                 } else {
                     Py_DECREF(ret);
                 }
