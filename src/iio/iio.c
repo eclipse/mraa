@@ -27,6 +27,7 @@
 #include "dirent.h"
 #include <string.h>
 #include <poll.h>
+#include <stropts.h>
 
 #define MAX_SIZE 128
 #define IIO_DEVICE "iio:device"
