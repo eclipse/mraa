@@ -29,6 +29,7 @@ extern "C" {
 #endif
 
 #include <syslog.h>
+#include <fnmatch.h>
 
 #include "common.h"
 #include "mraa_internal_types.h"
