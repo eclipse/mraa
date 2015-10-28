@@ -205,11 +205,11 @@ mraa_iio_get_device_num_by_name(const char* name)
 mraa_result_t
 mraa_iio_read(mraa_iio_context dev, const char* attr_chan, float* data)
 {
-    char buf[64];
-    snprintf(buf, 64, IIO_SYSFS_DEVICE "%d/%s", dev->num, attr_chan);
+    char buf[MAX_SIZE];
+    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, attr_chan);
     int fd = open(buf, O_RDONLY);
     if (fd != -1) {
-        int len = read(fd, &buf, 64);
+        int len = read(fd, &buf, MAX_SIZE);
         *data = strtol(buf, NULL, 10);
         return MRAA_SUCCESS;
     }
@@ -356,11 +356,11 @@ mraa_iio_get_event_data(mraa_iio_context dev)
 mraa_result_t
 mraa_iio_event_read(mraa_iio_context dev, const char* attribute, float* data)
 {
-    char buf[64];
-    snprintf(buf, 64, IIO_SYSFS_DEVICE "%d/" IIO_EVENTS "/%s", dev->num, attribute);
+    char buf[MAX_SIZE];
+    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/" IIO_EVENTS "/%s", dev->num, attribute);
     int fd = open(buf, O_RDONLY);
     if (fd != -1) {
-        int len = read(fd, &buf, 64);
+        int len = read(fd, &buf, MAX_SIZE);
         *data = strtol(buf, NULL, 10);
         return MRAA_SUCCESS;
     }
@@ -371,8 +371,8 @@ mraa_result_t
 mraa_iio_event_write(mraa_iio_context dev, const char* attribute,  const char* data)
 {
 	int len;
-    char buf[128];
-    snprintf(buf, 128, IIO_SYSFS_DEVICE "%d/" IIO_EVENTS "/%s", dev->num, attribute);
+    char buf[MAX_SIZE];
+    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/" IIO_EVENTS "/%s", dev->num, attribute);
     int fd = open(buf, O_WRONLY);
     if (fd != -1) {
 		int len = write(fd, data, ( strlen(data) +1 ));
