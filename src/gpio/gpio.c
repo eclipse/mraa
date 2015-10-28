@@ -240,7 +240,7 @@ mraa_gpio_interrupt_handler(void* arg)
             PyGILState_STATE gilstate = PyGILState_Ensure();
             PyObject* arglist;
             PyObject* ret;
-            arglist = Py_BuildValue("(i)", dev->isr_args);
+            arglist = Py_BuildValue("(O)", dev->isr_args);
             if (arglist == NULL) {
                 syslog(LOG_ERR, "gpio: Py_BuildValue NULL");
             } else {
