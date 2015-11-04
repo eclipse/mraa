@@ -120,6 +120,9 @@ mraa_result_t mraa_iio_event_extract_event(struct iio_event_data* event,
                                            int* channel,
                                            int* channel2,
                                            int* different);
+
+mraa_result_t mraa_iio_get_mounting_matrix(mraa_iio_context dev, float mm[9]);
+
 /**
  * De-inits an mraa_iio_context device
  *

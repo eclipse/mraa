@@ -32,6 +32,7 @@
 #define MAX_SIZE 128
 #define IIO_DEVICE "iio:device"
 #define IIO_SCAN_ELEM "scan_elements"
+#define IIO_MOUNTING_MATRIX "mounting_matrix"
 #define IIO_SLASH_DEV "/dev/" IIO_DEVICE
 #define IIO_SYSFS_DEVICE "/sys/bus/iio/devices/" IIO_DEVICE
 #define IIO_EVENTS "events"
@@ -516,6 +517,27 @@ mraa_iio_event_extract_event(struct iio_event_data* event,
     *different = IIO_EVENT_CODE_EXTRACT_DIFF(event->id);
     return MRAA_SUCCESS;
 }
+
+mraa_result_t
+mraa_iio_get_mounting_matrix(mraa_iio_context dev, float mm[9])
+{
+    char buf[MAX_SIZE];
+    FILE* fp;
+    int ret = 0;
+    int len;
+    int i;
+
+    memset(buf, 0, MAX_SIZE);
+    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/" IIO_MOUNTING_MATRIX, dev->num);
+    fp = fopen(buf, "r");
+    if (fp != NULL) {
+        fscanf(fp, "%f %f %f\n%f %f %f\n%f %f %f\n", &mm[0], &mm[1], &mm[2], &mm[3], &mm[4], &mm[5],
+               &mm[6], &mm[7], &mm[8]);
+        return MRAA_SUCCESS;
+    }
+    return MRAA_ERROR_UNSPECIFIED;
+}
+
 #if 0
 // does stop make any sense on iio devices?
 mraa_result_t
