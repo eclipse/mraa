@@ -26,14 +26,14 @@
 #include "mraa/iio.h"
 
 static void
-printword(uint16_t input, mraa_iio_channel *chan)
+printword(uint16_t input, mraa_iio_channel* chan)
 {
     int16_t res;
 
     if (!chan->lendian) {
-            input = be16toh(input);
+        input = be16toh(input);
     } else {
-            input = le16toh(input);
+        input = le16toh(input);
     }
 
     input >>= chan->shift;
@@ -43,7 +43,7 @@ printword(uint16_t input, mraa_iio_channel *chan)
     } else {
         res = input;
     }
-    printf("  value = %05f\n", (float)res);
+    printf("  value = %05f\n", (float) res);
 }
 
 mraa_iio_context iio_device0;
@@ -60,13 +60,14 @@ interrupt(char* data)
             printf("channel %d - bytes %d\n", channels[i].index, channels[i].bytes);
             switch (channels[i].bytes) {
                 case 2:
-                    printword(*(uint16_t *)(data + channels[i].location), &channels[i]);
+                    printword(*(uint16_t*) (data + channels[i].location), &channels[i]);
             }
         }
     }
 }
 
-void event_interrupt(struct iio_event_data* data)
+void
+event_interrupt(struct iio_event_data* data)
 {
     int chan_type;
     int modifier;
@@ -77,7 +78,9 @@ void event_interrupt(struct iio_event_data* data)
     int different;
     mraa_iio_event_extract_event(data, &chan_type, &modifier, &type, &direction, &channel, &channel2, &different);
 
-    printf("event time %lld id %lld extracted chan_type %d modifier %d type %d direction %d channel %d channel2 %d different %d\n", data->timestamp, data->id, chan_type, modifier, type, direction, channel, channel2, different);
+    printf("event time %lld id %lld extracted chan_type %d modifier %d type %d direction %d "
+           "channel %d channel2 %d different %d\n",
+           data->timestamp, data->id, chan_type, modifier, type, direction, channel, channel2, different);
 }
 
 int
@@ -89,10 +92,28 @@ main()
         return EXIT_FAILURE;
     }
 
-    float iio_value;
-    mraa_result_t ret = mraa_iio_read(iio_device0, "in_voltage0_raw", &iio_value);
+    float iio_float;
+    int iio_integer;
+    mraa_result_t ret;
+
+    ret = mraa_iio_write_float(iio_device0, "in_accel_scale", 0.019163);
     if (ret == MRAA_SUCCESS) {
-        fprintf(stdout, "IIO read %f\n", iio_value);
+        fprintf(stdout, "IIO write success\n");
+    }
+
+    ret = mraa_iio_read_float(iio_device0, "in_accel_scale", &iio_float);
+    if (ret == MRAA_SUCCESS) {
+        fprintf(stdout, "IIO read %f\n", iio_float);
+    }
+
+    ret = mraa_iio_write_integer(iio_device0, "scan_elements/in_accel_x_en", 1);
+    if (ret == MRAA_SUCCESS) {
+        fprintf(stdout, "IIO write success\n", iio_integer);
+    }
+
+    ret = mraa_iio_read_integer(iio_device0, "scan_elements/in_accel_x_en", &iio_integer);
+    if (ret == MRAA_SUCCESS) {
+        fprintf(stdout, "IIO read %d\n", iio_integer);
     }
 
     if (mraa_iio_trigger_buffer(iio_device0, interrupt, NULL) == MRAA_SUCCESS) {
@@ -106,7 +127,7 @@ main()
     if (iio_device6 == NULL) {
         return EXIT_FAILURE;
     }
-    mraa_iio_event_write(iio_device6, "in_proximity2_thresh_either_en", "1");
+    mraa_iio_write_integer(iio_device6, "events/in_proximity2_thresh_either_en", 1);
 
 
     // Blocking until event fired
