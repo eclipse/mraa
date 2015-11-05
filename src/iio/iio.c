@@ -36,6 +36,7 @@
 #define IIO_SLASH_DEV "/dev/" IIO_DEVICE
 #define IIO_SYSFS_DEVICE "/sys/bus/iio/devices/" IIO_DEVICE
 #define IIO_EVENTS "events"
+#define IIO_CONFIGFS_TRIGGER "/sys/kernel/config/iio/triggers/"
 
 mraa_iio_context
 mraa_iio_init(int device)
@@ -533,6 +534,28 @@ mraa_iio_get_mounting_matrix(mraa_iio_context dev, float mm[9])
         fclose(fp);
         return MRAA_SUCCESS;
     }
+    return MRAA_ERROR_UNSPECIFIED;
+}
+
+mraa_result_t
+mraa_iio_create_trigger(mraa_iio_context dev, const char* trigger)
+{
+    struct stat configfs_status;
+    struct stat trigger_status;
+    char buf[MAX_SIZE];
+
+    if (stat(IIO_CONFIGFS_TRIGGER, &configfs_status) == 0) {
+        memset(buf, 0, MAX_SIZE);
+        snprintf(buf, MAX_SIZE, IIO_CONFIGFS_TRIGGER "%s", trigger);
+        if (stat(buf, &trigger_status) != 0) {
+            if (mkdir(buf, configfs_status.st_mode) == 0)
+                return MRAA_SUCCESS;
+        } else {
+            // trigger folder already created
+            return MRAA_SUCCESS;
+        }
+    }
+
     return MRAA_ERROR_UNSPECIFIED;
 }
 
