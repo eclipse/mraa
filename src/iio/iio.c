@@ -523,9 +523,6 @@ mraa_iio_get_mounting_matrix(mraa_iio_context dev, float mm[9])
 {
     char buf[MAX_SIZE];
     FILE* fp;
-    int ret = 0;
-    int len;
-    int i;
 
     memset(buf, 0, MAX_SIZE);
     snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/" IIO_MOUNTING_MATRIX, dev->num);
@@ -533,6 +530,7 @@ mraa_iio_get_mounting_matrix(mraa_iio_context dev, float mm[9])
     if (fp != NULL) {
         fscanf(fp, "%f %f %f\n%f %f %f\n%f %f %f\n", &mm[0], &mm[1], &mm[2], &mm[3], &mm[4], &mm[5],
                &mm[6], &mm[7], &mm[8]);
+        fclose(fp);
         return MRAA_SUCCESS;
     }
     return MRAA_ERROR_UNSPECIFIED;
