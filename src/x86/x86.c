@@ -68,16 +68,28 @@ mraa_x86_platform()
                 platform_type = MRAA_INTEL_GALILEO_GEN1;
                 plat = mraa_intel_galileo_rev_d();
             } else if (strncasecmp(line, "MinnowBoard Compatible", 22) == 0) {
-		platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
-		plat = mraa_intel_minnowboard_byt_compatible();
-	    } else {
+                platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
+                plat = mraa_intel_minnowboard_byt_compatible();
+            } else {
                 syslog(LOG_ERR, "Platform not supported, not initialising");
                 platform_type = MRAA_UNKNOWN_PLATFORM;
             }
             free(line);
         }
         fclose(fh);
+    } else {
+        fh = fopen("/proc/cmdline", "r");
+        if (fh != NULL) {
+            if (getline(&line, &len, fh) != -1) {
+                if (strstr(line, "sf3gr_mrd_version=P2.0")) {
+                    platform_type = MRAA_INTEL_SOFIA_3GR;
+                    plat = mraa_intel_sofia_3gr();
+                    syslog(LOG_ERR, "Platform MRAA_INTEL_SOFIA_3GR");
+                }
+                free(line);
+            }
+            fclose(fh);
+        }
     }
-
     return platform_type;
 }

@@ -46,11 +46,11 @@ typedef enum {
     MRAA_BEAGLEBONE = 6,            /**< The different BeagleBone Black Modes B/C */
     MRAA_BANANA = 7,                /**< Allwinner A20 based Banana Pi and Banana Pro */
     MRAA_INTEL_NUC5 = 8,            /**< The Intel 5th generations Broadwell NUCs */
-
+    MRAA_INTEL_SOFIA_3GR = 9,       /**< The Intel Sofia 3GR */
     // USB platform extenders start at 256
-    MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
+    MRAA_FTDI_FT4222 = 256, /**< FTDI FT4222 USB to i2c bridge */
 
-    MRAA_NULL_PLATFORM = 98,        /**< Platform with no capabilities that hosts a sub platform  */
+    MRAA_NULL_PLATFORM = 98, /**< Platform with no capabilities that hosts a sub platform  */
     MRAA_UNKNOWN_PLATFORM =
     99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
 } mraa_platform_t;
@@ -228,13 +228,12 @@ typedef enum {
 } mraa_i2c_mode_t;
 
 typedef enum {
-	MRAA_UART_PARITY_NONE = 0,
-	MRAA_UART_PARITY_EVEN = 1,
-	MRAA_UART_PARITY_ODD = 2,
-	MRAA_UART_PARITY_MARK = 3,
-	MRAA_UART_PARITY_SPACE = 4
+    MRAA_UART_PARITY_NONE = 0,
+    MRAA_UART_PARITY_EVEN = 1,
+    MRAA_UART_PARITY_ODD = 2,
+    MRAA_UART_PARITY_MARK = 3,
+    MRAA_UART_PARITY_SPACE = 4
 } mraa_uart_parity_t;
-
 
 
 #ifdef __cplusplus
