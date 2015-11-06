@@ -559,6 +559,60 @@ mraa_iio_create_trigger(mraa_iio_context dev, const char* trigger)
     return MRAA_ERROR_UNSPECIFIED;
 }
 
+mraa_result_t
+mraa_iio_update_channels(mraa_iio_context dev)
+{
+    const struct dirent* ent;
+    DIR* dir;
+    int chan_num = 0;
+    char buf[MAX_SIZE];
+    char readbuf[32];
+    int fd;
+    mraa_iio_channel* chan;
+
+    dev->datasize = 0;
+    memset(buf, 0, MAX_SIZE);
+    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/" IIO_SCAN_ELEM, dev->num);
+    dir = opendir(buf);
+    if (dir != NULL) {
+        while ((ent = readdir(dir)) != NULL) {
+            if (strcmp(ent->d_name + strlen(ent->d_name) - strlen("_index"), "_index") == 0) {
+                snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/" IIO_SCAN_ELEM "/%s", dev->num, ent->d_name);
+                fd = open(buf, O_RDONLY);
+                if (fd > 0) {
+                    if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
+                        break;
+                    }
+                    chan_num = ((int) strtol(readbuf, NULL, 10));
+                    chan = &dev->channels[chan_num];
+                    chan->index = chan_num;
+                    close(fd);
+
+                    buf[(strlen(buf) - 5)] = '\0';
+                    char* str = strdup(buf);
+                    // grab the enable flag of channel
+                    snprintf(buf, MAX_SIZE, "%sen", str);
+                    fd = open(buf, O_RDONLY);
+                    if (fd > 0) {
+                        if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
+                            syslog(LOG_ERR, "iio: Failed to read a sensible value from sysfs");
+                            return -1;
+                        }
+                        chan->enabled = (int) strtol(readbuf, NULL, 10);
+                        // only calculate enable buffer size for trigger buffer extract data
+                        if (chan->enabled) {
+                            dev->datasize += chan->bytes;
+                        }
+                        close(fd);
+                    }
+                    // clean up str var
+                    free(str);
+                }
+            }
+        }
+    }
+    return MRAA_SUCCESS;
+}
 #if 0
 // does stop make any sense on iio devices?
 mraa_result_t
