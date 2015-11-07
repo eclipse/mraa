@@ -52,7 +52,7 @@ static int currentI2cBus = 0;
 mraa_result_t
 mraa_ftdi_ft4222_init()
 {
-    mraa_result_t mraaStatus = MRAA_SUCCESS;
+    mraa_result_t mraaStatus = MRAA_ERROR_NO_RESOURCES;
     FT_STATUS ftStatus;
     FT_DEVICE_LIST_INFO_NODE* devInfo = NULL;
     DWORD numDevs = 0;
@@ -62,22 +62,18 @@ mraa_ftdi_ft4222_init()
     ftStatus = FT_CreateDeviceInfoList(&numDevs);
     if (ftStatus != FT_OK) {
         syslog(LOG_ERR, "FT_CreateDeviceInfoList failed: error code %d\n", ftStatus);
-        mraaStatus = MRAA_ERROR_NO_RESOURCES;
         goto init_exit;
     }
 
     devInfo = calloc((size_t) numDevs, sizeof(FT_DEVICE_LIST_INFO_NODE));
     if (devInfo == NULL) {
         syslog(LOG_ERR, "FT4222 allocation failure.\n");
-        mraaStatus = MRAA_ERROR_NO_RESOURCES;
         goto init_exit;
     }
-
 
     ftStatus = FT_GetDeviceInfoList(devInfo, &numDevs);
     if (ftStatus != FT_OK) {
         syslog(LOG_ERR, "FT_GetDeviceInfoList failed (error code %d)\n", (int) ftStatus);
-        mraaStatus = MRAA_ERROR_NO_RESOURCES;
         goto init_exit;
     }
     if (numDevs < 2) {
@@ -95,44 +91,39 @@ mraa_ftdi_ft4222_init()
 
     if (locationIdI2c == 0) {
         syslog(LOG_ERR, "FT_GetDeviceInfoList contains no I2C controllers\n");
-        mraaStatus = MRAA_ERROR_NO_RESOURCES;
         goto init_exit;
     }
 
     if (locationIdGpio == 0) {
         syslog(LOG_ERR, "FT_GetDeviceInfoList contains no GPIO controllers\n");
-        mraaStatus = MRAA_ERROR_NO_RESOURCES;
         goto init_exit;
     }
 
     ftStatus = FT_OpenEx((PVOID)(uintptr_t) locationIdI2c, FT_OPEN_BY_LOCATION, &ftHandleI2c);
     if (ftStatus != FT_OK) {
         syslog(LOG_ERR, "FT_OpenEx failed (error %d)\n", (int) ftStatus);
-        mraaStatus = MRAA_ERROR_NO_RESOURCES;
         goto init_exit;
     }
 
     ftStatus = FT_OpenEx((PVOID)(uintptr_t) locationIdGpio, FT_OPEN_BY_LOCATION, &ftHandleGpio);
     if (ftStatus != FT_OK) {
         syslog(LOG_ERR, "FT_OpenEx failed (error %d)\n", (int) ftStatus);
-        mraaStatus = MRAA_ERROR_NO_RESOURCES;
-        goto init_exit;
-    }
-    // Tell the FT4222 to be an I2C Master.
-    FT4222_STATUS ft4222Status = FT4222_I2CMaster_Init(ftHandleI2c, bus_speed);
-    if (FT4222_OK != ft4222Status) {
-        syslog(LOG_ERR, "FT4222_I2CMaster_Init failed (error %d)!\n", ft4222Status);
-        mraaStatus = MRAA_ERROR_NO_RESOURCES;
         goto init_exit;
     }
 
-    // Reset the I2CM registers to a known state.
+    FT4222_STATUS ft4222Status = FT4222_I2CMaster_Init(ftHandleI2c, bus_speed);
+    if (FT4222_OK != ft4222Status) {
+        syslog(LOG_ERR, "FT4222_I2CMaster_Init failed (error %d)!\n", ft4222Status);
+        goto init_exit;
+    }
+
     ft4222Status = FT4222_I2CMaster_Reset(ftHandleI2c);
     if (FT4222_OK != ft4222Status) {
         syslog(LOG_ERR, "FT4222_I2CMaster_Reset failed (error %d)!\n", ft4222Status);
-        mraaStatus = MRAA_ERROR_NO_RESOURCES;
         goto init_exit;
     }
+
+    mraaStatus = MRAA_SUCCESS;    
 
 init_exit:
     if (devInfo != NULL)
@@ -632,8 +623,6 @@ mraa_ftdi_ft4222()
         sub_plat->i2c_bus[bus].scl = pinIndex;
         pinIndex++;                    
     }
-
-
 
     // Set up integrare gpio to detect level changes on I/O expander
     if (haveGpio)
