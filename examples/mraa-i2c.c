@@ -35,10 +35,7 @@ extern mraa_board_t* plat;
 void
 print_version()
 {
-    fprintf(stdout, "Version %s on %s", mraa_get_version(), mraa_get_platform_name());
-    if (plat != NULL && plat->sub_platform != NULL)
-        fprintf(stdout, " with %s", plat->sub_platform->platform_name);
-    fprintf(stdout, "\n");
+    fprintf(stdout, "Version %s on %s\n", mraa_get_version(), mraa_get_platform_name());
 }
 
 void
@@ -62,6 +59,7 @@ void
 print_bus(mraa_board_t* board)
 {
     int i, bus;
+    printf("Bus count = %d\n", board->i2c_bus_count);
     for (i = 0; i < board->i2c_bus_count; ++i) {
         char* busType;
         switch (board->platform_type) {
