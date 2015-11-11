@@ -35,7 +35,7 @@ target_link_libraries (spi_max7219 mraa)
 
 add_subdirectory (c++)
 
-install (DIRECTORY ${PROJECT_SOURCE_DIR}/examples/ DESTINATION share/mraa/examples)
+install (DIRECTORY ${PROJECT_SOURCE_DIR}/examples/ DESTINATION ${CMAKE_INSTALL_DATADIR}/mraa/examples)
 
 if (INSTALLGPIOTOOL)
    install (TARGETS mraa-gpio DESTINATION bin)

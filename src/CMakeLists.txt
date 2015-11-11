@@ -93,8 +93,8 @@ set_target_properties(
    SOVERSION ${mraa_VERSION_MAJOR}
    VERSION ${mraa_VERSION_STRING}
 )
-install (FILES ${mraa_LIB_GLOB_HEADERS} DESTINATION include/)
-install (DIRECTORY ${PROJECT_SOURCE_DIR}/api/mraa/ DESTINATION include/mraa)
+install (FILES ${mraa_LIB_GLOB_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install (DIRECTORY ${PROJECT_SOURCE_DIR}/api/mraa/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mraa)
 
 macro (mraa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
   configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
