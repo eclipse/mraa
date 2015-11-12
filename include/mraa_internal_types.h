@@ -30,6 +30,11 @@
 #include "mraa_func.h"
 #include "mraa_adv_func.h"
 
+// Bionic does not implement pthread cancellation API
+#ifndef __BIONIC__
+#define HAVE_PTHREAD_CANCEL
+#endif
+
 // general status failures for internal functions
 #define MRAA_PLATFORM_NO_INIT -3
 #define MRAA_IO_SETUP_FAILURE -2
@@ -47,6 +52,9 @@ struct _gpio {
     void *isr_args; /**< args return when interupt service request triggered */
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */
+#ifndef HAVE_PTHREAD_CANCEL
+    int isr_control_pipe[2]; /**< a pipe used to interrupt the isr from polling the value fd*/
+#endif
     mraa_boolean_t isr_thread_terminating; /**< is the isr thread being terminated? */
     mraa_boolean_t owner; /**< If this context originally exported the pin */
     mraa_result_t (*mmap_write) (mraa_gpio_context dev, int value);

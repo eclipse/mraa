@@ -87,6 +87,9 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
 
     dev->value_fp = -1;
     dev->isr_value_fp = -1;
+#ifndef HAVE_PTHREAD_CANCEL
+    dev->isr_control_pipe[0] = dev->isr_control_pipe[1] = -1;
+#endif
     dev->isr_thread_terminating = 0;
     dev->phy_pin = -1;
 
@@ -182,26 +185,47 @@ mraa_gpio_init_raw(int pin)
 
 
 static mraa_result_t
-mraa_gpio_wait_interrupt(int fd)
+mraa_gpio_wait_interrupt(int fd
+#ifndef HAVE_PTHREAD_CANCEL
+        , int control_fd
+#endif
+        )
 {
     unsigned char c;
-    struct pollfd pfd;
+#ifdef HAVE_PTHREAD_CANCEL
+    struct pollfd pfd[1];
+#else
+    struct pollfd pfd[2];
+
+    if (control_fd < 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+#endif
 
     if (fd < 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
     // setup poll on POLLPRI
-    pfd.fd = fd;
-    pfd.events = POLLPRI;
+    pfd[0].fd = fd;
+    pfd[0].events = POLLPRI;
 
     // do an initial read to clear interrupt
     lseek(fd, 0, SEEK_SET);
     read(fd, &c, 1);
 
+#ifdef HAVE_PTHREAD_CANCEL
     // Wait for it forever or until pthread_cancel
     // poll is a cancelable point like sleep()
-    int x = poll(&pfd, 1, -1);
+    int x = poll(pfd, 1, -1);
+#else
+    // setup poll on the controling fd
+    pfd[1].fd = control_fd;
+    pfd[1].events = 0; //  POLLHUP, POLLERR, and POLLNVAL
+
+    // Wait for it forever or until control fd is closed
+    int x = poll(pfd, 2, -1);
+#endif
 
     // do a final read to clear interrupt
     read(fd, &c, 1);
@@ -226,12 +250,27 @@ mraa_gpio_interrupt_handler(void* arg)
         syslog(LOG_ERR, "gpio: failed to open gpio%d/value", dev->pin);
         return NULL;
     }
+
+#ifndef HAVE_PTHREAD_CANCEL
+    if (pipe(dev->isr_control_pipe)) {
+        syslog(LOG_ERR, "gpio: failed to create isr control pipe");
+        close(fp);
+        return NULL;
+    }
+#endif
+
     dev->isr_value_fp = fp;
 
     for (;;) {
-        ret = mraa_gpio_wait_interrupt(dev->isr_value_fp);
+        ret = mraa_gpio_wait_interrupt(dev->isr_value_fp
+#ifndef HAVE_PTHREAD_CANCEL
+                , dev->isr_control_pipe[0]
+#endif
+                );
         if (ret == MRAA_SUCCESS && !dev->isr_thread_terminating) {
+#ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+#endif
 #ifdef SWIGPYTHON
             // In order to call a python object (all python functions are objects) we
             // need to aquire the GIL (Global Interpreter Lock). This may not always be
@@ -297,10 +336,14 @@ mraa_gpio_interrupt_handler(void* arg)
 #else
             dev->isr(dev->isr_args);
 #endif
+#ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+#endif
         } else {
             // we must have got an error code or exit request so die nicely
+#ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+#endif
             close(dev->isr_value_fp);
             dev->isr_value_fp = -1;
             return NULL;
@@ -392,9 +435,18 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
     ret = mraa_gpio_edge_mode(dev, MRAA_GPIO_EDGE_NONE);
 
     if ((dev->thread_id != 0)) {
+#ifdef HAVE_PTHREAD_CANCEL
         if ((pthread_cancel(dev->thread_id) != 0) || (pthread_join(dev->thread_id, NULL) != 0)) {
             ret = MRAA_ERROR_INVALID_HANDLE;
         }
+#else
+        close(dev->isr_control_pipe[1]);
+        if (pthread_join(dev->thread_id, NULL) != 0)
+            ret = MRAA_ERROR_INVALID_HANDLE;
+
+        close(dev->isr_control_pipe[0]);
+        dev->isr_control_pipe[0] =  dev->isr_control_pipe[1] = -1;
+#endif
     }
 
     // close the filehandle in case it's still open
