@@ -5,17 +5,60 @@ include_directories (
   ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
+macro(C2HEX RET VAL)
+   if(${VAL} LESS 10)
+     set(${RET} "${VAL}")
+   elseif(${VAL} EQUAL 10)
+     set(${RET} "A")
+   elseif(${VAL} EQUAL 11)
+     set(${RET} "B")
+   elseif(${VAL} EQUAL 12)
+     set(${RET} "C")
+   elseif(${VAL} EQUAL 13)
+     set(${RET} "D")
+   elseif(${VAL} EQUAL 14)
+     set(${RET} "E")
+   elseif(${VAL} EQUAL 15)
+     set(${RET} "F")
+   else()
+     message(WARNING " - wrong value in C2HEX: val=${VAL} -> ZERO !!!")
+     set(${RET} "0")
+   endif()
+endmacro(C2HEX)
+
+macro(CONVERT_DEC2HEX RET VAL)
+  string(LENGTH VAL len)
+  set(${RET} "00")
+  if(${len} LESS 1 OR ${len} GREATER 3)
+    message (WARNING " - there is a wrong input value length for CONVERT_DEC2HEX: '${VAL}' len: ${len} -> return ZERO !!!")
+  else()
+    string(REGEX MATCH "[0-9]+" TMP ${VAL})
+    math(EXPR CLO "${TMP}&15")
+    math(EXPR CHI "${TMP}>>4")
+    if(CLO GREATER 15)
+       message (WARNING " - wrong input value for CONVERT_DEC2HEX: '${VAL}' CLO: '${CLO}' -> use ZERO !!!")
+       set(CLO 0)
+    endif()
+    if(CHI GREATER 15)
+       message (WARNING " - wrong input value for CONVERT_DEC2HEX: '${VAL}' CHI: '${CHI}' -> use ZERO !!!")
+       set(CHI 0)
+    endif()
+    C2HEX(CHIH ${CHI})
+    C2HEX(CLOH ${CLO})
+    set(${RET} "${CHIH}${CLOH}")
+  endif()
+endmacro(CONVERT_DEC2HEX)
+
+# convert V8 version to hex string
+CONVERT_DEC2HEX(V8_VERSION_MAJOR_HEX ${V8_VERSION_MAJOR})
+CONVERT_DEC2HEX(V8_VERSION_MINOR_HEX ${V8_VERSION_MINOR})
+CONVERT_DEC2HEX(V8_VERSION_PATCH_HEX ${V8_VERSION_PATCH})
+set (V8_VERSION_HEX 0x${V8_VERSION_MAJOR_HEX}${V8_VERSION_MINOR_HEX}${V8_VERSION_PATCH_HEX})
+
+message (INFO " -    where V8_VERSION_HEX = ${V8_VERSION_HEX}, V8_VERSION_MAJOR=${V8_VERSION_MAJOR}")
+
 # SWIG treats SWIG_FLAGS as a list and not a string so semicolon seperation is
-# required. This hardcodes V8_VERSION to be <10 but I assume that's not going
-# to be a problem for a little while! SWIG uses a padded SWIG_V8 version which
-# we hack together from our findnode module.
-set (V8_VERSION_HEX 0x0${V8_VERSION_MAJOR}${V8_VERSION_MINOR}${V8_VERSION_PATCH})
-string (LENGTH "${V8_VERSION_HEX}" V8_VERSION_HEX_length)
-while (V8_VERSION_HEX_length LESS 8)
-  set (V8_VERSION_HEX "${V8_VERSION_HEX}0")
-  message (DEBUG " - Padded V8 version to match SWIG format")
-  string (LENGTH "${V8_VERSION_HEX}" V8_VERSION_HEX_length)
-endwhile ()
+# required.
 
 set_property (SOURCE mraajs.i PROPERTY SWIG_FLAGS "-node"
               "-I${CMAKE_BINARY_DIR}/src" "-DV8_VERSION=${V8_VERSION_HEX}")

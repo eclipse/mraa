@@ -49,7 +49,7 @@ class Spi;
       SWIG_exception_fail(SWIG_ERROR, "Spi buffer failed");
       SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
-%#elif SWIG_V8_VERSION > 0x032870
+%#elif SWIG_V8_VERSION > 0x031C46
   $result = node::Buffer::New((char*) result, arg3);
   free(result);
 %#else
@@ -91,7 +91,7 @@ class Spi;
       SWIG_exception_fail(SWIG_ERROR, "Uart buffer failed");
       SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
-%#elif SWIG_V8_VERSION > 0x032870
+%#elif SWIG_V8_VERSION > 0x031C46
    $result = node::Buffer::New((char*) $1, result);
    free($1);
 %#else
@@ -129,7 +129,7 @@ class Spi;
       SWIG_exception_fail(SWIG_ERROR, "I2c buffer failed");
       SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
-%#elif SWIG_V8_VERSION > 0x032870
+%#elif SWIG_V8_VERSION > 0x031C46
    $result = node::Buffer::New((char*) $1, result);
    free($1);
 %#else
