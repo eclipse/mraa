@@ -20,10 +20,13 @@ Mraa supports raw access
 
 ###Triggers
 
+Activate the trigger in /sys/class/iio
+$ echo 1 > trigger0/trigger_now
+
 ## Testing without hardware
 
 Create a dummy iio device
 $ modprobe iio_dummy
 
 Create a dummy iio event generator
-$modprobe iio_dummy_evgen
+$ modprobe iio_dummy_evgen
