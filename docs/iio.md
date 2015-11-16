@@ -1,7 +1,12 @@
 iio				{#iio}
 ===
 
-IIO is the kernel's framework for supporting sensors
+IIO is the kernel's framework for supporting sensors. You may need to recompile
+a kernel and add, this is from kernel 4.2:
+CONFIG_IIO_DUMMY_EVGEN=m
+CONFIG_IIO_SIMPLE_DUMMY=m
+CONFIG_IIO_SIMPLE_DUMMY_EVENTS=y
+CONFIG_IIO_SIMPLE_DUMMY_BUFFER=y
 
 ## 'RAW' access
 
