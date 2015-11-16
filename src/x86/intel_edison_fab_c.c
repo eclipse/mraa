@@ -250,39 +250,39 @@ mraa_intel_edison_i2c_init_pre(unsigned int bus)
 static mraa_result_t
 mraa_intel_edison_misc_spi()
 {
-    mraa_gpio_write(tristate, 0);
+    // These arrays must have same length
+    static const int gpio_pin_list[] = {263, 240, 262, 241, 242, 243};
+    static int pin_num = sizeof(gpio_pin_list) / sizeof(int);
+    static const int gpio_val_list[] = {1, 0, 1, 0, 0, 0};
+    static const int gpio_dir_list[] = {MRAA_GPIO_OUT, MRAA_GPIO_OUT,
+                                        MRAA_GPIO_OUT, MRAA_GPIO_OUT,
+                                        MRAA_GPIO_OUT, MRAA_GPIO_OUT};
+    int i;
+    mraa_result_t ret;
 
-    mraa_gpio_context io10_p1 = mraa_gpio_init_raw(263);
-    mraa_gpio_context io10_p2 = mraa_gpio_init_raw(240);
-    mraa_gpio_context io11_p1 = mraa_gpio_init_raw(262);
-    mraa_gpio_context io11_p2 = mraa_gpio_init_raw(241);
-    mraa_gpio_context io12_p1 = mraa_gpio_init_raw(242);
-    mraa_gpio_context io13_p1 = mraa_gpio_init_raw(243);
-    mraa_gpio_dir(io10_p1, MRAA_GPIO_OUT);
-    mraa_gpio_dir(io10_p2, MRAA_GPIO_OUT);
-    mraa_gpio_dir(io11_p1, MRAA_GPIO_OUT);
-    mraa_gpio_dir(io11_p2, MRAA_GPIO_OUT);
-    mraa_gpio_dir(io12_p1, MRAA_GPIO_OUT);
-    mraa_gpio_dir(io13_p1, MRAA_GPIO_OUT);
+    MRAA_RETURN_FOR_ERROR(mraa_gpio_write(tristate, 0));
 
-    mraa_gpio_write(io10_p1, 1);
-    mraa_gpio_write(io10_p2, 0);
-    mraa_gpio_write(io11_p1, 1);
-    mraa_gpio_write(io11_p2, 0);
-    mraa_gpio_write(io12_p1, 0);
-    mraa_gpio_write(io13_p1, 0);
+    for (i = 0; i < pin_num; i++) {
+        mraa_gpio_context io = mraa_gpio_init_raw(gpio_pin_list[i]);
+        if (io != NULL) {
+            ret = mraa_gpio_dir(io, gpio_dir_list[i]);
+            if (ret == MRAA_SUCCESS) {
+                ret = mraa_gpio_write(io, gpio_val_list[i]);
+            }
 
-    mraa_gpio_close(io10_p1);
-    mraa_gpio_close(io10_p2);
-    mraa_gpio_close(io11_p1);
-    mraa_gpio_close(io11_p2);
-    mraa_gpio_close(io12_p1);
-    mraa_gpio_close(io13_p1);
+            //Don't care return value of close()
+            mraa_gpio_close(io);
+            MRAA_RETURN_FOR_ERROR(ret);
+        } else {
+          syslog(LOG_ERR, "edison: Failed to init raw gpio %d!",gpio_pin_list[i]);
+          return MRAA_ERROR_NO_RESOURCES;
+        }
+    }
 
-    mraa_intel_edison_pinmode_change(115, 1);
-    mraa_intel_edison_pinmode_change(114, 1);
-    mraa_intel_edison_pinmode_change(109, 1);
-    mraa_gpio_write(tristate, 1);
+    MRAA_RETURN_FOR_ERROR(mraa_intel_edison_pinmode_change(115, 1));
+    MRAA_RETURN_FOR_ERROR(mraa_intel_edison_pinmode_change(114, 1));
+    MRAA_RETURN_FOR_ERROR(mraa_intel_edison_pinmode_change(109, 1));
+    MRAA_RETURN_FOR_ERROR(mraa_gpio_write(tristate, 1));
 
     return MRAA_SUCCESS;
 }
