@@ -14,6 +14,12 @@ what you'll need:
 * [node.js](http://nodejs.org) 0.10.x or 0.12.x (you'll need not just the interpreter but nodejs-dev)
 * [CMake](http://cmake.org) 2.8.8+
 
+For Debian-like distros the below command installs the basic set:
+
+```bash
+sudo apt-get install git build-essential swig3.0 python-dev nodejs-dev cmake
+```
+
 To build the documentation you'll also need:
 * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) 1.8.9.1+
 * [Graphviz](http://graphviz.org/) 2+ (For doxygen graph generation)
@@ -32,6 +38,29 @@ make
 If this goes wrong and you have all the dependencies installed, then please
 file an issue with the full output of `cmake ..` and `make` or however far you
 got.
+
+After that you can install built files (into default path) by running:
+
+
+```bash
+sudo make install
+```
+
+See flags for adjusting install paths in the section below.
+
+Currently our install logic puts Python bindings into standard paths, which
+do not work on Debian due to their
+ [policy](http://www.debian.org/doc/packaging-manuals/python-policy/ch-python.html#s-paths).
+
+We are working on a permanent solution, in the meanwhile please use this command
+after `make install` to link installed modules where Debian's Python expects them:
+
+```bash
+sudo ln -s <your install prefix, e.g. /usr>/lib/python2.7/site-packages/* /usr/lib/python2.7/dist-packages
+```
+
+Same approach works for Python 3, you'll just need to adjust the version number
+in the path accordingly.
 
 ## Configuration flags
 
