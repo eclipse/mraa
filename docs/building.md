@@ -123,11 +123,11 @@ generally support building both at once.
 ## Using a Yocto/OE toolchain
 
 In order to compile with a Yocto/OE toolchain use the following toolchain file.
-This works well on the Edison 1.6 SDK. First source the environment file, then
+This works well on the Edison 1.7.2 SDK. First source the environment file, then
 use our CMake toolchain file.
 
 ~~~~~~~~~~~~~{.sh}
-source /opt/poky-edison/1.6/environment-setup-core2-32-poky-linux
+source /opt/poky-edison/1.7.2/environment-setup-core2-32-poky-linux
 mkdir build
 cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/oe-sdk_cross.cmake ..
 make
