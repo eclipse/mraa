@@ -37,9 +37,9 @@ USB
 Installing on your board
 ========
 
-See the section below on compiling or use our repository to install on an
-eglibc based yocto poky image that supports opkg. Adding this repository is as
-simple as and you'll have the latest stable tagged build of mraa installed!
+See the section below on compiling or use our repository to install on a glibc
+based yocto poky image that supports opkg. Adding this repository is as simple
+as and you'll have the latest stable tagged build of mraa installed!
 
 ``` bash
 echo "src mraa-upm http://iotdk.intel.com/repos/2.0/intelgalactic" > /etc/opkg/mraa-upm.conf
