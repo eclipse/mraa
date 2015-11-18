@@ -82,17 +82,10 @@ issues in github or join us in #mraa on freenode IRC, hang around for a little
 while because we're not necessarily on 24/7, but we'll get back to you! Have a
 glance at our [debugging](../master/docs/debugging.md) page too.
 
-C/C++ API Documentation
-===========
+API Documentation
+=================
 
-The C/C++ documentation is available [here](http://iotdk.intel.com/docs/master/mraa/)
-
-Python API Documentation
-===========
-
-The Python documentation is available [here](http://iotdk.intel.com/docs/master/mraa/python)
-
-NodeJS API documentation
-===========
-
-The Javascript documention is available [here](http://iotdk.intel.com/docs/master/mraa/node/modules/mraa.html)
+<a href="http://c.mraa.io"><img src="http://iotdk.intel.com/misc/logos/c++.png"/></a>
+<a href="http://java.mraa.io"><img src="http://iotdk.intel.com/misc/logos/java.png"/></a>
+<a href="http://py.mraa.io"><img src="http://iotdk.intel.com/misc/logos/python.png"/></a>
+<a href="http://js.mraa.io"><img src="http://iotdk.intel.com/misc/logos/node.png"/></a>
