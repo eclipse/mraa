@@ -131,7 +131,7 @@ mraa_uart_init(int index)
     }
 
     if (mraa_is_sub_platform_id(index)) {
-        syslog(LOG_NOTICE, "pwm: Using sub platform is not supported");
+        syslog(LOG_NOTICE, "uart: Using sub platform is not supported");
         return NULL;
     }
 

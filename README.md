@@ -37,12 +37,12 @@ USB
 Installing on your board
 ========
 
-See the section below on compiling or use our repository to install on an
-eglibc based yocto poky image that supports opkg. Adding this repository is as
-simple as and you'll have the latest stable tagged build of mraa installed!
+See the section below on compiling or use our repository to install on a glibc
+based yocto poky image that supports opkg. Adding this repository is as simple
+as and you'll have the latest stable tagged build of mraa installed!
 
 ``` bash
-echo "src mraa-upm http://iotdk.intel.com/repos/1.1/intelgalactic" > /etc/opkg/mraa-upm.conf
+echo "src mraa-upm http://iotdk.intel.com/repos/2.0/intelgalactic" > /etc/opkg/mraa-upm.conf
 opkg update
 opkg install libmraa0
 ```
@@ -51,7 +51,7 @@ If you would like to get the latest & greatest builds from master HEAD you can
 use our -dev repository
 
 ```bash
-echo "src mraa-upm http://iotdk.intel.com/repos/1.1/intelgalactic-dev" > /etc/opkg/mraa-upm.conf
+echo "src mraa-upm http://iotdk.intel.com/repos/2.0/intelgalactic-dev" > /etc/opkg/mraa-upm.conf
 opkg update
 opkg install libmraa0
 ```
@@ -82,17 +82,10 @@ issues in github or join us in #mraa on freenode IRC, hang around for a little
 while because we're not necessarily on 24/7, but we'll get back to you! Have a
 glance at our [debugging](../master/docs/debugging.md) page too.
 
-C/C++ API Documentation
-===========
+API Documentation
+=================
 
-The C/C++ documentation is available [here](http://iotdk.intel.com/docs/master/mraa/)
-
-Python API Documentation
-===========
-
-The Python documentation is available [here](http://iotdk.intel.com/docs/master/mraa/python)
-
-NodeJS API documentation
-===========
-
-The Javascript documention is available [here](http://iotdk.intel.com/docs/master/mraa/node/modules/mraa.html)
+<a href="http://c.mraa.io"><img src="http://iotdk.intel.com/misc/logos/c++.png"/></a>
+<a href="http://java.mraa.io"><img src="http://iotdk.intel.com/misc/logos/java.png"/></a>
+<a href="http://py.mraa.io"><img src="http://iotdk.intel.com/misc/logos/python.png"/></a>
+<a href="http://js.mraa.io"><img src="http://iotdk.intel.com/misc/logos/node.png"/></a>

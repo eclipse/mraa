@@ -7,11 +7,18 @@ include_directories (
 
 # SWIG treats SWIG_FLAGS as a list and not a string so semicolon seperation is
 # required. This hardcodes V8_VERSION to be <10 but I assume that's not going
-# to be a problem for a little while!
-#set_source_files_properties (mraajs.i PROPERTIES SWIG_FLAGS "-node;-DV8_VERSION=0x0${V8_VERSION_HEX};-I${CMAKE_BINARY_DIR}/src")
-#set_source_files_properties (mraajs.i PROPERTIES SWIG_FLAGS "-node;-I${CMAKE_BINARY_DIR}/src")
+# to be a problem for a little while! SWIG uses a padded SWIG_V8 version which
+# we hack together from our findnode module.
+set (V8_VERSION_HEX 0x0${V8_VERSION_MAJOR}${V8_VERSION_MINOR}${V8_VERSION_PATCH})
+string (LENGTH "${V8_VERSION_HEX}" V8_VERSION_HEX_length)
+while (V8_VERSION_HEX_length LESS 8)
+  set (V8_VERSION_HEX "${V8_VERSION_HEX}0")
+  message (DEBUG " - Padded V8 version to match SWIG format")
+  string (LENGTH "${V8_VERSION_HEX}" V8_VERSION_HEX_length)
+endwhile ()
+
 set_property (SOURCE mraajs.i PROPERTY SWIG_FLAGS "-node"
-              "-I${CMAKE_BINARY_DIR}/src" "-DV8_VERSION=0x0${V8_VERSION_MAJOR}${V8_VERSION_MINOR}${V8_VERSION_PATCH}")
+              "-I${CMAKE_BINARY_DIR}/src" "-DV8_VERSION=${V8_VERSION_HEX}")
 set_source_files_properties (mraajs.i PROPERTIES CPLUSPLUS ON)
 
 swig_add_module (mraajs javascript mraajs.i ${mraa_LIB_SRCS})
