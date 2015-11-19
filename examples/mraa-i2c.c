@@ -101,6 +101,23 @@ print_busses()
 }
 
 mraa_result_t
+i2c_probe(mraa_i2c_context i2c, uint8_t device_address, uint8_t register_address)
+{
+    mraa_result_t status = MRAA_SUCCESS;
+    uint8_t data;    
+    status = mraa_i2c_address(i2c, device_address);
+    if (status != MRAA_SUCCESS)
+        return status;
+    status = mraa_i2c_write_byte(i2c, register_address);
+    if (status != MRAA_SUCCESS)
+        return status;
+    status = mraa_i2c_read(i2c, &data, 1) == 1 ? MRAA_SUCCESS : MRAA_ERROR_UNSPECIFIED;
+    if (status != MRAA_SUCCESS)
+        return status;
+    return status;
+}
+
+mraa_result_t
 i2c_get(int bus, uint8_t device_address, uint8_t register_address, uint8_t* data)
 {
     mraa_result_t status = MRAA_SUCCESS;
@@ -158,16 +175,16 @@ i2c_detect_devices(int bus)
     }
     int addr;
     for (addr = 0x0; addr < 0x80; ++addr) {
-        uint8_t value;
         if ((addr) % 16 == 0)
             printf("%02x: ", addr);
-        if (i2c_get(bus, addr, 0, &value) == MRAA_SUCCESS)
+        if (i2c_probe(i2c, addr, 0) == MRAA_SUCCESS)
             printf("%02x ", addr);
         else
             printf("-- ");
         if ((addr + 1) % 16 == 0)
             printf("\n");
     }
+    mraa_i2c_stop(i2c);    
 }
 
 int
