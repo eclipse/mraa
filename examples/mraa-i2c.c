@@ -59,7 +59,6 @@ void
 print_bus(mraa_board_t* board)
 {
     int i, bus;
-    printf("Bus count = %d\n", board->i2c_bus_count);
     for (i = 0; i < board->i2c_bus_count; ++i) {
         char* busType;
         switch (board->platform_type) {
