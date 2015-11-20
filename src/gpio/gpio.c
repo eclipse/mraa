@@ -584,6 +584,10 @@ mraa_gpio_write(mraa_gpio_context dev, int value)
             return pre_ret;
     }
 
+    if (IS_FUNC_DEFINED(dev, gpio_write_replace)) {
+        return dev->advance_func->gpio_write_replace(dev, value);
+    }
+
     if (dev->value_fp == -1) {
         if (mraa_gpio_get_valfp(dev) != MRAA_SUCCESS) {
             return MRAA_ERROR_INVALID_RESOURCE;
