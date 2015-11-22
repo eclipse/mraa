@@ -44,7 +44,7 @@ as and you'll have the latest stable tagged build of mraa installed!
 ``` bash
 echo "src mraa-upm http://iotdk.intel.com/repos/2.0/intelgalactic" > /etc/opkg/mraa-upm.conf
 opkg update
-opkg install libmraa0
+opkg install mraa
 ```
 
 If you would like to get the latest & greatest builds from master HEAD you can
@@ -53,7 +53,7 @@ use our -dev repository
 ```bash
 echo "src mraa-upm http://iotdk.intel.com/repos/2.0/intelgalactic-dev" > /etc/opkg/mraa-upm.conf
 opkg update
-opkg install libmraa0
+opkg install mraa
 ```
 
 You can also install just the node.js mraa module by using npm. You will need a
