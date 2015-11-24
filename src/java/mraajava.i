@@ -66,3 +66,14 @@ class Spi;
         return JNI_VERSION_1_8;
     }
 %}
+
+%pragma(java) jniclasscode=%{
+    static {
+        try {
+            System.loadLibrary("mraajava");
+        } catch (UnsatisfiedLinkError e) {
+            System.err.println("Native code library failed to load. \n" + e);
+            System.exit(1);
+        }
+    }
+%}
