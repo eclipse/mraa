@@ -46,11 +46,14 @@
 #include "version.h"
 
 #define MAX_PLATFORM_NAME_LENGTH 128
+#define IIO_DEVICE_WILDCARD "iio:device*"
 mraa_board_t* plat = NULL;
-// static mraa_board_t* current_plat = NULL;
+mraa_iio_info_t* plat_iio = NULL;
 
 static char platform_name[MAX_PLATFORM_NAME_LENGTH];
-mraa_adv_func_t* advance_func;
+
+static int num_i2c_devices = 0;
+static int num_iio_devices = 0;
 
 const char*
 mraa_get_version()
@@ -68,6 +71,16 @@ mraa_set_log_level(int level)
     }
     syslog(LOG_NOTICE, "Invalid loglevel %d requested", level);
     return MRAA_ERROR_INVALID_PARAMETER;
+}
+
+static int
+mraa_count_iio_devices(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
+{
+    // we are only interested in files with specific names
+    if (fnmatch(IIO_DEVICE_WILDCARD, basename(path), 0) == 0) {
+        num_iio_devices++;
+    }
+    return 0;
 }
 
 #if (defined SWIGPYTHON) || (defined SWIG)
@@ -101,9 +114,6 @@ mraa_init()
     PyEval_InitThreads();
 #endif
 
-    advance_func = (mraa_adv_func_t*) malloc(sizeof(mraa_adv_func_t));
-    memset(advance_func, 0, sizeof(mraa_adv_func_t));
-
     mraa_platform_t platform_type;
 #if defined(X86PLAT)
     // Use runtime x86 platform detection
@@ -124,7 +134,7 @@ mraa_init()
         plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
         if (plat != NULL) {
             plat->platform_type = MRAA_NULL_PLATFORM;
-            plat->platform_name = "Null platform";
+            plat->platform_name = "Unknown platform";
         }
     }
     // Now detect sub platform
@@ -141,6 +151,38 @@ mraa_init()
         return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
     }
 #endif
+
+    plat_iio = (mraa_iio_info_t*) calloc(1, sizeof(mraa_iio_info_t));
+    // Now detect IIO devices, linux only
+    // find how many iio devices we have if we haven't already
+    if (num_iio_devices == 0) {
+        if (nftw("/sys/bus/iio/devices", &mraa_count_iio_devices, 20, FTW_PHYS) == -1) {
+            return MRAA_ERROR_UNSPECIFIED;
+        }
+    }
+    char name[64], filepath[64];
+    int fd, len, i;
+    plat_iio->iio_device_count = num_iio_devices;
+    plat_iio->iio_devices = calloc(num_iio_devices, sizeof(struct _iio));
+    struct _iio* device;
+    for (i=0; i < num_iio_devices; i++) {
+        device = &plat_iio->iio_devices[i];
+        device->num = i;
+        snprintf(filepath, 64, "/sys/bus/iio/devices/iio:device%d/name", i);
+        fd = open(filepath, O_RDONLY);
+        if (fd > 0) {
+            len = read(fd, &name, 64);
+            if (len > 1) {
+                // remove any trailing CR/LF symbols
+                name[strcspn(name, "\r\n")] = '\0';
+                len = strlen(name);
+                // use strndup
+                device->name = malloc((sizeof(char) * len) + sizeof(char));
+                strncpy(device->name, name, len+1);
+            }
+            close(fd);
+        }
+    }
 
     syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
     return MRAA_SUCCESS;
@@ -162,6 +204,9 @@ mraa_deinit()
         }
         free(plat);
 
+    }
+    if (plat_iio != NULL) {
+        free(plat_iio);
     }
     closelog();
 }
@@ -625,10 +670,8 @@ mraa_link_targets(const char* filename, const char* targetname)
     }
 }
 
-static int num_i2c_devices = 0;
-
 static int
-mraa_count_files(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
+mraa_count_i2c_files(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
 {
     switch (sb->st_mode & S_IFMT) {
         case S_IFLNK:
@@ -654,7 +697,7 @@ mraa_find_i2c_bus(const char* devname, int startfrom)
 
     // find how many i2c buses we have if we haven't already
     if (num_i2c_devices == 0) {
-        if (nftw("/sys/class/i2c-dev/", &mraa_count_files, 20, FTW_PHYS) == -1) {
+        if (nftw("/sys/class/i2c-dev/", &mraa_count_i2c_files, 20, FTW_PHYS) == -1) {
             return -1;
         }
     }
@@ -723,4 +766,24 @@ int
 mraa_get_sub_platform_index(int pin_or_bus)
 {
     return pin_or_bus & (~MRAA_SUB_PLATFORM_MASK);
+}
+
+int
+mraa_get_iio_device_count()
+{
+    return plat_iio->iio_device_count;
+}
+
+int
+mraa_find_iio_device(const char* devicename)
+{
+    int i = 0;
+    for (i; i < plat_iio->iio_device_count; i++) {
+#if 0
+        // compare with devices array
+        if (!strcmp() {
+        }
+#endif
+    }
+    return 0;
 }

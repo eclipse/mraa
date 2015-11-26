@@ -29,12 +29,14 @@ extern "C" {
 #endif
 
 #include <syslog.h>
+#include <fnmatch.h>
 
 #include "common.h"
 #include "mraa_internal_types.h"
 #include "mraa_adv_func.h"
 
 extern mraa_board_t* plat;
+extern mraa_iio_info_t* plat_iio;
 
 /**
  * Takes in pin information and sets up the multiplexors.

@@ -16,6 +16,7 @@ set (mraa_LIB_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/spi/spi.c
   ${PROJECT_SOURCE_DIR}/src/aio/aio.c
   ${PROJECT_SOURCE_DIR}/src/uart/uart.c
+  ${PROJECT_SOURCE_DIR}/src/iio/iio.c
 )
 
 set (mraa_LIB_X86_SRCS_NOAUTO
@@ -26,6 +27,7 @@ set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/intel_de3815.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_nuc5.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_minnow_byt_compatible.c
+  ${PROJECT_SOURCE_DIR}/src/x86/intel_sofia_3gr.c
 )
 
 set (mraa_LIB_ARM_SRCS_NOAUTO

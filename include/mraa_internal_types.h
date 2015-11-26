@@ -27,8 +27,8 @@
 
 #include "common.h"
 #include "mraa.h"
-#include "mraa_func.h"
 #include "mraa_adv_func.h"
+#include "iio.h"
 
 // general status failures for internal functions
 #define MRAA_PLATFORM_NO_INIT -3
@@ -119,6 +119,25 @@ struct _uart {
     int fd; /**< file descriptor for device. */
     mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
+};
+
+/**
+ * A structure representing an IIO device
+ */
+struct _iio {
+    int num; /**< IIO device number */
+    char* name; /**< IIO device name */
+    int fp; /**< IIO device in /dev */
+    int fp_event;  /**<  event file descriptor for IIO device */
+    void (* isr)(char* data); /**< the interupt service request */
+    void *isr_args; /**< args return when interupt service request triggered */
+    void (* isr_event)(struct iio_event_data* data); /**< the event interupt service request */
+    int chan_num;
+    pthread_t thread_id; /**< the isr handler thread id */
+    mraa_iio_channel* channels;
+    int event_num;
+    mraa_iio_event* events;
+    int datasize;
 };
 
 /**
@@ -263,4 +282,7 @@ typedef struct _board_t {
     /*@}*/
 } mraa_board_t;
 
-
+typedef struct {
+    struct _iio* iio_devices; /**< Pointer to IIO devices */
+    uint8_t iio_device_count; /**< IIO device count */
+} mraa_iio_info_t;
