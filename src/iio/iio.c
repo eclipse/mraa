@@ -153,6 +153,7 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
                 if (fd > 0) {
                     if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
                         syslog(LOG_ERR, "iio: Failed to read a sensible value from sysfs");
+                        free(str);
                         return -1;
                     }
                     chan->enabled = (int) strtol(readbuf, NULL, 10);
@@ -233,13 +234,13 @@ mraa_iio_read_integer(mraa_iio_context dev, const char* filename, int* data)
 }
 
 mraa_result_t
-mraa_iio_read_string(mraa_iio_context dev, const char* filename, char* data)
+mraa_iio_read_string(mraa_iio_context dev, const char* filename, char data[IIO_MAX_SIZE])
 {
     char buf[MAX_SIZE];
     snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, filename);
     FILE* fp = fopen(buf, "r");
     if (fp != NULL) {
-        fscanf(fp, "%s\n", data);
+        fgets(data, (IIO_MAX_SIZE - 1), fp);
         fclose(fp);
         return MRAA_SUCCESS;
     }
@@ -584,29 +585,32 @@ mraa_iio_update_channels(mraa_iio_context dev)
                         break;
                     }
                     chan_num = ((int) strtol(readbuf, NULL, 10));
-                    chan = &dev->channels[chan_num];
-                    chan->index = chan_num;
-                    close(fd);
-
-                    buf[(strlen(buf) - 5)] = '\0';
-                    char* str = strdup(buf);
-                    // grab the enable flag of channel
-                    snprintf(buf, MAX_SIZE, "%sen", str);
-                    fd = open(buf, O_RDONLY);
-                    if (fd > 0) {
-                        if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
-                            syslog(LOG_ERR, "iio: Failed to read a sensible value from sysfs");
-                            return -1;
-                        }
-                        chan->enabled = (int) strtol(readbuf, NULL, 10);
-                        // only calculate enable buffer size for trigger buffer extract data
-                        if (chan->enabled) {
-                            dev->datasize += chan->bytes;
-                        }
+                    if (chan_num >= 0 && chan_num < dev->chan_num) {
+                        chan = &dev->channels[chan_num];
+                        chan->index = chan_num;
                         close(fd);
+
+                        buf[(strlen(buf) - 5)] = '\0';
+                        char* str = strdup(buf);
+                        // grab the enable flag of channel
+                        snprintf(buf, MAX_SIZE, "%sen", str);
+                        fd = open(buf, O_RDONLY);
+                        if (fd > 0) {
+                            if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
+                                syslog(LOG_ERR, "iio: Failed to read a sensible value from sysfs");
+                                free(str);
+                                return -1;
+                            }
+                            chan->enabled = (int) strtol(readbuf, NULL, 10);
+                            // only calculate enable buffer size for trigger buffer extract data
+                            if (chan->enabled) {
+                                dev->datasize += chan->bytes;
+                            }
+                            close(fd);
+                        }
+                        // clean up str var
+                        free(str);
                     }
-                    // clean up str var
-                    free(str);
                 }
             }
         }
