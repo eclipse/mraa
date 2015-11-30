@@ -5,17 +5,84 @@ include_directories (
   ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
+macro(C2HEX RET VAL)
+   if(${VAL} LESS 10)
+     set(${RET} "${VAL}")
+   elseif(${VAL} EQUAL 10)
+     set(${RET} "A")
+   elseif(${VAL} EQUAL 11)
+     set(${RET} "B")
+   elseif(${VAL} EQUAL 12)
+     set(${RET} "C")
+   elseif(${VAL} EQUAL 13)
+     set(${RET} "D")
+   elseif(${VAL} EQUAL 14)
+     set(${RET} "E")
+   elseif(${VAL} EQUAL 15)
+     set(${RET} "F")
+   else()
+     message(WARNING " - wrong value in C2HEX: val=${VAL} -> use F !!!")
+     set(${RET} "F")
+   endif()
+endmacro(C2HEX)
+
+macro(CONVERT_DEC2HEX RET VAL)
+  string(LENGTH VAL len)
+  set(${RET} "00")
+  if(${len} LESS 1 OR ${len} GREATER 3)
+    message (WARNING " - there is a wrong input value length for CONVERT_DEC2HEX: '${VAL}' len: ${len} -> return ZERO !!!")
+  else()
+    string(REGEX MATCH "[0-9]+" TMP ${VAL})
+    if(TMP GREATER 255)
+       set (TMP 255)
+       message (WARNING " - a value is above 255 in CONVERT_DEC2HEX: '${VAL}' -> use 0xFF ")
+    endif()
+    math(EXPR CLO "${TMP}&15")
+    math(EXPR CHI "${TMP}>>4")
+    C2HEX(CHIH ${CHI})
+    C2HEX(CLOH ${CLO})
+    set(${RET} "${CHIH}${CLOH}")
+  endif()
+endmacro(CONVERT_DEC2HEX)
+
+message (INFO " - v8-version.h search path: ${NODE_INCLUDE_DIRS}")
+
+foreach(VERPATH ${NODE_INCLUDE_DIRS})
+   message(INFO " -   check ${VERPATH}")
+   if(EXISTS "${VERPATH}/v8-version.h")
+      file(READ "${VERPATH}/v8-version.h" V8_VERSION_FILE)
+      string(REGEX MATCH "\#define V8_MAJOR_VERSION [0-9]+" V8_MAJOR_VERSION_STR ${V8_VERSION_FILE})
+      string(REGEX MATCH "\#define V8_MINOR_VERSION [0-9]+" V8_MINOR_VERSION_STR ${V8_VERSION_FILE})
+      string(REGEX MATCH "\#define V8_BUILD_NUMBER [0-9]+" V8_BUILD_NUMBER_STR ${V8_VERSION_FILE})
+      string(REGEX REPLACE "\#define V8_MAJOR_VERSION " "" V8_MAJOR_VERSION ${V8_MAJOR_VERSION_STR})
+      string(REGEX REPLACE "\#define V8_MINOR_VERSION " "" V8_MINOR_VERSION ${V8_MINOR_VERSION_STR})
+      string(REGEX REPLACE "\#define V8_BUILD_NUMBER " "" V8_BUILD_NUMBER ${V8_BUILD_NUMBER_STR})
+      message (INFO " -   Node API: v8-version.h has a version like ${V8_MAJOR_VERSION}.${V8_MINOR_VERSION}.${V8_BUILD_NUMBER}")
+      break()
+   endif()
+endforeach()
+
+
+# convert V8 version to hex string
+if(DEFINED V8_MAJOR_VERSION AND DEFINED V8_MINOR_VERSION AND DEFINED V8_BUILD_NUMBER)
+   message (INFO " - Use V8 API version ${V8_MAJOR_VERSION}.${V8_MINOR_VERSION}.${V8_BUILD_NUMBER}")
+   # use a value provided by V8 API (only for version 4.3.0 or above)
+   CONVERT_DEC2HEX(V8_VERSION_MAJOR_HEX ${V8_MAJOR_VERSION})
+   CONVERT_DEC2HEX(V8_VERSION_MINOR_HEX ${V8_MINOR_VERSION})
+   CONVERT_DEC2HEX(V8_VERSION_PATCH_HEX ${V8_BUILD_NUMBER})
+else()
+   message (INFO " -  Use a command line version ${V8_VERSION_MAJOR}.${V8_VERSION_MINOR}.${V8_VERSION_PATCH}")
+   # use a value provided as a command line parameter
+   CONVERT_DEC2HEX(V8_VERSION_MAJOR_HEX ${V8_VERSION_MAJOR})
+   CONVERT_DEC2HEX(V8_VERSION_MINOR_HEX ${V8_VERSION_MINOR})
+   CONVERT_DEC2HEX(V8_VERSION_PATCH_HEX ${V8_VERSION_PATCH})
+endif()
+set (V8_VERSION_HEX 0x${V8_VERSION_MAJOR_HEX}${V8_VERSION_MINOR_HEX}${V8_VERSION_PATCH_HEX})
+
+message (INFO " -    where V8_VERSION_HEX = ${V8_VERSION_HEX}, V8_VERSION_MAJOR=${V8_VERSION_MAJOR}")
+
 # SWIG treats SWIG_FLAGS as a list and not a string so semicolon seperation is
-# required. This hardcodes V8_VERSION to be <10 but I assume that's not going
-# to be a problem for a little while! SWIG uses a padded SWIG_V8 version which
-# we hack together from our findnode module.
-set (V8_VERSION_HEX 0x0${V8_VERSION_MAJOR}${V8_VERSION_MINOR}${V8_VERSION_PATCH})
-string (LENGTH "${V8_VERSION_HEX}" V8_VERSION_HEX_length)
-while (V8_VERSION_HEX_length LESS 8)
-  set (V8_VERSION_HEX "${V8_VERSION_HEX}0")
-  message (DEBUG " - Padded V8 version to match SWIG format")
-  string (LENGTH "${V8_VERSION_HEX}" V8_VERSION_HEX_length)
-endwhile ()
+# required.
 
 set_property (SOURCE mraajs.i PROPERTY SWIG_FLAGS "-node"
               "-I${CMAKE_BINARY_DIR}/src" "-DV8_VERSION=${V8_VERSION_HEX}")
