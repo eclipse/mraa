@@ -32,6 +32,7 @@
 #include "x86/intel_de3815.h"
 #include "x86/intel_nuc5.h"
 #include "x86/intel_minnow_byt_compatible.h"
+#include "x86/intel_sofia_3gr.h"
 
 mraa_platform_t
 mraa_x86_platform()
@@ -77,7 +78,19 @@ mraa_x86_platform()
             free(line);
         }
         fclose(fh);
+    } else {
+        fh = fopen("/proc/cmdline", "r");
+        if (fh != NULL) {
+            if (getline(&line, &len, fh) != -1) {
+                if (strstr(line, "sf3gr_mrd_version=P2.0")) {
+                    platform_type = MRAA_INTEL_SOFIA_3GR;
+                    plat = mraa_intel_sofia_3gr();
+                    syslog(LOG_ERR, "Platform MRAA_INTEL_SOFIA_3GR");
+                }
+                free(line);
+            }
+            fclose(fh);
+        }
     }
-
     return platform_type;
 }

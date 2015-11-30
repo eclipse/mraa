@@ -66,6 +66,7 @@ extern "C" {
 
 #include "common.h"
 
+#define IIO_MAX_SIZE 128
 /**
  * Opaque pointer definition to the internal struct _iio
  */
@@ -95,7 +96,7 @@ mraa_result_t mraa_iio_read_float(mraa_iio_context dev, const char* filename, fl
 
 mraa_result_t mraa_iio_read_integer(mraa_iio_context dev, const char* filename, int* data);
 
-mraa_result_t mraa_iio_read_string(mraa_iio_context dev, const char* filename, char* data);
+mraa_result_t mraa_iio_read_string(mraa_iio_context dev, const char* filename, char data[IIO_MAX_SIZE]);
 
 mraa_result_t mraa_iio_write_float(mraa_iio_context dev, const char* attr_chan, const float data);
 
