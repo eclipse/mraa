@@ -120,7 +120,7 @@ mraa_i2c_init_internal(mraa_adv_func_t* advance_func, unsigned int bus)
 init_internal_cleanup:
     if (status == MRAA_SUCCESS) {
         return dev;
-	} else {
+    } else {
         if (dev != NULL)
             free(dev);
         return NULL;
@@ -202,14 +202,17 @@ int
 mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 {
     int bytes_read = 0;
-    if (IS_FUNC_DEFINED(dev, i2c_read_replace))
+    if (IS_FUNC_DEFINED(dev, i2c_read_replace)) {
         bytes_read = dev->advance_func->i2c_read_replace(dev, data, length);
-    else
+    }
+    else {
         bytes_read = read(dev->fh, data, length);
-   if (bytes_read == length)
-      return length;
-   else
-      return 0;
+    }
+    if (bytes_read == length) {
+        return length;
+    }
+
+    return 0;
 }
 
 uint8_t
