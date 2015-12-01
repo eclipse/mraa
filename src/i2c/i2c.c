@@ -215,7 +215,7 @@ mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 uint8_t
 mraa_i2c_read_byte(mraa_i2c_context dev)
 {
-    if (IS_FUNC_DEFINED(dev, i2c_read_replace))
+    if (IS_FUNC_DEFINED(dev, i2c_read_byte_replace))
         return dev->advance_func->i2c_read_byte_replace(dev);
     i2c_smbus_data_t d;
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_READ, I2C_NOCMD, I2C_SMBUS_BYTE, &d) < 0) {
