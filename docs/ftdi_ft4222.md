@@ -4,7 +4,8 @@ FTDI FT4222H                             {#ft4222}
 The FT4222H is a High/Full Speed USB2.0-to-Quad SPI/I2C device controller. Mraa
 supports it as a USB subplatform using the libft4222 library from FTDI which
 can be found
-[here](http://www.ftdichip.com/Support/SoftwareExamples/libft4222-1.2.0.240.tgz).
+[here](http://www.ftdichip.com/Support/SoftwareExamples/libft4222-1.2.1.4.tgz).
+You need the latest version for the GPIO to work
 
 The FT 4222H has 4 configuration modes selected by {DCNF1, DCNF0}.  The c hip
 configuration mode will determine the number of USB interface s for data stream
