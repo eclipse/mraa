@@ -68,6 +68,13 @@ mraa_platform_t mraa_arm_platform();
 mraa_platform_t mraa_usb_platform_extender(mraa_board_t* board);
 
 /**
+ * runtime detect iio subsystem
+ *
+ * @return mraa_result_t indicating success of iio detection
+ */
+mraa_result_t mraa_iio_detect();
+
+/**
  * helper function to check if file exists
  *
  * @param filename to check
