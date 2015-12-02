@@ -1,5 +1,5 @@
 /*
- * Author: Brendan Le Foll
+ * Author: Henry Bruce
  * Copyright (c) 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -23,37 +23,63 @@
  */
 
 #include <unistd.h>
+#include <math.h>
+#include <float.h>
 #include "mraa/iio.h"
+
+#define EXPECT_FAILURE 0
+#define EXPECT_SUCCESS 1
+
+void log_result(const char* test_name, const char* attr_name, mraa_boolean_t expect_success, mraa_result_t test_result)
+{
+    char* result;
+    if (expect_success)
+       result = test_result == MRAA_SUCCESS ? "PASS" : "FAIL";
+    else
+       result = test_result == MRAA_SUCCESS ? "FAIL" : "PASS";
+    fprintf(stdout, "%s(%s): %s\n", test_name, attr_name, result);
+}
 
 int
 main()
 {
-    mraa_iio_context iio_device0 = mraa_iio_init(0);
+    mraa_iio_context iio_device = mraa_iio_init(0);
     char* attr_name;
-    if (iio_device0 == NULL) {
-        fprintf(stderr, "IIO device %d not found\n", 0);
-        return EXIT_FAILURE;
-    }
-
-    fprintf(stderr, "Using IIO device %s\n", mraa_iio_get_device_name(iio_device0));
     float iio_float;
     int iio_integer;
     mraa_result_t ret;
 
+    if (iio_device == NULL) {
+        fprintf(stderr, "IIO device %d not found\n", 0);
+        return EXIT_FAILURE;
+    }
+    fprintf(stderr, "Using IIO device %s\n", mraa_iio_get_device_name(iio_device));
 
     attr_name = "in_accel_x_raw";
-    fprintf(stdout, "IIO write in_accel_x_raw: ");
-    ret = mraa_iio_write_float(iio_device0, "in_accel_x_raw", 0.019163);
-    if (ret != MRAA_SUCCESS) {
-        mraa_result_print(ret);
-    }
+    ret = mraa_iio_write_float(iio_device, attr_name, 100);
+    log_result("iio_write_float", attr_name, EXPECT_FAILURE, ret);
 
-    fprintf(stdout, "IIO read in_accel_x_raw\n");    
-	ret = mraa_iio_read_float(iio_device0, "in_accel_x_raw", &iio_float);
-    if (ret == MRAA_SUCCESS)
-        fprintf(stdout, "in_accel_x_raw: %f\n", iio_float);
-	else
-        mraa_result_print(ret);
+    attr_name = "in_voltage0_scale";
+    ret = mraa_iio_write_float(iio_device, attr_name, 100);
+    log_result("iio_write_float", attr_name, EXPECT_FAILURE, ret);
 
-   return EXIT_SUCCESS;
+    attr_name = "out_voltage0_raw";
+    ret = mraa_iio_write_integer(iio_device, attr_name, 100);
+    log_result("iio_write_integer", attr_name, EXPECT_SUCCESS, ret);
+
+    attr_name = "in_accel_x_raw";
+    ret = mraa_iio_read_integer(iio_device, attr_name, &iio_integer);
+    ret = iio_integer == 34 ? MRAA_SUCCESS : MRAA_ERROR_UNSPECIFIED;
+    log_result("iio_read_integer", attr_name, EXPECT_SUCCESS, ret);
+
+    attr_name = "in_voltage0_scale";
+    ret = mraa_iio_read_float(iio_device, attr_name, &iio_float);
+    ret = fabs(iio_float - 0.001333) < FLT_EPSILON ? MRAA_SUCCESS : MRAA_ERROR_UNSPECIFIED;
+    log_result("iio_read_float", attr_name, EXPECT_SUCCESS, ret);
+
+    attr_name = "";
+    ret = mraa_iio_stop(iio_device);
+    log_result("iio_stop", attr_name, EXPECT_SUCCESS, ret);
+
+    return EXIT_SUCCESS;
 }
