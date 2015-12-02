@@ -41,7 +41,7 @@
 mraa_iio_context
 mraa_iio_init(int device)
 {
-    if (device > plat_iio->iio_device_count) {
+    if (plat_iio->iio_device_count == 0 || device > plat_iio->iio_device_count) {
         return NULL;
     }
 
@@ -205,45 +205,45 @@ mraa_iio_get_device_num_by_name(const char* name)
 }
 
 mraa_result_t
-mraa_iio_read_float(mraa_iio_context dev, const char* filename, float* data)
+mraa_iio_read_float(mraa_iio_context dev, const char* attr_name, float* data)
 {
     char buf[MAX_SIZE];
-    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, filename);
-    FILE* fp = fopen(buf, "r");
-    if (fp != NULL) {
-        fscanf(fp, "%f\n", data);
-        fclose(fp);
-        return MRAA_SUCCESS;
-    }
-    return MRAA_ERROR_UNSPECIFIED;
+    mraa_result_t result = mraa_iio_read_string(dev, attr_name, buf);
+    if (result != MRAA_SUCCESS)
+        return result;
+    int status = sscanf(buf, "%f", data);
+    result = status == 1 ? MRAA_SUCCESS : MRAA_ERROR_UNSPECIFIED;
+    return result;
+}
+
+
+mraa_result_t
+mraa_iio_read_integer(mraa_iio_context dev, const char* attr_name, int* data)
+{
+    char buf[MAX_SIZE];
+    mraa_result_t result = mraa_iio_read_string(dev, attr_name, buf);
+    if (result != MRAA_SUCCESS)
+        return result;
+    int status = sscanf(buf, "%d", data);
+    result = status == 1 ? MRAA_SUCCESS : MRAA_ERROR_UNSPECIFIED;
+    return result;
 }
 
 mraa_result_t
-mraa_iio_read_integer(mraa_iio_context dev, const char* filename, int* data)
+mraa_iio_read_string(mraa_iio_context dev, const char* attr_name, char* data)
 {
     char buf[MAX_SIZE];
-    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, filename);
-    FILE* fp = fopen(buf, "r");
-    if (fp != NULL) {
-        fscanf(fp, "%d\n", data);
-        fclose(fp);
-        return MRAA_SUCCESS;
+    mraa_result_t result = MRAA_ERROR_UNSPECIFIED;
+    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, attr_name);
+    int fd = open(buf, O_RDONLY);
+    if (fd != -1) {
+        ssize_t len = read(fd, data, MAX_SIZE);
+        if (len > 0)
+            result = MRAA_SUCCESS;
+        close(fd);
     }
-    return MRAA_ERROR_UNSPECIFIED;
-}
+    return result;
 
-mraa_result_t
-mraa_iio_read_string(mraa_iio_context dev, const char* filename, char* data)
-{
-    char buf[MAX_SIZE];
-    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, filename);
-    FILE* fp = fopen(buf, "r");
-    if (fp != NULL) {
-        fscanf(fp, "%s\n", data);
-        fclose(fp);
-        return MRAA_SUCCESS;
-    }
-    return MRAA_ERROR_UNSPECIFIED;
 }
 
 mraa_result_t
@@ -255,17 +255,11 @@ mraa_iio_write_float(mraa_iio_context dev, const char* attr_name, const float da
 }
 
 mraa_result_t
-mraa_iio_write_integer(mraa_iio_context dev, const char* filename, const int data)
+mraa_iio_write_integer(mraa_iio_context dev, const char* attr_name, const int data)
 {
     char buf[MAX_SIZE];
-    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, filename);
-    FILE* fp = fopen(buf, "w");
-    if (fp != NULL) {
-        fprintf(fp, "%d", data);
-        fclose(fp);
-        return MRAA_SUCCESS;
-    }
-    return MRAA_ERROR_UNSPECIFIED;
+    snprintf(buf, MAX_SIZE, "%d", data);
+    return mraa_iio_write_string(dev, attr_name, buf);
 }
 
 mraa_result_t
@@ -274,13 +268,13 @@ mraa_iio_write_string(mraa_iio_context dev, const char* attr_name, const char* d
     char buf[MAX_SIZE];
     mraa_result_t result = MRAA_ERROR_UNSPECIFIED;
     snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, attr_name);
-    int fh = open(buf, O_RDWR);
-    if (fh != -1) {
+    int fd = open(buf, O_WRONLY);
+    if (fd != -1) {
         size_t len = strlen(data);
-        ssize_t status = write(fh, data, len);
-        printf("mraa_iio_write_string status %d\n", status);
+        ssize_t status = write(fd, data, len);
         if (status == len)
              result = MRAA_SUCCESS;
+        close(fd);
     }
     return result;
 }
@@ -320,7 +314,7 @@ mraa_iio_trigger_handler(void* arg)
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
             // only can process if readsize >= enabled channel's datasize
             for (i = 0; i < (read_size / dev->datasize); i++) {
-                dev->isr(&data);
+                dev->isr((void*)&data);
             }
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
         } else {
@@ -610,11 +604,10 @@ mraa_iio_update_channels(mraa_iio_context dev)
     }
     return MRAA_SUCCESS;
 }
-#if 0
-// does stop make any sense on iio devices?
+
 mraa_result_t
 mraa_iio_stop(mraa_iio_context dev)
 {
+    free(dev->channels);
     return MRAA_SUCCESS;
 }
-#endif
