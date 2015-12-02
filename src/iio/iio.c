@@ -247,17 +247,11 @@ mraa_iio_read_string(mraa_iio_context dev, const char* filename, char* data)
 }
 
 mraa_result_t
-mraa_iio_write_float(mraa_iio_context dev, const char* filename, const float data)
+mraa_iio_write_float(mraa_iio_context dev, const char* attr_name, const float data)
 {
     char buf[MAX_SIZE];
-    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, filename);
-    FILE* fp = fopen(buf, "w");
-    if (fp != NULL) {
-        fprintf(fp, "%f", data);
-        fclose(fp);
-        return MRAA_SUCCESS;
-    }
-    return MRAA_ERROR_UNSPECIFIED;
+    snprintf(buf, MAX_SIZE, "%f", data);
+    return mraa_iio_write_string(dev, attr_name, buf);
 }
 
 mraa_result_t
@@ -275,17 +269,20 @@ mraa_iio_write_integer(mraa_iio_context dev, const char* filename, const int dat
 }
 
 mraa_result_t
-mraa_iio_write_string(mraa_iio_context dev, const char* filename, const char* data)
+mraa_iio_write_string(mraa_iio_context dev, const char* attr_name, const char* data)
 {
     char buf[MAX_SIZE];
-    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, filename);
-    FILE* fp = fopen(buf, "w");
-    if (fp != NULL) {
-        fprintf(fp, "%s", data);
-        fclose(fp);
-        return MRAA_SUCCESS;
+    mraa_result_t result = MRAA_ERROR_UNSPECIFIED;
+    snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, attr_name);
+    int fh = open(buf, O_RDWR);
+    if (fh != -1) {
+        size_t len = strlen(data);
+        ssize_t status = write(fh, data, len);
+        printf("mraa_iio_write_string status %d\n", status);
+        if (status == len)
+             result = MRAA_SUCCESS;
     }
-    return MRAA_ERROR_UNSPECIFIED;
+    return result;
 }
 
 static mraa_result_t
