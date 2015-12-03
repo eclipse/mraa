@@ -28,6 +28,7 @@
 #include <string.h>
 #include <poll.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
 
 #define MAX_SIZE 128
 #define IIO_DEVICE "iio:device"
