@@ -41,7 +41,7 @@
 mraa_iio_context
 mraa_iio_init(int device)
 {
-    if (plat_iio->iio_device_count == 0 || device > plat_iio->iio_device_count) {
+    if (plat_iio->iio_device_count == 0 || device >= plat_iio->iio_device_count) {
         return NULL;
     }
 
