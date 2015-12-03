@@ -73,15 +73,6 @@ mraa_set_log_level(int level)
     return MRAA_ERROR_INVALID_PARAMETER;
 }
 
-static int
-mraa_count_iio_devices(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
-{
-    // we are only interested in files with specific names
-    if (fnmatch(IIO_DEVICE_WILDCARD, basename(path), 0) == 0) {
-        num_iio_devices++;
-    }
-    return 0;
-}
 
 #if (defined SWIGPYTHON) || (defined SWIG)
 mraa_result_t
@@ -155,7 +146,7 @@ mraa_init()
     mraa_result_t iio_result = mraa_iio_detect();
     if (iio_result != MRAA_SUCCESS)
         return iio_result;
-    
+
     syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
     return MRAA_SUCCESS;
 }
@@ -198,6 +189,15 @@ mraa_set_priority(const unsigned int priority)
     return sched_setscheduler(0, SCHED_RR, &sched_s);
 }
 
+static int
+mraa_count_iio_devices(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
+{
+    // we are only interested in files with specific names
+    if (fnmatch(IIO_DEVICE_WILDCARD, basename(path), 0) == 0) {
+        num_iio_devices++;
+    }
+    return 0;
+}
 
 mraa_result_t
 mraa_iio_detect()
