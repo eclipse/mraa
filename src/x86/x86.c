@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "mraa_internal.h"
+
 #include "x86/intel_galileo_rev_d.h"
 #include "x86/intel_galileo_rev_g.h"
 #include "x86/intel_edison_fab_c.h"
@@ -36,7 +37,9 @@
 mraa_platform_t
 mraa_x86_platform()
 {
+#ifndef MRAA_PLATFORM_FORCE
     mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
+
     char* line = NULL;
     // let getline allocate memory for *line
     size_t len = 0;
@@ -80,4 +83,22 @@ mraa_x86_platform()
     }
 
     return platform_type;
+#else
+    #if defined(xMRAA_INTEL_GALILEO_GEN2)
+    plat = mraa_intel_galileo_gen2();
+    #elif defined(xMRAA_INTEL_EDISON_FAB_C)
+    plat = mraa_intel_edison_fab_c();
+    #elif defined(xMRAA_INTEL_DE3815)
+    plat = mraa_intel_de3815();
+    #elif defined(xMRAA_INTEL_MINNOWBOARD_MAX)
+    plat = mraa_intel_minnowboard_byt_compatible();
+    #elif defined(xMRAA_INTEL_GALILEO_GEN1)
+    plat = mraa_intel_galileo_rev_d();
+    #elif defined(xMRAA_INTEL_NUC5)
+    plat = mraa_intel_nuc5();
+    #else
+        #error "Not using a valid platform value from mraa_platform_t - cannot compile"
+    #endif
+    return MRAA_PLATFORM_FORCE;
+#endif
 }

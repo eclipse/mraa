@@ -64,6 +64,8 @@ option (INSTALLGPIOTOOL "Install gpio tool" OFF)
 option (BUILDARCH "Override architecture to build for - override" OFF)
 option (TESTS "Override the addition of tests" ON)
 
+set (MRAAPLATFORMFORCE "" CACHE STRING "ALL")
+
 if (NOT BUILDSWIG)
   set (BUILDSWIGPYTHON OFF)
   set (BUILDSWIGNODE OFF)

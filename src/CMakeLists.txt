@@ -28,6 +28,30 @@ set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/intel_minnow_byt_compatible.c
 )
 
+message (INFO " - Adding support for platform ${MRAAPLATFORMFORCE}")
+
+#keywords in if statements are case sensitive
+if (NOT ${MRAAPLATFORMFORCE} STREQUAL "ALL")
+  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Dx${MRAAPLATFORMFORCE} -DMRAA_PLATFORM_FORCE=${MRAAPLATFORMFORCE}")
+  if (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_GALILEO_GEN2")
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_galileo_rev_g.c)
+  elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_GALILEO_GEN1")
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_galileo_rev_d.c)
+  elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_DE3815")
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_de3815.c)
+  elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_EDISON_FAB_C")
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_edison_fab_c.c)
+  elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_MINNOWBOARD_MAX")
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_minnow_byt_compatible.c)
+  elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_NUC5")
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_nuc5.c)
+  else ()
+    message (ERROR " - Unknown x86 platform enabled!")
+  endif ()
+else ()
+    message (INFO " - Adding support for all platforms")
+endif ()
+
 set (mraa_LIB_ARM_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/arm/arm.c
   ${PROJECT_SOURCE_DIR}/src/arm/raspberry_pi.c
