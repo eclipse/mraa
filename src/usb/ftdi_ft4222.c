@@ -37,24 +37,27 @@
 #define I2CM_ERROR(status) (((status) &0x02) != 0)
 #define PCA9672_ADDR 0x20
 #define PCA9545_ADDR 0x70
+#define PCA9672_PINS 8
+#define PCA9545_BUSSES 4
 #define GPIO_PORT_IO_RESET GPIO_PORT2
 #define GPIO_PORT_IO_STATUS GPIO_PORT3
 
 
-static FT_HANDLE ftHandleI2c = NULL;
-static FT_HANDLE ftHandleGpio = NULL;
+static FT_HANDLE ftHandleGpio = (FT_HANDLE) NULL; //GPIO Handle
+static FT_HANDLE ftHandleI2c = (FT_HANDLE) NULL; //I2C/SPI Handle
+static FT_HANDLE ftHandleSpi = (FT_HANDLE) NULL; //I2C/SPI Handle
+static GPIO_Dir pinDirection[] = {GPIO_OUTPUT, GPIO_OUTPUT, GPIO_OUTPUT, GPIO_OUTPUT};
 static int bus_speed = 400;
 static int numI2cGpioExpanderPins = 8;
 static int numI2cSwitchBusses = 4;
 static int currentI2cBus = 0;
 
-
 mraa_result_t
 mraa_ftdi_ft4222_init()
 {
     mraa_result_t mraaStatus = MRAA_ERROR_NO_RESOURCES;
-    FT_STATUS ftStatus;
     FT_DEVICE_LIST_INFO_NODE* devInfo = NULL;
+    FT_STATUS ftStatus;
     DWORD numDevs = 0;
     int i;
     int retCode = 0;
@@ -72,6 +75,7 @@ mraa_ftdi_ft4222_init()
     }
 
     ftStatus = FT_GetDeviceInfoList(devInfo, &numDevs);
+    syslog(LOG_NOTICE, "FT_GetDeviceInfoList returned %d devices\n", numDevs);
     if (ftStatus != FT_OK) {
         syslog(LOG_ERR, "FT_GetDeviceInfoList failed (error code %d)\n", (int) ftStatus);
         goto init_exit;
@@ -80,7 +84,10 @@ mraa_ftdi_ft4222_init()
         syslog(LOG_ERR, "No FT4222 devices connected.\n");
         goto init_exit;
     }
-    syslog(LOG_NOTICE, "FT_GetDeviceInfoList returned %d devices\n", numDevs);
+    if(numDevs > 2) {
+        syslog(LOG_ERR, "CNFMODE not supported. Valid modes are 0 or 3.\n");
+        goto init_exit;
+    }
 
     // FIXME: Assumes just one physical FTDI device present
     DWORD locationIdI2c = 0;
@@ -112,6 +119,16 @@ mraa_ftdi_ft4222_init()
         goto init_exit;
     }
 
+    FT4222_SetSuspendOut(ftHandleGpio, 0);
+    FT4222_SetWakeUpInterrupt(ftHandleGpio, 0);
+    ftStatus =  FT4222_GPIO_Init(ftHandleGpio, pinDirection);
+    if (ftStatus != FT_OK) {
+        syslog(LOG_ERR, "FT4222_GPIO_Init failed (error %d)\n", (int) ftStatus);
+        mraaStatus = MRAA_ERROR_NO_RESOURCES;
+        goto init_exit;
+    }
+
+    // Tell the FT4222 to be an I2C Master by default on init.
     FT4222_STATUS ft4222Status = FT4222_I2CMaster_Init(ftHandleI2c, bus_speed);
     if (FT4222_OK != ft4222Status) {
         syslog(LOG_ERR, "FT4222_I2CMaster_Init failed (error %d)!\n", ft4222Status);
@@ -181,8 +198,7 @@ mraa_ftdi_ft4222_i2c_write_internal(FT_HANDLE handle, uint8_t addr, const uint8_
     uint16 bytesWritten = 0;
     uint8 controllerStatus;
     // syslog(LOG_NOTICE, "FT4222_I2CMaster_Write(%#02X, %#02X, %d)", addr, *data, bytesToWrite);
-    FT4222_STATUS ft4222Status =
-    FT4222_I2CMaster_Write(handle, addr, (uint8_t*) data, bytesToWrite, &bytesWritten);
+    FT4222_STATUS ft4222Status = FT4222_I2CMaster_Write(handle, addr, (uint8_t*) data, bytesToWrite, &bytesWritten);
     ft4222Status = FT4222_I2CMaster_GetStatus(ftHandleI2c, &controllerStatus);
     if (FT4222_OK != ft4222Status || I2CM_ERROR(controllerStatus)) {
         syslog(LOG_ERR, "FT4222_I2CMaster_Write failed address %#02x\n", addr);
@@ -197,25 +213,31 @@ mraa_ftdi_ft4222_i2c_write_internal(FT_HANDLE handle, uint8_t addr, const uint8_
 }
 
 
-static mraa_boolean_t
-mraa_ftdi_ft4222_is_io_expander_detected()
+// Function detects known I2C I/O expanders and returns the number of GPIO pins on expander
+static int
+mraa_ftdi_ft4222_detect_io_expander()
 {
     uint8_t data;
-    return mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &data, 1) == 1;
-}
-
-static mraa_boolean_t
-mraa_ftdi_ft4222_is_i2c_switch_detected()
-{
-    uint8_t data;
-    mraa_boolean_t isDetected = mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9545_ADDR, &data, 1) == 1;
-    if (isDetected) {
-        data = 0;
-        isDetected = mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9545_ADDR, &data, 1) == 1; 
+    if(mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &data, 1) == 1) {
+        return PCA9672_PINS;
     }
-    return isDetected;
-
+    return 0;
 }
+
+
+// Function detects known I2C switches and returns the number of busses.
+// Switches are disabled so default bus will be intergated i2c buss.
+static int
+mraa_ftdi_ft4222_detect_i2c_switch()
+{
+    uint8_t data;
+    if(mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9545_ADDR, &data, 1) == 1) {
+        data = 0;
+        return mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9545_ADDR, &data, 1) == 1 ? PCA9545_BUSSES : 0; 
+    }
+    return 0;
+}
+
 
 static mraa_result_t
 mraa_ftdi_ft4222_i2c_select_bus(int bus)
@@ -317,6 +339,7 @@ mraa_ftdi_ft4222_i2c_init_bus_replace(mraa_i2c_context dev)
         return MRAA_ERROR_NO_RESOURCES;
     }
 
+    syslog(LOG_NOTICE, "I2C interface enabled GPIO0 and GPIO1 will be unavailable.\n");
     dev->handle = ftHandleI2c;
     dev->fh = -1;              // We don't use file descriptors
     dev->funcs = I2C_FUNC_I2C; // Advertise minimal i2c support as per
@@ -447,6 +470,16 @@ mraa_ftdi_ft4222_i2c_stop(mraa_i2c_context dev)
 static mraa_result_t
 mraa_ftdi_ft4222_gpio_init_internal_replace(int pin)
 {
+    if ((pin - numI2cGpioExpanderPins) == 0 || (pin - numI2cGpioExpanderPins) == 1) {
+        syslog(LOG_NOTICE, "Closing I2C interface to enable GPIO%d\n", pin);
+
+        /* Replace with call to SPI init when SPI is fully implemented */
+        FT4222_STATUS ft4222Status = FT4222_SPIMaster_Init(ftHandleSpi, SPI_IO_SINGLE, CLK_DIV_4, CLK_IDLE_HIGH, CLK_LEADING, 0x01);
+        if (FT4222_OK != ft4222Status){
+            syslog(LOG_ERR, "Failed to close I2C interface and start SPI (error %d)!\n", ft4222Status);
+            return MRAA_ERROR_NO_RESOURCES;
+        }
+    }
     return MRAA_SUCCESS;
 }
 
@@ -466,11 +499,24 @@ static int
 mraa_ftdi_ft4222_gpio_read_replace(mraa_gpio_context dev)
 {
     uint8_t pin = dev->phy_pin;
-    uint8_t mask = 1 << pin;
-    uint8_t value;
-    if (mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &value, 1) != 1)
-        return -1;
-     return (value & mask) == mask;
+    if(pin >= numI2cGpioExpanderPins) {
+        // FTDI GPIO
+        BOOL value;
+        FT4222_STATUS ft4222Status = FT4222_GPIO_Read(ftHandleGpio, (pin - numI2cGpioExpanderPins), &value);
+        if (FT4222_OK != ft4222Status) {
+            syslog(LOG_ERR, "FT4222_GPIO_Read failed (error %d)!\n", ft4222Status);
+            return -1;
+        }
+        return value;
+    }
+    else {
+        // Expander GPIO
+        uint8_t mask = 1 << pin;
+        uint8_t value;
+        if (mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &value, 1) != 1)
+            return -1;
+        return (value & mask) == mask;
+    }
 }
 
 
@@ -478,16 +524,27 @@ static mraa_result_t
 mraa_ftdi_ft4222_gpio_write_replace(mraa_gpio_context dev, int write_value)
 {
     uint8_t pin = dev->phy_pin;
-    uint8_t mask = 1 << pin;
-    uint8_t value;
-    if (mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &value, 1) != 1)
-        return MRAA_ERROR_UNSPECIFIED;
-    if (write_value == 1)
-        value |= mask;
-    else
-        value &= (~mask);
-    if (mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9672_ADDR, &value, 1) != 1)
-        return MRAA_ERROR_UNSPECIFIED;
+    if(pin >= numI2cGpioExpanderPins) {
+        // FTDI GPIO
+        FT4222_STATUS ft4222Status = FT4222_GPIO_Write(ftHandleGpio, (pin - numI2cGpioExpanderPins), write_value);
+        if (FT4222_OK != ft4222Status) {
+            syslog(LOG_ERR, "FT4222_GPIO_Write failed (error %d)!\n", ft4222Status);
+            return MRAA_ERROR_UNSPECIFIED;
+        }
+    }
+    else {
+        // Expander GPIO
+        uint8_t mask = 1 << pin;
+        uint8_t value;
+        if (mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &value, 1) != 1)
+            return MRAA_ERROR_UNSPECIFIED;
+        if (write_value == 1)
+            value |= mask;
+        else
+            value &= (~mask);
+        if (mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9672_ADDR, &value, 1) != 1)
+            return MRAA_ERROR_UNSPECIFIED;
+    }
     return MRAA_SUCCESS;
 }
 
@@ -496,14 +553,38 @@ mraa_ftdi_ft4222_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
     switch (dir) {
         case MRAA_GPIO_IN:
+            if (dev->phy_pin >= numI2cGpioExpanderPins) {
+                pinDirection[dev->phy_pin - numI2cGpioExpanderPins] = GPIO_INPUT;
+                if (FT4222_GPIO_Init(ftHandleGpio, pinDirection) != FT4222_OK)
+                    return MRAA_ERROR_UNSPECIFIED;
+                else
+                    return MRAA_SUCCESS;                    
+            } else
+                return mraa_ftdi_ft4222_gpio_write_replace(dev, 1);
+        case MRAA_GPIO_OUT:
+            if (dev->phy_pin >= numI2cGpioExpanderPins) {
+                pinDirection[dev->phy_pin - numI2cGpioExpanderPins] = GPIO_OUTPUT;
+                if (FT4222_GPIO_Init(ftHandleGpio, pinDirection) != FT4222_OK)
+                    return MRAA_ERROR_UNSPECIFIED;
+            }
+            return MRAA_SUCCESS;
         case MRAA_GPIO_OUT_HIGH:
+            if (dev->phy_pin >= numI2cGpioExpanderPins) {
+                pinDirection[dev->phy_pin - numI2cGpioExpanderPins] = GPIO_OUTPUT;
+                if (FT4222_GPIO_Init(ftHandleGpio, pinDirection) != FT4222_OK)
+                    return MRAA_ERROR_UNSPECIFIED;
+            }
             return mraa_ftdi_ft4222_gpio_write_replace(dev, 1);
         case MRAA_GPIO_OUT_LOW:
+            if (dev->phy_pin >= numI2cGpioExpanderPins) {
+                pinDirection[dev->phy_pin - numI2cGpioExpanderPins] = GPIO_OUTPUT;
+                if (FT4222_GPIO_Init(ftHandleGpio, pinDirection) != FT4222_OK)
+                    return MRAA_ERROR_UNSPECIFIED;
+            }
             return mraa_ftdi_ft4222_gpio_write_replace(dev, 0);
         default:
-            ;
+            return MRAA_ERROR_INVALID_PARAMETER;
     }
-    return MRAA_SUCCESS;
 }
 
 
@@ -540,6 +621,7 @@ mraa_ftdi_ft4222_gpio_interrupt_handler_replace(mraa_gpio_context dev)
     int prev_level = mraa_ftdi_ft4222_gpio_read_replace(dev);
     while (1) {
         int level = mraa_ftdi_ft4222_gpio_read_replace(dev);
+        // MRAA_GPIO_EDGE_BOTH
         if (level != prev_level) {
             dev->isr(dev->isr_args);
             prev_level = level;
@@ -587,12 +669,11 @@ mraa_ftdi_ft4222()
     mraa_board_t* sub_plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (sub_plat == NULL)
         return NULL;
-    mraa_boolean_t haveGpio = mraa_ftdi_ft4222_is_io_expander_detected();
-    mraa_boolean_t haveI2cSwitch = mraa_ftdi_ft4222_is_i2c_switch_detected();
+    numI2cGpioExpanderPins = mraa_ftdi_ft4222_detect_io_expander();
     int pinIndex = 0;
-    int numUsbGpio = haveGpio ? numI2cGpioExpanderPins : 0;
-    int numI2cBusses = haveI2cSwitch ? numI2cSwitchBusses + 1 : 1;
-    int numUsbPins = numUsbGpio + 2 * numI2cBusses; // Add SDA and SCL for each i2c bus
+    int numUsbGpio = 4 + numI2cGpioExpanderPins;
+    int numI2cBusses = 1 + mraa_ftdi_ft4222_detect_i2c_switch();
+    int numUsbPins = numUsbGpio + 2 * (numI2cBusses-1); // Add SDA and SCL for each i2c switch bus
     sub_plat->platform_name = PLATFORM_NAME;
     sub_plat->phy_pin_count = numUsbPins;
     sub_plat->gpio_count = numUsbGpio;
@@ -604,32 +685,62 @@ mraa_ftdi_ft4222()
 
     // Virtual gpio pins on i2c I/O expander.
     mraa_pincapabilities_t pinCapsGpio = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    for (pinIndex = 0; pinIndex < numUsbGpio; ++pinIndex) {
-        char name[8];
-        sprintf(name, "Pin%d", pinIndex);
-        strncpy(sub_plat->pins[pinIndex].name, name, 8);
+    for (pinIndex = 0; pinIndex < numI2cGpioExpanderPins; ++pinIndex) {
+        snprintf(sub_plat->pins[pinIndex].name, MRAA_PIN_NAME_SIZE, "EXP-GPIO%d", pinIndex);
         sub_plat->pins[pinIndex].capabilites = pinCapsGpio;
         sub_plat->pins[pinIndex].gpio.mux_total = 0;        
     }
 
-    sub_plat->i2c_bus_count = numI2cBusses;
-    sub_plat->def_i2c_bus = 0;
     int bus = 0;
-    for (bus = 0; bus < numI2cBusses; ++bus) {
+    sub_plat->i2c_bus_count = numI2cBusses;
+    sub_plat->def_i2c_bus = bus;
+    sub_plat->i2c_bus[bus].bus_id = bus;
+
+    // I2c pins (these are virtual, entries are required to configure i2c layer)
+    // We currently assume that GPIO 0/1 are reserved for i2c operation
+    mraa_pincapabilities_t pinCapsI2c = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
+    strncpy(sub_plat->pins[pinIndex].name, "SCL0", 10);
+    sub_plat->pins[pinIndex].capabilites = pinCapsI2c;
+    sub_plat->pins[pinIndex].gpio.pinmap = pinIndex;
+    sub_plat->pins[pinIndex].gpio.mux_total = 0;
+    sub_plat->pins[pinIndex].i2c.mux_total = 0;
+    sub_plat->i2c_bus[bus].scl = pinIndex;
+    pinIndex++;
+    strncpy(sub_plat->pins[pinIndex].name, "SDA0", 10);
+    sub_plat->pins[pinIndex].capabilites = pinCapsI2c;
+    sub_plat->pins[pinIndex].gpio.pinmap = pinIndex;
+    sub_plat->pins[pinIndex].gpio.mux_total = 0;
+    sub_plat->pins[pinIndex].i2c.mux_total = 0;
+    sub_plat->i2c_bus[bus].sda = pinIndex;
+    pinIndex++;
+
+    // FTDI4222 gpio
+    strncpy(sub_plat->pins[pinIndex].name, "INT-GPIO2", 10);
+    sub_plat->pins[pinIndex].capabilites = pinCapsGpio;
+    sub_plat->pins[pinIndex].gpio.pinmap = pinIndex;
+    sub_plat->pins[pinIndex].gpio.mux_total = 0;
+    pinIndex++;
+    strncpy(sub_plat->pins[pinIndex].name, "INT-GPIO3", 10);
+    sub_plat->pins[pinIndex].capabilites = pinCapsGpio;
+    sub_plat->pins[pinIndex].gpio.pinmap = pinIndex;
+    sub_plat->pins[pinIndex].gpio.mux_total = 0;
+    pinIndex++;    
+
+    // Now add any extra i2c busses behind i2c switch
+    for (bus = 1; bus < numI2cBusses; ++bus) {
         sub_plat->i2c_bus[bus].bus_id = bus;
         sub_plat->pins[pinIndex].i2c.mux_total = 0;
-        // i2c pins (these are virtual, entries are required to configure i2c layer)
-        mraa_pincapabilities_t pinCapsI2c = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
         snprintf(sub_plat->pins[pinIndex].name, 7, "SDA%d", bus);
         sub_plat->pins[pinIndex].capabilites = pinCapsI2c;
         sub_plat->i2c_bus[bus].sda = pinIndex;
         pinIndex++;
-        snprintf(sub_plat->pins[pinIndex].name, 7, "SCL%d", bus);        
+        snprintf(sub_plat->pins[pinIndex].name, 7, "SCL%d", bus);
         sub_plat->pins[pinIndex].capabilites = pinCapsI2c;
         sub_plat->pins[pinIndex].i2c.mux_total = 0;
         sub_plat->i2c_bus[bus].scl = pinIndex;
         pinIndex++;                    
     }
+
 
     // Set override functions
     mraa_adv_func_t* func_table = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
@@ -637,9 +748,8 @@ mraa_ftdi_ft4222()
         return NULL;
     }
     mraa_ftdi_ft4222_populate_i2c_func_table(func_table);
-    if (haveGpio && mraa_ftdi_ft4222_setup_integrated_gpio() == MRAA_SUCCESS)
-        mraa_ftdi_ft4222_populate_gpio_func_table(func_table);
-    sub_plat->adv_func = func_table;
+    mraa_ftdi_ft4222_populate_gpio_func_table(func_table);
 
+    sub_plat->adv_func = func_table;
     return sub_plat;
 }
