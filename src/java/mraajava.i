@@ -57,6 +57,7 @@ class Spi;
 %ignore read(char* data, int length);
 
 %feature("director") IsrCallback;
+SWIG_DIRECTOR_OWNED(IsrCallback)
 %include ../mraa.i
 
 %wrapper %{
