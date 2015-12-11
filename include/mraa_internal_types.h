@@ -260,6 +260,7 @@ typedef struct _board_t {
     unsigned int def_uart_dev; /**< Position in array of defult uart */
     unsigned int uart_dev_count; /**< Usable spi Count */
     mraa_uart_dev_t uart_dev[6]; /**< Array of UARTs */
+    mraa_boolean_t no_bus_mux; /**< i2c/spi/adc/pwm/uart bus muxing setup not required */
     int pwm_default_period; /**< The default PWM period is US */
     int pwm_max_period; /**< Maximum period in us */
     int pwm_min_period; /**< Minimum period in us */
