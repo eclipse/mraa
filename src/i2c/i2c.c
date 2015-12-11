@@ -161,20 +161,21 @@ mraa_i2c_init(int bus)
         syslog(LOG_ERR, "Invalid i2c bus, moving to default i2c bus");
         bus = board->def_i2c_bus;
     }
-
-    int pos = board->i2c_bus[bus].sda;
-    if (board->pins[pos].i2c.mux_total > 0) {
-        if (mraa_setup_mux_mapped(board->pins[pos].i2c) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "i2c: Failed to set-up i2c sda multiplexer");
-            return NULL;
+    if (!board->no_bus_mux) {
+        int pos = board->i2c_bus[bus].sda;
+        if (board->pins[pos].i2c.mux_total > 0) {
+            if (mraa_setup_mux_mapped(board->pins[pos].i2c) != MRAA_SUCCESS) {
+                syslog(LOG_ERR, "i2c: Failed to set-up i2c sda multiplexer");
+                return NULL;
+            }
         }
-    }
 
-    pos = board->i2c_bus[bus].scl;
-    if (board->pins[pos].i2c.mux_total > 0) {
-        if (mraa_setup_mux_mapped(board->pins[pos].i2c) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "i2c: Failed to set-up i2c scl multiplexer");
-            return NULL;
+        pos = board->i2c_bus[bus].scl;
+        if (board->pins[pos].i2c.mux_total > 0) {
+            if (mraa_setup_mux_mapped(board->pins[pos].i2c) != MRAA_SUCCESS) {
+                syslog(LOG_ERR, "i2c: Failed to set-up i2c scl multiplexer");
+                return NULL;
+            }
         }
     }
 
