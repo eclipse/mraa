@@ -77,35 +77,37 @@ mraa_spi_init(int bus)
         }
     }
 
-    int pos = plat->spi_bus[bus].sclk;
-    if (plat->pins[pos].spi.mux_total > 0) {
-        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "spi: failed to set-up spi sclk multiplexer");
-            return NULL;
+    if (!plat->no_bus_mux) {
+        int pos = plat->spi_bus[bus].sclk;
+        if (plat->pins[pos].spi.mux_total > 0) {
+            if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
+                syslog(LOG_ERR, "spi: failed to set-up spi sclk multiplexer");
+                return NULL;
+            }
         }
-    }
 
-    pos = plat->spi_bus[bus].mosi;
-    if (plat->pins[pos].spi.mux_total > 0) {
-        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "spi: failed to set-up spi mosi multiplexer");
-            return NULL;
+        pos = plat->spi_bus[bus].mosi;
+        if (plat->pins[pos].spi.mux_total > 0) {
+            if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
+                syslog(LOG_ERR, "spi: failed to set-up spi mosi multiplexer");
+                return NULL;
+            }
         }
-    }
 
-    pos = plat->spi_bus[bus].miso;
-    if (plat->pins[pos].spi.mux_total > 0) {
-        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "spi: failed to set-up spi miso multiplexer");
-            return NULL;
+        pos = plat->spi_bus[bus].miso;
+        if (plat->pins[pos].spi.mux_total > 0) {
+            if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
+                syslog(LOG_ERR, "spi: failed to set-up spi miso multiplexer");
+                return NULL;
+            }
         }
-    }
 
-    pos = plat->spi_bus[bus].cs;
-    if (plat->pins[pos].spi.mux_total > 0) {
-        if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "spi: failed to set-up spi cs multiplexer");
-            return NULL;
+        pos = plat->spi_bus[bus].cs;
+        if (plat->pins[pos].spi.mux_total > 0) {
+            if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
+                syslog(LOG_ERR, "spi: failed to set-up spi cs multiplexer");
+                return NULL;
+            }
         }
     }
     mraa_spi_context dev = mraa_spi_init_raw(plat->spi_bus[bus].bus_id, plat->spi_bus[bus].slave_s);
