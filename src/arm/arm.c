@@ -53,6 +53,9 @@ mraa_arm_platform()
                 if (strstr(line, "Generic AM33XX")) {
                     platform_type = MRAA_BEAGLEBONE;
                 }
+		if (strstr(line, "HiKey Development Board")) {
+                    platform_type = MRAA_96BOARDS;
+                }
                 if (strstr(line, "sun7i")) {
                     if (mraa_file_contains("/sys/firmware/devicetree/base/model", "Banana Pro")) {
                         platform_type = MRAA_BANANA;

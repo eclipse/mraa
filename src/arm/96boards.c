@@ -36,12 +36,19 @@
 #define DT_BASE "/sys/firmware/devicetree/base"
 
 #define PLATFORM_NAME_DB410C "DB410C"
+#define PLATFORM_NAME_HIKEY "HIKEY"
 
 int db410c_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
   36, 12, 13, 69, 115, 4, 24, 25, 35, 34, 28, 33,
 };
 
 const char* db410c_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyMSM0", "/dev/ttyMSM1"};
+
+int hikey_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
+ 488, 489, 490, 491, 492, 415, 463, 495, 426, 433, 427, 434,
+};
+
+const char* hikey_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyAMA2", "/dev/ttyAMA3"};
 
 mraa_board_t* mraa_96boards()
 {
@@ -66,7 +73,13 @@ mraa_board_t* mraa_96boards()
             ls_gpio_pins = db410c_ls_gpio_pins;
             b->uart_dev[0].device_path = db410c_serialdev[0];
             b->uart_dev[1].device_path = db410c_serialdev[1];
-        }
+        } else if (mraa_file_contains(DT_BASE "/model", "HiKey Development Board")) {
+            b->platform_name = PLATFORM_NAME_HIKEY;
+            b->phy_pin_count = HIKEY_PINCOUNT;
+            ls_gpio_pins = hikey_ls_gpio_pins;
+            b->uart_dev[0].device_path = hikey_serialdev[0];
+            b->uart_dev[1].device_path = hikey_serialdev[1];
+	}
    }
 
    //UART
