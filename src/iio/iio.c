@@ -209,7 +209,7 @@ mraa_result_t
 mraa_iio_read_float(mraa_iio_context dev, const char* attr_name, float* data)
 {
     char buf[MAX_SIZE];
-    mraa_result_t result = mraa_iio_read_string(dev, attr_name, buf);
+    mraa_result_t result = mraa_iio_read_string(dev, attr_name, buf, MAX_SIZE-1);
     if (result != MRAA_SUCCESS)
         return result;
     int status = sscanf(buf, "%f", data);
@@ -219,10 +219,10 @@ mraa_iio_read_float(mraa_iio_context dev, const char* attr_name, float* data)
 
 
 mraa_result_t
-mraa_iio_read_integer(mraa_iio_context dev, const char* attr_name, int* data)
+mraa_iio_read_int(mraa_iio_context dev, const char* attr_name, int* data)
 {
     char buf[MAX_SIZE];
-    mraa_result_t result = mraa_iio_read_string(dev, attr_name, buf);
+    mraa_result_t result = mraa_iio_read_string(dev, attr_name, buf, MAX_SIZE-1);
     if (result != MRAA_SUCCESS)
         return result;
     int status = sscanf(buf, "%d", data);
@@ -231,14 +231,14 @@ mraa_iio_read_integer(mraa_iio_context dev, const char* attr_name, int* data)
 }
 
 mraa_result_t
-mraa_iio_read_string(mraa_iio_context dev, const char* attr_name, char* data)
+mraa_iio_read_string(mraa_iio_context dev, const char* attr_name, char* data, int max_len)
 {
     char buf[MAX_SIZE];
     mraa_result_t result = MRAA_ERROR_UNSPECIFIED;
     snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, attr_name);
     int fd = open(buf, O_RDONLY);
     if (fd != -1) {
-        ssize_t len = read(fd, data, MAX_SIZE);
+        ssize_t len = read(fd, data, max_len);
         if (len > 0)
             result = MRAA_SUCCESS;
         close(fd);
@@ -256,7 +256,7 @@ mraa_iio_write_float(mraa_iio_context dev, const char* attr_name, const float da
 }
 
 mraa_result_t
-mraa_iio_write_integer(mraa_iio_context dev, const char* attr_name, const int data)
+mraa_iio_write_int(mraa_iio_context dev, const char* attr_name, const int data)
 {
     char buf[MAX_SIZE];
     snprintf(buf, MAX_SIZE, "%d", data);
@@ -454,7 +454,7 @@ mraa_iio_event_handler(void* arg)
     for (;;) {
         if (mraa_iio_event_poll_nonblock(dev->fp_event, &data) == MRAA_SUCCESS) {
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
-            dev->isr_event(&data);
+            dev->isr_event(&data, dev->isr_args);
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
         } else {
             // we must have got an error code so die nicely
@@ -465,7 +465,7 @@ mraa_iio_event_handler(void* arg)
 }
 
 mraa_result_t
-mraa_iio_event_setup_callback(mraa_iio_context dev, void (*fptr)(struct iio_event_data* data), void* args)
+mraa_iio_event_setup_callback(mraa_iio_context dev, void (*fptr)(struct iio_event_data* data, void* args), void* args)
 {
     int ret;
     char bu[MAX_SIZE];
@@ -486,6 +486,7 @@ mraa_iio_event_setup_callback(mraa_iio_context dev, void (*fptr)(struct iio_even
     }
 
     dev->isr_event = fptr;
+    dev->isr_args = args;
     pthread_create(&dev->thread_id, NULL, mraa_iio_event_handler, (void*) dev);
 
     return MRAA_SUCCESS;
@@ -607,7 +608,7 @@ mraa_iio_update_channels(mraa_iio_context dev)
 }
 
 mraa_result_t
-mraa_iio_stop(mraa_iio_context dev)
+mraa_iio_close(mraa_iio_context dev)
 {
     free(dev->channels);
     return MRAA_SUCCESS;

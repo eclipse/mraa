@@ -93,13 +93,13 @@ int mraa_iio_get_channel_count(mraa_iio_context dev);
 
 mraa_result_t mraa_iio_read_float(mraa_iio_context dev, const char* filename, float* data);
 
-mraa_result_t mraa_iio_read_integer(mraa_iio_context dev, const char* filename, int* data);
+mraa_result_t mraa_iio_read_int(mraa_iio_context dev, const char* filename, int* data);
 
-mraa_result_t mraa_iio_read_string(mraa_iio_context dev, const char* filename, char* data);
+mraa_result_t mraa_iio_read_string(mraa_iio_context dev, const char* filename, char* data, int max_len);
 
 mraa_result_t mraa_iio_write_float(mraa_iio_context dev, const char* attr_chan, const float data);
 
-mraa_result_t mraa_iio_write_integer(mraa_iio_context dev, const char* attr_chan, const int data);
+mraa_result_t mraa_iio_write_int(mraa_iio_context dev, const char* attr_chan, const int data);
 
 mraa_result_t mraa_iio_write_string(mraa_iio_context dev, const char* attr_chan, const char* data);
 
@@ -110,7 +110,7 @@ mraa_result_t mraa_iio_get_event_data(mraa_iio_context dev);
 mraa_result_t mraa_iio_event_poll(mraa_iio_context dev, struct iio_event_data* data);
 
 mraa_result_t
-mraa_iio_event_setup_callback(mraa_iio_context dev, void (*fptr)(struct iio_event_data* data), void* args);
+mraa_iio_event_setup_callback(mraa_iio_context dev, void (*fptr)(struct iio_event_data* data, void* args), void* args);
 
 mraa_result_t mraa_iio_event_extract_event(struct iio_event_data* event,
                                            int* chan_type,
@@ -132,7 +132,7 @@ mraa_result_t mraa_iio_update_channels(mraa_iio_context dev);
  * @param dev The iio context
  * @return Result of operation
  */
-mraa_result_t mraa_iio_stop(mraa_iio_context dev);
+mraa_result_t mraa_iio_close(mraa_iio_context dev);
 
 #ifdef __cplusplus
 }

@@ -93,7 +93,7 @@ main()
     }
 
     float iio_float;
-    int iio_integer;
+    int iio_int;
     mraa_result_t ret;
 
     ret = mraa_iio_write_float(iio_device0, "in_accel_scale", 0.019163);
@@ -106,14 +106,14 @@ main()
         fprintf(stdout, "IIO read %f\n", iio_float);
     }
 
-    ret = mraa_iio_write_integer(iio_device0, "scan_elements/in_accel_x_en", 1);
+    ret = mraa_iio_write_int(iio_device0, "scan_elements/in_accel_x_en", 1);
     if (ret == MRAA_SUCCESS) {
-        fprintf(stdout, "IIO write success\n", iio_integer);
+        fprintf(stdout, "IIO write success\n");
     }
 
-    ret = mraa_iio_read_integer(iio_device0, "scan_elements/in_accel_x_en", &iio_integer);
+    ret = mraa_iio_read_int(iio_device0, "scan_elements/in_accel_x_en", &iio_int);
     if (ret == MRAA_SUCCESS) {
-        fprintf(stdout, "IIO read %d\n", iio_integer);
+        fprintf(stdout, "IIO read %d\n", iio_int);
     }
 
     if (mraa_iio_trigger_buffer(iio_device0, interrupt, NULL) == MRAA_SUCCESS) {
@@ -127,7 +127,7 @@ main()
     if (iio_device6 == NULL) {
         return EXIT_FAILURE;
     }
-    mraa_iio_write_integer(iio_device6, "events/in_proximity2_thresh_either_en", 1);
+    mraa_iio_write_int(iio_device6, "events/in_proximity2_thresh_either_en", 1);
 
 
     // Blocking until event fired
