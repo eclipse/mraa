@@ -30,6 +30,8 @@
 #include "arm/raspberry_pi.h"
 #include "arm/beaglebone.h"
 #include "arm/banana.h"
+#include "arm/96boards.h"
+
 
 mraa_platform_t
 mraa_arm_platform()
@@ -38,6 +40,7 @@ mraa_arm_platform()
     size_t len = 100;
     char* line = malloc(len);
     FILE* fh = fopen("/proc/cpuinfo", "r");
+
     if (fh != NULL) {
         while (getline(&line, &len, fh) != -1) {
             if (strncmp(line, "Hardware", 8) == 0) {
@@ -49,6 +52,9 @@ mraa_arm_platform()
                 }
                 if (strstr(line, "Generic AM33XX")) {
                     platform_type = MRAA_BEAGLEBONE;
+                }
+		if (strstr(line, "HiKey Development Board")) {
+                    platform_type = MRAA_96BOARDS;
                 }
                 if (strstr(line, "sun7i")) {
                     if (mraa_file_contains("/sys/firmware/devicetree/base/model", "Banana Pro")) {
@@ -63,10 +69,17 @@ mraa_arm_platform()
                     }
                 }
             }
+
         }
         fclose(fh);
     }
     free(line);
+
+    /* Get compatible string from Device tree for boards that dont have enough info in /proc/cpuinfo */
+    if (platform_type == MRAA_UNKNOWN_PLATFORM) {
+        if (mraa_file_contains("/sys/firmware/devicetree/base/compatible", "qcom,apq8016-sbc"))
+                   platform_type = MRAA_96BOARDS;
+     }
 
     switch (platform_type) {
         case MRAA_RASPBERRY_PI:
@@ -77,6 +90,9 @@ mraa_arm_platform()
             break;
         case MRAA_BANANA:
             plat = mraa_banana();
+            break;
+        case MRAA_96BOARDS:
+            plat = mraa_96boards();
             break;
         default:
             plat = NULL;

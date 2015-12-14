@@ -13,7 +13,9 @@
 # "There are many more known variants/revisions that we do not handle/detect."
 
 set(archdetect_c_code "
-#if defined(__arm__) || defined(__TARGET_ARCH_ARM)
+#if defined(__aarch64__)
+        #error cmake_ARCH armv8
+#elif defined(__arm__) || defined(__TARGET_ARCH_ARM)
     #if defined(__ARM_ARCH_7__) \\
         || defined(__ARM_ARCH_7A__) \\
         || defined(__ARM_ARCH_7R__) \\

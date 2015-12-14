@@ -71,3 +71,23 @@ fairly simple in use.
   :prepend: import mraa
   :start-after: import mraa
 
+Uart
+====
+
+Uart is the Universal asynchronous receiver/transmitter interface in mraa.
+It allows the exposure of UART pins on supported boards, with basic
+configuration operations supported.
+
+Here's a simple pair of programs comprising a sender and receiver pair.
+
+Sender:
+
+.. literalinclude:: ../../../examples/python/uart_sender.py
+  :prepend: import mraa
+  :start-after: import mraa
+
+Receiver:
+
+.. literalinclude:: ../../../examples/python/uart_receiver.py
+  :prepend: import mraa
+  :start-after: import mraa
