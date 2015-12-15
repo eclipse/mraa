@@ -72,7 +72,7 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
     dev->pin = pin;
 
     if (IS_FUNC_DEFINED(dev, gpio_init_internal_replace)) {
-        status = dev->advance_func->gpio_init_internal_replace(pin);
+        status = dev->advance_func->gpio_init_internal_replace(dev, pin);
         if (status == MRAA_SUCCESS)
             return dev;
         else
@@ -165,7 +165,8 @@ mraa_gpio_init(int pin)
         syslog(LOG_CRIT, "gpio: mraa_gpio_init_raw(%d) returned error", pin);
         return NULL;
     }
-    r->phy_pin = pin;
+    if (r->phy_pin == -1)
+        r->phy_pin = pin;
 
     if (IS_FUNC_DEFINED(r, gpio_init_post)) {
         mraa_result_t ret = r->advance_func->gpio_init_post(r);
