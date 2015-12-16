@@ -130,6 +130,7 @@ macro (mraa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
   install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} DESTINATION ${install_location})
 endmacro (mraa_CREATE_INSTALL_PKGCONFIG)
 mraa_create_install_pkgconfig (mraa.pc ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+mraa_create_install_pkgconfig (mraajava.pc ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 install(TARGETS mraa DESTINATION ${CMAKE_INSTALL_LIBDIR})
 

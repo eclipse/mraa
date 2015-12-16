@@ -44,6 +44,12 @@ extern "C" {
 #include <Python.h>
 #endif
 
+#if defined(SWIGJAVA) || defined(JAVACALLBACK)
+#include <jni.h>
+extern JavaVM *globVM;
+extern void mraa_java_isr_callback(void *);
+#endif
+
 #include <stdio.h>
 #include <pthread.h>
 

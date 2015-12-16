@@ -42,6 +42,9 @@
     return $jnicall;
 }
 
+%typemap(jtype) jobject runnable "java.lang.Runnable"
+%typemap(jstype) jobject runnable "java.lang.Runnable"
+
 namespace mraa {
 class Spi;
 %typemap(out) uint8_t*
@@ -55,14 +58,18 @@ class Spi;
 
 %ignore write(const char* data, int length);
 %ignore read(char* data, int length);
+%ignore globVM;
+%ignore env_key;
+%ignore mraa_java_isr_callback;
 
-%feature("director") IsrCallback;
-SWIG_DIRECTOR_OWNED(IsrCallback)
 %include ../mraa.i
 
 %wrapper %{
+    JavaVM *globVM;
+
     jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         /* initialize mraa */
+        globVM = vm;
         mraa_init();
         return JNI_VERSION_1_8;
     }

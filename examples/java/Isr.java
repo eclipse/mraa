@@ -25,7 +25,6 @@
 import mraa.Dir;
 import mraa.Edge;
 import mraa.Gpio;
-import mraa.IsrCallback;
 
 public class Isr {
     static {
@@ -41,7 +40,7 @@ public class Isr {
     public static void main(String argv[]) throws InterruptedException {
         Gpio gpio = new Gpio(6);
 
-        IsrCallback callback = new JavaCallback();
+        Runnable callback = new JavaCallback();
 
         gpio.isr(Edge.EDGE_RISING, callback);
         while (true)
@@ -49,8 +48,6 @@ public class Isr {
     };
 }
 
-class JavaCallback extends IsrCallback {
-    public JavaCallback() { super(); }
-
+class JavaCallback extends Runnable {
     public void run() { System.out.println("JavaCallback.run()"); }
 }
