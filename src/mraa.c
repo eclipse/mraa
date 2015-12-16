@@ -486,6 +486,15 @@ mraa_result_print(mraa_result_t result)
         case MRAA_ERROR_PLATFORM_NOT_INITIALISED:
             fprintf(stdout, "MRAA: Platform not initialised.\n");
             break;
+        case MRAA_ERROR_UART_OW_SHORTED:
+            fprintf(stdout, "MRAA: UART OW: Bus short detected.\n");
+            break;
+        case MRAA_ERROR_UART_OW_NO_DEVICES:
+            fprintf(stdout, "MRAA: UART OW: No devices detected on bus.\n");
+            break;
+        case MRAA_ERROR_UART_OW_DATA_ERROR:
+            fprintf(stdout, "MRAA: UART OW: Data or Bus error detected.\n");
+            break;
         case MRAA_ERROR_UNSPECIFIED:
             fprintf(stdout, "MRAA: Unspecified Error.\n");
             break;

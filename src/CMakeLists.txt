@@ -23,6 +23,7 @@ set (mraa_LIB_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/uart/uart.c
   ${PROJECT_SOURCE_DIR}/src/iio/iio.c
   ${mraa_LIB_SRCS_NOAUTO}
+  ${PROJECT_SOURCE_DIR}/src/uart_ow/uart_ow.c
 )
 
 set (mraa_LIB_X86_SRCS_NOAUTO

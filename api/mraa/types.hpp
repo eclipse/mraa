@@ -205,6 +205,9 @@ typedef enum {
     ERROR_INVALID_PLATFORM = 10,             /**< Platform not recognised */
     ERROR_PLATFORM_NOT_INITIALISED = 11,     /**< Board information not initialised */
     ERROR_PLATFORM_ALREADY_INITIALISED = 0,  /**< Board is already initialised, same as SUCCESS */
+    ERROR_UART_OW_SHORTED = 12,              /**< UART OW Short Circuit Detected*/
+    ERROR_UART_OW_NO_DEVICES = 13,           /**< UART OW No devices detected */
+    ERROR_UART_OW_DATA_ERROR = 14,           /**< UART OW Data/Bus error detected */
 
     ERROR_UNSPECIFIED = 99 /**< Unknown Error */
 } Result;
