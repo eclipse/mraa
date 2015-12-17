@@ -47,6 +47,7 @@ typedef enum {
     MRAA_BANANA = 7,                /**< Allwinner A20 based Banana Pi and Banana Pro */
     MRAA_INTEL_NUC5 = 8,            /**< The Intel 5th generations Broadwell NUCs */
     MRAA_96BOARDS = 9,            /**< Linaro 96boards */
+    MRAA_INTEL_SOFIA_3GR = 10,      /**< The Intel SoFIA 3GR */
 
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */

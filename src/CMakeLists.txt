@@ -27,6 +27,7 @@ set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/intel_de3815.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_nuc5.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_minnow_byt_compatible.c
+  ${PROJECT_SOURCE_DIR}/src/x86/intel_sofia_3gr.c
 )
 
 message (INFO " - Adding support for platform ${MRAAPLATFORMFORCE}")
@@ -46,6 +47,8 @@ if (NOT ${MRAAPLATFORMFORCE} STREQUAL "ALL")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_minnow_byt_compatible.c)
   elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_NUC5")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_nuc5.c)
+  elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_SOFIA_3GR")
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_sofia_3gr.c)
   else ()
     message (ERROR " - Unknown x86 platform enabled!")
   endif ()

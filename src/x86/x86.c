@@ -80,8 +80,19 @@ mraa_x86_platform()
             free(line);
         }
         fclose(fh);
+    } else {
+        fh = fopen("/proc/cmdline", "r");
+        if (fh != NULL) {
+            if (getline(&line, &len, fh) != -1) {
+                if (strstr(line, "sf3gr_mrd_version=P2.0")) {
+                    platform_type = MRAA_INTEL_SOFIA_3GR;
+                    plat = mraa_intel_sofia_3gr();
+                }
+                free(line);
+            }
+            fclose(fh);
+        }
     }
-
     return platform_type;
 #else
     #if defined(xMRAA_INTEL_GALILEO_GEN2)
@@ -96,6 +107,8 @@ mraa_x86_platform()
     plat = mraa_intel_galileo_rev_d();
     #elif defined(xMRAA_INTEL_NUC5)
     plat = mraa_intel_nuc5();
+    #elif defined(xMRAA_INTEL_SOFIA_3GR)
+    plat = mraa_intel_sofia_3gr();
     #else
         #error "Not using a valid platform value from mraa_platform_t - cannot compile"
     #endif
