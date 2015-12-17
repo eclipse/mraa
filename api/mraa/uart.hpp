@@ -28,6 +28,7 @@
 
 #include "uart.h"
 #include "types.hpp"
+#include <stdlib.h>
 #include <stdexcept>
 #include <cstring>
 
