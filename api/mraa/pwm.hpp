@@ -27,6 +27,7 @@
 #include "pwm.h"
 #include "types.hpp"
 #include <stdexcept>
+#include <sstream>
 
 namespace mraa
 {
@@ -59,7 +60,9 @@ class Pwm
         }
 
         if (m_pwm == NULL) {
-            throw std::invalid_argument("Error initialising PWM on pin");
+            std::ostringstream ss;
+            ss << "Error initialising PWM on pin " << pin;
+            throw std::invalid_argument(ss.str());
         }
 
         if (!owner) {
