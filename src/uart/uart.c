@@ -425,7 +425,25 @@ mraa_uart_set_timeout(mraa_uart_context dev, int read, int write, int interchar)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    struct termios termio;
+    // get current modes
+    if (tcgetattr(dev->fd, &termio)) {
+        syslog(LOG_ERR, "uart: tcgetattr() failed");
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
+    if (read > 0) {
+        read = read / 100;
+        if (read == 0)
+            read = 1;
+    }
+    termio.c_lflag &= ~ICANON; /* Set non-canonical mode */
+    termio.c_cc[VTIME] = read; /* Set timeout in tenth seconds */
+    if (tcsetattr(dev->fd, TCSANOW, &termio) < 0) {
+        syslog(LOG_ERR, "uart: tcsetattr() failed");
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
+
+    return MRAA_SUCCESS;
 }
 
 const char*
