@@ -127,7 +127,6 @@ mraa_board_t* mraa_96boards()
    b->aio_count = 0;
    b->adc_raw = 0;
    b->adc_supported = 0;
-   b->gpio_count = 0;
 
    return b;
 }
