@@ -545,17 +545,14 @@ mraa_iio_create_trigger(mraa_iio_context dev, const char* trigger)
     struct stat configfs_status;
     struct stat trigger_status;
     char buf[MAX_SIZE];
+    int ret;
 
     if (stat(IIO_CONFIGFS_TRIGGER, &configfs_status) == 0) {
         memset(buf, 0, MAX_SIZE);
         snprintf(buf, MAX_SIZE, IIO_CONFIGFS_TRIGGER "%s", trigger);
-        if (stat(buf, &trigger_status) != 0) {
-            if (mkdir(buf, configfs_status.st_mode) == 0)
-                return MRAA_SUCCESS;
-        } else {
-            // trigger folder already created
-            return MRAA_SUCCESS;
-        }
+	// we actually don't care if this doesn't succeed, as it just means
+	// it's already been initialised
+	mkdir(buf, configfs_status.st_mode);
     }
 
     return MRAA_ERROR_UNSPECIFIED;
