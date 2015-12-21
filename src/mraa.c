@@ -220,7 +220,7 @@ mraa_iio_detect()
         device->num = i;
         snprintf(filepath, 64, "/sys/bus/iio/devices/iio:device%d/name", i);
         fd = open(filepath, O_RDONLY);
-        if (fd > 0) {
+        if (fd != -1) {
             len = read(fd, &name, 64);
             if (len > 1) {
                 // remove any trailing CR/LF symbols

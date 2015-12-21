@@ -109,7 +109,7 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
         if (strcmp(ent->d_name + strlen(ent->d_name) - strlen("_index"), "_index") == 0) {
             snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/" IIO_SCAN_ELEM "/%s", dev->num, ent->d_name);
             fd = open(buf, O_RDONLY);
-            if (fd > 0) {
+            if (fd != -1) {
                 if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
                     break;
                 }
@@ -123,7 +123,7 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
                 // grab the type of the buffer
                 snprintf(buf, MAX_SIZE, "%stype", str);
                 fd = open(buf, O_RDONLY);
-                if (fd > 0) {
+                if (fd != -1) {
                     read(fd, readbuf, 31 * sizeof(char));
                     ret = sscanf(readbuf, "%ce:%c%u/%u>>%u", &shortbuf, &signchar, &chan->bits_used,
                                  &padint, &chan->shift);
@@ -153,10 +153,11 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
                 // grab the enable flag of channel
                 snprintf(buf, MAX_SIZE, "%sen", str);
                 fd = open(buf, O_RDONLY);
-                if (fd > 0) {
+                if (fd != -1) {
                     if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
                         syslog(LOG_ERR, "iio: Failed to read a sensible value from sysfs");
                         free(str);
+                        close(fd);
                         return -1;
                     }
                     chan->enabled = (int) strtol(readbuf, NULL, 10);
@@ -392,8 +393,9 @@ mraa_iio_get_event_data(mraa_iio_context dev)
                 event->name = strdup(ent->d_name);
                 snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/" IIO_EVENTS "/%s", dev->num, ent->d_name);
                 fd = open(buf, O_RDONLY);
-                if (fd > 0) {
+                if (fd != -1) {
                     if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
+                        close(fd);
                         break;
                     }
                     close(fd);
@@ -578,8 +580,9 @@ mraa_iio_update_channels(mraa_iio_context dev)
             if (strcmp(ent->d_name + strlen(ent->d_name) - strlen("_index"), "_index") == 0) {
                 snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/" IIO_SCAN_ELEM "/%s", dev->num, ent->d_name);
                 fd = open(buf, O_RDONLY);
-                if (fd > 0) {
+                if (fd != -1) {
                     if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
+                        close(fd);
                         break;
                     }
                     chan_num = ((int) strtol(readbuf, NULL, 10));
@@ -593,7 +596,7 @@ mraa_iio_update_channels(mraa_iio_context dev)
                         // grab the enable flag of channel
                         snprintf(buf, MAX_SIZE, "%sen", str);
                         fd = open(buf, O_RDONLY);
-                        if (fd > 0) {
+                        if (fd != -1) {
                             if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
                                 syslog(LOG_ERR, "iio: Failed to read a sensible value from sysfs");
                                 free(str);
@@ -608,6 +611,9 @@ mraa_iio_update_channels(mraa_iio_context dev)
                         }
                         // clean up str var
                         free(str);
+                    }
+                    else {
+                        close(fd);
                     }
                 }
             }
