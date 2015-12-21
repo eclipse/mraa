@@ -599,6 +599,8 @@ mraa_iio_update_channels(mraa_iio_context dev)
                             if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
                                 syslog(LOG_ERR, "iio: Failed to read a sensible value from sysfs");
                                 free(str);
+                                close(fd);
+                                closedir(dir);
                                 return -1;
                             }
                             chan->enabled = (int) strtol(readbuf, NULL, 10);
@@ -617,8 +619,11 @@ mraa_iio_update_channels(mraa_iio_context dev)
                 }
             }
         }
+        closedir(dir);
+        return MRAA_SUCCESS;
     }
-    return MRAA_SUCCESS;
+
+    return MRAA_ERROR_INVALID_HANDLE;
 }
 
 mraa_result_t
