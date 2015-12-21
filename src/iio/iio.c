@@ -559,9 +559,9 @@ mraa_iio_create_trigger(mraa_iio_context dev, const char* trigger)
     if (stat(IIO_CONFIGFS_TRIGGER, &configfs_status) == 0) {
         memset(buf, 0, MAX_SIZE);
         snprintf(buf, MAX_SIZE, IIO_CONFIGFS_TRIGGER "%s", trigger);
-    // we actually don't care if this doesn't succeed, as it just means
-    // it's already been initialised
-    mkdir(buf, configfs_status.st_mode);
+        // we actually don't care if this doesn't succeed, as it just means
+        // it's already been initialised
+        mkdir(buf, configfs_status.st_mode);
     }
 
     return MRAA_ERROR_UNSPECIFIED;
