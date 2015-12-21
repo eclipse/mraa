@@ -365,6 +365,7 @@ mraa_iio_get_event_data(mraa_iio_context dev)
     int curr_bytes = 0;
     char shortbuf, signchar;
     memset(buf, 0, MAX_SIZE);
+    memset(readbuf, 0, 32);
     snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/" IIO_EVENTS, dev->num);
     dir = opendir(buf);
     if (dir != NULL) {
