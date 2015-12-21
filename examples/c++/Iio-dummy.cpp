@@ -23,7 +23,7 @@
  */
 
 #include <unistd.h>
-#include <iostream> 
+#include <iostream>
 #include <math.h>
 #include <float.h>
 #include "mraa/iio.hpp"
@@ -80,7 +80,7 @@ void log_result(std::string test_name, std::string attr_name, bool expect_succes
     else
        result = success ? "FAIL" : "PASS";
     if (attr_name.empty())
-        fprintf(stdout, "%s: %s\n", test_name.c_str(), result.c_str());   
+        fprintf(stdout, "%s: %s\n", test_name.c_str(), result.c_str());
     else
         fprintf(stdout, "%s(%s): %s\n", test_name.c_str(), attr_name.c_str(), result.c_str());
 }
@@ -113,39 +113,39 @@ main()
     IioTestHandler testHandler;
     std::string deviceName;
     try {
-        mraa::Iio* iio_device0 = new mraa::Iio(0);      
+        mraa::Iio* iio_device0 = new mraa::Iio(0);
         std::cout << "IIO device 0 found by id." << std::endl;
-        deviceName = iio_device0->getDeviceName();        
-        delete iio_device0;        
+        deviceName = iio_device0->getDeviceName();
+        delete iio_device0;
     } catch (std::exception& e) {
         std::cerr << "IIO device 0 not found." << std::endl;
         return EXIT_FAILURE;
     }
 
     try {
-        mraa::Iio* iio_device1 = new mraa::Iio(1);        
+        mraa::Iio* iio_device1 = new mraa::Iio(1);
         delete iio_device1;
     } catch (std::exception& e) {
         std::cerr << "IIO device 1 not found. This is expected behavior." << std::endl;
     }
 
     try {
-        iio_device = new mraa::Iio(deviceName);      
-        std::cout << "IIO device 0 found by name." << std::endl;        
+        iio_device = new mraa::Iio(deviceName);
+        std::cout << "IIO device 0 found by name." << std::endl;
     } catch (std::exception& e) {
         std::cerr << "IIO device 0 not found." << std::endl;
         return EXIT_FAILURE;
     }
 
 
-    std::cout << "Using IIO device0. Name is " << iio_device->getDeviceName() << std::endl;          
+    std::cout << "Using IIO device0. Name is " << iio_device->getDeviceName() << std::endl;
     IIO_RUN(writeFloat, "in_accel_x_raw", 100, EXPECT_FAILURE);
-    IIO_RUN(writeFloat, "in_voltage0_scale", 100, EXPECT_FAILURE);    
-    IIO_RUN(writeInt, "out_voltage0_raw", 100, EXPECT_SUCCESS);        
+    IIO_RUN(writeFloat, "in_voltage0_scale", 100, EXPECT_FAILURE);
+    IIO_RUN(writeInt, "out_voltage0_raw", 100, EXPECT_SUCCESS);
     IIO_TEST(readInt, "in_accel_x_raw", 34, EXPECT_SUCCESS);
     IIO_TEST(readFloat, "in_voltage0_scale", 0.001333, EXPECT_SUCCESS);
     IIO_RUN(writeInt, "events/in_voltage0_thresh_rising_en", 1, EXPECT_SUCCESS);
-    IIO_TRY(registerEventHandler(&testHandler));    
+    IIO_TRY(registerEventHandler(&testHandler));
     eventCount = 0;
     generate_event();
     usleep(500000);

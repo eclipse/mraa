@@ -1,9 +1,11 @@
-iio				{#iio}
+iio             {#iio}
 ===
-IIO is the kernel's framework for supporting sensors. 
+IIO is the kernel's framework for supporting sensors.
 ## Using dummy_iio driver
-For platforms without IIO hardware the iio_dummy driver can be used. You can add the driver by either rebuilding the kernel with IIO component enabled or just building the IIO modules and load them.
-You must add the following config fragment. Known to work for kernel 3.19 and later.
+For platforms without IIO hardware the iio_dummy driver can be used. You can
+add the driver by either rebuilding the kernel with IIO component enabled or
+just building the IIO modules and load them.  You must add the following config
+fragment. Known to work for kernel 3.19 and later.
 <pre><code>
 CONFIG_IIO_DUMMY_EVGEN=m
 CONFIG_IIO_SIMPLE_DUMMY=m

@@ -202,7 +202,7 @@ mraa_result_t
 mraa_iio_detect()
 {
     plat_iio = (mraa_iio_info_t*) calloc(1, sizeof(mraa_iio_info_t));
-    plat_iio->iio_device_count = num_iio_devices;    
+    plat_iio->iio_device_count = num_iio_devices;
     // Now detect IIO devices, linux only
     // find how many iio devices we have if we haven't already
     if (num_iio_devices == 0) {

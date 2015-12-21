@@ -43,13 +43,13 @@ struct IioEventData
     int diff;
 };
 
-class IioHandler 
+class IioHandler
 {
 public:
   virtual void onIioEvent(const IioEventData& eventData) = 0;
 };
 
-   
+
 /**
  * @brief API to Industrial IO
  *
@@ -108,9 +108,9 @@ class Iio
         mraa_iio_close(m_iio);
     }
 
-    
+
     /**
-     * Get device name 
+     * Get device name
      *
      * @returns The device name
      */
@@ -143,7 +143,7 @@ class Iio
     }
 
     /**
-     * Read a float value from specified attribute. 
+     * Read a float value from specified attribute.
      *
      * @param attributeName attribute mame
      *
@@ -165,7 +165,7 @@ class Iio
     }
 
     /**
-     * Write an int value to specified attribute. 
+     * Write an int value to specified attribute.
      *
      * @param attributeName attribute mame
      * @param value int value
@@ -185,7 +185,7 @@ class Iio
     }
 
     /**
-     * Write a float value to specified attribute. 
+     * Write a float value to specified attribute.
      *
      * @param attributeName attribute mame
      * @param value float value
@@ -205,7 +205,7 @@ class Iio
     }
 
     /**
-     * Register event handler. 
+     * Register event handler.
      *
      * @param handler handler class that implements IioHandler
      *
@@ -237,7 +237,7 @@ class Iio
             eventData.diff = different;
             handler->onIioEvent(eventData);
         }
-	}
+    }
 
     mraa_iio_context m_iio;
 };
