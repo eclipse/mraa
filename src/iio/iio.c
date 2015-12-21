@@ -441,7 +441,7 @@ mraa_iio_event_poll(mraa_iio_context dev, struct iio_event_data* data)
     int event_fd;
     int fd;
 
-    sprintf(bu, IIO_SLASH_DEV "%d", dev->num);
+    snprintf(bu, MAX_SIZE, IIO_SLASH_DEV "%d", dev->num);
     fd = open(bu, 0);
     ret = ioctl(fd, IIO_GET_EVENT_FD_IOCTL, &event_fd);
     close(fd);
