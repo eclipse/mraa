@@ -33,6 +33,7 @@
 #include "x86/intel_de3815.h"
 #include "x86/intel_nuc5.h"
 #include "x86/intel_minnow_byt_compatible.h"
+#include "x86/intel_sofia_3gr.h"
 
 mraa_platform_t
 mraa_x86_platform()
