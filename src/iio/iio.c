@@ -111,6 +111,7 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
             fd = open(buf, O_RDONLY);
             if (fd != -1) {
                 if (read(fd, readbuf, 2 * sizeof(char)) != 2) {
+                    close(fd);
                     break;
                 }
                 chan_num = ((int) strtol(readbuf, NULL, 10));
