@@ -98,8 +98,10 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
     }
     dev->chan_num = chan_num;
     // no need proceed if no channel found
-    if (chan_num == 0)
+    if (chan_num == 0) {
+        closedir(dir);
         return MRAA_SUCCESS;
+    }
     mraa_iio_channel* chan;
     dev->channels = calloc(chan_num, sizeof(mraa_iio_channel));
     seekdir(dir, 0);
@@ -169,6 +171,7 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
             }
         }
     }
+    closedir(dir);
 
     return MRAA_SUCCESS;
 }
@@ -371,8 +374,10 @@ mraa_iio_get_event_data(mraa_iio_context dev)
         }
         dev->event_num = event_num;
         // no need proceed if no event found
-        if (event_num == 0)
+        if (event_num == 0) {
+            closedir(dir);
             return MRAA_SUCCESS;
+        }
         mraa_iio_event* event;
         dev->events = calloc(event_num, sizeof(mraa_iio_event));
         if (dev->events == NULL) {
