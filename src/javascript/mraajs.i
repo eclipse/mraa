@@ -43,11 +43,10 @@ class Spi;
 %typemap(out) uint8_t*
 {
 %#if SWIG_V8_VERSION > 0x040000
-   v8::MaybeLocal<v8::Object> objret = node::Buffer::New(v8::Isolate::GetCurrent(), (char*) result, arg3);
+   v8::MaybeLocal<v8::Object> objret = node::Buffer::Copy(v8::Isolate::GetCurrent(), (char*) result, arg3);
    free(result);
-   if(!objret.ToLocal(&$result)) {
-      SWIG_exception_fail(SWIG_ERROR, "Spi buffer failed");
-      SWIGV8_RETURN(SWIGV8_UNDEFINED());
+   if(!objret.ToLocal(&$result)){
+	SWIG_exception_fail(SWIG_ERROR, "Spi buffer failed");
    }
 %#elif SWIG_V8_VERSION > 0x032870
   $result = node::Buffer::New((char*) result, arg3);
@@ -73,7 +72,6 @@ class Spi;
    $2 = x;
    if ($2 < 0) {
        SWIG_exception_fail(SWIG_ERROR, "Positive integer expected");
-       SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
    $1 = (char*) malloc($2 * sizeof(uint8_t));
 }
@@ -82,14 +80,12 @@ class Spi;
    if (result < 0) {      /* Check for I/O error */
        free($1);
        SWIG_exception_fail(SWIG_ERROR, "Uart write failed");
-       SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
 %#if SWIG_V8_VERSION > 0x040000
-   v8::MaybeLocal<v8::Object> objret = node::Buffer::New(v8::Isolate::GetCurrent(), (char*) $1, result);
+   v8::MaybeLocal<v8::Object> objret = node::Buffer::Copy(v8::Isolate::GetCurrent(), (char*) $1, result);
    free($1);
    if(!objret.ToLocal(&$result)) {
       SWIG_exception_fail(SWIG_ERROR, "Uart buffer failed");
-      SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
 %#elif SWIG_V8_VERSION > 0x032870
    $result = node::Buffer::New((char*) $1, result);
@@ -111,7 +107,6 @@ class Spi;
    $2 = x;
    if ($2 < 0) {
        SWIG_exception_fail(SWIG_ERROR, "Positive integer expected");
-       SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
    $1 = (uint8_t*) malloc($2 * sizeof(uint8_t));
 }
@@ -120,14 +115,12 @@ class Spi;
    if (result < 0) {      /* Check for I/O error */
        free($1);
        SWIG_exception_fail(SWIG_ERROR, "I2c write failed");
-       SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
 %#if SWIG_V8_VERSION > 0x040000
-   v8::MaybeLocal<v8::Object> objret = node::Buffer::New(v8::Isolate::GetCurrent(), (char*) $1, result);
+   v8::MaybeLocal<v8::Object> objret = node::Buffer::Copy(v8::Isolate::GetCurrent(), (char*) $1, result);
    free($1);
    if(!objret.ToLocal(&$result)) {
       SWIG_exception_fail(SWIG_ERROR, "I2c buffer failed");
-      SWIGV8_RETURN(SWIGV8_UNDEFINED());
    }
 %#elif SWIG_V8_VERSION > 0x032870
    $result = node::Buffer::New((char*) $1, result);
