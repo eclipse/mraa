@@ -70,6 +70,13 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.9.0**
+  * Beta iio API in C & C++ (no SWIG support)
+  * Added 96Board support
+  * Added Brillo/Android support
+  * Java ISR fixes
+  * FT4222 gpio support
+
 **0.8.1**
   * Nodejs 4.1.1 support
   * Java examples fixes
