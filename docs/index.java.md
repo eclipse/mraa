@@ -64,3 +64,6 @@ More information on compiling is @ref building page.
 Please see the @ref contributing page, the @ref internals page may also be of
 use.
 
+## API Changelog
+
+Version @ref changelog here.

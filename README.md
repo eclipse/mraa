@@ -89,3 +89,8 @@ API Documentation
 <a href="http://java.mraa.io"><img src="http://iotdk.intel.com/misc/logos/java.png"/></a>
 <a href="http://py.mraa.io"><img src="http://iotdk.intel.com/misc/logos/python.png"/></a>
 <a href="http://js.mraa.io"><img src="http://iotdk.intel.com/misc/logos/node.png"/></a>
+
+Changelog
+=========
+
+Version changelog [here](docs/changelog.md).
