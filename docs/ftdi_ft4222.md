@@ -23,8 +23,41 @@ Supported GPIO expanders:
 * PCA9555
 * PCF8575
 
-When a GPIO expander is present, the pins on the expander will be initialized
-first and the 4 GPIO pins on the FT4222H are appended after.
+Output from 'mraa-gpio list' would be as follows:
+~~~~~~~~~~~~~
+512 IGPIO0/SCL0: GPIO I2C
+513 IGPIO1/SDA0: GPIO I2C
+514   INT-GPIO2: GPIO
+515   INT-GPIO3: GPIO
+~~~~~~~~~~~~~
+
+When an I2C GPIO expander is present, the pins on the expander will appear after
+the 4 FT4222H GPIO pins (i.e. starting at physical pin #4, logical pin #516).
+~~~~~~~~~~~~~
+512 IGPIO0/SCL0: GPIO I2C
+513 IGPIO1/SDA0: GPIO I2C
+514   INT-GPIO2: GPIO
+515   INT-GPIO3: GPIO
+516   EXP-GPIO0: GPIO
+517   EXP-GPIO1: GPIO
+518   EXP-GPIO2: GPIO
+519   EXP-GPIO3: GPIO
+520   EXP-GPIO4: GPIO
+521   EXP-GPIO5: GPIO
+522   EXP-GPIO6: GPIO
+523   EXP-GPIO7: GPIO
+~~~~~~~~~~~~~
+
+If a PCA9545 I2C switch is detected an extra four I2C busses will appear,
+representing the four downstream busses. Output from 'mraa-i2c list'
+would be as follows:
+~~~~~~~~~~~~~
+Bus 512: id=00 type=ft4222  default
+Bus 513: id=01 type=ft4222
+Bus 514: id=02 type=ft4222
+Bus 515: id=03 type=ft4222
+Bus 516: id=04 type=ft4222
+~~~~~~~~~~~~~
 
 Please note that some mraa features might not be fully implemented yet and they
 are still under development (e.g. SPI replacement functions).
