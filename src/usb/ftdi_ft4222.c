@@ -98,7 +98,7 @@ mraa_ftdi_ft4222_init()
     }
 
     // CNFMODE 0, GPIO interface available.
-    if(numDevs = 2) {
+    if(numDevs == 2) {
         ftStatus = FT_OpenEx((PVOID)(uintptr_t) devInfo[1].LocId, FT_OPEN_BY_LOCATION, &ftHandleGPIO);
         if (ftStatus != FT_OK) {
             syslog(LOG_ERR, "FT_OpenEx GPIO handle failed (error %d)\n", (int) ftStatus);
@@ -606,6 +606,7 @@ mraa_ftdi_ft4222()
         sprintf(name, "Pin%d", pinIndex);
         strncpy(sub_plat->pins[pinIndex].name, name, 8);
         sub_plat->pins[pinIndex].capabilites = pinCapsGpio;
+        sub_plat->pins[pinIndex].gpio.pinmap = pinIndex;
         sub_plat->pins[pinIndex].gpio.mux_total = 0;
     }
 
