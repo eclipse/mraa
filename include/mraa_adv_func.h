@@ -32,7 +32,7 @@
 #define IS_FUNC_DEFINED(dev, func)   (dev != NULL && dev->advance_func != NULL && dev->advance_func->func != NULL)
 
 typedef struct {
-    mraa_result_t (*gpio_init_internal_replace) (int pin);
+    mraa_result_t (*gpio_init_internal_replace) (mraa_gpio_context dev, int pin);
     mraa_result_t (*gpio_init_pre) (int pin);
     mraa_result_t (*gpio_init_post) (mraa_gpio_context dev);
 
