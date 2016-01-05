@@ -400,7 +400,7 @@ mraa_ftdi_ft4222_i2c_stop(mraa_i2c_context dev)
 /******************* GPIO functions *******************/
 
 static mraa_result_t
-mraa_ftdi_ft4222_gpio_init_internal_replace(int pin)
+mraa_ftdi_ft4222_gpio_init_internal_replace(mraa_gpio_context dev, int pin)
 {
     if ((pin - numI2cGpioExpanderPins) == 0 || (pin - numI2cGpioExpanderPins) == 1) {
         syslog(LOG_NOTICE, "Closing I2C interface to enable GPIO%d\n", pin);
