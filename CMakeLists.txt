@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8)
-project (mraa)
+project (mraa C)
 
 FIND_PACKAGE (Threads REQUIRED)
 

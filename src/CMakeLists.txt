@@ -171,6 +171,7 @@ if (DOXYGEN_FOUND)
 endif ()
 
 if (BUILDSWIG)
+  enable_language(CXX)
   find_package (SWIG)
   if (SWIG_FOUND)
     include (${SWIG_USE_FILE})

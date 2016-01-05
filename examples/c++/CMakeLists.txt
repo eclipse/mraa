@@ -1,3 +1,5 @@
+enable_language(CXX)
+
 add_executable (AioA0 AioA0.cpp)
 add_executable (blink-io-cpp Blink-IO.cpp)
 add_executable (Pwm3-cycle Pwm3-cycle.cpp)
