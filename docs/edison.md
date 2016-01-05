@@ -31,6 +31,10 @@ in libmraa:
   else. Therefore use `mraa_gpio_init(14)` to use A0 as a GPIO
 - Arduino pin 7 can sometimes negatively impact the WiFi capability, if using
   WiFi avoid using this pin
+- Edison's i2c-1 can be used using for example the sparkfun i2c breakout ontop
+  of the Arduino breakout board, this is not supported officially so asking for
+  mraa_i2c_init(1) will result in getting i2c bus 6 (the default one). However
+  using raw mode (mraa_i2c_init_raw(1)) this bus is fully usable
 
 Because of the way IO is setup with the tristate on the Arduino breakout board
 IO will be flipped as it is setup. It's recommended to setup IO pins &
