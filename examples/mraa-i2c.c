@@ -84,7 +84,7 @@ print_bus(mraa_board_t* board)
                 busType = "unknown";
                 break;
         }
-        int id = board->i2c_bus[bus].bus_id;
+        int id = board->i2c_bus[i].bus_id;
         fprintf(stdout, "Bus %3d: id=%02d type=%s ", bus, id, busType);
         if (i == board->def_i2c_bus)
             fprintf(stdout, " default");
