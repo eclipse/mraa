@@ -111,7 +111,7 @@ set (mraa_LIB_GLOB_HEADERS
   ${PROJECT_SOURCE_DIR}/api/mraa.hpp
 )
 
-add_library (mraa SHARED ${mraa_LIB_SRCS})
+add_library (mraa ${mraa_LIB_SRCS})
 
 
 target_link_libraries (mraa ${mraa_LIBS})
