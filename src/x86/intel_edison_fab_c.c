@@ -1119,7 +1119,7 @@ mraa_intel_edison_miniboard(mraa_board_t* b)
 
     // BUS DEFINITIONS
     b->i2c_bus_count = 9;
-    b->def_i2c_bus = 6;
+    b->def_i2c_bus = 1;
     int ici;
     for (ici = 0; ici < 9; ici++) {
         b->i2c_bus[ici].bus_id = -1;
