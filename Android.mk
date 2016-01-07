@@ -28,11 +28,13 @@ LOCAL_SRC_FILES := \
     src/aio/aio.c \
     src/uart/uart.c \
     src/x86/x86.c \
+    src/iio/iio.c \
     src/x86/intel_galileo_rev_d.c \
     src/x86/intel_galileo_rev_g.c \
     src/x86/intel_edison_fab_c.c  \
     src/x86/intel_de3815.c \
     src/x86/intel_nuc5.c \
+    src/x86/intel_sofia_3gr.c \
     src/x86/intel_minnow_byt_compatible.c
 
 # glob.c pulled in from NetBSD project (BSD 3-clause License)
