@@ -164,6 +164,8 @@ To run, make sure `libmraajava.so` is in `LD_LIBRARY_PATH`
 jave -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example
 ~~~~~~~~~~~~~
 
+If you want to add or improve Java bindings for mraa, please follow the [Creating Java Bindings Guide](https://github.com/intel-iot-devkit/upm/blob/master/docs/creating_java_bindings.md).
+
 ## Building an IPK/RPM package using `cpack`
 
 You can get `cpack` to generate an IPK or RPM package fairly easily if you have
