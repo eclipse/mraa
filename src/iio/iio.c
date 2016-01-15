@@ -318,15 +318,21 @@ mraa_iio_trigger_handler(void* arg)
 
     for (;;) {
         if (mraa_iio_wait_event(dev->fp, &data[0], &read_size) == MRAA_SUCCESS) {
+#ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+#endif
             // only can process if readsize >= enabled channel's datasize
             for (i = 0; i < (read_size / dev->datasize); i++) {
                 dev->isr((void*)&data);
             }
+#ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+#endif
         } else {
             // we must have got an error code so die nicely
+#ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+#endif
             return NULL;
         }
     }
@@ -467,12 +473,18 @@ mraa_iio_event_handler(void* arg)
 
     for (;;) {
         if (mraa_iio_event_poll_nonblock(dev->fp_event, &data) == MRAA_SUCCESS) {
+#ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+#endif
             dev->isr_event(&data, dev->isr_args);
+#ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+#endif
         } else {
             // we must have got an error code so die nicely
+#ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+#endif
             return NULL;
         }
     }
