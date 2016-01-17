@@ -76,7 +76,7 @@ mraa_i2c_init_internal(mraa_adv_func_t* advance_func, unsigned int bus)
     if (advance_func == NULL)
         return NULL;
 
-    mraa_i2c_context dev = (mraa_i2c_context) malloc(sizeof(struct _i2c));
+    mraa_i2c_context dev = (mraa_i2c_context) calloc(1,sizeof(struct _i2c));
     if (dev == NULL) {
         syslog(LOG_CRIT, "i2c: Failed to allocate memory for context");
         return NULL;

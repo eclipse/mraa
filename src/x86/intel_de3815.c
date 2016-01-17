@@ -52,7 +52,7 @@ mraa_intel_de3815()
     b->pwm_max_period = 2147483;
     b->pwm_min_period = 1;
 
-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_DE3815_PINCOUNT);
+    b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_DE3815_PINCOUNT,sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
         goto error;
     }

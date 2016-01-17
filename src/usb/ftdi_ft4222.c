@@ -675,7 +675,7 @@ mraa_ftdi_ft4222()
     sub_plat->platform_name = PLATFORM_NAME;
     sub_plat->phy_pin_count = numUsbPins;
     sub_plat->gpio_count = numUsbGpio;
-    mraa_pininfo_t* pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * numUsbPins);
+    mraa_pininfo_t* pins = (mraa_pininfo_t*) calloc(numUsbPins,sizeof(mraa_pininfo_t));
     if (pins == NULL) {
         return NULL;
     }

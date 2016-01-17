@@ -356,7 +356,7 @@ mraa_beaglebone_pwm_init_replace(int pin)
     }
 
     if (mraa_file_exist(devpath)) {
-        mraa_pwm_context dev = (mraa_pwm_context) malloc(sizeof(struct _pwm));
+        mraa_pwm_context dev = (mraa_pwm_context) calloc(1,sizeof(struct _pwm));
         if (dev == NULL)
             return NULL;
         dev->duty_fp = -1;
@@ -488,7 +488,7 @@ mraa_beaglebone()
     else
         ehrpwm2b_enabled = 0;
 
-    mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
+    mraa_board_t* b = (mraa_board_t*) calloc(1,sizeof(mraa_board_t));
     if (b == NULL)
         return NULL;
     // TODO: Detect Beaglebone Black Revisions, for now always TYPE B
@@ -512,7 +512,7 @@ mraa_beaglebone()
     b->pwm_max_period = 2147483;
     b->pwm_min_period = 1;
 
-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * b->phy_pin_count);
+    b->pins = (mraa_pininfo_t*) calloc(b->phy_pin_count,sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
         goto error;
     }
