@@ -57,7 +57,7 @@ mraa_board_t* mraa_96boards()
    char ch;
    char name[MRAA_PIN_NAME_SIZE];
 
-   mraa_board_t* b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
+   mraa_board_t* b = (mraa_board_t*) calloc(1,sizeof(mraa_board_t));
    if (b == NULL) {
       return NULL;
    }

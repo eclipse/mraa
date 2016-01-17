@@ -899,7 +899,7 @@ globextend(const Char *path, glob_t *pglob, struct glob_limit *limit)
 	    newsize > GLOB_LIMIT_PATH * sizeof(*pathv))
 		goto nospace;
 	pathv = pglob->gl_pathv ? realloc(pglob->gl_pathv, newsize) :
-	    malloc(newsize);
+	    calloc(newsize,sizeof(char *));
 	if (pathv == NULL)
 		return GLOB_NOSPACE;
 
