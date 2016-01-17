@@ -788,7 +788,7 @@ mraa_intel_edison_miniboard(mraa_board_t* b)
     b->pwm_max_period = 218453;
     b->pwm_min_period = 1;
 
-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * 56);
+    b->pins = (mraa_pininfo_t*) calloc(b->phy_pin_count, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
         return MRAA_ERROR_UNSPECIFIED;
     }
@@ -1197,7 +1197,7 @@ mraa_intel_edison_fab_c()
     b->adv_func->gpio_mmap_setup = &mraa_intel_edison_mmap_setup;
     b->adv_func->spi_lsbmode_replace = &mraa_intel_edison_spi_lsbmode_replace;
 
-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_EDISON_PINCOUNT);
+    b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_EDISON_PINCOUNT, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
         free(b->adv_func);
         goto error;

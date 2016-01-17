@@ -99,7 +99,7 @@ mraa_intel_minnowboard_byt_compatible()
     b->phy_pin_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
     b->gpio_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
 
-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_MINNOW_MAX_PINCOUNT);
+    b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_MINNOW_MAX_PINCOUNT, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
         goto error;
     }

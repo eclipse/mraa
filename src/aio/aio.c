@@ -58,7 +58,7 @@ aio_get_valid_fp(mraa_aio_context dev)
 static mraa_aio_context
 mraa_aio_init_internal(mraa_adv_func_t* func_table)
 {
-    mraa_aio_context dev = malloc(sizeof(struct _aio));
+    mraa_aio_context dev = calloc(1, sizeof(struct _aio));
     if (dev == NULL) {
         return NULL;
     }

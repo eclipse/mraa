@@ -578,7 +578,7 @@ mraa_file_contains(const char* filename, const char* content)
     char* file = mraa_file_unglob(filename);
     if (file != NULL) {
         size_t len = 1024;
-        char* line = malloc(len);
+        char* line = calloc(len, sizeof(char));
         if (line == NULL) {
             free(file);
             return 0;
@@ -613,7 +613,7 @@ mraa_file_contains_both(const char* filename, const char* content, const char* c
     char* file = mraa_file_unglob(filename);
     if (file != NULL) {
         size_t len = 1024;
-        char* line = malloc(len);
+        char* line = calloc(len, sizeof(char));
         if (line == NULL) {
             free(file);
             return 0;

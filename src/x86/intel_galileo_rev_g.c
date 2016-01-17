@@ -347,7 +347,7 @@ mraa_intel_galileo_gen2()
     b->adv_func->uart_init_pre = &mraa_intel_galileo_gen2_uart_init_pre;
     b->adv_func->gpio_mmap_setup = &mraa_intel_galileo_g2_mmap_setup;
 
-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_GALILEO_GEN_2_PINCOUNT);
+    b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_GALILEO_GEN_2_PINCOUNT, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
         free(b->adv_func);
         goto error;

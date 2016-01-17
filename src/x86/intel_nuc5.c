@@ -51,7 +51,7 @@ mraa_intel_nuc5()
         goto error;
     }
 
-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_NUC5_PINCOUNT);
+    b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_NUC5_PINCOUNT,sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
         free(b->adv_func);
         goto error;
