@@ -1,5 +1,12 @@
 find_package (Nodejs)
 
+# Cannot use pkg_check_modules() as compat-libuv010.pc contains an error in Cflags property that causes cmake to crash
+set (COMPAT_LIBUV_INCLUDE_DIR /usr/include/compat-libuv010)
+if (IS_DIRECTORY ${COMPAT_LIBUV_INCLUDE_DIR})
+  message (INFO " - Detected compat-libuv010 and added ${COMPAT_LIBUV_INCLUDE_DIR} to include path")
+  include_directories (${COMPAT_LIBUV_INCLUDE_DIR})
+endif()
+
 include_directories (
   ${NODE_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/..
