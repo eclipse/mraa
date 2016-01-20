@@ -45,13 +45,12 @@
 #include "gpio.h"
 #include "version.h"
 
-#define MAX_PLATFORM_NAME_LENGTH 128
 #define IIO_DEVICE_WILDCARD "iio:device*"
 mraa_board_t* plat = NULL;
 mraa_iio_info_t* plat_iio = NULL;
 
-static char* platform_name;
-static char* platform_long_name;
+static char* platform_name = NULL;
+static char* platform_long_name = NULL;
 
 static int num_i2c_devices = 0;
 static int num_iio_devices = 0;
@@ -117,8 +116,11 @@ mraa_init()
 #error mraa_ARCH NOTHING
 #endif
 
-    if (plat != NULL)
+    if (plat != NULL) {
         plat->platform_type = platform_type;
+    } else {
+        platform_name = NULL;
+    }
 
 #if defined(USBPLAT)
     // This is a platform extender so create null base platform if one doesn't already exist
@@ -146,6 +148,19 @@ mraa_init()
 
     // Look for IIO devices
     mraa_iio_detect();
+
+    if (plat != NULL) {
+        int length = strlen(plat->platform_name) + 1;
+        if (mraa_has_sub_platform()) {
+            length += strlen(plat->sub_platform->platform_name);
+        }
+        platform_name = calloc(length, sizeof(char));
+        if (mraa_has_sub_platform()) {
+            snprintf(platform_name, length, "%s + %s", plat->platform_name, plat->sub_platform->platform_name);
+        } else {
+            strncpy(platform_name, plat->platform_name, length);
+        }
+    }
 
     syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
     return MRAA_SUCCESS;
@@ -461,20 +476,6 @@ mraa_get_platform_adc_supported_bits(int platform_offset)
 const char*
 mraa_get_platform_name()
 {
-    if (plat == NULL) {
-        return NULL;
-    }
-    int length = strlen(plat->platform_name) + 1;
-    if (mraa_has_sub_platform()) {
-        length += strlen(plat->sub_platform->platform_name);
-    }
-    platform_name = calloc(length, sizeof(char));
-    if (mraa_has_sub_platform()) {
-        snprintf(platform_name, length, "%s + %s", plat->platform_name, plat->sub_platform->platform_name);
-    } else {
-        strncpy(platform_name, plat->platform_name, length);
-    }
-
     return platform_name;
 }
 
