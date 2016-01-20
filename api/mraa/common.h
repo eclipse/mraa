@@ -140,7 +140,7 @@ mraa_result_t mraa_set_log_level(int level);
  *
  * @return platform name
  */
-char* mraa_get_platform_name();
+const char* mraa_get_platform_name();
 
 /**
  * Return the platform's versioning info, the information given depends per

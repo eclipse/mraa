@@ -50,7 +50,7 @@
 mraa_board_t* plat = NULL;
 mraa_iio_info_t* plat_iio = NULL;
 
-static char platform_name[MAX_PLATFORM_NAME_LENGTH];
+static char* platform_name;
 static char* platform_long_name;
 
 static int num_i2c_devices = 0;
@@ -458,17 +458,21 @@ mraa_get_platform_adc_supported_bits(int platform_offset)
     }
 }
 
-
-char*
+const char*
 mraa_get_platform_name()
 {
     if (plat == NULL) {
         return NULL;
     }
+    int length = strlen(plat->platform_name) + 1;
     if (mraa_has_sub_platform()) {
-        snprintf(platform_name, MAX_PLATFORM_NAME_LENGTH, "%s + %s", plat->platform_name, plat->sub_platform->platform_name);
+        length += strlen(plat->sub_platform->platform_name);
+    }
+    platform_name = calloc(length, sizeof(char));
+    if (mraa_has_sub_platform()) {
+        snprintf(platform_name, length, "%s + %s", plat->platform_name, plat->sub_platform->platform_name);
     } else {
-        strncpy(platform_name, plat->platform_name, MAX_PLATFORM_NAME_LENGTH-1);
+        strncpy(platform_name, plat->platform_name, length);
     }
 
     return platform_name;

@@ -33,7 +33,7 @@ main(int argc, char** argv)
 {
     mraa_platform_t platform = mraa_get_platform_type();
     mraa_gpio_context gpio, gpio_in = NULL;
-    char* board_name = mraa_get_platform_name();
+    const char* board_name = mraa_get_platform_name();
     int ledstate = 0;
 
     switch (platform) {
