@@ -84,7 +84,7 @@ mraa_get_pin_index(mraa_board_t* board, char* name, int* pin_index)
 }
 
 mraa_board_t*
-mraa_intel_minnowboard_byt_compatible()
+mraa_intel_minnowboard_byt_compatible(mraa_boolean_t turbot)
 {
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
 
@@ -96,6 +96,11 @@ mraa_intel_minnowboard_byt_compatible()
     }
 
     b->platform_name = PLATFORM_NAME;
+    if (turbot) {
+        b->platform_version = "Turbot";
+    } else {
+        b->platform_version = "Ax";
+    }
     b->phy_pin_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
     b->gpio_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
 

@@ -1,6 +1,7 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ *         Brendan Le Foll <brendan.le.foll@intel.com>
+ * Copyright (c) 2014-2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -1173,6 +1174,7 @@ mraa_intel_edison_fab_c()
     b->phy_pin_count = 20;
     b->gpio_count = 14;
     b->aio_count = 6;
+    b->platform_version = "arduino";
 
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
     if (b->adv_func == NULL) {

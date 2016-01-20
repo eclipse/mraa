@@ -143,6 +143,16 @@ mraa_result_t mraa_set_log_level(int level);
 char* mraa_get_platform_name();
 
 /**
+ * Return the platform's versioning info, the information given depends per
+ * platform and can be NULL. platform_offset has to be given. Do not modify
+ * this pointer
+ *
+ * @param specified platform offset; 0 for main platform, 1 for sub platform
+ * @return platform's versioning string
+ */
+const char* mraa_get_platform_version(int platform_offset);
+
+/**
  * This function attempts to set the mraa process to a given priority and the
  * scheduler to SCHED_RR. Highest * priority is typically 99 and minimum is 0.
  * This function * will set to MAX if * priority is > MAX. Function will return

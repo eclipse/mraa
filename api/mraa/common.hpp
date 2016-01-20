@@ -155,6 +155,19 @@ getPlatformName()
 }
 
 /**
+ * Return platform versioning info. Returns NULL if no info present.
+ *
+ * @param optional subplatform identifier
+ * @return platform versioning info
+ */
+inline std::string
+getPlatformVersion(int platform_offset=MRAA_MAIN_PLATFORM_OFFSET)
+{
+    std::string ret_val(mraa_get_platform_version(platform_offset));
+    return ret_val;
+}
+
+/**
  * Return count of physical pins on the running platform
  *
  * @return uint of physical pins.

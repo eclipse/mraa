@@ -285,6 +285,7 @@ typedef struct _board_t {
     int pwm_min_period; /**< Minimum period in us */
     mraa_platform_t platform_type; /**< Platform type */
     const char* platform_name; /**< Platform Name pointer */
+    const char* platform_version; /**< Platform versioning info */
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
     mraa_adv_func_t* adv_func;    /**< Pointer to advanced function disptach table */
     struct _board_t* sub_platform;     /**< Pointer to sub platform */

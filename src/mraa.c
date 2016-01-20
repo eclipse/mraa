@@ -1,7 +1,7 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Copyright (c) 2014-2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -51,6 +51,7 @@ mraa_board_t* plat = NULL;
 mraa_iio_info_t* plat_iio = NULL;
 
 static char platform_name[MAX_PLATFORM_NAME_LENGTH];
+static char* platform_long_name;
 
 static int num_i2c_devices = 0;
 static int num_iio_devices = 0;
@@ -471,6 +472,19 @@ mraa_get_platform_name()
     }
 
     return platform_name;
+}
+
+const char*
+mraa_get_platform_version(int platform_offset)
+{
+    if (plat == NULL) {
+        return NULL;
+    }
+    if (platform_offset == MRAA_MAIN_PLATFORM_OFFSET) {
+        return plat->platform_version;
+    } else {
+        return plat->sub_platform->platform_version;
+    }
 }
 
 int
