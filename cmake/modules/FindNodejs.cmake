@@ -36,14 +36,14 @@ else()
 endif()
 
 # Check that v8.h is in NODEJS_INCLUDE_DIRS
-find_path (V8_ROOT_DIR "v8.h" PATHS NODEJS_INCLUDE_DIRS)
+find_path (V8_ROOT_DIR "v8.h" PATHS ${NODEJS_INCLUDE_DIRS})
 if (NOT V8_ROOT_DIR)
   unset(NODEJS_INCLUDE_DIRS)
   message(ERROR " - v8.h not found")
 endif()
 
 # Check that uv.h is in NODEJS_INCLUDE_DIRS
-find_path (UV_ROOT_DIR "uv.h" PATHS NODEJS_INCLUDE_DIRS)
+find_path (UV_ROOT_DIR "uv.h" PATHS ${NODEJS_INCLUDE_DIRS})
 if (NOT UV_ROOT_DIR)
   unset(NODEJS_INCLUDE_DIRS)
   message(ERROR " - uv.h not found")
