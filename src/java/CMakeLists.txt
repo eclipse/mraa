@@ -10,7 +10,8 @@ include_directories (
 set_source_files_properties (mraajava.i PROPERTIES SWIG_FLAGS ";-package;mraa;-I${CMAKE_BINARY_DIR}/src")
 set_source_files_properties (mraajava.i PROPERTIES CPLUSPLUS ON)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -DJAVACALLBACK")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DJAVACALLBACK")
 
 if (NOT DEFINED $ENV{JAVA_HOME_NATIVE})
   set (JAVA_HOME_NATIVE $ENV{JAVA_HOME})
@@ -29,6 +30,7 @@ add_custom_command (TARGET mraajava
   COMMAND cmake -E echo "Compiling java.."
   COMMAND cmake -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/mraa
   COMMAND ${JAVAC} *.java -d ${CMAKE_CURRENT_BINARY_DIR}
+  COMMAND cmake -E create_symlink java/libmraajava.so ${CMAKE_CURRENT_BINARY_DIR}/../libmraajava.so
   COMMAND cmake -E echo "Creating jar"
   COMMAND ${JAR} cvf mraa.jar mraa
 )
@@ -41,6 +43,9 @@ endif ()
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/libmraajava.so
 		DESTINATION lib/java
+)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/../libmraajava.so
+		DESTINATION lib/
 )
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.jar
 		DESTINATION lib/java

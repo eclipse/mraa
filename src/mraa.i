@@ -46,6 +46,7 @@
 %ignore Gpio::v8isr(uv_work_t* req);
 %ignore Gpio::v8isr(uv_work_t* req, int status);
 %ignore Gpio::uvwork(void *ctx);
+%ignore Gpio::isr(Edge mode, void (*fptr)(void*), void* args);
 
 %include "gpio.hpp"
 
