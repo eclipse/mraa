@@ -1,4 +1,7 @@
-find_package (Nodejs)
+find_package (Nodejs REQUIRED)
+if (NOT Nodejs_FOUND)
+  message(ERROR " - Nodejs not found")
+endif()
 
 include_directories (
   ${NODE_INCLUDE_DIRS}
