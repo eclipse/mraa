@@ -1,14 +1,12 @@
- # Macro to add directory to NODE_INCLUDE_DIRS if it exists and is not /usr/include
+ # Macro to add directory to NODEJS_INCLUDE_DIRS if it exists and is not /usr/include
  macro(add_include_dir dir)
     if (IS_DIRECTORY ${dir} AND NOT ${dir} STREQUAL "/usr/include")
-      set(NODE_INCLUDE_DIRS ${NODE_INCLUDE_DIRS} ${dir})
+      set(NODEJS_INCLUDE_DIRS ${NODEJS_INCLUDE_DIRS} ${dir})
     endif()
 endmacro()
 
 
-set (Nodejs_FOUND TRUE)
-
-find_program (NODE_EXECUTABLE NAMES node nodejs
+find_program (NODEJS_EXECUTABLE NAMES node nodejs
     HINTS
     $ENV{NODE_DIR}
     PATH_SUFFIXES bin
@@ -20,7 +18,7 @@ include (FindPackageHandleStandardArgs)
 # If compat-libuv package exists, it must be at start of include path
 find_path (UV_ROOT_DIR "uv.h" PATHS /usr/include/compat-libuv010 NO_DEFAULT_PATH)
 if (UV_ROOT_DIR)
-  # set (NODE_INCLUDE_DIRS ${UV_ROOT_DIR})
+  # set (NODEJS_INCLUDE_DIRS ${UV_ROOT_DIR})
   add_include_dir(${UV_ROOT_DIR})
 endif()
 
@@ -33,34 +31,34 @@ if (NODE_ROOT_DIR)
   add_include_dir(${NODE_ROOT_DIR}/deps/v8/include)
   add_include_dir(${NODE_ROOT_DIR}/deps/uv/include)
 else()
+  unset(NODEJS_INCLUDE_DIRS)
   message(ERROR " - node.h not found")
-  set (Nodejs_FOUND FALSE)
 endif()
 
-# Check that v8.h is in NODE_INCLUDE_DIRS
-find_path (V8_ROOT_DIR "v8.h" PATHS NODE_INCLUDE_DIRS)
+# Check that v8.h is in NODEJS_INCLUDE_DIRS
+find_path (V8_ROOT_DIR "v8.h" PATHS NODEJS_INCLUDE_DIRS)
 if (NOT V8_ROOT_DIR)
+  unset(NODEJS_INCLUDE_DIRS)
   message(ERROR " - v8.h not found")
-  set (Nodejs_FOUND FALSE)
 endif()
 
-# Check that uv.h is in NODE_INCLUDE_DIRS
-find_path (UV_ROOT_DIR "u8.h" PATHS NODE_INCLUDE_DIRS)
+# Check that uv.h is in NODEJS_INCLUDE_DIRS
+find_path (UV_ROOT_DIR "uv.h" PATHS NODEJS_INCLUDE_DIRS)
 if (NOT UV_ROOT_DIR)
+  unset(NODEJS_INCLUDE_DIRS)
   message(ERROR " - uv.h not found")
-  set (Nodejs_FOUND FALSE)
 endif()
 
-find_package_handle_standard_args (Node DEFAULT_MSG
-    NODE_EXECUTABLE
-    NODE_INCLUDE_DIRS
+find_package_handle_standard_args (Nodejs DEFAULT_MSG
+    NODEJS_EXECUTABLE
+    NODEJS_INCLUDE_DIRS
 )
 
-if (NODE_EXECUTABLE)
-    execute_process(COMMAND ${NODE_EXECUTABLE} --version
+if (NODEJS_EXECUTABLE)
+    execute_process(COMMAND ${NODEJS_EXECUTABLE} --version
                     OUTPUT_VARIABLE _VERSION
                     RESULT_VARIABLE _NODE_VERSION_RESULT)
-    execute_process(COMMAND ${NODE_EXECUTABLE} -e "console.log(process.versions.v8)"
+    execute_process(COMMAND ${NODEJS_EXECUTABLE} -e "console.log(process.versions.v8)"
                     OUTPUT_VARIABLE _V8_VERSION
                     RESULT_VARIABLE _V8_RESULT)
     if (NOT _NODE_VERSION_RESULT AND NOT _V8_RESULT)
@@ -91,7 +89,7 @@ if (NODE_EXECUTABLE)
     string (REGEX REPLACE "\n" "" V8_VERSION_STRING ${V8_VERSION_STRING})
     message ("INFO - Node version is " ${NODE_VERSION_STRING})
     message ("INFO - Node using v8 " ${V8_VERSION_STRING})
-    mark_as_advanced (NODE_EXECUTABLE)
+    mark_as_advanced (NODEJS_EXECUTABLE)
 else()
   message ("ERROR - node executable not found")
   set (Nodejs_FOUND FALSE)
