@@ -186,6 +186,10 @@ mraa_pwm_init(int pin)
         syslog(LOG_NOTICE, "pwm: Using sub platform is not supported");
         return NULL;
     }
+    if (pin < 0 || pin > plat->phy_pin_count) {
+        syslog(LOG_ERR, "pwm: pin %i beyond platform definition", pin);
+        return NULL;
+    }
     if (plat->pins[pin].capabilites.pwm != 1) {
         syslog(LOG_ERR, "pwm: pin not capable of pwm");
         return NULL;
