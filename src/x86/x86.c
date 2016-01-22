@@ -35,6 +35,7 @@
 #include "x86/intel_nuc5.h"
 #include "x86/intel_minnow_byt_compatible.h"
 #include "x86/intel_sofia_3gr.h"
+#include "x86/intel_cherryhills.h"
 
 mraa_platform_t
 mraa_x86_platform()
@@ -78,6 +79,9 @@ mraa_x86_platform()
             } else if (strncasecmp(line, "MinnowBoard Turbot", 18) == 0) {
                 platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
                 plat = mraa_intel_minnowboard_byt_compatible(1);
+            } else if (strncasecmp(line, "Braswell Cherry Hill", 20) == 0) {
+                platform_type = MRAA_INTEL_CHERRYHILLS;
+                plat = mraa_intel_cherryhills();
             } else {
                 syslog(LOG_ERR, "Platform not supported, not initialising");
                 platform_type = MRAA_UNKNOWN_PLATFORM;
@@ -114,6 +118,8 @@ mraa_x86_platform()
     plat = mraa_intel_nuc5();
     #elif defined(xMRAA_INTEL_SOFIA_3GR)
     plat = mraa_intel_sofia_3gr();
+    #elif defined(xMRAA_INTEL_CHERRYHILLS)
+    plat = mraa_intel_cherryhills();
     #else
         #error "Not using a valid platform value from mraa_platform_t - cannot compile"
     #endif
