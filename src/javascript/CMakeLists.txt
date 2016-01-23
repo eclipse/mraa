@@ -25,7 +25,7 @@ swig_add_module (mraajs javascript mraajs.i ${mraa_LIB_SRCS})
 swig_link_libraries (mraajs ${NODE_LIBRARIES} ${mraa_LIBS})
 
 set_target_properties (mraajs PROPERTIES
-  COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_NODE_EXTENSION -DSWIGJAVASCRIPT=${SWIG_FOUND}"
+  COMPILE_FLAGS " -DBUILDING_NODE_EXTENSION -DSWIGJAVASCRIPT=${SWIG_FOUND}"
   PREFIX ""
   OUTPUT_NAME mraa
   SUFFIX ".node"
@@ -37,6 +37,9 @@ if (${V8_VERSION_MAJOR} GREATER 3)
   # Node 2.1.0  V8 engine major version is '4'.
   set_property (TARGET mraajs PROPERTY CXX_STANDARD 11)
   set_property (TARGET mraajs PROPERTY CXX_STANDARD_REQUIRED ON)
+  if((${CMAKE_MAJOR_VERSION} LESS 3) OR (${CMAKE_MAJOR_VERSION} EQUAL 3 AND ${CMAKE_MINOR_VERSION} EQUAL 0))
+    message(FATAL_ERROR " FATAL ERROR: Need to use CMAKE version 3.1+, but it is ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")
+  endif()
 endif ()
 
 macro (mraa_CREATE_INSTALL_PACKAGE_JSON generated_file install_location)
