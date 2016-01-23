@@ -90,9 +90,5 @@ if (NODEJS_EXECUTABLE)
     message ("INFO - Node version is " ${NODE_VERSION_STRING})
     message ("INFO - Node using v8 " ${V8_VERSION_STRING})
     mark_as_advanced (NODEJS_EXECUTABLE)
-else()
-  message ("ERROR - node executable not found")
-  set (Nodejs_FOUND FALSE)
 endif ()
-
 
