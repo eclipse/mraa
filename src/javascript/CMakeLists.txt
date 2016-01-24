@@ -31,14 +31,27 @@ set_target_properties (mraajs PROPERTIES
   SUFFIX ".node"
 )
 
+message (INFO " - swig Version ${SWIG_VERSION}")
+message (INFO " - CXX compiler Version ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+
 if (${V8_VERSION_MAJOR} GREATER 3)
   message (INFO " - Using V8 version > 3 so requiring C++11 compiler")
   # Node 0.12.x V8 engine major version is '3'.
   # Node 2.1.0  V8 engine major version is '4'.
   set_property (TARGET mraajs PROPERTY CXX_STANDARD 11)
   set_property (TARGET mraajs PROPERTY CXX_STANDARD_REQUIRED ON)
-  if((${CMAKE_MAJOR_VERSION} LESS 3) OR (${CMAKE_MAJOR_VERSION} EQUAL 3 AND ${CMAKE_MINOR_VERSION} EQUAL 0))
-    message(FATAL_ERROR " FATAL ERROR: Need to use CMAKE version 3.1+, but it is ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")
+  if(CMAKE_VERSION VERSION_LESS "3.1")
+    message(INFO " - **WARNING** Need to use CMAKE version 3.1+, but it is ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")
+    message(INFO " -             So a workaround will be used.")
+    if(CMAKE_COMPILER_IS_GNUCXX)
+      if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7")
+        message(FATAL_ERROR " FATAL ERROR: GNU gcc compiler is also too old (need 4.7+, but ${CMAKE_CXX_COMPILER_VERSION}) and does not support C++11 standard.")
+      endif()
+      set(MRAA_CXX11_WORKAROUND_OPTION "-std=gnu++11")
+    else()
+      set(MRAA_CXX11_WORKAROUND_OPTION "-std=c++11")
+    endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MRAA_CXX11_WORKAROUND_OPTION} ")
   endif()
 endif ()
 
