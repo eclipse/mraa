@@ -131,13 +131,16 @@ mraa_init()
             plat->platform_name = "Unknown platform";
         }
     }
-    // Now detect sub platform
+    // Now detect sub platform. Note special cases if main platform type is unknown
+    // If main platform type is unknown and we detect a valid sub-platform then set main platform type to sub-platform type
+    // If both main and sub platforms are unknown, return MRAA_ERROR_PLATFORM_NOT_INITIALISED
     if (plat != NULL) {
         mraa_platform_t usb_platform_type = mraa_usb_platform_extender(plat);
-        if (plat->platform_type == MRAA_UNKNOWN_PLATFORM && usb_platform_type != MRAA_UNKNOWN_PLATFORM) {
-            plat->platform_type = usb_platform_type;
-        } else {
-            return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
+        if (plat->platform_type == MRAA_UNKNOWN_PLATFORM) {
+            if (usb_platform_type == MRAA_UNKNOWN_PLATFORM)
+                return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
+            else
+                plat->platform_type = usb_platform_type;
         }
     }
     if (plat == NULL) {
@@ -152,7 +155,7 @@ mraa_init()
     if (plat != NULL) {
         int length = strlen(plat->platform_name) + 1;
         if (mraa_has_sub_platform()) {
-            length += strlen(plat->sub_platform->platform_name);
+            length += (strlen(plat->sub_platform->platform_name) + 3);
         }
         platform_name = calloc(length, sizeof(char));
         if (mraa_has_sub_platform()) {
