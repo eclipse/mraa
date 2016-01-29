@@ -69,6 +69,7 @@ option (RPM "Generate RPM using CPack" OFF)
 option (BUILDPYTHON3 "Use python3 for building/installing/testing" OFF)
 option (ENABLEEXAMPLES "Disable building of examples" ON)
 option (INSTALLGPIOTOOL "Install gpio tool" OFF)
+option (INSTALLTOOLS "Install all tools" OFF)
 option (BUILDARCH "Override architecture to build for - override" OFF)
 option (BUILDTESTS "Override the addition of tests" ON)
 
@@ -146,7 +147,7 @@ if (IPK)
   if ("${VERSION_COMMIT}" STREQUAL "")
     set(mraa_PACKAGE_ON_TAG "")
   endif()
-  set(CPACK_PACKAGE_VERSION 
+  set(CPACK_PACKAGE_VERSION
       "${mraa_VERSION_MAJOR}.${mraa_VERSION_MINOR}.${mraa_VERSION_PATCH}${mraa_PACKAGE_ON_TAG}${VERSION_COMMIT}")
   set(CPACK_PACKAGE_NAME "mraa")
   set(CPACK_DEBIAN_PACKAGE_SECTION "libs")

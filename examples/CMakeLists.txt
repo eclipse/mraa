@@ -39,6 +39,11 @@ add_subdirectory (c++)
 
 install (DIRECTORY ${PROJECT_SOURCE_DIR}/examples/ DESTINATION ${CMAKE_INSTALL_DATADIR}/mraa/examples)
 
-if (INSTALLGPIOTOOL)
+if (INSTALLGPIOTOOL AND NOT INSTALLTOOLS)
    install (TARGETS mraa-gpio DESTINATION bin)
+endif()
+
+if (INSTALLTOOLS)
+   install (TARGETS mraa-gpio DESTINATION bin)
+   install (TARGETS mraa-i2c DESTINATION bin)
 endif()
