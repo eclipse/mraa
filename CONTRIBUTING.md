@@ -1,4 +1,4 @@
-Contributing to libmraa                           {#contributing} 
+Contributing to libmraa                           {#contributing}
 ======================
 
 libmraa is an opensource project and we are actively looking for people to help

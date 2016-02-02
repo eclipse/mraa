@@ -756,6 +756,7 @@ WARN_LOGFILE           =
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/api/ \
                          @CMAKE_CURRENT_SOURCE_DIR@/api/mraa/ \
                          @CMAKE_CURRENT_SOURCE_DIR@/docs/ \
+                         @CMAKE_CURRENT_SOURCE_DIR@/docs/CONTRIBUTING.md \
                          @CMAKE_BINARY_DIR@/src/ \
                          @CMAKE_CURRENT_SOURCE_DIR@/docs/index.java.md \
                          @CMAKE_CURRENT_SOURCE_DIR@/README.md
