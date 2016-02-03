@@ -240,8 +240,6 @@ hasSubPlatform()
     return static_cast<bool>(mraa_has_sub_platform());
 }
 
-
-
 /**
  * Check if pin or bus id includes sub platform mask.
  *
