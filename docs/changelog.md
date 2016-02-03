@@ -5,6 +5,15 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.9.1**
+  * Minnowboard Turbot support
+  * Change to java runables for ISR support
+  * New platform version call
+  * Default i2c bus on edison miniboard is now i2c-1
+  * More compatibility with node.js versions > 0.10
+  * New C++ get i2c default bus call
+  * Various bug fixes & optimisations
+
 **0.9.0**
   * Beta iio API in C & C++ (no SWIG support)
   * Added 96Board support
