@@ -235,6 +235,23 @@ class Gpio
     {
         return (Result )mraa_gpio_dir(m_gpio, (mraa_gpio_dir_t) dir);
     }
+
+    /**
+     * Read Gpio direction
+     *
+     * @throw std::runtime_error in case of failure
+     * @return Result of operation
+     */
+    Dir
+    readDir()
+    {
+        mraa_gpio_dir_t dir;
+        if (mraa_gpio_read_dir(m_gpio, &dir) != MRAA_SUCCESS) {
+            throw std::runtime_error("Failed to read direction");
+        }
+        return (Dir) dir;
+    }
+
     /**
      * Read value from Gpio
      *
