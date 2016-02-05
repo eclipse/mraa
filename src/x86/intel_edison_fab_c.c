@@ -419,6 +419,8 @@ mraa_intel_edison_pwm_init_post(mraa_pwm_context pwm)
 mraa_result_t
 mraa_intel_edison_spi_init_pre(int bus)
 {
+    mraa_intel_edison_misc_spi();
+
     if (miniboard == 1) {
         mraa_intel_edison_pinmode_change(115, 1);
         mraa_intel_edison_pinmode_change(114, 1);
@@ -1154,6 +1156,7 @@ mraa_intel_edison_miniboard(mraa_board_t* b)
 mraa_board_t*
 mraa_intel_edison_fab_c()
 {
+    mraa_gpio_dir_t tristate_dir;
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
         return NULL;
@@ -1205,8 +1208,14 @@ mraa_intel_edison_fab_c()
         goto error;
     }
 
-    mraa_gpio_dir(tristate, MRAA_GPIO_OUT);
-    mraa_intel_edison_misc_spi();
+    if (mraa_gpio_read_dir(tristate, &tristate_dir) != MRAA_SUCCESS) {
+       free(b->adv_func);
+       goto error;
+    }
+
+    if (tristate_dir != MRAA_GPIO_OUT) {
+        mraa_gpio_dir(tristate, MRAA_GPIO_OUT);
+    }
 
     b->adc_raw = 12;
     b->adc_supported = 10;
