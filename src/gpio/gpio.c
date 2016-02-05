@@ -654,6 +654,38 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
     return MRAA_SUCCESS;
 }
 
+mraa_result_t
+mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
+{
+    char value[5];
+    char filepath[MAX_SIZE];
+    int fd, rc;
+    mraa_result_t result = MRAA_SUCCESS;
+
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/direction", dev->pin);
+    fd = open(filepath, O_RDONLY);
+    if (fd == -1) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    memset(value, '\0', sizeof(value));
+    rc = read(fd, value, sizeof(value));
+    close(fd);
+    if (rc <= 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    if (strcmp(value, "out\n") == 0) {
+        *dir = MRAA_GPIO_OUT;
+    } else if (strcmp(value, "in\n") == 0) {
+        *dir = MRAA_GPIO_IN;
+    } else {
+        result = MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return result;
+}
+
 int
 mraa_gpio_read(mraa_gpio_context dev)
 {

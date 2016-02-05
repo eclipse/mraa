@@ -155,6 +155,15 @@ mraa_result_t mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode);
 mraa_result_t mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir);
 
 /**
+ * Read Gpio direction
+ *
+ * @param dev The Gpio context
+ * @param dir The address where to store the Gpio direction
+ * @return Result of operation
+ */
+mraa_result_t mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir);
+
+/**
  * Close the Gpio context
  * - Will free the memory for the context and unexport the Gpio
  *
