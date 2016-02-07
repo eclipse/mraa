@@ -79,6 +79,8 @@ mraa_arm_platform()
     if (platform_type == MRAA_UNKNOWN_PLATFORM) {
         if (mraa_file_contains("/sys/firmware/devicetree/base/compatible", "qcom,apq8016-sbc"))
                    platform_type = MRAA_96BOARDS;
+        if (mraa_file_contains("/sys/firmware/devicetree/base/model", "HiKey Development Board"))
+                   platform_type = MRAA_96BOARDS;
      }
 
     switch (platform_type) {
