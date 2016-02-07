@@ -26,15 +26,12 @@
 
 var m = require('mraa'); //require mraa
 
-// helper function to go from hex val to dec
-function char(x) { return parseInt(x, 16); }
-
 x = new m.Spi(0)
 buf = new Buffer(4)
-buf[0] = char('0xf4')
-buf[1] = char('0x2e')
-buf[2] = char('0x3e')
-buf[3] = char('0x4e')
+buf[0] = 0xf4
+buf[1] = 0x2e
+buf[2] = 0x3e
+buf[3] = 0x4e
 buf2 = x.write(buf)
 console.log("Sent: " + buf.toString('hex') + ". Received: " + buf2.toString('hex'))
 
