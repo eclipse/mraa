@@ -419,14 +419,15 @@ mraa_intel_edison_pwm_init_post(mraa_pwm_context pwm)
 mraa_result_t
 mraa_intel_edison_spi_init_pre(int bus)
 {
-    mraa_intel_edison_misc_spi();
-
     if (miniboard == 1) {
         mraa_intel_edison_pinmode_change(115, 1);
         mraa_intel_edison_pinmode_change(114, 1);
         mraa_intel_edison_pinmode_change(109, 1);
         return MRAA_SUCCESS;
     }
+
+    mraa_intel_edison_misc_spi();
+
     mraa_gpio_write(tristate, 0);
 
     mraa_gpio_context io10_out = mraa_gpio_init_raw(258);
