@@ -38,7 +38,15 @@ public class Isr {
         }
     }
     public static void main(String argv[]) throws InterruptedException {
-        Gpio gpio = new Gpio(6);
+        int pin = 6;
+        if (argv.length == 1) {
+            try {
+                pin = Integer.parseInt(argv[0]);
+            } catch (Exception e) {
+            }
+        }
+        System.out.println("Starting ISR for pin " + Integer.toString(pin));
+        Gpio gpio = new Gpio(pin);
 
         Runnable callback = new JavaCallback();
 
@@ -46,8 +54,12 @@ public class Isr {
         while (true)
             Thread.sleep(999999);
     };
+
 }
 
-class JavaCallback extends Runnable {
-    public void run() { System.out.println("JavaCallback.run()"); }
+class JavaCallback implements Runnable {
+    @Override
+    public void run() {
+        System.out.println("Gpio level changed");
+    }
 }

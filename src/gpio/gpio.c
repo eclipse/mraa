@@ -268,18 +268,21 @@ static void*
 mraa_gpio_interrupt_handler(void* arg)
 {
     mraa_gpio_context dev = (mraa_gpio_context) arg;
-    if (IS_FUNC_DEFINED(dev, gpio_interrupt_handler_replace))
-        return dev->advance_func->gpio_interrupt_handler_replace(dev);
-
+    int fp = -1;
     mraa_result_t ret;
 
-    // open gpio value with open(3)
-    char bu[MAX_SIZE];
-    sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
-    int fp = open(bu, O_RDONLY);
-    if (fp < 0) {
-        syslog(LOG_ERR, "gpio: failed to open gpio%d/value", dev->pin);
-        return NULL;
+    if (IS_FUNC_DEFINED(dev, gpio_interrupt_handler_init_replace)) {
+        if (dev->advance_func->gpio_interrupt_handler_init_replace(dev) != MRAA_SUCCESS)
+            return NULL;
+    } else {
+        // open gpio value with open(3)
+        char bu[MAX_SIZE];
+        sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
+        fp = open(bu, O_RDONLY);
+        if (fp < 0) {
+            syslog(LOG_ERR, "gpio: failed to open gpio%d/value", dev->pin);
+            return NULL;
+        }
     }
 
 #ifndef HAVE_PTHREAD_CANCEL
@@ -309,11 +312,15 @@ mraa_gpio_interrupt_handler(void* arg)
 #endif
 
     for (;;) {
-        ret = mraa_gpio_wait_interrupt(dev->isr_value_fp
+        if (IS_FUNC_DEFINED(dev, gpio_wait_interrupt_replace)) {
+            ret = dev->advance_func->gpio_wait_interrupt_replace(dev);
+        } else {
+            ret = mraa_gpio_wait_interrupt(dev->isr_value_fp
 #ifndef HAVE_PTHREAD_CANCEL
                 , dev->isr_control_pipe[0]
 #endif
                 );
+        }
         if (ret == MRAA_SUCCESS && !dev->isr_thread_terminating) {
 #ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
@@ -391,8 +398,10 @@ mraa_gpio_interrupt_handler(void* arg)
 #ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 #endif
-            close(dev->isr_value_fp);
-            dev->isr_value_fp = -1;
+            if (fp != -1) {
+                close(dev->isr_value_fp);
+                dev->isr_value_fp = -1;
+            }
 #if defined(SWIGJAVA) || defined(JAVACALLBACK)
 
             if(dev->isr == mraa_java_isr_callback) {
