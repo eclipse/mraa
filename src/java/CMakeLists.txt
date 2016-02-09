@@ -30,7 +30,6 @@ add_custom_command (TARGET mraajava
   COMMAND cmake -E echo "Compiling java.."
   COMMAND cmake -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/mraa
   COMMAND ${JAVAC} *.java -d ${CMAKE_CURRENT_BINARY_DIR}
-  COMMAND cmake -E create_symlink java/libmraajava.so ${CMAKE_CURRENT_BINARY_DIR}/../libmraajava.so
   COMMAND cmake -E echo "Creating jar"
   COMMAND ${JAR} cvf mraa.jar mraa
 )
@@ -43,10 +42,5 @@ endif ()
 
 mraa_create_install_pkgconfig (mraajava.pc ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/libmraajava.so
-               ${CMAKE_CURRENT_BINARY_DIR}/mraa.jar
-		DESTINATION lib/java
-)
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/../libmraajava.so
-		DESTINATION lib/
-)
+install (TARGETS mraajava LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.jar DESTINATION ${CMAKE_INSTALL_LIBDIR}/../lib/java)
