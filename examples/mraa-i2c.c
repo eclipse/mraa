@@ -176,6 +176,7 @@ i2c_detect_devices(int bus)
 int
 process_command(int argc, char** argv)
 {
+    int status = 0;
     if (strcmp(argv[1], "help") == 0) {
         print_help();
         return 0;
@@ -194,24 +195,33 @@ process_command(int argc, char** argv)
             print_command_error();
             return 1;
         }
-    } else if ((strcmp(argv[1], "get") == 0)) {
+    } else if ((strcmp(argv[1], "get") == 0) || (strcmp(argv[1], "getrpt") == 0)) {
         if (argc == 5) {
+            int interation = 0;
+            mraa_boolean_t should_repeat = strcmp(argv[1], "getrpt") == 0;
             int bus = strtol(argv[2], NULL, 0);
             uint8_t device_address = strtol(argv[3], NULL, 0);
             uint8_t register_address = strtol(argv[4], NULL, 0);
             // fprintf(stdout, "Device %02X, Register = %02X\n", device_address, register_address);
             uint8_t data;
-            if (i2c_get(bus, device_address, register_address, &data) == MRAA_SUCCESS) {
-                fprintf(stdout, "Register %#02X = %#02X\n", register_address, data);
-                return 0;
-            } else {
-                fprintf(stdout, "i2c get failed\n");
-                return 1;
-            }
+            do {
+                if (i2c_get(bus, device_address, register_address, &data) == MRAA_SUCCESS) {
+                    if (should_repeat)
+                        fprintf(stdout, "%4d: ", interation);
+                    fprintf(stdout, "Register %#02X = %#02X\n", register_address, data);
+                    status = 0;
+                } else {
+                    fprintf(stdout, "i2c get failed\n");
+                    status = 1;
+                }
+                interation++;
+                usleep(10000);
+            } while (should_repeat && status == 0);
         } else {
             print_command_error();
-            return 1;
+            status = 1;
         }
+        return status;
     } else if ((strcmp(argv[1], "set") == 0)) {
         if (argc == 6) {
             int bus = strtol(argv[2], NULL, 0);
