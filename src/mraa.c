@@ -131,13 +131,13 @@ mraa_init()
             plat->platform_name = "Unknown platform";
         }
     }
-    // Now detect sub platform
+    // Now detect sub platform, note this is not an else since we could be in
+    // an error case and fall through to MRAA_ERROR_PLATFORM_NOT_INITIALISED
     if (plat != NULL) {
         mraa_platform_t usb_platform_type = mraa_usb_platform_extender(plat);
+        // if we have no known platform just replace usb platform with platform
         if (plat->platform_type == MRAA_UNKNOWN_PLATFORM && usb_platform_type != MRAA_UNKNOWN_PLATFORM) {
             plat->platform_type = usb_platform_type;
-        } else {
-            return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
         }
     }
     if (plat == NULL) {
