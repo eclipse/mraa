@@ -42,6 +42,7 @@
 #define GPIO_PORT_IO_RESET GPIO_PORT2
 #define GPIO_PORT_IO_INT GPIO_PORT3
 
+static pthread_mutex_t ft4222_lock;
 static FT_HANDLE ftHandleGpio = (FT_HANDLE) NULL; //GPIO Handle
 static FT_HANDLE ftHandleI2c = (FT_HANDLE) NULL; //I2C/SPI Handle
 static FT_HANDLE ftHandleSpi = (FT_HANDLE) NULL; //I2C/SPI Handle
@@ -51,6 +52,7 @@ static int numFt4222GpioPins = 4;
 static int numI2cGpioExpanderPins = 8;
 static int numI2cSwitchBusses = 4;
 static int currentI2cBus = 0;
+
 
 
 static void
@@ -211,16 +213,19 @@ mraa_ftdi_ft4222_i2c_read_internal(FT_HANDLE handle, uint8_t addr, uint8_t* data
 {
     uint16 bytesRead = 0;
     uint8 controllerStatus;
-    syslog(LOG_NOTICE, "FT4222_I2CMaster_Read(%#02X, %#02X)", addr, length);
+    // syslog(LOG_NOTICE, "FT4222_I2CMaster_Read(%#02X, %#02X)", addr, length);
     mraa_ftdi_ft4222_sleep_ms(1);
+    pthread_mutex_lock(&ft4222_lock);
     FT4222_STATUS ft4222Status = FT4222_I2CMaster_Read(handle, addr, data, length, &bytesRead);
     ft4222Status = FT4222_I2CMaster_GetStatus(ftHandleI2c, &controllerStatus);
     if (FT4222_OK != ft4222Status || I2CM_ERROR(controllerStatus)) {
         syslog(LOG_ERR, "FT4222_I2CMaster_Read failed for address %#02x\n", addr);
         FT4222_I2CMaster_Reset(handle);
+        pthread_mutex_unlock(&ft4222_lock);
         return 0;
     }
-    syslog(LOG_NOTICE, "FT4222_I2CMaster_Read completed");
+    // syslog(LOG_NOTICE, "FT4222_I2CMaster_Read completed");
+    pthread_mutex_unlock(&ft4222_lock);
     return bytesRead;
 }
 
@@ -229,15 +234,17 @@ mraa_ftdi_ft4222_i2c_write_internal(FT_HANDLE handle, uint8_t addr, const uint8_
 {
     uint16 bytesWritten = 0;
     uint8 controllerStatus;
-    syslog(LOG_NOTICE, "FT4222_I2CMaster_Write(%#02X, %#02X, %d)", addr, *data, bytesToWrite);
+    // syslog(LOG_NOTICE, "FT4222_I2CMaster_Write(%#02X, %#02X, %d)", addr, *data, bytesToWrite);
+    pthread_mutex_lock(&ft4222_lock);
     FT4222_STATUS ft4222Status = FT4222_I2CMaster_Write(handle, addr, (uint8_t*) data, bytesToWrite, &bytesWritten);
     ft4222Status = FT4222_I2CMaster_GetStatus(ftHandleI2c, &controllerStatus);
     if (FT4222_OK != ft4222Status || I2CM_ERROR(controllerStatus)) {
         syslog(LOG_ERR, "FT4222_I2CMaster_Write failed address %#02x\n", addr);
         FT4222_I2CMaster_Reset(handle);
+        pthread_mutex_unlock(&ft4222_lock);
         return 0;
     }
-
+    pthread_mutex_unlock(&ft4222_lock);
     if (bytesWritten != bytesToWrite)
         syslog(LOG_ERR, "FT4222_I2CMaster_Write wrote %u of %u bytes.\n", bytesWritten, bytesToWrite);
 
@@ -794,6 +801,11 @@ mraa_ftdi_ft4222()
     mraa_ftdi_ft4222_populate_gpio_func_table(func_table);
 
     sub_plat->adv_func = func_table;
+
+    if (pthread_mutex_init(&ft4222_lock, NULL) != 0) {
+        syslog(LOG_ERR, "Could not create mutex for FT4222 access");
+        return NULL;
+    }
     return sub_plat;
 }
 
