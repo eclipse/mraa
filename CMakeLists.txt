@@ -28,8 +28,8 @@ if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND" OR "x_${VERSION}" STREQUAL "x_HEAD-
   set (VERSION "v0.9.5-dirty")
 endif ()
 
-message (INFO " - libmraa Version ${VERSION}")
-message (INFO " - cmake Version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")
+message (STATUS " - libmraa Version ${VERSION}")
+message (STATUS " - cmake Version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")
 
 #parse the version information into pieces.
 string (REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${VERSION}")
@@ -84,10 +84,10 @@ endif()
 if (NOT BUILDARCH)
   include (TargetArch)
   target_architecture (DETECTED_ARCH)
-  message( INFO " - Target arch is ${DETECTED_ARCH}")
+  message (STATUS " - Target arch is ${DETECTED_ARCH}")
 else ()
   set (DETECTED_ARCH ${BUILDARCH})
-  message( INFO " - Override arch is ${DETECTED_ARCH}")
+  message (STATUS " - Override arch is ${DETECTED_ARCH}")
 endif()
 
 if (DETECTED_ARCH STREQUAL "i586" OR DETECTED_ARCH STREQUAL "x86_64"
@@ -96,7 +96,7 @@ if (DETECTED_ARCH STREQUAL "i586" OR DETECTED_ARCH STREQUAL "x86_64"
 elseif (DETECTED_ARCH MATCHES "arm.*")
   set (ARMPLAT ON)
 else ()
-  message(FATAL_ERROR "Only x86 and arm platforms currently supported")
+  message (FATAL_ERROR "Only x86 and arm platforms currently supported")
 endif()
 
 if (BUILDSWIGPYTHON OR BUILDTESTS)
@@ -137,7 +137,7 @@ if (IPK)
       set (TARGET_ARCH ${DETECTED_ARCH})
     endif ()
   endif ()
-  message (INFO " - Package arch is ${TARGET_ARCH}")
+  message (STATUS " - Package arch is ${TARGET_ARCH}")
 
   set(CPACK_GENERATOR "DEB" "TGZ")
   set(OPKG_ARCH ${TARGET_ARCH})
@@ -161,7 +161,7 @@ if (IPK)
 endif()
 
 if (RPM)
-  message (INFO " - Enabled RPM packaging for ${DETECTED_ARCH}")
+  message (STATUS " - Enabled RPM packaging for ${DETECTED_ARCH}")
   set(CMAKE_INSTALL_PREFIX "/usr")
   set(CPACK_PACKAGE_VERSION ${VERSION})
   set(CPACK_GENERATOR "RPM")
