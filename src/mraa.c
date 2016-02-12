@@ -804,17 +804,3 @@ mraa_get_iio_device_count()
 {
     return plat_iio->iio_device_count;
 }
-
-int
-mraa_find_iio_device(const char* devicename)
-{
-    int i = 0;
-    for (i; i < plat_iio->iio_device_count; i++) {
-#if 0
-        // compare with devices array
-        if (!strcmp() {
-        }
-#endif
-    }
-    return 0;
-}
