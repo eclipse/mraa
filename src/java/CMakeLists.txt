@@ -15,7 +15,7 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DJAVACALLBACK")
 
 if (NOT DEFINED ENV{JAVA_HOME_NATIVE})
   if (NOT DEFINED ENV{JAVA_HOME})
-    message (FATAL_ERROR " - Neither JAVA_HOME nor JAVA_HOME_NATIVE are set")
+    message (FATAL_ERROR "Neither JAVA_HOME nor JAVA_HOME_NATIVE are set")
   endif()
   set (JAVA_HOME_NATIVE $ENV{JAVA_HOME})
   set (JAVAC $ENV{JAVA_HOME}/bin/javac)
