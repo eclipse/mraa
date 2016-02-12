@@ -42,6 +42,7 @@
 #include <stdio.h>
 
 #include "mraa_internal.h"
+#include "firmata/firmata.h"
 #include "gpio.h"
 #include "version.h"
 
@@ -122,8 +123,7 @@ mraa_init()
         platform_name = NULL;
     }
 
-#if defined(USBPLAT)
-    // This is a platform extender so create null base platform if one doesn't already exist
+    // Create null base platform if one doesn't already exist
     if (plat == NULL) {
         plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
         if (plat != NULL) {
@@ -131,6 +131,8 @@ mraa_init()
             plat->platform_name = "Unknown platform";
         }
     }
+
+#if defined(USBPLAT)
     // Now detect sub platform, note this is not an else since we could be in
     // an error case and fall through to MRAA_ERROR_PLATFORM_NOT_INITIALISED
     if (plat != NULL) {
@@ -804,3 +806,17 @@ mraa_get_iio_device_count()
 {
     return plat_iio->iio_device_count;
 }
+
+#ifdef FIRMATA
+mraa_result_t
+mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
+{
+    if (subplatformtype == MRAA_FIRMATA) {
+        if (mraa_firmata_platform(plat, uart_dev) == MRAA_FIRMATA) {
+            return MRAA_SUCCESS;
+        }
+    }
+
+    return MRAA_ERROR_INVALID_PARAMETER;
+}
+#endif

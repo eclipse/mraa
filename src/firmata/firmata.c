@@ -26,20 +26,24 @@
 #include <string.h>
 
 #include "mraa_internal.h"
+#include "firmata/firmata.h"
 
-mraa_board_t
-mraa_firmata_init(mraa_uart_context uart_dev)
+mraa_board_t*
+mraa_firmata_init(const char* uart_dev)
 {
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
         return NULL;
     }
-    b->platform_name = MRAA_FIRMATA;
+
+    b->platform_name = "firmata";
     b->platform_version = "2.3";
+
+    return b;
 }
 
 mraa_platform_t
-mraa_firmata_platform(mraa_board_t* board, mraa_uart_context uart_dev)
+mraa_firmata_platform(mraa_board_t* board, const char* uart_dev)
 {
    /** 
     * Firmata boards are not something we can detect so we just trust the user
@@ -49,7 +53,7 @@ mraa_firmata_platform(mraa_board_t* board, mraa_uart_context uart_dev)
     mraa_board_t* sub_plat = NULL;
     mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
 
-    sub_plat = mraa_firmata();
+    sub_plat = mraa_firmata_init(uart_dev);
 
     if (sub_plat != NULL) {
         sub_plat->platform_type = platform_type;

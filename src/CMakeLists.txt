@@ -104,6 +104,7 @@ if (USBPLAT)
 endif ()
 
 if (FIRMATA)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFIRMATA=1")
   add_subdirectory (firmata)
 endif ()
 
