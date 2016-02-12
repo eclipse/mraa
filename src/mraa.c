@@ -152,7 +152,8 @@ mraa_init()
     if (plat != NULL) {
         int length = strlen(plat->platform_name) + 1;
         if (mraa_has_sub_platform()) {
-            length += strlen(plat->sub_platform->platform_name);
+            // Account for ' + ' chars
+            length += strlen(plat->sub_platform->platform_name) + 3;
         }
         platform_name = calloc(length, sizeof(char));
         if (mraa_has_sub_platform()) {
