@@ -1170,7 +1170,7 @@ is_arduino_board()
     // prepare format string for fscanf, based on MAX_SIZE
     char format_str[MAX_SIZE];
     snprintf(format_str, MAX_SIZE, "%%%ds", MAX_SIZE - 1);
-    int i;
+    int i, ret, errno_saved;
 
     // check tristate first
     tristate = mraa_gpio_init_raw(214);
@@ -1197,14 +1197,16 @@ is_arduino_board()
         }
 
         memset(gpiochip_label, 0, MAX_SIZE);
-        if (fscanf(fp, format_str, &gpiochip_label) != 1) {
+        ret = fscanf(fp, format_str, &gpiochip_label);
+        errno_saved = errno;
+        fclose(fp);
+        if (ret != 1) {
             syslog(LOG_INFO,
                    "edison: could not read from '%s', errno %d",
                    gpiochip_path,
-                   errno);
+                   errno_saved);
             return 0;
         }
-        fclose(fp);
 
         // we want to check for exact match
         if (strncmp(gpiochip_label, gpiochip_label_arduino, strlen(gpiochip_label) + 1) != 0) {
