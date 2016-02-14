@@ -67,6 +67,24 @@ static int numI2cSwitchBusses = 4;
 static int currentI2cBus = 0;
 static ft4222_io_exp_type gpio_expander_chip;
 
+FT_STATUS (*dl_FT_GetDeviceInfoList)(FT_DEVICE_LIST_INFO_NODE*, LPDWORD);
+FT_STATUS (*dl_FT_CreateDeviceInfoList)(LPDWORD);
+FT_STATUS (*dl_FT_OpenEx)(PVOID, DWORD, FT_HANDLE*);
+FT4222_STATUS (*dl_FT4222_GetVersion)(FT_HANDLE, FT4222_Version*);
+FT4222_STATUS (*dl_FT4222_I2CMaster_Write)(FT_HANDLE, uint16, uint8*, uint16, uint16*);
+FT4222_STATUS (*dl_FT4222_I2CMaster_Reset)(FT_HANDLE);
+FT4222_STATUS (*dl_FT4222_I2CMaster_Read)(FT_HANDLE, uint16, uint8*, uint16, uint16*);
+FT4222_STATUS (*dl_FT4222_I2CMaster_Init)(FT_HANDLE, uint32);
+FT4222_STATUS (*dl_FT4222_I2CMaster_GetStatus)(FT_HANDLE, uint8*);
+FT4222_STATUS (*dl_FT4222_GPIO_Init)(FT_HANDLE, GPIO_Dir[4]);
+FT4222_STATUS (*dl_FT4222_GPIO_GetTriggerStatus)(FT_HANDLE, GPIO_Port, uint16*);
+FT4222_STATUS (*dl_FT4222_GPIO_ReadTriggerQueue)(FT_HANDLE, GPIO_Port, GPIO_Trigger*, uint16, uint16*);
+FT4222_STATUS (*dl_FT4222_GPIO_Read)(FT_HANDLE, GPIO_Port, BOOL*);
+FT4222_STATUS (*dl_FT4222_GPIO_SetInputTrigger)(FT_HANDLE, GPIO_Port, GPIO_Trigger);
+FT4222_STATUS (*dl_FT4222_GPIO_Write)(FT_HANDLE, GPIO_Port, BOOL);
+FT4222_STATUS (*dl_FT4222_SetWakeUpInterrupt)(FT_HANDLE, BOOL);
+FT4222_STATUS (*dl_FT4222_SetSuspendOut)(FT_HANDLE, BOOL);
+FT4222_STATUS (*dl_FT4222_SPIMaster_Init)(FT_HANDLE, FT4222_SPIMode, FT4222_SPIClock, FT4222_SPICPOL, FT4222_SPICPHA, uint8);
 
 static void
 mraa_ftdi_ft4222_sleep_ms(unsigned long mseconds)
@@ -107,7 +125,34 @@ mraa_ftdi_ft4222_init()
     int i;
     int retCode = 0;
 
-    ftStatus = FT_CreateDeviceInfoList(&numDevs);
+    dl_FT_GetDeviceInfoList = dlsym(libft4222_lib, "FT_GetDeviceInfoList");
+    dl_FT_CreateDeviceInfoList = dlsym(libft4222_lib, "FT_CreateDeviceInfoList");
+    dl_FT4222_GetVersion = dlsym(libft4222_lib, "FT4222_GetVersion");
+    dl_FT4222_I2CMaster_Write = dlsym(libft4222_lib, "FT4222_I2CMaster_Write");
+    dl_FT4222_I2CMaster_Reset = dlsym(libft4222_lib, "FT4222_I2CMaster_Reset");
+    dl_FT4222_I2CMaster_Read = dlsym(libft4222_lib, "FT4222_I2CMaster_Read");
+    dl_FT4222_I2CMaster_Init = dlsym(libft4222_lib, "FT4222_I2CMaster_Init");
+    dl_FT4222_I2CMaster_GetStatus = dlsym(libft4222_lib, "FT4222_I2CMaster_GetStatus");
+    dl_FT4222_GPIO_Init = dlsym(libft4222_lib, "FT4222_GPIO_Init");
+    dl_FT4222_GPIO_GetTriggerStatus = dlsym(libft4222_lib, "FT4222_GPIO_GetTriggerStatus");
+    dl_FT4222_GPIO_ReadTriggerQueue = dlsym(libft4222_lib, "FT4222_GPIO_ReadTriggerQueue");
+    dl_FT4222_GPIO_Read = dlsym(libft4222_lib, "FT4222_GPIO_Read");
+    dl_FT4222_GPIO_SetInputTrigger = dlsym(libft4222_lib, "FT4222_GPIO_SetInputTrigger");
+    dl_FT4222_GPIO_Write = dlsym(libft4222_lib, "FT4222_GPIO_Write");
+    dl_FT4222_SetWakeUpInterrupt = dlsym(libft4222_lib, "FT4222_SetWakeUpInterrupt");
+    dl_FT4222_SetSuspendOut = dlsym(libft4222_lib, "FT4222_SetSuspendOut");
+    dl_FT4222_SPIMaster_Init = dlsym(libft4222_lib, "FT4222_SPIMaster_Init");
+    dl_FT_OpenEx = dlsym(libft4222_lib, "FT_OpenEx");
+
+    char *error = dlerror();
+    if (error != NULL)  {
+        printf(error);
+        syslog(LOG_ERR, "Failed to find all symbols fort FTDI4222 support");
+        syslog(LOG_ERR, error);
+        goto init_exit;
+    }
+
+    ftStatus = dl_FT_CreateDeviceInfoList(&numDevs);
     if (ftStatus != FT_OK) {
         syslog(LOG_ERR, "FT_CreateDeviceInfoList failed: error code %d\n", ftStatus);
         goto init_exit;
@@ -119,7 +164,7 @@ mraa_ftdi_ft4222_init()
         goto init_exit;
     }
 
-    ftStatus = FT_GetDeviceInfoList(devInfo, &numDevs);
+    ftStatus = dl_FT_GetDeviceInfoList(devInfo, &numDevs);
     syslog(LOG_NOTICE, "FT_GetDeviceInfoList returned %d devices\n", numDevs);
     if (ftStatus != FT_OK) {
         syslog(LOG_ERR, "FT_GetDeviceInfoList failed (error code %d)\n", (int) ftStatus);
@@ -152,21 +197,21 @@ mraa_ftdi_ft4222_init()
         goto init_exit;
     }
 
-    ftStatus = FT_OpenEx((PVOID)(uintptr_t) locationIdI2c, FT_OPEN_BY_LOCATION, &ftHandleI2c);
+    ftStatus = dl_FT_OpenEx((PVOID)(uintptr_t) locationIdI2c, FT_OPEN_BY_LOCATION, &ftHandleI2c);
     if (ftStatus != FT_OK) {
         syslog(LOG_ERR, "FT_OpenEx failed (error %d)\n", (int) ftStatus);
         goto init_exit;
     }
 
-    ftStatus = FT_OpenEx((PVOID)(uintptr_t) locationIdGpio, FT_OPEN_BY_LOCATION, &ftHandleGpio);
+    ftStatus = dl_FT_OpenEx((PVOID)(uintptr_t) locationIdGpio, FT_OPEN_BY_LOCATION, &ftHandleGpio);
     if (ftStatus != FT_OK) {
         syslog(LOG_ERR, "FT_OpenEx failed (error %d)\n", (int) ftStatus);
         goto init_exit;
     }
 
-    FT4222_SetSuspendOut(ftHandleGpio, 0);
-    FT4222_SetWakeUpInterrupt(ftHandleGpio, 0);
-    ftStatus =  FT4222_GPIO_Init(ftHandleGpio, pinDirection);
+    dl_FT4222_SetSuspendOut(ftHandleGpio, 0);
+    dl_FT4222_SetWakeUpInterrupt(ftHandleGpio, 0);
+    ftStatus =  dl_FT4222_GPIO_Init(ftHandleGpio, pinDirection);
     if (ftStatus != FT_OK) {
         syslog(LOG_ERR, "FT4222_GPIO_Init failed (error %d)\n", (int) ftStatus);
         mraaStatus = MRAA_ERROR_NO_RESOURCES;
@@ -174,13 +219,13 @@ mraa_ftdi_ft4222_init()
     }
 
     // Tell the FT4222 to be an I2C Master by default on init.
-    FT4222_STATUS ft4222Status = FT4222_I2CMaster_Init(ftHandleI2c, bus_speed);
+    FT4222_STATUS ft4222Status = dl_FT4222_I2CMaster_Init(ftHandleI2c, bus_speed);
     if (FT4222_OK != ft4222Status) {
         syslog(LOG_ERR, "FT4222_I2CMaster_Init failed (error %d)!\n", ft4222Status);
         goto init_exit;
     }
 
-    ft4222Status = FT4222_I2CMaster_Reset(ftHandleI2c);
+    ft4222Status = dl_FT4222_I2CMaster_Reset(ftHandleI2c);
     if (FT4222_OK != ft4222Status) {
         syslog(LOG_ERR, "FT4222_I2CMaster_Reset failed (error %d)!\n", ft4222Status);
         goto init_exit;
@@ -202,7 +247,7 @@ mraa_ftdi_ft4222_get_version(unsigned int* versionChip, unsigned int* versionLib
 {
     if (ftHandleI2c != NULL) {
         FT4222_Version ft4222Version;
-        FT4222_STATUS ft4222Status = FT4222_GetVersion(ftHandleI2c, &ft4222Version);
+        FT4222_STATUS ft4222Status = dl_FT4222_GetVersion(ftHandleI2c, &ft4222Version);
         if (FT4222_OK == ft4222Status) {
             *versionChip = (unsigned int) ft4222Version.chipVersion;
             *versionLib = (unsigned int) ft4222Version.dllVersion;
@@ -240,12 +285,12 @@ mraa_ftdi_ft4222_i2c_read_internal(FT_HANDLE handle, uint8_t addr, uint8_t* data
 {
     uint16 bytesRead = 0;
     uint8 controllerStatus;
-    FT4222_STATUS ft4222Status = FT4222_I2CMaster_Read(handle, addr, data, length, &bytesRead);
+    FT4222_STATUS ft4222Status = dl_FT4222_I2CMaster_Read(handle, addr, data, length, &bytesRead);
     // mraa_ftdi_ft4222_i2c_log("FT4222_I2CMaster_Read", addr, data, length);
-    ft4222Status = FT4222_I2CMaster_GetStatus(ftHandleI2c, &controllerStatus);
+    ft4222Status = dl_FT4222_I2CMaster_GetStatus(ftHandleI2c, &controllerStatus);
     if (FT4222_OK != ft4222Status || I2CM_ERROR(controllerStatus)) {
         syslog(LOG_ERR, "FT4222_I2CMaster_Read failed for address %#02x. Code %d", addr, controllerStatus);
-        FT4222_I2CMaster_Reset(handle);
+        dl_FT4222_I2CMaster_Reset(handle);
         return 0;
     }
     // syslog(LOG_NOTICE, "FT4222_I2CMaster_Read completed");
@@ -258,11 +303,11 @@ mraa_ftdi_ft4222_i2c_write_internal(FT_HANDLE handle, uint8_t addr, const uint8_
     uint16 bytesWritten = 0;
     uint8 controllerStatus;
     // mraa_ftdi_ft4222_i2c_log("FT4222_I2CMaster_Write", addr, data, bytesToWrite);
-    FT4222_STATUS ft4222Status = FT4222_I2CMaster_Write(handle, addr, (uint8_t*) data, bytesToWrite, &bytesWritten);
-    ft4222Status = FT4222_I2CMaster_GetStatus(ftHandleI2c, &controllerStatus);
+    FT4222_STATUS ft4222Status = dl_FT4222_I2CMaster_Write(handle, addr, (uint8_t*) data, bytesToWrite, &bytesWritten);
+    ft4222Status = dl_FT4222_I2CMaster_GetStatus(ftHandleI2c, &controllerStatus);
     if (FT4222_OK != ft4222Status || I2CM_ERROR(controllerStatus)) {
         syslog(LOG_ERR, "FT4222_I2CMaster_Write failed address %#02x\n", addr);
-        FT4222_I2CMaster_Reset(handle);
+        dl_FT4222_I2CMaster_Reset(handle);
         return 0;
     }
     if (bytesWritten != bytesToWrite)
@@ -317,7 +362,7 @@ static mraa_result_t
 ftdi_ft4222_set_internal_gpio_dir(int pin, GPIO_Dir direction)
 {
     pinDirection[pin] = direction;
-    if (FT4222_GPIO_Init(ftHandleGpio, pinDirection) != FT4222_OK)
+    if (dl_FT4222_GPIO_Init(ftHandleGpio, pinDirection) != FT4222_OK)
         return MRAA_ERROR_UNSPECIFIED;
     else
         return MRAA_SUCCESS;
@@ -371,7 +416,7 @@ mraa_ftdi_ft4222_gpio_set_pca9555_dir(int pin, mraa_gpio_dir_t dir)
 static mraa_result_t
 ftdi_ft4222_set_internal_gpio_trigger(int pin, GPIO_Trigger trigger)
 {
-    FT4222_STATUS ft4222Status = FT4222_GPIO_SetInputTrigger(ftHandleGpio, pin, trigger);
+    FT4222_STATUS ft4222Status = dl_FT4222_GPIO_SetInputTrigger(ftHandleGpio, pin, trigger);
     if (ft4222Status == FT4222_OK)
         return MRAA_SUCCESS;
     else
@@ -439,14 +484,14 @@ static mraa_result_t
 mraa_ftdi_ft4222_i2c_init_bus_replace(mraa_i2c_context dev)
 {
     // Tell the FT4222 to be an I2C Master.
-    FT4222_STATUS ft4222Status = FT4222_I2CMaster_Init(ftHandleI2c, bus_speed);
+    FT4222_STATUS ft4222Status = dl_FT4222_I2CMaster_Init(ftHandleI2c, bus_speed);
     if (FT4222_OK != ft4222Status) {
         syslog(LOG_ERR, "FT4222_I2CMaster_Init failed (error %d)!\n", ft4222Status);
         return MRAA_ERROR_NO_RESOURCES;
     }
 
     // Reset the I2CM registers to a known state.
-    ft4222Status = FT4222_I2CMaster_Reset(ftHandleI2c);
+    ft4222Status = dl_FT4222_I2CMaster_Reset(ftHandleI2c);
     if (FT4222_OK != ft4222Status) {
         syslog(LOG_ERR, "FT4222_I2CMaster_Reset failed (error %d)!\n", ft4222Status);
         return MRAA_ERROR_NO_RESOURCES;
@@ -475,7 +520,7 @@ mraa_ftdi_ft4222_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
             bus_speed = 3400;
             break;
     }
-    return FT4222_I2CMaster_Init(ftHandleI2c, bus_speed) == FT4222_OK ? MRAA_SUCCESS : MRAA_ERROR_NO_RESOURCES;
+    return dl_FT4222_I2CMaster_Init(ftHandleI2c, bus_speed) == FT4222_OK ? MRAA_SUCCESS : MRAA_ERROR_NO_RESOURCES;
 }
 
 
@@ -602,7 +647,7 @@ mraa_ftdi_ft4222_gpio_init_internal_replace(mraa_gpio_context dev, int pin)
         syslog(LOG_NOTICE, "Closing I2C interface to enable GPIO%d\n", pin);
 
         /* Replace with call to SPI init when SPI is fully implemented */
-        FT4222_STATUS ft4222Status = FT4222_SPIMaster_Init(ftHandleSpi, SPI_IO_SINGLE, CLK_DIV_4, CLK_IDLE_HIGH, CLK_LEADING, 0x01);
+        FT4222_STATUS ft4222Status = dl_FT4222_SPIMaster_Init(ftHandleSpi, SPI_IO_SINGLE, CLK_DIV_4, CLK_IDLE_HIGH, CLK_LEADING, 0x01);
         if (FT4222_OK != ft4222Status){
             syslog(LOG_ERR, "Failed to close I2C interface and start SPI (error %d)!\n", ft4222Status);
             return MRAA_ERROR_NO_RESOURCES;
@@ -671,7 +716,7 @@ mraa_ftdi_ft4222_gpio_read_replace(mraa_gpio_context dev)
         case GPIO_TYPE_BUILTIN:
         {
             BOOL value;
-            FT4222_STATUS ft4222Status = FT4222_GPIO_Read(ftHandleGpio, dev->phy_pin, &value);
+            FT4222_STATUS ft4222Status = dl_FT4222_GPIO_Read(ftHandleGpio, dev->phy_pin, &value);
             if (FT4222_OK != ft4222Status) {
                 syslog(LOG_ERR, "FT4222_GPIO_Read failed (error %d)!\n", ft4222Status);
                 return -1;
@@ -698,7 +743,7 @@ mraa_ftdi_ft4222_gpio_write_replace(mraa_gpio_context dev, int write_value)
     switch (mraa_ftdi_ft4222_get_gpio_type(dev->pin)) {
         case GPIO_TYPE_BUILTIN:
         {
-            FT4222_STATUS ft4222Status = FT4222_GPIO_Write(ftHandleGpio, dev->phy_pin, write_value);
+            FT4222_STATUS ft4222Status = dl_FT4222_GPIO_Write(ftHandleGpio, dev->phy_pin, write_value);
             if (FT4222_OK != ft4222Status) {
                 syslog(LOG_ERR, "FT4222_GPIO_Write failed (error %d)!\n", ft4222Status);
                 return MRAA_ERROR_UNSPECIFIED;
@@ -806,13 +851,13 @@ static mraa_boolean_t
 mraa_ftdi_ft4222_has_internal_gpio_triggered(int pin)
 {
     uint16 num_events = 0;
-    FT4222_STATUS ft4222Status = FT4222_GPIO_GetTriggerStatus(ftHandleGpio, pin, &num_events);
+    FT4222_STATUS ft4222Status = dl_FT4222_GPIO_GetTriggerStatus(ftHandleGpio, pin, &num_events);
     if (num_events > 0) {
         int i;
         uint16 num_events_read;
         GPIO_Trigger event;
         for (i = 0; i < num_events; ++i)
-            FT4222_GPIO_ReadTriggerQueue(ftHandleGpio, pin, &event, 1, &num_events_read);
+            dl_FT4222_GPIO_ReadTriggerQueue(ftHandleGpio, pin, &event, 1, &num_events_read);
         return TRUE;
     } else
         return FALSE;

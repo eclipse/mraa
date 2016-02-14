@@ -36,14 +36,20 @@ mraa_usb_platform_extender(mraa_board_t* board)
 {
     mraa_board_t* sub_plat = NULL;
     mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
+
 #ifdef FTDI4222
-    if (mraa_ftdi_ft4222_init() == MRAA_SUCCESS) {
-        unsigned int versionChip, versionLib;
-        if (mraa_ftdi_ft4222_get_version(&versionChip, &versionLib) == MRAA_SUCCESS) {
-            // TODO: Add ft4222 version checks
-            platform_type = MRAA_FTDI_FT4222;        
+    libft4222_lib = dlopen("libft4222.so", RTLD_LAZY);
+    if (!libft4222_lib) {
+        syslog(LOG_WARNING, "libft4222.so not found, skipping");
+    } else {
+        if (mraa_ftdi_ft4222_init() == MRAA_SUCCESS) {
+            unsigned int versionChip, versionLib;
+            if (mraa_ftdi_ft4222_get_version(&versionChip, &versionLib) == MRAA_SUCCESS) {
+                // TODO: Add ft4222 version checks
+                platform_type = MRAA_FTDI_FT4222;
+            }
         }
-    }  
+    }
 #endif
     switch (platform_type) {
 #ifdef FTDI4222
@@ -62,4 +68,3 @@ mraa_usb_platform_extender(mraa_board_t* board)
     }
     return platform_type;
 }
-
