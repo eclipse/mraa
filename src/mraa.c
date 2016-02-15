@@ -42,7 +42,7 @@
 #include <stdio.h>
 
 #include "mraa_internal.h"
-#include "firmata/firmata.h"
+#include "firmata/firmata_mraa.h"
 #include "gpio.h"
 #include "version.h"
 
