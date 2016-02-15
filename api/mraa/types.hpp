@@ -46,7 +46,16 @@ typedef enum {
     RASPBERRY_PI = 5,          /**< The different Raspberry PI Models -like  A,B,A+,B+ */
     BEAGLEBONE = 6,            /**< The different BeagleBone Black Modes B/C */
     BANANA = 7,                /**< Allwinner A20 based Banana Pi and Banana Pro */
+    INTEL_NUC5 = 8,            /**< The Intel 5th generations Broadwell NUCs */
+    96BOARDS = 9,              /**< Linaro 96boards */
+    INTEL_SOFIA_3GR = 10,      /**< The Intel SoFIA 3GR */
+    INTEL_CHERRYHILLS = 11,    /**< The Intel Braswell Cherryhills */
 
+    FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
+
+    FIRMATA = 1024,            /**< Firmata uart platform/bridge */
+
+    NULL_PLATFORM = 98,
     UNKNOWN_PLATFORM =
     99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
 } Platform;
