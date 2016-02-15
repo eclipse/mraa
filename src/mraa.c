@@ -807,16 +807,17 @@ mraa_get_iio_device_count()
     return plat_iio->iio_device_count;
 }
 
-#ifdef FIRMATA
 mraa_result_t
 mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
 {
-    if (subplatformtype == MRAA_FIRMATA) {
-        if (mraa_firmata_platform(plat, uart_dev) == MRAA_FIRMATA) {
+#ifdef FIRMATA
+    if (subplatformtype == MRAA_GENERIC_FIRMATA) {
+        if (mraa_firmata_platform(plat, uart_dev) == MRAA_GENERIC_FIRMATA) {
+            syslog(LOG_NOTICE, "mraa: Added firmata subplatform");
             return MRAA_SUCCESS;
         }
     }
+#endif
 
     return MRAA_ERROR_INVALID_PARAMETER;
 }
-#endif
