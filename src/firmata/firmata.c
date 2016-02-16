@@ -286,6 +286,7 @@ firmata_analogWrite(t_firmata* firmata, int pin, int value)
     return (res);
 }
 
+#if 0
 int
 firmata_analogRead(t_firmata* firmata, int pin)
 {
@@ -299,6 +300,7 @@ firmata_analogRead(t_firmata* firmata, int pin)
     res = serial_write(firmata->serial, buff, 3);
     return (res);
 }
+#endif
 
 int
 firmata_digitalWrite(t_firmata* firmata, int pin, int value)
