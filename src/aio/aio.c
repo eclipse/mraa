@@ -70,23 +70,30 @@ mraa_aio_init_internal(mraa_adv_func_t* func_table)
 mraa_aio_context
 mraa_aio_init(unsigned int aio)
 {
-    if (plat == NULL) {
+    mraa_board_t* board = plat;
+    int pin;
+    if (board == NULL) {
         syslog(LOG_ERR, "aio: Platform not initialised");
         return NULL;
     }
     if (mraa_is_sub_platform_id(aio)) {
-        syslog(LOG_NOTICE, "aio: Using sub platform is not supported");
-        return NULL;
+        syslog(LOG_NOTICE, "aio: Using sub platform");
+        board = board->sub_platform;
+        if (board == NULL) {
+            syslog(LOG_ERR, "aio: Sub platform Not Initialised");
+            return NULL;
+        }
+        pin = mraa_get_sub_platform_index(aio);
     }
 
     // Create ADC device connected to specified channel
-    mraa_aio_context dev = mraa_aio_init_internal(plat->adv_func);
+    mraa_aio_context dev = mraa_aio_init_internal(board->adv_func);
     if (dev == NULL) {
         syslog(LOG_ERR, "aio: Insufficient memory for specified input channel %d", aio);
         return NULL;
     }
-    int pin = aio + plat->gpio_count;
-    dev->channel = plat->pins[pin].aio.pinmap;
+    pin = aio + board->gpio_count;
+    dev->channel = board->pins[pin].aio.pinmap;
     dev->value_bit = DEFAULT_BITS;
 
     if (IS_FUNC_DEFINED(dev, aio_init_pre)) {
@@ -96,20 +103,20 @@ mraa_aio_init(unsigned int aio)
             return NULL;
         }
     }
-    if (aio > plat->aio_count) {
+    if (aio > board->aio_count) {
         syslog(LOG_ERR, "aio: requested channel out of range");
         free(dev);
         return NULL;
     }
 
-    if (plat->pins[pin].capabilites.aio != 1) {
+    if (board->pins[pin].capabilites.aio != 1) {
         syslog(LOG_ERR, "aio: pin uncapable of aio");
         free(dev);
         return NULL;
     }
 
-    if (plat->pins[pin].aio.mux_total > 0) {
-        if (mraa_setup_mux_mapped(plat->pins[pin].aio) != MRAA_SUCCESS) {
+    if (board->pins[pin].aio.mux_total > 0) {
+        if (mraa_setup_mux_mapped(board->pins[pin].aio) != MRAA_SUCCESS) {
             free(dev);
             syslog(LOG_ERR, "aio: unable to setup multiplexers for pin");
             return NULL;
