@@ -148,6 +148,10 @@ mraa_init()
     }
 #endif
 
+#if defined(FIRMATA)
+    // look for USB id 8087:0aba -> genuino/arduino 101
+#endif
+
     // Look for IIO devices
     mraa_iio_detect();
 

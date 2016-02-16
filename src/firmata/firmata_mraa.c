@@ -29,7 +29,7 @@
 #include "firmata/firmata_mraa.h"
 #include "firmata/firmata.h"
 
-static t_firmata *firmata_dev;
+static t_firmata* firmata_dev;
 
 static mraa_result_t
 mraa_firmata_gpio_init_internal_replace(mraa_gpio_context dev, int pin)
@@ -57,8 +57,7 @@ mraa_firmata_gpio_write_replace(mraa_gpio_context dev, int write_value)
 {
     if (write_value == 0) {
         firmata_digitalWrite(firmata_dev, dev->phy_pin, LOW);
-    }
-    else {
+    } else {
         firmata_digitalWrite(firmata_dev, dev->phy_pin, HIGH);
     }
 }
@@ -68,9 +67,9 @@ mraa_firmata_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
     switch (dir) {
         case MRAA_GPIO_IN:
-	    firmata_pinMode(firmata_dev, dev->phy_pin, MODE_OUTPUT);
-	case MRAA_GPIO_OUT:
-	    firmata_pinMode(firmata_dev, dev->phy_pin, MODE_INPUT);
+            firmata_pinMode(firmata_dev, dev->phy_pin, MODE_OUTPUT);
+        case MRAA_GPIO_OUT:
+            firmata_pinMode(firmata_dev, dev->phy_pin, MODE_INPUT);
         default:
             return MRAA_ERROR_INVALID_PARAMETER;
     }
@@ -95,8 +94,47 @@ mraa_firmata_init(const char* uart_dev)
     if (b->pins == NULL) {
         free(b);
         return NULL;
-    }   
+    }
 
+    strncpy(b->pins[0].name, "IO0", 8);
+    b->pins[0].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[0].gpio.pinmap = 0;
+    strncpy(b->pins[1].name, "IO1", 8);
+    b->pins[1].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[1].gpio.pinmap = 1;
+    strncpy(b->pins[2].name, "IO2", 8);
+    b->pins[2].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[2].gpio.pinmap = 2;
+    strncpy(b->pins[3].name, "IO3", 8);
+    b->pins[3].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[3].gpio.pinmap = 3;
+    strncpy(b->pins[4].name, "IO4", 8);
+    b->pins[4].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[4].gpio.pinmap = 4;
+    strncpy(b->pins[5].name, "IO5", 8);
+    b->pins[5].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[5].gpio.pinmap = 5;
+    strncpy(b->pins[6].name, "IO6", 8);
+    b->pins[6].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[6].gpio.pinmap = 6;
+    strncpy(b->pins[7].name, "IO7", 8);
+    b->pins[7].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[7].gpio.pinmap = 7;
+    strncpy(b->pins[8].name, "IO8", 8);
+    b->pins[8].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[8].gpio.pinmap = 8;
+    strncpy(b->pins[9].name, "IO9", 8);
+    b->pins[9].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[9].gpio.pinmap = 9;
+    strncpy(b->pins[10].name, "IO10", 8);
+    b->pins[10].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[10].gpio.pinmap = 10;
+    strncpy(b->pins[11].name, "IO11", 8);
+    b->pins[11].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[11].gpio.pinmap = 11;
+    strncpy(b->pins[12].name, "IO12", 8);
+    b->pins[12].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[12].gpio.pinmap = 12;
     strncpy(b->pins[13].name, "IO13", 8);
     b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[13].gpio.pinmap = 13;
@@ -127,11 +165,11 @@ mraa_firmata_init(const char* uart_dev)
 mraa_platform_t
 mraa_firmata_platform(mraa_board_t* board, const char* uart_dev)
 {
-   /** 
-    * Firmata boards are not something we can detect so we just trust the user
-    * to initialise them themselves and is the only platform type not to be
-    * initialised from mraa_init(). Good luck!
-    */
+    /**
+     * Firmata boards are not something we can detect so we just trust the user
+     * to initialise them themselves and is the only platform type not to be
+     * initialised from mraa_init(). Good luck!
+     */
     mraa_board_t* sub_plat = NULL;
 
     sub_plat = mraa_firmata_init(uart_dev);
@@ -143,4 +181,3 @@ mraa_firmata_platform(mraa_board_t* board, const char* uart_dev)
 
     return MRAA_NULL_PLATFORM;
 }
-
