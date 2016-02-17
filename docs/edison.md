@@ -17,6 +17,8 @@ Intel Arduino board
 The Edison used with the Arduino board has the following limitations
 in libmraa:
 
+- Do not use the 'reset' button on the arduino shields, there is a hardware
+  bug and the platform will likely not come back up correctly
 - I2C is exposed on i2c-6, therefore you must use bus 6 and not bus 0
 - PWM available on default swizzler positions. (3,5,6,9)
 - SPI exposed is also used for the ADC. Try not to use your own CS.
