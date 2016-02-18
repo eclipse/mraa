@@ -107,7 +107,7 @@ mraa_aio_init(unsigned int aio)
         syslog(LOG_ERR, "aio: pin %i beyond platform definition", pin);
         return NULL;
     }
-    if (aio > board->aio_count) {
+    if (aio >= board->aio_count) {
         syslog(LOG_ERR, "aio: requested channel out of range");
         return NULL;
     }
