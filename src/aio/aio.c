@@ -103,7 +103,7 @@ mraa_aio_init(unsigned int aio)
             return NULL;
         }
     }
-    if (aio > board->aio_count) {
+    if (aio >= board->aio_count) {
         syslog(LOG_ERR, "aio: requested channel out of range");
         free(dev);
         return NULL;
