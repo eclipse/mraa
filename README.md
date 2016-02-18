@@ -90,6 +90,15 @@ API Documentation
 <a href="http://py.mraa.io"><img src="http://iotdk.intel.com/misc/logos/python.png"/></a>
 <a href="http://js.mraa.io"><img src="http://iotdk.intel.com/misc/logos/node.png"/></a>
 
+Contact Us
+==========
+
+To ask questions eithe file issues in github or send emails on our [mailing
+list](https://lists.01.org/mailman/listinfo/mraa). You might also catch us on
+the mraa channel on freenode IRC.
+
+See the [Contribution](CONTRIBUTING.md) documentation for more details.
+
 Changelog
 =========
 
