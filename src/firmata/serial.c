@@ -75,6 +75,7 @@ serial_open(t_serial* serial, char* name)
         }
         return (-1);
     }
+#if 0
     if (ioctl(serial->port_fd, TIOCMGET, &bits) < 0) {
         close(serial->port_fd);
         perror("Unable to query serial port signals");
@@ -100,6 +101,7 @@ serial_open(t_serial* serial, char* name)
         ioctl(serial->port_fd, TIOCSSERIAL, &kernel_serial_settings);
     }
     tcflush(serial->port_fd, TCIFLUSH);
+#endif
     serial->port_name = name;
     serial->port_is_open = 1;
     return 0;
@@ -276,35 +278,9 @@ serial_read(t_serial* serial, void* ptr, int count)
 int
 serial_write(t_serial* serial, void* ptr, int len)
 {
-    // printf("Write %d\n", len);
-    if (!serial->port_is_open)
-        return -1;
-    int n, written = 0;
-    fd_set wfds;
-    struct timeval tv;
-    while (written < len) {
-        n = write(serial->port_fd, (const char*) ptr + written, len - written);
-        if (n < 0 && (errno == EAGAIN || errno == EINTR))
-            n = 0;
-        // printf("Write, n = %d\n", n);
-        if (n < 0)
-            return -1;
-        if (n > 0) {
-            written += n;
-        } else {
-            tv.tv_sec = 10;
-            tv.tv_usec = 0;
-            FD_ZERO(&wfds);
-            FD_SET(serial->port_fd, &wfds);
-            n = select(serial->port_fd + 1, NULL, &wfds, NULL, &tv);
-            if (n < 0 && errno == EINTR)
-                n = 1;
-            if (n <= 0)
-                return -1;
-        }
-    }
-    serial->tx += written;
-    return (written);
+  //printf("Write %d\n", len);                                                                                 
+  write(serial->port_fd, (const char *)ptr, len);
+  return (len);
 }
 
 int

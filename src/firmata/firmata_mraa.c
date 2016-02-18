@@ -31,6 +31,24 @@
 
 static t_firmata* firmata_dev;
 
+static unsigned int
+mraa_firmata_aio_read(mraa_aio_context dev)
+{
+    firmata_pull(firmata_dev);
+    return (unsigned int) firmata_dev->pins[dev->channel].value;
+}
+
+static mraa_result_t
+mraa_firmata_aio_init_internal_replace(mraa_aio_context dev, int aio)
+{
+    // firmata considers A0 pin0 as well as actual pin0 :/
+    firmata_pinMode(firmata_dev, aio, MODE_ANALOG);
+    // register for updates on that ADC channel
+    firmata_analogRead(firmata_dev, aio);
+
+    return MRAA_SUCCESS;
+}
+
 static mraa_result_t
 mraa_firmata_gpio_init_internal_replace(mraa_gpio_context dev, int pin)
 {
@@ -60,6 +78,8 @@ mraa_firmata_gpio_write_replace(mraa_gpio_context dev, int write_value)
     } else {
         firmata_digitalWrite(firmata_dev, dev->phy_pin, HIGH);
     }
+
+    return MRAA_SUCCESS;
 }
 
 static mraa_result_t
@@ -86,11 +106,15 @@ mraa_firmata_init(const char* uart_dev)
     }
 
     b->platform_name = "firmata";
-    b->platform_version = "2.3";
-    b->gpio_count = 20;
-    b->phy_pin_count = b->gpio_count;
+    // do we support 2.5? Or are we more 2.3?
+    // or should we return the flashed sketch name?
+    b->platform_version = "2.5";
+    b->gpio_count = 14;
+    b->aio_count = 6;
+    b->adc_supported = 10;
+    b->phy_pin_count = 20;
 
-    b->pins = (mraa_pininfo_t*) calloc(b->gpio_count, sizeof(mraa_pininfo_t));
+    b->pins = (mraa_pininfo_t*) calloc(b->phy_pin_count, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
         free(b);
         return NULL;
@@ -138,6 +162,25 @@ mraa_firmata_init(const char* uart_dev)
     strncpy(b->pins[13].name, "IO13", 8);
     b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[13].gpio.pinmap = 13;
+    strncpy(b->pins[10].name, "A0", 8);
+    b->pins[14].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[14].gpio.pinmap = 14;
+    strncpy(b->pins[11].name, "A1", 8);
+    b->pins[15].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[15].gpio.pinmap = 15;
+    strncpy(b->pins[12].name, "A2", 8);
+    b->pins[16].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[16].gpio.pinmap = 16;
+    strncpy(b->pins[13].name, "A3", 8);
+    b->pins[17].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[17].gpio.pinmap = 17;
+    strncpy(b->pins[13].name, "A4", 8);
+    b->pins[18].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[18].gpio.pinmap = 18;
+    strncpy(b->pins[13].name, "A5", 8);
+    b->pins[19].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[19].gpio.pinmap = 19;
+
 
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
     if (b->adv_func == NULL) {
@@ -152,12 +195,15 @@ mraa_firmata_init(const char* uart_dev)
     b->adv_func->gpio_read_replace = &mraa_firmata_gpio_read_replace;
     b->adv_func->gpio_write_replace = &mraa_firmata_gpio_write_replace;
 
+    b->adv_func->aio_init_internal_replace = &mraa_firmata_aio_init_internal_replace;
+    b->adv_func->aio_read_replace = &mraa_firmata_aio_read;
+
     firmata_dev = firmata_new(uart_dev);
-#if 0
+
+    // if this isn't working then we have an issue with our uart
     while (!firmata_dev->isReady) {
        firmata_pull(firmata_dev);
     }
-#endif
 
     return b;
 }

@@ -286,21 +286,19 @@ firmata_analogWrite(t_firmata* firmata, int pin, int value)
     return (res);
 }
 
-#if 0
 int
-firmata_analogRead(t_firmata* firmata, int pin)
+firmata_analogRead(t_firmata *firmata, int pin)
 {
     int res;
-
-    uint8_t buff[3];
+    int value = 1;
+    uint8_t buff[2];
     printf("Writting analogRead at: %i\n", pin);
-    buff[0] = 0xE0 | pin;
-    buff[1] = value & 0x7F;
-    buff[2] = (value >> 7) & 0x7F;
-    res = serial_write(firmata->serial, buff, 3);
-    return (res);
+    buff[0] = FIRMATA_REPORT_ANALOG | pin;
+    buff[1] = value;
+    printf("192 == %d, pinval == %d, pin %d", buff[0], buff[1], pin);
+    res = serial_write(firmata->serial, buff, 2);
+    return res;
 }
-#endif
 
 int
 firmata_digitalWrite(t_firmata* firmata, int pin, int value)
