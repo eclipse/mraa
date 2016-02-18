@@ -37,9 +37,7 @@ extern "C" {
 #define MRAA_96BOARDS_LS_I2C_COUNT  2
 #define MRAA_96BOARDS_LS_SPI_COUNT  1
 #define MRAA_96BOARDS_LS_UART_COUNT 2
-
-#define DB410C_PINCOUNT	122
-#define HIKEY_PINCOUNT	512
+#define MRAA_96BOARDS_LS_PIN_COUNT  40
 
 mraa_board_t* mraa_96boards();
 
