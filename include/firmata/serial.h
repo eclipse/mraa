@@ -29,7 +29,7 @@
 
 typedef struct s_serial {
     int port_is_open;
-    char* port_name;
+    const char* port_name;
     int baud_rate;
     char* error_msg;
 
@@ -41,7 +41,7 @@ typedef struct s_serial {
 } t_serial;
 
 t_serial* serial_new();
-int serial_open(t_serial* serial, char* name);
+int serial_open(t_serial* serial, const char* name);
 int serial_setBaud(t_serial* serial, int baud);
 int serial_read(t_serial* serial, void* ptr, int count);
 int serial_write(t_serial* serial, void* ptr, int len);

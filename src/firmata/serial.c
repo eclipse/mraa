@@ -55,7 +55,7 @@ serial_new()
 }
 
 int
-serial_open(t_serial* serial, char* name)
+serial_open(t_serial* serial, const char* name)
 {
     struct serial_struct kernel_serial_settings;
     int bits;

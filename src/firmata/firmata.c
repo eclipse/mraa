@@ -30,7 +30,7 @@
 #include <stdio.h>
 
 t_firmata*
-firmata_new(char* name)
+firmata_new(const char* name)
 {
     t_firmata* res;
 

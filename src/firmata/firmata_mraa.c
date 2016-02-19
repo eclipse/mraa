@@ -35,7 +35,8 @@ static unsigned int
 mraa_firmata_aio_read(mraa_aio_context dev)
 {
     firmata_pull(firmata_dev);
-    sleep(1);
+    // careful, whilst you need to enable '0' for A0 you then need to read 14
+    // in t_firmata because well that makes sense doesn't it...
     return (unsigned int) firmata_dev->pins[dev->channel].value;
 }
 
@@ -166,22 +167,27 @@ mraa_firmata_init(const char* uart_dev)
     strncpy(b->pins[10].name, "A0", 8);
     b->pins[14].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[14].gpio.pinmap = 14;
+    b->pins[14].aio.pinmap = 14;
     strncpy(b->pins[11].name, "A1", 8);
     b->pins[15].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[15].gpio.pinmap = 15;
+    b->pins[15].aio.pinmap = 15;
     strncpy(b->pins[12].name, "A2", 8);
     b->pins[16].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[16].gpio.pinmap = 16;
+    b->pins[16].aio.pinmap = 16;
     strncpy(b->pins[13].name, "A3", 8);
     b->pins[17].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[17].gpio.pinmap = 17;
+    b->pins[17].aio.pinmap = 17;
     strncpy(b->pins[13].name, "A4", 8);
     b->pins[18].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[18].gpio.pinmap = 18;
+    b->pins[18].aio.pinmap = 18;
     strncpy(b->pins[13].name, "A5", 8);
     b->pins[19].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[19].gpio.pinmap = 19;
-
+    b->pins[19].aio.pinmap = 19;
 
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
     if (b->adv_func == NULL) {

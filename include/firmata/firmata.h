@@ -89,13 +89,13 @@ typedef struct s_firmata {
     char firmware[140];
 } t_firmata;
 
-t_firmata* firmata_new(char* name);
+t_firmata* firmata_new(const char* name);
 void firmata_initPins(t_firmata* firmata);
 int firmata_askFirmware(t_firmata* firmata);
 int firmata_pinMode(t_firmata* firmata, int pin, int mode);
 int firmata_digitalWrite(t_firmata* firmata, int pin, int value);
 int firmata_analogWrite(t_firmata* firmata, int pin, int value);
-int firmata_analogRead(t_firmata *firmata, int pin);
+int firmata_analogRead(t_firmata* firmata, int pin);
 int firmata_pull(t_firmata* firmata);
 void firmata_parse(t_firmata* firmata, const uint8_t* buf, int len);
 void firmata_endParse(t_firmata* firmata);
