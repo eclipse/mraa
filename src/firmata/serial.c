@@ -48,7 +48,7 @@ serial_new()
         return (NULL);
     }
     res->port_is_open = 0;
-    res->baud_rate = 38400;
+    res->baud_rate = 57600;
     res->tx = 0;
     res->rx = 0;
     return (res);
@@ -75,6 +75,7 @@ serial_open(t_serial* serial, char* name)
         }
         return (-1);
     }
+    memset(&(serial->settings), 0, sizeof(struct termios));
 #if 0
     if (ioctl(serial->port_fd, TIOCMGET, &bits) < 0) {
         close(serial->port_fd);

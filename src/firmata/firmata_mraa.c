@@ -35,6 +35,7 @@ static unsigned int
 mraa_firmata_aio_read(mraa_aio_context dev)
 {
     firmata_pull(firmata_dev);
+    sleep(1);
     return (unsigned int) firmata_dev->pins[dev->channel].value;
 }
 
