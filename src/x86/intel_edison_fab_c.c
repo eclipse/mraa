@@ -427,8 +427,6 @@ mraa_intel_edison_spi_init_pre(int bus)
         return MRAA_SUCCESS;
     }
 
-    mraa_intel_edison_misc_spi();
-
     mraa_gpio_write(tristate, 0);
 
     mraa_gpio_context io10_out = mraa_gpio_init_raw(258);
@@ -1284,6 +1282,9 @@ mraa_intel_edison_fab_c()
     if (tristate_dir != MRAA_GPIO_OUT) {
         mraa_gpio_dir(tristate, MRAA_GPIO_OUT);
     }
+
+    // this is required to initialise not just SPI but also the ADC channels
+    mraa_intel_edison_misc_spi();
 
     b->adc_raw = 12;
     b->adc_supported = 10;
