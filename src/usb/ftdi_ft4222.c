@@ -664,6 +664,89 @@ mraa_ftdi_ft4222_has_internal_gpio_triggered(int pin)
         return FALSE;
 }
 
+static struct {
+    pthread_t thread;
+    pthread_mutex_t mutex;
+    mraa_boolean_t should_stop;
+    mraa_boolean_t is_interrupt_detected[PCA9672_PINS];
+    int num_active_pins;
+} gpio_monitor = {0};
+
+// INT pin of i2c PCA9672 GPIO expander is connected to FT4222 GPIO #3
+// We use INT to detect any expander GPIO level change
+static void*
+mraa_ftdi_ft4222_gpio_monitor(void *arg)
+{
+    uint8_t prev_value = 0;
+    pthread_mutex_lock(&ft4222_lock);
+    mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &prev_value, 1);
+    pthread_mutex_unlock(&ft4222_lock);
+    while (!gpio_monitor.should_stop) {
+        mraa_boolean_t gpio_activity_detected = mraa_ftdi_ft4222_has_internal_gpio_triggered(GPIO_PORT_IO_INT);
+        if (gpio_activity_detected) {
+            uint8_t value;
+            pthread_mutex_lock(&ft4222_lock);
+            int bytes_read = mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &value, 1);
+            pthread_mutex_unlock(&ft4222_lock);
+            if (bytes_read == 1) {
+                pthread_mutex_lock(&gpio_monitor.mutex);
+                uint8_t change_value = prev_value ^ value;
+                int i;
+                for (i = 0; i < PCA9672_PINS; ++i) {
+                    uint8_t mask = 1 << i;
+                    gpio_monitor.is_interrupt_detected[i] = change_value & mask ? 1 : 0;
+                }
+                pthread_mutex_unlock(&gpio_monitor.mutex);
+                prev_value = value;
+            }
+        }
+        mraa_ftdi_ft4222_sleep_ms(20);
+    }
+    printf("gpio_monitor_thread stopped\n");
+}
+
+
+static void
+mraa_ftdi_ft4222_gpio_monitor_add_pin(int pin)
+{
+    if (gpio_monitor.num_active_pins == 0) {
+        pthread_mutex_init(&gpio_monitor.mutex, NULL);
+        pthread_create(&gpio_monitor.thread, NULL, mraa_ftdi_ft4222_gpio_monitor, NULL);
+    }
+    pthread_mutex_lock(&gpio_monitor.mutex);
+    gpio_monitor.num_active_pins++;
+    pthread_mutex_unlock(&gpio_monitor.mutex);
+}
+
+
+static void
+mraa_ftdi_ft4222_gpio_monitor_remove_pin(int pin)
+{
+    pthread_mutex_lock(&gpio_monitor.mutex);
+    gpio_monitor.num_active_pins--;
+    if (gpio_monitor.num_active_pins == 0) {
+        pthread_mutex_unlock(&gpio_monitor.mutex);
+        gpio_monitor.should_stop = TRUE;
+        pthread_join(gpio_monitor.thread, NULL);
+        pthread_mutex_destroy(&gpio_monitor.mutex);
+    } else
+       pthread_mutex_unlock(&gpio_monitor.mutex);
+}
+
+
+static mraa_boolean_t
+mraa_ftdi_ft4222_gpio_monitor_is_interrupt_detected(int pin)
+{
+    mraa_boolean_t is_interrupt_detected = FALSE;
+    pthread_mutex_lock(&gpio_monitor.mutex);
+    if (gpio_monitor.is_interrupt_detected[pin]) {
+        gpio_monitor.is_interrupt_detected[pin] = FALSE;
+        is_interrupt_detected = TRUE;
+    }
+    pthread_mutex_unlock(&gpio_monitor.mutex);
+    return is_interrupt_detected;
+}
+
 static mraa_result_t
 mraa_ftdi_ft4222_gpio_interrupt_handler_init_replace(mraa_gpio_context dev)
 {
@@ -673,6 +756,7 @@ mraa_ftdi_ft4222_gpio_interrupt_handler_init_replace(mraa_gpio_context dev)
         ftdi_ft4222_set_internal_gpio_dir(GPIO_PORT_IO_INT, GPIO_INPUT);
         ftdi_ft4222_set_internal_gpio_trigger(GPIO_PORT_IO_INT, GPIO_TRIGGER_FALLING);
         mraa_ftdi_ft4222_has_internal_gpio_triggered(GPIO_PORT_IO_INT);
+        mraa_ftdi_ft4222_gpio_monitor_add_pin(dev->phy_pin);
     }
     return MRAA_SUCCESS;
 }
@@ -684,24 +768,18 @@ mraa_ftdi_ft4222_gpio_wait_interrupt_replace(mraa_gpio_context dev)
     mraa_boolean_t is_internal_pin = mraa_ftdi_ft4222_is_internal_gpio(dev->pin);
     mraa_boolean_t interrupt_detected = FALSE;
 
-    // INT pin of i2c PCA9672 GPIO expander is connected to FT4222 GPIO #3
-    // We use INT to detect any expander GPIO level change
     while (!dev->isr_thread_terminating && !interrupt_detected) {
         if (is_internal_pin) {
             interrupt_detected = mraa_ftdi_ft4222_has_internal_gpio_triggered(dev->phy_pin);
         }
         else {
-            mraa_boolean_t gpio_activity_detected = mraa_ftdi_ft4222_has_internal_gpio_triggered(GPIO_PORT_IO_INT);
-            if (gpio_activity_detected) {
-                int level = mraa_ftdi_ft4222_gpio_read_replace(dev);
-                if (level != prev_level) {
-                    interrupt_detected = TRUE;
-                }
-            }
+            interrupt_detected = mraa_ftdi_ft4222_gpio_monitor_is_interrupt_detected(dev->phy_pin);
         }
         if (!interrupt_detected)
             mraa_ftdi_ft4222_sleep_ms(20);
     }
+    if (dev->isr_thread_terminating)
+        mraa_ftdi_ft4222_gpio_monitor_remove_pin(dev->phy_pin);
     return MRAA_SUCCESS;
 }
 
