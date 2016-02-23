@@ -31,6 +31,87 @@
 
 static t_firmata* firmata_dev;
 
+static mraa_result_t
+mraa_firmata_i2c_init_bus_replace(mraa_i2c_context dev)
+{
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_firmata_i2c_address(mraa_i2c_context dev, uint8_t addr)
+{
+    dev->addr = (int) addr;
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_firmata_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static int
+mraa_firmata_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
+{
+    return 0;
+}
+
+static uint8_t
+mraa_firmata_i2c_read_byte(mraa_i2c_context dev)
+{
+    return 0;
+}
+
+
+static uint16_t
+mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
+{
+    uint16_t data = 0;
+    return data;
+}
+
+static int
+mraa_firmata_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* data, int length)
+{
+    return 0;
+}
+
+static mraa_result_t
+mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWrite)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static mraa_result_t
+mraa_firmata_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static uint8_t
+mraa_firmata_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
+{
+    return command;
+}
+
+static mraa_result_t
+mraa_firmata_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static mraa_result_t
+mraa_firmata_i2c_write_word_data(mraa_i2c_context dev, const uint16_t data, const uint8_t command)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static mraa_result_t
+mraa_firmata_i2c_stop(mraa_i2c_context dev)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
 static unsigned int
 mraa_firmata_aio_read(mraa_aio_context dev)
 {
@@ -107,14 +188,25 @@ mraa_firmata_init(const char* uart_dev)
         return NULL;
     }
 
+    firmata_dev = firmata_new(uart_dev);
+
+    // if this isn't working then we have an issue with our uart
+    while (!firmata_dev->isReady) {
+       firmata_pull(firmata_dev);
+    }
+
+
     b->platform_name = "firmata";
     // do we support 2.5? Or are we more 2.3?
     // or should we return the flashed sketch name?
-    b->platform_version = "2.5";
+    b->platform_version = firmata_dev->firmware;
     b->gpio_count = 14;
     b->aio_count = 6;
     b->adc_supported = 10;
     b->phy_pin_count = 20;
+    b->i2c_bus_count = 1;
+    b->def_i2c_bus = 0;
+    b->i2c_bus[0].bus_id = 0;
 
     b->pins = (mraa_pininfo_t*) calloc(b->phy_pin_count, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
@@ -205,12 +297,19 @@ mraa_firmata_init(const char* uart_dev)
     b->adv_func->aio_init_internal_replace = &mraa_firmata_aio_init_internal_replace;
     b->adv_func->aio_read_replace = &mraa_firmata_aio_read;
 
-    firmata_dev = firmata_new(uart_dev);
-
-    // if this isn't working then we have an issue with our uart
-    while (!firmata_dev->isReady) {
-       firmata_pull(firmata_dev);
-    }
+    b->adv_func->i2c_init_bus_replace = &mraa_firmata_i2c_init_bus_replace;
+    b->adv_func->i2c_set_frequency_replace = &mraa_firmata_i2c_frequency;
+    b->adv_func->i2c_address_replace = &mraa_firmata_i2c_address;
+    b->adv_func->i2c_read_replace = &mraa_firmata_i2c_read;
+    b->adv_func->i2c_read_byte_replace = &mraa_firmata_i2c_read_byte;
+    b->adv_func->i2c_read_byte_data_replace = &mraa_firmata_i2c_read_byte_data;
+    b->adv_func->i2c_read_word_data_replace = &mraa_firmata_i2c_read_word_data;
+    b->adv_func->i2c_read_bytes_data_replace = &mraa_firmata_i2c_read_bytes_data;
+    b->adv_func->i2c_write_replace = &mraa_firmata_i2c_write;
+    b->adv_func->i2c_write_byte_replace = &mraa_firmata_i2c_write_byte;
+    b->adv_func->i2c_write_byte_data_replace = &mraa_firmata_i2c_write_byte_data;
+    b->adv_func->i2c_write_word_data_replace = &mraa_firmata_i2c_write_word_data;
+    b->adv_func->i2c_stop_replace = &mraa_firmata_i2c_stop;
 
     return b;
 }
