@@ -87,6 +87,11 @@ mraa_firmata_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t*
     return 0;
 }
 
+static uint8_t
+mraa_firmata_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
+{
+    return command;
+}
 static mraa_result_t
 mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWrite)
 {
@@ -95,6 +100,7 @@ mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWri
     buffer[1] = FIRMATA_I2C_REQUEST;
     buffer[2] = dev->addr;
     buffer[3] = I2C_MODE_WRITE;
+// missing stuff here
     memcpy(&buffer[4], data, bytesToWrite);
     buffer[bytesToWrite+4] = FIRMATA_END_SYSEX;
     serial_write(firmata_dev->serial, buffer, bytesToWrite+5);
@@ -107,16 +113,21 @@ mraa_firmata_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
     return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-static uint8_t
-mraa_firmata_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
-{
-    return command;
-}
-
 static mraa_result_t
 mraa_firmata_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    uint8_t* buffer = calloc(9, 0);
+    buffer[0] = FIRMATA_START_SYSEX;
+    buffer[1] = FIRMATA_I2C_REQUEST;
+    buffer[2] = dev->addr;
+    buffer[3] = I2C_MODE_WRITE << 3;
+    buffer[4] = command & 0x7F;
+    buffer[5] = (command >> 7) & 0x7F;
+    buffer[6] = data & 0x7F;
+    buffer[7] = (data >> 7) & 0x7F;
+    buffer[8] = FIRMATA_END_SYSEX;
+    serial_write(firmata_dev->serial, buffer, 9);
+    return MRAA_SUCCESS;
 }
 
 static mraa_result_t
