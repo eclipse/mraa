@@ -28,12 +28,22 @@
 #include "mraa_internal.h"
 #include "firmata/firmata_mraa.h"
 #include "firmata/firmata.h"
+#include "firmata/serial.h"
 
 static t_firmata* firmata_dev;
 
 static mraa_result_t
 mraa_firmata_i2c_init_bus_replace(mraa_i2c_context dev)
 {
+    int delay = 1; // this should be either 1 or 0, I don't know :)
+    uint8_t buff[4];
+    printf("i2c init\n");
+    buff[0] = FIRMATA_START_SYSEX;
+    buff[1] = FIRMATA_I2C_CONFIG;
+    buff[2] = delay & 0xFF, (delay >> 8) & 0xFF;
+    buff[3] = FIRMATA_END_SYSEX;
+    serial_write(firmata_dev->serial, buff, 4);
+
     return MRAA_SUCCESS;
 }
 
@@ -41,6 +51,7 @@ static mraa_result_t
 mraa_firmata_i2c_address(mraa_i2c_context dev, uint8_t addr)
 {
     dev->addr = (int) addr;
+
     return MRAA_SUCCESS;
 }
 
@@ -79,7 +90,15 @@ mraa_firmata_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t*
 static mraa_result_t
 mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWrite)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    uint8_t* buffer = calloc(bytesToWrite + 5, 0);
+    buffer[0] = FIRMATA_START_SYSEX;
+    buffer[1] = FIRMATA_I2C_REQUEST;
+    buffer[2] = dev->addr;
+    buffer[3] = I2C_MODE_WRITE;
+    memcpy(&buffer[4], data, bytesToWrite);
+    buffer[bytesToWrite+4] = FIRMATA_END_SYSEX;
+    serial_write(firmata_dev->serial, buffer, bytesToWrite+5);
+    return MRAA_SUCCESS;
 }
 
 static mraa_result_t

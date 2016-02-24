@@ -54,6 +54,15 @@
 #define FIRMATA_REPORT_ANALOG 0xC0   // enable analog input by pin #
 #define FIRMATA_REPORT_DIGITAL 0xD0  // enable digital input by port pair
 
+#define FIRMATA_I2C_CONFIG 0x78
+#define FIRMATA_I2C_REPLY 0x77
+#define FIRMATA_I2C_REQUEST 0x76
+
+#define I2C_MODE_WRITE 0x00
+#define I2C_MODE_READ 0x01
+#define I2C_CONTINUOUSREAD 0x02
+#define I2C_STOP_READING 0x03
+
 #define FIRMATA_SET_PIN_MODE 0xF4 // set a pin to INPUT/OUTPUT/PWM/etc
 
 #define FIRMATA_REPORT_VERSION 0xF9 // report protocol version
