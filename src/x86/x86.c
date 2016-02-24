@@ -124,6 +124,8 @@ mraa_x86_platform()
     plat = mraa_intel_sofia_3gr();
     #elif defined(xMRAA_INTEL_CHERRYHILLS)
     plat = mraa_intel_cherryhills();
+    #elif defined(xMRAA_UP)
+    plat = mraa_up_board();
     #else
         #error "Not using a valid platform value from mraa_platform_t - cannot compile"
     #endif
