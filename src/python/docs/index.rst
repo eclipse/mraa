@@ -28,6 +28,7 @@ Supported Platforms
    * `Banana Pi/Pro <../bananapi.html>`_
    * `Beaglebone Black <../beaglebone.html>`_
    * `Intel NUC NUC5i5MYBE <../nuc5.html>`_
+   * `UP <../up.html>`_
    * `FTDI FT4222H <../ft4222.html>`_
 
 Compiling & Debugging libmraa

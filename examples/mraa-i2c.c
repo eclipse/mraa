@@ -73,6 +73,7 @@ print_bus(mraa_board_t* board)
             case MRAA_RASPBERRY_PI:
             case MRAA_BEAGLEBONE:
             case MRAA_BANANA:
+            case MRAA_UP:
                 bus = i;
                 busType = "linux";
                 break;

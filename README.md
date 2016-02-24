@@ -23,6 +23,7 @@ X86
 * [Intel DE3815](../master/docs/intel_de3815.md)
 * [Minnowboard Max](../master/docs/minnow_max.md)
 * [NUC 5th generation](../master/docs/intel_nuc5.md)
+* [UP](../master/docs/up.md)
 
 ARM
 ---

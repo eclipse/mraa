@@ -29,6 +29,7 @@ set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/intel_minnow_byt_compatible.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_sofia_3gr.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_cherryhills.c
+  ${PROJECT_SOURCE_DIR}/src/x86/up.c
 )
 
 message (INFO " - Adding support for platform ${MRAAPLATFORMFORCE}")
