@@ -91,6 +91,7 @@ typedef struct s_pin {
 typedef struct s_firmata {
     t_serial* serial;
     t_pin pins[128];
+    int i2cmsg[256][256];
     int parse_command_len;
     int parse_count;
     uint8_t parse_buff[FIRMATA_MSG_LEN];

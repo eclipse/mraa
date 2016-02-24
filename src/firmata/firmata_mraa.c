@@ -90,19 +90,41 @@ mraa_firmata_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t*
 static uint8_t
 mraa_firmata_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
-    return command;
-}
-static mraa_result_t
-mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWrite)
-{
-    uint8_t* buffer = calloc(bytesToWrite + 5, 0);
+    uint8_t* buffer = calloc(9, 0);
     buffer[0] = FIRMATA_START_SYSEX;
     buffer[1] = FIRMATA_I2C_REQUEST;
     buffer[2] = dev->addr;
-    buffer[3] = I2C_MODE_WRITE;
-// missing stuff here
+    buffer[3] = I2C_MODE_READ << 3;
+
+    // register to read from
+    buffer[4] = command & 0x7f;
+    buffer[5] = (command >> 7) & 0x7f;
+    // number of bytes
+    buffer[6] = 1 & 0x7f;
+    buffer[7] = (1 >> 7) & 0x7f;
+    buffer[8] = FIRMATA_END_SYSEX;
+
+    serial_write(firmata_dev->serial, buffer, 9);
+
+    return 0x0;
+}
+
+static mraa_result_t
+mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWrite)
+{
+    uint8_t* buffer = calloc((bytesToWrite*2) + 5, 0);
+    int i = 4;
+    buffer[0] = FIRMATA_START_SYSEX;
+    buffer[1] = FIRMATA_I2C_REQUEST;
+    buffer[2] = dev->addr;
+    buffer[3] = I2C_MODE_WRITE << 3;
+    for (i; i < (bytesToWrite*2); i++) {
+        buffer[i] = data[i] & 0x7F;
+        buffer[i+1] = (data[i] >> 7) & 0x7f;
+        i = i+2;
+    }
     memcpy(&buffer[4], data, bytesToWrite);
-    buffer[bytesToWrite+4] = FIRMATA_END_SYSEX;
+    buffer[(bytesToWrite*2)+4] = FIRMATA_END_SYSEX;
     serial_write(firmata_dev->serial, buffer, bytesToWrite+5);
     return MRAA_SUCCESS;
 }
@@ -110,7 +132,16 @@ mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWri
 static mraa_result_t
 mraa_firmata_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    uint8_t* buffer = calloc(7, 0);
+    buffer[0] = FIRMATA_START_SYSEX;
+    buffer[1] = FIRMATA_I2C_REQUEST;
+    buffer[2] = dev->addr;
+    buffer[3] = I2C_MODE_WRITE << 3;
+    buffer[4] = data & 0x7F;
+    buffer[5] = (data >> 7) & 0x7F;
+    buffer[6] = FIRMATA_END_SYSEX;
+    serial_write(firmata_dev->serial, buffer, 7);
+    return MRAA_SUCCESS;
 }
 
 static mraa_result_t
