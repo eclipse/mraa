@@ -22,6 +22,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import mraa.Dir;
 import mraa.Edge;
 import mraa.Gpio;
@@ -37,6 +40,7 @@ public class Isr {
             System.exit(1);
         }
     }
+
     public static void main(String argv[]) throws InterruptedException {
         int pin = 6;
         if (argv.length == 1) {
@@ -45,15 +49,17 @@ public class Isr {
             } catch (Exception e) {
             }
         }
-        System.out.println("Starting ISR for pin " + Integer.toString(pin));
+        BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Starting ISR for pin " + Integer.toString(pin) + ". Press ENTER to stop");
         Gpio gpio = new Gpio(pin);
-
         Runnable callback = new JavaCallback();
-
         gpio.isr(Edge.EDGE_RISING, callback);
-        while (true)
-            Thread.sleep(999999);
-    };
+        try {
+            String input = console.readLine();
+        } catch (IOException e) {
+        }
+        gpio.isrExit();
+    }
 
 }
 
