@@ -28,6 +28,13 @@
 #include "types.hpp"
 #include <stdexcept>
 
+#if defined(SWIGJAVA) || defined(JAVACALLBACK)
+extern "C" {
+    void mraa_java_isr_callback(void *args);
+}
+#endif
+
+
 #if defined(SWIGJAVASCRIPT)
 #if NODE_MODULE_VERSION >= 0x000D
 #include <uv.h>
