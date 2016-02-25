@@ -24,6 +24,9 @@
  */
 #include "gpio.h"
 #include "mraa_internal.h"
+#if defined(SWIGJAVA) || defined(JAVACALLBACK)
+#include "java/mraajni.h"
+#endif
 
 #include <stdlib.h>
 #include <fcntl.h>
@@ -234,35 +237,6 @@ mraa_gpio_wait_interrupt(int fd
     return MRAA_SUCCESS;
 }
 
-#if defined(SWIGJAVA) || defined(JAVACALLBACK)
-pthread_key_t env_key;
-
-extern JavaVM *globVM;
-static pthread_once_t env_key_init = PTHREAD_ONCE_INIT;
-
-jmethodID runGlobal;
-
-static void make_env_key(void)
-{
-
-    JNIEnv *jenv;
-    (*globVM)->GetEnv(globVM, (void **)&jenv, JNI_VERSION_1_8);
-
-    jclass rcls = (*jenv)->FindClass(jenv, "java/lang/Runnable");
-    jmethodID runm = (*jenv)->GetMethodID(jenv, rcls, "run", "()V");
-
-    runGlobal = (jmethodID)(*jenv)->NewGlobalRef(jenv, (jobject)runm);
-
-    pthread_key_create(&env_key, NULL);
-}
-
-void mraa_java_isr_callback(void* data)
-{
-    JNIEnv *jenv = (JNIEnv *) pthread_getspecific(env_key);
-    (*jenv)->CallVoidMethod(jenv, (jobject)data, runGlobal);
-}
-
-#endif
 
 static void*
 mraa_gpio_interrupt_handler(void* arg)
@@ -296,18 +270,12 @@ mraa_gpio_interrupt_handler(void* arg)
     dev->isr_value_fp = fp;
 
 #if defined(SWIGJAVA) || defined(JAVACALLBACK)
-    JNIEnv *jenv;
     if(dev->isr == mraa_java_isr_callback) {
-        jint err = (*globVM)->AttachCurrentThreadAsDaemon(globVM, (void **)&jenv, NULL);
-
-        if (err != JNI_OK) {
-                close(dev->isr_value_fp);
-                dev->isr_value_fp = -1;
-                return NULL;
+        if (mraa_java_attach_thread() != MRAA_SUCCESS) {
+            close(dev->isr_value_fp);
+            dev->isr_value_fp = -1;
+            return NULL;
         }
-
-        pthread_once(&env_key_init, make_env_key);
-        pthread_setspecific(env_key, jenv);
     }
 #endif
 
@@ -403,10 +371,9 @@ mraa_gpio_interrupt_handler(void* arg)
                 dev->isr_value_fp = -1;
             }
 #if defined(SWIGJAVA) || defined(JAVACALLBACK)
-
             if(dev->isr == mraa_java_isr_callback) {
-                (*jenv)->DeleteGlobalRef(jenv, (jobject)dev->isr_args);
-                (*globVM)->DetachCurrentThread(globVM);
+                mraa_java_delete_global_ref(dev->isr_args);
+                mraa_java_detach_thread();
             }
 #endif
             return NULL;
@@ -477,13 +444,10 @@ mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t mode, void (*fptr)(void*),
 
     dev->isr = fptr;
 #if defined(SWIGJAVA) || defined(JAVACALLBACK)
-    JNIEnv *jenv;
     /* Most UPM sensors use the C API, the global ref must be created here. */
     /* The reason for checking the callback function is internal callbacks. */
     if (fptr == mraa_java_isr_callback) {
-        (*globVM)->GetEnv(globVM, (void **)&jenv, JNI_VERSION_1_8);
-        jobject grunnable = (*jenv)->NewGlobalRef(jenv, (jobject) args);
-        args = (void *) grunnable;
+        args = mraa_java_create_global_ref(args);
     }
 #endif
     dev->isr_args = args;

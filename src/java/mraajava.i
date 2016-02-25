@@ -65,11 +65,11 @@ class Spi;
 %include ../mraa.i
 
 %wrapper %{
-    JavaVM *globVM;
+    #include "java/mraajni.h"
 
     jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         /* initialize mraa */
-        globVM = vm;
+        mraa_java_set_jvm(vm);
         mraa_init();
         return JNI_VERSION_1_8;
     }
