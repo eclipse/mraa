@@ -40,10 +40,6 @@
 extern "C" {
 #endif
 
-#ifdef SWIGPYTHON
-#include <Python.h>
-#endif
-
 #include <stdio.h>
 #include <pthread.h>
 #include "common.h"

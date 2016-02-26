@@ -99,13 +99,6 @@ mraa_init()
     syslog(LOG_NOTICE, "libmraa version %s initialised by user '%s' with EUID %d",
            mraa_get_version(), (proc_user != NULL) ? proc_user->pw_name : "<unknown>", proc_euid);
 
-#ifdef SWIGPYTHON
-    // Initialise python threads, this allows use to grab the GIL when we are
-    // required to do so
-    Py_InitializeEx(0);
-    PyEval_InitThreads();
-#endif
-
     mraa_platform_t platform_type;
 #if defined(X86PLAT)
     // Use runtime x86 platform detection
