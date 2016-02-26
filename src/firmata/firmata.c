@@ -225,10 +225,11 @@ firmata_endParse(t_firmata* firmata)
             if (firmata->parse_count > 7)
                 firmata->pins[pin].value |= (firmata->parse_buff[6] << 14);
         } else if (firmata->parse_buff[1] == FIRMATA_I2C_REPLY) {
-            printf("got an i2c reply with count %d!!\n", firmata->parse_count);
+//            printf("got an i2c reply with count %d!!\n", firmata->parse_count);
             int addr = (firmata->parse_buff[2] & 0x7f) | ((firmata->parse_buff[3] & 0x7f) << 7);
             int reg = (firmata->parse_buff[4] & 0x7f) | ((firmata->parse_buff[5] & 0x7f) << 7);
             firmata->i2cmsg[addr][reg] = (firmata->parse_buff[6] & 0x7f) | ((firmata->parse_buff[7] & 0x7f) << 7);;
+//            printf("i2c reply is %d\n", firmata->i2cmsg[addr][reg]);
         }
         return;
     }

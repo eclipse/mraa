@@ -106,26 +106,36 @@ mraa_firmata_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 
     serial_write(firmata_dev->serial, buffer, 9);
 
-    return 0x0;
+    /* This section needs a lock :) */
+    firmata_dev->i2cmsg[dev->addr][command] = -1;
+
+    while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
+        firmata_pull(firmata_dev);
+    }
+
+    return firmata_dev->i2cmsg[dev->addr][command];
 }
 
 static mraa_result_t
 mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWrite)
 {
-    uint8_t* buffer = calloc((bytesToWrite*2) + 5, 0);
-    int i = 4;
+    // buffer needs 5 bytes for firmata, and 2 bytes for every byte of data
+    int buffer_size = (bytesToWrite*2) + 5;
+    uint8_t* buffer = calloc(buffer_size, 0);
+    int i = 0;
+    int ii = 4;
     buffer[0] = FIRMATA_START_SYSEX;
     buffer[1] = FIRMATA_I2C_REQUEST;
     buffer[2] = dev->addr;
     buffer[3] = I2C_MODE_WRITE << 3;
-    for (i; i < (bytesToWrite*2); i++) {
-        buffer[i] = data[i] & 0x7F;
-        buffer[i+1] = (data[i] >> 7) & 0x7f;
-        i = i+2;
+    // we need to write until FIRMATA_END_SYSEX
+    for (i; i < (buffer_size-1); i++) {
+        buffer[ii] = data[i] & 0x7F;
+        buffer[ii+1] = (data[i] >> 7) & 0x7f;
+        ii = ii+2;
     }
-    memcpy(&buffer[4], data, bytesToWrite);
-    buffer[(bytesToWrite*2)+4] = FIRMATA_END_SYSEX;
-    serial_write(firmata_dev->serial, buffer, bytesToWrite+5);
+    buffer[buffer_size-1] = FIRMATA_END_SYSEX;
+    serial_write(firmata_dev->serial, buffer, buffer_size);
     return MRAA_SUCCESS;
 }
 
@@ -170,7 +180,7 @@ mraa_firmata_i2c_write_word_data(mraa_i2c_context dev, const uint16_t data, cons
 static mraa_result_t
 mraa_firmata_i2c_stop(mraa_i2c_context dev)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    return MRAA_SUCCESS;
 }
 
 static unsigned int
