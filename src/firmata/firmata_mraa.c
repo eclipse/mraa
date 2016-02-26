@@ -77,7 +77,37 @@ mraa_firmata_i2c_read_byte(mraa_i2c_context dev)
 static uint16_t
 mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
-    uint16_t data = 0;
+    uint8_t* buffer = calloc(9, 0);
+    buffer[0] = FIRMATA_START_SYSEX;
+    buffer[1] = FIRMATA_I2C_REQUEST;
+    buffer[2] = dev->addr;
+    buffer[3] = I2C_MODE_READ << 3;
+
+    // register to read from
+    buffer[4] = command & 0x7f;
+    buffer[5] = (command >> 7) & 0x7f;
+    // number of bytes
+    buffer[6] = 2 & 0x7f;
+    buffer[7] = (1 >> 7) & 0x7f;
+    buffer[8] = FIRMATA_END_SYSEX;
+
+    serial_write(firmata_dev->serial, buffer, 9);
+
+    /* This section needs a lock :) */
+    firmata_dev->i2cmsg[dev->addr][command] = -1;
+    firmata_dev->i2cmsg[dev->addr][command+1] = -1;
+
+    while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
+        firmata_pull(firmata_dev);
+    }
+    uint8_t* rawdata[2];
+    rawdata[0] = firmata_dev->i2cmsg[dev->addr][command];
+    rawdata[1] = firmata_dev->i2cmsg[dev->addr][command+1];
+    uint16_t data = (uint16_t) rawdata;
+    uint8_t high = (data & 0xFF00) >> 8;
+    data = (data << 8) & 0xFF00;
+    data |= high;
+
     return data;
 }
 
