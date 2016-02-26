@@ -175,15 +175,6 @@ if (BUILDSWIG)
       add_subdirectory (python)
     endif ()
     if (BUILDSWIGJAVA)
-      FIND_PACKAGE (JNI REQUIRED)
-      include_directories (
-        ${JAVA_INCLUDE_PATH}
-        ${JAVA_INCLUDE_PATH2}
-        ${CMAKE_CURRENT_SOURCE_DIR}/..
-      )
-      set (mraa_LIB_SRCS ${mraa_LIB_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/java/mraajni.c)
-      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -DJAVACALLBACK")
-      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DJAVACALLBACK")
       add_subdirectory (java)
     endif ()
     if (BUILDSWIGNODE)

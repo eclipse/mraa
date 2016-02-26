@@ -66,11 +66,20 @@ class Spi;
 
 %wrapper %{
     #include "java/mraajni.h"
+    #include "mraa_lang_func.h"
+    extern mraa_lang_func_t* lang_func;
 
     jint JNI_OnLoad(JavaVM *vm, void *reserved) {
-        /* initialize mraa */
-        mraa_java_set_jvm(vm);
-        mraa_init();
+        /* initialize mraa and set jni functions */
+        mraa_result_t res = mraa_init();
+        if (res == MRAA_SUCCESS || res == MRAA_ERROR_PLATFORM_ALREADY_INITIALISED) {
+            mraa_java_set_jvm(vm);
+            lang_func->java_isr_callback = &mraa_java_isr_callback;
+            lang_func->java_attach_thread  = &mraa_java_attach_thread;
+            lang_func->java_detach_thread = &mraa_java_detach_thread;
+            lang_func->java_create_global_ref = &mraa_java_create_global_ref;
+            lang_func->java_delete_global_ref = &mraa_java_delete_global_ref;
+        }
         return JNI_VERSION_1_8;
     }
 %}
