@@ -149,6 +149,17 @@ class Spi;
 %include ../mraa.i
 
 %init %{
-    //Adding mraa_init() to the module initialisation process
-    mraa_init();
+    #include "python/mraapy.h"
+    #include "mraa_lang_func.h"
+    extern mraa_lang_func_t* lang_func;
+    // Initialise python threads, this allows use to grab the GIL when we are
+    // required to do so
+    Py_InitializeEx(0);
+    PyEval_InitThreads();
+    // Add mraa_init() to the module initialisation process and set isr function
+    mraa_result_t res = mraa_init();
+    if (res == MRAA_SUCCESS || res == MRAA_ERROR_PLATFORM_ALREADY_INITIALISED) {
+        lang_func->python_isr = &mraa_python_isr;
+    }
+
 %}
