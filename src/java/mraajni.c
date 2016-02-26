@@ -41,11 +41,11 @@ static void
 mraa_java_make_env_key(void)
 {
     if (globVM != NULL) {
-        JNIEnv *jenv;
-        (*globVM)->GetEnv(globVM, (void **)&jenv, JNI_VERSION_1_8);
+        JNIEnv* jenv;
+        (*globVM)->GetEnv(globVM, (void**) &jenv, JNI_VERSION_1_8);
         jclass rcls = (*jenv)->FindClass(jenv, "java/lang/Runnable");
         jmethodID runm = (*jenv)->GetMethodID(jenv, rcls, "run", "()V");
-        runGlobal = (jmethodID)(*jenv)->NewGlobalRef(jenv, (jobject)runm);
+        runGlobal = (jmethodID)(*jenv)->NewGlobalRef(jenv, (jobject) runm);
         pthread_key_create(&env_key, NULL);
     }
 }
@@ -53,16 +53,16 @@ mraa_java_make_env_key(void)
 void
 mraa_java_isr_callback(void* data)
 {
-    JNIEnv *jenv = (JNIEnv *) pthread_getspecific(env_key);
-    (*jenv)->CallVoidMethod(jenv, (jobject)data, runGlobal);
+    JNIEnv* jenv = (JNIEnv*) pthread_getspecific(env_key);
+    (*jenv)->CallVoidMethod(jenv, (jobject) data, runGlobal);
 }
 
 mraa_result_t
 mraa_java_attach_thread()
 {
     if (globVM != NULL) {
-        JNIEnv *jenv;
-        jint err = (*globVM)->AttachCurrentThreadAsDaemon(globVM, (void **)&jenv, NULL);
+        JNIEnv* jenv;
+        jint err = (*globVM)->AttachCurrentThreadAsDaemon(globVM, (void**) &jenv, NULL);
         if (err == JNI_OK) {
             pthread_once(&env_key_init, mraa_java_make_env_key);
             pthread_setspecific(env_key, jenv);
@@ -83,21 +83,20 @@ void*
 mraa_java_create_global_ref(void* args)
 {
     if (globVM != NULL) {
-        JNIEnv *jenv;
-        (*globVM)->GetEnv(globVM, (void **)&jenv, JNI_VERSION_1_8);
+        JNIEnv* jenv;
+        (*globVM)->GetEnv(globVM, (void**) &jenv, JNI_VERSION_1_8);
         jobject grunnable = (*jenv)->NewGlobalRef(jenv, (jobject) args);
-        return (void *)grunnable;
+        return (void*) grunnable;
     } else
         return NULL;
 }
 
 void
-mraa_java_delete_global_ref(void *ref)
+mraa_java_delete_global_ref(void* ref)
 {
     if (globVM != NULL) {
-        JNIEnv *jenv;
-        (*globVM)->GetEnv(globVM, (void **)&jenv, JNI_VERSION_1_8);
-        (*jenv)->DeleteGlobalRef(jenv, (jobject)ref);
+        JNIEnv* jenv;
+        (*globVM)->GetEnv(globVM, (void**) &jenv, JNI_VERSION_1_8);
+        (*jenv)->DeleteGlobalRef(jenv, (jobject) ref);
     }
 }
-

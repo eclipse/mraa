@@ -1,6 +1,6 @@
 /*
  * Author: Henry Bruce <henry.bruce@intel.com>
- * Copyright (c) 2014-2016 Intel Corporation.
+ * Copyright (c) 2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -24,20 +24,12 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+typedef struct {
+    void (*python_isr)(void (*isr)(void*), void* isr_args);
+	void (*java_isr_callback)(void *args);
+	mraa_result_t (*java_attach_thread)();
+	void (*java_detach_thread)();
+	void* (*java_create_global_ref)(void* args);
+	void (*java_delete_global_ref)(void* ref);
 
-#include "jni.h"
-#include "mraa/types.h"
-
-void mraa_java_set_jvm(JavaVM* vm);
-void mraa_java_isr_callback(void* args);
-mraa_result_t mraa_java_attach_thread();
-void mraa_java_detach_thread();
-void* mraa_java_create_global_ref(void* args);
-void mraa_java_delete_global_ref(void* ref);
-
-#ifdef __cplusplus
-}
-#endif
+} mraa_lang_func_t;

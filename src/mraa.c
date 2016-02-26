@@ -48,6 +48,7 @@
 #define IIO_DEVICE_WILDCARD "iio:device*"
 mraa_board_t* plat = NULL;
 mraa_iio_info_t* plat_iio = NULL;
+mraa_lang_func_t* lang_func = NULL;
 
 static char* platform_name = NULL;
 static char* platform_long_name = NULL;
@@ -162,6 +163,8 @@ mraa_init()
             strncpy(platform_name, plat->platform_name, length);
         }
     }
+
+    lang_func = (mraa_lang_func_t*) calloc(1, sizeof(mraa_lang_func_t));
 
     syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
     return MRAA_SUCCESS;

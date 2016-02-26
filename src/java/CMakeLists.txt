@@ -1,3 +1,10 @@
+FIND_PACKAGE (JNI REQUIRED)
+include_directories (
+  ${JAVA_INCLUDE_PATH}
+  ${JAVA_INCLUDE_PATH2}
+  ${CMAKE_CURRENT_SOURCE_DIR}/..
+)
+
 # SWIG treats SWIG_FLAGS as a list and not a string so semicolon seperation is required
 set_source_files_properties (mraajava.i PROPERTIES SWIG_FLAGS ";-package;mraa;-I${CMAKE_BINARY_DIR}/src")
 set_source_files_properties (mraajava.i PROPERTIES CPLUSPLUS ON)
@@ -17,7 +24,7 @@ else ()
   set (JAR $ENV{JAVA_HOME_NATIVE}/bin/jar)
 endif ()
 
-swig_add_module (mraajava java mraajava.i)
+swig_add_module (mraajava java mraajava.i mraajni.c)
 swig_link_libraries (mraajava ${JAVA_LIBRARIES} mraa)
 
 add_custom_command (TARGET mraajava
