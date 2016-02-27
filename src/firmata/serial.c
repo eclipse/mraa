@@ -272,6 +272,15 @@ serial_read(t_serial* serial, void* ptr, int count)
         return (0);
     if (n == 0 && ioctl(serial->port_fd, TIOCMGET, &bits) < 0)
         return (-99);
+#ifdef DEBUG
+    int i;
+    uint8_t *buff = ptr;
+    printf("Read: ");
+    for(i = 0; i < count; i++){
+          printf("%02x ", *(buff + i));
+    }
+    printf("len %d\n", count);
+#endif
     serial->rx += n;
     return (n);
 }
@@ -279,6 +288,15 @@ serial_read(t_serial* serial, void* ptr, int count)
 int
 serial_write(t_serial* serial, void* ptr, int len)
 {
+#ifdef DEBUG
+  int i;
+  uint8_t *buff = ptr;
+  printf("Write: ");
+  for(i = 0; i < len; i++){
+        printf("%02x ", *(buff + i));
+    }
+  printf("len %d\n", len);
+#endif
   //printf("Write %d\n", len);                                                                                 
   write(serial->port_fd, (const char *)ptr, len);
   return (len);
