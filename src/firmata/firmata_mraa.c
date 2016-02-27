@@ -271,10 +271,16 @@ mraa_firmata_init(const char* uart_dev)
     firmata_dev = firmata_new(uart_dev);
 
     // if this isn't working then we have an issue with our uart
-    while (!firmata_dev->isReady) {
-       firmata_pull(firmata_dev);
+    int retry = 20;
+    while (!firmata_dev->isReady && retry--) {
+        firmata_pull(firmata_dev);
     }
-
+    // or COM port is already in use
+    if(!retry){
+        printf("ERROR - COM port already in use"); //change to syslog later on
+        free(b);
+        return NULL;
+    }
 
     b->platform_name = "firmata";
     // do we support 2.5? Or are we more 2.3?
