@@ -241,13 +241,22 @@ mraa_firmata_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
     switch (dir) {
         case MRAA_GPIO_IN:
-            firmata_pinMode(firmata_dev, dev->phy_pin, MODE_OUTPUT);
-        case MRAA_GPIO_OUT:
             firmata_pinMode(firmata_dev, dev->phy_pin, MODE_INPUT);
+            break;
+        case MRAA_GPIO_OUT:
+            firmata_pinMode(firmata_dev, dev->phy_pin, MODE_OUTPUT);
+            break;        
+        case MRAA_GPIO_OUT_LOW:
+            firmata_pinMode(firmata_dev, dev->phy_pin, MODE_OUTPUT);
+            firmata_digitalWrite(firmata_dev, dev->phy_pin, LOW);
+            break;
+        case MRAA_GPIO_OUT_HIGH:
+            firmata_pinMode(firmata_dev, dev->phy_pin, MODE_OUTPUT);
+            firmata_digitalWrite(firmata_dev, dev->phy_pin, HIGH);
+            break;
         default:
             return MRAA_ERROR_INVALID_PARAMETER;
     }
-
     return MRAA_SUCCESS;
 }
 
