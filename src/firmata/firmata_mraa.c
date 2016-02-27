@@ -271,13 +271,22 @@ mraa_firmata_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
     switch (dir) {
         case MRAA_GPIO_IN:
-            firmata_pinMode(firmata_dev, dev->phy_pin, MODE_OUTPUT);
-        case MRAA_GPIO_OUT:
             firmata_pinMode(firmata_dev, dev->phy_pin, MODE_INPUT);
+            break;
+        case MRAA_GPIO_OUT:
+            firmata_pinMode(firmata_dev, dev->phy_pin, MODE_OUTPUT);
+            break;        
+        case MRAA_GPIO_OUT_LOW:
+            firmata_pinMode(firmata_dev, dev->phy_pin, MODE_OUTPUT);
+            firmata_digitalWrite(firmata_dev, dev->phy_pin, LOW);
+            break;
+        case MRAA_GPIO_OUT_HIGH:
+            firmata_pinMode(firmata_dev, dev->phy_pin, MODE_OUTPUT);
+            firmata_digitalWrite(firmata_dev, dev->phy_pin, HIGH);
+            break;
         default:
             return MRAA_ERROR_INVALID_PARAMETER;
     }
-
     return MRAA_SUCCESS;
 }
 
@@ -292,10 +301,16 @@ mraa_firmata_init(const char* uart_dev)
     firmata_dev = firmata_new(uart_dev);
 
     // if this isn't working then we have an issue with our uart
-    while (!firmata_dev->isReady) {
-       firmata_pull(firmata_dev);
+    int retry = 20;
+    while (!firmata_dev->isReady && retry--) {
+        firmata_pull(firmata_dev);
     }
-
+    // or COM port is already in use
+    if(!retry){
+        printf("ERROR - COM port already in use"); //change to syslog later on
+        free(b);
+        return NULL;
+    }
 
     b->platform_name = "firmata";
     // do we support 2.5? Or are we more 2.3?
