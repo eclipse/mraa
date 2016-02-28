@@ -136,6 +136,9 @@ class Gpio
     static void
     v8isr(uv_work_t* req, int status)
     {
+#if NODE_MODULE_VERSION >= 0x000D
+        v8::HandleScope scope(v8::Isolate::GetCurrent());
+#endif
         mraa::Gpio* This = (mraa::Gpio*) req->data;
         int argc = 1;
         v8::Local<v8::Value> argv[] = { SWIGV8_INTEGER_NEW(-1) };
