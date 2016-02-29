@@ -71,7 +71,7 @@ class Spi;
         /* initialize mraa */
         globVM = vm;
         mraa_init();
-        return JNI_VERSION_1_8;
+        return JNI_VERSION_1_6;
     }
 %}
 
