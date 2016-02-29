@@ -50,7 +50,8 @@ mraa_firmata_i2c_init_bus_replace(mraa_i2c_context dev)
 static mraa_result_t
 mraa_firmata_i2c_address(mraa_i2c_context dev, uint8_t addr)
 {
-    dev->addr = (int) addr;
+    // only thing needed and it's already done
+    //dev->addr = (int) addr;
 
     return MRAA_SUCCESS;
 }
@@ -61,89 +62,137 @@ mraa_firmata_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
     return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-static int
-mraa_firmata_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
+static mraa_result_t
+mraa_firmata_send_i2c_read_req(mraa_i2c_context dev, int length)
 {
-    return 0;
+    uint8_t* buffer = calloc(7, 0);
+    if (buffer == NULL) {
+        return MRAA_ERROR_NO_RESOURCES;
+    }
+    buffer[0] = FIRMATA_START_SYSEX;
+    buffer[1] = FIRMATA_I2C_REQUEST;
+    buffer[2] = dev->addr;
+    buffer[3] = I2C_MODE_READ << 3;
+
+    // number of bytes
+    buffer[4] = length & 0x7f;
+    buffer[5] = (length >> 7) & 0x7f;
+    buffer[6] = FIRMATA_END_SYSEX;
+
+    if (serial_write(firmata_dev->serial, buffer, 7) != 7) {
+        free(buffer);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    // this needs a lock :)
+    memset(&firmata_dev->i2cmsg[dev->addr][0], -1, sizeof(int)*length);
+
+    free(buffer);
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_firmata_send_i2c_read_cont_req(mraa_i2c_context dev, uint8_t command, int length)
+{
+    uint8_t* buffer = calloc(9, 0);
+    if (buffer == NULL) {
+        return MRAA_ERROR_NO_RESOURCES;
+    }
+    buffer[0] = FIRMATA_START_SYSEX;
+    buffer[1] = FIRMATA_I2C_REQUEST;
+    buffer[2] = dev->addr;
+    buffer[3] = I2C_MODE_READ << 3;
+
+    // register to read from
+    buffer[4] = command & 0x7f;
+    buffer[5] = (command >> 7) & 0x7f;
+    // number of bytes
+    buffer[6] = length & 0x7f;
+    buffer[7] = (length >> 7) & 0x7f;
+    buffer[8] = FIRMATA_END_SYSEX;
+
+    if (serial_write(firmata_dev->serial, buffer, 9) != 9) {
+        free(buffer);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    // this needs a lock :)
+    memset(&firmata_dev->i2cmsg[dev->addr][command], -1, sizeof(int)*length);
+
+    free(buffer);
+    return MRAA_SUCCESS;
 }
 
 static uint8_t
 mraa_firmata_i2c_read_byte(mraa_i2c_context dev)
 {
-    return 0;
+    if (mraa_firmata_send_i2c_read_req(dev, 1) == MRAA_SUCCESS) {
+        while (firmata_dev->i2cmsg[dev->addr][0] == -1) {
+            firmata_pull(firmata_dev);
+        }
+        return firmata_dev->i2cmsg[dev->addr][0];
+    }
 }
-
 
 static uint16_t
 mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
-    uint8_t* buffer = calloc(9, 0);
-    buffer[0] = FIRMATA_START_SYSEX;
-    buffer[1] = FIRMATA_I2C_REQUEST;
-    buffer[2] = dev->addr;
-    buffer[3] = I2C_MODE_READ << 3;
+    if (mraa_firmata_send_i2c_read_cont_req(dev, command, 2) == MRAA_SUCCESS) {
+        while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
+            firmata_pull(firmata_dev);
+        }
 
-    // register to read from
-    buffer[4] = command & 0x7f;
-    buffer[5] = (command >> 7) & 0x7f;
-    // number of bytes
-    buffer[6] = 2 & 0x7f;
-    buffer[7] = (1 >> 7) & 0x7f;
-    buffer[8] = FIRMATA_END_SYSEX;
+        uint8_t* rawdata[2];
+        rawdata[0] = firmata_dev->i2cmsg[dev->addr][command];
+        rawdata[1] = firmata_dev->i2cmsg[dev->addr][command+1];
+        uint16_t data = (uint16_t) rawdata;
+        uint8_t high = (data & 0xFF00) >> 8;
+        data = (data << 8) & 0xFF00;
+        data |= high;
 
-    serial_write(firmata_dev->serial, buffer, 9);
-
-    /* This section needs a lock :) */
-    firmata_dev->i2cmsg[dev->addr][command] = -1;
-    firmata_dev->i2cmsg[dev->addr][command+1] = -1;
-
-    while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
-        firmata_pull(firmata_dev);
+        return data;
     }
-    uint8_t* rawdata[2];
-    rawdata[0] = firmata_dev->i2cmsg[dev->addr][command];
-    rawdata[1] = firmata_dev->i2cmsg[dev->addr][command+1];
-    uint16_t data = (uint16_t) rawdata;
-    uint8_t high = (data & 0xFF00) >> 8;
-    data = (data << 8) & 0xFF00;
-    data |= high;
-
-    return data;
+    return 0;
 }
 
 static int
 mraa_firmata_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* data, int length)
 {
+    if (mraa_firmata_send_i2c_read_cont_req(dev, command, length) == MRAA_SUCCESS) {
+        while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
+            firmata_pull(firmata_dev);
+        }
+
+        memcpy(data, &firmata_dev->i2cmsg[dev->addr][command], sizeof(int)*length);
+        return length;
+    }
     return 0;
+}
+
+static int
+mraa_firmata_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
+{
+    if (mraa_firmata_send_i2c_read_req(dev, length) == MRAA_SUCCESS) {
+        while (firmata_dev->i2cmsg[dev->addr][0] == -1) {
+            firmata_pull(firmata_dev);
+        }
+        memcpy(data, &firmata_dev->i2cmsg[dev->addr][0], sizeof(int)*length);
+        return length;
+    }
 }
 
 static uint8_t
 mraa_firmata_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
-    uint8_t* buffer = calloc(9, 0);
-    buffer[0] = FIRMATA_START_SYSEX;
-    buffer[1] = FIRMATA_I2C_REQUEST;
-    buffer[2] = dev->addr;
-    buffer[3] = I2C_MODE_READ << 3;
+    if (mraa_firmata_send_i2c_read_cont_req(dev, command, 1) == MRAA_SUCCESS) {
+        while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
+            firmata_pull(firmata_dev);
+        }
 
-    // register to read from
-    buffer[4] = command & 0x7f;
-    buffer[5] = (command >> 7) & 0x7f;
-    // number of bytes
-    buffer[6] = 1 & 0x7f;
-    buffer[7] = (1 >> 7) & 0x7f;
-    buffer[8] = FIRMATA_END_SYSEX;
-
-    serial_write(firmata_dev->serial, buffer, 9);
-
-    /* This section needs a lock :) */
-    firmata_dev->i2cmsg[dev->addr][command] = -1;
-
-    while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
-        firmata_pull(firmata_dev);
+        return firmata_dev->i2cmsg[dev->addr][command];
     }
 
-    return firmata_dev->i2cmsg[dev->addr][command];
+    return 0;
 }
 
 static mraa_result_t
