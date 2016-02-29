@@ -1,7 +1,5 @@
 find_package (PythonLibs ${PYTHONBUILD_VERSION} REQUIRED)
 
-INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
-
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/..
   ${PYTHON_INCLUDE_DIRS}
@@ -9,8 +7,8 @@ include_directories(
 
 set_source_files_properties (mraa.i PROPERTIES CPLUSPLUS ON)
 set_source_files_properties (mraa.i PROPERTIES SWIG_FLAGS "-I${CMAKE_BINARY_DIR}/src")
-swig_add_module (python-mraa python mraa.i ${mraa_LIB_SRCS})
-swig_link_libraries (python-mraa ${PYTHON_LIBRARIES} ${mraa_LIBS})
+swig_add_module (python-mraa python mraa.i mraapy.c)
+swig_link_libraries (python-mraa ${PYTHON_LIBRARIES} mraa)
 
 if (DOXYGEN_FOUND)
   foreach (_file ${DOCCLASSES})

@@ -234,35 +234,6 @@ mraa_gpio_wait_interrupt(int fd
     return MRAA_SUCCESS;
 }
 
-#if defined(SWIGJAVA) || defined(JAVACALLBACK)
-pthread_key_t env_key;
-
-extern JavaVM *globVM;
-static pthread_once_t env_key_init = PTHREAD_ONCE_INIT;
-
-jmethodID runGlobal;
-
-static void make_env_key(void)
-{
-
-    JNIEnv *jenv;
-    (*globVM)->GetEnv(globVM, (void **)&jenv, JNI_VERSION_1_8);
-
-    jclass rcls = (*jenv)->FindClass(jenv, "java/lang/Runnable");
-    jmethodID runm = (*jenv)->GetMethodID(jenv, rcls, "run", "()V");
-
-    runGlobal = (jmethodID)(*jenv)->NewGlobalRef(jenv, (jobject)runm);
-
-    pthread_key_create(&env_key, NULL);
-}
-
-void mraa_java_isr_callback(void* data)
-{
-    JNIEnv *jenv = (JNIEnv *) pthread_getspecific(env_key);
-    (*jenv)->CallVoidMethod(jenv, (jobject)data, runGlobal);
-}
-
-#endif
 
 static void*
 mraa_gpio_interrupt_handler(void* arg)
@@ -295,21 +266,15 @@ mraa_gpio_interrupt_handler(void* arg)
 
     dev->isr_value_fp = fp;
 
-#if defined(SWIGJAVA) || defined(JAVACALLBACK)
-    JNIEnv *jenv;
-    if(dev->isr == mraa_java_isr_callback) {
-        jint err = (*globVM)->AttachCurrentThreadAsDaemon(globVM, (void **)&jenv, NULL);
-
-        if (err != JNI_OK) {
+    if (lang_func->java_attach_thread != NULL) {
+        if (dev->isr == lang_func->java_isr_callback) {
+            if (lang_func->java_attach_thread() != MRAA_SUCCESS) {
                 close(dev->isr_value_fp);
                 dev->isr_value_fp = -1;
                 return NULL;
+            }
         }
-
-        pthread_once(&env_key_init, make_env_key);
-        pthread_setspecific(env_key, jenv);
     }
-#endif
 
     for (;;) {
         if (IS_FUNC_DEFINED(dev, gpio_wait_interrupt_replace)) {
@@ -325,71 +290,11 @@ mraa_gpio_interrupt_handler(void* arg)
 #ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 #endif
-#ifdef SWIGPYTHON
-            // In order to call a python object (all python functions are objects) we
-            // need to aquire the GIL (Global Interpreter Lock). This may not always be
-            // necessary but especially if doing IO (like print()) python will segfault
-            // if we do not hold a lock on the GIL
-            PyGILState_STATE gilstate = PyGILState_Ensure();
-            PyObject* arglist;
-            PyObject* ret;
-            arglist = Py_BuildValue("(O)", dev->isr_args);
-            if (arglist == NULL) {
-                syslog(LOG_ERR, "gpio: Py_BuildValue NULL");
+            if (lang_func->python_isr != NULL) {
+                lang_func->python_isr(dev->isr, dev->isr_args);
             } else {
-                ret = PyEval_CallObject((PyObject*) dev->isr, arglist);
-                if (ret == NULL) {
-                    syslog(LOG_ERR, "gpio: PyEval_CallObject failed");
-                    PyObject *pvalue, *ptype, *ptraceback;
-                    PyObject *pvalue_pystr, *ptype_pystr, *ptraceback_pystr;
-                    char *pvalue_cstr, *ptype_cstr, *ptraceback_cstr;
-                    PyErr_Fetch(&pvalue, &ptype, &ptraceback);
-                    pvalue_pystr = PyObject_Str(pvalue);
-                    ptype_pystr = PyObject_Str(ptype);
-                    ptraceback_pystr = PyObject_Str(ptraceback);
-// Python2
-#if PY_VERSION_HEX < 0x03000000
-                    pvalue_cstr = PyString_AsString(pvalue_pystr);
-                    ptype_cstr = PyString_AsString(ptype_pystr);
-                    ptraceback_cstr = PyString_AsString(ptraceback_pystr);
-// Python 3 and up
-#elif PY_VERSION_HEX >= 0x03000000
-                    // In Python 3 we need one extra conversion
-                    PyObject *pvalue_ustr, *ptype_ustr, *ptraceback_ustr;
-                    pvalue_ustr = PyUnicode_AsUTF8String(pvalue_pystr);
-                    pvalue_cstr = PyBytes_AsString(pvalue_ustr);
-                    ptype_ustr = PyUnicode_AsUTF8String(ptype_pystr);
-                    ptype_cstr = PyBytes_AsString(ptype_ustr);
-                    ptraceback_ustr = PyUnicode_AsUTF8String(ptraceback_pystr);
-                    ptraceback_cstr = PyBytes_AsString(ptraceback_ustr);
-#endif // PY_VERSION_HEX
-                    syslog(LOG_ERR, "gpio: the error was %s:%s:%s",
-                           pvalue_cstr,
-                           ptype_cstr,
-                           ptraceback_cstr
-                    );
-                    Py_XDECREF(pvalue);
-                    Py_XDECREF(ptype);
-                    Py_XDECREF(ptraceback);
-                    Py_XDECREF(pvalue_pystr);
-                    Py_XDECREF(ptype_pystr);
-                    Py_XDECREF(ptraceback_pystr);
-// Python 3 and up
-#if PY_VERSION_HEX >= 0x03000000
-                    Py_XDECREF(pvalue_ustr);
-                    Py_XDECREF(ptype_ustr);
-                    Py_XDECREF(ptraceback_ustr);
-#endif // PY_VERSION_HEX
-                } else {
-                    Py_DECREF(ret);
-                }
-                Py_DECREF(arglist);
+                dev->isr(dev->isr_args);
             }
-
-            PyGILState_Release(gilstate);
-#else
-            dev->isr(dev->isr_args);
-#endif
 #ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 #endif
@@ -402,13 +307,14 @@ mraa_gpio_interrupt_handler(void* arg)
                 close(dev->isr_value_fp);
                 dev->isr_value_fp = -1;
             }
-#if defined(SWIGJAVA) || defined(JAVACALLBACK)
 
-            if(dev->isr == mraa_java_isr_callback) {
-                (*jenv)->DeleteGlobalRef(jenv, (jobject)dev->isr_args);
-                (*globVM)->DetachCurrentThread(globVM);
+            if (lang_func->java_detach_thread != NULL && lang_func->java_delete_global_ref != NULL) {
+                if (dev->isr == lang_func->java_isr_callback) {
+                    lang_func->java_delete_global_ref(dev->isr_args);
+                    lang_func->java_detach_thread();
+                }
             }
-#endif
+
             return NULL;
         }
     }
@@ -476,16 +382,15 @@ mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t mode, void (*fptr)(void*),
     }
 
     dev->isr = fptr;
-#if defined(SWIGJAVA) || defined(JAVACALLBACK)
-    JNIEnv *jenv;
-    /* Most UPM sensors use the C API, the global ref must be created here. */
+
+    /* Most UPM sensors use the C API, the Java global ref must be created here. */
     /* The reason for checking the callback function is internal callbacks. */
-    if (fptr == mraa_java_isr_callback) {
-        (*globVM)->GetEnv(globVM, (void **)&jenv, JNI_VERSION_1_8);
-        jobject grunnable = (*jenv)->NewGlobalRef(jenv, (jobject) args);
-        args = (void *) grunnable;
+    if (lang_func->java_create_global_ref != NULL) {
+        if (dev->isr == lang_func->java_isr_callback) {
+            args = lang_func->java_create_global_ref(args);
+        }
     }
-#endif
+
     dev->isr_args = args;
     pthread_create(&dev->thread_id, NULL, mraa_gpio_interrupt_handler, (void*) dev);
 

@@ -1,5 +1,4 @@
 FIND_PACKAGE (JNI REQUIRED)
-
 include_directories (
   ${JAVA_INCLUDE_PATH}
   ${JAVA_INCLUDE_PATH2}
@@ -25,8 +24,8 @@ else ()
   set (JAR $ENV{JAVA_HOME_NATIVE}/bin/jar)
 endif ()
 
-swig_add_module (mraajava java mraajava.i ${mraa_LIB_SRCS})
-swig_link_libraries (mraajava ${JAVA_LIBRARIES} ${mraa_LIBS})
+swig_add_module (mraajava java mraajava.i mraajni.c)
+swig_link_libraries (mraajava ${JAVA_LIBRARIES} mraa)
 
 add_custom_command (TARGET mraajava
   POST_BUILD

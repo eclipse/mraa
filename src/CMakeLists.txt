@@ -117,17 +117,6 @@ set (mraa_LIB_GLOB_HEADERS
   ${PROJECT_SOURCE_DIR}/api/mraa.hpp
 )
 
-add_library (mraa ${mraa_LIB_SRCS})
-
-
-target_link_libraries (mraa ${mraa_LIBS})
-
-set_target_properties(
-   mraa
-   PROPERTIES
-   SOVERSION ${mraa_VERSION_MAJOR}
-   VERSION ${mraa_VERSION_STRING}
-)
 install (FILES ${mraa_LIB_GLOB_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install (DIRECTORY ${PROJECT_SOURCE_DIR}/api/mraa/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mraa)
 
@@ -137,7 +126,6 @@ macro (mraa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
 endmacro (mraa_CREATE_INSTALL_PKGCONFIG)
 mraa_create_install_pkgconfig (mraa.pc ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
-install(TARGETS mraa DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if (DOXYGEN_FOUND)
   set (CMAKE_SWIG_FLAGS -DDOXYGEN=${DOXYGEN_FOUND})
@@ -198,3 +186,13 @@ if (BUILDSWIG)
     endif ()
   endif ()
 endif ()
+
+add_library (mraa ${mraa_LIB_SRCS})
+target_link_libraries (mraa ${mraa_LIBS})
+set_target_properties(
+   mraa
+   PROPERTIES
+   SOVERSION ${mraa_VERSION_MAJOR}
+   VERSION ${mraa_VERSION_STRING}
+)
+install(TARGETS mraa DESTINATION ${CMAKE_INSTALL_LIBDIR})
