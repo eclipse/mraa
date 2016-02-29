@@ -246,7 +246,7 @@ static void make_env_key(void)
 {
 
     JNIEnv *jenv;
-    (*globVM)->GetEnv(globVM, (void **)&jenv, JNI_VERSION_1_8);
+    (*globVM)->GetEnv(globVM, (void **)&jenv, JNI_VERSION_1_6);
 
     jclass rcls = (*jenv)->FindClass(jenv, "java/lang/Runnable");
     jmethodID runm = (*jenv)->GetMethodID(jenv, rcls, "run", "()V");
@@ -481,7 +481,7 @@ mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t mode, void (*fptr)(void*),
     /* Most UPM sensors use the C API, the global ref must be created here. */
     /* The reason for checking the callback function is internal callbacks. */
     if (fptr == mraa_java_isr_callback) {
-        (*globVM)->GetEnv(globVM, (void **)&jenv, JNI_VERSION_1_8);
+        (*globVM)->GetEnv(globVM, (void **)&jenv, JNI_VERSION_1_6);
         jobject grunnable = (*jenv)->NewGlobalRef(jenv, (jobject) args);
         args = (void *) grunnable;
     }
