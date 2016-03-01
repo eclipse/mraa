@@ -158,6 +158,9 @@ mraa_init()
     }
 
     lang_func = (mraa_lang_func_t*) calloc(1, sizeof(mraa_lang_func_t));
+    if (lang_func == NULL) {
+        return MRAA_ERROR_NO_RESOURCES;
+    }
 
     syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
     return MRAA_SUCCESS;
