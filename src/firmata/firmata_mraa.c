@@ -28,7 +28,6 @@
 #include "mraa_internal.h"
 #include "firmata/firmata_mraa.h"
 #include "firmata/firmata.h"
-#include "firmata/serial.h"
 
 static t_firmata* firmata_dev;
 static pthread_t thread_id;
@@ -43,7 +42,7 @@ mraa_firmata_i2c_init_bus_replace(mraa_i2c_context dev)
     buff[1] = FIRMATA_I2C_CONFIG;
     buff[2] = delay & 0xFF, (delay >> 8) & 0xFF;
     buff[3] = FIRMATA_END_SYSEX;
-    serial_write(firmata_dev->serial, buff, 4);
+    mraa_uart_write(firmata_dev->uart, buff, 4);
 
     return MRAA_SUCCESS;
 }
@@ -80,9 +79,11 @@ mraa_firmata_send_i2c_read_req(mraa_i2c_context dev, int length)
     buffer[5] = (length >> 7) & 0x7f;
     buffer[6] = FIRMATA_END_SYSEX;
 
-    if (serial_write(firmata_dev->serial, buffer, 7) != 7) {
+    mraa_result_t res = mraa_uart_write(firmata_dev->uart, buffer, 7);
+    if (res != MRAA_SUCCESS) {
         free(buffer);
-        return MRAA_ERROR_INVALID_RESOURCE;
+        mraa_result_print(res);
+        return res;
     }
 
     // this needs a lock :)
@@ -112,9 +113,11 @@ mraa_firmata_send_i2c_read_cont_req(mraa_i2c_context dev, uint8_t command, int l
     buffer[7] = (length >> 7) & 0x7f;
     buffer[8] = FIRMATA_END_SYSEX;
 
-    if (serial_write(firmata_dev->serial, buffer, 9) != 9) {
+    mraa_result_t res = mraa_uart_write(firmata_dev->uart, buffer, 9);
+    if (res != MRAA_SUCCESS) {
         free(buffer);
-        return MRAA_ERROR_INVALID_RESOURCE;
+        mraa_result_print(res);
+        return res;
     }
 
     // this needs a lock :)
@@ -218,7 +221,7 @@ mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWri
         ii = ii+2;
     }
     buffer[buffer_size-1] = FIRMATA_END_SYSEX;
-    serial_write(firmata_dev->serial, buffer, buffer_size);
+    mraa_uart_write(firmata_dev->uart, buffer, buffer_size);
     return MRAA_SUCCESS;
 }
 
@@ -233,7 +236,7 @@ mraa_firmata_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
     buffer[4] = data & 0x7F;
     buffer[5] = (data >> 7) & 0x7F;
     buffer[6] = FIRMATA_END_SYSEX;
-    serial_write(firmata_dev->serial, buffer, 7);
+    mraa_uart_write(firmata_dev->uart, buffer, 7);
     return MRAA_SUCCESS;
 }
 
@@ -250,7 +253,7 @@ mraa_firmata_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const
     buffer[6] = data & 0x7F;
     buffer[7] = (data >> 7) & 0x7F;
     buffer[8] = FIRMATA_END_SYSEX;
-    serial_write(firmata_dev->serial, buffer, 9);
+    mraa_uart_write(firmata_dev->uart, buffer, 9);
     return MRAA_SUCCESS;
 }
 

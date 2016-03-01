@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "serial.h"
+#include "uart.h"
 
 #define MODE_INPUT 0x00
 #define MODE_OUTPUT 0x01
@@ -89,7 +89,7 @@ typedef struct s_pin {
 } t_pin;
 
 typedef struct s_firmata {
-    t_serial* serial;
+    mraa_uart_context uart;
     t_pin pins[128];
     int i2cmsg[256][256];
     int parse_command_len;
