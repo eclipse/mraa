@@ -22,7 +22,6 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "firmata/serial.h"
 #include "firmata/firmata.h"
 
 #include <string.h>
@@ -33,6 +32,7 @@ t_firmata*
 firmata_new(const char* name)
 {
     t_firmata* res;
+    mraa_result_t uart_res = MRAA_ERROR_UNSPECIFIED;
 
     printf("Opening device at: %s\n", name);
     res = malloc(sizeof(t_firmata));
@@ -41,14 +41,20 @@ firmata_new(const char* name)
         return (NULL);
     }
     memset(res, 0, sizeof(*res));
-    res->serial = serial_new();
-    if (!res->serial) {
-        perror("firmata_new::Failed malloc");
-        return (NULL);
+
+    res->uart = mraa_uart_init_raw(name);
+    if (res->uart == NULL) {
+        fprintf(stderr, "UART failed to setup\n");
+        return EXIT_FAILURE;
     }
-    serial_open(res->serial, name);
+
     firmata_initPins(res);
-    serial_setBaud(res->serial, 57600);
+
+    uart_res = mraa_uart_set_baudrate(res->uart, 57600);
+    if (uart_res != MRAA_SUCCESS) {
+        mraa_result_print(uart_res);
+    }
+
     firmata_askFirmware(res);
     printf("Device opened at: %s\n", name);
     return (res);
@@ -60,9 +66,9 @@ firmata_pull(t_firmata* firmata)
     uint8_t buff[FIRMATA_MSG_LEN];
     int r;
 
-    r = serial_waitInput(firmata->serial, 40);
+    r = mraa_uart_data_available(firmata->uart, 40);
     if (r > 0) {
-        r = serial_read(firmata->serial, buff, sizeof(buff));
+        r = mraa_uart_read(firmata->uart, buff, sizeof(buff));
         if (r < 0) {
             return (0);
         }
@@ -178,7 +184,7 @@ firmata_endParse(t_firmata* firmata)
                 buf[len++] = 1;
             }
             firmata->isReady = 1;
-            serial_write(firmata->serial, buf, len);
+            mraa_uart_write(firmata->uart, buf, len);
         } else if (firmata->parse_buff[1] == FIRMATA_CAPABILITY_RESPONSE) {
             int pin, i, n;
             for (pin = 0; pin < 128; pin++) {
@@ -206,7 +212,7 @@ firmata_endParse(t_firmata* firmata)
                     buf[len++] = pin;
                     buf[len++] = FIRMATA_END_SYSEX;
                 }
-                serial_write(firmata->serial, buf, len);
+                mraa_uart_write(firmata->uart, buf, len);
             }
         } else if (firmata->parse_buff[1] == FIRMATA_ANALOG_MAPPING_RESPONSE) {
             int pin = 0;
@@ -228,12 +234,12 @@ firmata_endParse(t_firmata* firmata)
             printf("got an i2c reply with count %d!!\n", firmata->parse_count);
             int addr = (firmata->parse_buff[2] & 0x7f) | ((firmata->parse_buff[3] & 0x7f) << 7);
             int reg = (firmata->parse_buff[4] & 0x7f) | ((firmata->parse_buff[5] & 0x7f) << 7);
-	    int i = 6;
-	    int ii = 0;
-	    for (ii; ii < (firmata->parse_count - 7) / 2; ii++) {
-              firmata->i2cmsg[addr][reg+ii] = (firmata->parse_buff[i] & 0x7f) | ((firmata->parse_buff[i+1] & 0x7f) << 7);;
-	      i = i+2;
-	    }
+            int i = 6;
+            int ii = 0;
+            for (ii; ii < (firmata->parse_count - 7) / 2; ii++) {
+                firmata->i2cmsg[addr][reg+ii] = (firmata->parse_buff[i] & 0x7f) | ((firmata->parse_buff[i+1] & 0x7f) << 7);;
+                i = i+2;
+            }
             printf("i2c reply is %d\n", firmata->i2cmsg[addr][reg]);
         }
         return;
@@ -265,7 +271,7 @@ firmata_askFirmware(t_firmata* firmata)
     buf[0] = FIRMATA_START_SYSEX;
     buf[1] = FIRMATA_REPORT_FIRMWARE; // read firmata name & version
     buf[2] = FIRMATA_END_SYSEX;
-    res = serial_write(firmata->serial, buf, 3);
+    res = mraa_uart_write(firmata->uart, buf, 3);
     return (res);
 }
 
@@ -280,7 +286,7 @@ firmata_pinMode(t_firmata* firmata, int pin, int mode)
     buff[1] = pin;
     buff[2] = mode;
     printf("Setting pinMode at: %i with value: %i\n", pin, mode);
-    res = serial_write(firmata->serial, buff, 3);
+    res = mraa_uart_write(firmata->uart, buff, 3);
     return (res);
 }
 
@@ -294,7 +300,7 @@ firmata_analogWrite(t_firmata* firmata, int pin, int value)
     buff[0] = 0xE0 | pin;
     buff[1] = value & 0x7F;
     buff[2] = (value >> 7) & 0x7F;
-    res = serial_write(firmata->serial, buff, 3);
+    res = mraa_uart_write(firmata->uart, buff, 3);
     return (res);
 }
 
@@ -308,7 +314,7 @@ firmata_analogRead(t_firmata *firmata, int pin)
     buff[0] = FIRMATA_REPORT_ANALOG | pin;
     buff[1] = value;
     printf("192 == %d, pinval == %d, pin %d", buff[0], buff[1], pin);
-    res = serial_write(firmata->serial, buff, 2);
+    res = mraa_uart_write(firmata->uart, buff, 2);
     return res;
 }
 
@@ -336,6 +342,6 @@ firmata_digitalWrite(t_firmata* firmata, int pin, int value)
     buff[0] = FIRMATA_DIGITAL_MESSAGE | port_num;
     buff[1] = port_val & 0x7F;
     buff[2] = (port_val >> 7) & 0x7F;
-    res = serial_write(firmata->serial, buff, 3);
+    res = mraa_uart_write(firmata->uart, buff, 3);
     return (res);
 }
