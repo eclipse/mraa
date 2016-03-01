@@ -62,13 +62,17 @@ function onPinLevelChange() {
 
 function monitorPin() {
     var pinNumber = arguments[0];
-    var pin = new mraa.Gpio(pinNumber);
-    pin.dir(mraa.DIR_IN);
-    pin.isr(mraa.EDGE_BOTH, onPinLevelChange);
-    rl.question('Press ENTER to stop', function(answer) {
-        rl.close();
-        pin.isrExit();
-    });
+    try {
+        var pin = new mraa.Gpio(pinNumber);
+        pin.dir(mraa.DIR_IN);
+        pin.isr(mraa.EDGE_BOTH, onPinLevelChange);
+        rl.question('Press ENTER to stop', function(answer) {
+            rl.close();
+            pin.isrExit();
+        });
+    } catch (err) {
+     console.log(err.message);
+    }
 }
 
 const args = process.argv;
