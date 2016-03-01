@@ -203,7 +203,7 @@ typedef enum {
     MRAA_ERROR_NO_DATA_AVAILABLE = 9,             /**< No data available */
     MRAA_ERROR_INVALID_PLATFORM = 10,             /**< Platform not recognised */
     MRAA_ERROR_PLATFORM_NOT_INITIALISED = 11,     /**< Board information not initialised */
-    MRAA_ERROR_PLATFORM_ALREADY_INITIALISED = 12, /**< Board is already initialised */
+    MRAA_ERROR_PLATFORM_ALREADY_INITIALISED = 0,  /**< Board is already initialised, same as MRAA_SUCESS */
 
     MRAA_ERROR_UNSPECIFIED = 99 /**< Unknown Error */
 } mraa_result_t;

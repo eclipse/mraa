@@ -64,9 +64,7 @@ typedef unsigned int mraa_boolean_t;
  *
  * Detects running platform and attempts to use included pinmap, this is run on
  * module/library init/load but is handy to rerun to check board initialised
- * correctly. MRAA_SUCCESS inidicates correct (first time) initialisation
- * whilst MRAA_ERROR_PLATFORM_ALREADY_INITIALISED indicates the board is
- * already initialised correctly
+ * correctly. MRAA_SUCCESS inidicates correct initialisation.
  *
  * @return Result of operation
  */

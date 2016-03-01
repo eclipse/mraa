@@ -83,7 +83,7 @@ mraa_result_t __attribute__((constructor))
 mraa_init()
 {
     if (plat != NULL) {
-        return MRAA_ERROR_PLATFORM_ALREADY_INITIALISED;
+        return MRAA_SUCCESS;
     }
 
     uid_t proc_euid = geteuid();
@@ -319,9 +319,6 @@ mraa_result_print(mraa_result_t result)
             break;
         case MRAA_ERROR_PLATFORM_NOT_INITIALISED:
             fprintf(stdout, "MRAA: Platform not initialised.\n");
-            break;
-        case MRAA_ERROR_PLATFORM_ALREADY_INITIALISED:
-            fprintf(stdout, "MRAA: Platform already initialised.\n");
             break;
         case MRAA_ERROR_UNSPECIFIED:
             fprintf(stdout, "MRAA: Unspecified Error.\n");
