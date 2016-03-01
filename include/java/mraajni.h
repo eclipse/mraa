@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#include "jni.h"
+#include <jni.h>
 #include "mraa/types.h"
 
 // location for defining JNI version to use
