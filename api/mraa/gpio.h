@@ -40,6 +40,13 @@
 extern "C" {
 #endif
 
+#if defined(SWIGJAVA) || defined(JAVACALLBACK)
+#include <jni.h>
+extern "C" {
+    void mraa_java_isr_callback(void *args);
+}
+#endif
+
 #ifdef SWIGPYTHON
 #include <Python.h>
 #endif
