@@ -31,6 +31,7 @@
 #include "firmata/serial.h"
 
 static t_firmata* firmata_dev;
+static pthread_t thread_id;
 
 static mraa_result_t
 mraa_firmata_i2c_init_bus_replace(mraa_i2c_context dev)
@@ -128,7 +129,7 @@ mraa_firmata_i2c_read_byte(mraa_i2c_context dev)
 {
     if (mraa_firmata_send_i2c_read_req(dev, 1) == MRAA_SUCCESS) {
         while (firmata_dev->i2cmsg[dev->addr][0] == -1) {
-            firmata_pull(firmata_dev);
+            usleep(500);
         }
         return firmata_dev->i2cmsg[dev->addr][0];
     }
@@ -139,7 +140,7 @@ mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
     if (mraa_firmata_send_i2c_read_cont_req(dev, command, 2) == MRAA_SUCCESS) {
         while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
-            firmata_pull(firmata_dev);
+            usleep(500);
         }
 
         uint8_t* rawdata[2];
@@ -160,7 +161,7 @@ mraa_firmata_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t*
 {
     if (mraa_firmata_send_i2c_read_cont_req(dev, command, length) == MRAA_SUCCESS) {
         while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
-            firmata_pull(firmata_dev);
+            usleep(500);
         }
 
         memcpy(data, &firmata_dev->i2cmsg[dev->addr][command], sizeof(int)*length);
@@ -174,7 +175,7 @@ mraa_firmata_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 {
     if (mraa_firmata_send_i2c_read_req(dev, length) == MRAA_SUCCESS) {
         while (firmata_dev->i2cmsg[dev->addr][0] == -1) {
-            firmata_pull(firmata_dev);
+            usleep(500);
         }
         int i = 0;
         for (i = 0; i < length; i++) {
@@ -189,7 +190,7 @@ mraa_firmata_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
     if (mraa_firmata_send_i2c_read_cont_req(dev, command, 1) == MRAA_SUCCESS) {
         while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
-            firmata_pull(firmata_dev);
+            usleep(500);
         }
 
         return firmata_dev->i2cmsg[dev->addr][command];
@@ -268,7 +269,6 @@ mraa_firmata_i2c_stop(mraa_i2c_context dev)
 static unsigned int
 mraa_firmata_aio_read(mraa_aio_context dev)
 {
-    firmata_pull(firmata_dev);
     // careful, whilst you need to enable '0' for A0 you then need to read 14
     // in t_firmata because well that makes sense doesn't it...
     return (unsigned int) firmata_dev->pins[dev->channel].value;
@@ -342,6 +342,15 @@ mraa_firmata_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
     return MRAA_SUCCESS;
 }
 
+static void
+mraa_firmata_pull_handler(void)
+{
+    while(1) {
+        firmata_pull(firmata_dev);
+        usleep(100);
+    }
+}
+
 mraa_board_t*
 mraa_firmata_init(const char* uart_dev)
 {
@@ -357,6 +366,7 @@ mraa_firmata_init(const char* uart_dev)
        firmata_pull(firmata_dev);
     }
 
+    pthread_create(&thread_id, NULL, mraa_firmata_pull_handler, NULL);
 
     b->platform_name = "firmata";
     // do we support 2.5? Or are we more 2.3?
