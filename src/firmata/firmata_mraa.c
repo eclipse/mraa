@@ -303,7 +303,7 @@ mraa_firmata_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 static int
 mraa_firmata_gpio_read_replace(mraa_gpio_context dev)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    return firmata_dev->pins[dev->pin].value;
 }
 
 static mraa_result_t
