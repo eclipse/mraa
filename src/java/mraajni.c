@@ -42,7 +42,7 @@ mraa_java_make_env_key(void)
 {
     if (globVM != NULL) {
         JNIEnv* jenv;
-        (*globVM)->GetEnv(globVM, (void**) &jenv, JNI_VERSION_1_8);
+        (*globVM)->GetEnv(globVM, (void**) &jenv, JNI_REQUIRED_VERSION);
         jclass rcls = (*jenv)->FindClass(jenv, "java/lang/Runnable");
         jmethodID runm = (*jenv)->GetMethodID(jenv, rcls, "run", "()V");
         runGlobal = (jmethodID)(*jenv)->NewGlobalRef(jenv, (jobject) runm);
@@ -84,7 +84,7 @@ mraa_java_create_global_ref(void* args)
 {
     if (globVM != NULL) {
         JNIEnv* jenv;
-        (*globVM)->GetEnv(globVM, (void**) &jenv, JNI_VERSION_1_8);
+        (*globVM)->GetEnv(globVM, (void**) &jenv, JNI_REQUIRED_VERSION);
         jobject grunnable = (*jenv)->NewGlobalRef(jenv, (jobject) args);
         return (void*) grunnable;
     } else
@@ -96,7 +96,7 @@ mraa_java_delete_global_ref(void* ref)
 {
     if (globVM != NULL) {
         JNIEnv* jenv;
-        (*globVM)->GetEnv(globVM, (void**) &jenv, JNI_VERSION_1_8);
+        (*globVM)->GetEnv(globVM, (void**) &jenv, JNI_REQUIRED_VERSION);
         (*jenv)->DeleteGlobalRef(jenv, (jobject) ref);
     }
 }
