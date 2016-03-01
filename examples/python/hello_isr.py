@@ -43,9 +43,12 @@ if (len(sys.argv) == 2):
     pin = int(sys.argv[1], 10)
   except ValueError:
     printf("Invalid pin " + sys.argv[1])
-print("Starting ISR for pin " + repr(pin))
-x = mraa.Gpio(pin)
-x.dir(mraa.DIR_IN)
-x.isr(mraa.EDGE_BOTH, test, x)
-var = raw_input("Press ENTER to stop")
-x.isrExit()
+try:
+	x = mraa.Gpio(pin)
+	print("Starting ISR for pin " + repr(pin))
+	x.dir(mraa.DIR_IN)
+	x.isr(mraa.EDGE_BOTH, test, x)
+	var = raw_input("Press ENTER to stop")
+	x.isrExit()
+except ValueError as e:
+    print(e)
