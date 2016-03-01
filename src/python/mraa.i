@@ -158,8 +158,10 @@ class Spi;
     PyEval_InitThreads();
     // Add mraa_init() to the module initialisation process and set isr function
     mraa_result_t res = mraa_init();
-    if (res == MRAA_SUCCESS || res == MRAA_ERROR_PLATFORM_ALREADY_INITIALISED) {
+    if (res == MRAA_SUCCESS) {
         lang_func->python_isr = &mraa_python_isr;
     }
+    else
+        SWIG_Error(SWIG_RuntimeError, "mraa_init() failed");
 
 %}
