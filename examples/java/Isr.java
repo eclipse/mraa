@@ -52,7 +52,7 @@ public class Isr {
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Starting ISR for pin " + Integer.toString(pin) + ". Press ENTER to stop");
         Gpio gpio = new Gpio(pin);
-        Runnable callback = new JavaCallback();
+        Runnable callback = new JavaCallback(gpio);
         gpio.isr(Edge.EDGE_RISING, callback);
         try {
             String input = console.readLine();
@@ -64,8 +64,16 @@ public class Isr {
 }
 
 class JavaCallback implements Runnable {
+    private Gpio gpio;
+
+    public JavaCallback(Gpio gpio) {
+        this.gpio = gpio;
+    }
+
     @Override
     public void run() {
-        System.out.println("Gpio level changed");
+        String pin = Integer.toString(gpio.getPin(true));
+        String level = Integer.toString(gpio.read());
+        System.out.println("Pin " + pin + " = " + level);
     }
 }
