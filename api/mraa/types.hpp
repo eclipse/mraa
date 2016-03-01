@@ -195,7 +195,7 @@ typedef enum {
     ERROR_NO_DATA_AVAILABLE = 9,             /**< No data available */
     ERROR_INVALID_PLATFORM = 10,             /**< Platform not recognised */
     ERROR_PLATFORM_NOT_INITIALISED = 11,     /**< Board information not initialised */
-    ERROR_PLATFORM_ALREADY_INITIALISED = 12, /**< Board is already initialised */
+    ERROR_PLATFORM_ALREADY_INITIALISED = 0,  /**< Board is already initialised, same as SUCCESS */
 
     ERROR_UNSPECIFIED = 99 /**< Unknown Error */
 } Result;
