@@ -44,6 +44,13 @@ extern "C" {
 #include <pthread.h>
 #include "common.h"
 
+#if defined(SWIGJAVA) || defined(JAVACALLBACK)
+#include <jni.h>
+extern "C" {
+    void mraa_java_isr_callback(void *args);
+}
+#endif
+
 /**
  * Opaque pointer definition to the internal struct _gpio
  */
