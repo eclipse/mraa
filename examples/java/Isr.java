@@ -50,8 +50,14 @@ public class Isr {
             }
         }
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+        Gpio gpio = null;
+        try {
+            gpio = new Gpio(pin);
+        }  catch (Exception e) {
+            System.out.println(e.getMessage());
+            return;
+        }
         System.out.println("Starting ISR for pin " + Integer.toString(pin) + ". Press ENTER to stop");
-        Gpio gpio = new Gpio(pin);
         Runnable callback = new JavaCallback(gpio);
         gpio.isr(Edge.EDGE_RISING, callback);
         try {
