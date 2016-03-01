@@ -31,6 +31,9 @@ extern "C" {
 #include "jni.h"
 #include "mraa/types.h"
 
+// location for defining JNI version to use
+#define JNI_REQUIRED_VERSION JNI_VERSION_1_6
+
 void mraa_java_set_jvm(JavaVM* vm);
 void mraa_java_isr_callback(void* args);
 mraa_result_t mraa_java_attach_thread();

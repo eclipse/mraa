@@ -80,7 +80,7 @@ class Spi;
             lang_func->java_create_global_ref = &mraa_java_create_global_ref;
             lang_func->java_delete_global_ref = &mraa_java_delete_global_ref;
         }
-        return JNI_VERSION_1_8;
+        return JNI_REQUIRED_VERSION;
     }
 %}
 
