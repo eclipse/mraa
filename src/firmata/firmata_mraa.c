@@ -176,7 +176,10 @@ mraa_firmata_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
         while (firmata_dev->i2cmsg[dev->addr][0] == -1) {
             firmata_pull(firmata_dev);
         }
-        memcpy(data, &firmata_dev->i2cmsg[dev->addr][0], sizeof(int)*length);
+        int i = 0;
+        for (i = 0; i < length; i++) {
+            data[i] = firmata_dev->i2cmsg[dev->addr][i];
+        }
         return length;
     }
 }
