@@ -234,7 +234,6 @@ mraa_gpio_wait_interrupt(int fd
     return MRAA_SUCCESS;
 }
 
-
 static void*
 mraa_gpio_interrupt_handler(void* arg)
 {
