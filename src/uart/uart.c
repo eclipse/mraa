@@ -451,6 +451,28 @@ mraa_uart_set_timeout(mraa_uart_context dev, int read, int write, int interchar)
     return MRAA_SUCCESS;
 }
 
+mraa_result_t
+mraa_uart_set_non_blocking(mraa_uart_context dev, mraa_boolean_t nonblock)
+{
+    // get current flags
+    int flags = fcntl(dev->fd, F_GETFL);
+
+    // update flags with new blocking state according to nonblock bool
+    if (nonblock) {
+        flags |= O_NONBLOCK;
+    } else {
+        flags &= ~O_NONBLOCK;
+    }
+
+    // set new flags
+    if (fcntl(dev->fd, F_SETFL, flags) < 0) {
+        syslog(LOG_ERR, "failed changing fd blocking state");
+        return MRAA_ERROR_UNSPECIFIED;
+    }
+
+    return MRAA_SUCCESS;
+}
+
 const char*
 mraa_uart_get_dev_path(mraa_uart_context dev)
 {
