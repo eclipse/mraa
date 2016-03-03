@@ -119,6 +119,15 @@ mraa_result_t mraa_uart_set_flowcontrol(mraa_uart_context dev, mraa_boolean_t xo
 mraa_result_t mraa_uart_set_timeout(mraa_uart_context dev, int read, int write, int interchar);
 
 /**
+ * Set the blocking state for write operations
+ *
+ * @param dev The UART context
+ * @param nonblock new nonblocking state
+ * @return Result of operation
+ */
+mraa_result_t mraa_uart_set_non_blocking(mraa_uart_context dev, mraa_boolean_t nonblock);
+
+/**
  * Get Char pointer with tty device path within Linux
  * For example. Could point to "/dev/ttyS0"
  *

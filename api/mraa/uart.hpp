@@ -236,6 +236,19 @@ class Uart
         return (Result) mraa_uart_set_timeout(m_uart, read, write, interchar);
     }
 
+    /**
+     * Set the blocking state for write operations
+     *
+     * @param dev The UART context
+     * @param nonblock new nonblocking state
+     * @return Result of operation
+     */
+    Result
+    SetNonBlocking(bool nonblock)
+    {
+        return (Result) mraa_uart_set_non_blocking(m_uart, nonblock);
+    }
+
   private:
     mraa_uart_context m_uart;
 };
