@@ -36,24 +36,36 @@
 #define PLATFORM_NAME "FTDI FT4222"
 #define I2CM_ERROR(status) (((status) &0x02) != 0)
 #define PCA9672_ADDR 0x20
+#define PCA9555_ADDR 0x27
+#define PCA9555_INPUT_REG 0
+#define PCA9555_OUTPUT_REG 2
+#define PCA9555_POLARITY_REG 4
+#define PCA9555_DIRECTION_REG 6
 #define PCA9545_ADDR 0x70
 #define PCA9672_PINS 8
+#define PCA9555_PINS 16
 #define PCA9545_BUSSES 4
 #define GPIO_PORT_IO_RESET GPIO_PORT2
 #define GPIO_PORT_IO_INT GPIO_PORT3
+#define MAX_IO_EXPANDER_PINS PCA9555_PINS
+
+typedef enum {IO_EXP_NONE, IO_EXP_PCA9672, IO_EXP_PCA9555} ft4222_io_exp_type;
+typedef enum {GPIO_TYPE_BUILTIN, GPIO_TYPE_PCA9672, GPIO_TYPE_PCA9555, GPIO_TYPE_UNKNOWN=99} ft4222_gpio_type;
 
 static pthread_mutex_t ft4222_lock;
 static FT_HANDLE ftHandleGpio = (FT_HANDLE) NULL; //GPIO Handle
 static FT_HANDLE ftHandleI2c = (FT_HANDLE) NULL; //I2C/SPI Handle
 static FT_HANDLE ftHandleSpi = (FT_HANDLE) NULL; //I2C/SPI Handle
 static GPIO_Dir pinDirection[] = {GPIO_OUTPUT, GPIO_OUTPUT, GPIO_OUTPUT, GPIO_OUTPUT};
-static uint8_t gpioExpanderDirectionMask = 0;
+static uint8_t pca9672DirectionMask = 0;
+static uint16_t pca9555OutputValue = 0;
+static uint16_t pca9555DirectionValue = 0;
 static int bus_speed = 400;
 static int numFt4222GpioPins = 4;
 static int numI2cGpioExpanderPins = 8;
 static int numI2cSwitchBusses = 4;
 static int currentI2cBus = 0;
-
+static ft4222_io_exp_type gpio_expander_chip;
 
 
 static void
@@ -232,7 +244,7 @@ mraa_ftdi_ft4222_i2c_read_internal(FT_HANDLE handle, uint8_t addr, uint8_t* data
     // mraa_ftdi_ft4222_i2c_log("FT4222_I2CMaster_Read", addr, data, length);
     ft4222Status = FT4222_I2CMaster_GetStatus(ftHandleI2c, &controllerStatus);
     if (FT4222_OK != ft4222Status || I2CM_ERROR(controllerStatus)) {
-        syslog(LOG_ERR, "FT4222_I2CMaster_Read failed for address %#02x", addr);
+        syslog(LOG_ERR, "FT4222_I2CMaster_Read failed for address %#02x. Code %d", addr, controllerStatus);
         FT4222_I2CMaster_Reset(handle);
         return 0;
     }
@@ -266,17 +278,38 @@ static int
 mraa_ftdi_ft4222_detect_io_expander()
 {
     uint8_t data;
-    if(mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &data, 1) == 1) {
+    if (mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &data, 1) == 1) {
+        gpio_expander_chip = IO_EXP_PCA9672;
         return PCA9672_PINS;
+    } else if (mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9555_ADDR, &data, 1) == 1) {
+        gpio_expander_chip = IO_EXP_PCA9555;
+        uint8_t reg = PCA9555_OUTPUT_REG;
+        mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9555_ADDR, &reg, 1);
+        mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9555_ADDR, (uint8_t*)&pca9555OutputValue, 2);
+        reg = PCA9555_DIRECTION_REG;
+        mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9555_ADDR, &reg, 1);
+        mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9555_ADDR, (uint8_t*)&pca9555DirectionValue, 2);
+        return PCA9555_PINS;
+    } else {
+        gpio_expander_chip = IO_EXP_NONE;
+        return 0;
     }
-    return 0;
 }
 
 
-static mraa_boolean_t
-mraa_ftdi_ft4222_is_internal_gpio(int pin)
+static ft4222_gpio_type
+mraa_ftdi_ft4222_get_gpio_type(int pin)
 {
-    return pin < numFt4222GpioPins;
+    if (pin < numFt4222GpioPins) {
+        return GPIO_TYPE_BUILTIN;
+    } else switch (gpio_expander_chip) {
+        case IO_EXP_PCA9672:
+            return GPIO_TYPE_PCA9672;
+        case GPIO_TYPE_PCA9555:
+            return GPIO_TYPE_PCA9555;
+        default:
+            return GPIO_TYPE_UNKNOWN;
+    }
 }
 
 
@@ -290,6 +323,51 @@ ftdi_ft4222_set_internal_gpio_dir(int pin, GPIO_Dir direction)
         return MRAA_SUCCESS;
 }
 
+
+static mraa_result_t
+mraa_ftdi_ft4222_gpio_set_pca9672_dir(int pin, mraa_gpio_dir_t dir)
+{
+    uint8_t mask = 1 << pin;
+    switch (dir) {
+        case MRAA_GPIO_IN:
+                pca9672DirectionMask |= mask;
+                int bytes_written = mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9672_ADDR, &pca9672DirectionMask, 1);
+                return bytes_written == 1 ? MRAA_SUCCESS : MRAA_ERROR_UNSPECIFIED;
+        case MRAA_GPIO_OUT:
+                pca9672DirectionMask &= (~mask);
+                return MRAA_SUCCESS;
+        default:
+                return MRAA_ERROR_UNSPECIFIED;
+    }
+}
+
+
+static mraa_result_t
+mraa_ftdi_ft4222_gpio_set_pca9555_dir(int pin, mraa_gpio_dir_t dir)
+{
+    uint16_t mask = 1 << pin;
+    switch (dir) {
+        case MRAA_GPIO_IN:
+                pca9555DirectionValue |= mask;
+                break;
+        case MRAA_GPIO_OUT:
+                pca9555DirectionValue &= (~mask);
+                break;
+        default:
+                return MRAA_ERROR_UNSPECIFIED;
+    }
+    uint8_t buf[3];
+    buf[0] = PCA9555_DIRECTION_REG;
+    buf[1] = (uint8_t)(pca9555DirectionValue & 0xFF);
+    buf[2] = (uint8_t)(pca9555DirectionValue >> 8);
+    pthread_mutex_lock(&ft4222_lock);
+    int bytes_written = mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9555_ADDR, buf, sizeof(buf));
+    pthread_mutex_unlock(&ft4222_lock);
+    return bytes_written == sizeof(buf) ? MRAA_SUCCESS : MRAA_ERROR_UNSPECIFIED;
+}
+
+
+
 static mraa_result_t
 ftdi_ft4222_set_internal_gpio_trigger(int pin, GPIO_Trigger trigger)
 {
@@ -299,6 +377,8 @@ ftdi_ft4222_set_internal_gpio_trigger(int pin, GPIO_Trigger trigger)
     else
         return MRAA_ERROR_UNSPECIFIED;
 }
+
+
 
 
 // Function detects known I2C switches and returns the number of busses.
@@ -540,45 +620,74 @@ mraa_ftdi_ft4222_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 static mraa_result_t
 mraa_ftdi_ft4222_gpio_edge_mode_replace(mraa_gpio_context dev, mraa_gpio_edge_t mode)
 {
-    if (mraa_ftdi_ft4222_is_internal_gpio(dev->pin)) {
-        switch (mode) {
-            case MRAA_GPIO_EDGE_NONE:
-                return ftdi_ft4222_set_internal_gpio_trigger(dev->pin, 0);
-            case MRAA_GPIO_EDGE_BOTH:
-                return ftdi_ft4222_set_internal_gpio_trigger(dev->pin, GPIO_TRIGGER_RISING | GPIO_TRIGGER_FALLING);
-            case MRAA_GPIO_EDGE_RISING:
-                return ftdi_ft4222_set_internal_gpio_trigger(dev->pin, GPIO_TRIGGER_RISING);
-            case MRAA_GPIO_EDGE_FALLING:
-                return ftdi_ft4222_set_internal_gpio_trigger(dev->pin, GPIO_TRIGGER_FALLING);
-            default:
-                return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
-        }
-    } else
-        return MRAA_SUCCESS;
+    switch (mraa_ftdi_ft4222_get_gpio_type(dev->pin)) {
+        case GPIO_TYPE_BUILTIN:
+            switch (mode) {
+                case MRAA_GPIO_EDGE_NONE:
+                    return ftdi_ft4222_set_internal_gpio_trigger(dev->pin, 0);
+                case MRAA_GPIO_EDGE_BOTH:
+                    return ftdi_ft4222_set_internal_gpio_trigger(dev->pin, GPIO_TRIGGER_RISING | GPIO_TRIGGER_FALLING);
+                case MRAA_GPIO_EDGE_RISING:
+                    return ftdi_ft4222_set_internal_gpio_trigger(dev->pin, GPIO_TRIGGER_RISING);
+                case MRAA_GPIO_EDGE_FALLING:
+                    return ftdi_ft4222_set_internal_gpio_trigger(dev->pin, GPIO_TRIGGER_FALLING);
+                default:
+                    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+            }
+            break;
+        case GPIO_TYPE_PCA9672:
+        case GPIO_TYPE_PCA9555:
+            return MRAA_SUCCESS;
+        default:
+            return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+}
+
+static mraa_result_t
+mraa_ftdi_ft4222_i2c_read_io_expander(uint16_t* value)
+{
+    int bytes_read = 0;
+    uint8_t reg = PCA9555_INPUT_REG;
+    pthread_mutex_lock(&ft4222_lock);
+    switch (gpio_expander_chip) {
+        case IO_EXP_PCA9672:
+            bytes_read = mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, (uint8_t*)value, 1);
+            break;
+        case GPIO_TYPE_PCA9555:
+            if (mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9555_ADDR, &reg, 1) == 1)
+                bytes_read = mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9555_ADDR, (uint8_t*)value, 2);
+            break;
+        default:;
+    }
+    pthread_mutex_unlock(&ft4222_lock);
+    return bytes_read > 0 ? MRAA_SUCCESS : MRAA_ERROR_UNSPECIFIED;
 }
 
 static int
 mraa_ftdi_ft4222_gpio_read_replace(mraa_gpio_context dev)
 {
-    uint8_t pin = dev->pin;
-    if (mraa_ftdi_ft4222_is_internal_gpio(pin)) {
-        // FTDI GPIO
-        BOOL value;
-        FT4222_STATUS ft4222Status = FT4222_GPIO_Read(ftHandleGpio, dev->phy_pin, &value);
-        if (FT4222_OK != ft4222Status) {
-            syslog(LOG_ERR, "FT4222_GPIO_Read failed (error %d)!\n", ft4222Status);
-            return -1;
+    switch (mraa_ftdi_ft4222_get_gpio_type(dev->pin)) {
+        case GPIO_TYPE_BUILTIN:
+        {
+            BOOL value;
+            FT4222_STATUS ft4222Status = FT4222_GPIO_Read(ftHandleGpio, dev->phy_pin, &value);
+            if (FT4222_OK != ft4222Status) {
+                syslog(LOG_ERR, "FT4222_GPIO_Read failed (error %d)!\n", ft4222Status);
+                return -1;
+            }
+            return value;
         }
-        return value;
-    }
-    else {
-        // Expander GPIO
-        uint8_t mask = 1 << dev->phy_pin;
-        uint8_t value;
-        pthread_mutex_lock(&ft4222_lock);
-        int bytes_read = mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &value, 1);
-        pthread_mutex_unlock(&ft4222_lock);
-        return bytes_read == 1 ? (value & mask) == mask : -1;
+        case GPIO_TYPE_PCA9672:
+        case GPIO_TYPE_PCA9555:
+        {
+            uint16_t mask = 1 << dev->phy_pin;
+            uint16_t value;
+            mraa_result_t res = mraa_ftdi_ft4222_i2c_read_io_expander(&value);
+            return res == MRAA_SUCCESS ? (value & mask) == mask : -1;
+        }
+        default:
+            return -1;
     }
 }
 
@@ -586,87 +695,110 @@ mraa_ftdi_ft4222_gpio_read_replace(mraa_gpio_context dev)
 static mraa_result_t
 mraa_ftdi_ft4222_gpio_write_replace(mraa_gpio_context dev, int write_value)
 {
-    uint8_t pin = dev->pin;
-    if (mraa_ftdi_ft4222_is_internal_gpio(pin)) {
-        // FTDI GPIO
-        FT4222_STATUS ft4222Status = FT4222_GPIO_Write(ftHandleGpio, dev->phy_pin, write_value);
-        if (FT4222_OK != ft4222Status) {
-            syslog(LOG_ERR, "FT4222_GPIO_Write failed (error %d)!\n", ft4222Status);
-            return MRAA_ERROR_UNSPECIFIED;
-        }
-    }
-    else {
-        // Expander GPIO
-        uint8_t mask = 1 << dev->phy_pin;
-        uint8_t value;
-        int bytes_written = 0;
-        pthread_mutex_lock(&ft4222_lock);
-        int bytes_read = mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &value, 1);
-        if (bytes_read == 1) {
-            if (write_value == 1)
-                value = value | mask | gpioExpanderDirectionMask;
-            else
-                value &= (~mask);
-            bytes_written = mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9672_ADDR, &value, 1);
-        }
-        pthread_mutex_unlock(&ft4222_lock);
-        if (bytes_written == 0)
-            return MRAA_ERROR_UNSPECIFIED;
-    }
-    return MRAA_SUCCESS;
-}
-
-
-static mraa_result_t
-mraa_ftdi_ft4222_gpio_set_external_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
-{
-    uint8_t mask = 1 << dev->phy_pin;
-    switch (dir) {
-        case MRAA_GPIO_IN:
-                gpioExpanderDirectionMask |= mask;
-                return mraa_ftdi_ft4222_gpio_write_replace(dev, 1);
-        case MRAA_GPIO_OUT:
-                gpioExpanderDirectionMask &= (~mask);
-                return MRAA_SUCCESS;
-        default:
+    switch (mraa_ftdi_ft4222_get_gpio_type(dev->pin)) {
+        case GPIO_TYPE_BUILTIN:
+        {
+            FT4222_STATUS ft4222Status = FT4222_GPIO_Write(ftHandleGpio, dev->phy_pin, write_value);
+            if (FT4222_OK != ft4222Status) {
+                syslog(LOG_ERR, "FT4222_GPIO_Write failed (error %d)!\n", ft4222Status);
                 return MRAA_ERROR_UNSPECIFIED;
+            }
+            return MRAA_SUCCESS;
+        }
+        case GPIO_TYPE_PCA9672:
+        {
+            uint8_t mask = 1 << dev->phy_pin;
+            uint8_t value;
+            int bytes_written = 0;
+            pthread_mutex_lock(&ft4222_lock);
+            int bytes_read = mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &value, 1);
+            if (bytes_read == 1) {
+                if (write_value == 1)
+                    value = value | mask | pca9672DirectionMask;
+                else
+                    value &= (~mask);
+                bytes_written = mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9672_ADDR, &value, 1);
+            }
+            pthread_mutex_unlock(&ft4222_lock);
+            return bytes_written == 1 ? MRAA_SUCCESS : MRAA_ERROR_UNSPECIFIED;
+        }
+        case GPIO_TYPE_PCA9555:
+        {
+            uint16_t mask = 1 << dev->phy_pin;
+            if (write_value)
+                pca9555OutputValue |= mask;
+            else
+                pca9555OutputValue &= (~mask);
+            uint8_t buf[3];
+            buf[0] = PCA9555_OUTPUT_REG;
+            buf[1] = (uint8_t)(pca9555OutputValue & 0xFF);
+            buf[2] = (uint8_t)(pca9555OutputValue >> 8);
+            pthread_mutex_lock(&ft4222_lock);
+            int bytes_written = mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9555_ADDR, buf, sizeof(buf));
+            pthread_mutex_unlock(&ft4222_lock);
+            return bytes_written == sizeof(buf) ? MRAA_SUCCESS : MRAA_ERROR_UNSPECIFIED;
+        }
+        default:
+            return MRAA_ERROR_INVALID_RESOURCE;
     }
 }
+
 
 static mraa_result_t
 mraa_ftdi_ft4222_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
-    switch (dir) {
-        case MRAA_GPIO_IN:
-            if (mraa_ftdi_ft4222_is_internal_gpio(dev->pin))
-                return ftdi_ft4222_set_internal_gpio_dir(dev->phy_pin, GPIO_INPUT);
-            else
-                return mraa_ftdi_ft4222_gpio_set_external_dir(dev, dir);
-        case MRAA_GPIO_OUT:
-            if (mraa_ftdi_ft4222_is_internal_gpio(dev->pin))
-                return ftdi_ft4222_set_internal_gpio_dir(dev->phy_pin, GPIO_OUTPUT);
-            else
-                return mraa_ftdi_ft4222_gpio_set_external_dir(dev, dir);
-        case MRAA_GPIO_OUT_HIGH:
-            if (mraa_ftdi_ft4222_is_internal_gpio(dev->pin)) {
-                if (ftdi_ft4222_set_internal_gpio_dir(dev->phy_pin, GPIO_OUTPUT) != MRAA_SUCCESS)
-                    return MRAA_ERROR_UNSPECIFIED;
-            } else {
-                if (mraa_ftdi_ft4222_gpio_set_external_dir(dev, dir) != MRAA_SUCCESS)
-                    return MRAA_ERROR_UNSPECIFIED;
+    switch (mraa_ftdi_ft4222_get_gpio_type(dev->pin)) {
+        case GPIO_TYPE_BUILTIN:
+            switch (dir) {
+                case MRAA_GPIO_IN:
+                        return ftdi_ft4222_set_internal_gpio_dir(dev->phy_pin, GPIO_INPUT);
+                case MRAA_GPIO_OUT:
+                        return ftdi_ft4222_set_internal_gpio_dir(dev->phy_pin, GPIO_OUTPUT);
+                case MRAA_GPIO_OUT_HIGH:
+                        if (ftdi_ft4222_set_internal_gpio_dir(dev->phy_pin, GPIO_OUTPUT) != MRAA_SUCCESS)
+                            return MRAA_ERROR_UNSPECIFIED;
+                        return mraa_ftdi_ft4222_gpio_write_replace(dev, 1);
+                case MRAA_GPIO_OUT_LOW:
+                        if (ftdi_ft4222_set_internal_gpio_dir(dev->phy_pin, GPIO_OUTPUT) != MRAA_SUCCESS)
+                            return MRAA_ERROR_UNSPECIFIED;
+                        return mraa_ftdi_ft4222_gpio_write_replace(dev, 0);
+                default:
+                    return MRAA_ERROR_INVALID_PARAMETER;
             }
-            return mraa_ftdi_ft4222_gpio_write_replace(dev, 1);
-        case MRAA_GPIO_OUT_LOW:
-            if (mraa_ftdi_ft4222_is_internal_gpio(dev->pin)) {
-                if (ftdi_ft4222_set_internal_gpio_dir(dev->phy_pin, GPIO_OUTPUT) != MRAA_SUCCESS)
-                    return MRAA_ERROR_UNSPECIFIED;
-            } else {
-                if (mraa_ftdi_ft4222_gpio_set_external_dir(dev, dir) != MRAA_SUCCESS)
-                    return MRAA_ERROR_UNSPECIFIED;
+        case GPIO_TYPE_PCA9672:
+            switch (dir) {
+                case MRAA_GPIO_IN:
+                case MRAA_GPIO_OUT:
+                    return mraa_ftdi_ft4222_gpio_set_pca9672_dir(dev->phy_pin, dir);
+                case MRAA_GPIO_OUT_HIGH:
+                    if (mraa_ftdi_ft4222_gpio_set_pca9672_dir(dev->phy_pin, dir) != MRAA_SUCCESS)
+                        return MRAA_ERROR_UNSPECIFIED;
+                    return mraa_ftdi_ft4222_gpio_write_replace(dev, 1);
+                case MRAA_GPIO_OUT_LOW:
+                    if (mraa_ftdi_ft4222_gpio_set_pca9672_dir(dev->phy_pin, dir) != MRAA_SUCCESS)
+                        return MRAA_ERROR_UNSPECIFIED;
+                    return mraa_ftdi_ft4222_gpio_write_replace(dev, 0);
+                default:
+                    return MRAA_ERROR_INVALID_PARAMETER;
             }
-            return mraa_ftdi_ft4222_gpio_write_replace(dev, 0);
+        case GPIO_TYPE_PCA9555:
+            switch (dir) {
+                case MRAA_GPIO_IN:
+                case MRAA_GPIO_OUT:
+                    return mraa_ftdi_ft4222_gpio_set_pca9555_dir(dev->phy_pin, dir);
+                case MRAA_GPIO_OUT_HIGH:
+                    if (mraa_ftdi_ft4222_gpio_set_pca9555_dir(dev->phy_pin, dir) != MRAA_SUCCESS)
+                        return MRAA_ERROR_UNSPECIFIED;
+                    return mraa_ftdi_ft4222_gpio_write_replace(dev, 1);
+                case MRAA_GPIO_OUT_LOW:
+                    if (mraa_ftdi_ft4222_gpio_set_pca9555_dir(dev->phy_pin, dir) != MRAA_SUCCESS)
+                        return MRAA_ERROR_UNSPECIFIED;
+                    return mraa_ftdi_ft4222_gpio_write_replace(dev, 0);
+                default:
+                    return MRAA_ERROR_INVALID_PARAMETER;
+            }
         default:
-            return MRAA_ERROR_INVALID_PARAMETER;
+            return MRAA_ERROR_INVALID_RESOURCE;
     }
 }
 
@@ -690,7 +822,7 @@ static struct {
     pthread_t thread;
     pthread_mutex_t mutex;
     mraa_boolean_t should_stop;
-    mraa_boolean_t is_interrupt_detected[PCA9672_PINS];
+    mraa_boolean_t is_interrupt_detected[MAX_IO_EXPANDER_PINS];
     int num_active_pins;
 } gpio_monitor = {0};
 
@@ -699,23 +831,18 @@ static struct {
 static void*
 mraa_ftdi_ft4222_gpio_monitor(void *arg)
 {
-    uint8_t prev_value = 0;
-    pthread_mutex_lock(&ft4222_lock);
-    mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &prev_value, 1);
-    pthread_mutex_unlock(&ft4222_lock);
+    uint16_t prev_value = 0;
+    mraa_ftdi_ft4222_i2c_read_io_expander(&prev_value);
     while (!gpio_monitor.should_stop) {
         mraa_boolean_t gpio_activity_detected = mraa_ftdi_ft4222_has_internal_gpio_triggered(GPIO_PORT_IO_INT);
         if (gpio_activity_detected) {
-            uint8_t value;
-            pthread_mutex_lock(&ft4222_lock);
-            int bytes_read = mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &value, 1);
-            pthread_mutex_unlock(&ft4222_lock);
-            if (bytes_read == 1) {
-                pthread_mutex_lock(&gpio_monitor.mutex);
-                uint8_t change_value = prev_value ^ value;
+            uint16_t value;
+            if (mraa_ftdi_ft4222_i2c_read_io_expander(&value) == MRAA_SUCCESS) {
+                uint16_t change_value = prev_value ^ value;
                 int i;
-                for (i = 0; i < PCA9672_PINS; ++i) {
-                    uint8_t mask = 1 << i;
+                pthread_mutex_lock(&gpio_monitor.mutex);
+                for (i = 0; i < MAX_IO_EXPANDER_PINS; ++i) {
+                    uint16_t mask = 1 << i;
                     gpio_monitor.is_interrupt_detected[i] = change_value & mask ? 1 : 0;
                 }
                 pthread_mutex_unlock(&gpio_monitor.mutex);
@@ -724,7 +851,6 @@ mraa_ftdi_ft4222_gpio_monitor(void *arg)
         }
         mraa_ftdi_ft4222_sleep_ms(20);
     }
-    printf("gpio_monitor_thread stopped\n");
 }
 
 
@@ -772,13 +898,17 @@ mraa_ftdi_ft4222_gpio_monitor_is_interrupt_detected(int pin)
 static mraa_result_t
 mraa_ftdi_ft4222_gpio_interrupt_handler_init_replace(mraa_gpio_context dev)
 {
-    if (mraa_ftdi_ft4222_is_internal_gpio(dev->pin)) {
-        mraa_ftdi_ft4222_has_internal_gpio_triggered(dev->phy_pin);
-    } else {
-        ftdi_ft4222_set_internal_gpio_dir(GPIO_PORT_IO_INT, GPIO_INPUT);
-        ftdi_ft4222_set_internal_gpio_trigger(GPIO_PORT_IO_INT, GPIO_TRIGGER_FALLING);
-        mraa_ftdi_ft4222_has_internal_gpio_triggered(GPIO_PORT_IO_INT);
-        mraa_ftdi_ft4222_gpio_monitor_add_pin(dev->phy_pin);
+    switch (mraa_ftdi_ft4222_get_gpio_type(dev->pin)) {
+        case GPIO_TYPE_BUILTIN:
+            mraa_ftdi_ft4222_has_internal_gpio_triggered(dev->phy_pin);
+            break;
+        case GPIO_TYPE_PCA9672:
+        case GPIO_TYPE_PCA9555:
+            ftdi_ft4222_set_internal_gpio_dir(GPIO_PORT_IO_INT, GPIO_INPUT);
+            ftdi_ft4222_set_internal_gpio_trigger(GPIO_PORT_IO_INT, GPIO_TRIGGER_FALLING);
+            mraa_ftdi_ft4222_has_internal_gpio_triggered(GPIO_PORT_IO_INT);
+            mraa_ftdi_ft4222_gpio_monitor_add_pin(dev->phy_pin);
+            break;
     }
     return MRAA_SUCCESS;
 }
@@ -787,15 +917,19 @@ static mraa_result_t
 mraa_ftdi_ft4222_gpio_wait_interrupt_replace(mraa_gpio_context dev)
 {
     int prev_level = mraa_ftdi_ft4222_gpio_read_replace(dev);
-    mraa_boolean_t is_internal_pin = mraa_ftdi_ft4222_is_internal_gpio(dev->pin);
+    ft4222_gpio_type gpio_type = mraa_ftdi_ft4222_get_gpio_type(dev->pin);
     mraa_boolean_t interrupt_detected = FALSE;
 
     while (!dev->isr_thread_terminating && !interrupt_detected) {
-        if (is_internal_pin) {
-            interrupt_detected = mraa_ftdi_ft4222_has_internal_gpio_triggered(dev->phy_pin);
-        }
-        else {
-            interrupt_detected = mraa_ftdi_ft4222_gpio_monitor_is_interrupt_detected(dev->phy_pin);
+        switch (gpio_type) {
+            case GPIO_TYPE_BUILTIN:
+                interrupt_detected = mraa_ftdi_ft4222_has_internal_gpio_triggered(dev->phy_pin);
+                break;
+            case GPIO_TYPE_PCA9672:
+            case GPIO_TYPE_PCA9555:
+                interrupt_detected = mraa_ftdi_ft4222_gpio_monitor_is_interrupt_detected(dev->phy_pin);
+                break;
+            default:;
         }
         if (!interrupt_detected)
             mraa_ftdi_ft4222_sleep_ms(20);
