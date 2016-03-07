@@ -276,7 +276,10 @@ int mraa_get_sub_platform_id(int pin_or_bus_index);
  */
 int mraa_get_sub_platform_index(int pin_or_bus_id);
 
-
+/**
+ *
+ */
+mraa_result_t mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev);
 
 #ifdef __cplusplus
 }
