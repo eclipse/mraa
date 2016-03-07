@@ -66,6 +66,7 @@ static int numI2cGpioExpanderPins = 8;
 static int numI2cSwitchBusses = 4;
 static int currentI2cBus = 0;
 static ft4222_io_exp_type gpio_expander_chip;
+static mraa_boolean_t libft4222_load_success = TRUE;
 
 FT_STATUS (*dl_FT_GetDeviceInfoList)(FT_DEVICE_LIST_INFO_NODE*, LPDWORD);
 FT_STATUS (*dl_FT_CreateDeviceInfoList)(LPDWORD);
@@ -114,6 +115,17 @@ mraa_ftdi_ft4222_get_tick_count_ms()
     return ticks - startTick;
 }
 
+void *
+mraa_ftdi_ft4222_dlsym(const char *symbol)
+{
+    void *func = dlsym(libft4222_lib, symbol);
+    if (func == NULL) {
+        syslog(LOG_ERR, "%s", dlerror());
+        libft4222_load_success = FALSE;
+    }
+    return func;
+}
+
 
 mraa_result_t
 mraa_ftdi_ft4222_init()
@@ -125,30 +137,27 @@ mraa_ftdi_ft4222_init()
     int i;
     int retCode = 0;
 
-    dl_FT_GetDeviceInfoList = dlsym(libft4222_lib, "FT_GetDeviceInfoList");
-    dl_FT_CreateDeviceInfoList = dlsym(libft4222_lib, "FT_CreateDeviceInfoList");
-    dl_FT4222_GetVersion = dlsym(libft4222_lib, "FT4222_GetVersion");
-    dl_FT4222_I2CMaster_Write = dlsym(libft4222_lib, "FT4222_I2CMaster_Write");
-    dl_FT4222_I2CMaster_Reset = dlsym(libft4222_lib, "FT4222_I2CMaster_Reset");
-    dl_FT4222_I2CMaster_Read = dlsym(libft4222_lib, "FT4222_I2CMaster_Read");
-    dl_FT4222_I2CMaster_Init = dlsym(libft4222_lib, "FT4222_I2CMaster_Init");
-    dl_FT4222_I2CMaster_GetStatus = dlsym(libft4222_lib, "FT4222_I2CMaster_GetStatus");
-    dl_FT4222_GPIO_Init = dlsym(libft4222_lib, "FT4222_GPIO_Init");
-    dl_FT4222_GPIO_GetTriggerStatus = dlsym(libft4222_lib, "FT4222_GPIO_GetTriggerStatus");
-    dl_FT4222_GPIO_ReadTriggerQueue = dlsym(libft4222_lib, "FT4222_GPIO_ReadTriggerQueue");
-    dl_FT4222_GPIO_Read = dlsym(libft4222_lib, "FT4222_GPIO_Read");
-    dl_FT4222_GPIO_SetInputTrigger = dlsym(libft4222_lib, "FT4222_GPIO_SetInputTrigger");
-    dl_FT4222_GPIO_Write = dlsym(libft4222_lib, "FT4222_GPIO_Write");
-    dl_FT4222_SetWakeUpInterrupt = dlsym(libft4222_lib, "FT4222_SetWakeUpInterrupt");
-    dl_FT4222_SetSuspendOut = dlsym(libft4222_lib, "FT4222_SetSuspendOut");
-    dl_FT4222_SPIMaster_Init = dlsym(libft4222_lib, "FT4222_SPIMaster_Init");
-    dl_FT_OpenEx = dlsym(libft4222_lib, "FT_OpenEx");
+    dl_FT_GetDeviceInfoList = mraa_ftdi_ft4222_dlsym("FT_GetDeviceInfoList");
+    dl_FT_CreateDeviceInfoList = mraa_ftdi_ft4222_dlsym("FT_CreateDeviceInfoList");
+    dl_FT4222_GetVersion = mraa_ftdi_ft4222_dlsym("FT4222_GetVersion");
+    dl_FT4222_I2CMaster_Write = mraa_ftdi_ft4222_dlsym("FT4222_I2CMaster_Write");
+    dl_FT4222_I2CMaster_Reset = mraa_ftdi_ft4222_dlsym("FT4222_I2CMaster_Reset");
+    dl_FT4222_I2CMaster_Read = mraa_ftdi_ft4222_dlsym("FT4222_I2CMaster_Read");
+    dl_FT4222_I2CMaster_Init = mraa_ftdi_ft4222_dlsym("FT4222_I2CMaster_Init");
+    dl_FT4222_I2CMaster_GetStatus = mraa_ftdi_ft4222_dlsym("FT4222_I2CMaster_GetStatus");
+    dl_FT4222_GPIO_Init = mraa_ftdi_ft4222_dlsym("FT4222_GPIO_Init");
+    dl_FT4222_GPIO_GetTriggerStatus = mraa_ftdi_ft4222_dlsym("FT4222_GPIO_GetTriggerStatus");
+    dl_FT4222_GPIO_ReadTriggerQueue = mraa_ftdi_ft4222_dlsym("FT4222_GPIO_ReadTriggerQueue");
+    dl_FT4222_GPIO_Read = mraa_ftdi_ft4222_dlsym("FT4222_GPIO_Read");
+    dl_FT4222_GPIO_SetInputTrigger = mraa_ftdi_ft4222_dlsym("FT4222_GPIO_SetInputTrigger");
+    dl_FT4222_GPIO_Write = mraa_ftdi_ft4222_dlsym("FT4222_GPIO_Write");
+    dl_FT4222_SetWakeUpInterrupt = mraa_ftdi_ft4222_dlsym("FT4222_SetWakeUpInterrupt");
+    dl_FT4222_SetSuspendOut = mraa_ftdi_ft4222_dlsym("FT4222_SetSuspendOut");
+    dl_FT4222_SPIMaster_Init = mraa_ftdi_ft4222_dlsym("FT4222_SPIMaster_Init");
+    dl_FT_OpenEx = mraa_ftdi_ft4222_dlsym("FT_OpenEx");
 
-    char *error = dlerror();
-    if (error != NULL)  {
-        printf(error);
-        syslog(LOG_ERR, "Failed to find all symbols fort FTDI4222 support");
-        syslog(LOG_ERR, error);
+    if (!libft4222_load_success) {
+        syslog(LOG_ERR, "Failed to find all symbols for FTDI4222 support");
         goto init_exit;
     }
 
