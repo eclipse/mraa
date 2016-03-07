@@ -1,7 +1,7 @@
 /*
  * Author: Nandkishor Sonar
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright (c) 2014, 2015 Intel Corporation.
+ * Copyright (c) 2014-2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -56,13 +56,27 @@ aio_get_valid_fp(mraa_aio_context dev)
 }
 
 static mraa_aio_context
-mraa_aio_init_internal(mraa_adv_func_t* func_table)
+mraa_aio_init_internal(mraa_adv_func_t* func_table, int aio)
 {
     mraa_aio_context dev = calloc(1, sizeof(struct _aio));
     if (dev == NULL) {
         return NULL;
     }
     dev->advance_func = func_table;
+
+    if (IS_FUNC_DEFINED(dev, aio_init_internal_replace)) {
+        if (dev->advance_func->aio_init_internal_replace(dev, aio) == MRAA_SUCCESS) {
+            return dev;
+        }
+        free(dev);
+        return NULL;
+    }
+
+    // Open valid  analog input file and get the pointer.
+    if (MRAA_SUCCESS != aio_get_valid_fp(dev)) {
+        free(dev);
+        return NULL;
+    }
 
     return dev;
 }
@@ -83,16 +97,37 @@ mraa_aio_init(unsigned int aio)
             syslog(LOG_ERR, "aio: Sub platform Not Initialised");
             return NULL;
         }
-        pin = mraa_get_sub_platform_index(aio);
+        aio = mraa_get_sub_platform_index(aio);
+    }
+
+    // aio are always past the gpio_count in the pin array
+    pin = aio + board->gpio_count;
+
+    if (pin < 0 || pin >= board->phy_pin_count) {
+        syslog(LOG_ERR, "aio: pin %i beyond platform definition", pin);
+        return NULL;
+    }
+    if (aio > board->aio_count) {
+        syslog(LOG_ERR, "aio: requested channel out of range");
+        return NULL;
+    }
+    if (board->pins[pin].capabilites.aio != 1) {
+        syslog(LOG_ERR, "aio: pin %i not capable of aio", pin);
+        return NULL;
+    }
+    if (board->pins[pin].aio.mux_total > 0) {
+        if (mraa_setup_mux_mapped(board->pins[pin].aio) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "aio: unable to setup multiplexers for pin");
+            return NULL;
+        }
     }
 
     // Create ADC device connected to specified channel
-    mraa_aio_context dev = mraa_aio_init_internal(board->adv_func);
+    mraa_aio_context dev = mraa_aio_init_internal(board->adv_func, aio);
     if (dev == NULL) {
         syslog(LOG_ERR, "aio: Insufficient memory for specified input channel %d", aio);
         return NULL;
     }
-    pin = aio + board->gpio_count;
     dev->channel = board->pins[pin].aio.pinmap;
     dev->value_bit = DEFAULT_BITS;
 
@@ -103,32 +138,6 @@ mraa_aio_init(unsigned int aio)
             return NULL;
         }
     }
-    if (aio > board->aio_count) {
-        syslog(LOG_ERR, "aio: requested channel out of range");
-        free(dev);
-        return NULL;
-    }
-
-    if (board->pins[pin].capabilites.aio != 1) {
-        syslog(LOG_ERR, "aio: pin uncapable of aio");
-        free(dev);
-        return NULL;
-    }
-
-    if (board->pins[pin].aio.mux_total > 0) {
-        if (mraa_setup_mux_mapped(board->pins[pin].aio) != MRAA_SUCCESS) {
-            free(dev);
-            syslog(LOG_ERR, "aio: unable to setup multiplexers for pin");
-            return NULL;
-        }
-    }
-
-    // Open valid  analog input file and get the pointer.
-    if (MRAA_SUCCESS != aio_get_valid_fp(dev)) {
-        free(dev);
-        return NULL;
-    }
-    raw_bits = mraa_adc_raw_bits();
 
     if (IS_FUNC_DEFINED(dev, aio_init_post)) {
         mraa_result_t ret = dev->advance_func->aio_init_post(dev);
@@ -138,12 +147,18 @@ mraa_aio_init(unsigned int aio)
         }
     }
 
+    raw_bits = mraa_adc_raw_bits();
+
     return dev;
 }
 
 unsigned int
 mraa_aio_read(mraa_aio_context dev)
 {
+    if (IS_FUNC_DEFINED(dev, aio_read_replace)) {
+        return dev->advance_func->aio_read_replace(dev);
+    }
+
     char buffer[17];
     unsigned int shifter_value = 0;
 
