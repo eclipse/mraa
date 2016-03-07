@@ -288,4 +288,19 @@ getDefaultI2cBus(int platform_offset=MRAA_MAIN_PLATFORM_OFFSET)
 {
     return mraa_get_default_i2c_bus(platform_offset);
 }
+
+/**
+ * Add mraa subplatform
+ *
+ * @param subplatformtype the type of subplatform to add
+ * (e.g. MRAA_GENERIC_FIRMATA)
+ * @param uart_dev subplatform device string (e.g. "/dev/ttyACM0")
+ * @return Result of operation
+ */
+inline Result
+addSubplatform(Platform subplatformtype, std::string uart_dev)
+{
+    return (Result) mraa_add_subplatform((mraa_platform_t) subplatformtype, uart_dev.c_str());
+}
+
 }
