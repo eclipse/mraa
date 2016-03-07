@@ -13,7 +13,7 @@ set (V8_VERSION_HEX 0x0${V8_VERSION_MAJOR}${V8_VERSION_MINOR}${V8_VERSION_PATCH}
 string (LENGTH "${V8_VERSION_HEX}" V8_VERSION_HEX_length)
 while (V8_VERSION_HEX_length LESS 8)
   set (V8_VERSION_HEX "${V8_VERSION_HEX}0")
-  message (STATUS " - Padded V8 version to match SWIG format")
+  message (STATUS "INFO - Padded V8 version to match SWIG format")
   string (LENGTH "${V8_VERSION_HEX}" V8_VERSION_HEX_length)
 endwhile ()
 
@@ -31,21 +31,20 @@ set_target_properties (mraajs PROPERTIES
   SUFFIX ".node"
 )
 
-message (STATUS " - swig Version ${SWIG_VERSION}")
-message (STATUS " - CXX compiler Version ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+message (STATUS "INFO - swig Version ${SWIG_VERSION}")
+message (STATUS "INFO - CXX compiler Version ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
 if (${V8_VERSION_MAJOR} GREATER 3)
-  message (STATUS " - Using V8 version > 3 so requiring C++11 compiler")
+  message (STATUS "INFO - Using V8 version > 3 so requiring C++11 compiler")
   # Node 0.12.x V8 engine major version is '3'.
   # Node 2.1.0  V8 engine major version is '4'.
   set_property (TARGET mraajs PROPERTY CXX_STANDARD 11)
   set_property (TARGET mraajs PROPERTY CXX_STANDARD_REQUIRED ON)
   if (CMAKE_VERSION VERSION_LESS "3.1")
-    message (SEND_ERROR " - Need to use CMAKE version 3.1+, but it is ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")
-    message (STATUS " -             So a workaround will be used.")
+    message (SEND_ERROR "Need to use CMAKE version 3.1+, but it is ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}, using a workaround.")
     if (CMAKE_COMPILER_IS_GNUCXX)
       if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7")
-        message (FATAL_ERROR " - GNU gcc compiler is also too old (need 4.7+, but ${CMAKE_CXX_COMPILER_VERSION}) and does not support C++11 standard.")
+        message (FATAL_ERROR "GNU gcc compiler is also too old (need 4.7+, but ${CMAKE_CXX_COMPILER_VERSION}) and does not support C++11 standard.")
       endif ()
       set (MRAA_CXX11_WORKAROUND_OPTION "-std=gnu++11")
     else ()
@@ -106,7 +105,7 @@ if (BUILDDOC)
       COMMENT "Generating API documentation with Yuidoc" VERBATIM
   )
   else ()
-    message (STATUS " - Failed to find Yuidoc. node.js API doc will not be generated")
+    message (STATUS "INFO - Failed to find Yuidoc. node.js API doc will not be generated")
   endif ()
 endif ()
 
