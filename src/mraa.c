@@ -42,6 +42,7 @@
 #include <stdio.h>
 
 #include "mraa_internal.h"
+#include "firmata/firmata_mraa.h"
 #include "gpio.h"
 #include "version.h"
 
@@ -122,8 +123,7 @@ mraa_init()
         platform_name = NULL;
     }
 
-#if defined(USBPLAT)
-    // This is a platform extender so create null base platform if one doesn't already exist
+    // Create null base platform if one doesn't already exist
     if (plat == NULL) {
         plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
         if (plat != NULL) {
@@ -131,6 +131,8 @@ mraa_init()
             plat->platform_name = "Unknown platform";
         }
     }
+
+#if defined(USBPLAT)
     // Now detect sub platform, note this is not an else since we could be in
     // an error case and fall through to MRAA_ERROR_PLATFORM_NOT_INITIALISED
     if (plat != NULL) {
@@ -144,6 +146,10 @@ mraa_init()
         printf("mraa: FATAL error, failed to initialise platform\n");
         return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
     }
+#endif
+
+#if defined(FIRMATA)
+    // look for USB id 8087:0aba -> genuino/arduino 101
 #endif
 
     // Look for IIO devices
@@ -803,4 +809,19 @@ int
 mraa_get_iio_device_count()
 {
     return plat_iio->iio_device_count;
+}
+
+mraa_result_t
+mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
+{
+#ifdef FIRMATA
+    if (subplatformtype == MRAA_GENERIC_FIRMATA) {
+        if (mraa_firmata_platform(plat, uart_dev) == MRAA_GENERIC_FIRMATA) {
+            syslog(LOG_NOTICE, "mraa: Added firmata subplatform");
+            return MRAA_SUCCESS;
+        }
+    }
+#endif
+
+    return MRAA_ERROR_INVALID_PARAMETER;
 }
