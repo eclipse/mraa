@@ -23,6 +23,7 @@
  */
 
 #include "firmata/firmata.h"
+#include "mraa_internal.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -35,17 +36,17 @@ firmata_new(const char* name)
     mraa_result_t uart_res = MRAA_ERROR_UNSPECIFIED;
 
     printf("Opening device at: %s\n", name);
-    res = malloc(sizeof(t_firmata));
+    res = calloc(1, sizeof(t_firmata));
     if (!res) {
         perror("firmata_new::Failed malloc");
-        return (NULL);
+        return NULL;
     }
-    memset(res, 0, sizeof(*res));
 
     res->uart = mraa_uart_init_raw(name);
     if (res->uart == NULL) {
         fprintf(stderr, "UART failed to setup\n");
-        return EXIT_FAILURE;
+        free(res);
+        return  NULL;
     }
 
     firmata_initPins(res);
@@ -70,15 +71,14 @@ firmata_pull(t_firmata* firmata)
     if (r > 0) {
         r = mraa_uart_read(firmata->uart, buff, sizeof(buff));
         if (r < 0) {
-            return (0);
+            return 0;
         }
         if (r > 0) {
             firmata_parse(firmata, buff, r);
-            return (r);
+            return r;
         }
-    } else if (r < 0) {
-        return (r);
     }
+    return r;
 }
 
 void
@@ -230,6 +230,8 @@ firmata_endParse(t_firmata* firmata)
                 firmata->pins[pin].value |= (firmata->parse_buff[5] << 7);
             if (firmata->parse_count > 7)
                 firmata->pins[pin].value |= (firmata->parse_buff[6] << 14);
+#if 1
+        // disable this to check the firmata_devs responses
         } else if (firmata->parse_buff[1] == FIRMATA_I2C_REPLY) {
             printf("got an i2c reply with count %d!!\n", firmata->parse_count);
             int addr = (firmata->parse_buff[2] & 0x7f) | ((firmata->parse_buff[3] & 0x7f) << 7);
@@ -237,10 +239,26 @@ firmata_endParse(t_firmata* firmata)
             int i = 6;
             int ii = 0;
             for (ii; ii < (firmata->parse_count - 7) / 2; ii++) {
-                firmata->i2cmsg[addr][reg+ii] = (firmata->parse_buff[i] & 0x7f) | ((firmata->parse_buff[i+1] & 0x7f) << 7);;
+                firmata->i2cmsg[addr][reg+ii] = (firmata->parse_buff[i] & 0x7f) | ((firmata->parse_buff[i+1] & 0x7f) << 7);
                 i = i+2;
             }
             printf("i2c reply is %d\n", firmata->i2cmsg[addr][reg]);
+#endif
+        } else {
+            struct _firmata* devs = firmata->devs[0];
+            int i = 0;
+            if (devs != NULL) {
+                for (i; i < firmata->dev_count; i++, devs++) {
+                    if (devs != NULL) {
+                        if (firmata->parse_buff[1] == devs->feature) {
+                            // call func
+                            if (devs->isr) {
+                                devs->isr(firmata->parse_buff, firmata->parse_count);
+                            }
+                        }
+                    }
+                }
+            }
         }
         return;
     }
