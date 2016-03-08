@@ -25,12 +25,66 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "firmata.h"
 #include "mraa_internal.h"
 #include "firmata/firmata_mraa.h"
 #include "firmata/firmata.h"
 
 static t_firmata* firmata_dev;
 static pthread_t thread_id;
+
+mraa_firmata_context
+mraa_firmata_init(int feature)
+{
+    mraa_firmata_context dev = (mraa_firmata_context) calloc(1, sizeof(struct _firmata));
+    if (dev == NULL) {
+        return NULL;
+    }
+    dev->feature = (uint8_t) feature;
+    dev->added = 0;
+
+    return dev;
+}
+
+mraa_result_t
+mraa_firmata_write_sysex(mraa_firmata_context dev, char* msg, int length)
+{
+    return mraa_uart_write(firmata_dev->uart, msg, length);
+}
+
+mraa_result_t
+mraa_firmata_response(mraa_firmata_context dev, void (*fptr)(uint8_t*, int))
+{
+    if (dev->added == 0) {
+        struct _firmata** ptr;
+        ptr = realloc(firmata_dev->devs, (firmata_dev->dev_count+1) * sizeof(struct _firmata*));
+        if (ptr == NULL) {
+            return MRAA_ERROR_NO_RESOURCES;
+        }
+        firmata_dev->devs = ptr;
+        dev->index = firmata_dev->dev_count;
+        firmata_dev->dev_count++;
+        firmata_dev->devs[dev->index] = dev;
+        dev->added = 1;
+    }
+    dev->isr = fptr;
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_firmata_response_stop(mraa_firmata_context dev)
+{
+    dev->isr = NULL;
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_firmata_close(mraa_firmata_context dev)
+{
+    mraa_firmata_response_stop(dev);
+    free(dev);
+    return MRAA_SUCCESS;
+}
 
 static mraa_result_t
 mraa_firmata_i2c_init_bus_replace(mraa_i2c_context dev)
@@ -136,6 +190,7 @@ mraa_firmata_i2c_read_byte(mraa_i2c_context dev)
         }
         return firmata_dev->i2cmsg[dev->addr][0];
     }
+    return 0;
 }
 
 static uint16_t
@@ -186,6 +241,8 @@ mraa_firmata_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
         }
         return length;
     }
+
+    return 0;
 }
 
 static uint8_t
@@ -208,6 +265,9 @@ mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWri
     // buffer needs 5 bytes for firmata, and 2 bytes for every byte of data
     int buffer_size = (bytesToWrite*2) + 5;
     uint8_t* buffer = calloc(buffer_size, 0);
+    if (buffer == NULL) {
+        return MRAA_ERROR_NO_RESOURCES;
+    }
     int i = 0;
     int ii = 4;
     buffer[0] = FIRMATA_START_SYSEX;
@@ -222,6 +282,7 @@ mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWri
     }
     buffer[buffer_size-1] = FIRMATA_END_SYSEX;
     mraa_uart_write(firmata_dev->uart, buffer, buffer_size);
+    free(buffer);
     return MRAA_SUCCESS;
 }
 
@@ -229,6 +290,9 @@ static mraa_result_t
 mraa_firmata_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
 {
     uint8_t* buffer = calloc(7, 0);
+    if (buffer == NULL) {
+        return MRAA_ERROR_NO_RESOURCES;
+    }
     buffer[0] = FIRMATA_START_SYSEX;
     buffer[1] = FIRMATA_I2C_REQUEST;
     buffer[2] = dev->addr;
@@ -237,6 +301,7 @@ mraa_firmata_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
     buffer[5] = (data >> 7) & 0x7F;
     buffer[6] = FIRMATA_END_SYSEX;
     mraa_uart_write(firmata_dev->uart, buffer, 7);
+    free(buffer);
     return MRAA_SUCCESS;
 }
 
@@ -244,6 +309,9 @@ static mraa_result_t
 mraa_firmata_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
 {
     uint8_t* buffer = calloc(9, 0);
+    if (buffer == NULL) {
+        return MRAA_ERROR_NO_RESOURCES;
+    }
     buffer[0] = FIRMATA_START_SYSEX;
     buffer[1] = FIRMATA_I2C_REQUEST;
     buffer[2] = dev->addr;
@@ -254,6 +322,7 @@ mraa_firmata_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const
     buffer[7] = (data >> 7) & 0x7F;
     buffer[8] = FIRMATA_END_SYSEX;
     mraa_uart_write(firmata_dev->uart, buffer, 9);
+    free(buffer);
     return MRAA_SUCCESS;
 }
 
@@ -345,8 +414,8 @@ mraa_firmata_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
     return MRAA_SUCCESS;
 }
 
-static void
-mraa_firmata_pull_handler(void)
+static void*
+mraa_firmata_pull_handler(void* vp)
 {
     while(1) {
         firmata_pull(firmata_dev);
@@ -355,7 +424,7 @@ mraa_firmata_pull_handler(void)
 }
 
 mraa_board_t*
-mraa_firmata_init(const char* uart_dev)
+mraa_firmata_plat_init(const char* uart_dev)
 {
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
@@ -499,7 +568,7 @@ mraa_firmata_platform(mraa_board_t* board, const char* uart_dev)
      */
     mraa_board_t* sub_plat = NULL;
 
-    sub_plat = mraa_firmata_init(uart_dev);
+    sub_plat = mraa_firmata_plat_init(uart_dev);
     if (sub_plat != NULL) {
         sub_plat->platform_type = MRAA_GENERIC_FIRMATA;
         board->sub_platform = sub_plat;

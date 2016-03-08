@@ -97,6 +97,8 @@ typedef struct s_firmata {
     uint8_t parse_buff[FIRMATA_MSG_LEN];
     int isReady;
     char firmware[140];
+    uint8_t dev_count;
+    struct _firmata** devs;
 } t_firmata;
 
 t_firmata* firmata_new(const char* name);
