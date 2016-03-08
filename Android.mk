@@ -36,7 +36,8 @@ LOCAL_SRC_FILES := \
     src/x86/intel_nuc5.c \
     src/x86/intel_sofia_3gr.c \
     src/x86/intel_minnow_byt_compatible.c \
-    src/x86/intel_cherryhills.c
+    src/x86/intel_cherryhills.c \
+    src/x86/up.c
 
 # glob.c pulled in from NetBSD project (BSD 3-clause License)
 LOCAL_SRC_FILES += \
