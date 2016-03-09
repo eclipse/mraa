@@ -5,6 +5,10 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.9.6**
+  * ftdi ft4222 now dynamically loaded
+  * FT4222 improved ISR code
+
 **0.9.5**
   * Add support for the UP board (up-board.org)
   * Support OpenJDK 7 as well as OpenJDK 8
