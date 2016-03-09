@@ -50,7 +50,7 @@ public class BlinkIO {
         if (argv.length == 0) {
             System.out.println("Provide an int arg if you want to flash on something other than " + DEFAULT_IOPIN);
         } else {
-            iopin = Integer.valueOf(argv[0], DEFAULT_IOPIN);
+            iopin = Integer.valueOf(argv[0]);
         }
 
         //! [Interesting]
