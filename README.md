@@ -94,7 +94,7 @@ API Documentation
 Contact Us
 ==========
 
-To ask questions eithe file issues in github or send emails on our [mailing
+To ask questions either file issues in github or send emails on our [mailing
 list](https://lists.01.org/mailman/listinfo/mraa). You might also catch us on
 the mraa channel on freenode IRC.
 
