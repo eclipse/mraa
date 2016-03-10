@@ -80,6 +80,9 @@ mraa_pwm_write_period(mraa_pwm_context dev, int period)
 static mraa_result_t
 mraa_pwm_write_duty(mraa_pwm_context dev, int duty)
 {
+    if (IS_FUNC_DEFINED(dev, pwm_write_replace)) {
+        return dev->advance_func->pwm_write_replace(dev, duty);
+    }
     if (dev->duty_fp == -1) {
         if (mraa_pwm_setup_duty_fp(dev) == 1) {
             return MRAA_ERROR_INVALID_HANDLE;
@@ -178,35 +181,44 @@ mraa_pwm_init_internal(mraa_adv_func_t* func_table, int chipin, int pin)
 mraa_pwm_context
 mraa_pwm_init(int pin)
 {
-    if (plat == NULL) {
+    mraa_board_t* board = plat;
+    if (board == NULL) {
         syslog(LOG_ERR, "pwm: Platform Not Initialised");
         return NULL;
     }
     if (mraa_is_sub_platform_id(pin)) {
-        syslog(LOG_NOTICE, "pwm: Using sub platform is not supported");
-        return NULL;
+        syslog(LOG_NOTICE, "pwm: Using sub platform");
+        board = board->sub_platform;
+        if (board == NULL) {
+            syslog(LOG_ERR, "pwm: Sub platform Not Initialised");
+            return NULL;
+        }
+        pin = mraa_get_sub_platform_index(pin);
     }
-    if (pin < 0 || pin > plat->phy_pin_count) {
+    if (pin < 0 || pin > board->phy_pin_count) {
         syslog(LOG_ERR, "pwm: pin %i beyond platform definition", pin);
         return NULL;
     }
-    if (plat->pins[pin].capabilites.pwm != 1) {
+    if (board->pins[pin].capabilites.pwm != 1) {
         syslog(LOG_ERR, "pwm: pin not capable of pwm");
         return NULL;
     }
 
-    if (plat->adv_func->pwm_init_replace != NULL) {
-        return plat->adv_func->pwm_init_replace(pin);
+    if (board->adv_func->pwm_init_replace != NULL) {
+        return board->adv_func->pwm_init_replace(pin);
     }
-    if (plat->adv_func->pwm_init_pre != NULL) {
-        if (plat->adv_func->pwm_init_pre(pin) != MRAA_SUCCESS)
+    if (board->adv_func->pwm_init_internal_replace != NULL) {
+        return board->adv_func->pwm_init_internal_replace(board->adv_func, pin);
+    }
+    if (board->adv_func->pwm_init_pre != NULL) {
+        if (board->adv_func->pwm_init_pre(pin) != MRAA_SUCCESS)
             return NULL;
     }
 
-    if (plat->pins[pin].capabilites.gpio == 1) {
+    if (board->pins[pin].capabilites.gpio == 1) {
         // This deserves more investigation
         mraa_gpio_context mux_i;
-        mux_i = mraa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
+        mux_i = mraa_gpio_init_raw(board->pins[pin].gpio.pinmap);
         if (mux_i == NULL) {
             syslog(LOG_ERR, "pwm: error in gpio->pwm transition");
             return NULL;
@@ -225,19 +237,19 @@ mraa_pwm_init(int pin)
         }
     }
 
-    if (plat->pins[pin].pwm.mux_total > 0) {
-        if (mraa_setup_mux_mapped(plat->pins[pin].pwm) != MRAA_SUCCESS) {
+    if (board->pins[pin].pwm.mux_total > 0) {
+        if (mraa_setup_mux_mapped(board->pins[pin].pwm) != MRAA_SUCCESS) {
             syslog(LOG_ERR, "pwm: Failed to set-up multiplexer");
             return NULL;
         }
     }
 
-    int chip = plat->pins[pin].pwm.parent_id;
-    int pinn = plat->pins[pin].pwm.pinmap;
+    int chip = board->pins[pin].pwm.parent_id;
+    int pinn = board->pins[pin].pwm.pinmap;
 
-    if (plat->adv_func->pwm_init_post != NULL) {
+    if (board->adv_func->pwm_init_post != NULL) {
         mraa_pwm_context pret = mraa_pwm_init_raw(chip, pinn);
-        mraa_result_t ret = plat->adv_func->pwm_init_post(pret);
+        mraa_result_t ret = board->adv_func->pwm_init_post(pret);
         if (ret != MRAA_SUCCESS) {
             free(pret);
             return NULL;
@@ -304,6 +316,9 @@ mraa_pwm_write(mraa_pwm_context dev, float percentage)
 float
 mraa_pwm_read(mraa_pwm_context dev)
 {
+    if (IS_FUNC_DEFINED(dev, pwm_read_replace)) {
+        return dev->advance_func->pwm_read_replace(dev);
+    }
     int period = mraa_pwm_read_period(dev);
     if (period > 0) {
         return (mraa_pwm_read_duty(dev) / (float) period);
@@ -354,6 +369,9 @@ mraa_pwm_pulsewidth_us(mraa_pwm_context dev, int us)
 mraa_result_t
 mraa_pwm_enable(mraa_pwm_context dev, int enable)
 {
+    if (IS_FUNC_DEFINED(dev, pwm_enable_replace)) {
+        return dev->advance_func->pwm_enable_replace(dev, enable);
+    }
     int status;
     if (enable != 0) {
         status = 1;
