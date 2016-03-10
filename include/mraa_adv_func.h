@@ -80,9 +80,13 @@ typedef struct {
     mraa_result_t (*aio_init_post) (mraa_aio_context dev);
 
     mraa_pwm_context (*pwm_init_replace) (int pin);
+    mraa_pwm_context (*pwm_init_internal_replace) (void* func_table, int pin);
     mraa_result_t (*pwm_init_pre) (int pin);
     mraa_result_t (*pwm_init_post) (mraa_pwm_context pwm);
     mraa_result_t (*pwm_period_replace) (mraa_pwm_context dev, int period);
+    float (*pwm_read_replace) (mraa_pwm_context dev);
+    mraa_result_t (*pwm_write_replace) (mraa_pwm_context dev, float duty);
+    mraa_result_t (*pwm_enable_replace) (mraa_pwm_context dev, int enable);
 
     mraa_result_t (*spi_init_pre) (int bus);
     mraa_result_t (*spi_init_post) (mraa_spi_context spi);
