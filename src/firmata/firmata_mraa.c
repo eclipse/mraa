@@ -574,6 +574,11 @@ mraa_firmata_plat_init(const char* uart_dev)
 
     b->adv_func->aio_init_internal_replace = &mraa_firmata_aio_init_internal_replace;
     b->adv_func->aio_read_replace = &mraa_firmata_aio_read;
+    
+    b->adv_func->pwm_init_internal_replace = &mraa_firmata_pwm_init_internal_replace;
+    b->adv_func->pwm_write_replace = &mraa_firmata_pwm_write_replace;
+    b->adv_func->pwm_read_replace = &mraa_firmata_pwm_read_replace;
+    b->adv_func->pwm_enable_replace = &mraa_firmata_pwm_enable_replace;
 
     b->adv_func->pwm_init_internal_replace = &mraa_firmata_pwm_init_internal_replace;
     b->adv_func->pwm_write_replace = &mraa_firmata_pwm_write_replace;
