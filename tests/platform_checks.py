@@ -27,7 +27,7 @@ from __future__ import print_function
 import mraa as m
 import unittest as u
 
-@u.skipIf(m.init() != m.ERROR_PLATFORM_ALREADY_INITIALISED, "mraa_init() not valid")
+@u.skipIf(m.getPlatformName() == "Unknown platform", "Not valid platform loaded")
 class PlatformChecks(u.TestCase):
   def test_mraa_check_platform_no_of_pins(self):
     pinCount = m.getPinCount()
