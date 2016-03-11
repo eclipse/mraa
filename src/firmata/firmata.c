@@ -35,16 +35,14 @@ firmata_new(const char* name)
     t_firmata* res;
     mraa_result_t uart_res = MRAA_ERROR_UNSPECIFIED;
 
-    printf("Opening device at: %s\n", name);
     res = calloc(1, sizeof(t_firmata));
     if (!res) {
-        perror("firmata_new::Failed malloc");
         return NULL;
     }
 
     res->uart = mraa_uart_init_raw(name);
     if (res->uart == NULL) {
-        fprintf(stderr, "UART failed to setup\n");
+        syslog(LOG_ERR, "firmata: UART failed to setup");
         free(res);
         return  NULL;
     }
@@ -57,7 +55,7 @@ firmata_new(const char* name)
     }
 
     firmata_askFirmware(res);
-    printf("Device opened at: %s\n", name);
+    syslog(LOG_INFO, "firmata: Device opened at: %s", name);
     return (res);
 }
 
@@ -162,7 +160,7 @@ firmata_endParse(t_firmata* firmata)
             firmata->firmware[len++] = '.';
             firmata->firmware[len++] = firmata->parse_buff[3] + '0';
             firmata->firmware[len++] = 0;
-            printf("Name :: %s\n", firmata->firmware);
+            syslog(LOG_INFO, "firmata: sketch name:: %s", firmata->firmware);
             // query the board's capabilities only after hearing the
             // REPORT_FIRMWARE message.  For boards that reset when
             // the port open (eg, Arduino with reset=DTR), they are
@@ -230,10 +228,8 @@ firmata_endParse(t_firmata* firmata)
                 firmata->pins[pin].value |= (firmata->parse_buff[5] << 7);
             if (firmata->parse_count > 7)
                 firmata->pins[pin].value |= (firmata->parse_buff[6] << 14);
-#if 1
         // disable this to check the firmata_devs responses
         } else if (firmata->parse_buff[1] == FIRMATA_I2C_REPLY) {
-            printf("got an i2c reply with count %d!!\n", firmata->parse_count);
             int addr = (firmata->parse_buff[2] & 0x7f) | ((firmata->parse_buff[3] & 0x7f) << 7);
             int reg = (firmata->parse_buff[4] & 0x7f) | ((firmata->parse_buff[5] & 0x7f) << 7);
             int i = 6;
@@ -242,8 +238,6 @@ firmata_endParse(t_firmata* firmata)
                 firmata->i2cmsg[addr][reg+ii] = (firmata->parse_buff[i] & 0x7f) | ((firmata->parse_buff[i+1] & 0x7f) << 7);
                 i = i+2;
             }
-            printf("i2c reply is %d\n", firmata->i2cmsg[addr][reg]);
-#endif
         } else {
             if (firmata->devs != NULL) {
                 struct _firmata* devs = firmata->devs[0];
@@ -303,7 +297,6 @@ firmata_pinMode(t_firmata* firmata, int pin, int mode)
     buff[0] = FIRMATA_SET_PIN_MODE;
     buff[1] = pin;
     buff[2] = mode;
-    printf("Setting pinMode at: %i with value: %i\n", pin, mode);
     res = mraa_uart_write(firmata->uart, buff, 3);
     return (res);
 }
@@ -314,7 +307,6 @@ firmata_analogWrite(t_firmata* firmata, int pin, int value)
     int res;
 
     uint8_t buff[3];
-    printf("Writting analogWrite at: %i with value: %i\n", pin, value);
     buff[0] = 0xE0 | pin;
     buff[1] = value & 0x7F;
     buff[2] = (value >> 7) & 0x7F;
@@ -328,10 +320,8 @@ firmata_analogRead(t_firmata *firmata, int pin)
     int res;
     int value = 1;
     uint8_t buff[2];
-    printf("Writting analogRead at: %i\n", pin);
     buff[0] = FIRMATA_REPORT_ANALOG | pin;
     buff[1] = value;
-    printf("192 == %d, pinval == %d, pin %d", buff[0], buff[1], pin);
     res = mraa_uart_write(firmata->uart, buff, 2);
     return res;
 }
@@ -356,7 +346,6 @@ firmata_digitalWrite(t_firmata* firmata, int pin, int value)
             }
         }
     }
-    printf("Writting digitalWrite at: %i with value: %i\n", pin, value);
     buff[0] = FIRMATA_DIGITAL_MESSAGE | port_num;
     buff[1] = port_val & 0x7F;
     buff[2] = (port_val >> 7) & 0x7F;
