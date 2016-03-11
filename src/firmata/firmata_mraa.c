@@ -133,11 +133,9 @@ mraa_firmata_send_i2c_read_req(mraa_i2c_context dev, int length)
     buffer[5] = (length >> 7) & 0x7f;
     buffer[6] = FIRMATA_END_SYSEX;
 
-    mraa_result_t res = mraa_uart_write(firmata_dev->uart, buffer, 7);
-    if (res != MRAA_SUCCESS) {
+    if (mraa_uart_write(firmata_dev->uart, buffer, 7) != 7) {
         free(buffer);
-        mraa_result_print(res);
-        return res;
+        return MRAA_ERROR_UNSPECIFIED;
     }
 
     // this needs a lock :)
@@ -167,11 +165,9 @@ mraa_firmata_send_i2c_read_cont_req(mraa_i2c_context dev, uint8_t command, int l
     buffer[7] = (length >> 7) & 0x7f;
     buffer[8] = FIRMATA_END_SYSEX;
 
-    mraa_result_t res = mraa_uart_write(firmata_dev->uart, buffer, 9);
-    if (res != MRAA_SUCCESS) {
+    if (mraa_uart_write(firmata_dev->uart, buffer, 9) != 9) {
         free(buffer);
-        mraa_result_print(res);
-        return res;
+        return MRAA_ERROR_UNSPECIFIED;
     }
 
     // this needs a lock :)
