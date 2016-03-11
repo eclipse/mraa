@@ -414,6 +414,38 @@ mraa_firmata_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
     return MRAA_SUCCESS;
 }
 
+static mraa_pwm_context
+mraa_firmata_pwm_init_internal_replace(void* func_table, int pin)
+{
+    mraa_pwm_context dev = (mraa_pwm_context) calloc(1, sizeof(struct _pwm));
+    if (dev == NULL) {
+        return NULL;
+    }
+    dev->pin = pin;
+    dev->period = 2048000; // Locked, in ns
+    dev->advance_func = (mraa_adv_func_t*) func_table;
+
+    return dev;
+}
+
+static mraa_result_t
+mraa_firmata_pwm_write_replace(mraa_pwm_context dev, float percentage)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static float
+mraa_firmata_pwm_read_replace(mraa_pwm_context dev)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static mraa_result_t
+mraa_firmata_pwm_enable_replace(mraa_pwm_context dev, int enable)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
 static void*
 mraa_firmata_pull_handler(void* vp)
 {
@@ -451,6 +483,8 @@ mraa_firmata_plat_init(const char* uart_dev)
     b->i2c_bus_count = 1;
     b->def_i2c_bus = 0;
     b->i2c_bus[0].bus_id = 0;
+    b->pwm_min_period = 2048000;
+    b->pwm_max_period = 2048000;
 
     b->pins = (mraa_pininfo_t*) calloc(b->phy_pin_count, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
@@ -468,16 +502,16 @@ mraa_firmata_plat_init(const char* uart_dev)
     b->pins[2].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[2].gpio.pinmap = 2;
     strncpy(b->pins[3].name, "IO3", 8);
-    b->pins[3].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[3].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[3].gpio.pinmap = 3;
     strncpy(b->pins[4].name, "IO4", 8);
     b->pins[4].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[4].gpio.pinmap = 4;
     strncpy(b->pins[5].name, "IO5", 8);
-    b->pins[5].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[5].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[5].gpio.pinmap = 5;
     strncpy(b->pins[6].name, "IO6", 8);
-    b->pins[6].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[6].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[6].gpio.pinmap = 6;
     strncpy(b->pins[7].name, "IO7", 8);
     b->pins[7].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
@@ -486,7 +520,7 @@ mraa_firmata_plat_init(const char* uart_dev)
     b->pins[8].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[8].gpio.pinmap = 8;
     strncpy(b->pins[9].name, "IO9", 8);
-    b->pins[9].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[9].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[9].gpio.pinmap = 9;
     strncpy(b->pins[10].name, "IO10", 8);
     b->pins[10].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
@@ -540,6 +574,11 @@ mraa_firmata_plat_init(const char* uart_dev)
 
     b->adv_func->aio_init_internal_replace = &mraa_firmata_aio_init_internal_replace;
     b->adv_func->aio_read_replace = &mraa_firmata_aio_read;
+
+    b->adv_func->pwm_init_internal_replace = &mraa_firmata_pwm_init_internal_replace;
+    b->adv_func->pwm_write_replace = &mraa_firmata_pwm_write_replace;
+    b->adv_func->pwm_read_replace = &mraa_firmata_pwm_read_replace;
+    b->adv_func->pwm_enable_replace = &mraa_firmata_pwm_enable_replace;
 
     b->adv_func->i2c_init_bus_replace = &mraa_firmata_i2c_init_bus_replace;
     b->adv_func->i2c_set_frequency_replace = &mraa_firmata_i2c_frequency;
