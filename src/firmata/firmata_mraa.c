@@ -464,6 +464,10 @@ mraa_firmata_plat_init(const char* uart_dev)
     }
 
     firmata_dev = firmata_new(uart_dev);
+    if (firmata_dev == NULL) {
+        free(b);
+        return NULL;
+    }
 
     // if this isn't working then we have an issue with our uart
     while (!firmata_dev->isReady) {

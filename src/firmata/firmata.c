@@ -245,9 +245,9 @@ firmata_endParse(t_firmata* firmata)
             printf("i2c reply is %d\n", firmata->i2cmsg[addr][reg]);
 #endif
         } else {
-            struct _firmata* devs = firmata->devs[0];
-            int i = 0;
-            if (devs != NULL) {
+            if (firmata->devs != NULL) {
+                struct _firmata* devs = firmata->devs[0];
+                int i = 0;
                 for (i; i < firmata->dev_count; i++, devs++) {
                     if (devs != NULL) {
                         if (firmata->parse_buff[1] == devs->feature) {
