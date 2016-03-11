@@ -361,7 +361,7 @@ mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
         pin = mraa_get_sub_platform_index(pin);
     }
 
-    if (current_plat == NULL || current_plat->platform_type == MRAA_UNKNOWN_PLATFORM) {
+    if (current_plat == NULL || current_plat->platform_type == MRAA_UNKNOWN_PLATFORM || current_plat->platform_type == MRAA_NULL_PLATFORM) {
         return 0;
     }
     if (pin > (current_plat->phy_pin_count - 1) || pin < 0)
