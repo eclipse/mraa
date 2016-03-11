@@ -73,6 +73,7 @@ option (INSTALLGPIOTOOL "Install gpio tool" OFF)
 option (INSTALLTOOLS "Install all tools" OFF)
 option (BUILDARCH "Override architecture to build for - override" OFF)
 option (BUILDTESTS "Override the addition of tests" ON)
+option (INSTALIMRAA "Install imraa" OFF)
 
 set (MRAAPLATFORMFORCE "" CACHE STRING "ALL")
 

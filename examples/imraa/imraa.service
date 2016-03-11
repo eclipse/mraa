@@ -1,0 +1,9 @@
+[Unit]
+Description = Starts imraa
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/arduino101uploader /usr/bin/ /usr/share/mraa/StandardFirmata.ino.bin /dev/ttyACM0 verbose
+
+[Install]
+WantedBy = multi-user.target

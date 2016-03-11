@@ -43,6 +43,7 @@ if (FIRMATA)
 endif ()
 
 add_subdirectory (c++)
+add_subdirectory (imraa)
 
 install (DIRECTORY ${PROJECT_SOURCE_DIR}/examples/ DESTINATION ${CMAKE_INSTALL_DATADIR}/mraa/examples)
 
