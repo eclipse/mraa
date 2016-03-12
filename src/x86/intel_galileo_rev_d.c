@@ -179,11 +179,13 @@ mraa_intel_galileo_rev_d()
     b->pins[0].gpio.pinmap = 50;
     b->pins[0].gpio.parent_id = 0;
     b->pins[0].gpio.mux_total = 1;
+    b->pins[0].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[0].gpio.mux[0].pin = 40;
     b->pins[0].gpio.mux[0].value = 1;
     b->pins[0].uart.pinmap = 0;
     b->pins[0].uart.parent_id = 0;
     b->pins[0].uart.mux_total = 1;
+    b->pins[0].uart.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[0].uart.mux[0].pin = 40;
     b->pins[0].uart.mux[0].value = 0;
 
@@ -191,11 +193,13 @@ mraa_intel_galileo_rev_d()
     b->pins[1].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[1].gpio.pinmap = 51;
     b->pins[1].gpio.mux_total = 1;
+    b->pins[1].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[1].gpio.mux[0].pin = 41;
     b->pins[1].gpio.mux[0].value = 1;
     b->pins[1].uart.pinmap = 0;
     b->pins[1].uart.parent_id = 0;
     b->pins[1].uart.mux_total = 1;
+    b->pins[1].uart.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[1].uart.mux[0].pin = 41;
     b->pins[1].uart.mux[0].value = 0;
 
@@ -203,15 +207,21 @@ mraa_intel_galileo_rev_d()
     b->pins[2].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 1, 0, 0, 0, 0 };
     b->pins[2].gpio.pinmap = 32;
     b->pins[2].gpio.mux_total = 1;
+    b->pins[2].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[2].gpio.mux[0].pin = 31;
     b->pins[2].gpio.mux[0].value = 1;
     b->pins[2].mmap.gpio.pinmap = 14;
     strncpy(b->pins[2].mmap.mem_dev, "/dev/uio0", 12);
-    b->pins[2].mmap.gpio.mux_total = 2;
-    b->pins[2].mmap.gpio.mux[0].pin = 31;
+    b->pins[2].mmap.gpio.mux_total = 3;
+    b->pins[2].mmap.gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
+    b->pins[2].mmap.gpio.mux[0].pin = 0;
     b->pins[2].mmap.gpio.mux[0].value = 0;
-    b->pins[2].mmap.gpio.mux[1].pin = 14;
+    b->pins[2].mmap.gpio.mux[1].pincmd = PINCMD_SET_OUT_VALUE;
+    b->pins[2].mmap.gpio.mux[1].pin = 31;
     b->pins[2].mmap.gpio.mux[1].value = 0;
+    b->pins[2].mmap.gpio.mux[2].pincmd = PINCMD_SET_OUT_VALUE;
+    b->pins[2].mmap.gpio.mux[2].pin = 14;
+    b->pins[2].mmap.gpio.mux[2].value = 0;
     b->pins[2].mmap.mem_sz = 0x1000;
     b->pins[2].mmap.bit_pos = 6;
 
@@ -219,20 +229,27 @@ mraa_intel_galileo_rev_d()
     b->pins[3].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 1, 0, 0, 0, 0 };
     b->pins[3].gpio.pinmap = 18;
     b->pins[3].gpio.mux_total = 1;
+    b->pins[3].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[3].gpio.mux[0].pin = 30;
     b->pins[3].gpio.mux[0].value = 1;
     b->pins[3].mmap.gpio.pinmap = 15;
     strncpy(b->pins[3].mmap.mem_dev, "/dev/uio0", 12);
-    b->pins[3].mmap.gpio.mux_total = 2;
-    b->pins[3].mmap.gpio.mux[0].pin = 30;
+    b->pins[3].mmap.gpio.mux_total = 3;
+    b->pins[3].mmap.gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
+    b->pins[3].mmap.gpio.mux[0].pin = 1;
     b->pins[3].mmap.gpio.mux[0].value = 0;
-    b->pins[3].mmap.gpio.mux[1].pin = 15;
+    b->pins[3].mmap.gpio.mux[1].pincmd = PINCMD_SET_OUT_VALUE;
+    b->pins[3].mmap.gpio.mux[1].pin = 30;
     b->pins[3].mmap.gpio.mux[1].value = 0;
+    b->pins[3].mmap.gpio.mux[2].pincmd = PINCMD_SET_OUT_VALUE;
+    b->pins[3].mmap.gpio.mux[2].pin = 15;
+    b->pins[3].mmap.gpio.mux[2].value = 0;
     b->pins[3].mmap.mem_sz = 0x1000;
     b->pins[3].mmap.bit_pos = 7;
     b->pins[3].pwm.pinmap = 3;
     b->pins[3].pwm.parent_id = 0;
     b->pins[3].pwm.mux_total = 1;
+    b->pins[3].pwm.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[3].pwm.mux[0].pin = 30;
     b->pins[3].pwm.mux[0].value = 1;
 
@@ -280,15 +297,18 @@ mraa_intel_galileo_rev_d()
     b->pins[10].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 1, 0, 0, 0 };
     b->pins[10].gpio.pinmap = 16;
     b->pins[10].gpio.mux_total = 1;
+    b->pins[10].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[10].gpio.mux[0].pin = 42;
     b->pins[10].gpio.mux[0].value = 1;
     b->pins[10].pwm.pinmap = 7;
     b->pins[10].pwm.parent_id = 0;
     b->pins[10].pwm.mux_total = 1;
+    b->pins[10].pwm.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[10].pwm.mux[0].pin = 42;
     b->pins[10].pwm.mux[0].value = 1;
     b->pins[10].spi.pinmap = 1;
     b->pins[10].spi.mux_total = 1;
+    b->pins[10].spi.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[10].spi.mux[0].pin = 42;
     b->pins[10].spi.mux[0].value = 0;
 
@@ -296,15 +316,18 @@ mraa_intel_galileo_rev_d()
     b->pins[11].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 1, 0, 0, 0 };
     b->pins[11].gpio.pinmap = 25;
     b->pins[11].gpio.mux_total = 1;
+    b->pins[11].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[11].gpio.mux[0].pin = 43;
     b->pins[11].gpio.mux[0].value = 1;
     b->pins[11].pwm.pinmap = 4;
     b->pins[11].pwm.parent_id = 0;
     b->pins[11].pwm.mux_total = 1;
+    b->pins[11].pwm.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[11].pwm.mux[0].pin = 43;
     b->pins[11].pwm.mux[0].value = 1;
     b->pins[11].spi.pinmap = 1;
     b->pins[11].spi.mux_total = 1;
+    b->pins[11].spi.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[11].spi.mux[0].pin = 43;
     b->pins[11].spi.mux[0].value = 0;
 
@@ -312,10 +335,12 @@ mraa_intel_galileo_rev_d()
     b->pins[12].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
     b->pins[12].gpio.pinmap = 38;
     b->pins[12].gpio.mux_total = 1;
+    b->pins[12].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[12].gpio.mux[0].pin = 54;
     b->pins[12].gpio.mux[0].value = 1;
     b->pins[12].spi.pinmap = 1;
     b->pins[12].spi.mux_total = 1;
+    b->pins[12].spi.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[12].spi.mux[0].pin = 54;
     b->pins[12].spi.mux[0].value = 0;
 
@@ -323,10 +348,12 @@ mraa_intel_galileo_rev_d()
     b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
     b->pins[13].gpio.pinmap = 39;
     b->pins[13].gpio.mux_total = 1;
+    b->pins[13].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[13].gpio.mux[0].pin = 55;
     b->pins[13].gpio.mux[0].value = 1;
     b->pins[13].spi.pinmap = 1;
     b->pins[13].spi.mux_total = 1;
+    b->pins[13].spi.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[13].spi.mux[0].pin = 55;
     b->pins[13].spi.mux[0].value = 0;
 
@@ -334,10 +361,12 @@ mraa_intel_galileo_rev_d()
     b->pins[14].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[14].gpio.pinmap = 44;
     b->pins[14].gpio.mux_total = 1;
+    b->pins[14].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[14].gpio.mux[0].pin = 37;
     b->pins[14].gpio.mux[0].value = 1;
     b->pins[14].aio.pinmap = 0;
     b->pins[14].aio.mux_total = 1;
+    b->pins[14].aio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[14].aio.mux[0].pin = 37;
     b->pins[14].aio.mux[0].value = 0;
 
@@ -345,10 +374,12 @@ mraa_intel_galileo_rev_d()
     b->pins[15].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[15].gpio.pinmap = 45;
     b->pins[15].gpio.mux_total = 1;
+    b->pins[15].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[15].gpio.mux[0].pin = 36;
     b->pins[15].gpio.mux[0].value = 1;
     b->pins[15].aio.pinmap = 1;
     b->pins[15].aio.mux_total = 1;
+    b->pins[15].aio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[15].aio.mux[0].pin = 36;
     b->pins[15].aio.mux[0].value = 0;
 
@@ -356,10 +387,12 @@ mraa_intel_galileo_rev_d()
     b->pins[16].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[16].gpio.pinmap = 46;
     b->pins[16].gpio.mux_total = 1;
+    b->pins[16].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[16].gpio.mux[0].pin = 23;
     b->pins[16].gpio.mux[0].value = 1;
     b->pins[16].aio.pinmap = 2;
     b->pins[16].aio.mux_total = 1;
+    b->pins[16].aio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[16].aio.mux[0].pin = 23;
     b->pins[16].aio.mux[0].value = 0;
 
@@ -367,10 +400,12 @@ mraa_intel_galileo_rev_d()
     b->pins[17].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[17].gpio.pinmap = 47;
     b->pins[17].gpio.mux_total = 1;
+    b->pins[17].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[17].gpio.mux[0].pin = 22;
     b->pins[17].gpio.mux[0].value = 1;
     b->pins[17].aio.pinmap = 3;
     b->pins[17].aio.mux_total = 1;
+    b->pins[17].aio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[17].aio.mux[0].pin = 22;
     b->pins[17].aio.mux[0].value = 0;
 
@@ -378,18 +413,23 @@ mraa_intel_galileo_rev_d()
     b->pins[18].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 1, 0 };
     b->pins[18].gpio.pinmap = 48;
     b->pins[18].gpio.mux_total = 2;
+    b->pins[18].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[18].gpio.mux[0].pin = 29;
     b->pins[18].gpio.mux[0].value = 1;
+    b->pins[18].gpio.mux[1].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[18].gpio.mux[1].pin = 21;
     b->pins[18].gpio.mux[1].value = 1;
     b->pins[18].i2c.pinmap = 1;
     b->pins[18].i2c.mux_total = 1;
+    b->pins[18].i2c.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[18].i2c.mux[0].pin = 29;
     b->pins[18].i2c.mux[0].value = 0;
     b->pins[18].aio.pinmap = 4;
     b->pins[18].aio.mux_total = 2;
+    b->pins[18].aio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[18].aio.mux[0].pin = 29;
     b->pins[18].aio.mux[0].value = 1;
+    b->pins[18].aio.mux[1].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[18].aio.mux[1].pin = 21;
     b->pins[18].aio.mux[1].value = 0;
 
@@ -397,18 +437,23 @@ mraa_intel_galileo_rev_d()
     b->pins[19].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 1, 0 };
     b->pins[19].gpio.pinmap = 49;
     b->pins[19].gpio.mux_total = 2;
+    b->pins[19].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[19].gpio.mux[0].pin = 29;
     b->pins[19].gpio.mux[0].value = 1;
+    b->pins[19].gpio.mux[1].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[19].gpio.mux[1].pin = 20;
     b->pins[19].gpio.mux[1].value = 1;
     b->pins[19].i2c.pinmap = 1;
     b->pins[19].i2c.mux_total = 1;
+    b->pins[19].i2c.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[19].i2c.mux[0].pin = 29;
     b->pins[19].i2c.mux[0].value = 0;
     b->pins[19].aio.pinmap = 5;
     b->pins[19].aio.mux_total = 2;
+    b->pins[19].aio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[19].aio.mux[0].pin = 29;
     b->pins[19].aio.mux[0].value = 1;
+    b->pins[19].aio.mux[1].pincmd = PINCMD_SET_OUT_VALUE;
     b->pins[19].aio.mux[1].pin = 20;
     b->pins[19].aio.mux[1].value = 0;
 
