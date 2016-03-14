@@ -155,7 +155,7 @@ mraa_firmata_send_i2c_read_cont_req(mraa_i2c_context dev, uint8_t command, int l
     buffer[0] = FIRMATA_START_SYSEX;
     buffer[1] = FIRMATA_I2C_REQUEST;
     buffer[2] = dev->addr;
-    buffer[3] = I2C_MODE_READ << 3;
+    buffer[3] = I2C_CONTINUOUSREAD << 3;
 
     // register to read from
     buffer[4] = command & 0x7f;
