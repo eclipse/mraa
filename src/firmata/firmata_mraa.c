@@ -418,7 +418,7 @@ mraa_firmata_pwm_init_internal_replace(void* func_table, int pin)
         return NULL;
     }
     dev->pin = pin;
-    dev->period = 2048000; // Locked, in ns
+    dev->period = 2048; // Locked, in us
     dev->advance_func = (mraa_adv_func_t*) func_table;
 
     return dev;
@@ -483,8 +483,8 @@ mraa_firmata_plat_init(const char* uart_dev)
     b->i2c_bus_count = 1;
     b->def_i2c_bus = 0;
     b->i2c_bus[0].bus_id = 0;
-    b->pwm_min_period = 2048000;
-    b->pwm_max_period = 2048000;
+    b->pwm_min_period = 2048;
+    b->pwm_max_period = 2048;
 
     b->pins = (mraa_pininfo_t*) calloc(b->phy_pin_count, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
