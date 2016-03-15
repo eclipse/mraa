@@ -132,6 +132,24 @@ mraa_boolean_t mraa_link_targets(const char* filename, const char* targetname);
  */
 int mraa_find_i2c_bus(const char* devname, int startfrom);
 
+#if defined(IMRAA)
+/**
+ * read Imraa subplatform lock file, caller is responsible to free return
+ * struct array
+ *
+ * @param imraa lockfile location
+ * @return the number of subplatforms added
+ */
+uint32_t mraa_add_from_lockfile(const char* imraa_lock_file);
+
+/**
+ * Internal imraa init function
+ *
+ * @return mraa_result_t indicating success
+ */
+mraa_result_t imraa_init();
+#endif
+
 #ifdef __cplusplus
 }
 #endif

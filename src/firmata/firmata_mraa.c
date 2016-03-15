@@ -91,7 +91,6 @@ mraa_firmata_i2c_init_bus_replace(mraa_i2c_context dev)
 {
     int delay = 1; // this should be either 1 or 0, I don't know :)
     uint8_t buff[4];
-    printf("i2c init\n");
     buff[0] = FIRMATA_START_SYSEX;
     buff[1] = FIRMATA_I2C_CONFIG;
     buff[2] = delay & 0xFF, (delay >> 8) & 0xFF;

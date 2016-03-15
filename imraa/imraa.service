@@ -1,0 +1,9 @@
+[Unit]
+Description=imraa
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/imraa
+
+[Install]
+WantedBy = multi-user.target

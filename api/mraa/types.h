@@ -242,8 +242,6 @@ typedef enum {
 	MRAA_UART_PARITY_SPACE = 4
 } mraa_uart_parity_t;
 
-
-
 #ifdef __cplusplus
 }
 #endif
