@@ -98,6 +98,10 @@ mraa_pwm_write_duty(mraa_pwm_context dev, int duty)
 static int
 mraa_pwm_read_period(mraa_pwm_context dev)
 {
+    if (IS_FUNC_DEFINED(dev, pwm_read_replace)) {
+        return dev->period;
+    }
+
     char bu[MAX_SIZE];
     char output[MAX_SIZE];
     snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/period", dev->chipid, dev->pin);
@@ -134,6 +138,10 @@ mraa_pwm_read_period(mraa_pwm_context dev)
 static int
 mraa_pwm_read_duty(mraa_pwm_context dev)
 {
+    if (IS_FUNC_DEFINED(dev, pwm_read_replace)) {
+        return dev->advance_func->pwm_read_replace(dev);
+    }
+
     if (dev->duty_fp == -1) {
         if (mraa_pwm_setup_duty_fp(dev) == 1) {
             return MRAA_ERROR_INVALID_HANDLE;
@@ -316,9 +324,6 @@ mraa_pwm_write(mraa_pwm_context dev, float percentage)
 float
 mraa_pwm_read(mraa_pwm_context dev)
 {
-    if (IS_FUNC_DEFINED(dev, pwm_read_replace)) {
-        return dev->advance_func->pwm_read_replace(dev);
-    }
     int period = mraa_pwm_read_period(dev);
     if (period > 0) {
         return (mraa_pwm_read_duty(dev) / (float) period);
@@ -341,7 +346,15 @@ mraa_pwm_period_ms(mraa_pwm_context dev, int ms)
 mraa_result_t
 mraa_pwm_period_us(mraa_pwm_context dev, int us)
 {
-    if (us < plat->pwm_min_period || us > plat->pwm_max_period) {
+    int min, max;
+    if (mraa_is_sub_platform_id(dev->chipid)) {
+        min = plat->sub_platform->pwm_min_period;
+        max = plat->sub_platform->pwm_max_period;
+    } else {
+        min = plat->pwm_min_period;
+        max = plat->pwm_max_period;
+    }
+    if (us < min || us > max) {
         syslog(LOG_ERR, "pwm: period value outside platform range");
         return MRAA_ERROR_INVALID_PARAMETER;
     }
@@ -373,11 +386,6 @@ mraa_pwm_enable(mraa_pwm_context dev, int enable)
         return dev->advance_func->pwm_enable_replace(dev, enable);
     }
     int status;
-    if (enable != 0) {
-        status = 1;
-    } else {
-        status = enable;
-    }
     char bu[MAX_SIZE];
     snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/enable", dev->chipid, dev->pin);
 
@@ -498,19 +506,25 @@ mraa_pwm_config_percent(mraa_pwm_context dev, int ms, float percentage)
 }
 
 int
-mraa_pwm_get_max_period()
+mraa_pwm_get_max_period(mraa_pwm_context dev)
 {
     if (plat == NULL) {
         return -1;
+    }
+    if (mraa_is_sub_platform_id(dev->chipid)) {
+        return plat->sub_platform->pwm_max_period;
     }
     return plat->pwm_max_period;
 }
 
 int
-mraa_pwm_get_min_period()
+mraa_pwm_get_min_period(mraa_pwm_context dev)
 {
     if (plat == NULL) {
         return -1;
+    }
+    if (mraa_is_sub_platform_id(dev->chipid)) {
+        return plat->sub_platform->pwm_min_period;
     }
     return plat->pwm_min_period;
 }

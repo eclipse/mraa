@@ -176,10 +176,7 @@ class Pwm
     Result
     enable(bool enable)
     {
-        if (enable)
-            return (Result) mraa_pwm_enable(m_pwm, 1);
-        else
-            return (Result) mraa_pwm_enable(m_pwm, 0);
+        return (Result) mraa_pwm_enable(m_pwm, enable);
     }
     /**
      * Set the period and duty of a PWM object.
@@ -213,7 +210,7 @@ class Pwm
     int
     max_period()
     {
-        return mraa_pwm_get_max_period();
+        return mraa_pwm_get_max_period(m_pwm);
     }
     /**
      * Get the minimum pwm period in us
@@ -223,7 +220,7 @@ class Pwm
     int
     min_period()
     {
-        return mraa_pwm_get_min_period();
+        return mraa_pwm_get_min_period(m_pwm);
     }
 
   private:
