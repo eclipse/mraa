@@ -40,6 +40,11 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
+
+#if defined(IMRAA
+#include <json-c/json.h>
+#endif
 
 #include "mraa_internal.h"
 #include "firmata/firmata_mraa.h"
@@ -75,16 +80,15 @@ mraa_set_log_level(int level)
     return MRAA_ERROR_INVALID_PARAMETER;
 }
 
-
-#if (defined SWIGPYTHON) || (defined SWIG)
+/**
+ * Whilst the actual mraa init function is now called imraa_init, it's only
+ * callable externally if IMRAA is enabled
+ */
 mraa_result_t
-#else
-mraa_result_t __attribute__((constructor))
-#endif
-mraa_init()
+imraa_init()
 {
     if (plat != NULL) {
-        return MRAA_SUCCESS;
+        return MRAA_ERROR_PLATFORM_ALREADY_INITIALISED;
     }
 
     uid_t proc_euid = geteuid();
@@ -142,8 +146,14 @@ mraa_init()
     }
 #endif
 
-#if defined(FIRMATA)
-    // look for USB id 8087:0aba -> genuino/arduino 101
+#if defined(IMRAA)
+    const char* subplatform_lockfile = "/tmp/imraa.lock";
+    if (access(subplatform_lockfile, F_OK) != -1 ){
+        uint32_t plat_n = mraa_add_from_lockfile(subplatform_lockfile);
+        syslog(LOG_INFO, "imraa: added %d platforms", plat_n);
+    } else {
+        syslog(LOG_DEBUG, "imraa: no lockfile found");
+    }
 #endif
 
     // Look for IIO devices
@@ -170,6 +180,20 @@ mraa_init()
 
     syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
     return MRAA_SUCCESS;
+}
+
+#if (defined SWIGPYTHON) || (defined SWIG)
+mraa_result_t
+#else
+mraa_result_t __attribute__((constructor))
+#endif
+mraa_init()
+{
+    if (plat != NULL) {
+        return MRAA_ERROR_PLATFORM_ALREADY_INITIALISED;
+    } else {
+        return imraa_init();
+    }
 }
 
 void
@@ -873,14 +897,69 @@ mraa_get_iio_device_count()
 mraa_result_t
 mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
 {
-#ifdef FIRMATA
+#if defined(FIRMATA)
     if (subplatformtype == MRAA_GENERIC_FIRMATA) {
         if (mraa_firmata_platform(plat, uart_dev) == MRAA_GENERIC_FIRMATA) {
             syslog(LOG_NOTICE, "mraa: Added firmata subplatform");
             return MRAA_SUCCESS;
         }
+        syslog(LOG_NOTICE, "mraa: Failed to add firmata subplatform");
     }
 #endif
 
     return MRAA_ERROR_INVALID_PARAMETER;
 }
+
+#if defined(IMRAA)
+uint32_t
+mraa_add_from_lockfile(const char* imraa_lock_file) {
+    char* buffer = NULL;
+    long fsize;
+    int i = 0;
+    uint32_t subplat_num = 0;
+    FILE* flock = fopen(imraa_lock_file, "r");
+    if (flock == NULL) {
+        fprintf(stderr, "Failed to open lock file\n");
+        return 0;
+    }
+    fseek(flock, 0, SEEK_END);
+    fsize = ftell(flock) + 1;
+    fseek(flock, 0, SEEK_SET);
+    buffer = (char*) calloc(fsize, sizeof(char));
+    if (buffer != NULL) {
+        fread(buffer, sizeof(char), fsize, flock);
+    }
+    json_object* jobj_lock = json_tokener_parse(buffer);
+
+    struct json_object* ioarray;
+    if (json_object_object_get_ex(jobj_lock, "Platform", &ioarray) == true &&
+        json_object_is_type(ioarray, json_type_array)) {
+        subplat_num = json_object_array_length(ioarray);
+        int id = -1;
+        const char* uartdev = NULL;
+        for (i = 0; i < subplat_num; i++) {
+            struct json_object *ioobj = json_object_array_get_idx(ioarray, i);
+            json_object_object_foreach(ioobj, key, val) {
+                if (strcmp(key, "id") == 0) {
+                    id = atoi(json_object_get_string(val));
+                } else if (strcmp(key, "uart") == 0) {
+                    uartdev = json_object_get_string(val);
+                }
+            }
+            if (id != -1 && uartdev != NULL) {
+                if (mraa_add_subplatform(id, uartdev) == MRAA_SUCCESS) {
+                    syslog(LOG_NOTICE, "imraa: automatically added subplatform %d, %s", id, uartdev);
+                } else {
+                    syslog(LOG_ERR, "imraa: Failed to add subplatform (%d on %s) from lockfile", id, uartdev);
+                }
+                id = -1;
+                uartdev = NULL;
+            }
+        }
+    } else {
+        fprintf(stderr, "lockfile string incorrectly parsed\n");
+    }
+    free(buffer);
+    return subplat_num;
+}
+#endif
