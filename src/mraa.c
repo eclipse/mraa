@@ -42,7 +42,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#if defined(IMRAA
+#if defined(IMRAA)
 #include <json-c/json.h>
 #endif
 
