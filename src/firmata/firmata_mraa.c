@@ -176,14 +176,26 @@ mraa_firmata_send_i2c_read_cont_req(mraa_i2c_context dev, uint8_t command, int l
     return MRAA_SUCCESS;
 }
 
+static mraa_result_t
+mraa_firmata_i2c_wait(int addr, int reg)
+{
+    int i = 0;
+    for (i = 0; firmata_dev->i2cmsg[addr][reg] == -1; i++) {
+        if (i > 50) {
+            return MRAA_ERROR_UNSPECIFIED;
+        }
+        usleep(500);
+    }
+    return MRAA_SUCCESS;
+}
+
 static uint8_t
 mraa_firmata_i2c_read_byte(mraa_i2c_context dev)
 {
     if (mraa_firmata_send_i2c_read_req(dev, 1) == MRAA_SUCCESS) {
-        while (firmata_dev->i2cmsg[dev->addr][0] == -1) {
-            usleep(500);
+        if (mraa_firmata_i2c_wait(dev->addr, 0) == MRAA_SUCCESS) {
+            return firmata_dev->i2cmsg[dev->addr][0];
         }
-        return firmata_dev->i2cmsg[dev->addr][0];
     }
     return 0;
 }
@@ -192,19 +204,17 @@ static uint16_t
 mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
     if (mraa_firmata_send_i2c_read_cont_req(dev, command, 2) == MRAA_SUCCESS) {
-        while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
-            usleep(500);
-        }
+        if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
+            uint8_t* rawdata[2];
+            rawdata[0] = firmata_dev->i2cmsg[dev->addr][command];
+            rawdata[1] = firmata_dev->i2cmsg[dev->addr][command+1];
+            uint16_t data = (uint16_t) rawdata;
+            uint8_t high = (data & 0xFF00) >> 8;
+            data = (data << 8) & 0xFF00;
+            data |= high;
 
-        uint8_t* rawdata[2];
-        rawdata[0] = firmata_dev->i2cmsg[dev->addr][command];
-        rawdata[1] = firmata_dev->i2cmsg[dev->addr][command+1];
-        uint16_t data = (uint16_t) rawdata;
-        uint8_t high = (data & 0xFF00) >> 8;
-        data = (data << 8) & 0xFF00;
-        data |= high;
-
-        return data;
+            return data;
+    }
     }
     return 0;
 }
@@ -213,12 +223,10 @@ static int
 mraa_firmata_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* data, int length)
 {
     if (mraa_firmata_send_i2c_read_cont_req(dev, command, length) == MRAA_SUCCESS) {
-        while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
-            usleep(500);
+        if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
+            memcpy(data, &firmata_dev->i2cmsg[dev->addr][command], sizeof(int)*length);
+            return length;
         }
-
-        memcpy(data, &firmata_dev->i2cmsg[dev->addr][command], sizeof(int)*length);
-        return length;
     }
     return 0;
 }
@@ -227,14 +235,13 @@ static int
 mraa_firmata_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 {
     if (mraa_firmata_send_i2c_read_req(dev, length) == MRAA_SUCCESS) {
-        while (firmata_dev->i2cmsg[dev->addr][0] == -1) {
-            usleep(500);
+        if (mraa_firmata_i2c_wait(dev->addr, 0) == MRAA_SUCCESS) {
+            int i = 0;
+            for (i = 0; i < length; i++) {
+                data[i] = firmata_dev->i2cmsg[dev->addr][i];
+            }
+            return length;
         }
-        int i = 0;
-        for (i = 0; i < length; i++) {
-            data[i] = firmata_dev->i2cmsg[dev->addr][i];
-        }
-        return length;
     }
 
     return 0;
@@ -244,11 +251,9 @@ static uint8_t
 mraa_firmata_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
     if (mraa_firmata_send_i2c_read_cont_req(dev, command, 1) == MRAA_SUCCESS) {
-        while (firmata_dev->i2cmsg[dev->addr][command] == -1) {
-            usleep(500);
+        if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
+            return firmata_dev->i2cmsg[dev->addr][command];
         }
-
-        return firmata_dev->i2cmsg[dev->addr][command];
     }
 
     return 0;
