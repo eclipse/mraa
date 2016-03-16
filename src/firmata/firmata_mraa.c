@@ -414,6 +414,13 @@ mraa_firmata_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
     return MRAA_SUCCESS;
 }
 
+static mraa_result_t
+mraa_firmata_gpio_close_replace(mraa_gpio_context dev)
+{
+    free(dev);
+    return MRAA_SUCCESS;
+}
+
 static mraa_pwm_context
 mraa_firmata_pwm_init_internal_replace(void* func_table, int pin)
 {
@@ -575,6 +582,7 @@ mraa_firmata_plat_init(const char* uart_dev)
     b->adv_func->gpio_dir_replace = &mraa_firmata_gpio_dir_replace;
     b->adv_func->gpio_read_replace = &mraa_firmata_gpio_read_replace;
     b->adv_func->gpio_write_replace = &mraa_firmata_gpio_write_replace;
+    b->adv_func->gpio_close_replace = &mraa_firmata_gpio_close_replace;
 
     b->adv_func->aio_init_internal_replace = &mraa_firmata_aio_init_internal_replace;
     b->adv_func->aio_read_replace = &mraa_firmata_aio_read;

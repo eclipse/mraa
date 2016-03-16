@@ -705,6 +705,11 @@ mraa_gpio_close(mraa_gpio_context dev)
 {
     mraa_result_t result = MRAA_SUCCESS;
 
+    if (IS_FUNC_DEFINED(dev, gpio_close_replace)) {
+        return dev->advance_func->gpio_close_replace(dev);
+    }
+
+
     if (IS_FUNC_DEFINED(dev, gpio_close_pre)) {
         result = dev->advance_func->gpio_close_pre(dev);
     }

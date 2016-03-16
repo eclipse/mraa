@@ -37,6 +37,7 @@ typedef struct {
     mraa_result_t (*gpio_init_post) (mraa_gpio_context dev);
 
     mraa_result_t (*gpio_close_pre) (mraa_gpio_context dev);
+    mraa_result_t (*gpio_close_replace) (mraa_gpio_context dev);
 
     mraa_result_t (*gpio_mode_replace) (mraa_gpio_context dev, mraa_gpio_mode_t mode);
     mraa_result_t (*gpio_mode_pre) (mraa_gpio_context dev, mraa_gpio_mode_t mode);
