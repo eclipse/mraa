@@ -205,7 +205,7 @@ mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
     if (mraa_firmata_send_i2c_read_cont_req(dev, command, 2) == MRAA_SUCCESS) {
         if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
-            uint8_t* rawdata[2];
+            uint8_t rawdata[2];
             rawdata[0] = firmata_dev->i2cmsg[dev->addr][command];
             rawdata[1] = firmata_dev->i2cmsg[dev->addr][command+1];
             uint16_t data = (uint16_t) rawdata;
