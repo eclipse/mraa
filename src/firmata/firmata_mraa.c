@@ -429,7 +429,8 @@ mraa_firmata_pwm_init_internal_replace(void* func_table, int pin)
         return NULL;
     }
     dev->pin = pin;
-    dev->period = 2048; // Locked, in us
+    dev->chipid = 512;
+    dev->period = 2048000; // Locked, in ns
     dev->advance_func = (mraa_adv_func_t*) func_table;
 
     return dev;
@@ -438,19 +439,32 @@ mraa_firmata_pwm_init_internal_replace(void* func_table, int pin)
 static mraa_result_t
 mraa_firmata_pwm_write_replace(mraa_pwm_context dev, float percentage)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    int value = (int)((percentage - 1) / 8000);
+    firmata_analogWrite(firmata_dev, dev->pin, value);
+    firmata_dev->pins[dev->pin].value = value;
+    return MRAA_SUCCESS;
 }
 
 static float
 mraa_firmata_pwm_read_replace(mraa_pwm_context dev)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    int value = firmata_dev->pins[dev->pin].value;
+    if (value) {
+        return (value + 1) * 8000;
+    }
+    return 0;
 }
 
 static mraa_result_t
 mraa_firmata_pwm_enable_replace(mraa_pwm_context dev, int enable)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    if (enable) {
+        firmata_pinMode(firmata_dev, dev->pin, MODE_PWM);
+        firmata_dev->pins[dev->pin].value = 0;
+    } else {
+        firmata_pinMode(firmata_dev, dev->pin, MODE_INPUT);
+    }
+    return MRAA_SUCCESS;
 }
 
 static void*
