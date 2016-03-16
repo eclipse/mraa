@@ -959,6 +959,7 @@ mraa_add_from_lockfile(const char* imraa_lock_file) {
     } else {
         fprintf(stderr, "lockfile string incorrectly parsed\n");
     }
+    json_object_put(jobj_lock);
     free(buffer);
     return subplat_num;
 }

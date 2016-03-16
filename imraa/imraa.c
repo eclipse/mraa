@@ -35,6 +35,8 @@
 
 #include <mraa/uart.h>
 #include <mraa/gpio.h>
+#include <mraa/i2c.h>
+#include <mraa/pwm.h>
 
 #include <mraa_internal.h>
 
@@ -44,7 +46,7 @@ typedef struct mraa_io_objects_t {
     const char* type;
     int index;
     bool raw;
-    char* label;
+    const char* label;
 } mraa_io_objects_t;
 
 const char*
@@ -54,7 +56,7 @@ imraa_list_serialport()
     struct udev_enumerate* enumerate;
     struct udev_list_entry *devices, *dev_list_entry;
     struct udev_device* dev;
-    const char* ret;
+    const char* ret = NULL;
     udev = udev_new();
     if (!udev) {
         printf("Can't create udev, check libudev\n");
@@ -118,7 +120,7 @@ imraa_flash_101(const char* bin_path, const char* bin_file_name, const char* tty
     int i;
     // dfu list is still needed, as the time for reset and recognized is varies from platform to
     // platform.
-    // one dfu able to query available device, then it is ready to flash
+    // once dfu able to query available devices, then it is ready to flash
     for (i = 0; i < 10 && board_found == false; i++) {
         printf("Waiting for device...\n");
         // dfu-util -d,8087:0ABA -l
@@ -163,18 +165,19 @@ imraa_flash_101(const char* bin_path, const char* bin_file_name, const char* tty
     strncat(full_dfu_upload, dfu_option, strlen(dfu_option));
     printf("flash cmd: %s\n", full_dfu_upload);
     int status = system(full_dfu_upload);
-    free(full_dfu_upload);
     if (status != 0) {
         printf("ERROR: Upload failed on %s\n", tty);
         exit(1);
     }
     printf("SUCCESS: Sketch will execute in about 5 seconds.\n");
+    free(full_dfu_list);
+    free(full_dfu_upload);
     sleep(5);
     return 0;
 }
 
 void
-imraa_write_lockfile(const char* lock_file_location)
+imraa_write_lockfile(const char* lock_file_location, const char* serialport)
 {
     FILE* fh;
     char str[10];
@@ -185,7 +188,7 @@ imraa_write_lockfile(const char* lock_file_location)
     json_object* platform2 = json_object_new_object();
     snprintf(str, 10, "%d", MRAA_GENERIC_FIRMATA);
     json_object_object_add(platform2, "id", json_object_new_string(str));
-    json_object_object_add(platform2, "uart", json_object_new_string("/dev/ttyACM0"));
+    json_object_object_add(platform2, "uart", json_object_new_string(serialport));
 
     json_object* platfroms = json_object_new_array();
     json_object_array_add(platfroms, platform1);
@@ -196,7 +199,10 @@ imraa_write_lockfile(const char* lock_file_location)
     if (fh != NULL) {
         fputs(json_object_to_json_string_ext(lock_file, JSON_C_TO_STRING_PRETTY), fh);
         fclose(fh);
+    } else {
+        fprintf(stderr, "can't write to lock file\n");
     }
+    json_object_put(lock_file);
 }
 
 void
@@ -207,6 +213,7 @@ imraa_handle_subplatform(struct json_object* jobj)
     const char* dfu_loc;
     const char* lockfile_loc;
     const char* flash_loc;
+    const char* usbserial;
 
     struct json_object* dfu_location;
     if (json_object_object_get_ex(jobj, "dfu-utils-location", &dfu_location) == true) {
@@ -244,61 +251,115 @@ imraa_handle_subplatform(struct json_object* jobj)
         }
     }
     // got flash? do flash
-
     if (access(lockfile_loc, F_OK) != -1) {
-        printf("already exist lock file, skip flashing\n");
+        printf("already exist a lock file, skip flashing\n");
+        printf("force upgrade? remove the lockfile first\n", lockfile_loc);
     } else {
         fprintf(stdout, "Starting to flash board\n");
-        // TODO define dfu location in conf?
         // dfu_loc = "/usr/bin";
-        int flash_result = imraa_flash_101(dfu_loc, flash_loc, imraa_list_serialport());
-        imraa_write_lockfile(lockfile_loc);
+        //TODO flash img checksum, and serialport validation?
+        const char* serialport = (strcmp(usbserial, "auto") == 0) 
+                                 ? imraa_list_serialport() : usbserial;
+
+        if ( dfu_loc != NULL && flash_loc != NULL && serialport != NULL) {
+            if (imraa_flash_101(dfu_loc, flash_loc, serialport) == 0) {
+                imraa_write_lockfile(lockfile_loc, serialport);
+            } else {
+                fprintf(stderr, "Flash failed, push master reset and try again\n");
+            }
+        } else {
+            fprintf(stderr, "invalid flashing paramenters, please check agian\n");
+            fprintf(stderr, "DFU Util location: %s\n", dfu_loc);
+            fprintf(stderr, "Flash Img location: %s\n", dfu_loc);
+            fprintf(stderr, "USB Serial: %s\n", dfu_loc);
+        }
     }
 }
 
 void
 imraa_handle_IO(struct json_object* jobj)
 {
-    struct mraa_io_objects_t* mraaobjs;
+    struct mraa_io_objects_t* mraa_io_obj;
     struct json_object* ioarray;
     int ionum = 0;
     int i;
     if (json_object_object_get_ex(jobj, "IO", &ioarray) == true) {
         ionum = json_object_array_length(ioarray);
-        mraaobjs = malloc(sizeof(ioarray) * sizeof(mraa_io_objects_t));
+        mraa_io_obj = (mraa_io_objects_t*) malloc( ionum * sizeof(mraa_io_objects_t));
         printf("Length of IO array is %d\n", ionum);
+        int index2 = -1;;//optional index for io configuration;
         if (json_object_is_type(ioarray, json_type_array)) {
             for (i = 0; i < ionum; i++) {
                 struct json_object* ioobj = json_object_array_get_idx(ioarray, i);
                 struct json_object* x;
                 if (json_object_object_get_ex(ioobj, "type", &x) == true) {
-                    mraaobjs[i].type = json_object_get_string(x);
+                    mraa_io_obj[i].type = json_object_get_string(x);
                 }
                 if (json_object_object_get_ex(ioobj, "index", &x) == true) {
-                    mraaobjs[i].index = json_object_get_int(x);
+                    mraa_io_obj[i].index = json_object_get_int(x);
                 }
                 if (json_object_object_get_ex(ioobj, "raw", &x) == true) {
-                    mraaobjs[i].raw = json_object_get_boolean(x);
+                    mraa_io_obj[i].raw = json_object_get_boolean(x);
                 }
                 if (json_object_object_get_ex(ioobj, "label", &x) == true) {
-                    mraaobjs[i].index = json_object_get_int(x);
+                    mraa_io_obj[i].label = json_object_get_string(x);
                 }
-                json_object_object_foreach(ioobj, key, val)
-                {
-                    //                    fprintf(stderr, "key: %s\n", key);
-                    //                    fprintf(stderr, "val: %s\n", json_object_get_string(val));
-                    if (strncmp(key, "type", 4) == 0) {
-                        if (strncmp(json_object_get_string(val), "gpio", 4) == 0) {
-                            // mraa_gpio_context gpio = mraa_gpio_init(13);
-                            // mraa_result_t  r = mraa_gpio_owner(gpio, 0);
-                            // if (r != MRAA_SUCCESS) {
-                            //     mraa_result_print(r);
-                            // }
-                            printf("set up gpio here\n");
-
-                        } else if (strncmp(json_object_get_string(val), "i2c", 3) == 0) {
-                            printf("set up i2c here\n");
-                        }
+                if (json_object_object_get_ex(ioobj, "index2", &x) == true) {
+                    index2 = json_object_get_int(x);
+                }
+                //starting io configuration
+                if(strcmp(mraa_io_obj[i].type, "gpio") == 0){
+                    mraa_gpio_context gpio = NULL;
+                    if(mraa_io_obj[i].raw){
+                        printf("gpio raw init\n");
+                        gpio = mraa_gpio_init_raw(mraa_io_obj[i].index);
+                    } else {
+                        printf("gpio init\n");
+                        gpio = mraa_gpio_init(mraa_io_obj[i].index);
+                    }
+                    mraa_result_t  r = mraa_gpio_owner(gpio, 0);
+                    if (r != MRAA_SUCCESS) {
+                        mraa_result_print(r);
+                    }
+                } else if (strcmp(mraa_io_obj[i].type, "i2c") == 0) {
+                    mraa_i2c_context i2c = NULL;
+                    if(mraa_io_obj[i].raw){
+                        printf("i2c raw init\n");
+                        i2c = mraa_i2c_init_raw(mraa_io_obj[i].index);
+                    } else {
+                        printf("i2c init\n");
+                        i2c = mraa_i2c_init(mraa_io_obj[i].index);
+                    }
+                } else if (strcmp(mraa_io_obj[i].type, "pwm") == 0) {
+                    mraa_pwm_context pwm = NULL;
+                    if(mraa_io_obj[i].raw){
+                        printf("pwm raw init\n");
+                        pwm = mraa_pwm_init_raw(index2,mraa_io_obj[i].index);
+                    } else {
+                        printf("pwm init\n");
+                        pwm = mraa_pwm_init(mraa_io_obj[i].index);
+                    }
+                    mraa_result_t  r = mraa_pwm_owner(pwm, 0);
+                    if (r != MRAA_SUCCESS) {
+                        mraa_result_print(r);
+                    }
+                } else if (strcmp(mraa_io_obj[i].type, "spi") == 0) {
+                    mraa_spi_context spi = NULL;
+                    if(mraa_io_obj[i].raw){
+                        printf("spi raw init\n");
+                        spi = mraa_spi_init_raw(mraa_io_obj[i].index, index2);
+                    } else {
+                        printf("spi init\n");
+                        spi = mraa_spi_init(mraa_io_obj[i].index);
+                    }
+                }  else if (strcmp(mraa_io_obj[i].type, "uart") == 0) {
+                    mraa_uart_context uart = NULL;
+                    if(mraa_io_obj[i].raw){
+                        printf("uart raw init\n");
+                        uart = mraa_uart_init_raw(mraa_io_obj[i].label);
+                    } else {
+                        printf("uart init\n");
+                        uart = mraa_uart_init(mraa_io_obj[i].index);
                     }
                 }
             }
@@ -306,6 +367,7 @@ imraa_handle_IO(struct json_object* jobj)
             fprintf(stderr, "IO array incorrectly parsed\n");
         }
     }
+    free(mraa_io_obj);
 }
 
 int
@@ -320,6 +382,8 @@ check_version(struct json_object* jobj)
             fprintf(stderr, "version string incorrectly parsed\n");
             return -1;
         }
+    } else {
+        fprintf(stderr, "no version specified\n");
     }
     return 0;
 }
@@ -391,5 +455,7 @@ main(int argc, char** argv)
         imraa_handle_IO(jobj);
     }
     fclose(fh);
+    json_object_put(jobj);
+    free(buffer);
     return EXIT_SUCCESS;
 }
