@@ -8,7 +8,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DIMRAA=1")
 
 find_package (JSON-C REQUIRED)
 include_directories (${JSON-C_INCLUDE_DIR})
-target_link_libraries (imraa mraa ${JSON-C_LIBRARIES} udev)
+find_package (UDEV REQUIRED)
+include_directories (${UDEV_INCLUDE_DIR})
+target_link_libraries (imraa mraa ${JSON-C_LIBRARIES} ${UDEV_LIBRARIES})
 
 set_property (TARGET imraa PROPERTY C_STANDARD 99)
 
