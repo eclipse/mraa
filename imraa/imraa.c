@@ -75,11 +75,16 @@ imraa_list_serialport()
         const char* path;
         path = udev_list_entry_get_name(dev_list_entry);
         dev = udev_device_new_from_syspath(udev, path);
-        printf("Ardunio 101 Device Node Path: %s\n", udev_device_get_devnode(dev));
         ret = udev_device_get_devnode(dev);
     }
     udev_enumerate_unref(enumerate);
     udev_unref(udev);
+
+    if(ret) {
+        printf("Ardunio 101 Device Node Path: %s\n", ret);
+    } else {
+        printf("Can't detect any Ardunio 101 Device on tty\n");
+    }
     return ret;
 }
 
@@ -102,7 +107,6 @@ imraa_reset_arduino(const char* modem)
 int
 imraa_flash_101(const char* bin_path, const char* bin_file_name, const char* tty)
 {
-
     if (imraa_reset_arduino(tty) != MRAA_SUCCESS) {
         fprintf(stderr, "Failed to reset arduino on %s for unknown reason, carrying on...\n", tty);
     }
@@ -114,6 +118,10 @@ imraa_flash_101(const char* bin_path, const char* bin_file_name, const char* tty
     size_t bin_path_len = strlen(bin_path);
 
     char* full_dfu_list = (char*) calloc((bin_path_len + strlen(dfu_list) + 1), sizeof(char));
+    if(!full_dfu_list){
+        printf("imraa_flash_101 can't allocate string buffer for dfu list\n");
+        exit(1);
+    }
     strncat(full_dfu_list, bin_path, strlen(bin_path));
     strncat(full_dfu_list, dfu_list, strlen(dfu_list));
 
@@ -159,6 +167,10 @@ imraa_flash_101(const char* bin_path, const char* bin_file_name, const char* tty
     const char* dfu_option = " -v -a 7 -R";
     int buffersize = bin_path_len + strlen(dfu_upload) + strlen(bin_file_name) + strlen(dfu_option) + 1;
     char* full_dfu_upload = calloc(buffersize, sizeof(char));
+    if(!full_dfu_upload){
+        printf("imraa_flash_101 can't allocate string buffer for dfu flash\n");
+        exit(1);
+    }
     strncat(full_dfu_upload, bin_path, strlen(bin_path));
     strncat(full_dfu_upload, dfu_upload, strlen(dfu_upload));
     strncat(full_dfu_upload, bin_file_name, strlen(bin_file_name));
@@ -206,7 +218,7 @@ imraa_write_lockfile(const char* lock_file_location, const char* serialport)
 }
 
 void
-imraa_handle_subplatform(struct json_object* jobj)
+imraa_handle_subplatform(struct json_object* jobj, bool force_update)
 {
     struct json_object* platform;
     int i, ionum;
@@ -244,6 +256,9 @@ imraa_handle_subplatform(struct json_object* jobj)
                     if (strcmp(key, "flash") == 0) {
                         flash_loc = json_object_get_string(val);
                     }
+                    if (strcmp(key, "usbserial") == 0) {
+                        usbserial = json_object_get_string(val);
+                    }
                 }
             }
         } else {
@@ -251,19 +266,30 @@ imraa_handle_subplatform(struct json_object* jobj)
         }
     }
     // got flash? do flash
-    if (access(lockfile_loc, F_OK) != -1) {
+    if (access(lockfile_loc, F_OK) != -1 && force_update == false) {
         printf("already exist a lock file, skip flashing\n");
-        printf("force upgrade? remove the lockfile first\n", lockfile_loc);
+        printf("force upgrade? remove the lockfile or run with force\n", lockfile_loc);
+        return;
     } else {
         fprintf(stdout, "Starting to flash board\n");
+        if(force_update) {
+            fprintf(stdout, "**Caution: force update mode**\n");
+        }
         // dfu_loc = "/usr/bin";
         //TODO flash img checksum, and serialport validation?
-        const char* serialport = (strcmp(usbserial, "auto") == 0) 
-                                 ? imraa_list_serialport() : usbserial;
-
-        if ( dfu_loc != NULL && flash_loc != NULL && serialport != NULL) {
-            if (imraa_flash_101(dfu_loc, flash_loc, serialport) == 0) {
-                imraa_write_lockfile(lockfile_loc, serialport);
+        const char* detected_serialport = imraa_list_serialport();
+        if (detected_serialport == NULL) {
+            printf("No subplatform detected, skip flashing\n");
+            return;
+        }
+        if (strcmp(usbserial, "auto") != 0 && strcmp(usbserial, detected_serialport) != 0) {
+            printf("given serial port didn't match detected serial port, skip flashing\n");
+            return;
+        }
+        detected_serialport = "/dev/ttyACM0";
+        if ( dfu_loc != NULL && flash_loc != NULL && usbserial != NULL) {
+            if (imraa_flash_101(dfu_loc, flash_loc, detected_serialport) == 0) {
+                imraa_write_lockfile(lockfile_loc, detected_serialport);
             } else {
                 fprintf(stderr, "Flash failed, push master reset and try again\n");
             }
@@ -271,7 +297,7 @@ imraa_handle_subplatform(struct json_object* jobj)
             fprintf(stderr, "invalid flashing paramenters, please check agian\n");
             fprintf(stderr, "DFU Util location: %s\n", dfu_loc);
             fprintf(stderr, "Flash Img location: %s\n", dfu_loc);
-            fprintf(stderr, "USB Serial: %s\n", dfu_loc);
+            fprintf(stderr, "USB Serial: %s\n", usbserial);
         }
     }
 }
@@ -285,8 +311,12 @@ imraa_handle_IO(struct json_object* jobj)
     int i;
     if (json_object_object_get_ex(jobj, "IO", &ioarray) == true) {
         ionum = json_object_array_length(ioarray);
-        mraa_io_obj = (mraa_io_objects_t*) malloc( ionum * sizeof(mraa_io_objects_t));
         printf("Length of IO array is %d\n", ionum);
+        mraa_io_obj = (mraa_io_objects_t*) malloc( ionum * sizeof(mraa_io_objects_t));
+        if (!mraa_io_obj) {
+            printf("imraa_handle_IO malloc failed\n");
+            exit(1);
+        }
         int index2 = -1;;//optional index for io configuration;
         if (json_object_is_type(ioarray, json_type_array)) {
             for (i = 0; i < ionum; i++) {
@@ -366,8 +396,8 @@ imraa_handle_IO(struct json_object* jobj)
         } else {
             fprintf(stderr, "IO array incorrectly parsed\n");
         }
+        free(mraa_io_obj);
     }
-    free(mraa_io_obj);
 }
 
 int
@@ -398,6 +428,8 @@ void
 print_help()
 {
     fprintf(stdout, "version           Get mraa version and board name\n");
+    fprintf(stdout, "force             Force update subplatform\n");
+    fprintf(stdout, "conf_path         Force update with override configuration\n");
 }
 
 void
@@ -414,6 +446,7 @@ main(int argc, char** argv)
     char* buffer = NULL;
     char* imraa_conf_file = IMRAA_CONF_FILE;
     long fsize;
+    bool force_update = false;
     int i = 0;
     uint32_t ionum = 0;
 
@@ -424,10 +457,15 @@ main(int argc, char** argv)
     if (argc > 1) {
         if (strcmp(argv[1], "help") == 0) {
             print_help();
+            return;
         } else if (strcmp(argv[1], "version") == 0) {
             print_version();
+            return;
+        } else if (strcmp(argv[1], "force") == 0) {
+            force_update = true;
         } else {
             imraa_conf_file = argv[1];
+            force_update = true;
         }
     }
 
@@ -443,16 +481,24 @@ main(int argc, char** argv)
     buffer = calloc(fsize, sizeof(char));
     if (buffer != NULL) {
         fread(buffer, sizeof(char), fsize, fh);
+    } else {
+        printf("imraa read_conf buffer can't allocated\n");
+        exit(1);
     }
 
     imraa_init();
 
     json_object* jobj = json_tokener_parse(buffer);
     if (check_version(jobj) != 0) {
-        printf("version of configuaration file is not compatible, please check again\n");
+        printf("version of configuration file is not compatible, please check again\n");
     } else {
-        imraa_handle_subplatform(jobj);
-        imraa_handle_IO(jobj);
+        mraa_platform_t type = mraa_get_platform_type();
+        imraa_handle_subplatform(jobj, force_update);
+        if( type == MRAA_NULL_PLATFORM || type == MRAA_UNKNOWN_PLATFORM) {
+            printf("imraa: Failed to do IO pinmuxing on null/unkown platform\n");
+        } else {
+            imraa_handle_IO(jobj);
+        }
     }
     fclose(fh);
     json_object_put(jobj);
