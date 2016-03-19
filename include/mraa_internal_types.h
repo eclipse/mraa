@@ -176,7 +176,7 @@ typedef enum {
     PINCMD_SET_IN_VALUE = 3,    // set input direction and value
     PINCMD_SET_OUT_VALUE = 4,   // set output direction and value
     PINCMD_SET_MODE = 5,        // set pin's mode
-    PINCMD_SKIP = 0xFFF         // just skip this command, do not apply pin and value
+    PINCMD_SKIP = 6             // just skip this command, do not apply pin and value
 } pincmd_t;
 
 
