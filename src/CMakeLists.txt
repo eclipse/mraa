@@ -19,6 +19,10 @@ set (mraa_LIB_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/iio/iio.c
 )
 
+if (IIO)
+  set (mraa_LIB_SRCS_NOAUTO ${mraa_LIB_SRCS_NOAUTO} ${PROJECT_SOURCE_DIR}/src/iio/iio.c)
+endif ()
+
 set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/x86.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_galileo_rev_d.c
@@ -122,8 +126,38 @@ set (mraa_LIB_GLOB_HEADERS
   ${PROJECT_SOURCE_DIR}/api/mraa.hpp
 )
 
-add_library (mraa ${mraa_LIB_SRCS})
+set (mraa_LIB_HEADERS
+  ${PROJECT_SOURCE_DIR}/api/mraa/aio.h
+  ${PROJECT_SOURCE_DIR}/api/mraa/aio.hpp
+  ${PROJECT_SOURCE_DIR}/api/mraa/gpio.h
+  ${PROJECT_SOURCE_DIR}/api/mraa/gpio.hpp
+  ${PROJECT_SOURCE_DIR}/api/mraa/pwm.h
+  ${PROJECT_SOURCE_DIR}/api/mraa/pwm.hpp
+  ${PROJECT_SOURCE_DIR}/api/mraa/spi.h
+  ${PROJECT_SOURCE_DIR}/api/mraa/spi.hpp
+  ${PROJECT_SOURCE_DIR}/api/mraa/uart.h
+  ${PROJECT_SOURCE_DIR}/api/mraa/uart.hpp
+  ${PROJECT_SOURCE_DIR}/api/mraa/common.h
+  ${PROJECT_SOURCE_DIR}/api/mraa/common.hpp
+  ${PROJECT_SOURCE_DIR}/api/mraa/types.h
+  ${PROJECT_SOURCE_DIR}/api/mraa/types.hpp
+)
 
+if (IIO)
+  set (mraa_LIB_HEADERS ${mraa_LIB_HEADERS}
+    ${PROJECT_SOURCE_DIR}/api/mraa/iio.h
+    ${PROJECT_SOURCE_DIR}/api/mraa/iio.hpp
+    ${PROJECT_SOURCE_DIR}/api/mraa/iio_kernel_headers.h
+  )
+endif ()
+
+if (FIRMATA)
+  set (mraa_LIB_HEADERS ${mraa_LIB_HEADERS}
+    ${PROJECT_SOURCE_DIR}/api/mraa/firmata.h
+  )
+endif()
+
+add_library (mraa ${mraa_LIB_SRCS})
 
 target_link_libraries (mraa ${mraa_LIBS})
 
@@ -134,7 +168,7 @@ set_target_properties(
    VERSION ${mraa_VERSION_STRING}
 )
 install (FILES ${mraa_LIB_GLOB_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install (DIRECTORY ${PROJECT_SOURCE_DIR}/api/mraa/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mraa)
+install (FILES ${mraa_LIB_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mraa)
 
 macro (mraa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
   configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
