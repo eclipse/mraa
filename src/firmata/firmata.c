@@ -49,14 +49,14 @@ firmata_new(const char* name)
 
     firmata_initPins(res);
 
-    uart_res = mraa_uart_set_baudrate(res->uart, 57600);
-    if (uart_res != MRAA_SUCCESS) {
-        mraa_result_print(uart_res);
+    if (mraa_uart_set_baudrate(res->uart, 57600) != MRAA_SUCCESS) {
+        syslog(LOG_WARNING, "firmata: Failed to set correct baud rate on %s", name);
     }
 
     firmata_askFirmware(res);
     syslog(LOG_INFO, "firmata: Device opened at: %s", name);
-    return (res);
+
+    return res;
 }
 
 void
