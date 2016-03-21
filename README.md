@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="http://iotdk.intel.com/misc/logos/mraa.png" height="150px" width="auto" algt="Mraa Logo"/>
+</p>
 libmraa - Low Level Skeleton Library for Communication on GNU/Linux platforms
 ==============
 
