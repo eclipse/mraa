@@ -66,7 +66,8 @@ imraa_list_serialport()
     udev_enumerate_add_match_subsystem(enumerate, "tty");
     udev_enumerate_add_match_property(enumerate, "ID_VENDOR_ID", "8087");
     udev_enumerate_add_match_property(enumerate, "ID_MODEL_ID", "0ab6");
-    //udev_enumerate_add_match_property(enumerate, "ID_SERIAL", "Intel_ARDUINO_101_AE6642SQ55000RS");
+    // udev_enumerate_add_match_property(enumerate, "ID_SERIAL",
+    // "Intel_ARDUINO_101_AE6642SQ55000RS");
     udev_enumerate_scan_devices(enumerate);
     devices = udev_enumerate_get_list_entry(enumerate);
 
@@ -80,7 +81,7 @@ imraa_list_serialport()
     udev_enumerate_unref(enumerate);
     udev_unref(udev);
 
-    if(ret) {
+    if (ret) {
         printf("Ardunio 101 Device Node Path: %s\n", ret);
     } else {
         printf("Can't detect any Ardunio 101 Device on tty\n");
@@ -118,7 +119,7 @@ imraa_flash_101(const char* bin_path, const char* bin_file_name, const char* tty
     size_t bin_path_len = strlen(bin_path);
 
     char* full_dfu_list = (char*) calloc((bin_path_len + strlen(dfu_list) + 1), sizeof(char));
-    if(!full_dfu_list){
+    if (!full_dfu_list) {
         printf("imraa_flash_101 can't allocate string buffer for dfu list\n");
         exit(1);
     }
@@ -167,7 +168,7 @@ imraa_flash_101(const char* bin_path, const char* bin_file_name, const char* tty
     const char* dfu_option = " -v -a 7 -R";
     int buffersize = bin_path_len + strlen(dfu_upload) + strlen(bin_file_name) + strlen(dfu_option) + 1;
     char* full_dfu_upload = calloc(buffersize, sizeof(char));
-    if(!full_dfu_upload){
+    if (!full_dfu_upload) {
         printf("imraa_flash_101 can't allocate string buffer for dfu flash\n");
         exit(1);
     }
@@ -272,11 +273,11 @@ imraa_handle_subplatform(struct json_object* jobj, bool force_update)
         return;
     } else {
         fprintf(stdout, "Starting to flash board\n");
-        if(force_update) {
+        if (force_update) {
             fprintf(stdout, "**Caution: force update mode**\n");
         }
         // dfu_loc = "/usr/bin";
-        //TODO flash img checksum, and serialport validation?
+        // TODO flash img checksum, and serialport validation?
         const char* detected_serialport = imraa_list_serialport();
         if (detected_serialport == NULL) {
             printf("No subplatform detected, skip flashing\n");
@@ -287,7 +288,7 @@ imraa_handle_subplatform(struct json_object* jobj, bool force_update)
             return;
         }
         detected_serialport = "/dev/ttyACM0";
-        if ( dfu_loc != NULL && flash_loc != NULL && usbserial != NULL) {
+        if (dfu_loc != NULL && flash_loc != NULL && usbserial != NULL) {
             if (imraa_flash_101(dfu_loc, flash_loc, detected_serialport) == 0) {
                 imraa_write_lockfile(lockfile_loc, detected_serialport);
             } else {
@@ -312,12 +313,13 @@ imraa_handle_IO(struct json_object* jobj)
     if (json_object_object_get_ex(jobj, "IO", &ioarray) == true) {
         ionum = json_object_array_length(ioarray);
         printf("Length of IO array is %d\n", ionum);
-        mraa_io_obj = (mraa_io_objects_t*) malloc( ionum * sizeof(mraa_io_objects_t));
+        mraa_io_obj = (mraa_io_objects_t*) malloc(ionum * sizeof(mraa_io_objects_t));
         if (!mraa_io_obj) {
             printf("imraa_handle_IO malloc failed\n");
             exit(1);
         }
-        int index2 = -1;;//optional index for io configuration;
+        int index2 = -1;
+        ; // optional index for io configuration;
         if (json_object_is_type(ioarray, json_type_array)) {
             for (i = 0; i < ionum; i++) {
                 struct json_object* ioobj = json_object_array_get_idx(ioarray, i);
@@ -337,23 +339,23 @@ imraa_handle_IO(struct json_object* jobj)
                 if (json_object_object_get_ex(ioobj, "index2", &x) == true) {
                     index2 = json_object_get_int(x);
                 }
-                //starting io configuration
-                if(strcmp(mraa_io_obj[i].type, "gpio") == 0){
+                // starting io configuration
+                if (strcmp(mraa_io_obj[i].type, "gpio") == 0) {
                     mraa_gpio_context gpio = NULL;
-                    if(mraa_io_obj[i].raw){
+                    if (mraa_io_obj[i].raw) {
                         printf("gpio raw init\n");
                         gpio = mraa_gpio_init_raw(mraa_io_obj[i].index);
                     } else {
                         printf("gpio init\n");
                         gpio = mraa_gpio_init(mraa_io_obj[i].index);
                     }
-                    mraa_result_t  r = mraa_gpio_owner(gpio, 0);
+                    mraa_result_t r = mraa_gpio_owner(gpio, 0);
                     if (r != MRAA_SUCCESS) {
                         mraa_result_print(r);
                     }
                 } else if (strcmp(mraa_io_obj[i].type, "i2c") == 0) {
                     mraa_i2c_context i2c = NULL;
-                    if(mraa_io_obj[i].raw){
+                    if (mraa_io_obj[i].raw) {
                         printf("i2c raw init\n");
                         i2c = mraa_i2c_init_raw(mraa_io_obj[i].index);
                     } else {
@@ -362,29 +364,29 @@ imraa_handle_IO(struct json_object* jobj)
                     }
                 } else if (strcmp(mraa_io_obj[i].type, "pwm") == 0) {
                     mraa_pwm_context pwm = NULL;
-                    if(mraa_io_obj[i].raw){
+                    if (mraa_io_obj[i].raw) {
                         printf("pwm raw init\n");
-                        pwm = mraa_pwm_init_raw(index2,mraa_io_obj[i].index);
+                        pwm = mraa_pwm_init_raw(index2, mraa_io_obj[i].index);
                     } else {
                         printf("pwm init\n");
                         pwm = mraa_pwm_init(mraa_io_obj[i].index);
                     }
-                    mraa_result_t  r = mraa_pwm_owner(pwm, 0);
+                    mraa_result_t r = mraa_pwm_owner(pwm, 0);
                     if (r != MRAA_SUCCESS) {
                         mraa_result_print(r);
                     }
                 } else if (strcmp(mraa_io_obj[i].type, "spi") == 0) {
                     mraa_spi_context spi = NULL;
-                    if(mraa_io_obj[i].raw){
+                    if (mraa_io_obj[i].raw) {
                         printf("spi raw init\n");
                         spi = mraa_spi_init_raw(mraa_io_obj[i].index, index2);
                     } else {
                         printf("spi init\n");
                         spi = mraa_spi_init(mraa_io_obj[i].index);
                     }
-                }  else if (strcmp(mraa_io_obj[i].type, "uart") == 0) {
+                } else if (strcmp(mraa_io_obj[i].type, "uart") == 0) {
                     mraa_uart_context uart = NULL;
-                    if(mraa_io_obj[i].raw){
+                    if (mraa_io_obj[i].raw) {
                         printf("uart raw init\n");
                         uart = mraa_uart_init_raw(mraa_io_obj[i].label);
                     } else {
@@ -494,7 +496,7 @@ main(int argc, char** argv)
     } else {
         mraa_platform_t type = mraa_get_platform_type();
         imraa_handle_subplatform(jobj, force_update);
-        if( type == MRAA_NULL_PLATFORM || type == MRAA_UNKNOWN_PLATFORM) {
+        if (type == MRAA_NULL_PLATFORM || type == MRAA_UNKNOWN_PLATFORM) {
             printf("imraa: Failed to do IO pinmuxing on null/unkown platform\n");
         } else {
             imraa_handle_IO(jobj);
