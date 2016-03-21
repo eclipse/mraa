@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 
 #include "firmata.h"
 #include "mraa_internal.h"
@@ -486,13 +487,23 @@ mraa_firmata_plat_init(const char* uart_dev)
 
     firmata_dev = firmata_new(uart_dev);
     if (firmata_dev == NULL) {
+        syslog(LOG_WARNING, "firmata: Failed to open uart to Firmata dev on %s", uart_dev);
+        fprintf(stderr, "Mraa expected to find a Firmata device on %s, is the port in use?\n", uart_dev);
         free(b);
         return NULL;
     }
 
     // if this isn't working then we have an issue with our uart
-    while (!firmata_dev->isReady) {
+    int retry = 20;
+    while (!firmata_dev->isReady && retry--) {
        firmata_pull(firmata_dev);
+    }
+
+    if (!retry) {
+        syslog(LOG_ERR, "firmata: Failed to find a valid Firmata board on %s", uart_dev);
+        firmata_close(firmata_dev);
+        free(b);
+	return NULL;
     }
 
     pthread_create(&thread_id, NULL, mraa_firmata_pull_handler, NULL);

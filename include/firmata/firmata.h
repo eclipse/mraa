@@ -111,3 +111,4 @@ int firmata_analogRead(t_firmata* firmata, int pin);
 int firmata_pull(t_firmata* firmata);
 void firmata_parse(t_firmata* firmata, const uint8_t* buf, int len);
 void firmata_endParse(t_firmata* firmata);
+void firmata_close(t_firmata* firmata);

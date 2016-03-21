@@ -59,6 +59,13 @@ firmata_new(const char* name)
     return (res);
 }
 
+void
+firmata_close(t_firmata* firmata)
+{
+    mraa_uart_stop(firmata->uart);
+    free(firmata);
+}
+
 int
 firmata_pull(t_firmata* firmata)
 {
