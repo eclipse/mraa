@@ -54,11 +54,14 @@ if (${V8_VERSION_MAJOR} GREATER 3)
   endif ()
 endif ()
 
+set (NODE_MODULE_INSTALL_PATH ${NODE_ROOT_DIR}/lib/node_modules/mraa/)
+message (STATUS "INFO - install NODE modules to ${NODE_MODULE_INSTALL_PATH}")
+
 macro (mraa_CREATE_INSTALL_PACKAGE_JSON generated_file install_location)
   configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
   install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} DESTINATION ${install_location})
 endmacro (mraa_CREATE_INSTALL_PACKAGE_JSON)
-mraa_create_install_package_json (package.json lib/node_modules/mraa)
+mraa_create_install_package_json (package.json ${NODE_MODULE_INSTALL_PATH})
 
 macro (mraa_CREATE_BINDING_GYP generated_file)
   set (mraa_LIB_SRCS_GYP "")
@@ -110,4 +113,4 @@ if (BUILDDOC)
 endif ()
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.node
-         DESTINATION lib/node_modules/mraa)
+         DESTINATION ${NODE_MODULE_INSTALL_PATH})
