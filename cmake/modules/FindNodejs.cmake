@@ -23,17 +23,19 @@ if (UV_ROOT_DIR)
 endif()
 
 # Now look for node. Flag an error if not found
-find_path (NODE_ROOT_DIR "include/node/node.h" "include/src/node.h"
+find_path (NODE_INCLUDE_DIR "node/node.h" "src/node.h"
   PATHS /usr/include/nodejs /usr/local/include/nodejs /usr/local/include)
-if (NODE_ROOT_DIR)
-  add_include_dir(${NODE_ROOT_DIR}/include/src)
-  add_include_dir(${NODE_ROOT_DIR}/include/node)
-  add_include_dir(${NODE_ROOT_DIR}/include/deps/v8/include)
-  add_include_dir(${NODE_ROOT_DIR}/include/deps/uv/include)
+if (NODE_INCLUDE_DIR)
+  add_include_dir(${NODE_INCLUDE_DIR}/src)
+  add_include_dir(${NODE_INCLUDE_DIR}/node)
+  add_include_dir(${NODE_INCLUDE_DIR}/deps/v8/include)
+  add_include_dir(${NODE_INCLUDE_DIR}/deps/uv/include)
 else()
   unset(NODEJS_INCLUDE_DIRS)
   message(ERROR " - node.h not found")
 endif()
+
+set (NODE_ROOT_DIR "${NODEJS_INCLUDE_DIRS}/..")
 
 message (INFO " %%% - ${NODEJS_INCLUDE_DIRS}")
 message (INFO " %%% = ${NODE_ROOT_DIR}")
