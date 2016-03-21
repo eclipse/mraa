@@ -35,6 +35,9 @@ else()
   message(ERROR " - node.h not found")
 endif()
 
+message (INFO " %%% - ${NODEJS_INCLUDE_DIRS}")
+message (INFO " %%% = ${NODE_ROOT_DIR}")
+
 # Check that v8.h is in NODEJS_INCLUDE_DIRS
 find_path (V8_ROOT_DIR "v8.h" PATHS ${NODEJS_INCLUDE_DIRS})
 if (NOT V8_ROOT_DIR)
