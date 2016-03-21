@@ -14,7 +14,7 @@ install:
   - sudo ln -s /usr/bin/swig3.0 /usr/bin/swig
   - sudo update-java-alternatives -s java-8-oracle
 before_script:
-  - export NODE_ROOT_DIR="/home/travis/.nvm/v0.10.36/include"
+  - export NODE_ROOT_DIR="/home/travis/.nvm/v0.10.36"
   - if [ "$CC" = "gcc" ]; then export BUILDJAVA=ON; else export BUILDJAVA=OFF; fi
   - export JAVA_HOME=/usr/lib/jvm/java-8-oracle
   - if [ "${NODE4}" ]; then nvm install 4.1; export CC=gcc-4.8; export CXX=g++-4.8; export NODE_ROOT_DIR="/home/travis/.nvm/versions/node/`nvm version`/include"; fi
