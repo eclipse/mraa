@@ -146,7 +146,7 @@ mraa_firmata_send_i2c_read_req(mraa_i2c_context dev, int length)
 }
 
 static mraa_result_t
-mraa_firmata_send_i2c_read_cont_req(mraa_i2c_context dev, uint8_t command, int length)
+mraa_firmata_send_i2c_read_reg_req(mraa_i2c_context dev, uint8_t command, int length)
 {
     uint8_t* buffer = calloc(9, 0);
     if (buffer == NULL) {
@@ -155,7 +155,7 @@ mraa_firmata_send_i2c_read_cont_req(mraa_i2c_context dev, uint8_t command, int l
     buffer[0] = FIRMATA_START_SYSEX;
     buffer[1] = FIRMATA_I2C_REQUEST;
     buffer[2] = dev->addr;
-    buffer[3] = I2C_CONTINUOUSREAD << 3;
+    buffer[3] = I2C_MODE_READ << 3;
 
     // register to read from
     buffer[4] = command & 0x7f;
@@ -204,7 +204,7 @@ mraa_firmata_i2c_read_byte(mraa_i2c_context dev)
 static uint16_t
 mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
-    if (mraa_firmata_send_i2c_read_cont_req(dev, command, 2) == MRAA_SUCCESS) {
+    if (mraa_firmata_send_i2c_read_reg_req(dev, command, 2) == MRAA_SUCCESS) {
         if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
             uint8_t rawdata[2];
             rawdata[0] = firmata_dev->i2cmsg[dev->addr][command];
@@ -223,7 +223,7 @@ mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 static int
 mraa_firmata_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* data, int length)
 {
-    if (mraa_firmata_send_i2c_read_cont_req(dev, command, length) == MRAA_SUCCESS) {
+    if (mraa_firmata_send_i2c_read_reg_req(dev, command, length) == MRAA_SUCCESS) {
         if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
             memcpy(data, &firmata_dev->i2cmsg[dev->addr][command], sizeof(int)*length);
             return length;
@@ -251,7 +251,7 @@ mraa_firmata_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 static uint8_t
 mraa_firmata_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
-    if (mraa_firmata_send_i2c_read_cont_req(dev, command, 1) == MRAA_SUCCESS) {
+    if (mraa_firmata_send_i2c_read_reg_req(dev, command, 1) == MRAA_SUCCESS) {
         if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
             return firmata_dev->i2cmsg[dev->addr][command];
         }
