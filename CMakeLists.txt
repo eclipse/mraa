@@ -141,7 +141,7 @@ if (IPK)
   endif ()
   message (STATUS "INFO - Package arch is ${TARGET_ARCH}")
 
-  set(CPACK_GENERATOR "DEB" "TGZ")
+  set(CPACK_GENERATOR "DEB")
   set(OPKG_ARCH ${TARGET_ARCH})
   set(CPACK_BINARY_DIR ${CMAKE_BINARY_DIR})
   set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Intel IoT-Devkit") #required
