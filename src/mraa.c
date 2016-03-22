@@ -253,27 +253,167 @@ mraa_iio_detect()
     return MRAA_SUCCESS;
 }
 
-
 mraa_result_t
 mraa_setup_mux_mapped(mraa_pin_t meta)
 {
     int mi;
+    mraa_result_t ret;
+    mraa_gpio_context mux_i = NULL;
+    int last_pin = -1;
 
     for (mi = 0; mi < meta.mux_total; mi++) {
-        mraa_gpio_context mux_i;
-        mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-        if (mux_i == NULL) {
-            return MRAA_ERROR_INVALID_HANDLE;
-        }
-        // this function will sometimes fail, however this is not critical as
-        // long as the write succeeds - Test case galileo gen2 pin2
-        mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
-        mraa_gpio_owner(mux_i, 0);
 
-        if (mraa_gpio_write(mux_i, meta.mux[mi].value) != MRAA_SUCCESS) {
-            mraa_gpio_close(mux_i);
-            return MRAA_ERROR_INVALID_RESOURCE;
+        switch(meta.mux[mi].pincmd) {
+            case PINCMD_UNDEFINED:              // used for backward compatibility
+                if(meta.mux[mi].pin != last_pin) {
+                    if (mux_i != NULL) {
+                        mraa_gpio_owner(mux_i, 0);
+                        mraa_gpio_close(mux_i);
+                    }
+                    mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
+                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    last_pin = meta.mux[mi].pin;
+                }
+                // this function will sometimes fail, however this is not critical as
+                // long as the write succeeds - Test case galileo gen2 pin2
+                mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
+                ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
+                if(ret != MRAA_SUCCESS) {
+                    if (mux_i != NULL) {
+                        mraa_gpio_owner(mux_i, 0);
+                        mraa_gpio_close(mux_i);
+                    }
+                    return MRAA_ERROR_INVALID_RESOURCE;
+                }
+                break;
+
+            case PINCMD_SET_VALUE:
+                if(meta.mux[mi].pin != last_pin) {
+                    if (mux_i != NULL) {
+                        mraa_gpio_owner(mux_i, 0);
+                        mraa_gpio_close(mux_i);
+                    }
+                    mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
+                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    last_pin = meta.mux[mi].pin;
+                }
+
+                ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
+
+                if(ret != MRAA_SUCCESS) {
+                    if (mux_i != NULL) {
+                        mraa_gpio_owner(mux_i, 0);
+                        mraa_gpio_close(mux_i);
+                    }
+                    return MRAA_ERROR_INVALID_RESOURCE;
+                }
+                break;
+
+            case PINCMD_SET_DIRECTION:
+                if(meta.mux[mi].pin != last_pin) {
+                    if (mux_i != NULL) {
+                        mraa_gpio_owner(mux_i, 0);
+                        mraa_gpio_close(mux_i);
+                    }
+                    mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
+                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    last_pin = meta.mux[mi].pin;
+                }
+
+                ret = mraa_gpio_dir(mux_i, meta.mux[mi].value);
+
+                if(ret != MRAA_SUCCESS) {
+                    if (mux_i != NULL) {
+                        mraa_gpio_owner(mux_i, 0);
+                        mraa_gpio_close(mux_i);
+                    }
+                    return MRAA_ERROR_INVALID_RESOURCE;
+                }
+                break;
+
+            case PINCMD_SET_IN_VALUE:
+                if(meta.mux[mi].pin != last_pin) {
+                    if (mux_i != NULL) {
+                        mraa_gpio_owner(mux_i, 0);
+                        mraa_gpio_close(mux_i);
+                    }
+                    mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
+                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    last_pin = meta.mux[mi].pin;
+                }
+
+                ret = mraa_gpio_dir(mux_i, MRAA_GPIO_IN);
+
+                if(ret == MRAA_SUCCESS)
+                    ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
+
+                if(ret != MRAA_SUCCESS) {
+                    if (mux_i != NULL) {
+                        mraa_gpio_owner(mux_i, 0);
+                        mraa_gpio_close(mux_i);
+                    }
+                    return MRAA_ERROR_INVALID_RESOURCE;
+                }
+                break;
+
+            case PINCMD_SET_OUT_VALUE:
+                if(meta.mux[mi].pin != last_pin) {
+                    if (mux_i != NULL) {
+                        mraa_gpio_owner(mux_i, 0);
+                        mraa_gpio_close(mux_i);
+                    }
+                    mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
+                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    last_pin = meta.mux[mi].pin;
+                }
+
+                ret = mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
+
+                if(ret == MRAA_SUCCESS)
+                    ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
+
+                if(ret != MRAA_SUCCESS) {
+                    if (mux_i != NULL) {
+                        mraa_gpio_owner(mux_i, 0);
+                        mraa_gpio_close(mux_i);
+                    }
+                    return MRAA_ERROR_INVALID_RESOURCE;
+                }
+                break;
+
+            case PINCMD_SET_MODE:
+                if(meta.mux[mi].pin != last_pin) {
+                    if (mux_i != NULL) {
+                        mraa_gpio_owner(mux_i, 0);
+                        mraa_gpio_close(mux_i);
+                    }
+                    mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
+                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    last_pin = meta.mux[mi].pin;
+                }
+
+                ret = mraa_gpio_mode(mux_i, meta.mux[mi].value);
+
+                if(ret != MRAA_SUCCESS) {
+                    if (mux_i != NULL) {
+                        mraa_gpio_owner(mux_i, 0);
+                        mraa_gpio_close(mux_i);
+                    }
+                    return MRAA_ERROR_INVALID_RESOURCE;
+                }
+                break;
+
+            case PINCMD_SKIP:
+                break;
+
+            default:
+                syslog(LOG_NOTICE, "mraa_setup_mux_mapped: wrong command %d on pin %d with value %d", meta.mux[mi].pincmd, meta.mux[mi].pin, meta.mux[mi].value);
+                break;
         }
+    }
+
+    if (mux_i != NULL) {
+        mraa_gpio_owner(mux_i, 0);
         mraa_gpio_close(mux_i);
     }
 
