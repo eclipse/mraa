@@ -277,7 +277,7 @@ mraa_beaglebone_i2c_init_pre(unsigned int bus)
     char* capepath = NULL;
     sprintf(devpath, "/dev/i2c-%u", plat->i2c_bus[bus].bus_id);
     if (!mraa_file_exist(devpath)) {
-        syslog(LOG_ERR, "i2c: %s doesn't exist", devpath);
+        syslog(LOG_INFO, "i2c: %s doesn't exist ", devpath);
         capepath = mraa_file_unglob(SYSFS_DEVICES_CAPEMGR_SLOTS);
         if (capepath == NULL) {
             syslog(LOG_ERR, "i2c: Could not find CapeManager");
