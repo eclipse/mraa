@@ -1009,7 +1009,10 @@ mraa_add_from_lockfile(const char* imraa_lock_file) {
     fseek(flock, 0, SEEK_SET);
     buffer = (char*) calloc(fsize, sizeof(char));
     if (buffer != NULL) {
-        fread(buffer, sizeof(char), fsize, flock);
+        int result = fread(buffer, sizeof(char), fsize, flock);
+        if (result != fsize) {
+            printf("imraa lockfile reading error");
+        }
     }
     json_object* jobj_lock = json_tokener_parse(buffer);
 
@@ -1043,6 +1046,7 @@ mraa_add_from_lockfile(const char* imraa_lock_file) {
     }
     json_object_put(jobj_lock);
     free(buffer);
+    fclose(flock);
     return subplat_num;
 }
 #endif
