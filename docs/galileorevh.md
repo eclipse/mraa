@@ -17,6 +17,16 @@ The Gen 2 board has the following limitations in libmraa:
   accuracy of 10bits.
 - AIO pins are treated as 0-5 in mraa_aio_init() but as 14-19 for everything
   else. Therefore use mraa_gpio_init(14) to use A0 as a Gpio
+- To explicitly use GPIO 10 for SPI and allow the kernel to handle the chip select, set
+  `intel_qrk_plat_galileo_gen2.gpio_cs=1` on the kernel line in the boot config on the
+  galileo, this can be found at `/media/mmcblk0p1/boot/grub/grub.conf`
+- if done correctly it should look similiar to this:
+
+<pre>
+  title Quark X1000 kernel-MassStorage iot-devkit on SD IMR-On IO-APIC/HPET NoEMU debug
+  root (hd0,0)
+  kernel /bzImage root=/dev/mmcblk0p2 <b>intel_qrk_plat_galileo_gen2.gpio_cs=1</b> rootwait console=ttyS1,115200n8 earlycon=uart8250,mmio32,0x8010f000,115200n8 reboot=efi,warm apic=debug rw LABEL=boot debugshell=5
+</pre>
 
 Uart 1 on gen2
 --------------
@@ -26,8 +36,8 @@ possible to use it from A2(Rx)/A3(Tx). However mraa does not support this
 directly so you need to enable the muxing manually. Here is an example of how
 this is done, this was tested using an FTDI 3.3V TTL cable:
 
+```
 $ systemctl stop serial-getty@ttyS1.service
-
 $ python
 >>> # Configure the Muxes for Uart1 on Aio2/3
 >>> import mraa as m
@@ -53,4 +63,4 @@ $ python
 >>> x.writeStr('hello')
 >>> x.read(5)
 bytearray(b'dsds\n')
-
+```

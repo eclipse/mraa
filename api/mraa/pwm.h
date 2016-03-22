@@ -189,16 +189,18 @@ mraa_result_t mraa_pwm_config_percent(mraa_pwm_context dev, int period, float du
 /**
  * Get the maximum pwm period in us
  *
+ * @param dev The pwm context to use
  * @return max pwm in us
  */
-int mraa_pwm_get_max_period();
+int mraa_pwm_get_max_period(mraa_pwm_context dev);
 
 /**
  * Get the minimum pwm period in us
  *
+ * @param dev The pwm context to use
  * @return min pwm in us
  */
-int mraa_pwm_get_min_period();
+int mraa_pwm_get_min_period(mraa_pwm_context dev);
 
 #ifdef __cplusplus
 }

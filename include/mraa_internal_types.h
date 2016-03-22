@@ -1,7 +1,7 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Copyright (c) 2014-2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -39,6 +39,17 @@
 #define MRAA_PLATFORM_NO_INIT -3
 #define MRAA_IO_SETUP_FAILURE -2
 #define MRAA_NO_SUCH_IO -1
+
+#ifdef FIRMATA
+struct _firmata {
+    /*@*/
+    uint8_t feature; /**< the feature */
+    uint8_t index;
+    void (* isr)(uint8_t*, int); /**< the feature response request */
+    mraa_boolean_t added; /**< boolean to set if responses already set in devs array */
+    /*@}*/
+};
+#endif
 
 /**
  * A structure representing a gpio pin.
@@ -164,13 +175,31 @@ typedef struct {
     /*@}*/
 } mraa_pincapabilities_t;
 
+
+/**
+ *  Pin commands definition for mraa_mux_t struc
+ */
+
+typedef enum {
+    PINCMD_UNDEFINED = 0,       // do not modify, default command for zero value, used for backward compatibility with boards where pincmd is not defined (it will be deleted later)
+    PINCMD_SET_VALUE = 1,       // set a pin's value
+    PINCMD_SET_DIRECTION = 2,   // set a pin's direction (value like MRAA_GPIO_OUT, MRAA_GPIO_OUT_HIGH...)
+    PINCMD_SET_IN_VALUE = 3,    // set input direction and value
+    PINCMD_SET_OUT_VALUE = 4,   // set output direction and value
+    PINCMD_SET_MODE = 5,        // set pin's mode
+    PINCMD_SKIP = 6             // just skip this command, do not apply pin and value
+} pincmd_t;
+
+
 /**
  * A Structure representing a multiplexer and the required value
  */
 typedef struct {
     /*@{*/
-    unsigned int pin;   /**< Raw GPIO pin id */
-    unsigned int value; /**< Raw GPIO value */
+    unsigned int pincmd; /**< Pin command pincmd_xxxx */
+                         /**< At this time not all boards will support it -> TO DO */
+    unsigned int pin;    /**< Raw GPIO pin id */
+    unsigned int value;  /**< Raw GPIO value */
     /*@}*/
 } mraa_mux_t;
 
@@ -189,7 +218,6 @@ typedef struct {
     unsigned int mux_total; /** Numfer of muxes needed for operation of pin */
     mraa_mux_t mux[6]; /** Array holding information about mux */
     unsigned int output_enable; /** Output Enable GPIO, for level shifting */
-    unsigned int pullup_enable; /** Pull-Up enable GPIO, inputs */
     mraa_pin_cap_complex_t complex_cap;
     /*@}*/
 } mraa_pin_t;

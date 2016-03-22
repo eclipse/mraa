@@ -64,9 +64,7 @@ typedef unsigned int mraa_boolean_t;
  *
  * Detects running platform and attempts to use included pinmap, this is run on
  * module/library init/load but is handy to rerun to check board initialised
- * correctly. MRAA_SUCCESS inidicates correct (first time) initialisation
- * whilst MRAA_ERROR_PLATFORM_ALREADY_INITIALISED indicates the board is
- * already initialised correctly
+ * correctly. MRAA_SUCCESS inidicates correct initialisation.
  *
  * @return Result of operation
  */
@@ -276,7 +274,15 @@ int mraa_get_sub_platform_id(int pin_or_bus_index);
  */
 int mraa_get_sub_platform_index(int pin_or_bus_id);
 
-
+/**
+ * Add mraa subplatform
+ *
+ * @param subplatform type
+ * @param uart device subplatform is on
+ *
+ * @return mraa_result_t indicating success
+ */
+mraa_result_t mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev);
 
 #ifdef __cplusplus
 }

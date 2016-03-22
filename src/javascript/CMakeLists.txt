@@ -13,7 +13,7 @@ set (V8_VERSION_HEX 0x0${V8_VERSION_MAJOR}${V8_VERSION_MINOR}${V8_VERSION_PATCH}
 string (LENGTH "${V8_VERSION_HEX}" V8_VERSION_HEX_length)
 while (V8_VERSION_HEX_length LESS 8)
   set (V8_VERSION_HEX "${V8_VERSION_HEX}0")
-  message (DEBUG " - Padded V8 version to match SWIG format")
+  message (STATUS "INFO - Padded V8 version to match SWIG format")
   string (LENGTH "${V8_VERSION_HEX}" V8_VERSION_HEX_length)
 endwhile ()
 
@@ -21,8 +21,8 @@ set_property (SOURCE mraajs.i PROPERTY SWIG_FLAGS "-node"
               "-I${CMAKE_BINARY_DIR}/src" "-DV8_VERSION=${V8_VERSION_HEX}")
 set_source_files_properties (mraajs.i PROPERTIES CPLUSPLUS ON)
 
-swig_add_module (mraajs javascript mraajs.i ${mraa_LIB_SRCS})
-swig_link_libraries (mraajs ${mraa_LIBS})
+swig_add_module (mraajs javascript mraajs.i)
+swig_link_libraries (mraajs mraa)
 
 set_target_properties (mraajs PROPERTIES
   COMPILE_FLAGS " -DBUILDING_NODE_EXTENSION -DSWIGJAVASCRIPT=${SWIG_FOUND}"
@@ -31,35 +31,37 @@ set_target_properties (mraajs PROPERTIES
   SUFFIX ".node"
 )
 
-message (INFO " - swig Version ${SWIG_VERSION}")
-message (INFO " - CXX compiler Version ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+message (STATUS "INFO - swig Version ${SWIG_VERSION}")
+message (STATUS "INFO - CXX compiler Version ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
 if (${V8_VERSION_MAJOR} GREATER 3)
-  message (INFO " - Using V8 version > 3 so requiring C++11 compiler")
+  message (STATUS "INFO - Using V8 version > 3 so requiring C++11 compiler")
   # Node 0.12.x V8 engine major version is '3'.
   # Node 2.1.0  V8 engine major version is '4'.
   set_property (TARGET mraajs PROPERTY CXX_STANDARD 11)
   set_property (TARGET mraajs PROPERTY CXX_STANDARD_REQUIRED ON)
-  if(CMAKE_VERSION VERSION_LESS "3.1")
-    message(INFO " - **WARNING** Need to use CMAKE version 3.1+, but it is ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")
-    message(INFO " -             So a workaround will be used.")
-    if(CMAKE_COMPILER_IS_GNUCXX)
-      if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7")
-        message(FATAL_ERROR " FATAL ERROR: GNU gcc compiler is also too old (need 4.7+, but ${CMAKE_CXX_COMPILER_VERSION}) and does not support C++11 standard.")
-      endif()
-      set(MRAA_CXX11_WORKAROUND_OPTION "-std=gnu++11")
-    else()
-      set(MRAA_CXX11_WORKAROUND_OPTION "-std=c++11")
-    endif()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MRAA_CXX11_WORKAROUND_OPTION} ")
-  endif()
+  if (CMAKE_VERSION VERSION_LESS "3.1")
+    message (WARNING "Need to use CMAKE version 3.1+, but it is ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}, using a workaround.")
+    if (CMAKE_COMPILER_IS_GNUCXX)
+      if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7")
+        message (FATAL_ERROR "GNU gcc compiler is also too old (need 4.7+, but ${CMAKE_CXX_COMPILER_VERSION}) and does not support C++11 standard.")
+      endif ()
+      set (MRAA_CXX11_WORKAROUND_OPTION "-std=gnu++11")
+    else ()
+      set (MRAA_CXX11_WORKAROUND_OPTION "-std=c++11")
+    endif ()
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MRAA_CXX11_WORKAROUND_OPTION} ")
+  endif ()
 endif ()
+
+set (NODE_MODULE_INSTALL_PATH ${NODE_ROOT_DIR}/lib/node_modules/mraa/)
+message (STATUS "INFO - install NODE modules to ${NODE_MODULE_INSTALL_PATH}")
 
 macro (mraa_CREATE_INSTALL_PACKAGE_JSON generated_file install_location)
   configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
   install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} DESTINATION ${install_location})
 endmacro (mraa_CREATE_INSTALL_PACKAGE_JSON)
-mraa_create_install_package_json (package.json lib/node_modules/mraa)
+mraa_create_install_package_json (package.json ${NODE_MODULE_INSTALL_PATH})
 
 macro (mraa_CREATE_BINDING_GYP generated_file)
   set (mraa_LIB_SRCS_GYP "")
@@ -106,9 +108,9 @@ if (BUILDDOC)
       COMMENT "Generating API documentation with Yuidoc" VERBATIM
   )
   else ()
-    message (INFO " - Failed to find Yuidoc. node.js API doc will not be generated")
+    message (STATUS "INFO - Failed to find Yuidoc. node.js API doc will not be generated")
   endif ()
 endif ()
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.node
-         DESTINATION lib/node_modules/mraa)
+         DESTINATION ${NODE_MODULE_INSTALL_PATH})

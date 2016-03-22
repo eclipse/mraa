@@ -46,9 +46,7 @@ namespace mraa
  *
  * Detects running platform and attempts to use included pinmap, this is run on
  * module/library init/load but is handy to rerun to check board initialised
- * correctly. MRAA_SUCCESS inidicates correct (first time) initialisation
- * whilst MRAA_ERROR_PLATFORM_ALREADY_INITIALISED indicates the board is
- * already initialised correctly
+ * correctly. mraa::SUCCESS inidicates correct initialisation.
  *
  * @return Result of operation
  */
@@ -260,7 +258,7 @@ isSubPlatformId(int pin_or_bus_id)
  *
  * @return int sub platform pin or bus number
  */
-inline int 
+inline int
 getSubPlatformId(int pin_or_bus_index)
 {
     return mraa_get_sub_platform_id(pin_or_bus_index);
@@ -290,4 +288,19 @@ getDefaultI2cBus(int platform_offset=MRAA_MAIN_PLATFORM_OFFSET)
 {
     return mraa_get_default_i2c_bus(platform_offset);
 }
+
+/**
+ * Add mraa subplatform
+ *
+ * @param subplatformtype the type of subplatform to add
+ * (e.g. MRAA_GENERIC_FIRMATA)
+ * @param uart_dev subplatform device string (e.g. "/dev/ttyACM0")
+ * @return Result of operation
+ */
+inline Result
+addSubplatform(Platform subplatformtype, std::string uart_dev)
+{
+    return (Result) mraa_add_subplatform((mraa_platform_t) subplatformtype, uart_dev.c_str());
+}
+
 }

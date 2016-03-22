@@ -54,6 +54,9 @@ typedef enum {
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 
+    // contains bit 9 so is subplatform
+    MRAA_GENERIC_FIRMATA = 1280,    /**< Firmata uart platform/bridge */
+
     MRAA_NULL_PLATFORM = 98,        /**< Platform with no capabilities that hosts a sub platform  */
     MRAA_UNKNOWN_PLATFORM =
     99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
@@ -203,7 +206,7 @@ typedef enum {
     MRAA_ERROR_NO_DATA_AVAILABLE = 9,             /**< No data available */
     MRAA_ERROR_INVALID_PLATFORM = 10,             /**< Platform not recognised */
     MRAA_ERROR_PLATFORM_NOT_INITIALISED = 11,     /**< Board information not initialised */
-    MRAA_ERROR_PLATFORM_ALREADY_INITIALISED = 12, /**< Board is already initialised */
+    MRAA_ERROR_PLATFORM_ALREADY_INITIALISED = 0,  /**< Board is already initialised, same as MRAA_SUCESS */
 
     MRAA_ERROR_UNSPECIFIED = 99 /**< Unknown Error */
 } mraa_result_t;
@@ -238,8 +241,6 @@ typedef enum {
 	MRAA_UART_PARITY_MARK = 3,
 	MRAA_UART_PARITY_SPACE = 4
 } mraa_uart_parity_t;
-
-
 
 #ifdef __cplusplus
 }

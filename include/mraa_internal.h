@@ -34,9 +34,11 @@ extern "C" {
 #include "common.h"
 #include "mraa_internal_types.h"
 #include "mraa_adv_func.h"
+#include "mraa_lang_func.h"
 
 extern mraa_board_t* plat;
 extern mraa_iio_info_t* plat_iio;
+extern mraa_lang_func_t* lang_func;
 
 /**
  * Takes in pin information and sets up the multiplexors.
@@ -129,6 +131,24 @@ mraa_boolean_t mraa_link_targets(const char* filename, const char* targetname);
  * @return the matching i2c-dev bus id or -1
  */
 int mraa_find_i2c_bus(const char* devname, int startfrom);
+
+#if defined(IMRAA)
+/**
+ * read Imraa subplatform lock file, caller is responsible to free return
+ * struct array
+ *
+ * @param imraa lockfile location
+ * @return the number of subplatforms added
+ */
+uint32_t mraa_add_from_lockfile(const char* imraa_lock_file);
+
+/**
+ * Internal imraa init function
+ *
+ * @return mraa_result_t indicating success
+ */
+mraa_result_t imraa_init();
+#endif
 
 #ifdef __cplusplus
 }

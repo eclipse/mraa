@@ -1,5 +1,4 @@
 FIND_PACKAGE (JNI REQUIRED)
-
 include_directories (
   ${JAVA_INCLUDE_PATH}
   ${JAVA_INCLUDE_PATH2}
@@ -15,7 +14,7 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DJAVACALLBACK")
 
 if (NOT DEFINED ENV{JAVA_HOME_NATIVE})
   if (NOT DEFINED ENV{JAVA_HOME})
-    message (FATAL_ERROR " - Neither JAVA_HOME nor JAVA_HOME_NATIVE are set")
+    message (FATAL_ERROR "Neither JAVA_HOME nor JAVA_HOME_NATIVE are set")
   endif()
   set (JAVA_HOME_NATIVE $ENV{JAVA_HOME})
   set (JAVAC $ENV{JAVA_HOME}/bin/javac)
@@ -25,8 +24,8 @@ else ()
   set (JAR $ENV{JAVA_HOME_NATIVE}/bin/jar)
 endif ()
 
-swig_add_module (mraajava java mraajava.i ${mraa_LIB_SRCS})
-swig_link_libraries (mraajava ${JAVA_LIBRARIES} ${mraa_LIBS})
+swig_add_module (mraajava java mraajava.i mraajni.c)
+swig_link_libraries (mraajava ${JAVA_LIBRARIES} mraa)
 
 add_custom_command (TARGET mraajava
   POST_BUILD

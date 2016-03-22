@@ -46,7 +46,16 @@ typedef enum {
     RASPBERRY_PI = 5,          /**< The different Raspberry PI Models -like  A,B,A+,B+ */
     BEAGLEBONE = 6,            /**< The different BeagleBone Black Modes B/C */
     BANANA = 7,                /**< Allwinner A20 based Banana Pi and Banana Pro */
+    INTEL_NUC5 = 8,            /**< The Intel 5th generations Broadwell NUCs */
+    A96BOARDS = 9,             /**< Linaro 96boards, A prefix for 'ARM' since not allowed numerical */
+    INTEL_SOFIA_3GR = 10,      /**< The Intel SoFIA 3GR */
+    INTEL_CHERRYHILLS = 11,    /**< The Intel Braswell Cherryhills */
 
+    FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
+
+    GENERIC_FIRMATA = 1280,    /**< Firmata uart platform/bridge */
+
+    NULL_PLATFORM = 98,
     UNKNOWN_PLATFORM =
     99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
 } Platform;
@@ -195,7 +204,7 @@ typedef enum {
     ERROR_NO_DATA_AVAILABLE = 9,             /**< No data available */
     ERROR_INVALID_PLATFORM = 10,             /**< Platform not recognised */
     ERROR_PLATFORM_NOT_INITIALISED = 11,     /**< Board information not initialised */
-    ERROR_PLATFORM_ALREADY_INITIALISED = 12, /**< Board is already initialised */
+    ERROR_PLATFORM_ALREADY_INITIALISED = 0,  /**< Board is already initialised, same as SUCCESS */
 
     ERROR_UNSPECIFIED = 99 /**< Unknown Error */
 } Result;

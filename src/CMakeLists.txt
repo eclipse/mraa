@@ -32,7 +32,7 @@ set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/up.c
 )
 
-message (INFO " - Adding support for platform ${MRAAPLATFORMFORCE}")
+message (STATUS "INFO - Adding support for platform ${MRAAPLATFORMFORCE}")
 
 #keywords in if statements are case sensitive
 if (NOT ${MRAAPLATFORMFORCE} STREQUAL "ALL")
@@ -56,10 +56,10 @@ if (NOT ${MRAAPLATFORMFORCE} STREQUAL "ALL")
   elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_UP")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/up.c)
   else ()
-    message (ERROR " - Unknown x86 platform enabled!")
+    message (FATAL_ERROR "Unknown x86 platform enabled!")
   endif ()
 else ()
-    message (INFO " - Adding support for all platforms")
+    message (STATUS "INFO - Adding support for all platforms")
 endif ()
 
 set (mraa_LIB_ARM_SRCS_NOAUTO
@@ -83,7 +83,7 @@ if (ARMPLAT)
 endif()
 
 if (USBPLAT)
-  message (INFO " - Adding USB platforms")
+  message (STATUS "INFO - Adding USB platforms")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSBPLAT=1")
   if (FTDID2xx)
     find_package (Ftd2xx)
@@ -91,7 +91,7 @@ if (USBPLAT)
       set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFTDID2XX=1")
       set (mraa_LIBS ${mraa_LIBS} ${LIBFTD2XX_LIBRARIES})
     else ()
-      message (WARNING " - Enabled FTDID2xx support but library not found")
+      message (SEND_ERROR "Enabled FTDID2xx support but library not found")
     endif ()
   endif ()
   if (FTDI4222)
@@ -100,10 +100,22 @@ if (USBPLAT)
       set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFTDI4222=1")
       set (mraa_LIBS ${mraa_LIBS} dl)
     else ()
-      message (WARNING " - Enabled FTDI4222 support but library not found")
+      message (SEND_ERROR "Enabled FTDI4222 support but library not found")
     endif ()
   endif ()
   add_subdirectory(usb)
+endif ()
+
+if (FIRMATA)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFIRMATA=1")
+  add_subdirectory (firmata)
+endif ()
+
+if (IMRAA)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DIMRAA=1")
+  find_package (JSON-C REQUIRED)
+  include_directories (${JSON-C_INCLUDE_DIR})
+  set (mraa_LIBS ${mraa_LIBS} ${JSON-C_LIBRARIES})
 endif ()
 
 set (mraa_LIB_SRCS
@@ -117,17 +129,6 @@ set (mraa_LIB_GLOB_HEADERS
   ${PROJECT_SOURCE_DIR}/api/mraa.hpp
 )
 
-add_library (mraa ${mraa_LIB_SRCS})
-
-
-target_link_libraries (mraa ${mraa_LIBS})
-
-set_target_properties(
-   mraa
-   PROPERTIES
-   SOVERSION ${mraa_VERSION_MAJOR}
-   VERSION ${mraa_VERSION_STRING}
-)
 install (FILES ${mraa_LIB_GLOB_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install (DIRECTORY ${PROJECT_SOURCE_DIR}/api/mraa/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mraa)
 
@@ -137,7 +138,6 @@ macro (mraa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
 endmacro (mraa_CREATE_INSTALL_PKGCONFIG)
 mraa_create_install_pkgconfig (mraa.pc ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
-install(TARGETS mraa DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if (DOXYGEN_FOUND)
   set (CMAKE_SWIG_FLAGS -DDOXYGEN=${DOXYGEN_FOUND})
@@ -193,8 +193,18 @@ if (BUILDSWIG)
       if (SWIG_VERSION VERSION_GREATER 3.0.4)
         add_subdirectory (javascript)
       else ()
-        message ("WARN - SWIG is ${SWIG_VERSION}. Please upgrade to 3.0.5+ to build nodejs addon")
+        message (SEND_ERROR "SWIG is ${SWIG_VERSION}. Please upgrade to 3.0.5+ to build nodejs addon")
       endif ()
     endif ()
   endif ()
 endif ()
+
+add_library (mraa ${mraa_LIB_SRCS})
+target_link_libraries (mraa ${mraa_LIBS})
+set_target_properties(
+   mraa
+   PROPERTIES
+   SOVERSION ${mraa_VERSION_MAJOR}
+   VERSION ${mraa_VERSION_STRING}
+)
+install(TARGETS mraa DESTINATION ${CMAKE_INSTALL_LIBDIR})

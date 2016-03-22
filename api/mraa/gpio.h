@@ -40,20 +40,16 @@
 extern "C" {
 #endif
 
-#ifdef SWIGPYTHON
-#include <Python.h>
-#endif
+#include <stdio.h>
+#include <pthread.h>
+#include "common.h"
 
 #if defined(SWIGJAVA) || defined(JAVACALLBACK)
 #include <jni.h>
-extern JavaVM *globVM;
-extern void mraa_java_isr_callback(void *);
+extern "C" {
+    void mraa_java_isr_callback(void *args);
+}
 #endif
-
-#include <stdio.h>
-#include <pthread.h>
-
-#include "common.h"
 
 /**
  * Opaque pointer definition to the internal struct _gpio
