@@ -4,6 +4,11 @@ set (mraa_LIB_INCLUDE_DIRS
   ${PROJECT_SOURCE_DIR}/include
 )
 
+if (FIRMATA)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFIRMATA=1")
+  add_subdirectory (firmata)
+endif ()
+
 include_directories(
   ${mraa_LIB_INCLUDE_DIRS}
 )
@@ -17,6 +22,7 @@ set (mraa_LIB_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/aio/aio.c
   ${PROJECT_SOURCE_DIR}/src/uart/uart.c
   ${PROJECT_SOURCE_DIR}/src/iio/iio.c
+  ${mraa_LIB_SRCS_NOAUTO}
 )
 
 set (mraa_LIB_X86_SRCS_NOAUTO
@@ -104,11 +110,6 @@ if (USBPLAT)
     endif ()
   endif ()
   add_subdirectory(usb)
-endif ()
-
-if (FIRMATA)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFIRMATA=1")
-  add_subdirectory (firmata)
 endif ()
 
 if (IMRAA)
