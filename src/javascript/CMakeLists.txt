@@ -54,7 +54,15 @@ if (${V8_VERSION_MAJOR} GREATER 3)
   endif ()
 endif ()
 
-set (NODE_MODULE_INSTALL_PATH ${NODE_ROOT_DIR}/lib/node_modules/mraa/)
+# If a CMAKE_INSTALL_PREFIX has NOT been provided, set NODE_MODULE_INSTALL_PATH
+# base on the NODE_ROOT_DIR.
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set (NODE_MODULE_INSTALL_PATH ${NODE_ROOT_DIR}/lib/node_modules/mraa/)
+# If a CMAKE_INSTALL_PREFIX has been provided, set NODE_MODULE_INSTALL_PATH
+# relative to the provide install directory.
+else (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set (NODE_MODULE_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/lib/node_modules/mraa/)
+endif (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 message (STATUS "INFO - install NODE modules to ${NODE_MODULE_INSTALL_PATH}")
 
 macro (mraa_CREATE_INSTALL_PACKAGE_JSON generated_file install_location)
