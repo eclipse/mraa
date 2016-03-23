@@ -1,7 +1,7 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright (c) 2014, 2015 Intel Corporation.
+ * Copyright (c) 2014 - 2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -265,7 +265,7 @@ mraa_spi_write(mraa_spi_context dev, uint8_t data)
     return (int) recv;
 }
 
-uint16_t
+int
 mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
 {
     struct spi_ioc_transfer msg;
@@ -284,7 +284,7 @@ mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
         syslog(LOG_ERR, "spi: Failed to perform dev transfer");
         return -1;
     }
-    return recv;
+    return (int) recv;
 }
 
 mraa_result_t

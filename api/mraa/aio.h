@@ -60,12 +60,12 @@ mraa_aio_context mraa_aio_init(unsigned int pin);
 
 /**
  * Read the input voltage. By default mraa will shift
- * the raw value up or down to a 10 bit value.
+ * the raw value up or down to a 10 bit value. Returns -1 if error
  *
  * @param dev The AIO context
  * @returns The current input voltage.
  */
-unsigned int mraa_aio_read(mraa_aio_context dev);
+int mraa_aio_read(mraa_aio_context dev);
 
 /**
  * Read the input voltage and return it as a normalized float (0.0f-1.0f).

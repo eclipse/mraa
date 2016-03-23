@@ -1,6 +1,6 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Copyright (c) 2014-2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -93,27 +93,27 @@ int mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length);
  * with the i2c offset 0x0
  *
  * @param dev The i2c context
- * @return The result of the read and 0 if failed
+ * @return The result of the read and -1 if failed
  */
-uint8_t mraa_i2c_read_byte(mraa_i2c_context dev);
+int mraa_i2c_read_byte(mraa_i2c_context dev);
 
 /**
  * Read a single byte from i2c context, from designated register
  *
  * @param dev The i2c context
  * @param command The register
- * @return The result of the read and 0 if failed
+ * @return The result of the read and -1 if failed
  */
-uint8_t mraa_i2c_read_byte_data(mraa_i2c_context dev, const uint8_t command);
+int mraa_i2c_read_byte_data(mraa_i2c_context dev, const uint8_t command);
 
 /**
  * Read a single word from i2c context, from designated register
  *
  * @param dev The i2c context
  * @param command The register
- * @return The result of the read and 0 if failed
+ * @return The result of the read and -1 if failed
  */
-uint16_t mraa_i2c_read_word_data(mraa_i2c_context dev, const uint8_t command);
+int mraa_i2c_read_word_data(mraa_i2c_context dev, const uint8_t command);
 
 /**
  * Bulk read from i2c context, starting from designated register

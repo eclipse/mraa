@@ -1,6 +1,6 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Copyright (c) 2014-2016 Intel Corporation.
  *
  * Code is modified from the RoadNarrows-robotics i2c library (distributed under
  * the MIT license, license is included verbatim under src/i2c/LICENSE)
@@ -216,41 +216,41 @@ mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
     return 0;
 }
 
-uint8_t
+int
 mraa_i2c_read_byte(mraa_i2c_context dev)
 {
     if (IS_FUNC_DEFINED(dev, i2c_read_byte_replace))
         return dev->advance_func->i2c_read_byte_replace(dev);
     i2c_smbus_data_t d;
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_READ, I2C_NOCMD, I2C_SMBUS_BYTE, &d) < 0) {
-        syslog(LOG_ERR, "i2c: Failed to write");
-        return 0;
+        syslog(LOG_ERR, "i2c: Failed to write to bus from mraa_i2c_read_byte");
+        return -1;
     }
     return 0x0FF & d.byte;
 }
 
-uint8_t
+int
 mraa_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
     if (IS_FUNC_DEFINED(dev, i2c_read_byte_data_replace))
         return dev->advance_func->i2c_read_byte_data_replace(dev, command);
     i2c_smbus_data_t d;
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_READ, command, I2C_SMBUS_BYTE_DATA, &d) < 0) {
-        syslog(LOG_ERR, "i2c: Failed to write");
-        return 0;
+        syslog(LOG_ERR, "i2c: Failed to write to bus from mraa_i2c_read_byte_data");
+        return -1;
     }
     return 0x0FF & d.byte;
 }
 
-uint16_t
+int
 mraa_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
     if (IS_FUNC_DEFINED(dev, i2c_read_word_data_replace))
         return dev->advance_func->i2c_read_word_data_replace(dev, command);
     i2c_smbus_data_t d;
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_READ, command, I2C_SMBUS_WORD_DATA, &d) < 0) {
-        syslog(LOG_ERR, "i2c: Failed to write");
-        return 0;
+        syslog(LOG_ERR, "i2c: Failed to write to bus from mraa_i2c_read_word_data");
+        return -1;
     }
     return 0xFFFF & d.word;
 }

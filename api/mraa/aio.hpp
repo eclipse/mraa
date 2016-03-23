@@ -1,6 +1,6 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Copyright (c) 2014-2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -62,25 +62,35 @@ class Aio
         mraa_aio_close(m_aio);
     }
     /**
-     * Read a value from the AIO pin. By default mraa will shift
-     * the raw value up or down to a 10 bit value.
+     * Read a value from the AIO pin. By default mraa will shift the raw value
+     * up or down to a 10 bit value. -1 indicates an error
      *
+     * @throws std::logic_error if read fails
      * @returns The current input voltage. By default, a 10bit value
      */
     int
     read()
     {
-        return mraa_aio_read(m_aio);
+        int val = mraa_aio_read(m_aio);
+	if (val == -1) {
+            throw std::runtime_error("Unkown error whilst reading from ADC");
+        }
+        return val;
     }
     /**
      * Read a value from the AIO pin and return it as a normalized float.
      *
+     * @throws std::logic_error if read fails
      * @returns The current input voltage as a normalized float (0.0f-1.0f)
      */
     float
     readFloat()
     {
-        return mraa_aio_read_float(m_aio);
+        float val = mraa_aio_read_float(m_aio);
+        if (val == -1.0) {
+            throw std::runtime_error("Unkown error whilst reading from ADC");
+        }
+        return val;
     }
     /**
      * Set the bit value which mraa will shift the raw reading
