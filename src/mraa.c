@@ -44,6 +44,8 @@
 
 #if defined(IMRAA)
 #include <json-c/json.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
 #endif
 
 #include "mraa_internal.h"
@@ -148,12 +150,7 @@ imraa_init()
 
 #if defined(IMRAA)
     const char* subplatform_lockfile = "/tmp/imraa.lock";
-    if (access(subplatform_lockfile, F_OK) != -1 ){
-        uint32_t plat_n = mraa_add_from_lockfile(subplatform_lockfile);
-        syslog(LOG_INFO, "imraa: added %d platforms", plat_n);
-    } else {
-        syslog(LOG_DEBUG, "imraa: no lockfile found");
-    }
+    mraa_add_from_lockfile(subplatform_lockfile);
 #endif
 
     // Look for IIO devices
@@ -988,27 +985,30 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
 }
 
 #if defined(IMRAA)
-uint32_t
-mraa_add_from_lockfile(const char* imraa_lock_file) {
+mraa_result_t
+mraa_add_from_lockfile(const char* imraa_lock_file)
+{
+    mraa_result_t ret = MRAA_SUCCESS;
     mraa_platform_t type = plat->platform_type;
     char* buffer = NULL;
-    long fsize;
+    off_t file_size;
+    struct stat st;
     int i = 0;
     uint32_t subplat_num = 0;
-    FILE* flock = fopen(imraa_lock_file, "r");
-    if (flock == NULL) {
-        fprintf(stderr, "Failed to open lock file\n");
-        return 0;
+    int flock = open(imraa_lock_file, O_RDONLY);
+    if (flock == -1) {
+        syslog(LOG_ERR, "imraa: Failed to open lock file");
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
-    fseek(flock, 0, SEEK_END);
-    fsize = ftell(flock) + 1;
-    fseek(flock, 0, SEEK_SET);
-    buffer = (char*) calloc(fsize, sizeof(char));
-    if (buffer != NULL) {
-        int result = fread(buffer, sizeof(char), fsize, flock);
-        if (result != fsize) {
-            printf("imraa lockfile reading error");
-        }
+    if (fstat(flock, &st) != 0 || (!S_ISREG(st.st_mode))) {
+        close(flock);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    buffer = mmap(0, st.st_size, PROT_READ, MAP_SHARED, flock, 0);
+    close(flock);
+    if (buffer == MAP_FAILED) {
+        syslog(LOG_ERR, "imraa: lockfile read error");
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
     json_object* jobj_lock = json_tokener_parse(buffer);
 
@@ -1038,11 +1038,10 @@ mraa_add_from_lockfile(const char* imraa_lock_file) {
             }
         }
     } else {
-        fprintf(stderr, "lockfile string incorrectly parsed\n");
+        ret = MRAA_ERROR_INVALID_RESOURCE;
     }
     json_object_put(jobj_lock);
-    free(buffer);
-    fclose(flock);
-    return subplat_num;
+    munmap(buffer, st.st_size);
+    return ret;
 }
 #endif
