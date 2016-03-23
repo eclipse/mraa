@@ -33,6 +33,7 @@
 
 static t_firmata* firmata_dev;
 static pthread_t thread_id;
+static volatile int isr_detected;
 
 mraa_firmata_context
 mraa_firmata_init(int feature)
@@ -416,6 +417,34 @@ mraa_firmata_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 }
 
 static mraa_result_t
+mraa_firmata_gpio_edge_mode_replace(mraa_gpio_context dev, mraa_gpio_edge_t mode)
+{
+    switch (mode) {
+        case MRAA_GPIO_EDGE_BOTH:
+            return MRAA_SUCCESS;
+        default:
+            return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    }
+}
+
+static mraa_result_t
+mraa_firmata_gpio_interrupt_handler_init_replace(mraa_gpio_context dev)
+{
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_firmata_gpio_wait_interrupt_replace(mraa_gpio_context dev)
+{
+    while (!((isr_detected >> dev->pin) & 1)) {
+        usleep(100);
+    }
+    // might want to lock here?
+    isr_detected &= ~(1 << dev->pin);
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
 mraa_firmata_gpio_close_replace(mraa_gpio_context dev)
 {
     free(dev);
@@ -471,8 +500,18 @@ mraa_firmata_pwm_enable_replace(mraa_pwm_context dev, int enable)
 static void*
 mraa_firmata_pull_handler(void* vp)
 {
+    int i, isr_now, isr_prev;
+    isr_prev = 0;
     while(1) {
+        isr_now = 0;
         firmata_pull(firmata_dev);
+        // would prefer to send board pointer as argument
+        for(i = 0; i < 14; i++) {
+            isr_now |= (firmata_dev->pins[i].value & 1) << i;
+        }
+        // might want to lock here?
+        isr_detected = isr_prev ^ isr_now; //both edges for now
+        isr_prev = isr_now;
         usleep(100);
     }
 }
@@ -605,6 +644,9 @@ mraa_firmata_plat_init(const char* uart_dev)
     b->adv_func->gpio_init_internal_replace = &mraa_firmata_gpio_init_internal_replace;
     b->adv_func->gpio_mode_replace = &mraa_firmata_gpio_mode_replace;
     b->adv_func->gpio_dir_replace = &mraa_firmata_gpio_dir_replace;
+    b->adv_func->gpio_edge_mode_replace = &mraa_firmata_gpio_edge_mode_replace;
+    b->adv_func->gpio_interrupt_handler_init_replace = &mraa_firmata_gpio_interrupt_handler_init_replace;
+    b->adv_func->gpio_wait_interrupt_replace = &mraa_firmata_gpio_wait_interrupt_replace;
     b->adv_func->gpio_read_replace = &mraa_firmata_gpio_read_replace;
     b->adv_func->gpio_write_replace = &mraa_firmata_gpio_write_replace;
     b->adv_func->gpio_close_replace = &mraa_firmata_gpio_close_replace;
