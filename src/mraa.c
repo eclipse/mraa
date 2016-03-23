@@ -991,10 +991,6 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
 uint32_t
 mraa_add_from_lockfile(const char* imraa_lock_file) {
     mraa_platform_t type = plat->platform_type;
-    if( type== MRAA_NULL_PLATFORM || type == MRAA_UNKNOWN_PLATFORM) {
-        syslog(LOG_ERR, "imraa: Failed to add subplatform on null/unkown platform");
-        return -1;
-    }
     char* buffer = NULL;
     long fsize;
     int i = 0;
