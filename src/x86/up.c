@@ -1,4 +1,3 @@
-
 /*
  * Author: Dan O'Donovan <dan@emutex.com>
  * Copyright (c) 2015 Emutex Ltd.
@@ -164,14 +163,14 @@ mraa_up_board()
     // Configure i2c adaptor #0 (default)
     // (For consistency with Raspberry Pi 2, use I2C1 as our primary I2C bus)
     b->i2c_bus[0].bus_id = 1;
-    get_pin_index(b, "I2C1_SDA", &(b->i2c_bus[0].sda));
-    get_pin_index(b, "I2C1_SCL", &(b->i2c_bus[0].scl));
+    get_pin_index(b, "I2C1_SDA", (int*) &(b->i2c_bus[0].sda));
+    get_pin_index(b, "I2C1_SCL", (int*) &(b->i2c_bus[0].scl));
 
     // Configure i2c adaptor #1
     // (normally reserved for accessing HAT EEPROM)
     b->i2c_bus[1].bus_id = 0;
-    get_pin_index(b, "I2C0_SDA", &(b->i2c_bus[1].sda));
-    get_pin_index(b, "I2C0_SCL", &(b->i2c_bus[1].scl));
+    get_pin_index(b, "I2C0_SDA", (int*) &(b->i2c_bus[1].sda));
+    get_pin_index(b, "I2C0_SCL", (int*) &(b->i2c_bus[1].scl));
     b->def_i2c_bus = 0;
 
     // Configure PWM
@@ -183,18 +182,18 @@ mraa_up_board()
     b->spi_bus_count = 2;
     b->spi_bus[0].bus_id = 2;
     b->spi_bus[0].slave_s = 0;
-    get_pin_index(b, "SPI_CS0", &(b->spi_bus[0].cs));
-    get_pin_index(b, "SPI_MOSI", &(b->spi_bus[0].mosi));
-    get_pin_index(b, "SPI_MISO", &(b->spi_bus[0].miso));
-    get_pin_index(b, "SPI_CLK", &(b->spi_bus[0].sclk));
+    get_pin_index(b, "SPI_CS0", (int*) &(b->spi_bus[0].cs));
+    get_pin_index(b, "SPI_MOSI", (int*) &(b->spi_bus[0].mosi));
+    get_pin_index(b, "SPI_MISO", (int*) &(b->spi_bus[0].miso));
+    get_pin_index(b, "SPI_CLK", (int*) &(b->spi_bus[0].sclk));
     b->def_spi_bus = 0;
     // Configure SPI #0 CS1
     b->spi_bus[1].bus_id = 2;
     b->spi_bus[1].slave_s = 1;
-    get_pin_index(b, "SPI_CS1", &(b->spi_bus[1].cs));
-    get_pin_index(b, "SPI_MOSI", &(b->spi_bus[1].mosi));
-    get_pin_index(b, "SPI_MISO", &(b->spi_bus[1].miso));
-    get_pin_index(b, "SPI_CLK", &(b->spi_bus[1].sclk));
+    get_pin_index(b, "SPI_CS1", (int*) &(b->spi_bus[1].cs));
+    get_pin_index(b, "SPI_MOSI", (int*) &(b->spi_bus[1].mosi));
+    get_pin_index(b, "SPI_MISO", (int*) &(b->spi_bus[1].miso));
+    get_pin_index(b, "SPI_CLK", (int*) &(b->spi_bus[1].sclk));
 
     // Configure UART #1 (default)
     b->uart_dev_count = 2;
