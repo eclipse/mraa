@@ -97,8 +97,8 @@ list_pins()
     if (pin_count == 0) {
         fprintf(stdout, "No Pins\n");
     }
+    return pin_count;
 }
-
 
 mraa_result_t
 gpio_set(int pin, int level, mraa_boolean_t raw)
