@@ -5,6 +5,16 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**0.10.0**
+  * Add Firmata support with -DFIRMATA=ON
+  * Add imraa with support for pinmuxing and arduino101 flashing
+  * Add better support for NVM installed node via NODE_ROOT_DIR.
+  * Mraa bindings now link to libmraa.so.x
+  * mraa_init() now returns MRAA_SUCCESS if platform is already initialize
+  * Mraa java bindings now support JNI 1.6+
+  * Added support for a02082 rpi2
+  * Mraa has a logo!
+
 **0.9.6**
   * ftdi ft4222 now dynamically loaded
   * FT4222 improved ISR code
