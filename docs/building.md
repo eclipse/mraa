@@ -1,10 +1,10 @@
 Building libmraa                         {#building}
 ===============
-
 libmraa uses cmake in order to make compilation relatively painless. CMake runs
 build out of tree so the recommended way is to clone from git and make a `build/`
 directory inside the clone directory.
 
+For building imraa check [building imraa](../master/docs/imraa.md)
 ## Build dependencies
 Not all these are required but if you're unsure of what you're doing this is
 what you'll need:
