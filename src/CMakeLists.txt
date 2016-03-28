@@ -137,7 +137,7 @@ macro (mraa_CREATE_INSTALL_PKGCONFIG generated_file install_location)
   configure_file (${generated_file}.cmake ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} @ONLY)
   install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${generated_file} DESTINATION ${install_location})
 endmacro (mraa_CREATE_INSTALL_PKGCONFIG)
-mraa_create_install_pkgconfig (mraa.pc ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+mraa_create_install_pkgconfig (mraa.pc ${LIB_INSTALL_DIR}/pkgconfig)
 
 
 if (DOXYGEN_FOUND)
@@ -208,4 +208,4 @@ set_target_properties(
    SOVERSION ${mraa_VERSION_MAJOR}
    VERSION ${mraa_VERSION_STRING}
 )
-install(TARGETS mraa DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS mraa DESTINATION ${LIB_INSTALL_DIR})
