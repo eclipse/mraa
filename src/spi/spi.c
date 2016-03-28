@@ -143,10 +143,12 @@ mraa_spi_init_raw(unsigned int bus, unsigned int cs)
     }
 
     int speed = 0;
-    if ((ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) != -1) && (speed < 4000000)) {
+    if (ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) != -1) {
         dev->clock = speed;
     } else {
+        // We had this on Galileo Gen1, so let it be a fallback value
         dev->clock = 4000000;
+        syslog(LOG_WARNING, "spi: Max speed query failed, setting %d", dev->clock);
     }
 
     if (mraa_spi_mode(dev, MRAA_SPI_MODE0) != MRAA_SUCCESS) {
