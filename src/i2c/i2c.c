@@ -298,7 +298,10 @@ mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length)
     }
     d.block[0] = length;
 
-    return mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, command, I2C_SMBUS_I2C_BLOCK_DATA, &d);
+    if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, command, I2C_SMBUS_I2C_BLOCK_DATA, &d) < 0) {
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+    return MRAA_SUCCESS;
 }
 
 mraa_result_t
