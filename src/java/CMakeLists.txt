@@ -42,7 +42,7 @@ if (DOXYGEN_FOUND)
   endforeach ()
 endif ()
 
-mraa_create_install_pkgconfig (mraajava.pc ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+mraa_create_install_pkgconfig (mraajava.pc ${LIB_INSTALL_DIR}/pkgconfig)
 
-install (TARGETS mraajava LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.jar DESTINATION ${CMAKE_INSTALL_LIBDIR}/../lib/java)
+install (TARGETS mraajava LIBRARY DESTINATION ${LIB_INSTALL_DIR})
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.jar DESTINATION ${LIB_INSTALL_DIR}/../lib/java)
