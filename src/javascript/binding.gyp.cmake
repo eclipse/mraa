@@ -28,7 +28,6 @@
       ],
       'defines' : [ 'SWIG',
                     'SWIGJAVASCRIPT',
-                    'IMRAA=ON',
                     'FIRMATA=ON',
                     'BUILDING_NODE_EXTENSION=1',
                     'SWIG_V8_VERSION=0x0<(v8_version)',
