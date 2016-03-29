@@ -1,6 +1,6 @@
 prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=${prefix}
-libdir=${exec_prefix}/lib@LIB_SUFFIX@
+libdir=${exec_prefix}/@LIB_INSTALL_DIR@
 includedir=${prefix}/include
 
 Name: mraa
