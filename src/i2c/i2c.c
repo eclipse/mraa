@@ -36,7 +36,8 @@
 #include <sys/errno.h>
 #include <sys/ioctl.h>
 #include "linux/i2c-dev.h"
-
+#include <errno.h>
+#include <string.h>
 
 typedef union i2c_smbus_data_union {
     uint8_t byte;        ///< data byte
@@ -78,7 +79,7 @@ mraa_i2c_init_internal(mraa_adv_func_t* advance_func, unsigned int bus)
 
     mraa_i2c_context dev = (mraa_i2c_context) calloc(1, sizeof(struct _i2c));
     if (dev == NULL) {
-        syslog(LOG_CRIT, "i2c: Failed to allocate memory for context");
+        syslog(LOG_CRIT, "i2c%i_init: Failed to allocate memory for context", bus);
         return NULL;
     }
 
@@ -99,13 +100,13 @@ mraa_i2c_init_internal(mraa_adv_func_t* advance_func, unsigned int bus)
         char filepath[32];
         snprintf(filepath, 32, "/dev/i2c-%u", bus);
         if ((dev->fh = open(filepath, O_RDWR)) < 1) {
-            syslog(LOG_ERR, "i2c: Failed to open requested i2c port %s", filepath);
-            status = MRAA_ERROR_NO_RESOURCES;
+            syslog(LOG_ERR, "i2c%i_init: Failed to open requested i2c port %s: %s", bus, filepath, strerror(errno));
+            status = MRAA_ERROR_INVALID_RESOURCE;
             goto init_internal_cleanup;
         }
 
         if (ioctl(dev->fh, I2C_FUNCS, &dev->funcs) < 0) {
-            syslog(LOG_CRIT, "i2c: Failed to get I2C_FUNC map from device");
+            syslog(LOG_CRIT, "i2c%i_init: Failed to get I2C_FUNC map from device: %s", bus, strerror(errno));
             dev->funcs = 0;
         }
     }
@@ -133,39 +134,39 @@ mraa_i2c_init(int bus)
 {
     mraa_board_t* board = plat;
     if (board == NULL) {
-        syslog(LOG_ERR, "i2c: Platform Not Initialised");
+        syslog(LOG_ERR, "i2c%i_init: Platform Not Initialised", bus);
         return NULL;
     }
 
     if (mraa_is_sub_platform_id(bus)) {
-        syslog(LOG_NOTICE, "i2c: Using sub platform");
+        syslog(LOG_NOTICE, "i2c%i_init: Using sub platform", bus);
         board = board->sub_platform;
         if (board == NULL) {
-            syslog(LOG_ERR, "i2c: Sub platform Not Initialised");
+            syslog(LOG_ERR, "i2c%i_init: Sub platform Not Initialised", bus);
             return NULL;
         }
         bus = mraa_get_sub_platform_index(bus);
     }
-    syslog(LOG_NOTICE, "i2c: Selected bus %d", bus);
+    syslog(LOG_NOTICE, "i2c_init: Selected bus %d", bus);
 
     if (board->i2c_bus_count == 0) {
-        syslog(LOG_ERR, "No i2c buses defined in platform");
+        syslog(LOG_ERR, "i2c_init: No i2c buses defined in platform");
         return NULL;
     }
     if (bus >= board->i2c_bus_count) {
-        syslog(LOG_ERR, "Above i2c bus count");
+        syslog(LOG_ERR, "i2c_init: i2c%i over i2c bus count", bus);
         return NULL;
     }
 
     if (board->i2c_bus[bus].bus_id == -1) {
-        syslog(LOG_ERR, "Invalid i2c bus, moving to default i2c bus");
-        bus = board->def_i2c_bus;
+        syslog(LOG_ERR, "i2c%i_init: Invalid i2c bus", bus);
+        return NULL;
     }
     if (!board->no_bus_mux) {
         int pos = board->i2c_bus[bus].sda;
         if (board->pins[pos].i2c.mux_total > 0) {
             if (mraa_setup_mux_mapped(board->pins[pos].i2c) != MRAA_SUCCESS) {
-                syslog(LOG_ERR, "i2c: Failed to set-up i2c sda multiplexer");
+                syslog(LOG_ERR, "i2c%i_init: Failed to set-up i2c sda multiplexer", bus);
                 return NULL;
             }
         }
@@ -173,7 +174,7 @@ mraa_i2c_init(int bus)
         pos = board->i2c_bus[bus].scl;
         if (board->pins[pos].i2c.mux_total > 0) {
             if (mraa_setup_mux_mapped(board->pins[pos].i2c) != MRAA_SUCCESS) {
-                syslog(LOG_ERR, "i2c: Failed to set-up i2c scl multiplexer");
+                syslog(LOG_ERR, "i2c%i_init: Failed to set-up i2c scl multiplexer", bus);
                 return NULL;
             }
         }
@@ -213,44 +214,44 @@ mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
         return length;
     }
 
-    return 0;
+    return -1;
 }
 
-uint8_t
+int
 mraa_i2c_read_byte(mraa_i2c_context dev)
 {
     if (IS_FUNC_DEFINED(dev, i2c_read_byte_replace))
         return dev->advance_func->i2c_read_byte_replace(dev);
     i2c_smbus_data_t d;
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_READ, I2C_NOCMD, I2C_SMBUS_BYTE, &d) < 0) {
-        syslog(LOG_ERR, "i2c: Failed to write");
-        return 0;
+        syslog(LOG_ERR, "i2c%i: read_byte: Access error: %s", dev->busnum, strerror(errno));
+        return -1;
     }
     return 0x0FF & d.byte;
 }
 
-uint8_t
+int
 mraa_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
     if (IS_FUNC_DEFINED(dev, i2c_read_byte_data_replace))
         return dev->advance_func->i2c_read_byte_data_replace(dev, command);
     i2c_smbus_data_t d;
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_READ, command, I2C_SMBUS_BYTE_DATA, &d) < 0) {
-        syslog(LOG_ERR, "i2c: Failed to write");
-        return 0;
+       syslog(LOG_ERR, "i2c%i: read_byte_data: Access error: %s", dev->busnum, strerror(errno));
+       return -1;
     }
     return 0x0FF & d.byte;
 }
 
-uint16_t
+int
 mraa_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
     if (IS_FUNC_DEFINED(dev, i2c_read_word_data_replace))
         return dev->advance_func->i2c_read_word_data_replace(dev, command);
     i2c_smbus_data_t d;
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_READ, command, I2C_SMBUS_WORD_DATA, &d) < 0) {
-        syslog(LOG_ERR, "i2c: Failed to write");
-        return 0;
+        syslog(LOG_ERR, "i2c%i: read_word_data: Access error: %s", dev->busnum, strerror(errno));
+        return -1;
     }
     return 0xFFFF & d.word;
 }
@@ -266,16 +267,23 @@ mraa_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* data, i
     m[0].addr = dev->addr;
     m[0].flags = 0x00;
     m[0].len = 1;
-    m[0].buf = &command;
+    m[0].buf = (char*) &command;
     m[1].addr = dev->addr;
     m[1].flags = I2C_M_RD;
     m[1].len = length;
-    m[1].buf = data;
+    m[1].buf = (char*) data;
 
     d.msgs = m;
     d.nmsgs = 2;
 
-    return ioctl(dev->fh, I2C_RDWR, &d) < 0 ? -1 : length;
+    int ret = ioctl(dev->fh, I2C_RDWR, &d);
+
+    if (ret < 0)
+    {
+        syslog(LOG_ERR, "i2c%i: read_bytes_data: Access error: %s", dev->busnum, strerror(errno));
+        return -1;
+    }
+    return length;
 }
 
 mraa_result_t
@@ -299,7 +307,8 @@ mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length)
     d.block[0] = length;
 
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, command, I2C_SMBUS_I2C_BLOCK_DATA, &d) < 0) {
-        return MRAA_ERROR_INVALID_HANDLE;
+        syslog(LOG_ERR, "i2c%i: write: Access error: %s", dev->busnum, strerror(errno));
+        return MRAA_ERROR_UNSPECIFIED;
     }
     return MRAA_SUCCESS;
 }
@@ -311,8 +320,8 @@ mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data)
         return dev->advance_func->i2c_write_byte_replace(dev, data);
     } else {
         if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, data, I2C_SMBUS_BYTE, NULL) < 0) {
-            syslog(LOG_ERR, "i2c: Failed to write");
-            return MRAA_ERROR_INVALID_HANDLE;
+            syslog(LOG_ERR, "i2c%i: write_byte: Access error: %s", dev->busnum, strerror(errno));
+            return MRAA_ERROR_UNSPECIFIED;
         }
         return MRAA_SUCCESS;
     }
@@ -326,8 +335,8 @@ mraa_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t
     i2c_smbus_data_t d;
     d.byte = data;
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, command, I2C_SMBUS_BYTE_DATA, &d) < 0) {
-        syslog(LOG_ERR, "i2c: Failed to write");
-        return MRAA_ERROR_INVALID_HANDLE;
+        syslog(LOG_ERR, "i2c%i: write_byte_data: Access error: %s", dev->busnum, strerror(errno));
+        return MRAA_ERROR_UNSPECIFIED;
     }
     return MRAA_SUCCESS;
 }
@@ -340,8 +349,8 @@ mraa_i2c_write_word_data(mraa_i2c_context dev, const uint16_t data, const uint8_
     i2c_smbus_data_t d;
     d.word = data;
     if (mraa_i2c_smbus_access(dev->fh, I2C_SMBUS_WRITE, command, I2C_SMBUS_WORD_DATA, &d) < 0) {
-        syslog(LOG_ERR, "i2c: Failed to write");
-        return MRAA_ERROR_INVALID_HANDLE;
+        syslog(LOG_ERR, "i2c%i: write_word_data: Access error: %s", dev->busnum, strerror(errno));
+        return MRAA_ERROR_UNSPECIFIED;
     }
     return MRAA_SUCCESS;
 }
@@ -358,8 +367,8 @@ mraa_i2c_address(mraa_i2c_context dev, uint8_t addr)
         return dev->advance_func->i2c_address_replace(dev, addr);
     } else {
         if (ioctl(dev->fh, I2C_SLAVE_FORCE, addr) < 0) {
-            syslog(LOG_ERR, "i2c: Failed to set slave address %d", addr);
-            return MRAA_ERROR_INVALID_HANDLE;
+            syslog(LOG_ERR, "i2c%i: address: Failed to set slave address %d: %s", dev->busnum, addr, strerror(errno));
+            return MRAA_ERROR_UNSPECIFIED;
         }
         return MRAA_SUCCESS;
     }
