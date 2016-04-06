@@ -65,7 +65,7 @@ mraa_pwm_context mraa_pwm_init(int pin);
 mraa_pwm_context mraa_pwm_init_raw(int chipid, int pin);
 
 /**
- * Set the ouput duty-cycle percentage, as a float
+ * Set the output duty-cycle percentage, as a float
  *
  * @param dev The Pwm context to use
  * @param percentage A floating-point value representing percentage of output.
@@ -76,7 +76,7 @@ mraa_pwm_context mraa_pwm_init_raw(int chipid, int pin);
 mraa_result_t mraa_pwm_write(mraa_pwm_context dev, float percentage);
 
 /**
- * Read the ouput duty-cycle percentage, as a float
+ * Read the output duty-cycle percentage, as a float
  *
  * @param dev The Pwm context to use
  * @return percentage A floating-point value representing percentage of output.
