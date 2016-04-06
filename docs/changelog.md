@@ -35,7 +35,7 @@ they are listed here. Anything pre 0.2.x is ignored.
 
 **0.9.3**
   * Intel edison detection much improved
-  * ftdi ft4222 interupt improvement
+  * ftdi ft4222 interrupt improvement
   * small fixes to java lib
 
 **0.9.2**

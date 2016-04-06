@@ -59,8 +59,8 @@ struct _gpio {
     int pin; /**< the pin number, as known to the os. */
     int phy_pin; /**< pin passed to clean init. -1 none and raw*/
     int value_fp; /**< the file pointer to the value of the gpio */
-    void (* isr)(void *); /**< the interupt service request */
-    void *isr_args; /**< args return when interupt service request triggered */
+    void (* isr)(void *); /**< the interrupt service request */
+    void *isr_args; /**< args return when interrupt service request triggered */
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */
 #ifndef HAVE_PTHREAD_CANCEL
@@ -148,9 +148,9 @@ struct _iio {
     char* name; /**< IIO device name */
     int fp; /**< IIO device in /dev */
     int fp_event;  /**<  event file descriptor for IIO device */
-    void (* isr)(char* data); /**< the interupt service request */
-    void *isr_args; /**< args return when interupt service request triggered */
-    void (* isr_event)(struct iio_event_data* data, void* args); /**< the event interupt service request */
+    void (* isr)(char* data); /**< the interrupt service request */
+    void *isr_args; /**< args return when interrupt service request triggered */
+    void (* isr_event)(struct iio_event_data* data, void* args); /**< the event interrupt service request */
     int chan_num;
     pthread_t thread_id; /**< the isr handler thread id */
     mraa_iio_channel* channels;

@@ -60,13 +60,13 @@ typedef enum {
 } Dir;
 
 /**
- * Gpio Edge types for interupts
+ * Gpio Edge types for interrupts
  */
 typedef enum {
     EDGE_NONE = 0,   /**< No interrupt on Gpio */
-    EDGE_BOTH = 1,   /**< Interupt on rising & falling */
-    EDGE_RISING = 2, /**< Interupt on rising only */
-    EDGE_FALLING = 3 /**< Interupt on falling only */
+    EDGE_BOTH = 1,   /**< Interrupt on rising & falling */
+    EDGE_RISING = 2, /**< Interrupt on rising only */
+    EDGE_FALLING = 3 /**< Interrupt on falling only */
 } Edge;
 
 /**
@@ -80,7 +80,7 @@ class Gpio
 {
   public:
     /**
-     * Instanciates a Gpio object
+     * Instantiates a Gpio object
      *
      * @param pin pin number to use
      * @param owner (optional) Set pin owner, default behaviour is to 'own'
@@ -186,7 +186,7 @@ class Gpio
      * Sets a callback to be called when pin value changes
      *
      * @param mode The edge mode to set
-     * @param fptr Function pointer to function to be called when interupt is
+     * @param fptr Function pointer to function to be called when interrupt is
      * triggered
      * @param args Arguments passed to the interrupt handler (fptr)
      * @return Result of operation
@@ -198,7 +198,7 @@ class Gpio
     }
 
     /**
-     * Exits callback - this call will not kill the isr thread immediatly
+     * Exits callback - this call will not kill the isr thread immediately
      * but only when it is out of it's critical section
      *
      * @return Result of operation

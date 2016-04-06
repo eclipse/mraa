@@ -31,7 +31,7 @@ class Counter:
 
 c = Counter()
 
-# inside a python interupt you cannot use 'basic' types so you'll need to use
+# inside a python interrupt you cannot use 'basic' types so you'll need to use
 # objects
 def test(gpio):
   print("pin " + repr(gpio.getPin(True)) + " = " + repr(gpio.read()))

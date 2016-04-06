@@ -88,7 +88,7 @@ class Pwm
         return (Result) mraa_pwm_write(m_pwm, percentage);
     }
     /**
-     * Read the ouput duty-cycle percentage, as a float
+     * Read the output duty-cycle percentage, as a float
      *
      * @return A floating-point value representing percentage of
      * output. The value should lie between 0.0f (representing on 0%) and
