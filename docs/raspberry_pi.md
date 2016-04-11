@@ -17,6 +17,15 @@ Interface notes
 
 **PWM** Whilst the Raspberry Pi is meant to have 1 PWM channel this is currently not supported.
 
+**GPIO MMAP** GPIO memory mapping may be used. For example, [UPM library](https://github.com/intel-iot-devkit/upm) uses GPIO memory maping for control Chip Select `CS` pin on SPI bus. 
+As default, MRAA uses `/dev/mem` (only `root` can read-write this device), and you programs must be executed with root privilegies. 
+For security reasons, its not good idea. You can use GPIO mmap using another way. Normal user (usually, `pi`), can have full read-write privilegies for access to `/dev/gpiomem`. 
+For enabling `/dev/gpiomem` in you system, you must use bcm2835-based kernel modules, instead old bcm2708. If you use Raspbian Jessie, run `raspi-config` and: 
+* disabling spi 
+* enabling device tree
+* rebooting
+Check `/dev/gpiomem` for existing: `ls /dev | grep gpio`. Also, if needed, you can add new spi module manually `modprobe spi_bcm2835`.
+
 Pin Mapping
 -----------
 
