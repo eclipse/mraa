@@ -18,13 +18,37 @@ Interface notes
 **PWM** Whilst the Raspberry Pi is meant to have 1 PWM channel this is currently not supported.
 
 **GPIO MMAP** GPIO memory mapping may be used. For example, [UPM library](https://github.com/intel-iot-devkit/upm) uses GPIO memory maping for control Chip Select `CS` pin on SPI bus. 
-As default, MRAA uses `/dev/mem` (only `root` can read-write this device), and you programs must be executed with root privilegies. 
-For security reasons, its not good idea. You can use GPIO mmap using another way. Normal user (usually, `pi`), can have full read-write privilegies for access to `/dev/gpiomem`. 
-For enabling `/dev/gpiomem` in you system, you must use bcm2835-based kernel modules, instead old bcm2708. If you use Raspbian Jessie, run `raspi-config` and: 
-* disabling spi 
-* enabling device tree
-* rebooting
-Check `/dev/gpiomem` for existing: `ls /dev | grep gpio`. Also, if needed, you can add new spi module manually `modprobe spi_bcm2835`.
+MRRA can use two models for GPIO memory mapping:
+
+* MRAA use `/dev/gpiomem` and users from group `gpio` can read-write, without needing root privileges, but new bcm2835-based kernel modules needed
+* MRAA use `/dev/mem` root privileges required. For security reasons, run programs with root privilegies not good idea.
+
+Normal user (usually, `pi`), can have full read-write privilegies for access to `/dev/gpiomem`. 
+For enabling `/dev/gpiomem` in you system, you must use bcm2835-based kernel modules, instead old bcm2708. 
+If you use [Raspbian Jessie](https://www.raspberrypi.org/downloads/raspbian/)  upgrade system:
+
+```
+sudo apt-get update
+sudo apt-get upgrade
+```
+
+then run `sudo raspi-config` and: 
+
+* Go to Advanced options and disabling "SPI"
+* Go to Advanced options and enabling "Device Tree"
+* Click "Finish" and reboot
+
+Check `/dev/gpiomem` for exist: `ls -l /dev/gpiomem`. 
+You may need to change the permissions and ownership of `/dev/gpiomem` if they have not been correctly set up.
+```
+sudo chown root:gpio /dev/gpiomem
+sudo chmod g+rw /dev/gpiomem
+```
+
+The user (default `pi`) needs to be in the `gpio` group: `sudo usermod -aG gpio pi`.
+
+
+Also, if needed, you can add new spi module manually `sudo modprobe spi_bcm2835`.
 
 Pin Mapping
 -----------
@@ -63,7 +87,7 @@ style numbers.
 | 26          | P1-26        | SPI CS1  |
 
 
-The following pin mapping applies to the new Raspberry Pi model 2 and B+. Note that GPIO(21) is now GPIO(27)
+The following pin mapping applies to the new Raspberry Pi model 3, 2 and B+. Note that GPIO(21) is now GPIO(27)
 
 | MRAA Number | Physical Pin | Function |
 |-------------|--------------|----------|
