@@ -229,36 +229,36 @@ mraa_raspberry_pi()
     if (fh != NULL) {
         while (getline(&line, &len, fh) != -1) {
             if (strncmp(line, "Revision", 8) == 0) {
-                if (strstr(line, "0002") || strstr(line, "0003")) {
+                if (strstr(line, "0002") == 0 || strstr(line, "0003") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_B_REV_1_PINCOUNT;
-                } else if (strstr(line, "0004") || strstr(line, "0005") || strstr(line, "0006") ||
-                           strstr(line, "000d") || strstr(line, "000e") || strstr(line, "000f")) {
+                } else if (strstr(line, "0004") == 0 || strstr(line, "0005") == 0 || strstr(line, "0006") == 0 ||
+                           strstr(line, "000d") == 0 || strstr(line, "000e") == 0 || strstr(line, "000f") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_2;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_2;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_REV_2_PINCOUNT;
-                } else if (strstr(line, "0007") || strstr(line, "0008") || strstr(line, "0009")) {
+                } else if (strstr(line, "0007") == 0 || strstr(line, "0008") == 0 || strstr(line, "0009") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_A_REV_2;
                     platform_detected = PLATFORM_RASPBERRY_PI_A_REV_2;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_REV_2_PINCOUNT;
-                } else if (strstr(line, "0010")) {
+                } else if (strstr(line, "0010") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_PLUS_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_PLUS_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_PLUS_PINCOUNT;
-                } else if (strstr(line, "0011")) {
+                } else if (strstr(line, "0011") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_COMPUTE_MODULE_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_COMPUTE_MODULE_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_COMPUTE_MODULE_PINCOUNT;
-                } else if (strstr(line, "0012")) {
+                } else if (strstr(line, "0012") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_A_PLUS_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_A_PLUS_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_PLUS_PINCOUNT;
-                } else if (strstr(line, "a01041") || strstr(line, "a21041")) {
+                } else if (strstr(line, "a01041") == 0 || strstr(line, "a21041") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI2_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI2_B_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI2_B_REV_1_PINCOUNT;
-                } else if (strstr(line, "a02082") || strstr(line, "a22082")) {
+                } else if (strstr(line, "a02082") == 0 || strstr(line, "a22082") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI3_B_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI3_B_REV_1_PINCOUNT;
