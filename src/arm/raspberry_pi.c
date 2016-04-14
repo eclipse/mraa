@@ -38,6 +38,7 @@
 #define PLATFORM_NAME_RASPBERRY_PI_COMPUTE_MODULE_REV_1 "Raspberry Pi Compute Module Rev 1"
 #define PLATFORM_NAME_RASPBERRY_PI_A_PLUS_REV_1 "Raspberry Pi Model A+ Rev 1"
 #define PLATFORM_NAME_RASPBERRY_PI2_B_REV_1 "Raspberry Pi 2 Model B Rev 1"
+#define PLATFORM_NAME_RASPBERRY_PI3_B_REV_1 "Raspberry Pi 3 Model B Rev 1"
 #define PLATFORM_RASPBERRY_PI_B_REV_1 1
 #define PLATFORM_RASPBERRY_PI_A_REV_2 2
 #define PLATFORM_RASPBERRY_PI_B_REV_2 3
@@ -45,7 +46,9 @@
 #define PLATFORM_RASPBERRY_PI_COMPUTE_MODULE_REV_1 5
 #define PLATFORM_RASPBERRY_PI_A_PLUS_REV_1 6
 #define PLATFORM_RASPBERRY_PI2_B_REV_1 7
-#define MMAP_PATH "/dev/mem"
+#define PLATFORM_RASPBERRY_PI3_B_REV_1 8
+#define MMAP_PATH "/dev/gpiomem"
+#define MMAP_PATH_ROOT "/dev/mem"
 #define BCM2835_PERI_BASE 0x20000000
 #define BCM2835_GPIO_BASE (BCM2835_PERI_BASE + 0x200000)
 #define BCM2836_PERI_BASE 0x3f000000
@@ -179,12 +182,17 @@ mraa_raspberry_pi_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
     // For example only allow one thread to enter the following block
     // to prevent mmap'ing twice.
     if (mmap_reg == NULL) {
+        // Try first /dev/gpiomem (users from gpio group can do this, but BCM283X needed), 
+        // if unsuccessful then try /dev/mem (root privilegies needed)
         if ((mmap_fd = open(MMAP_PATH, O_RDWR)) < 0) {
-            syslog(LOG_ERR, "raspberry map: unable to open resource0 file");
-            return MRAA_ERROR_INVALID_HANDLE;
+            if ((mmap_fd = open(MMAP_PATH_ROOT, O_RDWR)) < 0) {
+                syslog(LOG_ERR, "raspberry map: unable to open resource0 file");
+                return MRAA_ERROR_INVALID_HANDLE;
+            }
         }
 
-        if (platform_detected == PLATFORM_RASPBERRY_PI2_B_REV_1) {
+        if (platform_detected == PLATFORM_RASPBERRY_PI2_B_REV_1 ||
+            platform_detected == PLATFORM_RASPBERRY_PI3_B_REV_1) {
             mmap_reg = (uint8_t*) mmap(NULL, BCM2836_BLOCK_SIZE, PROT_READ | PROT_WRITE,
                                        MAP_FILE | MAP_SHARED, mmap_fd, BCM2836_GPIO_BASE);
         } else {
@@ -221,35 +229,39 @@ mraa_raspberry_pi()
     if (fh != NULL) {
         while (getline(&line, &len, fh) != -1) {
             if (strncmp(line, "Revision", 8) == 0) {
-                if (strstr(line, "0002") || strstr(line, "0003")) {
+                if (strstr(line, "0002") == 0 || strstr(line, "0003") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_B_REV_1_PINCOUNT;
-                } else if (strstr(line, "0004") || strstr(line, "0005") || strstr(line, "0006") ||
-                           strstr(line, "000d") || strstr(line, "000e") || strstr(line, "000f")) {
+                } else if (strstr(line, "0004") == 0 || strstr(line, "0005") == 0 || strstr(line, "0006") == 0 ||
+                           strstr(line, "000d") == 0 || strstr(line, "000e") == 0 || strstr(line, "000f") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_2;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_2;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_REV_2_PINCOUNT;
-                } else if (strstr(line, "0007") || strstr(line, "0008") || strstr(line, "0009")) {
+                } else if (strstr(line, "0007") == 0 || strstr(line, "0008") == 0 || strstr(line, "0009") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_A_REV_2;
                     platform_detected = PLATFORM_RASPBERRY_PI_A_REV_2;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_REV_2_PINCOUNT;
-                } else if (strstr(line, "0010")) {
+                } else if (strstr(line, "0010") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_PLUS_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_PLUS_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_PLUS_PINCOUNT;
-                } else if (strstr(line, "0011")) {
+                } else if (strstr(line, "0011") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_COMPUTE_MODULE_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_COMPUTE_MODULE_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_COMPUTE_MODULE_PINCOUNT;
-                } else if (strstr(line, "0012")) {
+                } else if (strstr(line, "0012") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_A_PLUS_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_A_PLUS_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_PLUS_PINCOUNT;
-                } else if (strstr(line, "a01041") || strstr(line, "a21041") || strstr(line, "a02082")) {
+                } else if (strstr(line, "a01041") == 0 || strstr(line, "a21041") == 0) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI2_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI2_B_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI2_B_REV_1_PINCOUNT;
+                } else if (strstr(line, "a02082") == 0 || strstr(line, "a22082") == 0) {
+                    b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_B_REV_1;
+                    platform_detected = PLATFORM_RASPBERRY_PI3_B_REV_1;
+                    b->phy_pin_count = MRAA_RASPBERRY_PI3_B_REV_1_PINCOUNT;
                 } else {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
@@ -490,7 +502,8 @@ mraa_raspberry_pi()
 
     if ((platform_detected == PLATFORM_RASPBERRY_PI_A_PLUS_REV_1) ||
         (platform_detected == PLATFORM_RASPBERRY_PI_B_PLUS_REV_1) ||
-        (platform_detected == PLATFORM_RASPBERRY_PI2_B_REV_1)) {
+        (platform_detected == PLATFORM_RASPBERRY_PI2_B_REV_1) ||
+        (platform_detected == PLATFORM_RASPBERRY_PI3_B_REV_1)) {
 
         strncpy(b->pins[27].name, "ID_SD", MRAA_PIN_NAME_SIZE);
         b->pins[27].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
