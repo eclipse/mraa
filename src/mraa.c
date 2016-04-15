@@ -90,7 +90,7 @@ mraa_result_t
 imraa_init()
 {
     if (plat != NULL) {
-        return MRAA_ERROR_PLATFORM_ALREADY_INITIALISED;
+        return MRAA_SUCCESS;
     }
 
     uid_t proc_euid = geteuid();
@@ -187,7 +187,7 @@ mraa_result_t __attribute__((constructor))
 mraa_init()
 {
     if (plat != NULL) {
-        return MRAA_ERROR_PLATFORM_ALREADY_INITIALISED;
+        return MRAA_SUCCESS;
     } else {
         return imraa_init();
     }
