@@ -46,6 +46,7 @@ class UartOW
      * UartOW Constructor, takes a pin number which will map directly to the
      * linux uart number, this 'enables' the uart, nothing more
      *
+     * @throws std::invalid_argument in case of error
      * @param uart the index of the uart to use
      */
     UartOW(int uart)
@@ -61,6 +62,7 @@ class UartOW
      * UartOW Constructor, takes a string to the path of the serial
      * interface that is needed.
      *
+     * @throws std::invalid_argument in case of error
      * @param path the file path for the UART to use
      */
     UartOW(std::string path)
@@ -96,24 +98,35 @@ class UartOW
     /**
      * Read a byte from the 1-wire bus
      *
+     * @throws std::invalid_argument in case of error
      * @return the byte read
      */
     uint8_t
     readByte()
     {
-        return mraa_uart_ow_read_byte(m_uart);
+        int res = mraa_uart_ow_read_byte(m_uart);
+        if (res == -1) {
+            throw std::invalid_argument("Unknown UART_OW error");
+        }
+        return (uint8_t) res;
     }
 
     /**
      * Write a byte to a 1-wire bus
      *
      * @param byte the byte to write to the bus
+     *
+     * @throws std::invalid_argument in case of error
      * @return the byte read back during the time slot
      */
     uint8_t
     writeByte(uint8_t byte)
     {
-        return mraa_uart_ow_write_byte(m_uart, byte);
+        int res = mraa_uart_ow_write_byte(m_uart, byte);
+        if (res == -1) {
+            throw std::invalid_argument("Unknown UART_OW error");
+        }
+        return (uint8_t) res;
     }
 
     /**
@@ -122,13 +135,17 @@ class UartOW
      * and RX together with a diode, forming a loopback.
      *
      * @param bit the bit to write to the bus
+     * @throws std::invalid_argument in case of error
      * @return the bit read back during the time slot
      */
     bool
     writeBit(bool bit)
     {
-        uint8_t rv = mraa_uart_ow_bit(m_uart, (bit) ? 1 : 0);
-        return ((rv) ? true : false);
+        int res = mraa_uart_ow_bit(m_uart, (bit) ? 1 : 0);
+        if (res == -1) {
+            throw std::invalid_argument("Unknown UART_OW error");
+        }
+        return ((res) ? true : false);
     }
 
     /**

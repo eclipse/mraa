@@ -117,18 +117,18 @@ mraa_result_t mraa_uart_ow_stop(mraa_uart_ow_context dev);
  * Read a byte from the 1-wire bus
  *
  * @param dev uart_ow context
- * @return the byte read
+ * @return the byte read or -1 for error
  */
-uint8_t mraa_uart_ow_read_byte(mraa_uart_ow_context dev);
+int mraa_uart_ow_read_byte(mraa_uart_ow_context dev);
 
 /**
  * Write a byte to a 1-wire bus
  *
  * @param dev uart_ow context
  * @param byte the byte to write to the bus
- * @return the byte read back during the time slot
+ * @return the byte read back during the time slot or -1 for error
  */
-uint8_t mraa_uart_ow_write_byte(mraa_uart_ow_context dev, uint8_t byte);
+int mraa_uart_ow_write_byte(mraa_uart_ow_context dev, uint8_t byte);
 
 /**
  * Write a bit to a 1-wire bus and read a bit corresponding to the
@@ -137,9 +137,9 @@ uint8_t mraa_uart_ow_write_byte(mraa_uart_ow_context dev, uint8_t byte);
  *
  * @param dev uart_ow context
  * @param bit the bit to write to the bus
- * @return the bit read back during the time slot
+ * @return the bit read back during the time slot or -1 for error
  */
-uint8_t mraa_uart_ow_bit(mraa_uart_ow_context dev, uint8_t bit);
+int mraa_uart_ow_bit(mraa_uart_ow_context dev, uint8_t bit);
 
 /**
  * Send a reset pulse to the 1-wire bus and test for device presence

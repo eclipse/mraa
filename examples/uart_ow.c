@@ -58,8 +58,7 @@ main(int argc, char** argv)
     uint8_t count = 0;
 
     // start the search from scratch
-    uint8_t result = mraa_uart_ow_rom_search(uart, 1, id);
-
+    mraa_result_t result = mraa_uart_ow_rom_search(uart, 1, id);
     if (result == MRAA_ERROR_UART_OW_NO_DEVICES) {
         printf("No devices detected.\n");
         return 1;

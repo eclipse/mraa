@@ -47,22 +47,20 @@ static int LastFamilyDiscrepancy;
 static mraa_boolean_t LastDeviceFlag;
 
 // low-level read byte
-static unsigned char
-read_byte(mraa_uart_ow_context dev)
+static mraa_result_t
+_ow_read_byte(mraa_uart_ow_context dev, uint8_t *ch)
 {
-    unsigned char ch = 0;
-
-    while (!mraa_uart_read(dev, &ch, 1))
+    while (!mraa_uart_read(dev, (char*) ch, 1))
         ;
 
-    return ch;
+    return MRAA_SUCCESS;
 }
 
 // low-level write byte
-static void
-write_byte(mraa_uart_ow_context dev, const unsigned char ch)
+static int
+_ow_write_byte(mraa_uart_ow_context dev, const char ch)
 {
-    mraa_uart_write(dev, &ch, 1);
+    return mraa_uart_write(dev, &ch, 1);
 }
 
 // Here we setup a very simple termios with the minimum required
@@ -70,20 +68,22 @@ write_byte(mraa_uart_ow_context dev, const unsigned char ch)
 // use the low speed (9600 bd) for emitting the reset pulse, and
 // high speed (115200 bd) for actual data communications.
 //
-static void
-set_speed(mraa_uart_context dev, mraa_boolean_t speed)
+static mraa_result_t
+_ow_set_speed(mraa_uart_context dev, mraa_boolean_t speed)
 {
 
     if (!dev) {
         syslog(LOG_ERR, "uart_ow: set_speed: context is NULL");
-        return;
+        return MRAA_ERROR_INVALID_HANDLE;
     }
 
     static speed_t baud;
-    if (speed)
+    if (speed) {
         baud = B115200;
-    else
+    }
+    else {
         baud = B9600;
+    }
 
     struct termios termio = {
         .c_cflag = baud | CS8 | CLOCAL | CREAD, .c_iflag = 0, .c_oflag = 0, .c_lflag = NOFLSH, .c_cc = { 0 },
@@ -94,10 +94,10 @@ set_speed(mraa_uart_context dev, mraa_boolean_t speed)
     // TCSANOW is required
     if (tcsetattr(dev->fd, TCSANOW, &termio) < 0) {
         syslog(LOG_ERR, "uart_ow: tcsetattr() failed");
-        return;
+        return MRAA_ERROR_INVALID_RESOURCE;
     }
 
-    return;
+    return MRAA_SUCCESS;
 }
 
 // Perform the 1-Wire Search Algorithm on the 1-Wire bus using the existing
@@ -291,31 +291,38 @@ mraa_uart_ow_get_dev_path(mraa_uart_ow_context dev)
     return mraa_uart_get_dev_path(dev);
 }
 
-uint8_t
+int
 mraa_uart_ow_bit(mraa_uart_ow_context dev, uint8_t bit)
 {
     if (!dev) {
         syslog(LOG_ERR, "uart_ow: ow_bit: context is NULL");
-        return 0;
+        return -1;
     }
 
-    if (bit)
-        write_byte(dev, 0xff); /* write a 1 bit */
-    else
-        write_byte(dev, 0x00); /* write a 0 bit */
+    int ret = 0;
+    uint8_t ch;
+    if (bit) {
+        ret = _ow_write_byte(dev, 0xff); /* write a 1 bit */
+    }
+    else {
+        ret = _ow_write_byte(dev, 0x00); /* write a 0 bit */
+    }
 
     /* return the bit present on the bus (0xff is a '1', anything else
      * (typically 0xfc or 0x00) is a 0
      */
-    return (read_byte(dev) == 0xff);
+    if (_ow_read_byte(dev, &ch) == -1 || ret == -1) {
+         return -1;
+    }
+    return (ch == 0xff);
 }
 
-uint8_t
+int
 mraa_uart_ow_write_byte(mraa_uart_ow_context dev, uint8_t byte)
 {
     if (!dev) {
         syslog(LOG_ERR, "uart_ow: write_byte: context is NULL");
-        return 0;
+        return -1;
     }
 
     /* writing bytes - each bit on the byte to send corresponds to a
@@ -341,12 +348,12 @@ mraa_uart_ow_write_byte(mraa_uart_ow_context dev, uint8_t byte)
     return byte;
 }
 
-uint8_t
+int
 mraa_uart_ow_read_byte(mraa_uart_ow_context dev)
 {
     if (!dev) {
         syslog(LOG_ERR, "uart_ow: read_byte: context is NULL");
-        return 0;
+        return -1;
     }
 
     /* we read by sending 0xff, so the bus is released on the initial
@@ -379,14 +386,19 @@ mraa_uart_ow_reset(mraa_uart_ow_context dev)
      * window. If no device is present, the receive value will equal the
      * transmit value. Otherwise the receive value can vary.
      */
-    set_speed(dev, 0);
-    /* pull the data line low */
-    write_byte(dev, 0xf0);
+    if (_ow_set_speed(dev, 0) != MRAA_SUCCESS) {
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
 
-    rv = read_byte(dev);
+    /* pull the data line low */
+    _ow_write_byte(dev, 0xf0);
+
+    _ow_read_byte(dev, &rv);
 
     /* back up to high speed for normal data transmissions */
-    set_speed(dev, 1);
+    if (_ow_set_speed(dev, 1) != MRAA_SUCCESS) {
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
 
     /* shorted data line */
     if (rv == 0x00)
