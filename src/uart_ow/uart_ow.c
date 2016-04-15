@@ -40,17 +40,11 @@
 #include "uart_ow.h"
 #include "mraa_internal.h"
 
-// global search state
-static unsigned char ROM_NO[8]; /* 8 byte (64b) rom code */
-static int LastDiscrepancy;
-static int LastFamilyDiscrepancy;
-static mraa_boolean_t LastDeviceFlag;
-
 // low-level read byte
 static mraa_result_t
 _ow_read_byte(mraa_uart_ow_context dev, uint8_t *ch)
 {
-    while (!mraa_uart_read(dev, (char*) ch, 1))
+    while (!mraa_uart_read(dev->uart, (char*) ch, 1))
         ;
 
     return MRAA_SUCCESS;
@@ -60,7 +54,7 @@ _ow_read_byte(mraa_uart_ow_context dev, uint8_t *ch)
 static int
 _ow_write_byte(mraa_uart_ow_context dev, const char ch)
 {
-    return mraa_uart_write(dev, &ch, 1);
+    return mraa_uart_write(dev->uart, &ch, 1);
 }
 
 // Here we setup a very simple termios with the minimum required
@@ -69,7 +63,7 @@ _ow_write_byte(mraa_uart_ow_context dev, const char ch)
 // high speed (115200 bd) for actual data communications.
 //
 static mraa_result_t
-_ow_set_speed(mraa_uart_context dev, mraa_boolean_t speed)
+_ow_set_speed(mraa_uart_ow_context dev, mraa_boolean_t speed)
 {
 
     if (!dev) {
@@ -89,10 +83,10 @@ _ow_set_speed(mraa_uart_context dev, mraa_boolean_t speed)
         .c_cflag = baud | CS8 | CLOCAL | CREAD, .c_iflag = 0, .c_oflag = 0, .c_lflag = NOFLSH, .c_cc = { 0 },
     };
 
-    tcflush(dev->fd, TCIFLUSH);
+    tcflush(dev->uart->fd, TCIFLUSH);
 
     // TCSANOW is required
-    if (tcsetattr(dev->fd, TCSANOW, &termio) < 0) {
+    if (tcsetattr(dev->uart->fd, TCSANOW, &termio) < 0) {
         syslog(LOG_ERR, "uart_ow: tcsetattr() failed");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -121,13 +115,13 @@ _ow_search(mraa_uart_ow_context dev)
     search_result = 0;
 
     // if the last call was not the last device
-    if (!LastDeviceFlag) {
+    if (!dev->LastDeviceFlag) {
         // 1-Wire reset
         if (mraa_uart_ow_reset(dev) != MRAA_SUCCESS) {
             // reset the search
-            LastDiscrepancy = 0;
-            LastDeviceFlag = 0;
-            LastFamilyDiscrepancy = 0;
+            dev->LastDiscrepancy = 0;
+            dev->LastDeviceFlag = 0;
+            dev->LastFamilyDiscrepancy = 0;
             return 0;
         }
 
@@ -150,26 +144,26 @@ _ow_search(mraa_uart_ow_context dev)
                 else {
                     // if this discrepancy if before the Last Discrepancy
                     // on a previous next then pick the same as last time
-                    if (id_bit_number < LastDiscrepancy)
-                        search_direction = ((ROM_NO[rom_byte_number] & rom_byte_mask) > 0);
+                    if (id_bit_number < dev->LastDiscrepancy)
+                        search_direction = ((dev->ROM_NO[rom_byte_number] & rom_byte_mask) > 0);
                     else
                         // if equal to last pick 1, if not then pick 0
-                        search_direction = (id_bit_number == LastDiscrepancy);
+                        search_direction = (id_bit_number == dev->LastDiscrepancy);
                     // if 0 was picked then record its position in LastZero
                     if (search_direction == 0) {
                         last_zero = id_bit_number;
                         // check for Last discrepancy in family
                         if (last_zero < 9)
-                            LastFamilyDiscrepancy = last_zero;
+                            dev->LastFamilyDiscrepancy = last_zero;
                     }
                 }
 
                 // set or clear the bit in the ROM byte rom_byte_number
                 // with mask rom_byte_mask
                 if (search_direction == 1)
-                    ROM_NO[rom_byte_number] |= rom_byte_mask;
+                    dev->ROM_NO[rom_byte_number] |= rom_byte_mask;
                 else
-                    ROM_NO[rom_byte_number] &= ~rom_byte_mask;
+                    dev->ROM_NO[rom_byte_number] &= ~rom_byte_mask;
 
                 // serial number search direction write bit
                 mraa_uart_ow_bit(dev, search_direction);
@@ -192,21 +186,21 @@ _ow_search(mraa_uart_ow_context dev)
         if (id_bit_number >= 65) {
             // search successful so set
             // LastDiscrepancy,LastDeviceFlag,search_result
-            LastDiscrepancy = last_zero;
+            dev->LastDiscrepancy = last_zero;
 
             // check for last device
-            if (LastDiscrepancy == 0)
-                LastDeviceFlag = 1;
+            if (dev->LastDiscrepancy == 0)
+                dev->LastDeviceFlag = 1;
         }
         search_result = 1;
     }
 
     // if no device found then reset counters so next 'search' will be
     // like a first
-    if (!search_result || !ROM_NO[0]) {
-        LastDiscrepancy = 0;
-        LastDeviceFlag = 0;
-        LastFamilyDiscrepancy = 0;
+    if (!search_result || !dev->ROM_NO[0]) {
+        dev->LastDiscrepancy = 0;
+        dev->LastDeviceFlag = 0;
+        dev->LastFamilyDiscrepancy = 0;
         search_result = 0;
     }
 
@@ -222,9 +216,9 @@ static mraa_boolean_t
 _ow_first(mraa_uart_ow_context dev)
 {
     // reset the search state
-    LastDiscrepancy = 0;
-    LastDeviceFlag = 0;
-    LastFamilyDiscrepancy = 0;
+    dev->LastDiscrepancy = 0;
+    dev->LastDeviceFlag = 0;
+    dev->LastFamilyDiscrepancy = 0;
 
     return _ow_search(dev);
 }
@@ -246,13 +240,20 @@ _ow_next(mraa_uart_ow_context dev)
 mraa_uart_ow_context
 mraa_uart_ow_init(int index)
 {
-    mraa_uart_ow_context dev = mraa_uart_init(index);
-
+    mraa_uart_ow_context dev = calloc(1, sizeof(struct _mraa_uart_ow));
     if (!dev)
         return NULL;
 
+    dev->uart = mraa_uart_init(index);
+    if (!dev->uart)
+        {
+            free(dev);
+            return NULL;
+        }
+
+
     // now get the fd, and set it up for non-blocking operation
-    if (fcntl(dev->fd, F_SETFL, O_NONBLOCK) == -1) {
+    if (fcntl(dev->uart->fd, F_SETFL, O_NONBLOCK) == -1) {
         syslog(LOG_ERR, "uart_ow: failed to set non-blocking on fd");
         mraa_uart_ow_stop(dev);
         return NULL;
@@ -264,13 +265,19 @@ mraa_uart_ow_init(int index)
 mraa_uart_ow_context
 mraa_uart_ow_init_raw(const char* path)
 {
-    mraa_uart_ow_context dev = mraa_uart_init_raw(path);
-
+    mraa_uart_ow_context dev = calloc(1, sizeof(struct _mraa_uart_ow));
     if (!dev)
         return NULL;
 
+    dev->uart = mraa_uart_init_raw(path);
+    if (!dev->uart)
+        {
+            free(dev);
+            return NULL;
+        }
+
     // now get the fd, and set it up for non-blocking operation
-    if (fcntl(dev->fd, F_SETFL, O_NONBLOCK) == -1) {
+    if (fcntl(dev->uart->fd, F_SETFL, O_NONBLOCK) == -1) {
         syslog(LOG_ERR, "uart_ow: failed to set non-blocking on fd");
         mraa_uart_ow_stop(dev);
         return NULL;
@@ -282,13 +289,15 @@ mraa_uart_ow_init_raw(const char* path)
 mraa_result_t
 mraa_uart_ow_stop(mraa_uart_ow_context dev)
 {
-    return mraa_uart_stop(dev);
+    mraa_result_t rv =  mraa_uart_stop(dev->uart);
+    free(dev);
+    return rv;
 }
 
 const char*
 mraa_uart_ow_get_dev_path(mraa_uart_ow_context dev)
 {
-    return mraa_uart_get_dev_path(dev);
+    return mraa_uart_get_dev_path(dev->uart);
 }
 
 int
@@ -438,7 +447,7 @@ mraa_uart_ow_rom_search(mraa_uart_ow_context dev, mraa_boolean_t start, uint8_t*
         // found one.  Copy into id and return 1
         int i;
         for (i = 0; i < MRAA_UART_OW_ROMCODE_SIZE; i++)
-            id[i] = ROM_NO[i];
+            id[i] = dev->ROM_NO[i];
 
         return MRAA_SUCCESS;
     } else
