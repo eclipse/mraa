@@ -8,6 +8,7 @@ set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall ")
 
 # Set CMAKE_INSTALL_LIBDIR if not defined
 include(GNUInstallDirs)
+set (LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE PATH "Installation path for libraries")
 
 # Older cmake might not pick CMAKE_INSTALL_LIBDIR right
 if (CMAKE_INSTALL_LIBDIR)
