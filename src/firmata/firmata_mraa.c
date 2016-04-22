@@ -191,7 +191,7 @@ mraa_firmata_i2c_wait(int addr, int reg)
     return MRAA_SUCCESS;
 }
 
-static uint8_t
+static int
 mraa_firmata_i2c_read_byte(mraa_i2c_context dev)
 {
     if (mraa_firmata_send_i2c_read_req(dev, 1) == MRAA_SUCCESS) {
@@ -199,10 +199,10 @@ mraa_firmata_i2c_read_byte(mraa_i2c_context dev)
             return firmata_dev->i2cmsg[dev->addr][0];
         }
     }
-    return 0;
+    return -1;
 }
 
-static uint16_t
+static int
 mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
     if (mraa_firmata_send_i2c_read_reg_req(dev, command, 2) == MRAA_SUCCESS) {
@@ -215,10 +215,10 @@ mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
             data = (data << 8) & 0xFF00;
             data |= high;
 
-            return data;
+            return (int) data;
+        }
     }
-    }
-    return 0;
+    return -1;
 }
 
 static int
@@ -249,16 +249,16 @@ mraa_firmata_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
     return 0;
 }
 
-static uint8_t
+static int
 mraa_firmata_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
     if (mraa_firmata_send_i2c_read_reg_req(dev, command, 1) == MRAA_SUCCESS) {
         if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
-            return firmata_dev->i2cmsg[dev->addr][command];
+            return (int) firmata_dev->i2cmsg[dev->addr][command];
         }
     }
 
-    return 0;
+    return -1;
 }
 
 static mraa_result_t

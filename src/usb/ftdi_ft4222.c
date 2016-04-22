@@ -550,17 +550,17 @@ mraa_ftdi_ft4222_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
     return bytes_read;
 }
 
-static uint8_t
+static int
 mraa_ftdi_ft4222_i2c_read_byte(mraa_i2c_context dev)
 {
     uint8_t data;
     pthread_mutex_lock(&ft4222_lock);
     int bytes_read = mraa_ftdi_ft4222_i2c_context_read(dev, &data, 1);
     pthread_mutex_unlock(&ft4222_lock);
-    return bytes_read == 1 ? data : 0;
+    return bytes_read == 1 ? data : -1;
 }
 
-static uint8_t
+static int
 mraa_ftdi_ft4222_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
     uint8_t data;
@@ -570,10 +570,13 @@ mraa_ftdi_ft4222_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
     if  (bytesWritten == 1)
        bytes_read = mraa_ftdi_ft4222_i2c_context_read(dev, &data, 1);
     pthread_mutex_unlock(&ft4222_lock);
-    return (bytes_read == 1) ? data : 0;
+    if (bytes_read == 1) {
+        return (int) data;
+    }
+    return -1;
 }
 
-static uint16_t
+static int
 mraa_ftdi_ft4222_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
     uint8_t buf[2];
@@ -584,8 +587,10 @@ mraa_ftdi_ft4222_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
     if (bytes_written == 1)
        bytes_read = mraa_ftdi_ft4222_i2c_context_read(dev, buf, 2);
     pthread_mutex_unlock(&ft4222_lock);
-    data = (bytes_read == 2) ? *(uint16_t*)buf : 0;
-    return data;
+    if (bytes_read == 2) {
+        return (int) data;
+    }
+    return -1;
 }
 
 static int
@@ -599,7 +604,6 @@ mraa_ftdi_ft4222_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint
     pthread_mutex_unlock(&ft4222_lock);
     return bytes_read;
 }
-
 
 static mraa_result_t
 mraa_ftdi_ft4222_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWrite)
@@ -617,7 +621,6 @@ mraa_ftdi_ft4222_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
     mraa_result_t status = mraa_ftdi_ft4222_i2c_write(dev, &data, 1);
     return status;
 }
-
 
 static mraa_result_t
 mraa_ftdi_ft4222_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
