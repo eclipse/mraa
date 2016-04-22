@@ -103,12 +103,17 @@ class I2c
     /**
      * Read exactly one byte from the bus
      *
+     * @throws std::invalid_argument in case of error
      * @return char read from the bus
      */
     uint8_t
     readByte()
     {
-        return (uint8_t) mraa_i2c_read_byte(m_i2c);
+        int x = mraa_i2c_read_byte(m_i2c);
+        if (x == -1) {
+            throw std::invalid_argument("Unknown error in I2c::readByte()");
+        }
+        return (uint8_t) x;
     }
 
     /**
@@ -128,24 +133,36 @@ class I2c
      * Read byte from an i2c register
      *
      * @param reg Register to read from
+     *
+     * @throws std::invalid_argument in case of error
      * @return char read from register
      */
     uint8_t
     readReg(uint8_t reg)
     {
-        return mraa_i2c_read_byte_data(m_i2c, reg);
+        int x = mraa_i2c_read_byte_data(m_i2c, reg);
+        if (x == -1) {
+            throw std::invalid_argument("Unknown error in I2c::readReg()");
+        }
+        return (uint8_t) x;
     }
 
     /**
      * Read word from an i2c register
      *
      * @param reg Register to read from
+     *
+     * @throws std::invalid_argument in case of error
      * @return char read from register
      */
     uint16_t
     readWordReg(uint8_t reg)
     {
-        return mraa_i2c_read_word_data(m_i2c, reg);
+        int x = mraa_i2c_read_word_data(m_i2c, reg);
+	if (x == -1) {
+            throw std::invalid_argument("Unknown error in I2c::readReg()");
+        }
+        return (uint16_t) x;
     }
 
     /**
