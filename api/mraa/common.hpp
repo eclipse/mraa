@@ -303,4 +303,10 @@ addSubplatform(Platform subplatformtype, std::string uart_dev)
     return (Result) mraa_add_subplatform((mraa_platform_t) subplatformtype, uart_dev.c_str());
 }
 
+inline Result
+removeSubplatform(Platform subplatformtype)
+{
+    return (Result) mraa_remove_subplatform((mraa_platform_t) subplatformtype);
+}
+
 }

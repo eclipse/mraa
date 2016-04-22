@@ -982,6 +982,9 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
 {
 #if defined(FIRMATA)
     if (subplatformtype == MRAA_GENERIC_FIRMATA) {
+        if (plat->sub_platform != NULL) {
+            return MRAA_ERROR_INVALID_PARAMETER;
+        }
         if (mraa_firmata_platform(plat, uart_dev) == MRAA_GENERIC_FIRMATA) {
             syslog(LOG_NOTICE, "mraa: Added firmata subplatform");
             return MRAA_SUCCESS;
@@ -990,6 +993,22 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
     }
 #endif
 
+    return MRAA_ERROR_INVALID_PARAMETER;
+}
+
+mraa_result_t
+mraa_remove_subplatform(mraa_platform_t subplatformtype)
+{
+#if defined(FIRMATA)
+    if (subplatformtype == MRAA_GENERIC_FIRMATA) {
+        if (plat == NULL || plat->sub_platform == NULL) {
+            return MRAA_ERROR_INVALID_PARAMETER;
+        }
+        free(plat->sub_platform->adv_func);
+        free(plat->sub_platform->pins);
+        free(plat->sub_platform);
+    }
+#endif
     return MRAA_ERROR_INVALID_PARAMETER;
 }
 

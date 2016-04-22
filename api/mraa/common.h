@@ -284,6 +284,15 @@ int mraa_get_sub_platform_index(int pin_or_bus_id);
  */
 mraa_result_t mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev);
 
+/**
+ * Remove a mraa subplatform
+ *
+ * @param subplatform type
+ *
+ * @return mraa_result indicating success
+ */
+mraa_result_t mraa_remove_subplatform(mraa_platform_t subplatformtype);
+
 #ifdef __cplusplus
 }
 #endif
