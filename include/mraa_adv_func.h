@@ -75,7 +75,7 @@ typedef struct {
     mraa_result_t (*i2c_stop_replace) (mraa_i2c_context dev);
 
     mraa_result_t (*aio_init_internal_replace) (mraa_aio_context dev, int pin);
-    mraa_result_t (*aio_read_replace) (mraa_aio_context dev);
+    int (*aio_read_replace) (mraa_aio_context dev);
     mraa_result_t (*aio_get_valid_fp) (mraa_aio_context dev);
     mraa_result_t (*aio_init_pre) (unsigned int aio);
     mraa_result_t (*aio_init_post) (mraa_aio_context dev);

@@ -59,19 +59,20 @@ typedef struct _aio* mraa_aio_context;
 mraa_aio_context mraa_aio_init(unsigned int pin);
 
 /**
- * Read the input voltage. By default mraa will shift
- * the raw value up or down to a 10 bit value.
+ * Read the input voltage. By default mraa will shift the raw value up or down
+ * to a 10 bit value.
  *
  * @param dev The AIO context
- * @returns The current input voltage.
+ * @returns The current input voltage or -1 for error
  */
-unsigned int mraa_aio_read(mraa_aio_context dev);
+int mraa_aio_read(mraa_aio_context dev);
 
 /**
  * Read the input voltage and return it as a normalized float (0.0f-1.0f).
  *
  * @param dev The AIO context
- * @returns The current input voltage as a normalized float (0.0f-1.0f)
+ * @returns The current input voltage as a normalized float (0.0f-1.0f), error
+ * will be signaled by -1.0f
  */
 float mraa_aio_read_float(mraa_aio_context dev);
 

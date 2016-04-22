@@ -152,7 +152,7 @@ mraa_aio_init(unsigned int aio)
     return dev;
 }
 
-unsigned int
+int
 mraa_aio_read(mraa_aio_context dev)
 {
     if (IS_FUNC_DEFINED(dev, aio_read_replace)) {
@@ -165,7 +165,7 @@ mraa_aio_read(mraa_aio_context dev)
     if (dev->adc_in_fp == -1) {
         if (aio_get_valid_fp(dev) != MRAA_SUCCESS) {
             syslog(LOG_ERR, "aio: Failed to get to the device");
-            return 0;
+            return -1;
         }
     }
 
@@ -182,8 +182,10 @@ mraa_aio_read(mraa_aio_context dev)
     unsigned int analog_value = (unsigned int) strtoul(buffer, &end, 10);
     if (end == &buffer[0]) {
         syslog(LOG_ERR, "aio: Value is not a decimal number");
+        return -1;
     } else if (errno != 0) {
         syslog(LOG_ERR, "aio: Errno was set");
+        return -1;
     }
 
     if (dev->value_bit != raw_bits) {
@@ -205,7 +207,7 @@ mraa_aio_read_float(mraa_aio_context dev)
 {
     if (dev == NULL) {
         syslog(LOG_ERR, "aio: Device not valid");
-        return 0.0;
+        return -1.0;
     }
 
     float max_analog_value = (1 << dev->value_bit) - 1;

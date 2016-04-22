@@ -340,12 +340,12 @@ mraa_firmata_i2c_stop(mraa_i2c_context dev)
     return MRAA_SUCCESS;
 }
 
-static unsigned int
+static int
 mraa_firmata_aio_read(mraa_aio_context dev)
 {
     // careful, whilst you need to enable '0' for A0 you then need to read 14
     // in t_firmata because well that makes sense doesn't it...
-    return (unsigned int) firmata_dev->pins[dev->channel].value;
+    return (int) firmata_dev->pins[dev->channel].value;
 }
 
 static mraa_result_t
