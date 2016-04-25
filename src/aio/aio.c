@@ -122,14 +122,15 @@ mraa_aio_init(unsigned int aio)
         }
     }
 
+    dev->channel = board->pins[pin].aio.pinmap;
+    dev->value_bit = DEFAULT_BITS;
+
     // Create ADC device connected to specified channel
     mraa_aio_context dev = mraa_aio_init_internal(board->adv_func, aio);
     if (dev == NULL) {
         syslog(LOG_ERR, "aio: Insufficient memory for specified input channel %d", aio);
         return NULL;
     }
-    dev->channel = board->pins[pin].aio.pinmap;
-    dev->value_bit = DEFAULT_BITS;
 
     if (IS_FUNC_DEFINED(dev, aio_init_pre)) {
         mraa_result_t pre_ret = (dev->advance_func->aio_init_pre(aio));
