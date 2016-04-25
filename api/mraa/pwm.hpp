@@ -179,30 +179,6 @@ class Pwm
         return (Result) mraa_pwm_enable(m_pwm, enable);
     }
     /**
-     * Set the period and duty of a PWM object.
-     *
-     * @param period represented in ms.
-     * @param duty represnted in ms as float.
-     * @return Result of operation
-     */
-    Result
-    config_ms(int period, float duty)
-    {
-        return (Result) mraa_pwm_config_ms(m_pwm, period, duty);
-    }
-    /**
-     * Set the period and duty (percent) of a PWM object.
-     *
-     * @param period as represented in ms.
-     * @param duty percentage i.e. 50% = 0.5f
-     * @return Result of operation
-     */
-    Result
-    config_percent(int period, float duty)
-    {
-        return (Result) mraa_pwm_config_percent(m_pwm, period, duty);
-    }
-    /**
      * Get the maximum pwm period in us
      *
      * @return max pwm in us

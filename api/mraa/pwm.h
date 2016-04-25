@@ -167,26 +167,6 @@ mraa_result_t mraa_pwm_owner(mraa_pwm_context dev, mraa_boolean_t owner);
 mraa_result_t mraa_pwm_close(mraa_pwm_context dev);
 
 /**
- * Set Both Period and DutyCycle on a PWM context
- *
- * @param dev The pwm context to use
- * @param period represented in ms.
- * @param duty dutycycle of the pwm signal.
- * @return Result of operation
- */
-mraa_result_t mraa_pwm_config_ms(mraa_pwm_context dev, int period, float duty);
-
-/**
- * Set Both Period and DutyCycle on a PWM context. Duty represented as percentage.
- *
- * @param dev The pwm context to use
- * @param period represented in ms.
- * @param duty duty percantage. i.e. 50% = 0.5f
- * @return Result of operation
- */
-mraa_result_t mraa_pwm_config_percent(mraa_pwm_context dev, int period, float duty);
-
-/**
  * Get the maximum pwm period in us
  *
  * @param dev The pwm context to use
