@@ -56,7 +56,7 @@ aio_get_valid_fp(mraa_aio_context dev)
 }
 
 static mraa_aio_context
-mraa_aio_init_internal(mraa_adv_func_t* func_table, int aio)
+mraa_aio_init_internal(mraa_adv_func_t* func_table, int aio, unsigned int channel)
 {
     mraa_aio_context dev = calloc(1, sizeof(struct _aio));
     if (dev == NULL) {
@@ -71,6 +71,8 @@ mraa_aio_init_internal(mraa_adv_func_t* func_table, int aio)
         free(dev);
         return NULL;
     }
+
+    dev->channel = channel;
 
     // Open valid  analog input file and get the pointer.
     if (MRAA_SUCCESS != aio_get_valid_fp(dev)) {
@@ -122,15 +124,13 @@ mraa_aio_init(unsigned int aio)
         }
     }
 
-    dev->channel = board->pins[pin].aio.pinmap;
-    dev->value_bit = DEFAULT_BITS;
-
     // Create ADC device connected to specified channel
-    mraa_aio_context dev = mraa_aio_init_internal(board->adv_func, aio);
+    mraa_aio_context dev = mraa_aio_init_internal(board->adv_func, aio, board->pins[pin].aio.pinmap);
     if (dev == NULL) {
         syslog(LOG_ERR, "aio: Insufficient memory for specified input channel %d", aio);
         return NULL;
     }
+    dev->value_bit = DEFAULT_BITS;
 
     if (IS_FUNC_DEFINED(dev, aio_init_pre)) {
         mraa_result_t pre_ret = (dev->advance_func->aio_init_pre(aio));
