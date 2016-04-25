@@ -130,7 +130,7 @@ class Spi
      * @return data received on the miso line or -1 in case of error
      */
     int
-    write_word(uint16_t data)
+    writeWord(uint16_t data)
     {
         return mraa_spi_write_word(m_spi, (uint16_t) data);
     }
@@ -161,7 +161,7 @@ class Spi
      * @return uint8_t* data received on the miso line. Same length as passed in
      */
     uint16_t*
-    write_word(uint16_t* txBuf, int length)
+    writeWord(uint16_t* txBuf, int length)
     {
         return mraa_spi_write_buf_word(m_spi, txBuf, length);
     }
