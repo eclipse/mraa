@@ -267,7 +267,7 @@ mraa_spi_write(mraa_spi_context dev, uint8_t data)
     return (int) recv;
 }
 
-uint16_t
+int
 mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
 {
     struct spi_ioc_transfer msg;
@@ -286,7 +286,7 @@ mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
         syslog(LOG_ERR, "spi: Failed to perform dev transfer");
         return -1;
     }
-    return recv;
+    return (int) recv;
 }
 
 mraa_result_t
