@@ -159,8 +159,8 @@ mraa_i2c_init(int bus)
     }
 
     if (board->i2c_bus[bus].bus_id == -1) {
-        syslog(LOG_ERR, "i2c%i_init: Invalid i2c bus", bus);
-        return NULL;
+        syslog(LOG_ERR, "Invalid i2c bus %i, moving to default i2c bus %i", bus, board->def_i2c_bus);
+        bus = board->def_i2c_bus;
     }
     if (!board->no_bus_mux) {
         int pos = board->i2c_bus[bus].sda;
