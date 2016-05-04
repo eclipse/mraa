@@ -172,7 +172,7 @@ You can get `cpack` to generate an IPK or RPM package fairly easily if you have
 the correct packaging tools
 
 ~~~~~~~~~~~~~{.sh}
-cmake -DIPK=ON -DCMAKE_INSTAL_PREFIX=/usr ..
+cmake -DIPK=ON -DCMAKE_INSTALL_PREFIX=/usr ..
 make package
 ~~~~~~~~~~~~~
 
@@ -180,5 +180,5 @@ To use RPM simply enable the RPM option. You'll need `rpmbuild` installed on you
 build machine.
 
 ~~~~~~~~~~~~~{.sh}
-cmake -DRPM=ON -DCMAKE_INSTAL_PREFIX=/usr ..
+cmake -DRPM=ON -DCMAKE_INSTALL_PREFIX=/usr ..
 ~~~~~~~~~~~~~
