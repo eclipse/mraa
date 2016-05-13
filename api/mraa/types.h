@@ -50,6 +50,7 @@ typedef enum {
     MRAA_INTEL_SOFIA_3GR = 10,      /**< The Intel SoFIA 3GR */
     MRAA_INTEL_CHERRYHILLS = 11,     /**< The Intel Braswell Cherryhills */
     MRAA_UP = 12,                    /**< The UP Board */
+    MRAA_INTEL_GT_TUCHUCK = 13,      /**< The Intel GT Tuchuck Board */
 
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */

@@ -27,6 +27,7 @@ X86
 * [Minnowboard Max](../master/docs/minnow_max.md)
 * [NUC 5th generation](../master/docs/intel_nuc5.md)
 * [UP](../master/docs/up.md)
+* [Intel Grosse Tete](../master/docs/grossetete.md)
 
 ARM
 ---
