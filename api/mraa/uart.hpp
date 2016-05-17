@@ -76,6 +76,20 @@ class Uart
     }
 
     /**
+     * Uart Constructor, takes a pointer to the UART context and initialises
+     * the UART class
+     *
+     * @param void * to a UART context
+     */
+    Uart(void* uart_context)
+    {
+        m_uart = (mraa_uart_context) uart_context;
+
+        if (m_uart == NULL) {
+            throw std::invalid_argument("Error initialising UART");
+        }
+    }
+    /**
      * Uart destructor
      */
     ~Uart()

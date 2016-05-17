@@ -108,6 +108,19 @@ class Gpio
         }
     }
     /**
+     * Gpio Constructor, takes a pointer to the GPIO context and initialises
+     * the GPIO class
+     *
+     * @param void * to GPIO context
+     */
+    Gpio(void* gpio_context)
+    {
+        m_gpio = (mraa_gpio_context) gpio_context;
+        if (m_gpio == NULL) {
+            throw std::invalid_argument("Invalid Gpio description");
+        }
+    }
+    /**
      * Gpio object destructor, this will only unexport the gpio if we where
      * the owner
      */

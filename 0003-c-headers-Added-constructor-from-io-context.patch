@@ -1,0 +1,201 @@
+From 7251c41acca2fffb9ea050e888306ef2a2e2a13e Mon Sep 17 00:00:00 2001
+From: Houman brinjcargorabi <houman.brinjcargorabir@intel.com>
+Date: Thu, 19 May 2016 09:37:18 +0100
+Subject: [PATCH 3/4] c++ headers: Added constructor from io context
+
+Signed-off-by: Houman Brinjcargorabi <houman.brinjcargorabi@intel.com>
+---
+ api/mraa/aio.hpp    | 13 +++++++++++++
+ api/mraa/common.hpp |  5 +++--
+ api/mraa/gpio.hpp   | 13 +++++++++++++
+ api/mraa/i2c.hpp    | 12 ++++++++++++
+ api/mraa/pwm.hpp    | 14 ++++++++++++++
+ api/mraa/spi.hpp    | 14 ++++++++++++++
+ api/mraa/uart.hpp   | 14 ++++++++++++++
+ src/mraa.i          |  6 ++++++
+ 8 files changed, 89 insertions(+), 2 deletions(-)
+
+diff --git a/api/mraa/aio.hpp b/api/mraa/aio.hpp
+index acb1522..548e76b 100644
+--- a/api/mraa/aio.hpp
++++ b/api/mraa/aio.hpp
+@@ -55,6 +55,19 @@ class Aio
+         }
+     }
+     /**
++     * Aio Constructor, takes a pointer to the AIO context and initialises
++     * the AIO class
++     *
++     * @param void * to an AIO context 
++     */
++    Aio(void* aio_context)
++    {
++        m_aio = (mraa_aio_context) aio_context;
++        if (m_aio == NULL) {
++            throw std::invalid_argument("Invalid AIO pin specified - do you have an ADC?");
++        }
++    }
++    /**
+      * Aio destructor
+      */
+     ~Aio()
+diff --git a/api/mraa/common.hpp b/api/mraa/common.hpp
+index 31b7cee..d1265aa 100644
+--- a/api/mraa/common.hpp
++++ b/api/mraa/common.hpp
+@@ -316,10 +316,11 @@ removeSubplatform(Platform subplatformtype)
+  *
+  * @return void pointer to io or NULL
+  */
+-inline void* 
++template <class T>
++inline T* 
+ initIo(std::string desc)
+ {
+-    return (void*) mraa_init_io(desc.c_str());
++    return new T(mraa_init_io(desc.c_str()));
+ }
+ 
+ }
+diff --git a/api/mraa/gpio.hpp b/api/mraa/gpio.hpp
+index 4c63e20..ac3fba3 100644
+--- a/api/mraa/gpio.hpp
++++ b/api/mraa/gpio.hpp
+@@ -108,6 +108,19 @@ class Gpio
+         }
+     }
+     /**
++     * Gpio Constructor, takes a pointer to the GPIO context and initialises
++     * the GPIO class
++     *
++     * @param void * to GPIO context
++     */
++    Gpio(void* gpio_context)
++    {
++        m_gpio = (mraa_gpio_context) gpio_context;
++        if (m_gpio == NULL) {
++            throw std::invalid_argument("Invalid Gpio description");
++        }
++    }
++    /**
+      * Gpio object destructor, this will only unexport the gpio if we where
+      * the owner
+      */
+diff --git a/api/mraa/i2c.hpp b/api/mraa/i2c.hpp
+index af02c95..7188999 100644
+--- a/api/mraa/i2c.hpp
++++ b/api/mraa/i2c.hpp
+@@ -62,6 +62,18 @@ class I2c
+             throw std::invalid_argument("Invalid i2c bus");
+         }
+     }
++    /**
++     * I2C constructor, takes a pointer to a I2C context and initialises the I2C class
++     *
++     * @param void * to an I2C context
++     */
++    I2c(void* i2c_context)
++    {
++        m_i2c = (mraa_i2c_context) i2c_context;
++        if (m_i2c == NULL) {
++            throw std::invalid_argument("Invalid i2c bus");
++        }
++    }
+ 
+     /**
+      * Closes the I2c Bus used. This does not guarrantee the bus will not
+diff --git a/api/mraa/pwm.hpp b/api/mraa/pwm.hpp
+index 12967ad..773b9b2 100644
+--- a/api/mraa/pwm.hpp
++++ b/api/mraa/pwm.hpp
+@@ -66,6 +66,20 @@ class Pwm
+             mraa_pwm_owner(m_pwm, 0);
+         }
+     }
++
++    /**
++     * Pwm constructor, takes a pointer to the PWM context and
++     * initialises the class
++     *
++     * @param void * to a PWM context
++     */
++    Pwm(void* pwm_context)
++    {
++        m_pwm = (mraa_pwm_context) pwm_context;
++        if (m_pwm == NULL) {
++            throw std::invalid_argument("Error initialising PWM on pin");
++        }
++    }
+     /**
+      * Pwm destructor
+      */
+diff --git a/api/mraa/spi.hpp b/api/mraa/spi.hpp
+index f75dbfb..52361e0 100644
+--- a/api/mraa/spi.hpp
++++ b/api/mraa/spi.hpp
+@@ -80,6 +80,20 @@ class Spi
+     }
+ 
+     /**
++     * Spi Constructor, takes a pointer to a SPI context and initialises
++     * the SPI class
++     *
++     * @param void * to SPI context
++     */
++    Spi(void* spi_context)
++    {
++        m_spi = (mraa_spi_context) spi_context;
++        if (m_spi == NULL) {
++            throw std::invalid_argument("Error initialising SPI bus");
++        }
++    }
++
++    /**
+      * Closes spi bus
+      */
+     ~Spi()
+diff --git a/api/mraa/uart.hpp b/api/mraa/uart.hpp
+index 6f2843f..d6e1b7b 100644
+--- a/api/mraa/uart.hpp
++++ b/api/mraa/uart.hpp
+@@ -76,6 +76,20 @@ class Uart
+     }
+ 
+     /**
++     * Uart Constructor, takes a pointer to the UART context and initialises
++     * the UART class
++     *
++     * @param void * to a UART context
++     */
++    Uart(void* uart_context)
++    {
++        m_uart = (mraa_uart_context) uart_context;
++
++        if (m_uart == NULL) {
++            throw std::invalid_argument("Error initialising UART");
++        }
++    }
++    /**
+      * Uart destructor
+      */
+     ~Uart()
+diff --git a/src/mraa.i b/src/mraa.i
+index 5259951..a375c7c 100644
+--- a/src/mraa.i
++++ b/src/mraa.i
+@@ -41,6 +41,12 @@
+ %include "types.hpp"
+ 
+ %include "common.hpp"
++%template (initGpioDesc) mraa::initIo<mraa::Gpio>;
++%template (initAioDesc) mraa::initIo<mraa::Aio>;
++%template (initUartDesc) mraa::initIo<mraa::Uart>;
++%template (initSpiDesc) mraa::initIo<mraa::Spi>;
++%template (initI2cDesc) mraa::initIo<mraa::I2c>;
++%template (initPwmDesc) mraa::initIo<mraa::Pwm>;
+ 
+ %ignore Gpio::nop(uv_work_t* req);
+ %ignore Gpio::v8isr(uv_work_t* req);
+-- 
+2.7.4 (Apple Git-66)
+

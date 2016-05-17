@@ -62,6 +62,18 @@ class I2c
             throw std::invalid_argument("Invalid i2c bus");
         }
     }
+    /**
+     * I2C constructor, takes a pointer to a I2C context and initialises the I2C class
+     *
+     * @param void * to an I2C context
+     */
+    I2c(void* i2c_context)
+    {
+        m_i2c = (mraa_i2c_context) i2c_context;
+        if (m_i2c == NULL) {
+            throw std::invalid_argument("Invalid i2c bus");
+        }
+    }
 
     /**
      * Closes the I2c Bus used. This does not guarrantee the bus will not

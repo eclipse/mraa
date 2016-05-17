@@ -309,4 +309,22 @@ removeSubplatform(Platform subplatformtype)
     return (Result) mraa_remove_subplatform((mraa_platform_t) subplatformtype);
 }
 
+/**
+ * Create IO using a description in the format:
+ * [io]-[pin]
+ * [io]-[raw]-[pin]
+ * [io]-[raw]-[id]-[pin]
+ * [io]-[raw]-[path]
+ *
+ * @param IO description
+ *
+ * @return class T initialised using pointer to IO or NULL
+ */
+template <class T>
+inline T* 
+initIo(std::string desc)
+{
+    return new T(mraa_init_io(desc.c_str()));
+}
+
 }

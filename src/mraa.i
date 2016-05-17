@@ -41,6 +41,12 @@
 %include "types.hpp"
 
 %include "common.hpp"
+%template (gpioFromDesc) mraa::initIo<mraa::Gpio>;
+%template (aioFromDesc) mraa::initIo<mraa::Aio>;
+%template (uartFromDesc) mraa::initIo<mraa::Uart>;
+%template (spiFromDesc) mraa::initIo<mraa::Spi>;
+%template (i2cFromDesc) mraa::initIo<mraa::I2c>;
+%template (pwmFromDesc) mraa::initIo<mraa::Pwm>;
 
 %ignore Gpio::nop(uv_work_t* req);
 %ignore Gpio::v8isr(uv_work_t* req);

@@ -27,6 +27,7 @@
 extern "C" {
 #endif
 
+#include "mraa/common.h"
 #include "mraa/pwm.h"
 #include "mraa/aio.h"
 #include "mraa/gpio.h"
