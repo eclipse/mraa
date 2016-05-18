@@ -75,6 +75,8 @@ style numbers.
 
 There is also a second 8-pin connector on the Banana Pi, the pins are as follows:
 
+| MRAA Number | Physical Pin | Function  |
+|-------------|--------------|-----------|
 | 27          | P1-19        | 5V VCC    |
 | 28          | P1-20        | 3V3 VCC   |
 | 29          | P1-21        | GPIO(PH5) |
