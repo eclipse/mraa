@@ -378,7 +378,7 @@ mraa_intel_galileo_gen2()
     b->pins[2].gpio.mux[0].pincmd = PINCMD_SET_DIRECTION;
     b->pins[2].gpio.mux[0].pin = 35;
     b->pins[2].gpio.mux[0].value = MRAA_GPIO_IN;
-    b->pins[2].gpio.mux[0].pincmd = PINCMD_SET_VALUE;
+    b->pins[2].gpio.mux[1].pincmd = PINCMD_SET_VALUE;
     b->pins[2].gpio.mux[1].pin = 77;
     b->pins[2].gpio.mux[1].value = 0;
     b->pins[2].gpio.complex_cap = (mraa_pin_cap_complex_t){ 1, 1, 0, 1, 1 };
