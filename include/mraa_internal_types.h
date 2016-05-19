@@ -253,9 +253,9 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
-    unsigned int bus_id; /**< ID as exposed in the system */
-    unsigned int scl; /**< i2c SCL */
-    unsigned int sda; /**< i2c SDA */
+    int bus_id; /**< ID as exposed in the system */
+    int scl; /**< i2c SCL */
+    int sda; /**< i2c SDA */
     // mraa_drv_api_t drv_type; /**< Driver type */
     /*@}*/
 } mraa_i2c_bus_t;
@@ -268,10 +268,10 @@ typedef struct {
     unsigned int bus_id; /**< The Bus ID as exposed to the system. */
     unsigned int slave_s; /**< Slave select */
     mraa_boolean_t three_wire; /**< Is the bus only a three wire system */
-    unsigned int sclk; /**< Serial Clock */
-    unsigned int mosi; /**< Master Out, Slave In. */
-    unsigned int miso; /**< Master In, Slave Out. */
-    unsigned int cs; /**< Chip Select, used when the board is a spi slave */
+    int sclk; /**< Serial Clock */
+    int mosi; /**< Master Out, Slave In. */
+    int miso; /**< Master In, Slave Out. */
+    int cs; /**< Chip Select, used when the board is a spi slave */
     /*@}*/
 } mraa_spi_bus_t;
 
@@ -293,19 +293,19 @@ typedef struct {
 
 typedef struct _board_t {
     /*@{*/
-    unsigned int phy_pin_count; /**< The Total IO pins on board */
+    int phy_pin_count; /**< The Total IO pins on board */
     unsigned int gpio_count; /**< GPIO Count */
     unsigned int aio_count;  /**< Analog side Count */
-    unsigned int i2c_bus_count; /**< Usable i2c Count */
+    int i2c_bus_count; /**< Usable i2c Count */
     mraa_i2c_bus_t  i2c_bus[12]; /**< Array of i2c */
     unsigned int def_i2c_bus; /**< Position in array of default i2c bus */
-    unsigned int spi_bus_count; /**< Usable spi Count */
+    int spi_bus_count; /**< Usable spi Count */
     mraa_spi_bus_t spi_bus[12];       /**< Array of spi */
     unsigned int def_spi_bus; /**< Position in array of defult spi bus */
     unsigned int adc_raw; /**< ADC raw bit value */
     unsigned int adc_supported; /**< ADC supported bit value */
     unsigned int def_uart_dev; /**< Position in array of defult uart */
-    unsigned int uart_dev_count; /**< Usable spi Count */
+    int uart_dev_count; /**< Usable spi Count */
     mraa_uart_dev_t uart_dev[6]; /**< Array of UARTs */
     mraa_boolean_t no_bus_mux; /**< i2c/spi/adc/pwm/uart bus muxing setup not required */
     int pwm_default_period; /**< The default PWM period is US */

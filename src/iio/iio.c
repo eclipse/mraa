@@ -284,7 +284,7 @@ mraa_iio_write_string(mraa_iio_context dev, const char* attr_name, const char* d
     snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/%s", dev->num, attr_name);
     int fd = open(buf, O_WRONLY);
     if (fd != -1) {
-        size_t len = strlen(data);
+        int len = strlen(data);
         ssize_t status = write(fd, data, len);
         if (status == len)
              result = MRAA_SUCCESS;
