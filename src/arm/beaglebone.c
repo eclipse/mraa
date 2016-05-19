@@ -64,7 +64,6 @@ static unsigned int mmap_count = 0;
 mraa_result_t
 mraa_beaglebone_mmap_write(mraa_gpio_context dev, int value)
 {
-    volatile uint32_t* addr;
     if (value) {
         *(volatile uint32_t*) (mmap_gpio[dev->pin / 32] + AM335X_SET) = (uint32_t)(1 << (dev->pin % 32));
     } else {
@@ -185,7 +184,6 @@ mraa_beaglebone_uart_init_pre(int index)
 {
     mraa_result_t ret = MRAA_ERROR_NO_RESOURCES;
     char devpath[MAX_SIZE];
-    char overlay[MAX_SIZE];
     char* capepath = NULL;
     sprintf(devpath, "/dev/ttyO%u", index + 1);
     if (!mraa_file_exist(devpath)) {
@@ -218,7 +216,6 @@ mraa_beaglebone_spi_init_pre(int index)
 {
     mraa_result_t ret = MRAA_ERROR_NO_RESOURCES;
     char devpath[MAX_SIZE];
-    char overlay[MAX_SIZE];
     char* capepath = NULL;
     int deviceindex = 0;
 
@@ -273,7 +270,6 @@ mraa_beaglebone_i2c_init_pre(unsigned int bus)
 {
     mraa_result_t ret = MRAA_ERROR_NO_RESOURCES;
     char devpath[MAX_SIZE];
-    char overlay[MAX_SIZE];
     char* capepath = NULL;
     sprintf(devpath, "/dev/i2c-%u", plat->i2c_bus[bus].bus_id);
     if (!mraa_file_exist(devpath)) {
@@ -311,7 +307,6 @@ mraa_pwm_context
 mraa_beaglebone_pwm_init_replace(int pin)
 {
     char devpath[MAX_SIZE];
-    char overlay[MAX_SIZE];
     char* capepath = NULL;
     if (plat == NULL) {
         syslog(LOG_ERR, "pwm: Platform Not Initialised");
