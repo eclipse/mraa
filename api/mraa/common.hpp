@@ -78,7 +78,7 @@ getVersion()
  * @return The priority value set
  */
 inline int
-setPriority(const unsigned int priority)
+setPriority(const int priority)
 {
     return mraa_set_priority(priority);
 }
@@ -195,7 +195,7 @@ getI2cBusCount()
  * @return I2C adapter number in sysfs. Function will return -1 on failure
  */
 inline int
-getI2cBusId(unsigned int i2c_bus)
+getI2cBusId(int i2c_bus)
 {
     return mraa_get_i2c_bus_id(i2c_bus);
 }

@@ -217,7 +217,7 @@ mraa_deinit()
 }
 
 int
-mraa_set_priority(const unsigned int priority)
+mraa_set_priority(const int priority)
 {
     struct sched_param sched_s;
 
@@ -282,7 +282,7 @@ mraa_iio_detect()
 mraa_result_t
 mraa_setup_mux_mapped(mraa_pin_t meta)
 {
-    int mi;
+    unsigned int mi;
     mraa_result_t ret;
     mraa_gpio_context mux_i = NULL;
     int last_pin = -1;
@@ -675,7 +675,7 @@ mraa_get_i2c_bus_count()
 }
 
 int
-mraa_get_i2c_bus_id(unsigned i2c_bus)
+mraa_get_i2c_bus_id(int i2c_bus)
 {
     if (plat == NULL) {
         return -1;
