@@ -293,6 +293,19 @@ mraa_result_t mraa_add_subplatform(mraa_platform_t subplatformtype, const char* 
  */
 mraa_result_t mraa_remove_subplatform(mraa_platform_t subplatformtype);
 
+/**
+ * Create IO using a description in the format: 
+ * [io]-[pin]
+ * [io]-[raw]-[pin]
+ * [io]-[raw]-[id]-[pin]
+ * [io]-[raw]-[path]
+ *
+ * @param IO description
+ *
+ * @return void* to IO context or NULL
+ */
+void* mraa_init_io(const char* _desc);
+
 #ifdef __cplusplus
 }
 #endif

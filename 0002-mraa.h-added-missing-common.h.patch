@@ -1,0 +1,25 @@
+From 102d9d64c3be9b661bbe4f15b20fb71c005e0fd0 Mon Sep 17 00:00:00 2001
+From: Houman brinjcargorabi <houman.brinjcargorabir@intel.com>
+Date: Tue, 17 May 2016 19:41:01 +0100
+Subject: [PATCH 2/4] mraa.h: added missing common.h
+
+Signed-off-by: Houman Brinjcargorabi <houman.brinjcargorabi@intel.com>
+---
+ api/mraa.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/api/mraa.h b/api/mraa.h
+index 70fde77..89a8740 100644
+--- a/api/mraa.h
++++ b/api/mraa.h
+@@ -27,6 +27,7 @@
+ extern "C" {
+ #endif
+ 
++#include "mraa/common.h"
+ #include "mraa/pwm.h"
+ #include "mraa/aio.h"
+ #include "mraa/gpio.h"
+-- 
+2.7.4 (Apple Git-66)
+

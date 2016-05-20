@@ -80,6 +80,20 @@ class Spi
     }
 
     /**
+     * Spi Constructor, takes a pointer to a SPI context and initialises
+     * the SPI class
+     *
+     * @param void * to SPI context
+     */
+    Spi(void* spi_context)
+    {
+        m_spi = (mraa_spi_context) spi_context;
+        if (m_spi == NULL) {
+            throw std::invalid_argument("Error initialising SPI bus");
+        }
+    }
+
+    /**
      * Closes spi bus
      */
     ~Spi()

@@ -1,0 +1,204 @@
+From 7abe6fee201475f14d319236a98ef4a4ac13ee78 Mon Sep 17 00:00:00 2001
+From: Houman brinjcargorabi <houman.brinjcargorabir@intel.com>
+Date: Fri, 20 May 2016 12:00:47 +0100
+Subject: [PATCH 4/4] mraa.c: Added common function to init io from a
+ description
+
+Signed-off-by: Houman Brinjcargorabi <houman.brinjcargorabi@intel.com>
+---
+ src/mraa.c | 74 +++++++++++++++++++++++++-------------------------------------
+ src/mraa.i | 12 +++++-----
+ 2 files changed, 36 insertions(+), 50 deletions(-)
+
+diff --git a/src/mraa.c b/src/mraa.c
+index ff3b32a..6059388 100644
+--- a/src/mraa.c
++++ b/src/mraa.c
+@@ -1091,12 +1091,12 @@ mraa_to_upper(char* s)
+ }
+ 
+ unsigned int
+-mraa_atoi(char* s, int* success)
++mraa_atoi(char* intStr, int* success)
+ {
+     *success = 0;
+     char* end;
+-    unsigned long val = strtol(s, &end, 10);
+-    if(*end != '\0' || errno == ERANGE || end == s)
++    unsigned long val = strtol(intStr, &end, 10);
++    if(*end != '\0' || errno == ERANGE || end == intStr)
+     {
+         *success = 0;
+         return 0;
+@@ -1106,78 +1106,64 @@ mraa_atoi(char* s, int* success)
+ }
+ 
+ unsigned int
+-mraa_init_io_helper(char ** pStr, int* success,const char* delim){
++mraa_init_io_helper(char ** str, int* success,const char* delim){
+     char* token;
+-    token = strsep(pStr, delim);
++    token = strsep(str, delim);
+     //check to see if empty string returned
+     if(token == NULL) {
+-        success = 0;
++        *success = 0;
+         return 0;
+     }
+     return mraa_atoi(token, success);
+ }
+ 
+ void *
+-mraa_init_io(const char* _desc)
++mraa_init_io(const char* desc)
+ {
+     const char* delim = "-";
+     int length = 0, 
+-        i = 0,
+-        descLen = 0,
+-        typeLen = 0,
+         raw = 0,
+         success = 0;
+     unsigned int pin = 0,
+-                  id;
+-    char desc[256] = {0},
++                  id = 0;
++    char _desc[256] = {0},
+          type[8] = {0};
+     char* token = 0, 
+-        * end = 0, 
+-        * pStr = 0;
++        * str = 0;
+     
+-    //get length of the description
+-    descLen = strlen(_desc);
+-    //is it bigger than what we expect?
+-    //is it NULL or empty
+-    if( descLen + 1 > 255 ||  _desc == NULL || descLen == 0)
++    length = strlen(desc);
++    if( length > 255 ||  desc == NULL || length == 0) {
+         return (void*) NULL;
+-    
+-    strncpy(desc, _desc, descLen);
+-    pStr = desc;
+-    token = strsep(&pStr, delim);
+-    
+-    //check to see if it's the max possible type length
++    }
++    strncpy(_desc, desc, length);
++
++    str = _desc;
++    token = strsep(&str, delim);
+     length = strlen(token);
+-    if(length +1 > 5)
++    if(length > 4) {
+         return (void*) NULL;
++    }
+     strncpy(type, token, length);
+     mraa_to_upper(type);
+-    
+-    //check to see if its the pin number or not
+-
+-    token = strsep(&pStr, delim);
+-    //check to see if empty string returned
++    token = strsep(&str, delim);
+     if(token == NULL) {
+         return (void*) NULL;
+     }
+     pin = mraa_atoi(token,&success);
+     if(!success) {
+-        //didn't get to convert, check to see if it's the string 'RAW'
+         mraa_to_upper(token);
+-        if(strncmp(token, "RAW", 3))
++        if(strncmp(token, "RAW", 3)) {
+             return (void*) NULL;
+-        //its a raw io req
++        }
+         raw = 1;
+     }
+-
+-    //if we're not initialising a raw value we need to make sure there is no more input after the pin number
+-    if(!raw && pStr != NULL) {
++    if(!raw && str != NULL) {
+             return (void*) NULL;
+     }
+ 
+     if(strncmp(type, "GPIO", 4) == 0) {
+         if(raw) {
+-            pin = mraa_init_io_helper(&pStr, &success, delim);
++            pin = mraa_init_io_helper(&str, &success, delim);
+             if(success){
+                 return (void*)mraa_gpio_init_raw(pin);
+             }
+@@ -1188,7 +1174,7 @@ mraa_init_io(const char* _desc)
+     else if(strncmp(type, "I2C",3) == 0) {
+         if(raw)
+         {
+-            pin = mraa_init_io_helper(&pStr, &success, delim);
++            pin = mraa_init_io_helper(&str, &success, delim);
+             if(success) {
+                 return (void*) mraa_i2c_init_raw(pin);
+             } else {
+@@ -1206,11 +1192,11 @@ mraa_init_io(const char* _desc)
+     else if(strncmp(type, "PWM",3) == 0) {
+         if(raw)
+         {
+-            id = mraa_init_io_helper(&pStr, &success, delim);
++            id = mraa_init_io_helper(&str, &success, delim);
+             if(!success) {
+                 return (void*) NULL;
+             }
+-            pin = mraa_init_io_helper(&pStr, &success, delim);
++            pin = mraa_init_io_helper(&str, &success, delim);
+             if(success) {
+                 return (void*) mraa_pwm_init_raw(id,pin);
+             } else {
+@@ -1222,11 +1208,11 @@ mraa_init_io(const char* _desc)
+     else if(strncmp(type, "SPI",3) == 0) {
+         if(raw)
+         {
+-            id = mraa_init_io_helper(&pStr, &success, delim);
++            id = mraa_init_io_helper(&str, &success, delim);
+             if(!success) {
+                 return (void*) NULL;
+             }
+-            pin = mraa_init_io_helper(&pStr, &success, delim);
++            pin = mraa_init_io_helper(&str, &success, delim);
+             if(success) {
+                 return (void*) mraa_spi_init_raw(id,pin);
+             } else {
+@@ -1237,7 +1223,7 @@ mraa_init_io(const char* _desc)
+     }
+     else if(strncmp(type, "UART",4) == 0) {
+         if(raw) {
+-            return (void*) mraa_uart_init_raw(pStr);
++            return (void*) mraa_uart_init_raw(str);
+         }
+         return (void*) mraa_uart_init(pin);
+     }
+diff --git a/src/mraa.i b/src/mraa.i
+index a375c7c..cba2a20 100644
+--- a/src/mraa.i
++++ b/src/mraa.i
+@@ -41,12 +41,12 @@
+ %include "types.hpp"
+ 
+ %include "common.hpp"
+-%template (initGpioDesc) mraa::initIo<mraa::Gpio>;
+-%template (initAioDesc) mraa::initIo<mraa::Aio>;
+-%template (initUartDesc) mraa::initIo<mraa::Uart>;
+-%template (initSpiDesc) mraa::initIo<mraa::Spi>;
+-%template (initI2cDesc) mraa::initIo<mraa::I2c>;
+-%template (initPwmDesc) mraa::initIo<mraa::Pwm>;
++%template (gpioFromDesc) mraa::initIo<mraa::Gpio>;
++%template (aioFromDesc) mraa::initIo<mraa::Aio>;
++%template (uartFromDesc) mraa::initIo<mraa::Uart>;
++%template (spiFromDesc) mraa::initIo<mraa::Spi>;
++%template (i2cFromDesc) mraa::initIo<mraa::I2c>;
++%template (pwmFromDesc) mraa::initIo<mraa::Pwm>;
+ 
+ %ignore Gpio::nop(uv_work_t* req);
+ %ignore Gpio::v8isr(uv_work_t* req);
+-- 
+2.7.4 (Apple Git-66)
+

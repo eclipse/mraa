@@ -66,6 +66,20 @@ class Pwm
             mraa_pwm_owner(m_pwm, 0);
         }
     }
+
+    /**
+     * Pwm constructor, takes a pointer to the PWM context and
+     * initialises the class
+     *
+     * @param void * to a PWM context
+     */
+    Pwm(void* pwm_context)
+    {
+        m_pwm = (mraa_pwm_context) pwm_context;
+        if (m_pwm == NULL) {
+            throw std::invalid_argument("Error initialising PWM on pin");
+        }
+    }
     /**
      * Pwm destructor
      */
