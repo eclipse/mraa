@@ -40,8 +40,10 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <unistd.h>
 #include <ctype.h>
 #include <limits.h>
+
 
 #if defined(IMRAA)
 #include <json-c/json.h>
@@ -59,13 +61,14 @@
 #include "spi.h"
 #include "uart.h"
 
-
 #define IIO_DEVICE_WILDCARD "iio:device*"
+
+
 mraa_board_t* plat = NULL;
 mraa_iio_info_t* plat_iio = NULL;
 mraa_lang_func_t* lang_func = NULL;
 
-static char* platform_name = NULL;
+char* platform_name = NULL;
 static char* platform_long_name = NULL;
 
 static int num_i2c_devices = 0;
@@ -99,7 +102,9 @@ imraa_init()
     if (plat != NULL) {
         return MRAA_SUCCESS;
     }
-
+    char* env_var;
+    mraa_result_t ret;
+    mraa_platform_t platform_type = MRAA_NULL_PLATFORM;
     uid_t proc_euid = geteuid();
     struct passwd* proc_user = getpwuid(proc_euid);
 
@@ -113,19 +118,34 @@ imraa_init()
     syslog(LOG_NOTICE, "libmraa version %s initialised by user '%s' with EUID %d",
            mraa_get_version(), (proc_user != NULL) ? proc_user->pw_name : "<unknown>", proc_euid);
 
-    mraa_platform_t platform_type;
+    // Check to see if the enviroment variable has been set
+    env_var = getenv(MRAA_JSONPLAT_ENV_VAR);
+    if (env_var != NULL) {
+        // We only care about success, the init will write to syslog if things went wrong
+        switch ((ret = mraa_init_json_platform(env_var))) {
+            case MRAA_SUCCESS:
+                platform_type = plat->platform_type;
+                break;
+            default:
+                syslog(LOG_NOTICE, "libmraa was unable to initialise a platform from json");
+        }
+    }
+
+    // Not an else because if the env var didn't load what we wanted maybe we can still load something
+    if (platform_type == MRAA_NULL_PLATFORM) {
 #if defined(X86PLAT)
-    // Use runtime x86 platform detection
-    platform_type = mraa_x86_platform();
+        // Use runtime x86 platform detection
+        platform_type = mraa_x86_platform();
 #elif defined(ARMPLAT)
-    // Use runtime ARM platform detection
-    platform_type = mraa_arm_platform();
+        // Use runtime ARM platform detection
+        platform_type = mraa_arm_platform();
 #elif defined(MOCKPLAT)
-    // Use mock platform
-    platform_type = mraa_mock_platform();
+        // Use mock platform
+        platform_type = mraa_mock_platform();
 #else
 #error mraa_ARCH NOTHING
 #endif
+    }
 
     if (plat != NULL) {
         plat->platform_type = platform_type;
@@ -206,6 +226,7 @@ mraa_init()
 void
 mraa_deinit()
 {
+    int i = 0;
     if (plat != NULL) {
         if (plat->pins != NULL) {
             free(plat->pins);
@@ -217,6 +238,19 @@ mraa_deinit()
             }
             free(sub_plat);
         }
+#if defined(JSONPLAT)
+        if (plat->platform_type == MRAA_JSON_PLATFORM) {
+            // Free the platform name
+            free(plat->platform_name);
+
+            // Free the UART device path
+            for (i = 0; i < plat->uart_dev_count; i++) {
+                if (plat->uart_dev[i].device_path != NULL) {
+                    free(plat->uart_dev[i].device_path);
+                }
+            }
+        }
+#endif
         free(plat);
 
     }
@@ -1235,3 +1269,12 @@ mraa_init_io(const char* desc)
     syslog(LOG_ERR, "mraa_init_io: Invalid IO type given.");
     return NULL;
 }
+
+
+#ifndef JSONPLAT
+mraa_result_t
+mraa_init_json_platform(const char* desc)
+{
+    return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+}
+#endif

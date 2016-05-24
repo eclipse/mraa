@@ -40,6 +40,46 @@
 #define MRAA_IO_SETUP_FAILURE -2
 #define MRAA_NO_SUCH_IO -1
 
+// Json platform keys
+#define INDEX_KEY "index"
+#define NAME_KEY "name"
+#define PIN_COUNT_KEY "pin_count"
+#define GPIO_COUNT_KEY "gpio_count"
+#define AIO_COUNT_KEY "aio_count"
+#define SPI_COUNT_KEY "spi_count"
+#define I2C_COUNT_KEY "i2c_count"
+#define UART_COUNT_KEY "uart_count"
+#define PWMDEFAULT_KEY "pwmDefPeriod"
+#define PWMMAX_KEY "pwmMaxPeriod"
+#define PWMMIN_KEY "pwmMinPeriod"
+#define LABEL_KEY "label"
+#define DEFAULT_KEY "default"
+#define INVALID_KEY "invalid"
+#define SCLPIN_KEY "sclpin"
+#define SDAPIN_KEY "sdapin"
+#define CHIP_ID_KEY "chipID"
+#define RAW_PIN_KEY "rawpin"
+#define RXPIN_KEY "rx"
+#define TXPIN_KEY "tx"
+#define UART_PATH_KEY "path"
+#define CLOCK_KEY "clock"
+#define MISO_KEY "miso"
+#define MOSI_KEY "mosi"
+#define CS_KEY "chipselect"
+#define PIN_KEY "pin"
+#define IO_KEY "layout"
+#define PLATFORM_KEY "platform"
+
+// IO keys
+#define GPIO_KEY "GPIO"
+#define SPI_KEY "SPI"
+#define UART_KEY "UART"
+#define I2C_KEY "I2C"
+#define PWM_KEY "PWM"
+#define AIO_KEY "AIO"
+
+#define MRAA_JSONPLAT_ENV_VAR "MRAA_JSON_PLATFORM"
+
 #ifdef FIRMATA
 struct _firmata {
     /*@*/
