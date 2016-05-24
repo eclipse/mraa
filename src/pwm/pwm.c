@@ -340,6 +340,13 @@ mraa_pwm_write(mraa_pwm_context dev, float percentage)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
+    if (IS_FUNC_DEFINED(dev, pwm_write_pre)) {
+        if (dev->advance_func->pwm_write_pre(dev, percentage) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "mraa_pwm_write (pwm%i): pwm_write_pre failed, see syslog", dev->pin);
+            return MRAA_ERROR_UNSPECIFIED;
+        }
+    }
+
     if (dev->period == -1) {
         if (mraa_pwm_read_period(dev) <= 0)
             return MRAA_ERROR_NO_DATA_AVAILABLE;
@@ -431,6 +438,13 @@ mraa_pwm_enable(mraa_pwm_context dev, int enable)
 
     if (IS_FUNC_DEFINED(dev, pwm_enable_replace)) {
         return dev->advance_func->pwm_enable_replace(dev, enable);
+    }
+
+    if (IS_FUNC_DEFINED(dev, pwm_enable_pre)) {
+        if (dev->advance_func->pwm_enable_pre(dev, enable) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "mraa_pwm_enable (pwm%i): pwm_enable_pre failed, see syslog", dev->pin);
+            return MRAA_ERROR_UNSPECIFIED;
+        }
     }
 
     char bu[MAX_SIZE];
