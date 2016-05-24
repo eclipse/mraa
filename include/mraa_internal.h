@@ -37,6 +37,7 @@ extern "C" {
 #include "mraa_lang_func.h"
 
 extern mraa_board_t* plat;
+extern char* platform_name;
 extern mraa_iio_info_t* plat_iio;
 extern mraa_lang_func_t* lang_func;
 

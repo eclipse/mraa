@@ -327,4 +327,18 @@ initIo(std::string desc)
     return new T(mraa_init_io(desc.c_str()));
 }
 
+/**
+ * Instantiate an unknown board using a json file
+ *
+ * @param Path to the json file, relative to the folder the program
+ * was initially run in or a direct path
+ *
+ * @return Result indicating success
+ */
+inline Result
+initJsonPlatform(std::string path)
+{
+    return (Result) mraa_init_json_platform(path.c_str());
+}
+
 }
