@@ -87,7 +87,9 @@ typedef struct {
     mraa_result_t (*pwm_period_replace) (mraa_pwm_context dev, int period);
     float (*pwm_read_replace) (mraa_pwm_context dev);
     mraa_result_t (*pwm_write_replace) (mraa_pwm_context dev, float duty);
+    mraa_result_t (*pwm_write_pre) (mraa_pwm_context dev, float percentage);
     mraa_result_t (*pwm_enable_replace) (mraa_pwm_context dev, int enable);
+    mraa_result_t (*pwm_enable_pre) (mraa_pwm_context dev, int enable);
 
     mraa_result_t (*spi_init_pre) (int bus);
     mraa_result_t (*spi_init_post) (mraa_spi_context spi);

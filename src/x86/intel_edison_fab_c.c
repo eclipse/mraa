@@ -76,6 +76,9 @@ static int mmap_fd = 0;
 static int mmap_size;
 static unsigned int mmap_count = 0;
 
+// PWM 0% duty workaround state array
+static int pwm_disabled[4] = { 0 };
+
 mraa_result_t
 mraa_intel_edison_spi_lsbmode_replace(mraa_spi_context dev, mraa_boolean_t lsb)
 {
@@ -368,6 +371,30 @@ mraa_intel_edison_aio_init_post(mraa_aio_context dev)
 }
 
 mraa_result_t
+mraa_intel_edison_pwm_enable_pre(mraa_pwm_context dev, int enable) {
+    // PWM 0% duty workaround: update state array
+    // if someone first ran write(0) and then enable(1).
+    if ((pwm_disabled[dev->pin] == 1) && (enable == 1)) { pwm_disabled[dev->pin] = 0; }
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_intel_edison_pwm_write_pre(mraa_pwm_context dev, float percentage) {
+    // PWM 0% duty workaround: set the state array and enable/disable pin accordingly
+    if (percentage == 0.0f) {
+        syslog(LOG_INFO, "edison_pwm_write_pre (pwm%i): requested zero duty cycle, disabling PWM on the pin", dev->pin);
+        pwm_disabled[dev->pin] = 1;
+        return mraa_pwm_enable(dev, 0);
+    } else if (pwm_disabled[dev->pin] == 1) {
+        syslog(LOG_INFO, "edison_pwm_write_pre (pwm%i): Re-enabling the pin after setting non-zero duty", dev->pin);
+        pwm_disabled[dev->pin] = 0;
+        return mraa_pwm_enable(dev, 1);
+    }
+
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
 mraa_intel_edison_pwm_init_pre(int pin)
 {
     if (miniboard == 1) {
@@ -414,6 +441,7 @@ mraa_intel_edison_pwm_init_pre(int pin)
 mraa_result_t
 mraa_intel_edison_pwm_init_post(mraa_pwm_context pwm)
 {
+    pwm_disabled[pwm->pin] = 0;
     return mraa_gpio_write(tristate, 1);
 }
 
@@ -802,6 +830,8 @@ mraa_intel_edison_miniboard(mraa_board_t* b)
     }
     b->adv_func->gpio_init_post = &mraa_intel_edison_gpio_init_post;
     b->adv_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
+    b->adv_func->pwm_enable_pre = &mraa_intel_edison_pwm_enable_pre;
+    b->adv_func->pwm_write_pre = &mraa_intel_edison_pwm_write_pre;
     b->adv_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
     b->adv_func->i2c_set_frequency_replace = &mraa_intel_edison_i2c_freq;
     b->adv_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
@@ -1259,6 +1289,8 @@ mraa_intel_edison_fab_c()
     b->adv_func->aio_init_post = &mraa_intel_edison_aio_init_post;
     b->adv_func->pwm_init_pre = &mraa_intel_edison_pwm_init_pre;
     b->adv_func->pwm_init_post = &mraa_intel_edison_pwm_init_post;
+    b->adv_func->pwm_enable_pre = &mraa_intel_edison_pwm_enable_pre;
+    b->adv_func->pwm_write_pre = &mraa_intel_edison_pwm_write_pre;
     b->adv_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
     b->adv_func->spi_init_post = &mraa_intel_edison_spi_init_post;
     b->adv_func->gpio_mode_replace = &mraa_intel_edison_gpio_mode_replace;
