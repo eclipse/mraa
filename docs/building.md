@@ -92,10 +92,6 @@ Building doc, this will require [SPHINX](http://sphinx-doc.org) &
 [Doxygen](http://doxygen.org):
  `-DBUILDDOC=ON`
 
-Building with Python 3 (careful you need to clear CMake cache between Python
-version switches!)
- `-DBUILDPYTHON3=ON`
-
 Override build architecture (this is useful because on x86 ARM code is not
 compiled so use this flag to force the target arch)
  `-DBUILDARCH=arm`

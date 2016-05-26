@@ -36,6 +36,6 @@ if (DOXYGEN_FOUND)
       COMMENT "Building HTML documentation with Sphinx"
     )
 
-    add_dependencies (sphinx ${SWIG_MODULE_python-mraa_REAL_NAME})
+    add_dependencies (sphinx ${SWIG_MODULE_python2-mraa_REAL_NAME})
   endif ()
 endif ()
