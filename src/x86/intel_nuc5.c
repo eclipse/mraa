@@ -126,8 +126,8 @@ mraa_intel_nuc5()
         }
         b->i2c_bus_count++;
         b->i2c_bus[i].bus_id = i2c_num;
-        b->i2c_bus[i].sda = 12 + i;
-        b->i2c_bus[i].scl = 13 + i;
+        b->i2c_bus[i].sda = 12 + (i*2);
+        b->i2c_bus[i].scl = 13 + (i*2);
     }
 
     if (b->i2c_bus_count > 0) {
