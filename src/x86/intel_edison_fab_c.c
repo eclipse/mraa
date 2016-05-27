@@ -1274,8 +1274,9 @@ mraa_intel_edison_fab_c()
     }
 
     if (mraa_gpio_read_dir(tristate, &tristate_dir) != MRAA_SUCCESS) {
-       free(b->adv_func);
-       goto error;
+        free(b->pins);
+        free(b->adv_func);
+        goto error;
     }
 
     if (tristate_dir != MRAA_GPIO_OUT) {
