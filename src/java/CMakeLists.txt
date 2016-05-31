@@ -33,7 +33,7 @@ add_custom_command (TARGET mraajava
   COMMAND cmake -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/mraa
   COMMAND ${JAVAC} *.java -d ${CMAKE_CURRENT_BINARY_DIR}
   COMMAND cmake -E echo "Creating jar"
-  COMMAND ${JAR} cvf mraa.jar mraa
+  COMMAND ${JAR} cvmf manifest.txt mraa.jar mraa
 )
 
 if (DOXYGEN_FOUND)
