@@ -1132,10 +1132,13 @@ mraa_init_io(const char* desc)
     // max size is 4 + 1 for the \0 = 5 rounded to 8
     char buffer[256] = { 0 }, type[8] = { 0 };
     char *token = 0, *str = 0;
+    if (desc == NULL) {
+        return NULL;
+    }
     length = strlen(desc);
     // Check to see the length is less than or equal to 255 which means
     // byte 256 is supposed to be \0
-    if (length > 255 || desc == NULL || length == 0) {
+    if (length > 255 || length == 0) {
         return NULL;
     }
     strncpy(buffer, desc, length);
