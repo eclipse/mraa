@@ -335,19 +335,22 @@ mraa_ftdi_ft4222_detect_io_expander()
     if (mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9672_ADDR, &data, 1) == 1) {
         gpio_expander_chip = IO_EXP_PCA9672;
         return PCA9672_PINS;
-    } else if (mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9555_ADDR, &data, 1) == 1) {
-        gpio_expander_chip = IO_EXP_PCA9555;
-        uint8_t reg = PCA9555_OUTPUT_REG;
-        mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9555_ADDR, &reg, 1);
-        mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9555_ADDR, (uint8_t*)&pca9555OutputValue, 2);
-        reg = PCA9555_DIRECTION_REG;
-        mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9555_ADDR, &reg, 1);
-        mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9555_ADDR, (uint8_t*)&pca9555DirectionValue, 2);
-        return PCA9555_PINS;
     } else {
-        gpio_expander_chip = IO_EXP_NONE;
-        return 0;
+        uint8_t reg = PCA9555_INPUT_REG;
+        mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9555_ADDR, &reg, 1);
+        if (mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9555_ADDR, &data, 1) == 1) {
+            gpio_expander_chip = IO_EXP_PCA9555;
+            reg = PCA9555_OUTPUT_REG;
+            mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9555_ADDR, &reg, 1);
+            mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9555_ADDR, (uint8_t*)&pca9555OutputValue, 2);
+            reg = PCA9555_DIRECTION_REG;
+            mraa_ftdi_ft4222_i2c_write_internal(ftHandleI2c, PCA9555_ADDR, &reg, 1);
+            mraa_ftdi_ft4222_i2c_read_internal(ftHandleI2c, PCA9555_ADDR, (uint8_t*)&pca9555DirectionValue, 2);
+            return PCA9555_PINS;
+        }
     }
+    gpio_expander_chip = IO_EXP_NONE;
+    return 0;
 }
 
 
