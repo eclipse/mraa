@@ -59,6 +59,7 @@ struct _gpio {
     int pin; /**< the pin number, as known to the os. */
     int phy_pin; /**< pin passed to clean init. -1 none and raw*/
     int value_fp; /**< the file pointer to the value of the gpio */
+    char *gpio_path; /**< Custom file path format to help with compatibility */
     void (* isr)(void *); /**< the interrupt service request */
     void *isr_args; /**< args return when interrupt service request triggered */
     pthread_t thread_id; /**< the isr handler thread id */
@@ -215,7 +216,7 @@ typedef struct {
     /*@{*/
     unsigned int pinmap; /**< sysfs pin */
     unsigned int parent_id; /** parent chip id */
-    unsigned int mux_total; /** Numfer of muxes needed for operation of pin */
+    unsigned int mux_total; /** Number of muxes needed for operation of pin */
     mraa_mux_t mux[6]; /** Array holding information about mux */
     unsigned int output_enable; /** Output Enable GPIO, for level shifting */
     mraa_pin_cap_complex_t complex_cap;
@@ -304,8 +305,8 @@ typedef struct _board_t {
     unsigned int def_spi_bus; /**< Position in array of defult spi bus */
     unsigned int adc_raw; /**< ADC raw bit value */
     unsigned int adc_supported; /**< ADC supported bit value */
-    unsigned int def_uart_dev; /**< Position in array of defult uart */
-    int uart_dev_count; /**< Usable spi Count */
+    unsigned int def_uart_dev; /**< Position in array of default uart */
+    int uart_dev_count; /**< Usable UART Count */
     mraa_uart_dev_t uart_dev[6]; /**< Array of UARTs */
     mraa_boolean_t no_bus_mux; /**< i2c/spi/adc/pwm/uart bus muxing setup not required */
     int pwm_default_period; /**< The default PWM period is US */
