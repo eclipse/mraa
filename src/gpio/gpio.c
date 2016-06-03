@@ -26,6 +26,7 @@
 #include "mraa_internal.h"
 
 #include <stdlib.h>
+#include <ctype.h>
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
@@ -44,8 +45,10 @@ static mraa_result_t
 mraa_gpio_get_valfp(mraa_gpio_context dev)
 {
     char bu[MAX_SIZE];
-    sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
+
+    sprintf(bu, SYSFS_CLASS_GPIO "%s/value", dev->gpio_path);
     dev->value_fp = open(bu, O_RDWR);
+
     if (dev->value_fp == -1) {
         syslog(LOG_ERR, "gpio%i: Failed to open 'value': %s", dev->pin, strerror(errno));
         return MRAA_ERROR_INVALID_RESOURCE;
@@ -61,8 +64,12 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
         return NULL;
 
     mraa_result_t status = MRAA_SUCCESS;
+    mraa_board_t* board = plat;
+    struct stat dir_stat;
+    char pin_name[MRAA_PIN_NAME_SIZE];
+    unsigned int phy_pin;
     char bu[MAX_SIZE];
-    int length;
+    int length, i;
 
     mraa_gpio_context dev = (mraa_gpio_context) calloc(1, sizeof(struct _gpio));
     if (dev == NULL) {
@@ -72,6 +79,7 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
 
     dev->advance_func = func_table;
     dev->pin = pin;
+    dev->gpio_path = (char*) calloc(MAX_SIZE, sizeof(char));
 
     if (IS_FUNC_DEFINED(dev, gpio_init_internal_replace)) {
         status = dev->advance_func->gpio_init_internal_replace(dev, pin);
@@ -94,29 +102,51 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
 #endif
     dev->isr_thread_terminating = 0;
     dev->phy_pin = -1;
+    dev->owner = 1;
 
-    // then check to make sure the pin is exported.
-    char directory[MAX_SIZE];
-    snprintf(directory, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/", dev->pin);
-    struct stat dir;
-    if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
+    snprintf(dev->gpio_path, MAX_SIZE, "/gpio%d", dev->pin);
+    snprintf(bu, sizeof(bu), SYSFS_CLASS_GPIO "%s", dev->gpio_path);
+
+    if (stat(bu, &dir_stat) == 0 && S_ISDIR(dir_stat.st_mode)) {
         dev->owner = 0; // Not Owner
     } else {
-        int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
-        if (export == -1) {
+        // old kernel GPIO CLASS path names compatibility
+        for (i = 0; i < board->phy_pin_count; i++) {
+            if (board->pins[i].gpio.pinmap == pin) {
+                phy_pin = i;
+                break;
+            }
+        }
+
+        for (i = 0; i < MRAA_PIN_NAME_SIZE; i++)
+            pin_name[i] = tolower(board->pins[phy_pin].name[i]);
+
+        snprintf(dev->gpio_path, MAX_SIZE, "/gpio%d_%s", dev->pin, pin_name);
+        snprintf(bu, sizeof(bu), SYSFS_CLASS_GPIO "%s", dev->gpio_path);
+
+        if (stat(bu, &dir_stat) == 0 && S_ISDIR(dir_stat.st_mode))
+            dev->owner = 0; // Not Owner
+    }
+
+    if (dev->owner == 1) {
+        int export_fd = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
+
+        if (export_fd == -1) {
             syslog(LOG_ERR, "gpio%i: init: Failed to open 'export' for writing: %s", pin, strerror(errno));
             status = MRAA_ERROR_INVALID_RESOURCE;
             goto init_internal_cleanup;
         }
+
         length = snprintf(bu, sizeof(bu), "%d", dev->pin);
-        if (write(export, bu, length * sizeof(char)) == -1) {
+
+        if (write(export_fd, bu, length * sizeof(char)) == -1) {
             syslog(LOG_ERR, "gpio%i: init: Failed to write to 'export': %s", pin, strerror(errno));
-            close(export);
+            close(export_fd);
             status = MRAA_ERROR_INVALID_RESOURCE;
             goto init_internal_cleanup;
         }
-        dev->owner = 1;
-        close(export);
+
+        close(export_fd);
     }
 
 init_internal_cleanup:
@@ -248,7 +278,7 @@ mraa_gpio_interrupt_handler(void* arg)
     } else {
         // open gpio value with open(3)
         char bu[MAX_SIZE];
-        sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
+        sprintf(bu, SYSFS_CLASS_GPIO "%s/value", dev->gpio_path);
         fp = open(bu, O_RDONLY);
         if (fp < 0) {
             syslog(LOG_ERR, "gpio%i: interrupt_handler: failed to open 'value' : %s", dev->pin, strerror(errno));
@@ -337,7 +367,7 @@ mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode)
     }
 
     char filepath[MAX_SIZE];
-    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/edge", dev->pin);
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "%s/edge", dev->gpio_path);
 
     int edge = open(filepath, O_RDWR);
     if (edge == -1) {
@@ -479,7 +509,7 @@ mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
     }
 
     char filepath[MAX_SIZE];
-    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/drive", dev->pin);
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "%s/drive", dev->gpio_path);
 
     int drive = open(filepath, O_WRONLY);
     if (drive == -1) {
@@ -542,7 +572,7 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
         dev->value_fp = -1;
     }
     char filepath[MAX_SIZE];
-    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/direction", dev->pin);
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "%s/direction", dev->gpio_path);
 
     int direction = open(filepath, O_RDWR);
 
@@ -605,7 +635,7 @@ mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/direction", dev->pin);
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "%s/direction", dev->gpio_path);
     fd = open(filepath, O_RDONLY);
     if (fd == -1) {
         syslog(LOG_ERR, "gpio%i: read_dir: Failed to open 'direction' for reading: %s", dev->pin, strerror(errno));
