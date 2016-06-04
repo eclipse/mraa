@@ -332,7 +332,7 @@ typedef struct {
     unsigned int index; /**< ID as exposed in the system */
     int rx; /**< uart rx */
     int tx; /**< uart tx */
-    const char* device_path; /**< To store "/dev/ttyS1" for example */
+    char* device_path; /**< To store "/dev/ttyS1" for example */
     /*@}*/
 } mraa_uart_dev_t;
 
@@ -343,8 +343,8 @@ typedef struct {
 typedef struct _board_t {
     /*@{*/
     int phy_pin_count; /**< The Total IO pins on board */
-    unsigned int gpio_count; /**< GPIO Count */
-    unsigned int aio_count;  /**< Analog side Count */
+    int gpio_count; /**< GPIO Count */
+    int aio_count;  /**< Analog side Count */
     int i2c_bus_count; /**< Usable i2c Count */
     mraa_i2c_bus_t  i2c_bus[12]; /**< Array of i2c */
     unsigned int def_i2c_bus; /**< Position in array of default i2c bus */
@@ -361,7 +361,7 @@ typedef struct _board_t {
     int pwm_max_period; /**< Maximum period in us */
     int pwm_min_period; /**< Minimum period in us */
     mraa_platform_t platform_type; /**< Platform type */
-    const char* platform_name; /**< Platform Name pointer */
+    char* platform_name; /**< Platform Name pointer */
     const char* platform_version; /**< Platform versioning info */
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
     mraa_adv_func_t* adv_func;    /**< Pointer to advanced function disptach table */
