@@ -1037,6 +1037,19 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
         syslog(LOG_NOTICE, "mraa: Failed to add firmata subplatform");
     }
 #endif
+#if defined(FIRMATABLE)
+    //by name & by address - two types
+    if (subplatformtype == MRAA_BLE_FIRMATA) {
+        if (plat->sub_platform != NULL) {
+            return MRAA_ERROR_INVALID_PARAMETER;
+        }
+        if (mraa_firmata_platform(plat, uart_dev) == MRAA_BLE_FIRMATA) {
+            syslog(LOG_NOTICE, "mraa: Added firmata subplatform");
+            return MRAA_SUCCESS;
+        }
+        syslog(LOG_NOTICE, "mraa: Failed to add firmata subplatform");
+    }
+#endif
 
     return MRAA_ERROR_INVALID_PARAMETER;
 }
