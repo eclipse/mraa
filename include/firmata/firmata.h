@@ -25,6 +25,7 @@
 #pragma once
 
 #include "uart.h"
+#include "littleb.h"
 
 #define MODE_INPUT 0x00
 #define MODE_OUTPUT 0x01
@@ -90,6 +91,7 @@ typedef struct s_pin {
 
 typedef struct s_firmata {
     mraa_uart_context uart;
+    lb_context* lb_ctx;
     t_pin pins[128];
     int i2cmsg[256][256];
     int parse_command_len;
@@ -102,6 +104,7 @@ typedef struct s_firmata {
 } t_firmata;
 
 t_firmata* firmata_new(const char* name);
+t_firmata* firmata_ble_new(const char* name);
 void firmata_initPins(t_firmata* firmata);
 int firmata_askFirmware(t_firmata* firmata);
 int firmata_pinMode(t_firmata* firmata, int pin, int mode);

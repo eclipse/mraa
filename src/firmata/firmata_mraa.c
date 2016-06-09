@@ -35,6 +35,16 @@ static t_firmata* firmata_dev;
 static pthread_t thread_id;
 static volatile int isr_detected;
 
+static inline
+mraa_result_t
+mraa_firmata_write_internal()
+{
+    //if (ble)
+    //    blah
+    //blah
+    return MRAA_SUCCESS;
+}
+
 mraa_firmata_context
 mraa_firmata_init(int feature)
 {
@@ -524,6 +534,7 @@ mraa_firmata_plat_init(const char* uart_dev)
         return NULL;
     }
 
+    firmata_ble_new("FIRMATA");
     firmata_dev = firmata_new(uart_dev);
     if (firmata_dev == NULL) {
         syslog(LOG_WARNING, "firmata: Failed to open uart to Firmata dev on %s", uart_dev);

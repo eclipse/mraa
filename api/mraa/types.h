@@ -56,6 +56,7 @@ typedef enum {
 
     // contains bit 9 so is subplatform
     MRAA_GENERIC_FIRMATA = 1280,    /**< Firmata uart platform/bridge */
+    MRAA_BLE_FIRMATA = 1281,        /**< Firmata ble platform */
 
     MRAA_NULL_PLATFORM = 98,        /**< Platform with no capabilities that hosts a sub platform  */
     MRAA_UNKNOWN_PLATFORM =

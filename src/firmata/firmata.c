@@ -23,6 +23,7 @@
  */
 
 #include "firmata/firmata.h"
+#include "firmata/firmata_ble.h"
 #include "mraa_internal.h"
 
 #include <string.h>
@@ -52,6 +53,33 @@ firmata_new(const char* name)
     if (mraa_uart_set_baudrate(res->uart, 57600) != MRAA_SUCCESS) {
         syslog(LOG_WARNING, "firmata: Failed to set correct baud rate on %s", name);
     }
+
+    firmata_askFirmware(res);
+    syslog(LOG_INFO, "firmata: Device opened at: %s", name);
+
+    return res;
+}
+
+t_firmata*
+firmata_ble_new(const char* name)
+{
+    t_firmata* res;
+    mraa_result_t ble_res = MRAA_ERROR_UNSPECIFIED;
+
+    res = calloc(1, sizeof(t_firmata));
+    if (!res) {
+        return NULL;
+    }
+
+    ble_res = mraa_firmata_ble_init();
+    res->lb_ctx = dl_lb_context_new();
+    if (res->uart == NULL) {
+        syslog(LOG_ERR, "firmata: UART failed to setup");
+        free(res);
+        return  NULL;
+    }
+
+    firmata_initPins(res);
 
     firmata_askFirmware(res);
     syslog(LOG_INFO, "firmata: Device opened at: %s", name);
