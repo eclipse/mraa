@@ -80,7 +80,7 @@ mraa_firmata_ble_init()
     dl_lb_parse_uart_service_message = mraa_firmata_ble_dlsym("lb_parse_uart_service_message");
 
     if (!liblittleb_load_success) {
-        syslog(LOG_ERR, "Failed to find all symbols for FTDI4222 support");
+        syslog(LOG_ERR, "Failed to find all symbols for littleb support");
         goto init_exit;
     }
 

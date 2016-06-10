@@ -30,7 +30,7 @@ extern "C" {
 
 #include "mraa_internal.h"
 
-mraa_platform_t mraa_firmata_platform(mraa_board_t* board, const char* uart_dev);
+mraa_platform_t mraa_firmata_platform(mraa_board_t* board, const char* uart_dev, mraa_platform_t type);
 
 
 #ifdef __cplusplus

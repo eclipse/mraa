@@ -31,6 +31,8 @@ extern "C" {
 #include "mraa_internal.h"
 #include "littleb.h"
 
+void* liblittleb_lib;
+
 lb_result_t (*dl_lb_init)();
 lb_result_t (*dl_lb_destroy)();
 lb_context* (*dl_lb_context_new)();
@@ -54,7 +56,7 @@ lb_result_t (*dl_lb_register_characteristic_read_event)(lb_context*,bl_device*, 
 lb_result_t (*dl_lb_parse_uart_service_message)(sd_bus_message*, const void**, size_t*);
 
 mraa_result_t mraa_firmata_ble_init();
-void* liblittleb_lib;
+
 
 #ifdef __cplusplus
 }
