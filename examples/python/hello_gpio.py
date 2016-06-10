@@ -25,7 +25,7 @@
 import mraa
 
 print (mraa.getVersion())
-mraa.addSubplatform(mraa.BLE_FIRMATA, "FIRMATA")
+mraa.addSubplatform(mraa.BLE_FIRMATA_BY_NAME, "FIRMATA")
 x = mraa.Gpio(13 + 512)
 x.dir(mraa.DIR_OUT)
 for i in range(100):
