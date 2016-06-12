@@ -23,11 +23,15 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import mraa
+import time
 
 print (mraa.getVersion())
 mraa.addSubplatform(mraa.BLE_FIRMATA_BY_NAME, "FIRMATA")
 x = mraa.Gpio(13 + 512)
 x.dir(mraa.DIR_OUT)
-for i in range(100):
+print "Blinking"
+for i in range(10):
 	x.write(1)
+	time.sleep(0)	
 	x.write(0)
+	time.sleep(1)

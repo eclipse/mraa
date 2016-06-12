@@ -555,7 +555,9 @@ mraa_firmata_plat_init(const char* uart_dev, mraa_platform_t type)
 	    return NULL;
     }
 
-    pthread_create(&thread_id, NULL, mraa_firmata_pull_handler, NULL);
+    if (!(type == MRAA_BLE_FIRMATA_BY_NAME || type == MRAA_BLE_FIRMATA_BY_ADDRESS)) {
+        pthread_create(&thread_id, NULL, mraa_firmata_pull_handler, NULL);
+    }
 
     b->platform_name = "firmata";
     // do we support 2.5? Or are we more 2.3?
