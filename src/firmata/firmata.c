@@ -31,7 +31,7 @@
 #include <stdio.h>
 
 static int
-test_callback(sd_bus_message* message, void* userdata, sd_bus_error* error)
+firmata_uart_read_handler(sd_bus_message* message, void* userdata, sd_bus_error* error)
 {
 
     int r, i;
@@ -39,22 +39,13 @@ test_callback(sd_bus_message* message, void* userdata, sd_bus_error* error)
     uint8_t* result = NULL;
     t_firmata* firmata = (t_firmata*) userdata;
 
-
-    printf("callback called\n");
-
     r = dl_lb_parse_uart_service_message(message, (const void**) &result, &size);
     if (r < 0) {
         fprintf(stderr, "ERROR: couldn't parse uart message\n");
         return LB_ERROR_UNSPECIFIED;
     }
 
-    printf("message is:\n");
-    for (i = 0; i < size; i++) {
-        printf("%x ", result[i]);
-    }
-    printf("\n");
-
-    //firmata_parse(firmata, result, size);
+    firmata_parse(firmata, result, size);
     
     return LB_SUCCESS;
 }
@@ -183,7 +174,7 @@ firmata_ble_new(const char* name, mraa_platform_t type)
     }
 
     ble_res = dl_lb_register_characteristic_read_event(res->lb_ctx, res->bl_dev,
-                                              "6e400003-b5a3-f393-e0a9-e50e24dcca9e", test_callback, res);
+                                              "6e400003-b5a3-f393-e0a9-e50e24dcca9e", firmata_uart_read_handler, res);
     if (ble_res < 0) {
         fprintf(stderr, "ERROR: lb_register_characteristic_read_event\n");
         firmata_ble_close(res);
