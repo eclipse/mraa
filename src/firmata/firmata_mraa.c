@@ -84,6 +84,7 @@ mraa_result_t
 mraa_firmata_close(mraa_firmata_context dev)
 {
     mraa_firmata_response_stop(dev);
+    firmata_close(firmata_dev);
     free(dev);
     return MRAA_SUCCESS;
 }
