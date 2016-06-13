@@ -3,6 +3,7 @@ build/
 # Object files
 *.o
 *.lib
+*.so.*
 *.so
 *.lo
 *.la
@@ -20,3 +21,17 @@ package.json
 binding.gyp
 READMEFIRST
 npm-debug.log
+
+# lua files
+src/lua/mraaLUA_wrap.cxx
+
+# CMake
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+
+# Gen files
+arch.c
+src/mraa.pc
