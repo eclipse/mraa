@@ -59,6 +59,7 @@ typedef enum {
     MRAA_GENERIC_FIRMATA = 1280,    /**< Firmata uart platform/bridge */
 
     MRAA_MOCK_PLATFORM = 96,        /**< Mock platform, which requires no real hardware */
+    MRAA_JSON_PLATFORM = 97,        /**< User initialised platform from json*/
     MRAA_NULL_PLATFORM = 98,        /**< Platform with no capabilities that hosts a sub platform  */
     MRAA_UNKNOWN_PLATFORM =
     99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
