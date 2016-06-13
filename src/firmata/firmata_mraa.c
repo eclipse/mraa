@@ -529,37 +529,37 @@ mraa_firmata_plat_init(const char* uart_dev, mraa_platform_t type)
 
     if (type == MRAA_GENERIC_FIRMATA) {
         firmata_dev = firmata_new(uart_dev);
+        if (firmata_dev == NULL) {
+            syslog(LOG_WARNING, "firmata: Failed to open uart to Firmata dev on %s", uart_dev);
+            fprintf(stderr, "Mraa expected to find a Firmata device on %s, is the port in use?\n", uart_dev);
+            free(b);
+            return NULL;
+        }
+
+        // if this isn't working then we have an issue with our uart
+        int retry = 20;
+        while (!firmata_dev->isReady && retry--) {
+            firmata_pull(firmata_dev);
+        }
+        if (!retry) {
+            syslog(LOG_ERR, "firmata: Failed to find a valid Firmata board on %s", uart_dev);
+            firmata_close(firmata_dev);
+            free(b);
+    	    return NULL;
+        }
+
+        pthread_create(&thread_id, NULL, mraa_firmata_pull_handler, NULL);
     }
+
     else if (type == MRAA_BLE_FIRMATA_BY_NAME || type == MRAA_BLE_FIRMATA_BY_ADDRESS) {
         firmata_dev = firmata_ble_new(uart_dev, type);
-    }
-    if (firmata_dev == NULL) {
-        syslog(LOG_WARNING, "firmata: Failed to open uart to Firmata dev on %s", uart_dev);
-        fprintf(stderr, "Mraa expected to find a Firmata device on %s, is the port in use?\n", uart_dev);
-        free(b);
-        return NULL;
-    }
-
-    // if this isn't working then we have an issue with our uart
-    int retry = 20;
-    while (!firmata_dev->isReady && retry--) {
-        firmata_pull(firmata_dev);
-    }
-
-    if (!retry) {
-        syslog(LOG_ERR, "firmata: Failed to find a valid Firmata board on %s", uart_dev);
-        if (type == MRAA_GENERIC_FIRMATA) {
-            firmata_close(firmata_dev);
-        }
-        else if (type == MRAA_BLE_FIRMATA_BY_NAME || type == MRAA_BLE_FIRMATA_BY_ADDRESS) {
+        if (firmata_dev == NULL) {
+            syslog(LOG_WARNING, "firmata: Failed to open ble to Firmata dev on %s", uart_dev);
+            fprintf(stderr, "Mraa expected to find a Firmata ble device named %s, is the device available?\n", uart_dev);
             firmata_ble_close(firmata_dev);
+            free(b);
+            return NULL;
         }
-        free(b);
-	    return NULL;
-    }
-
-    if (!(type == MRAA_BLE_FIRMATA_BY_NAME || type == MRAA_BLE_FIRMATA_BY_ADDRESS)) {
-        pthread_create(&thread_id, NULL, mraa_firmata_pull_handler, NULL);
     }
 
     b->platform_name = "firmata";
@@ -703,7 +703,7 @@ mraa_firmata_platform(mraa_board_t* board, const char* uart_dev, mraa_platform_t
 
     sub_plat = mraa_firmata_plat_init(uart_dev, type);
     if (sub_plat != NULL) {
-        sub_plat->platform_type = MRAA_GENERIC_FIRMATA;
+        sub_plat->platform_type = type;
         board->sub_platform = sub_plat;
         return sub_plat->platform_type;
     }
