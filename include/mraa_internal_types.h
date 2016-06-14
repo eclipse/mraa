@@ -59,6 +59,7 @@ struct _gpio {
     int pin; /**< the pin number, as known to the os. */
     int phy_pin; /**< pin passed to clean init. -1 none and raw*/
     int value_fp; /**< the file pointer to the value of the gpio */
+    char *gpio_path; /**< Custom file path format to help with compatibility */
     void (* isr)(void *); /**< the interrupt service request */
     void *isr_args; /**< args return when interrupt service request triggered */
     pthread_t thread_id; /**< the isr handler thread id */

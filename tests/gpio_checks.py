@@ -36,7 +36,7 @@ class GpioChecks(u.TestCase):
 
   def setUp(self):
     self.pin = m.Gpio(MRAA_GPIO)
-    self.gpio_path = "/sys/class/gpio/gpio" + str(self.pin.getPin(True))
+    self.gpio_path = "/sys/class/gpio" + self.pin.getPath()
 
   def tearDown(self):
     # dereference pin to force cleanup

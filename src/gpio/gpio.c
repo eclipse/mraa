@@ -44,7 +44,7 @@ static mraa_result_t
 mraa_gpio_get_valfp(mraa_gpio_context dev)
 {
     char bu[MAX_SIZE];
-    sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
+    sprintf(bu, SYSFS_CLASS_GPIO "%s/value", dev->gpio_path);
     dev->value_fp = open(bu, O_RDWR);
     if (dev->value_fp == -1) {
         syslog(LOG_ERR, "gpio%i: Failed to open 'value': %s", dev->pin, strerror(errno));
@@ -73,6 +73,14 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
     dev->advance_func = func_table;
     dev->pin = pin;
 
+    // GPIO sysfs path may store the default path names schema or any other specific to vendor
+    dev->gpio_path = (char*) calloc(MAX_SIZE, sizeof(char));
+    if (dev->gpio_path == NULL) {
+        syslog(LOG_CRIT, "gpio%i: Failed to allocate memory for gpio_path attribute", pin);
+        status = MRAA_ERROR_INVALID_RESOURCE;
+        goto init_internal_cleanup;
+    }
+
     if (IS_FUNC_DEFINED(dev, gpio_init_internal_replace)) {
         status = dev->advance_func->gpio_init_internal_replace(dev, pin);
         if (status == MRAA_SUCCESS)
@@ -95,11 +103,12 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
     dev->isr_thread_terminating = 0;
     dev->phy_pin = -1;
 
-    // then check to make sure the pin is exported.
-    char directory[MAX_SIZE];
-    snprintf(directory, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/", dev->pin);
+    snprintf(dev->gpio_path, MAX_SIZE, "/gpio%d", dev->pin);
+    snprintf(bu, sizeof(bu), SYSFS_CLASS_GPIO "%s", dev->gpio_path);
     struct stat dir;
-    if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
+
+    // check if the pin was already created, meaning another process may be the owner
+    if (stat(bu, &dir) == 0 && S_ISDIR(dir.st_mode)) {
         dev->owner = 0; // Not Owner
     } else {
         int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
@@ -121,8 +130,14 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
 
 init_internal_cleanup:
     if (status != MRAA_SUCCESS) {
-        if (dev != NULL)
+        if (dev != NULL) {
+            if (dev->gpio_path != NULL) {
+                free(dev->gpio_path);
+                dev->gpio_path = NULL;
+            }
             free(dev);
+            dev = NULL;
+        }
         return NULL;
     }
     return dev;
@@ -248,7 +263,7 @@ mraa_gpio_interrupt_handler(void* arg)
     } else {
         // open gpio value with open(3)
         char bu[MAX_SIZE];
-        sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
+        sprintf(bu, SYSFS_CLASS_GPIO "%s/value", dev->gpio_path);
         fp = open(bu, O_RDONLY);
         if (fp < 0) {
             syslog(LOG_ERR, "gpio%i: interrupt_handler: failed to open 'value' : %s", dev->pin, strerror(errno));
@@ -337,7 +352,7 @@ mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode)
     }
 
     char filepath[MAX_SIZE];
-    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/edge", dev->pin);
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "%s/edge", dev->gpio_path);
 
     int edge = open(filepath, O_RDWR);
     if (edge == -1) {
@@ -479,7 +494,7 @@ mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
     }
 
     char filepath[MAX_SIZE];
-    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/drive", dev->pin);
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "%s/drive", dev->gpio_path);
 
     int drive = open(filepath, O_WRONLY);
     if (drive == -1) {
@@ -542,7 +557,7 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
         dev->value_fp = -1;
     }
     char filepath[MAX_SIZE];
-    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/direction", dev->pin);
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "%s/direction", dev->gpio_path);
 
     int direction = open(filepath, O_RDWR);
 
@@ -605,7 +620,7 @@ mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/direction", dev->pin);
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "%s/direction", dev->gpio_path);
     fd = open(filepath, O_RDONLY);
     if (fd == -1) {
         syslog(LOG_ERR, "gpio%i: read_dir: Failed to open 'direction' for reading: %s", dev->pin, strerror(errno));
@@ -766,7 +781,10 @@ mraa_gpio_close(mraa_gpio_context dev)
         close(dev->value_fp);
     }
     mraa_gpio_unexport(dev);
+    free(dev->gpio_path);
+    dev->gpio_path = NULL;
     free(dev);
+    dev = NULL;
     return result;
 }
 
@@ -816,4 +834,14 @@ mraa_gpio_get_pin_raw(mraa_gpio_context dev)
         return -1;
     }
     return dev->pin;
+}
+
+char*
+mraa_gpio_get_path(mraa_gpio_context dev)
+{
+    if (dev == NULL) {
+        syslog(LOG_ERR, "gpio: get_path: context is invalid");
+        return NULL;
+    }
+    return dev->gpio_path;
 }
