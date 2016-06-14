@@ -59,7 +59,7 @@ mraa_firmata_response(mraa_firmata_context dev, void (*fptr)(uint8_t*, int))
 {
     if (dev->added == 0) {
         struct _firmata** ptr;
-        ptr = realloc(firmata_dev->devs, (firmata_dev->dev_count+1) * sizeof(struct _firmata*));
+        ptr = realloc(firmata_dev->devs, (firmata_dev->dev_count + 1) * sizeof(struct _firmata*));
         if (ptr == NULL) {
             return MRAA_ERROR_NO_RESOURCES;
         }
@@ -107,7 +107,7 @@ static mraa_result_t
 mraa_firmata_i2c_address(mraa_i2c_context dev, uint8_t addr)
 {
     // only thing needed and it's already done
-    //dev->addr = (int) addr;
+    // dev->addr = (int) addr;
 
     return MRAA_SUCCESS;
 }
@@ -141,7 +141,7 @@ mraa_firmata_send_i2c_read_req(mraa_i2c_context dev, int length)
     }
 
     // this needs a lock :)
-    memset(&firmata_dev->i2cmsg[dev->addr][0], -1, sizeof(int)*length);
+    memset(&firmata_dev->i2cmsg[dev->addr][0], -1, sizeof(int) * length);
 
     free(buffer);
     return MRAA_SUCCESS;
@@ -173,7 +173,7 @@ mraa_firmata_send_i2c_read_reg_req(mraa_i2c_context dev, uint8_t command, int le
     }
 
     // this needs a lock :)
-    memset(&firmata_dev->i2cmsg[dev->addr][command], -1, sizeof(int)*length);
+    memset(&firmata_dev->i2cmsg[dev->addr][command], -1, sizeof(int) * length);
 
     free(buffer);
     return MRAA_SUCCESS;
@@ -210,7 +210,7 @@ mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
         if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
             uint8_t rawdata[2];
             rawdata[0] = firmata_dev->i2cmsg[dev->addr][command];
-            rawdata[1] = firmata_dev->i2cmsg[dev->addr][command+1];
+            rawdata[1] = firmata_dev->i2cmsg[dev->addr][command + 1];
             uint16_t data = (uint16_t) rawdata;
             uint8_t high = (data & 0xFF00) >> 8;
             data = (data << 8) & 0xFF00;
@@ -227,7 +227,7 @@ mraa_firmata_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t*
 {
     if (mraa_firmata_send_i2c_read_reg_req(dev, command, length) == MRAA_SUCCESS) {
         if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
-            memcpy(data, &firmata_dev->i2cmsg[dev->addr][command], sizeof(int)*length);
+            memcpy(data, &firmata_dev->i2cmsg[dev->addr][command], sizeof(int) * length);
             return length;
         }
     }
@@ -266,7 +266,7 @@ static mraa_result_t
 mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWrite)
 {
     // buffer needs 5 bytes for firmata, and 2 bytes for every byte of data
-    int buffer_size = (bytesToWrite*2) + 5;
+    int buffer_size = (bytesToWrite * 2) + 5;
     uint8_t* buffer = calloc(buffer_size, 0);
     if (buffer == NULL) {
         return MRAA_ERROR_NO_RESOURCES;
@@ -278,12 +278,12 @@ mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWri
     buffer[2] = dev->addr;
     buffer[3] = I2C_MODE_WRITE << 3;
     // we need to write until FIRMATA_END_SYSEX
-    for (i; i < (buffer_size-1); i++) {
+    for (i; i < (buffer_size - 1); i++) {
         buffer[ii] = data[i] & 0x7F;
-        buffer[ii+1] = (data[i] >> 7) & 0x7f;
-        ii = ii+2;
+        buffer[ii + 1] = (data[i] >> 7) & 0x7f;
+        ii = ii + 2;
     }
-    buffer[buffer_size-1] = FIRMATA_END_SYSEX;
+    buffer[buffer_size - 1] = FIRMATA_END_SYSEX;
     firmata_write_internal(firmata_dev, buffer, buffer_size);
     free(buffer);
     return MRAA_SUCCESS;
@@ -473,7 +473,7 @@ mraa_firmata_pwm_init_internal_replace(void* func_table, int pin)
 static mraa_result_t
 mraa_firmata_pwm_write_replace(mraa_pwm_context dev, float percentage)
 {
-    int value = (int)((percentage - 1) / 8000);
+    int value = (int) ((percentage - 1) / 8000);
     firmata_analogWrite(firmata_dev, dev->pin, value);
     firmata_dev->pins[dev->pin].value = value;
     return MRAA_SUCCESS;
@@ -506,15 +506,15 @@ mraa_firmata_pull_handler(void* vp)
 {
     int i, isr_now, isr_prev;
     isr_prev = 0;
-    while(1) {
+    while (1) {
         isr_now = 0;
         firmata_pull(firmata_dev);
         // would prefer to send board pointer as argument
-        for(i = 0; i < 14; i++) {
+        for (i = 0; i < 14; i++) {
             isr_now |= (firmata_dev->pins[i].value & 1) << i;
         }
         // might want to lock here?
-        isr_detected = isr_prev ^ isr_now; //both edges for now
+        isr_detected = isr_prev ^ isr_now; // both edges for now
         isr_prev = isr_now;
         usleep(100);
     }
@@ -546,7 +546,7 @@ mraa_firmata_plat_init(const char* uart_dev, mraa_platform_t type)
             syslog(LOG_ERR, "firmata: Failed to find a valid Firmata board on %s", uart_dev);
             firmata_close(firmata_dev);
             free(b);
-    	    return NULL;
+            return NULL;
         }
 
         pthread_create(&thread_id, NULL, mraa_firmata_pull_handler, NULL);
@@ -556,8 +556,9 @@ mraa_firmata_plat_init(const char* uart_dev, mraa_platform_t type)
         firmata_dev = firmata_ble_new(uart_dev, type);
         if (firmata_dev == NULL) {
             syslog(LOG_WARNING, "firmata: Failed to open ble to Firmata dev on %s", uart_dev);
-            fprintf(stderr, "Mraa expected to find a Firmata ble device named %s, is the device available?\n", uart_dev);
-            firmata_ble_close(firmata_dev);
+            fprintf(stderr, "Mraa expected to find a Firmata ble device named %s, is the device "
+                            "available?\n",
+                    uart_dev);
             free(b);
             return NULL;
         }
