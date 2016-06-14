@@ -92,7 +92,18 @@ set (mraa_LIB_MOCK_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board_i2c.c
 )
 
+if (JSONPLAT)
+  find_package (JSON-C QUIET)
+  if (${JSON-C_FOUND})
+    set (mraa_LIB_SRCS_NOAUTO
+      ${mraa_LIB_SRCS_NOAUTO}
+      ${PROJECT_SOURCE_DIR}/src/json/jsonplatform.c
+    )
+  endif ()
+endif ()
+
 set (mraa_LIBS ${CMAKE_THREAD_LIBS_INIT})
+
 
 if (X86PLAT)
   add_subdirectory(x86)
@@ -136,11 +147,24 @@ if (USBPLAT)
   add_subdirectory(usb)
 endif ()
 
-if (IMRAA)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DIMRAA=1")
-  find_package (JSON-C REQUIRED)
-  include_directories (${JSON-C_INCLUDE_DIR})
-  set (mraa_LIBS ${mraa_LIBS} ${JSON-C_LIBRARIES})
+if (JSONPLAT OR IMRAA)
+  find_package (JSON-C QUIET)
+  if (NOT ${JSON-C_FOUND})
+    if (IMRAA)
+      message (FATAL_ERROR "Enabled IMRAA but JSON-C library not found")
+    elseif (JSONPLAT)
+      message (WARNING "Enabled JSONPLAT but JSON-C library not found: Ignoring JSONPLAT")
+    endif ()
+  else ()
+    if (JSONPLAT)
+      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DJSONPLAT=1")
+    endif ()
+    if (IMRAA)
+      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DIMRAA=1")
+    endif ()
+    include_directories (${JSON-C_INCLUDE_DIR})
+    set (mraa_LIBS ${mraa_LIBS} ${JSON-C_LIBRARIES})
+  endif ()
 endif ()
 
 set (mraa_LIB_SRCS
