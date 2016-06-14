@@ -184,7 +184,8 @@ imraa_init()
         return MRAA_ERROR_NO_RESOURCES;
     }
 
-    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
+    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(),
+           mraa_get_platform_type());
     return MRAA_SUCCESS;
 }
 
@@ -217,7 +218,6 @@ mraa_deinit()
             free(sub_plat);
         }
         free(plat);
-
     }
     if (plat_iio != NULL) {
         free(plat_iio);
@@ -267,7 +267,7 @@ mraa_iio_detect()
     plat_iio->iio_device_count = num_iio_devices;
     plat_iio->iio_devices = calloc(num_iio_devices, sizeof(struct _iio));
     struct _iio* device;
-    for (i=0; i < num_iio_devices; i++) {
+    for (i = 0; i < num_iio_devices; i++) {
         device = &plat_iio->iio_devices[i];
         device->num = i;
         snprintf(filepath, 64, "/sys/bus/iio/devices/iio:device%d/name", i);
@@ -280,7 +280,7 @@ mraa_iio_detect()
                 len = strlen(name);
                 // use strndup
                 device->name = malloc((sizeof(char) * len) + sizeof(char));
-                strncpy(device->name, name, len+1);
+                strncpy(device->name, name, len + 1);
             }
             close(fd);
         }
@@ -298,22 +298,23 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
 
     for (mi = 0; mi < meta.mux_total; mi++) {
 
-        switch(meta.mux[mi].pincmd) {
-            case PINCMD_UNDEFINED:              // used for backward compatibility
-                if(meta.mux[mi].pin != last_pin) {
+        switch (meta.mux[mi].pincmd) {
+            case PINCMD_UNDEFINED: // used for backward compatibility
+                if (meta.mux[mi].pin != last_pin) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
                     }
                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    if (mux_i == NULL)
+                        return MRAA_ERROR_INVALID_HANDLE;
                     last_pin = meta.mux[mi].pin;
                 }
                 // this function will sometimes fail, however this is not critical as
                 // long as the write succeeds - Test case galileo gen2 pin2
                 mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
                 ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
-                if(ret != MRAA_SUCCESS) {
+                if (ret != MRAA_SUCCESS) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
@@ -323,19 +324,20 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
                 break;
 
             case PINCMD_SET_VALUE:
-                if(meta.mux[mi].pin != last_pin) {
+                if (meta.mux[mi].pin != last_pin) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
                     }
                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    if (mux_i == NULL)
+                        return MRAA_ERROR_INVALID_HANDLE;
                     last_pin = meta.mux[mi].pin;
                 }
 
                 ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
 
-                if(ret != MRAA_SUCCESS) {
+                if (ret != MRAA_SUCCESS) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
@@ -345,19 +347,20 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
                 break;
 
             case PINCMD_SET_DIRECTION:
-                if(meta.mux[mi].pin != last_pin) {
+                if (meta.mux[mi].pin != last_pin) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
                     }
                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    if (mux_i == NULL)
+                        return MRAA_ERROR_INVALID_HANDLE;
                     last_pin = meta.mux[mi].pin;
                 }
 
                 ret = mraa_gpio_dir(mux_i, meta.mux[mi].value);
 
-                if(ret != MRAA_SUCCESS) {
+                if (ret != MRAA_SUCCESS) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
@@ -367,22 +370,23 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
                 break;
 
             case PINCMD_SET_IN_VALUE:
-                if(meta.mux[mi].pin != last_pin) {
+                if (meta.mux[mi].pin != last_pin) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
                     }
                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    if (mux_i == NULL)
+                        return MRAA_ERROR_INVALID_HANDLE;
                     last_pin = meta.mux[mi].pin;
                 }
 
                 ret = mraa_gpio_dir(mux_i, MRAA_GPIO_IN);
 
-                if(ret == MRAA_SUCCESS)
+                if (ret == MRAA_SUCCESS)
                     ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
 
-                if(ret != MRAA_SUCCESS) {
+                if (ret != MRAA_SUCCESS) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
@@ -392,22 +396,23 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
                 break;
 
             case PINCMD_SET_OUT_VALUE:
-                if(meta.mux[mi].pin != last_pin) {
+                if (meta.mux[mi].pin != last_pin) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
                     }
                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    if (mux_i == NULL)
+                        return MRAA_ERROR_INVALID_HANDLE;
                     last_pin = meta.mux[mi].pin;
                 }
 
                 ret = mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
 
-                if(ret == MRAA_SUCCESS)
+                if (ret == MRAA_SUCCESS)
                     ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
 
-                if(ret != MRAA_SUCCESS) {
+                if (ret != MRAA_SUCCESS) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
@@ -417,19 +422,20 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
                 break;
 
             case PINCMD_SET_MODE:
-                if(meta.mux[mi].pin != last_pin) {
+                if (meta.mux[mi].pin != last_pin) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
                     }
                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    if (mux_i == NULL)
+                        return MRAA_ERROR_INVALID_HANDLE;
                     last_pin = meta.mux[mi].pin;
                 }
 
                 ret = mraa_gpio_mode(mux_i, meta.mux[mi].value);
 
-                if(ret != MRAA_SUCCESS) {
+                if (ret != MRAA_SUCCESS) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
@@ -442,7 +448,9 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
                 break;
 
             default:
-                syslog(LOG_NOTICE, "mraa_setup_mux_mapped: wrong command %d on pin %d with value %d", meta.mux[mi].pincmd, meta.mux[mi].pin, meta.mux[mi].value);
+                syslog(LOG_NOTICE,
+                       "mraa_setup_mux_mapped: wrong command %d on pin %d with value %d",
+                       meta.mux[mi].pincmd, meta.mux[mi].pin, meta.mux[mi].value);
                 break;
         }
     }
@@ -536,7 +544,8 @@ mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
         pin = mraa_get_sub_platform_index(pin);
     }
 
-    if (current_plat == NULL || current_plat->platform_type == MRAA_UNKNOWN_PLATFORM || current_plat->platform_type == MRAA_NULL_PLATFORM) {
+    if (current_plat == NULL || current_plat->platform_type == MRAA_UNKNOWN_PLATFORM ||
+        current_plat->platform_type == MRAA_NULL_PLATFORM) {
         return 0;
     }
     if (pin > (current_plat->phy_pin_count - 1) || pin < 0)
@@ -713,9 +722,9 @@ mraa_get_platform_pin_count(uint8_t platform_offset)
         return mraa_get_pin_count();
     else {
         if (mraa_has_sub_platform())
-           return plat->sub_platform->phy_pin_count;
+            return plat->sub_platform->phy_pin_count;
         else
-           return 0;
+            return 0;
     }
 }
 
@@ -750,9 +759,9 @@ mraa_get_default_i2c_bus(uint8_t platform_offset)
         return plat->def_i2c_bus;
     } else {
         if (mraa_has_sub_platform())
-           return plat->sub_platform->def_i2c_bus;
+            return plat->sub_platform->def_i2c_bus;
         else
-           return -1;
+            return -1;
     }
 }
 
@@ -999,10 +1008,7 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* dev)
             return MRAA_SUCCESS;
         }
         syslog(LOG_NOTICE, "mraa: Failed to add firmata subplatform");
-    }
-#endif
-#if defined(FIRMATABLE)
-    else if (subplatformtype == MRAA_BLE_FIRMATA_BY_NAME) {
+    } else if (subplatformtype == MRAA_BLE_FIRMATA_BY_NAME) {
         if (plat->sub_platform != NULL) {
             return MRAA_ERROR_INVALID_PARAMETER;
         }
@@ -1011,8 +1017,7 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* dev)
             return MRAA_SUCCESS;
         }
         syslog(LOG_NOTICE, "mraa: Failed to add firmata ble subplatform by name");
-    }
-    else if (subplatformtype == MRAA_BLE_FIRMATA_BY_ADDRESS) {
+    } else if (subplatformtype == MRAA_BLE_FIRMATA_BY_ADDRESS) {
         if (plat->sub_platform != NULL) {
             return MRAA_ERROR_INVALID_PARAMETER;
         }
@@ -1078,8 +1083,9 @@ mraa_add_from_lockfile(const char* imraa_lock_file)
         int id = -1;
         const char* uartdev = NULL;
         for (i = 0; i < subplat_num; i++) {
-            struct json_object *ioobj = json_object_array_get_idx(ioarray, i);
-            json_object_object_foreach(ioobj, key, val) {
+            struct json_object* ioobj = json_object_array_get_idx(ioarray, i);
+            json_object_object_foreach(ioobj, key, val)
+            {
                 if (strcmp(key, "id") == 0) {
                     id = atoi(json_object_get_string(val));
                 } else if (strcmp(key, "uart") == 0) {
@@ -1223,11 +1229,13 @@ mraa_init_io(const char* desc)
     } else if (strncmp(type, "PWM", 3) == 0) {
         if (raw) {
             if (mraa_init_io_helper(&str, &id, delim) != MRAA_SUCCESS) {
-                syslog(LOG_ERR, "mraa_init_io: Pwm, unable to convert the chip id string into a useable Int");
+                syslog(LOG_ERR, "mraa_init_io: Pwm, unable to convert the chip id string into a "
+                                "useable Int");
                 return NULL;
             }
             if (mraa_init_io_helper(&str, &pin, delim) != MRAA_SUCCESS) {
-                syslog(LOG_ERR, "mraa_init_io: Pwm, unable to convert the pin string into a useable Int");
+                syslog(LOG_ERR,
+                       "mraa_init_io: Pwm, unable to convert the pin string into a useable Int");
                 return NULL;
             }
             return (void*) mraa_pwm_init_raw(id, pin);
@@ -1236,11 +1244,13 @@ mraa_init_io(const char* desc)
     } else if (strncmp(type, "SPI", 3) == 0) {
         if (raw) {
             if (mraa_init_io_helper(&str, &id, delim) != MRAA_SUCCESS) {
-                syslog(LOG_ERR, "mraa_init_io: Spi, unable to convert the bus string into a useable Int");
+                syslog(LOG_ERR,
+                       "mraa_init_io: Spi, unable to convert the bus string into a useable Int");
                 return NULL;
             }
             if (mraa_init_io_helper(&str, &pin, delim) != MRAA_SUCCESS) {
-                syslog(LOG_ERR, "mraa_init_io: Spi, unable to convert the cs string into a useable Int");
+                syslog(LOG_ERR,
+                       "mraa_init_io: Spi, unable to convert the cs string into a useable Int");
                 return NULL;
             }
             return (void*) mraa_spi_init_raw(id, pin);
