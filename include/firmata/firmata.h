@@ -25,7 +25,9 @@
 #pragma once
 
 #include "uart.h"
+#ifdef FIRMATABLE
 #include "firmata_ble.h"
+#endif
 
 #define MODE_INPUT 0x00
 #define MODE_OUTPUT 0x01
@@ -91,8 +93,10 @@ typedef struct s_pin {
 
 typedef struct s_firmata {
     mraa_uart_context uart;
+#ifdef FIRMATABLE
     lb_context* lb_ctx;
     bl_device* bl_dev;
+#endif
     t_pin pins[128];
     int i2cmsg[256][256];
     int parse_command_len;

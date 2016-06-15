@@ -56,7 +56,9 @@ firmata_write_internal(t_firmata* firmata_dev, const char* buf, size_t len)
     lb_result_t res = LB_ERROR_UNSPECIFIED;
     if (firmata_dev->uart != NULL) {
         mraa_uart_write(firmata_dev->uart, buf, len);
-    } else if (firmata_dev->lb_ctx != NULL) {
+    }
+#ifdef FIRMATABLE
+    else if (firmata_dev->lb_ctx != NULL) {
         res = dl_lb_write_to_characteristic(firmata_dev->lb_ctx, firmata_dev->bl_dev,
                                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e", len, (uint8_t*) buf);
         if (res < 0) {
@@ -64,6 +66,7 @@ firmata_write_internal(t_firmata* firmata_dev, const char* buf, size_t len)
             return MRAA_ERROR_UNSPECIFIED;
         }
     }
+#endif
     return MRAA_SUCCESS;
 }
 
@@ -97,6 +100,7 @@ firmata_new(const char* name)
     return res;
 }
 
+#ifdef FIRMATABLE
 t_firmata*
 firmata_ble_new(const char* name, mraa_platform_t type)
 {
@@ -218,6 +222,7 @@ firmata_ble_close(t_firmata* firmata)
         syslog(LOG_ERR, "ERROR: lb_destroy\n");
     }
 }
+#endif
 
 void
 firmata_close(t_firmata* firmata)
