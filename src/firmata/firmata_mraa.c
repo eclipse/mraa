@@ -553,6 +553,9 @@ mraa_firmata_plat_init(const char* uart_dev, mraa_platform_t type)
     }
 
     else if (type == MRAA_BLE_FIRMATA_BY_NAME || type == MRAA_BLE_FIRMATA_BY_ADDRESS) {
+#ifndef FIRMATABLE
+        return NULL;
+#endif
         firmata_dev = firmata_ble_new(uart_dev, type);
         if (firmata_dev == NULL) {
             syslog(LOG_WARNING, "firmata: Failed to open ble to Firmata dev on %s", uart_dev);
