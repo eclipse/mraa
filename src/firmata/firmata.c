@@ -42,7 +42,7 @@ firmata_uart_read_handler(sd_bus_message* message, void* userdata, sd_bus_error*
     r = dl_lb_parse_uart_service_message(message, (const void**) &result, &size);
     if (r < 0) {
         syslog(LOG_ERR, "ERROR: couldn't parse uart message\n");
-        return LB_ERROR_UNSPECIFIED;
+        return -MRAA_ERROR_UNSPECIFIED;
     }
 
     firmata_parse(firmata, result, size);
@@ -53,17 +53,17 @@ firmata_uart_read_handler(sd_bus_message* message, void* userdata, sd_bus_error*
 inline int
 firmata_write_internal(t_firmata* firmata_dev, const char* buf, size_t len)
 {
-    lb_result_t res = LB_ERROR_UNSPECIFIED;
+    int r = MRAA_ERROR_UNSPECIFIED;
     if (firmata_dev->uart != NULL) {
         mraa_uart_write(firmata_dev->uart, buf, len);
     }
 #ifdef FIRMATABLE
     else if (firmata_dev->lb_ctx != NULL) {
-        res = dl_lb_write_to_characteristic(firmata_dev->lb_ctx, firmata_dev->bl_dev,
+        r = dl_lb_write_to_characteristic(firmata_dev->lb_ctx, firmata_dev->bl_dev,
                                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e", len, (uint8_t*) buf);
-        if (res < 0) {
+        if (r < 0) {
             syslog(LOG_ERR, "ERROR: lb_write_to_characteristic\n");
-            return MRAA_ERROR_UNSPECIFIED;
+            return -MRAA_ERROR_UNSPECIFIED;
         }
     }
 #endif
