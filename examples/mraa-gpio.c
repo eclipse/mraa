@@ -103,7 +103,13 @@ list_pins()
 mraa_result_t
 gpio_set(int pin, int level, mraa_boolean_t raw)
 {
-    mraa_gpio_context gpio = mraa_gpio_init(pin);
+    mraa_gpio_context gpio;
+    if (raw) {
+        gpio = mraa_gpio_init_raw(pin);
+    }
+    else {
+        gpio = mraa_gpio_init(pin);
+    }
     if (gpio != NULL) {
         mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
         if (raw != 0) {
