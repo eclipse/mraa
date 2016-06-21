@@ -34,4 +34,3 @@ Makefile
 
 # Gen files
 arch.c
-src/mraa.pc
