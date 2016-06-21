@@ -23,11 +23,52 @@
  */
 
 #include "firmata/firmata.h"
+#include "firmata/firmata_ble.h"
 #include "mraa_internal.h"
 
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+static int
+firmata_uart_read_handler(sd_bus_message* message, void* userdata, sd_bus_error* error)
+{
+
+    int r, i;
+    size_t size = 0;
+    uint8_t* result = NULL;
+    t_firmata* firmata = (t_firmata*) userdata;
+
+    r = dl_lb_parse_uart_service_message(message, (const void**) &result, &size);
+    if (r < 0) {
+        syslog(LOG_ERR, "ERROR: couldn't parse uart message\n");
+        return -MRAA_ERROR_UNSPECIFIED;
+    }
+
+    firmata_parse(firmata, result, size);
+
+    return LB_SUCCESS;
+}
+
+inline int
+firmata_write_internal(t_firmata* firmata_dev, const char* buf, size_t len)
+{
+    int r = MRAA_ERROR_UNSPECIFIED;
+    if (firmata_dev->uart != NULL) {
+        mraa_uart_write(firmata_dev->uart, buf, len);
+    }
+#ifdef FIRMATABLE
+    else if (firmata_dev->lb_ctx != NULL) {
+        r = dl_lb_write_to_characteristic(firmata_dev->lb_ctx, firmata_dev->bl_dev,
+                                            "6e400002-b5a3-f393-e0a9-e50e24dcca9e", len, (uint8_t*) buf);
+        if (r < 0) {
+            syslog(LOG_ERR, "ERROR: lb_write_to_characteristic\n");
+            return -MRAA_ERROR_UNSPECIFIED;
+        }
+    }
+#endif
+    return MRAA_SUCCESS;
+}
 
 t_firmata*
 firmata_new(const char* name)
@@ -44,7 +85,7 @@ firmata_new(const char* name)
     if (res->uart == NULL) {
         syslog(LOG_ERR, "firmata: UART failed to setup");
         free(res);
-        return  NULL;
+        return NULL;
     }
 
     firmata_initPins(res);
@@ -58,6 +99,130 @@ firmata_new(const char* name)
 
     return res;
 }
+
+#ifdef FIRMATABLE
+t_firmata*
+firmata_ble_new(const char* name, mraa_platform_t type)
+{
+    t_firmata* res;
+    int ble_res = LB_ERROR_UNSPECIFIED;
+
+    res = calloc(1, sizeof(t_firmata));
+    if (!res) {
+        return NULL;
+    }
+
+    res->bl_dev = NULL;
+
+    ble_res = mraa_firmata_ble_init();
+    if (ble_res < 0) {
+        syslog(LOG_ERR, "firmata: littleb failed to setup");
+        free(res);
+        return NULL;
+    }
+
+    ble_res = dl_lb_init();
+    if (ble_res < 0) {
+        syslog(LOG_ERR, "ERROR: lb_init\n");
+        free(res);
+        return NULL;
+    }
+
+    res->lb_ctx = dl_lb_context_new();
+    if (res->lb_ctx == NULL) {
+        syslog(LOG_ERR, "ERROR: lb_context_new\n");
+        free(res);
+        return NULL;
+    }
+
+    ble_res = dl_lb_get_bl_devices(res->lb_ctx, 5);
+    if (ble_res < 0) {
+        syslog(LOG_ERR, "ERROR: lb_get_bl_devices\n");
+        firmata_ble_close(res);
+        free(res);
+        return NULL;
+    }
+
+    if (type == MRAA_BLE_FIRMATA_BY_NAME) {
+        ble_res = dl_lb_get_device_by_device_name(res->lb_ctx, name, &res->bl_dev);
+    } else if (type == MRAA_BLE_FIRMATA_BY_ADDRESS) {
+        ble_res = dl_lb_get_device_by_device_address(res->lb_ctx, name, &res->bl_dev);
+    }
+    if (ble_res < 0) {
+        syslog(LOG_ERR, "ERROR: Device FIRMATA not found\n");
+        firmata_ble_close(res);
+        free(res);
+        return NULL;
+    }
+
+    ble_res = dl_lb_connect_device(res->lb_ctx, res->bl_dev);
+    if (ble_res < 0) {
+        syslog(LOG_ERR, "ERROR: lb_connect_device\n");
+        firmata_ble_close(res);
+        free(res);
+        return NULL;
+    }
+
+    // ble_res = lb_pair_device(res->lb_ctx, res->bl_dev);
+    // if (ble_res < 0) {
+    //        syslog(LOG_ERR, "ERROR: lb_pair_device\n");
+    //        free(res);
+    //        return  NULL;
+    //}
+
+    ble_res = dl_lb_get_ble_device_services(res->lb_ctx, res->bl_dev);
+    if (ble_res < 0) {
+        syslog(LOG_ERR, "ERROR: lb_get_ble_device_services\n");
+        firmata_ble_close(res);
+        free(res);
+        return NULL;
+    }
+
+    ble_res = dl_lb_register_characteristic_read_event(res->lb_ctx, res->bl_dev,
+                                                       "6e400003-b5a3-f393-e0a9-e50e24dcca9e",
+                                                       firmata_uart_read_handler, res);
+    if (ble_res < 0) {
+        syslog(LOG_ERR, "ERROR: lb_register_characteristic_read_event\n");
+        firmata_ble_close(res);
+        free(res);
+        return NULL;
+    }
+
+    firmata_initPins(res);
+
+    firmata_askFirmware(res);
+    syslog(LOG_INFO, "firmata: Device opened at: %s", name);
+
+    return res;
+}
+
+void
+firmata_ble_close(t_firmata* firmata)
+{
+    lb_result_t r = LB_ERROR_UNSPECIFIED;
+
+    // r = lb_unpair_device(lb_ctx, firmata);
+    // if (r < 0) {
+    //        syslog(LOG_ERR, "ERROR: lb_unpair_device\n");
+    //        exit(r);
+    //}
+
+    r = dl_lb_disconnect_device(firmata->lb_ctx, firmata->bl_dev);
+    if (r < 0) {
+        syslog(LOG_ERR, "ERROR: lb_disconnect_device\n");
+    }
+
+    r = dl_lb_context_free(firmata->lb_ctx);
+    if (r < 0) {
+        syslog(LOG_ERR, "ERROR: lb_context_free\n");
+    }
+
+    r = dl_lb_destroy();
+    if (r < 0) {
+        syslog(LOG_ERR, "ERROR: lb_destroy\n");
+    }
+}
+#endif
 
 void
 firmata_close(t_firmata* firmata)
@@ -189,7 +354,7 @@ firmata_endParse(t_firmata* firmata)
                 buf[len++] = 1;
             }
             firmata->isReady = 1;
-            mraa_uart_write(firmata->uart, buf, len);
+            firmata_write_internal(firmata, buf, len);
         } else if (firmata->parse_buff[1] == FIRMATA_CAPABILITY_RESPONSE) {
             int pin, i, n;
             for (pin = 0; pin < 128; pin++) {
@@ -217,7 +382,7 @@ firmata_endParse(t_firmata* firmata)
                     buf[len++] = pin;
                     buf[len++] = FIRMATA_END_SYSEX;
                 }
-                mraa_uart_write(firmata->uart, buf, len);
+                firmata_write_internal(firmata, buf, len);
             }
         } else if (firmata->parse_buff[1] == FIRMATA_ANALOG_MAPPING_RESPONSE) {
             int pin = 0;
@@ -235,15 +400,16 @@ firmata_endParse(t_firmata* firmata)
                 firmata->pins[pin].value |= (firmata->parse_buff[5] << 7);
             if (firmata->parse_count > 7)
                 firmata->pins[pin].value |= (firmata->parse_buff[6] << 14);
-        // disable this to check the firmata_devs responses
+            // disable this to check the firmata_devs responses
         } else if (firmata->parse_buff[1] == FIRMATA_I2C_REPLY) {
             int addr = (firmata->parse_buff[2] & 0x7f) | ((firmata->parse_buff[3] & 0x7f) << 7);
             int reg = (firmata->parse_buff[4] & 0x7f) | ((firmata->parse_buff[5] & 0x7f) << 7);
             int i = 6;
             int ii = 0;
             for (ii; ii < (firmata->parse_count - 7) / 2; ii++) {
-                firmata->i2cmsg[addr][reg+ii] = (firmata->parse_buff[i] & 0x7f) | ((firmata->parse_buff[i+1] & 0x7f) << 7);
-                i = i+2;
+                firmata->i2cmsg[addr][reg + ii] =
+                (firmata->parse_buff[i] & 0x7f) | ((firmata->parse_buff[i + 1] & 0x7f) << 7);
+                i = i + 2;
             }
         } else {
             if (firmata->devs != NULL) {
@@ -290,7 +456,7 @@ firmata_askFirmware(t_firmata* firmata)
     buf[0] = FIRMATA_START_SYSEX;
     buf[1] = FIRMATA_REPORT_FIRMWARE; // read firmata name & version
     buf[2] = FIRMATA_END_SYSEX;
-    res = mraa_uart_write(firmata->uart, buf, 3);
+    res = firmata_write_internal(firmata, buf, 3);
     return (res);
 }
 
@@ -304,7 +470,7 @@ firmata_pinMode(t_firmata* firmata, int pin, int mode)
     buff[0] = FIRMATA_SET_PIN_MODE;
     buff[1] = pin;
     buff[2] = mode;
-    res = mraa_uart_write(firmata->uart, buff, 3);
+    res = firmata_write_internal(firmata, buff, 3);
     return (res);
 }
 
@@ -317,19 +483,19 @@ firmata_analogWrite(t_firmata* firmata, int pin, int value)
     buff[0] = 0xE0 | pin;
     buff[1] = value & 0x7F;
     buff[2] = (value >> 7) & 0x7F;
-    res = mraa_uart_write(firmata->uart, buff, 3);
+    res = firmata_write_internal(firmata, buff, 3);
     return (res);
 }
 
 int
-firmata_analogRead(t_firmata *firmata, int pin)
+firmata_analogRead(t_firmata* firmata, int pin)
 {
     int res;
     int value = 1;
     uint8_t buff[2];
     buff[0] = FIRMATA_REPORT_ANALOG | pin;
     buff[1] = value;
-    res = mraa_uart_write(firmata->uart, buff, 2);
+    res = firmata_write_internal(firmata, buff, 2);
     return res;
 }
 
@@ -356,6 +522,6 @@ firmata_digitalWrite(t_firmata* firmata, int pin, int value)
     buff[0] = FIRMATA_DIGITAL_MESSAGE | port_num;
     buff[1] = port_val & 0x7F;
     buff[2] = (port_val >> 7) & 0x7F;
-    res = mraa_uart_write(firmata->uart, buff, 3);
+    res = firmata_write_internal(firmata, buff, 3);
     return (res);
 }

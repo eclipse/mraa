@@ -38,22 +38,25 @@ namespace mraa
  * MRAA supported platform types
  */
 typedef enum {
-    INTEL_GALILEO_GEN1 = 0,    /**< The Generation 1 Galileo platform (RevD) */
-    INTEL_GALILEO_GEN2 = 1,    /**< The Generation 2 Galileo platform (RevG/H) */
-    INTEL_EDISON_FAB_C = 2,    /**< The Intel Edison (FAB C) */
-    INTEL_DE3815 = 3,          /**< The Intel DE3815 Baytrail NUC */
-    INTEL_MINNOWBOARD_MAX = 4, /**< The Intel Minnow Board Max */
-    RASPBERRY_PI = 5,          /**< The different Raspberry PI Models -like  A,B,A+,B+ */
-    BEAGLEBONE = 6,            /**< The different BeagleBone Black Modes B/C */
-    BANANA = 7,                /**< Allwinner A20 based Banana Pi and Banana Pro */
-    INTEL_NUC5 = 8,            /**< The Intel 5th generations Broadwell NUCs */
-    A96BOARDS = 9,             /**< Linaro 96boards, A prefix for 'ARM' since not allowed numerical */
-    INTEL_SOFIA_3GR = 10,      /**< The Intel SoFIA 3GR */
-    INTEL_CHERRYHILLS = 11,    /**< The Intel Braswell Cherryhills */
+    INTEL_GALILEO_GEN1 = 0,        /**< The Generation 1 Galileo platform (RevD) */
+    INTEL_GALILEO_GEN2 = 1,        /**< The Generation 2 Galileo platform (RevG/H) */
+    INTEL_EDISON_FAB_C = 2,        /**< The Intel Edison (FAB C) */
+    INTEL_DE3815 = 3,              /**< The Intel DE3815 Baytrail NUC */
+    INTEL_MINNOWBOARD_MAX = 4,     /**< The Intel Minnow Board Max */
+    RASPBERRY_PI = 5,              /**< The different Raspberry PI Models -like  A,B,A+,B+ */
+    BEAGLEBONE = 6,                /**< The different BeagleBone Black Modes B/C */
+    BANANA = 7,                    /**< Allwinner A20 based Banana Pi and Banana Pro */
+    INTEL_NUC5 = 8,                /**< The Intel 5th generations Broadwell NUCs */
+    A96BOARDS = 9,                 /**< Linaro 96boards, A prefix for 'ARM' since not allowed numerical */
+    INTEL_SOFIA_3GR = 10,          /**< The Intel SoFIA 3GR */
+    INTEL_CHERRYHILLS = 11,        /**< The Intel Braswell Cherryhills */
 
-    FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
+    FTDI_FT4222 = 256,             /**< FTDI FT4222 USB to i2c bridge */
 
-    GENERIC_FIRMATA = 1280,    /**< Firmata uart platform/bridge */
+    GENERIC_FIRMATA = 1280,        /**< Firmata uart platform/bridge */
+    BLE_FIRMATA_BY_NAME = 1281,    /**< Firmata ble platform by name */
+    BLE_FIRMATA_BY_ADDRESS = 1282, /**< Firmata ble platform by address */
+
 
     NULL_PLATFORM = 98,
     UNKNOWN_PLATFORM =

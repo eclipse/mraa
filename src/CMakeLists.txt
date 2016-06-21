@@ -7,6 +7,10 @@ set (mraa_LIB_INCLUDE_DIRS
 if (FIRMATA)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFIRMATA=1")
   add_subdirectory (firmata)
+
+  if (FIRMATABLE)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFIRMATABLE=1")
+  endif()
 endif ()
 
 if (ONEWIRE)
@@ -208,7 +212,7 @@ if (BUILDSWIG)
 endif ()
 
 add_library (mraa ${mraa_LIB_SRCS})
-target_link_libraries (mraa ${mraa_LIBS})
+target_link_libraries (mraa ${mraa_LIBS} dl)
 set_target_properties(
    mraa
    PROPERTIES
