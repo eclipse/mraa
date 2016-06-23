@@ -5,6 +5,14 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**1.1.0**
+  * build python2 & python3 bindings
+  * Intel Grosse Tete support
+  * mraa_init_io() generic funtion
+  * mraa-gpio fixes
+  * edison PWM 0% improvements
+  * iio location maping fix
+
 **1.0.0**
   * Change API to enhance error checking in C. Changes include:
     - mraa_aio_read
