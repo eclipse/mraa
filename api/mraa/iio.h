@@ -121,7 +121,7 @@ mraa_result_t mraa_iio_event_extract_event(struct iio_event_data* event,
                                            int* channel2,
                                            int* different);
 
-mraa_result_t mraa_iio_get_mounting_matrix(mraa_iio_context dev, float mm[9]);
+mraa_result_t mraa_iio_get_mount_matrix(mraa_iio_context dev, const char *sysfs_name, float mm[9]);
 
 mraa_result_t mraa_iio_create_trigger(mraa_iio_context dev, const char* trigger);
 
