@@ -81,7 +81,7 @@ option (INSTALLTOOLS "Install all tools" OFF)
 option (BUILDARCH "Override architecture to build for - override" OFF)
 option (BUILDTESTS "Override the addition of tests" ON)
 
-set (MRAAPLATFORMFORCE "" CACHE STRING "ALL")
+set (MRAAPLATFORMFORCE "ALL" CACHE STRING "Override platform to build for")
 
 if (NOT BUILDSWIG)
   set (BUILDSWIGPYTHON OFF)
