@@ -133,7 +133,7 @@ mraa_x86_platform()
     plat = mraa_intel_cherryhills();
     #elif defined(xMRAA_UP)
     plat = mraa_up_board();
-    #elif defined(MRAA_INTEL_GT_TUCHUCK)
+    #elif defined(xMRAA_INTEL_GT_TUCHUCK)
     plat = mraa_gt_tuchuck_board();
     #else
         #error "Not using a valid platform value from mraa_platform_t - cannot compile"
