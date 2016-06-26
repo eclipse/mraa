@@ -48,6 +48,7 @@ typedef struct {
     mraa_result_t (*gpio_dir_replace) (mraa_gpio_context dev, mraa_gpio_dir_t dir);
     mraa_result_t (*gpio_dir_pre) (mraa_gpio_context dev, mraa_gpio_dir_t dir);
     mraa_result_t (*gpio_dir_post) (mraa_gpio_context dev, mraa_gpio_dir_t dir);
+    mraa_result_t (*gpio_read_dir_replace) (mraa_gpio_context dev, mraa_gpio_dir_t *dir);
 
     int (*gpio_read_replace) (mraa_gpio_context dev);
     mraa_result_t (*gpio_write_replace) (mraa_gpio_context dev, int value);
@@ -56,6 +57,8 @@ typedef struct {
     mraa_result_t (*gpio_mmap_setup) (mraa_gpio_context dev, mraa_boolean_t en);
     mraa_result_t (*gpio_interrupt_handler_init_replace) (mraa_gpio_context dev);
     mraa_result_t (*gpio_wait_interrupt_replace) (mraa_gpio_context dev);
+    mraa_result_t (*gpio_isr_replace) (mraa_gpio_context dev, mraa_gpio_edge_t mode, void (*fptr)(void*), void* args);
+    mraa_result_t (*gpio_isr_exit_replace) (mraa_gpio_context dev);
 
     mraa_result_t (*i2c_init_pre) (unsigned int bus);
     mraa_result_t (*i2c_init_bus_replace) (mraa_i2c_context dev);

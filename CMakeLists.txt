@@ -78,8 +78,9 @@ option (RPM "Generate RPM using CPack" OFF)
 option (ENABLEEXAMPLES "Disable building of examples" ON)
 option (INSTALLGPIOTOOL "Install gpio tool" OFF)
 option (INSTALLTOOLS "Install all tools" OFF)
-option (BUILDARCH "Override architecture to build for - override" OFF)
 option (BUILDTESTS "Override the addition of tests" ON)
+
+set (BUILDARCH "" CACHE STRING "Override architecture to build for")
 
 set (MRAAPLATFORMFORCE "ALL" CACHE STRING "Override platform to build for")
 
@@ -103,8 +104,10 @@ if (DETECTED_ARCH STREQUAL "i586" OR DETECTED_ARCH STREQUAL "x86_64"
   set (X86PLAT ON)
 elseif (DETECTED_ARCH MATCHES "arm.*")
   set (ARMPLAT ON)
+elseif (DETECTED_ARCH STREQUAL "MOCK")
+  set (MOCKPLAT ON)
 else ()
-  message (FATAL_ERROR "Only x86 and arm platforms currently supported")
+  message (FATAL_ERROR "Only x86, arm and mock platforms currently supported")
 endif()
 
 if (BUILDSWIGPYTHON OR BUILDTESTS)

@@ -71,6 +71,10 @@ struct _gpio {
     mraa_result_t (*mmap_write) (mraa_gpio_context dev, int value);
     int (*mmap_read) (mraa_gpio_context dev);
     mraa_adv_func_t* advance_func; /**< override function table */
+#if defined(MOCKPLAT)
+    mraa_gpio_dir_t mock_dir; /**< mock direction of the pin */
+    int mock_state; /**< mock state of the pin */
+#endif
     /*@}*/
 };
 

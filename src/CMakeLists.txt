@@ -84,6 +84,11 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/arm/banana.c
 )
 
+set (mraa_LIB_MOCK_SRCS_NOAUTO
+  ${PROJECT_SOURCE_DIR}/src/mock/mock.c
+  ${PROJECT_SOURCE_DIR}/src/mock/mock_board.c
+)
+
 set (mraa_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
 if (X86PLAT)
@@ -94,6 +99,11 @@ endif()
 if (ARMPLAT)
   add_subdirectory(arm)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DARMPLAT=1")
+endif()
+
+if (MOCKPLAT)
+  add_subdirectory(mock)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMOCKPLAT=1")
 endif()
 
 if (USBPLAT)

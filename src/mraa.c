@@ -120,6 +120,9 @@ imraa_init()
 #elif defined(ARMPLAT)
     // Use runtime ARM platform detection
     platform_type = mraa_arm_platform();
+#elif defined(MOCKPLAT)
+    // Use mock platform
+    platform_type = mraa_mock_platform();
 #else
 #error mraa_ARCH NOTHING
 #endif

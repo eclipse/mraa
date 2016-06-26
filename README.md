@@ -39,6 +39,10 @@ USB
 ---
 * [FT4222](../master/docs/ftdi_ft4222.md)
 
+Mock
+----
+* [Generic simulated board](../master/docs/mock.md)
+
 Installing on your board
 ========
 
