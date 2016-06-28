@@ -17,8 +17,7 @@ the `test/index.js` file for an example.
 
 ## Installation
 
-mraaStub is not yet in npm so has to be installed from git. In the future
-you'll be able to install `mraaStub` from npm like this:
+You may install `mraaStub` from npm like this:
 
 ```
 npm install mraaStub
