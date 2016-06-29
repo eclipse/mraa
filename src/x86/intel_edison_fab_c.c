@@ -49,14 +49,14 @@
 typedef struct {
     int sysfs;
     int mode;
-} mraa_intel_edision_pindef_t;
+} mraa_intel_edison_pindef_t;
 
 typedef struct {
-    mraa_intel_edision_pindef_t gpio;
-    mraa_intel_edision_pindef_t pwm;
-    mraa_intel_edision_pindef_t i2c;
-    mraa_intel_edision_pindef_t spi;
-    mraa_intel_edision_pindef_t uart;
+    mraa_intel_edison_pindef_t gpio;
+    mraa_intel_edison_pindef_t pwm;
+    mraa_intel_edison_pindef_t i2c;
+    mraa_intel_edison_pindef_t spi;
+    mraa_intel_edison_pindef_t uart;
 } mraa_intel_edison_pinmodes_t;
 
 static mraa_gpio_context tristate;
@@ -553,7 +553,7 @@ mraa_intel_edison_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode
 }
 
 mraa_result_t
-mraa_intel_edsion_mb_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
+mraa_intel_edison_mb_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 {
     if (dev->value_fp != -1) {
         if (close(dev->value_fp) != 0) {
@@ -659,7 +659,7 @@ mraa_intel_edison_uart_init_post(mraa_uart_context uart)
 }
 
 static mraa_result_t
-mraa_intel_edsion_mmap_unsetup()
+mraa_intel_edison_mmap_unsetup()
 {
     if (mmap_reg == NULL) {
         syslog(LOG_ERR, "edison mmap: null register cant unsetup");
@@ -720,7 +720,7 @@ mraa_intel_edison_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
         dev->mmap_read = NULL;
         mmap_count--;
         if (mmap_count == 0) {
-            return mraa_intel_edsion_mmap_unsetup();
+            return mraa_intel_edison_mmap_unsetup();
         }
         return MRAA_SUCCESS;
     }
@@ -835,7 +835,7 @@ mraa_intel_edison_miniboard(mraa_board_t* b)
     b->adv_func->i2c_init_pre = &mraa_intel_edison_i2c_init_pre;
     b->adv_func->i2c_set_frequency_replace = &mraa_intel_edison_i2c_freq;
     b->adv_func->spi_init_pre = &mraa_intel_edison_spi_init_pre;
-    b->adv_func->gpio_mode_replace = &mraa_intel_edsion_mb_gpio_mode;
+    b->adv_func->gpio_mode_replace = &mraa_intel_edison_mb_gpio_mode;
     b->adv_func->uart_init_pre = &mraa_intel_edison_uart_init_pre;
     b->adv_func->gpio_mmap_setup = &mraa_intel_edison_mmap_setup;
 
