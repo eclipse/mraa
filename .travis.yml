@@ -18,9 +18,10 @@ before_script:
   - if [ "${NODE5}" ]; then nvm install 5; fi
   # Handle 0.10 NODE_ROOT_DIR differently than other versions
   - if [ -z ${NODE010} ]; then export NODE_ROOT_DIR="/home/travis/.nvm/versions/node/`nvm version`"; else export NODE_ROOT_DIR=/home/travis/.nvm/v0.10.36; fi
+  - wget http://prdownloads.sourceforge.net/swig/swig-3.0.10.tar.gz && tar xf swig-3.0.10.tar.gz && cd swig-3.0.10 && ./configure --prefix=/home/travis/ && make && make install && cd ..
 script:
   - echo "CC=$CC BUILDJAVA=$BUILDJAVA NODE010=$NODE010 NODE012=$NODE012 NODE4=$NODE4 NODE5=$NODE5 NODE_ROOT_DIR=$NODE_ROOT_DIR"
-  - mkdir build && cd build && cmake -DBUILDSWIGJAVA=$BUILDJAVA -DNODE_ROOT_DIR:PATH="${NODE_ROOT_DIR}" -DCMAKE_INSTALL_PREFIX:PATH=../install .. && make install && make test
+  - mkdir build && cd build && cmake -DBUILDSWIGJAVA=$BUILDJAVA -DNODE_ROOT_DIR:PATH="${NODE_ROOT_DIR}" -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make install && make test
 addons:
   apt:
     sources:
@@ -29,6 +30,5 @@ addons:
     packages:
       - g++-4.8
       - cmake
-      - swig
       - python
       - git
