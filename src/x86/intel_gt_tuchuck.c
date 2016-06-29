@@ -627,6 +627,16 @@ mraa_gt_tuchuck_board()
     b->pins[pos].gpio.pinmap = 340;
     pos++;
 
+    strncpy(b->pins[pos].name, "LEDWIFI", 8);
+    b->pins[pos].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[pos].gpio.pinmap = 438;
+    pos++;
+
+    strncpy(b->pins[pos].name, "LEDBT", 8);
+    b->pins[pos].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[pos].gpio.pinmap = 439;
+    pos++;
+
     return b;
 
 error:
