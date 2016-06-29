@@ -31,4 +31,6 @@ addons:
       - g++-4.8
       - cmake
       - python
+      - python3
+      - python3-dev
       - git
