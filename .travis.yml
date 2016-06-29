@@ -1,4 +1,5 @@
 language: cpp
+sudo: false
 env:
   - NODE010=true
   - NODE012=true
@@ -9,12 +10,6 @@ compiler:
   - gcc
 install:
   - if [ "${NODE4}" ]; then export CC=gcc-4.8 CXX=g++-4.8; fi
-  - sudo add-apt-repository --yes ppa:kalakris/cmake
-  - sudo add-apt-repository --yes ppa:fenics-packages/fenics-exp/swig
-  - sudo apt-get update -qq
-  - sudo apt-get install -y -qq swig3.0 python git cmake
-  - sudo ln -s /usr/bin/swig3.0 /usr/bin/swig
-  - sudo update-java-alternatives -s java-8-oracle
 before_script:
   # Turn off JAVA SWIG for clang++, use 4.8 for all g++ builds
   - if [ "$CC" == "gcc" ]; then export BUILDJAVA=ON; export CC=gcc-4.8; export CXX=g++-4.8; else export BUILDJAVA=OFF; fi
@@ -30,5 +25,10 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
+      - kalakris-cmake
     packages:
       - g++-4.8
+      - cmake
+      - swig
+      - python
+      - git
