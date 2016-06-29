@@ -294,7 +294,8 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
     unsigned int mi;
     mraa_result_t ret;
     mraa_gpio_context mux_i = NULL;
-    int last_pin = -1;
+    // avoids the unsigned comparison and we should never have a pin that is UINT_MAX!
+    unsigned int last_pin = UINT_MAX;
 
     for (mi = 0; mi < meta.mux_total; mi++) {
 
