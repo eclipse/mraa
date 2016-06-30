@@ -315,6 +315,21 @@ class Gpio
         }
         return mraa_gpio_get_pin(m_gpio);
     }
+    /**
+     * Get pin SYSFS path.
+     *
+     * @throw std::runtime_error in case of failure
+     * @return Pin path string
+     */
+    std::string
+    getPath()
+    {
+        char* path = mraa_gpio_get_path(m_gpio);
+        if (path == NULL) {
+            throw std::logic_error("Failed to get GPIO path");
+        }
+        return path;
+    }
 
   private:
     mraa_gpio_context m_gpio;

@@ -220,6 +220,14 @@ int mraa_gpio_get_pin(mraa_gpio_context dev);
  */
 int mraa_gpio_get_pin_raw(mraa_gpio_context dev);
 
+/**
+ * Get the SYSFS pin path, invalid will return NULL
+ *
+ * @param dev The Gpio context
+ * @return Gpio pin sysfs path or return NULL if invalid
+ */
+char* mraa_gpio_get_path(mraa_gpio_context dev);
+
 #ifdef __cplusplus
 }
 #endif
