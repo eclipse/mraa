@@ -5,6 +5,13 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**1.1.1**
+  * IIO 4.6 kernel matrix support
+  * Intel Grosse Tete radio led support
+  * mraa_init_io() examples
+  * MRAAPLATFORMFORCE fixes
+  * fix python documentation
+
 **1.1.0**
   * build python2 & python3 bindings
   * Intel Grosse Tete support
