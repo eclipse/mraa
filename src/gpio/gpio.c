@@ -605,6 +605,11 @@ mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
+    if (dir == NULL) {
+        syslog(LOG_ERR, "gpio: read_dir: output parameter for dir is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
     snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/direction", dev->pin);
     fd = open(filepath, O_RDONLY);
     if (fd == -1) {
