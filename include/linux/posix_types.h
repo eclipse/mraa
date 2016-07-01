@@ -28,6 +28,8 @@ typedef struct {
 typedef void (*__kernel_sighandler_t)(int);
 typedef int __kernel_key_t;
 typedef int __kernel_mqd_t;
+#if !defined(MSYS)
 #include <asm/posix_types.h>
+#endif
 /* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 #endif

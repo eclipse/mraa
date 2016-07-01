@@ -25,8 +25,17 @@
 
 #include <stdlib.h>
 #include <string.h>
+#if defined(MSYS)
+#define __USE_LINUX_IOCTL_DEFS
+#endif
 #include <sys/ioctl.h>
+#if defined(MSYS)
+// There's no spidev.h on MSYS, so we need to provide our own,
+// and only *after* including ioctl.h as that one contains prerequisites.
+#include "linux/spi_kernel_headers.h"
+#else
 #include <linux/spi/spidev.h>
+#endif
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>

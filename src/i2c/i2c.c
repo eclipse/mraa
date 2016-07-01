@@ -34,6 +34,9 @@
 #include <inttypes.h>
 #include <sys/types.h>
 #include <sys/errno.h>
+#if defined(MSYS)
+#define __USE_LINUX_IOCTL_DEFS
+#endif
 #include <sys/ioctl.h>
 #include "linux/i2c-dev.h"
 #include <errno.h>
