@@ -102,10 +102,12 @@ uint2speed(unsigned int speed)
             return B2500000;
         case 3000000:
             return B3000000;
+#if !defined(MSYS)
         case 3500000:
             return B3500000;
         case 4000000:
             return B4000000;
+#endif
         default:
             // if we are here, then an unsupported baudrate was selected.
             return 0;

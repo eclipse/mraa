@@ -104,6 +104,9 @@ endif()
 if (MOCKPLAT)
   add_subdirectory(mock)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMOCKPLAT=1")
+  if (MSYS)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMSYS=1")
+  endif ()
 endif()
 
 if (USBPLAT)
@@ -228,4 +231,9 @@ set_target_properties(
    SOVERSION ${mraa_VERSION_MAJOR}
    VERSION ${mraa_VERSION_STRING}
 )
-install(TARGETS mraa DESTINATION ${LIB_INSTALL_DIR})
+if (MSYS)
+  # Under MSYS we have to put our generated DLL into bin, otherwise it's not picked up
+  install(TARGETS mraa DESTINATION ${CMAKE_INSTALL_BINDIR})
+else ()
+  install(TARGETS mraa DESTINATION ${LIB_INSTALL_DIR})
+endif ()

@@ -27,6 +27,9 @@
 #include "dirent.h"
 #include <string.h>
 #include <poll.h>
+#if defined(MSYS)
+#define __USE_LINUX_IOCTL_DEFS
+#endif
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 
