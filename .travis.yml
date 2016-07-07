@@ -1,5 +1,6 @@
 language: cpp
-sudo: false
+sudo: required
+dist: trusty
 env:
   - NODE010=true
   - NODE012=true
@@ -8,20 +9,24 @@ env:
 compiler:
   - clang
   - gcc
+before_install:
+  # Via https://github.com/travis-ci/travis-ci/issues/5326
+  - export PATH="$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")"
 install:
   - if [ "${NODE4}" ]; then export CC=gcc-4.8 CXX=g++-4.8; fi
 before_script:
   # Turn off JAVA SWIG for clang++, use 4.8 for all g++ builds
   - if [ "$CC" == "gcc" ]; then export BUILDJAVA=ON; export CC=gcc-4.8; export CXX=g++-4.8; else export BUILDJAVA=OFF; fi
+  - if [ "${NODE010}" ]; then nvm install 0.10; fi
   - if [ "${NODE012}" ]; then nvm install 0.12; fi
   - if [ "${NODE4}" ]; then nvm install 4.1; fi
   - if [ "${NODE5}" ]; then nvm install 5; fi
   # Handle 0.10 NODE_ROOT_DIR differently than other versions
-  - if [ -z ${NODE010} ]; then export NODE_ROOT_DIR="/home/travis/.nvm/versions/node/`nvm version`"; else export NODE_ROOT_DIR=/home/travis/.nvm/v0.10.36; fi
+  - if [ -z ${NODE010} ]; then export NODE_ROOT_DIR="/home/travis/.nvm/versions/node/`nvm version`"; else export NODE_ROOT_DIR=/home/travis/.nvm/`nvm version`; fi
   - wget http://prdownloads.sourceforge.net/swig/swig-3.0.10.tar.gz && tar xf swig-3.0.10.tar.gz && cd swig-3.0.10 && ./configure --prefix=/home/travis/ && make && make install && cd ..
 script:
   - echo "CC=$CC BUILDJAVA=$BUILDJAVA NODE010=$NODE010 NODE012=$NODE012 NODE4=$NODE4 NODE5=$NODE5 NODE_ROOT_DIR=$NODE_ROOT_DIR"
-  - mkdir build && cd build && cmake -DBUILDSWIGJAVA=$BUILDJAVA -DNODE_ROOT_DIR:PATH="${NODE_ROOT_DIR}" -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make install && make test
+  - mkdir build && cd build && cmake -DBUILDSWIGJAVA="$BUILDJAVA" -DNODE_ROOT_DIR:PATH="${NODE_ROOT_DIR}" -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make install && make test
 addons:
   apt:
     sources:
@@ -31,6 +36,7 @@ addons:
       - g++-4.8
       - cmake
       - python
+      - python-dev
       - python3
       - python3-dev
       - git
