@@ -1,6 +1,6 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Copyright (c) 2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,13 +22,15 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#pragma once
+#include "utils.h"
 
-#include "mraa/common.hpp"
-#include "mraa/pwm.hpp"
-#include "mraa/aio.hpp"
-#include "mraa/gpio.hpp"
-#include "mraa/i2c.hpp"
-#include "mraa/spi.hpp"
-#include "mraa/uart.hpp"
-#include "mraa/utils.hpp"
+mraa_result_t
+mraa_usleep(int usec)
+{
+    int ret = usleep(usec);
+    if (usleep(usec) == 0) {
+        return MRAA_SUCCESS;
+    }
+
+    return MRAA_ERROR_UNSPECIFIED;
+}

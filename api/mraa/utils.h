@@ -1,6 +1,6 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright © 2014 Intel Corporation
+ * Copyright (c) 2016 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -23,18 +23,21 @@
 
 #pragma once
 
+/** @file
+ *
+ * This file defines the basic libmraa utilities for cross OS mraa drivers
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "mraa/pwm.h"
-#include "mraa/aio.h"
-#include "mraa/gpio.h"
-#include "mraa/spi.h"
-#include "mraa/i2c.h"
-#include "mraa/uart.h"
-#include "mraa/uart_ow.h"
-#include "mraa/utils.h"
+/**
+ * Micro second sleep
+ *
+ * @return Result of operation
+ */
+mraa_result_t mraa_usleep(int usec);
 
 #ifdef __cplusplus
 }

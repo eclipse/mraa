@@ -1,6 +1,6 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Copyright (c) 2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -24,11 +24,23 @@
 
 #pragma once
 
-#include "mraa/common.hpp"
-#include "mraa/pwm.hpp"
-#include "mraa/aio.hpp"
-#include "mraa/gpio.hpp"
-#include "mraa/i2c.hpp"
-#include "mraa/spi.hpp"
-#include "mraa/uart.hpp"
-#include "mraa/utils.hpp"
+#include "utils.h"
+
+/**
+ * @namespace mraa namespace
+ */
+namespace mraa
+{
+
+/**
+ * Micro second sleep
+ *
+ * @return Result of operation
+ */
+inline Result
+usleep(int usec)
+{
+    return (Result) mraa_init(usec);
+}
+
+}
