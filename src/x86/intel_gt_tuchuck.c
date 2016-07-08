@@ -69,9 +69,9 @@ mraa_gt_tuchuck_board()
     b->i2c_bus[1].bus_id = 5;
     b->i2c_bus[1].sda = 15;
     b->i2c_bus[1].scl = 17;
-    b->i2c_bus[1].bus_id = 6;
-    b->i2c_bus[1].sda = 19;
-    b->i2c_bus[1].scl = 21;
+    b->i2c_bus[2].bus_id = 6;
+    b->i2c_bus[2].sda = 19;
+    b->i2c_bus[2].scl = 21;
     b->def_i2c_bus = b->i2c_bus[0].bus_id;
 
 #if 0
