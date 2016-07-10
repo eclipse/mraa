@@ -12,17 +12,17 @@ Board configuration
 -------------------
 
 This feature is yet in the experimental mode and not all functionality is available.
-Right now we simulate a single generic board with only GPIO (without ISR) working.
-It also reports having an ADC with 10 (std)/12 (max) bit resolution, but the ADC
-functionality itself is not yet implemented.
+Right now we simulate a single generic board with GPIO (without ISR) and
+an ADC with 10 (std)/12 (max) bit resolution, which returns random values on read.
 
 We plan to develop it further and all [contributions](../CONTRIBUTING.md) are more than welcome.
 
 See the table below for pin layout and features
 
-| MRAA Number | Pin Name |            Notes            |
-|-------------|----------|-----------------------------|
-| 0           | GPIO0    | GPIO pin, no muxing, no ISR |
+| MRAA Number | Pin Name |            Notes                      |
+|-------------|----------|---------------------------------------|
+| 0           | GPIO0    | GPIO pin, no muxing, no ISR           |
+| 1           | ADC0     | AIO pin, returns random value on read |
 
 Building
 --------

@@ -131,6 +131,29 @@ mraa_mock_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode)
     return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
+mraa_result_t
+mraa_mock_aio_init_internal_replace(mraa_aio_context dev, int pin)
+{
+    dev->channel = pin;
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_mock_aio_close_replace(mraa_aio_context dev)
+{
+    free(dev);
+    return MRAA_SUCCESS;
+}
+
+int
+mraa_mock_aio_read_replace(mraa_aio_context dev)
+{
+    // return some random number between 0 and max value, based on the resolution
+    int max_value = (1 << dev->value_bit) - 1;
+    srand(time(NULL));
+    return rand() % max_value;
+}
+
 mraa_board_t*
 mraa_mock_board()
 {
@@ -142,6 +165,7 @@ mraa_mock_board()
     // General board definitions
     b->platform_name = PLATFORM_NAME;
     b->phy_pin_count = MRAA_MOCK_PINCOUNT;
+    b->gpio_count = 1;
     b->aio_count = 1;
     b->adc_raw = 12;
     b->adc_supported = 10;
@@ -174,6 +198,9 @@ mraa_mock_board()
     b->adv_func->gpio_isr_replace = &mraa_mock_gpio_isr_replace;
     b->adv_func->gpio_isr_exit_replace = &mraa_mock_gpio_isr_exit_replace;
     b->adv_func->gpio_mode_replace = &mraa_mock_gpio_mode_replace;
+    b->adv_func->aio_init_internal_replace = &mraa_mock_aio_init_internal_replace;
+    b->adv_func->aio_close_replace = &mraa_mock_aio_close_replace;
+    b->adv_func->aio_read_replace = &mraa_mock_aio_read_replace;
 
     // Pin definitions
     int pos = 0;
@@ -182,6 +209,12 @@ mraa_mock_board()
     b->pins[pos].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 0;
     b->pins[pos].gpio.mux_total = 0;
+    pos++;
+
+    strncpy(b->pins[pos].name, "ADC0", 8);
+    b->pins[pos].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[pos].aio.pinmap = 0;
+    b->pins[pos].aio.mux_total = 0;
     pos++;
 
     return b;

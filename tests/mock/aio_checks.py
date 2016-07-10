@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
-# Author: Costin Constantin <costin.c.constantin@intel.com>
-# Copyright (c) 2015 Intel Corporation.
-#
-# Contributors: Alex Tereschenko <alext.mkrs@gmail.com>
+# Author: Alex Tereschenko <alext.mkrs@gmail.com>
+# Copyright (c) 2016 Alex Tereschenko.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,23 +25,34 @@
 import mraa as m
 import unittest as u
 
-PLATFORM_PINCOUNT = 2
+MRAA_AIO_TEST_PIN = 0
 PLATFORM_STD_ADC_RES_BITS = 10
 PLATFORM_MAX_ADC_RES_BITS = 12
 
-class PlatformChecks(u.TestCase):
-  def test_platform_pin_count(self):
-    self.assertEqual(m.getPinCount(), PLATFORM_PINCOUNT, "Wrong number of pins reported by platform")
+class AioChecks(u.TestCase):
+  def setUp(self):
+    self.pin = m.Aio(MRAA_AIO_TEST_PIN)
 
-  def test_adc_std_res(self):
-    adc_std_res = m.adcSupportedBits()
-    print("Platform ADC standard resolution is: " + str(adc_std_res) + " bits")
-    self.assertEqual(adc_std_res, PLATFORM_STD_ADC_RES_BITS, "Wrong ADC standard resolution")
+  def tearDown(self):
+    del self.pin
 
-  def test_adc_max_res(self):
-    adc_max_res = m.adcRawBits()
-    print("Platform ADC max. resolution is: " + str(adc_max_res) + " bits")
-    self.assertEqual(adc_max_res, PLATFORM_MAX_ADC_RES_BITS, "Wrong ADC max. resolution")
+  def test_aio_get_bit(self):
+    self.assertEqual(self.pin.getBit(), PLATFORM_STD_ADC_RES_BITS, "Wrong ADC resolution reported")
+
+  def test_aio_set_bit(self):
+    self.pin.setBit(PLATFORM_MAX_ADC_RES_BITS)
+    self.assertEqual(self.pin.getBit(), PLATFORM_MAX_ADC_RES_BITS, "Wrong ADC resolution reported after setBit()")
+
+  def test_aio_read(self):
+    self.assertNotEqual(self.pin.read(), -1, "Error returned when reading ADC value")
+
+  def test_aio_read_float_std_res(self):
+    self.pin.setBit(PLATFORM_STD_ADC_RES_BITS)
+    self.assertNotEqual(self.pin.readFloat(), -1, "Error returned when reading float ADC value at standard resolution")
+
+  def test_aio_read_float_max_res(self):
+    self.pin.setBit(PLATFORM_MAX_ADC_RES_BITS)
+    self.assertNotEqual(self.pin.readFloat(), -1, "Error returned when reading float ADC value at maximum resolution")
 
 if __name__ == "__main__":
   u.main()
