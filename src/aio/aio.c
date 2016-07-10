@@ -225,13 +225,22 @@ mraa_aio_read_float(mraa_aio_context dev)
 mraa_result_t
 mraa_aio_close(mraa_aio_context dev)
 {
-    if (NULL != dev) {
-        if (dev->adc_in_fp != -1)
-            close(dev->adc_in_fp);
-        free(dev);
+    if (dev == NULL) {
+        syslog(LOG_ERR, "aio: close: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    return (MRAA_SUCCESS);
+    if (IS_FUNC_DEFINED(dev, aio_close_replace)) {
+        return dev->advance_func->aio_close_replace(dev);
+    }
+
+    if (dev->adc_in_fp != -1) {
+        close(dev->adc_in_fp);
+    }
+
+    free(dev);
+
+    return MRAA_SUCCESS;
 }
 
 mraa_result_t
