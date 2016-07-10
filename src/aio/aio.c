@@ -156,6 +156,11 @@ mraa_aio_init(unsigned int aio)
 int
 mraa_aio_read(mraa_aio_context dev)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "aio: read: context is invalid");
+        return -1;
+    }
+
     if (IS_FUNC_DEFINED(dev, aio_read_replace)) {
         return dev->advance_func->aio_read_replace(dev);
     }
