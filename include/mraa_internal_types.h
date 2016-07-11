@@ -262,7 +262,7 @@ typedef struct {
 
 typedef struct {
     /*@{*/
-    unsigned int pinmap; /**< sysfs pin */
+    int pinmap; /**< sysfs pin */
     unsigned int parent_id; /** parent chip id */
     unsigned int mux_total; /** Numfer of muxes needed for operation of pin */
     mraa_mux_t mux[6]; /** Array holding information about mux */
