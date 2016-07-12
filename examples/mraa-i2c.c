@@ -65,24 +65,13 @@ print_bus(mraa_board_t* board)
     for (i = 0; i < board->i2c_bus_count; ++i) {
         char* busType;
         switch (board->platform_type) {
-            case MRAA_INTEL_GALILEO_GEN1:
-            case MRAA_INTEL_GALILEO_GEN2:
-            case MRAA_INTEL_EDISON_FAB_C:
-            case MRAA_INTEL_DE3815:
-            case MRAA_INTEL_MINNOWBOARD_MAX:
-            case MRAA_RASPBERRY_PI:
-            case MRAA_BEAGLEBONE:
-            case MRAA_BANANA:
-            case MRAA_UP:
-                bus = i;
-                busType = "linux";
-                break;
             case MRAA_FTDI_FT4222:
                 busType = "ft4222";
                 bus = mraa_get_sub_platform_id(i);
                 break;
             default:
-                busType = "unknown";
+                busType = "linux";
+                bus = i;
                 break;
         }
         int id = board->i2c_bus[i].bus_id;
