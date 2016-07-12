@@ -66,12 +66,19 @@ mraa_gt_tuchuck_board()
     b->i2c_bus[0].bus_id = 0;
     b->i2c_bus[0].sda = 11;
     b->i2c_bus[0].scl = 13;
-    b->i2c_bus[1].bus_id = 5;
+
+    if (mraa_find_i2c_bus("designware", 5) != 5) {
+        b->i2c_bus[1].bus_id = 9;
+        b->i2c_bus[2].bus_id = 10;
+    } else {
+        b->i2c_bus[1].bus_id = 5;
+        b->i2c_bus[2].bus_id = 6;
+    }
     b->i2c_bus[1].sda = 15;
     b->i2c_bus[1].scl = 17;
-    b->i2c_bus[2].bus_id = 6;
     b->i2c_bus[2].sda = 19;
     b->i2c_bus[2].scl = 21;
+
     b->def_i2c_bus = b->i2c_bus[0].bus_id;
 
 #if 0
