@@ -5,6 +5,12 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**1.1.2**
+  * Mock platform support
+  * mraa-i2c treats i2c buses by default as linux
+  * grosse tete i2c fixes
+  * travis now uses 14.04 instead of 12.04
+
 **1.1.1**
   * IIO 4.6 kernel matrix support
   * Intel Grosse Tete radio led support
