@@ -29,6 +29,7 @@
 #include "mock/mock_board.h"
 #include "mock/mock_board_gpio.h"
 #include "mock/mock_board_aio.h"
+#include "mock/mock_board_i2c.h"
 
 #define PLATFORM_NAME "MRAA mock platform"
 
@@ -47,7 +48,13 @@ mraa_mock_board()
     b->aio_count = 1;
     b->adc_raw = 12;
     b->adc_supported = 10;
-    b->i2c_bus_count = 0;
+
+    b->i2c_bus_count = 1;
+    b->i2c_bus[0].bus_id = 0;
+    b->i2c_bus[0].sda = 2;
+    b->i2c_bus[0].scl = 3;
+    b->def_i2c_bus = b->i2c_bus[0].bus_id;
+
     b->spi_bus_count = 0;
 
     b->pwm_default_period = 0;
@@ -79,6 +86,19 @@ mraa_mock_board()
     b->adv_func->aio_init_internal_replace = &mraa_mock_aio_init_internal_replace;
     b->adv_func->aio_close_replace = &mraa_mock_aio_close_replace;
     b->adv_func->aio_read_replace = &mraa_mock_aio_read_replace;
+    b->adv_func->i2c_init_bus_replace = &mraa_mock_i2c_init_bus_replace;
+    b->adv_func->i2c_stop_replace = &mraa_mock_i2c_stop_replace;
+    b->adv_func->i2c_set_frequency_replace = &mraa_mock_i2c_set_frequency_replace;
+    b->adv_func->i2c_address_replace = &mraa_mock_i2c_address_replace;
+    b->adv_func->i2c_read_replace = &mraa_mock_i2c_read_replace;
+    b->adv_func->i2c_read_byte_replace = &mraa_mock_i2c_read_byte_replace;
+    b->adv_func->i2c_read_byte_data_replace = &mraa_mock_i2c_read_byte_data_replace;
+    b->adv_func->i2c_read_bytes_data_replace = &mraa_mock_i2c_read_bytes_data_replace;
+    b->adv_func->i2c_read_word_data_replace = &mraa_mock_i2c_read_word_data_replace;
+    b->adv_func->i2c_write_replace = &mraa_mock_i2c_write_replace;
+    b->adv_func->i2c_write_byte_replace = &mraa_mock_i2c_write_byte_replace;
+    b->adv_func->i2c_write_byte_data_replace = &mraa_mock_i2c_write_byte_data_replace;
+    b->adv_func->i2c_write_word_data_replace = &mraa_mock_i2c_write_word_data_replace;
 
     // Pin definitions
     int pos = 0;
@@ -93,6 +113,18 @@ mraa_mock_board()
     b->pins[pos].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
     b->pins[pos].aio.pinmap = 0;
     b->pins[pos].aio.mux_total = 0;
+    pos++;
+
+    strncpy(b->pins[pos].name, "I2C0SDA", 8);
+    b->pins[pos].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
+    b->pins[pos].i2c.mux_total = 0;
+    b->pins[pos].i2c.pinmap = 0;
+    pos++;
+
+    strncpy(b->pins[pos].name, "I2C0SCL", 8);
+    b->pins[pos].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
+    b->pins[pos].i2c.mux_total = 0;
+    b->pins[pos].i2c.pinmap = 0;
     pos++;
 
     return b;

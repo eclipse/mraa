@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
-# Author: Costin Constantin <costin.c.constantin@intel.com>
-# Copyright (c) 2015 Intel Corporation.
-#
-# Contributors: Alex Tereschenko <alext.mkrs@gmail.com>
+# Author: Alex Tereschenko <alext.mkrs@gmail.com>
+# Copyright (c) 2016 Alex Tereschenko.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,23 +25,28 @@
 import mraa as m
 import unittest as u
 
-PLATFORM_PINCOUNT = 4
-PLATFORM_STD_ADC_RES_BITS = 10
-PLATFORM_MAX_ADC_RES_BITS = 12
+from i2c_checks_shared import *
 
-class PlatformChecks(u.TestCase):
-  def test_platform_pin_count(self):
-    self.assertEqual(m.getPinCount(), PLATFORM_PINCOUNT, "Wrong number of pins reported by platform")
+class I2cChecksReadByteData(u.TestCase):
+  def setUp(self):
+    self.i2c = m.I2c(MRAA_I2C_BUS_NUM)
 
-  def test_adc_std_res(self):
-    adc_std_res = m.adcSupportedBits()
-    print("Platform ADC standard resolution is: " + str(adc_std_res) + " bits")
-    self.assertEqual(adc_std_res, PLATFORM_STD_ADC_RES_BITS, "Wrong ADC standard resolution")
+  def tearDown(self):
+    del self.i2c
 
-  def test_adc_max_res(self):
-    adc_max_res = m.adcRawBits()
-    print("Platform ADC max. resolution is: " + str(adc_max_res) + " bits")
-    self.assertEqual(adc_max_res, PLATFORM_MAX_ADC_RES_BITS, "Wrong ADC max. resolution")
+  def test_i2c_read_byte_data(self):
+    self.i2c.address(MRAA_MOCK_I2C_ADDR)
+    expected_res = MRAA_MOCK_I2C_DATA_INIT_BYTE
+    res = self.i2c.readReg(MRAA_MOCK_I2C_DATA_LEN - 1)
+    self.assertEqual(res, expected_res, "I2C readReg() returned unexpected data")
+
+  def test_i2c_read_byte_data_invalid_addr(self):
+    self.i2c.address(MRAA_MOCK_I2C_ADDR - 1)
+    self.assertRaises(ValueError, self.i2c.readReg, MRAA_MOCK_I2C_DATA_LEN - 1)
+
+  def test_i2c_read_byte_data_invalid_reg(self):
+    self.i2c.address(MRAA_MOCK_I2C_ADDR)
+    self.assertRaises(ValueError, self.i2c.readReg, MRAA_MOCK_I2C_DATA_LEN)
 
 if __name__ == "__main__":
   u.main()
