@@ -197,6 +197,11 @@ mraa_i2c_init_raw(unsigned int bus)
 mraa_result_t
 mraa_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "i2c: frequency: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
     if (IS_FUNC_DEFINED(dev, i2c_set_frequency_replace)) {
         return dev->advance_func->i2c_set_frequency_replace(dev, mode);
     }
@@ -206,6 +211,11 @@ mraa_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 int
 mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "i2c: read: context is invalid");
+        return -1;
+    }
+
     int bytes_read = 0;
     if (IS_FUNC_DEFINED(dev, i2c_read_replace)) {
         bytes_read = dev->advance_func->i2c_read_replace(dev, data, length);
@@ -223,6 +233,11 @@ mraa_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
 int
 mraa_i2c_read_byte(mraa_i2c_context dev)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "i2c: read_byte: context is invalid");
+        return -1;
+    }
+
     if (IS_FUNC_DEFINED(dev, i2c_read_byte_replace))
         return dev->advance_func->i2c_read_byte_replace(dev);
     i2c_smbus_data_t d;
@@ -236,6 +251,11 @@ mraa_i2c_read_byte(mraa_i2c_context dev)
 int
 mraa_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "i2c: read_byte_data: context is invalid");
+        return -1;
+    }
+
     if (IS_FUNC_DEFINED(dev, i2c_read_byte_data_replace))
         return dev->advance_func->i2c_read_byte_data_replace(dev, command);
     i2c_smbus_data_t d;
@@ -249,6 +269,11 @@ mraa_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 int
 mraa_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "i2c: read_word_data: context is invalid");
+        return -1;
+    }
+
     if (IS_FUNC_DEFINED(dev, i2c_read_word_data_replace))
         return dev->advance_func->i2c_read_word_data_replace(dev, command);
     i2c_smbus_data_t d;
@@ -262,6 +287,11 @@ mraa_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 int
 mraa_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* data, int length)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "i2c: read_bytes_data: context is invalid");
+        return -1;
+    }
+
     if (IS_FUNC_DEFINED(dev, i2c_read_bytes_data_replace))
         return dev->advance_func->i2c_read_bytes_data_replace(dev, command, data, length);
     struct i2c_rdwr_ioctl_data d;
@@ -292,6 +322,11 @@ mraa_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* data, i
 mraa_result_t
 mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "i2c: write: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
     if (IS_FUNC_DEFINED(dev, i2c_write_replace))
         return dev->advance_func->i2c_write_replace(dev, data, length);
     i2c_smbus_data_t d;
@@ -319,6 +354,11 @@ mraa_i2c_write(mraa_i2c_context dev, const uint8_t* data, int length)
 mraa_result_t
 mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "i2c: write_byte: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
     if (IS_FUNC_DEFINED(dev, i2c_write_byte_replace)) {
         return dev->advance_func->i2c_write_byte_replace(dev, data);
     } else {
@@ -333,6 +373,11 @@ mraa_i2c_write_byte(mraa_i2c_context dev, const uint8_t data)
 mraa_result_t
 mraa_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "i2c: write_byte_data: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
     if (IS_FUNC_DEFINED(dev, i2c_write_byte_data_replace))
         return dev->advance_func->i2c_write_byte_data_replace(dev, data, command);
     i2c_smbus_data_t d;
@@ -347,6 +392,11 @@ mraa_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t
 mraa_result_t
 mraa_i2c_write_word_data(mraa_i2c_context dev, const uint16_t data, const uint8_t command)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "i2c: write_word_data: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
     if (IS_FUNC_DEFINED(dev, i2c_write_word_data_replace))
         return dev->advance_func->i2c_write_word_data_replace(dev, data, command);
     i2c_smbus_data_t d;
@@ -362,6 +412,7 @@ mraa_result_t
 mraa_i2c_address(mraa_i2c_context dev, uint8_t addr)
 {
     if (dev == NULL) {
+        syslog(LOG_ERR, "i2c: address: context is invalid");
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
@@ -381,6 +432,11 @@ mraa_i2c_address(mraa_i2c_context dev, uint8_t addr)
 mraa_result_t
 mraa_i2c_stop(mraa_i2c_context dev)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "i2c: stop: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
     free(dev);
     return MRAA_SUCCESS;
 }
