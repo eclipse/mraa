@@ -89,6 +89,11 @@ struct _i2c {
     unsigned long funcs; /**< /dev/i2c-* device capabilities as per https://www.kernel.org/doc/Documentation/i2c/functionality */
     void *handle; /**< generic handle for non-standard drivers that don't use file descriptors  */
     mraa_adv_func_t* advance_func; /**< override function table */
+#if defined(MOCKPLAT)
+    uint8_t mock_dev_addr; /**< address of the mock I2C device */
+    uint8_t mock_dev_data_len; /**< mock device data register block length in bytes */
+    uint8_t* mock_dev_data; /**< mock device data register block contents */
+#endif
     /*@}*/
 };
 
