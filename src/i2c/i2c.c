@@ -437,6 +437,10 @@ mraa_i2c_stop(mraa_i2c_context dev)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
+    if (IS_FUNC_DEFINED(dev, i2c_stop_replace)) {
+        return dev->advance_func->i2c_stop_replace(dev);
+    }
+
     free(dev);
     return MRAA_SUCCESS;
 }
