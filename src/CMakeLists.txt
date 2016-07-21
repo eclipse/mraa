@@ -87,6 +87,8 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
 set (mraa_LIB_MOCK_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/mock/mock.c
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board.c
+  ${PROJECT_SOURCE_DIR}/src/mock/mock_board_gpio.c
+  ${PROJECT_SOURCE_DIR}/src/mock/mock_board_aio.c
 )
 
 set (mraa_LIBS ${CMAKE_THREAD_LIBS_INIT})
