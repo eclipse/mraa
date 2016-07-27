@@ -351,6 +351,9 @@ mraa_firmata_aio_read(mraa_aio_context dev)
 static mraa_result_t
 mraa_firmata_aio_init_internal_replace(mraa_aio_context dev, int aio)
 {
+    // set the channel, since we override internal it's never set
+    // offset by 14 because it makes total logical sense.
+    dev->channel = aio + 14;
     // firmata considers A0 pin0 as well as actual pin0 :/
     firmata_pinMode(firmata_dev, aio, MODE_ANALOG);
     // register for updates on that ADC channel
