@@ -140,6 +140,34 @@ mraa_intel_galileo_g1_spi_lsbmode_replace(mraa_spi_context dev, mraa_boolean_t l
     return MRAA_SUCCESS;
 }
 
+mraa_result_t
+mraa_intel_galileo_g1_pwm_init_pre(int pin)
+{
+    // Gen1 galileo has no kernel muxing for GPIOs/PWM so ends up with leakage
+    // on the PWM pins from the GPIO pins if not set to output high
+    if (plat->pins[pin].capabilites.gpio == 1) {
+        mraa_gpio_context mux_i;
+        mux_i = mraa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
+        if (mux_i == NULL) {
+            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_init", pin);
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        if (mraa_gpio_dir(mux_i, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_dir", pin);
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        if (mraa_gpio_write(mux_i, 1) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_write", pin);
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        if (mraa_gpio_close(mux_i) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_close", pin);
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+    }
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_intel_galileo_rev_d()
 {
@@ -166,6 +194,7 @@ mraa_intel_galileo_rev_d()
     }
     b->adv_func->gpio_mmap_setup = &mraa_intel_galileo_g1_mmap_setup;
     b->adv_func->spi_lsbmode_replace = &mraa_intel_galileo_g1_spi_lsbmode_replace;
+    b->adv_func->pwm_init_pre = mraa_intel_galileo_g1_pwm_init_pre;
 
     b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_GALILEO_REV_D_PINCOUNT, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
