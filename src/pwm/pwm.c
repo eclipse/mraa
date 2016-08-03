@@ -249,28 +249,6 @@ mraa_pwm_init(int pin)
             return NULL;
     }
 
-    if (board->pins[pin].capabilites.gpio == 1) {
-        // This deserves more investigation
-        mraa_gpio_context mux_i;
-        mux_i = mraa_gpio_init_raw(board->pins[pin].gpio.pinmap);
-        if (mux_i == NULL) {
-            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_init", pin);
-            return NULL;
-        }
-        if (mraa_gpio_dir(mux_i, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_dir", pin);
-            return NULL;
-        }
-        if (mraa_gpio_write(mux_i, 1) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_write", pin);
-            return NULL;
-        }
-        if (mraa_gpio_close(mux_i) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_close", pin);
-            return NULL;
-        }
-    }
-
     if (board->pins[pin].pwm.mux_total > 0) {
         if (mraa_setup_mux_mapped(board->pins[pin].pwm) != MRAA_SUCCESS) {
             syslog(LOG_ERR, "pwm_init: Failed to set-up pwm%i multiplexer", pin);
