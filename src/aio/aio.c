@@ -113,7 +113,7 @@ mraa_aio_init(unsigned int aio)
         syslog(LOG_ERR, "aio: requested channel out of range");
         return NULL;
     }
-    if (board->pins[pin].capabilites.aio != 1) {
+    if (board->pins[pin].capabilities.aio != 1) {
         syslog(LOG_ERR, "aio: pin %i not capable of aio", pin);
         return NULL;
     }

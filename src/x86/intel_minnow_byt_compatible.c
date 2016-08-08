@@ -45,7 +45,7 @@ mraa_set_pininfo(mraa_board_t* board, int mraa_index, char* name, mraa_pincapabi
         // adjust mraa_index for ARCH_NR_GPIOS value
         mraa_pininfo_t* pin_info = &board->pins[mraa_index];
         strncpy(pin_info->name, name, MAX_LENGTH);
-        pin_info->capabilites = caps;
+        pin_info->capabilities = caps;
         if (caps.gpio) {
             pin_info->gpio.pinmap = sysfs_pin | arch_nr_gpios_adjust;
             pin_info->gpio.mux_total = 0;

@@ -312,7 +312,7 @@ mraa_beaglebone_pwm_init_replace(int pin)
         syslog(LOG_ERR, "pwm: Platform Not Initialised");
         return NULL;
     }
-    if (plat->pins[pin].capabilites.pwm != 1) {
+    if (plat->pins[pin].capabilities.pwm != 1) {
         syslog(LOG_ERR, "pwm: pin not capable of pwm");
         return NULL;
     }
@@ -525,20 +525,20 @@ mraa_beaglebone()
     b->adv_func->pwm_init_replace = &mraa_beaglebone_pwm_init_replace;
 
     strncpy(b->pins[0].name, "INVALID", MRAA_PIN_NAME_SIZE);
-    b->pins[0].capabilites = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[0].capabilities = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[1].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[1].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[1].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[2].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[2].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[2].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     if (emmc_enabled == 1) {
         strncpy(b->pins[3].name, "MMC1_D6", MRAA_PIN_NAME_SIZE);
-        b->pins[3].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[3].name, "GPIO38", MRAA_PIN_NAME_SIZE);
-        b->pins[3].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[3].gpio.pinmap = 38;
     b->pins[3].gpio.parent_id = 0;
@@ -546,10 +546,10 @@ mraa_beaglebone()
 
     if (emmc_enabled == 1) {
         strncpy(b->pins[4].name, "MMC1_D7", MRAA_PIN_NAME_SIZE);
-        b->pins[4].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[4].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[4].name, "GPIO39", MRAA_PIN_NAME_SIZE);
-        b->pins[4].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[4].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[4].gpio.pinmap = 39;
     b->pins[4].gpio.parent_id = 0;
@@ -557,10 +557,10 @@ mraa_beaglebone()
 
     if (emmc_enabled == 1) {
         strncpy(b->pins[5].name, "MMC1_D2", MRAA_PIN_NAME_SIZE);
-        b->pins[5].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[5].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[5].name, "GPIO34", MRAA_PIN_NAME_SIZE);
-        b->pins[5].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[5].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[5].gpio.pinmap = 34;
     b->pins[5].gpio.parent_id = 0;
@@ -568,10 +568,10 @@ mraa_beaglebone()
 
     if (emmc_enabled == 1) {
         strncpy(b->pins[6].name, "MMC1_D3", MRAA_PIN_NAME_SIZE);
-        b->pins[6].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[6].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[6].name, "GPIO35", MRAA_PIN_NAME_SIZE);
-        b->pins[6].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[6].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[6].gpio.pinmap = 35;
     b->pins[6].gpio.parent_id = 0;
@@ -579,50 +579,50 @@ mraa_beaglebone()
 
     // TODO TIMER4
     strncpy(b->pins[7].name, "GPIO66", MRAA_PIN_NAME_SIZE);
-    b->pins[7].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[7].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[7].gpio.pinmap = 66;
     b->pins[7].gpio.parent_id = 0;
     b->pins[7].gpio.mux_total = 0;
 
     // TODO TIMER7
     strncpy(b->pins[8].name, "GPIO67", MRAA_PIN_NAME_SIZE);
-    b->pins[8].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[8].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[8].gpio.pinmap = 67;
     b->pins[8].gpio.parent_id = 0;
     b->pins[8].gpio.mux_total = 0;
 
     // TODO TIMER5
     strncpy(b->pins[9].name, "GPIO69", MRAA_PIN_NAME_SIZE);
-    b->pins[9].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[9].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[9].gpio.pinmap = 69;
     b->pins[9].gpio.parent_id = 0;
     b->pins[9].gpio.mux_total = 0;
 
     // TODO TIMER6
     strncpy(b->pins[10].name, "GPIO68", MRAA_PIN_NAME_SIZE);
-    b->pins[10].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[10].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[10].gpio.pinmap = 68;
     b->pins[10].gpio.parent_id = 0;
     b->pins[10].gpio.mux_total = 0;
 
     strncpy(b->pins[11].name, "GPIO45", MRAA_PIN_NAME_SIZE);
-    b->pins[11].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[11].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[11].gpio.pinmap = 45;
     b->pins[11].gpio.parent_id = 0;
     b->pins[11].gpio.mux_total = 0;
 
     strncpy(b->pins[12].name, "GPIO44", MRAA_PIN_NAME_SIZE);
-    b->pins[12].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[12].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[12].gpio.pinmap = 44;
     b->pins[12].gpio.parent_id = 0;
     b->pins[12].gpio.mux_total = 0;
 
     if (ehrpwm2b_enabled == 1) {
         strncpy(b->pins[13].name, "EHRPWM2B", MRAA_PIN_NAME_SIZE);
-        b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+        b->pins[13].capabilities = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[13].name, "GPIO23", MRAA_PIN_NAME_SIZE);
-        b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+        b->pins[13].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     }
     b->pins[13].gpio.pinmap = 23;
     b->pins[13].gpio.parent_id = 0;
@@ -631,42 +631,42 @@ mraa_beaglebone()
     b->pins[13].pwm.mux_total = 0;
 
     strncpy(b->pins[14].name, "GPIO26", MRAA_PIN_NAME_SIZE);
-    b->pins[14].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[14].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[14].gpio.pinmap = 26;
     b->pins[14].gpio.parent_id = 0;
     b->pins[14].gpio.mux_total = 0;
 
     strncpy(b->pins[15].name, "GPIO47", MRAA_PIN_NAME_SIZE);
-    b->pins[15].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[15].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[15].gpio.pinmap = 47;
     b->pins[15].gpio.parent_id = 0;
     b->pins[15].gpio.mux_total = 0;
 
     strncpy(b->pins[16].name, "GPIO46", MRAA_PIN_NAME_SIZE);
-    b->pins[16].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[16].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[16].gpio.pinmap = 46;
     b->pins[16].gpio.parent_id = 0;
     b->pins[16].gpio.mux_total = 0;
 
     // TODO PWM0_SYNCO
     strncpy(b->pins[17].name, "GPIO27", MRAA_PIN_NAME_SIZE);
-    b->pins[17].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[17].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[17].gpio.pinmap = 27;
     b->pins[17].gpio.parent_id = 0;
     b->pins[17].gpio.mux_total = 0;
 
     strncpy(b->pins[18].name, "GPIO65", MRAA_PIN_NAME_SIZE);
-    b->pins[18].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[18].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[18].gpio.pinmap = 65;
     b->pins[18].gpio.parent_id = 0;
     b->pins[18].gpio.mux_total = 0;
 
     if (ehrpwm2a_enabled == 1) {
         strncpy(b->pins[19].name, "EHRPWM2A", MRAA_PIN_NAME_SIZE);
-        b->pins[19].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+        b->pins[19].capabilities = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[19].name, "GPIO22", MRAA_PIN_NAME_SIZE);
-        b->pins[19].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+        b->pins[19].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     }
     b->pins[19].gpio.pinmap = 22;
     b->pins[19].gpio.parent_id = 0;
@@ -676,10 +676,10 @@ mraa_beaglebone()
 
     if (emmc_enabled == 1) {
         strncpy(b->pins[20].name, "MMC1_CMD", MRAA_PIN_NAME_SIZE);
-        b->pins[20].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[20].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[20].name, "GPIO63", MRAA_PIN_NAME_SIZE);
-        b->pins[20].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[20].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[20].gpio.pinmap = 63;
     b->pins[20].gpio.parent_id = 0;
@@ -687,10 +687,10 @@ mraa_beaglebone()
 
     if (emmc_enabled == 1) {
         strncpy(b->pins[21].name, "MMC1_CLK", MRAA_PIN_NAME_SIZE);
-        b->pins[21].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[21].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[21].name, "GPIO62", MRAA_PIN_NAME_SIZE);
-        b->pins[21].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[21].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[21].gpio.pinmap = 62;
     b->pins[21].gpio.parent_id = 0;
@@ -698,10 +698,10 @@ mraa_beaglebone()
 
     if (emmc_enabled == 1) {
         strncpy(b->pins[22].name, "MMC1_D5", MRAA_PIN_NAME_SIZE);
-        b->pins[22].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[22].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[22].name, "GPIO37", MRAA_PIN_NAME_SIZE);
-        b->pins[22].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[22].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[22].gpio.pinmap = 37;
     b->pins[22].gpio.parent_id = 0;
@@ -709,10 +709,10 @@ mraa_beaglebone()
 
     if (emmc_enabled == 1) {
         strncpy(b->pins[23].name, "MMC_D4", MRAA_PIN_NAME_SIZE);
-        b->pins[23].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[23].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[23].name, "GPIO36", MRAA_PIN_NAME_SIZE);
-        b->pins[23].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[23].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[23].gpio.pinmap = 36;
     b->pins[23].gpio.parent_id = 0;
@@ -720,10 +720,10 @@ mraa_beaglebone()
 
     if (emmc_enabled == 1) {
         strncpy(b->pins[24].name, "MMC_D1", MRAA_PIN_NAME_SIZE);
-        b->pins[24].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[24].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[24].name, "GPIO33", MRAA_PIN_NAME_SIZE);
-        b->pins[24].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[24].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[24].gpio.pinmap = 33;
     b->pins[24].gpio.parent_id = 0;
@@ -731,27 +731,27 @@ mraa_beaglebone()
 
     if (emmc_enabled == 1) {
         strncpy(b->pins[25].name, "MMC1_D0", MRAA_PIN_NAME_SIZE);
-        b->pins[25].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[25].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[25].name, "GPIO32", MRAA_PIN_NAME_SIZE);
-        b->pins[25].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[25].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[25].gpio.pinmap = 32;
     b->pins[25].gpio.parent_id = 0;
     b->pins[25].gpio.mux_total = 0;
 
     strncpy(b->pins[26].name, "GPIO61", MRAA_PIN_NAME_SIZE);
-    b->pins[26].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[26].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[26].gpio.pinmap = 61;
     b->pins[26].gpio.parent_id = 0;
     b->pins[26].gpio.mux_total = 0;
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[27].name, "LCD_VSYNC", MRAA_PIN_NAME_SIZE);
-        b->pins[27].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[27].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[27].name, "GPIO86", MRAA_PIN_NAME_SIZE);
-        b->pins[27].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[27].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[27].gpio.pinmap = 86;
     b->pins[27].gpio.parent_id = 0;
@@ -759,10 +759,10 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[28].name, "LCD_PCLK", MRAA_PIN_NAME_SIZE);
-        b->pins[28].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[28].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[28].name, "GPIO88", MRAA_PIN_NAME_SIZE);
-        b->pins[28].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[28].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[28].gpio.pinmap = 88;
     b->pins[28].gpio.parent_id = 0;
@@ -770,10 +770,10 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[29].name, "LCD_HSYNC", MRAA_PIN_NAME_SIZE);
-        b->pins[29].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[29].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[29].name, "GPIO87", MRAA_PIN_NAME_SIZE);
-        b->pins[29].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[29].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[29].gpio.pinmap = 87;
     b->pins[29].gpio.parent_id = 0;
@@ -781,10 +781,10 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[30].name, "LCD_AC_BIAS", MRAA_PIN_NAME_SIZE);
-        b->pins[30].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[30].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[30].name, "GPIO89", MRAA_PIN_NAME_SIZE);
-        b->pins[30].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[30].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[30].gpio.pinmap = 89;
     b->pins[30].gpio.parent_id = 0;
@@ -792,11 +792,11 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[31].name, "LCD_D14", MRAA_PIN_NAME_SIZE);
-        b->pins[31].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[31].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         // TODO UART5_CTS this is ignored when using ADAFRUIT
         strncpy(b->pins[31].name, "GPIO10", MRAA_PIN_NAME_SIZE);
-        b->pins[31].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[31].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[31].gpio.pinmap = 10;
     b->pins[31].gpio.parent_id = 0;
@@ -805,11 +805,11 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[32].name, "LCD_D15", MRAA_PIN_NAME_SIZE);
-        b->pins[32].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[32].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         // TODO UART5_RTS this is ignored when using ADAFRUIT
         strncpy(b->pins[32].name, "GPIO11", MRAA_PIN_NAME_SIZE);
-        b->pins[32].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[32].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[32].gpio.pinmap = 11;
     b->pins[32].gpio.parent_id = 0;
@@ -818,11 +818,11 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[33].name, "LCD_D13", MRAA_PIN_NAME_SIZE);
-        b->pins[33].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[33].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         // TODO UART4_RTS this is ignored when using ADAFRUIT
         strncpy(b->pins[33].name, "GPIO9", MRAA_PIN_NAME_SIZE);
-        b->pins[33].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[33].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[33].gpio.pinmap = 9;
     b->pins[33].gpio.parent_id = 0;
@@ -832,10 +832,10 @@ mraa_beaglebone()
     // TODO PWM_1B
     if (hdmi_enabled == 1) {
         strncpy(b->pins[34].name, "LCD_D11", MRAA_PIN_NAME_SIZE);
-        b->pins[34].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[34].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[34].name, "GPIO81", MRAA_PIN_NAME_SIZE);
-        b->pins[34].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+        b->pins[34].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     }
     b->pins[34].gpio.pinmap = 81;
     b->pins[34].gpio.parent_id = 0;
@@ -843,11 +843,11 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[35].name, "LCD_D12", MRAA_PIN_NAME_SIZE);
-        b->pins[35].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[35].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         // TODO UART4_CTS this is ignored when using ADAFRUIT
         strncpy(b->pins[35].name, "GPIO8", MRAA_PIN_NAME_SIZE);
-        b->pins[35].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[35].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[35].gpio.pinmap = 8;
     b->pins[35].gpio.parent_id = 0;
@@ -857,10 +857,10 @@ mraa_beaglebone()
     // TODO PWM_1A
     if (hdmi_enabled == 1) {
         strncpy(b->pins[36].name, "LCD_D10", MRAA_PIN_NAME_SIZE);
-        b->pins[36].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[36].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[36].name, "GPIO80", MRAA_PIN_NAME_SIZE);
-        b->pins[36].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+        b->pins[36].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     }
     b->pins[36].gpio.pinmap = 80;
     b->pins[36].gpio.parent_id = 0;
@@ -868,17 +868,17 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[37].name, "LCD_D8", MRAA_PIN_NAME_SIZE);
-        b->pins[37].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[37].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         if (uart5_enabled == 1) {
             strncpy(b->pins[37].name, "UART5TX", MRAA_PIN_NAME_SIZE);
-            b->pins[37].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+            b->pins[37].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
         } else {
             strncpy(b->pins[37].name, "GPIO78", MRAA_PIN_NAME_SIZE);
-            b->pins[37].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+            b->pins[37].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
         }
     }
-    b->pins[37].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[37].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[37].gpio.pinmap = 78;
     b->pins[37].gpio.parent_id = 0;
     b->pins[37].gpio.mux_total = 0;
@@ -886,15 +886,15 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[38].name, "LCD_D9", MRAA_PIN_NAME_SIZE);
-        b->pins[38].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[38].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         // TODO UART5_RX
         if (uart5_enabled == 1) {
             strncpy(b->pins[38].name, "UART5RX", MRAA_PIN_NAME_SIZE);
-            b->pins[38].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+            b->pins[38].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
         } else {
             strncpy(b->pins[38].name, "GPIO79", MRAA_PIN_NAME_SIZE);
-            b->pins[38].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+            b->pins[38].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
         }
     }
     b->pins[38].gpio.pinmap = 79;
@@ -904,10 +904,10 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[39].name, "LCD_D6", MRAA_PIN_NAME_SIZE);
-        b->pins[39].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[39].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[39].name, "GPIO76", MRAA_PIN_NAME_SIZE);
-        b->pins[39].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[39].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[39].gpio.pinmap = 76;
     b->pins[39].gpio.parent_id = 0;
@@ -915,10 +915,10 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[40].name, "LCD_D7", MRAA_PIN_NAME_SIZE);
-        b->pins[40].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[40].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[40].name, "GPIO77", MRAA_PIN_NAME_SIZE);
-        b->pins[40].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[40].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[40].gpio.pinmap = 77;
     b->pins[40].gpio.parent_id = 0;
@@ -926,10 +926,10 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[41].name, "LCD_D4", MRAA_PIN_NAME_SIZE);
-        b->pins[41].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[41].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[41].name, "GPIO74", MRAA_PIN_NAME_SIZE);
-        b->pins[41].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[41].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[41].gpio.pinmap = 74;
     b->pins[41].gpio.parent_id = 0;
@@ -937,10 +937,10 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[42].name, "LCD_D5", MRAA_PIN_NAME_SIZE);
-        b->pins[42].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[42].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[42].name, "GPIO75", MRAA_PIN_NAME_SIZE);
-        b->pins[42].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[42].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[42].gpio.pinmap = 75;
     b->pins[42].gpio.parent_id = 0;
@@ -948,10 +948,10 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[43].name, "LCD_D2", MRAA_PIN_NAME_SIZE);
-        b->pins[43].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[43].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[43].name, "GPIO72", MRAA_PIN_NAME_SIZE);
-        b->pins[43].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[43].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[43].gpio.pinmap = 72;
     b->pins[43].gpio.parent_id = 0;
@@ -959,10 +959,10 @@ mraa_beaglebone()
 
     if (hdmi_enabled == 1) {
         strncpy(b->pins[44].name, "LCD_D3", MRAA_PIN_NAME_SIZE);
-        b->pins[44].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[44].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[44].name, "GPIO73", MRAA_PIN_NAME_SIZE);
-        b->pins[44].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[44].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[44].gpio.pinmap = 73;
     b->pins[44].gpio.parent_id = 0;
@@ -971,10 +971,10 @@ mraa_beaglebone()
     // TODO PWM_2A
     if (hdmi_enabled == 1) {
         strncpy(b->pins[45].name, "LCD_D0", MRAA_PIN_NAME_SIZE);
-        b->pins[45].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[45].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[45].name, "GPIO70", MRAA_PIN_NAME_SIZE);
-        b->pins[45].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+        b->pins[45].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     }
     b->pins[45].gpio.pinmap = 70;
     b->pins[45].gpio.parent_id = 0;
@@ -983,51 +983,51 @@ mraa_beaglebone()
     // TODO PWM_2B
     if (hdmi_enabled == 1) {
         strncpy(b->pins[46].name, "LCD_D1", MRAA_PIN_NAME_SIZE);
-        b->pins[46].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[46].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[46].name, "GPIO71", MRAA_PIN_NAME_SIZE);
-        b->pins[46].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+        b->pins[46].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     }
     b->pins[46].gpio.pinmap = 71;
     b->pins[46].gpio.parent_id = 0;
     b->pins[46].gpio.mux_total = 0;
 
     strncpy(b->pins[47].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[47].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[47].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[48].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[48].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[48].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[49].name, "3.3V", MRAA_PIN_NAME_SIZE);
-    b->pins[49].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[49].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[50].name, "3.3V", MRAA_PIN_NAME_SIZE);
-    b->pins[50].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[50].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[51].name, "5V", MRAA_PIN_NAME_SIZE);
-    b->pins[51].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[51].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[52].name, "5V", MRAA_PIN_NAME_SIZE);
-    b->pins[52].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[52].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[53].name, "5V", MRAA_PIN_NAME_SIZE);
-    b->pins[53].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[53].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[54].name, "5V", MRAA_PIN_NAME_SIZE);
-    b->pins[54].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[54].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[55].name, "PWR", MRAA_PIN_NAME_SIZE);
-    b->pins[55].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[55].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[56].name, "RESET", MRAA_PIN_NAME_SIZE);
-    b->pins[56].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[56].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     if (uart4_enabled == 1) {
         strncpy(b->pins[57].name, "UART4_RX", MRAA_PIN_NAME_SIZE);
-        b->pins[57].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+        b->pins[57].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     } else {
         strncpy(b->pins[57].name, "GPIO30", MRAA_PIN_NAME_SIZE);
-        b->pins[57].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+        b->pins[57].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     }
     b->pins[57].gpio.pinmap = 30;
     b->pins[57].gpio.parent_id = 0;
@@ -1035,17 +1035,17 @@ mraa_beaglebone()
     b->pins[57].uart.mux_total = 0;
 
     strncpy(b->pins[58].name, "GPIO60", MRAA_PIN_NAME_SIZE);
-    b->pins[58].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[58].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[58].gpio.pinmap = 60;
     b->pins[58].gpio.parent_id = 0;
     b->pins[58].gpio.mux_total = 0;
 
     if (uart4_enabled == 1) {
         strncpy(b->pins[59].name, "UART4_TX", MRAA_PIN_NAME_SIZE);
-        b->pins[59].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+        b->pins[59].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     } else {
         strncpy(b->pins[59].name, "GPIO31", MRAA_PIN_NAME_SIZE);
-        b->pins[59].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+        b->pins[59].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     }
     b->pins[59].gpio.pinmap = 31;
     b->pins[59].gpio.parent_id = 0;
@@ -1054,10 +1054,10 @@ mraa_beaglebone()
 
     if (ehrpwm1a_enabled == 1) {
         strncpy(b->pins[60].name, "EHRPWM1A", MRAA_PIN_NAME_SIZE);
-        b->pins[60].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+        b->pins[60].capabilities = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[60].name, "GPIO50", MRAA_PIN_NAME_SIZE);
-        b->pins[60].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+        b->pins[60].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     }
     b->pins[60].gpio.pinmap = 50;
     b->pins[60].gpio.parent_id = 0;
@@ -1067,17 +1067,17 @@ mraa_beaglebone()
 
     // TODO PWM_TRIP2_IN (not a PWM output, but used for sync cf ref. manual)
     strncpy(b->pins[61].name, "GPIO48", MRAA_PIN_NAME_SIZE);
-    b->pins[61].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[61].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[61].gpio.pinmap = 48;
     b->pins[61].gpio.parent_id = 0;
     b->pins[61].gpio.mux_total = 0;
 
     if (ehrpwm1b_enabled == 1) {
         strncpy(b->pins[62].name, "EHRPWM1B", MRAA_PIN_NAME_SIZE);
-        b->pins[62].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+        b->pins[62].capabilities = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
     } else {
         strncpy(b->pins[62].name, "GPIO51", MRAA_PIN_NAME_SIZE);
-        b->pins[62].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+        b->pins[62].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     }
     b->pins[62].gpio.pinmap = 51;
     b->pins[62].gpio.parent_id = 0;
@@ -1088,15 +1088,15 @@ mraa_beaglebone()
     if ((i2c0_enabled == 1) || (spi0_enabled == 1)) {
         if (i2c0_enabled == 1) {
             strncpy(b->pins[63].name, "I2C1SCL", MRAA_PIN_NAME_SIZE);
-            b->pins[63].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 1, 0, 0 };
+            b->pins[63].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 1, 0, 0 };
         }
         if (spi0_enabled == 1) {
             strncpy(b->pins[63].name, "SPI0CS0", MRAA_PIN_NAME_SIZE);
-            b->pins[63].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+            b->pins[63].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
         }
     } else {
         strncpy(b->pins[63].name, "GPIO4", MRAA_PIN_NAME_SIZE);
-        b->pins[63].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 1, 0, 0 };
+        b->pins[63].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 1, 0, 0 };
     }
     b->pins[63].gpio.pinmap = 4;
     b->pins[63].gpio.parent_id = 0;
@@ -1107,15 +1107,15 @@ mraa_beaglebone()
     if ((i2c0_enabled == 1) || (spi0_enabled == 1)) {
         if (i2c0_enabled == 1) {
             strncpy(b->pins[64].name, "I2C1SDA", MRAA_PIN_NAME_SIZE);
-            b->pins[64].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 1, 0, 0 };
+            b->pins[64].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 1, 0, 0 };
         }
         if (spi0_enabled == 1) {
             strncpy(b->pins[64].name, "SPI0D1", MRAA_PIN_NAME_SIZE);
-            b->pins[64].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+            b->pins[64].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
         }
     } else {
         strncpy(b->pins[64].name, "GPIO5", MRAA_PIN_NAME_SIZE);
-        b->pins[64].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 1, 0, 0 };
+        b->pins[64].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 1, 0, 0 };
     }
     b->pins[64].gpio.pinmap = 5;
     b->pins[64].gpio.parent_id = 0;
@@ -1125,11 +1125,11 @@ mraa_beaglebone()
 
     if (i2c1_enabled == 1) {
         strncpy(b->pins[65].name, "I2C2SCL", MRAA_PIN_NAME_SIZE);
-        b->pins[65].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
+        b->pins[65].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
         b->pins[65].i2c.mux_total = 0;
     } else {
         strncpy(b->pins[65].name, "GPIO13", MRAA_PIN_NAME_SIZE);
-        b->pins[65].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
+        b->pins[65].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
     }
     b->pins[65].gpio.pinmap = 13;
     b->pins[65].gpio.parent_id = 0;
@@ -1138,11 +1138,11 @@ mraa_beaglebone()
 
     if (i2c1_enabled == 1) {
         strncpy(b->pins[66].name, "I2C2SDA", MRAA_PIN_NAME_SIZE);
-        b->pins[66].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
+        b->pins[66].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
         b->pins[66].i2c.mux_total = 0;
     } else {
         strncpy(b->pins[66].name, "GPIO12", MRAA_PIN_NAME_SIZE);
-        b->pins[66].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
+        b->pins[66].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
     }
     b->pins[66].gpio.pinmap = 12;
     b->pins[66].gpio.parent_id = 0;
@@ -1152,19 +1152,19 @@ mraa_beaglebone()
     if ((spi0_enabled == 1) || uart2_enabled == 1 || ehrpwm0b_enabled == 1) {
         if (uart2_enabled == 1) {
             strncpy(b->pins[67].name, "UART2_TX", MRAA_PIN_NAME_SIZE);
-            b->pins[67].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
+            b->pins[67].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
         }
         if (spi0_enabled == 1) {
             strncpy(b->pins[67].name, "SPI0D0", MRAA_PIN_NAME_SIZE);
-            b->pins[67].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+            b->pins[67].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
         }
         if (ehrpwm0b_enabled == 1) {
             strncpy(b->pins[67].name, "EHRPWM0B", MRAA_PIN_NAME_SIZE);
-            b->pins[67].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+            b->pins[67].capabilities = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
         }
     } else {
         strncpy(b->pins[67].name, "GPIO3", MRAA_PIN_NAME_SIZE);
-        b->pins[67].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 1, 0, 0, 1 };
+        b->pins[67].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 1, 0, 0, 1 };
     }
     b->pins[67].gpio.pinmap = 3;
     b->pins[67].gpio.parent_id = 0;
@@ -1177,19 +1177,19 @@ mraa_beaglebone()
     if ((spi0_enabled == 1) || uart2_enabled == 1 || ehrpwm0a_enabled == 1) {
         if (uart2_enabled == 1) {
             strncpy(b->pins[68].name, "UART2_RX", MRAA_PIN_NAME_SIZE);
-            b->pins[68].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 1 };
+            b->pins[68].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 1 };
         }
         if (spi0_enabled == 1) {
             strncpy(b->pins[68].name, "SPI0CLK", MRAA_PIN_NAME_SIZE);
-            b->pins[68].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+            b->pins[68].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
         }
         if (ehrpwm0a_enabled == 1) {
             strncpy(b->pins[68].name, "EHRPWM0A", MRAA_PIN_NAME_SIZE);
-            b->pins[68].capabilites = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+            b->pins[68].capabilities = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
         }
     } else {
         strncpy(b->pins[68].name, "GPIO2", MRAA_PIN_NAME_SIZE);
-        b->pins[68].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 1, 0, 0, 1 };
+        b->pins[68].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 1, 0, 0, 1 };
     }
     b->pins[68].gpio.pinmap = 2;
     b->pins[68].gpio.parent_id = 0;
@@ -1201,17 +1201,17 @@ mraa_beaglebone()
 
     // TODO PWM0_SYNCO ?? PWM
     strncpy(b->pins[69].name, "GPIO49", MRAA_PIN_NAME_SIZE);
-    b->pins[69].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[69].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[69].gpio.pinmap = 49;
     b->pins[69].gpio.parent_id = 0;
     b->pins[69].gpio.mux_total = 0;
 
     if (uart1_enabled == 1) {
         strncpy(b->pins[70].name, "UART1_RX", MRAA_PIN_NAME_SIZE);
-        b->pins[70].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+        b->pins[70].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     } else {
         strncpy(b->pins[70].name, "GPIO15", MRAA_PIN_NAME_SIZE);
-        b->pins[70].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+        b->pins[70].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     }
     b->pins[70].gpio.pinmap = 15;
     b->pins[70].gpio.parent_id = 0;
@@ -1219,26 +1219,26 @@ mraa_beaglebone()
     b->pins[70].uart.mux_total = 0;
 
     strncpy(b->pins[71].name, "GPIO117", MRAA_PIN_NAME_SIZE);
-    b->pins[71].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[71].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[71].gpio.pinmap = 117;
     b->pins[71].gpio.parent_id = 0;
     b->pins[71].gpio.mux_total = 0;
 
     if (uart1_enabled == 1) {
         strncpy(b->pins[72].name, "UART1_RX", MRAA_PIN_NAME_SIZE);
-        b->pins[72].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+        b->pins[72].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     } else {
         strncpy(b->pins[72].name, "GPIO14", MRAA_PIN_NAME_SIZE);
-        b->pins[72].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+        b->pins[72].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     }
-    b->pins[72].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[72].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[72].gpio.pinmap = 14;
     b->pins[72].gpio.parent_id = 0;
     b->pins[72].gpio.mux_total = 0;
     b->pins[72].uart.mux_total = 0;
 
     strncpy(b->pins[73].name, "GPIO115", MRAA_PIN_NAME_SIZE);
-    b->pins[73].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[73].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[73].gpio.pinmap = 115;
     b->pins[73].gpio.parent_id = 0;
     b->pins[73].gpio.mux_total = 0;
@@ -1246,14 +1246,14 @@ mraa_beaglebone()
     if (emmc_enabled != 1) {
         if (spi1_enabled == 1) {
             strncpy(b->pins[74].name, "SPI1CS0", MRAA_PIN_NAME_SIZE);
-            b->pins[74].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+            b->pins[74].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
         } else {
             strncpy(b->pins[74].name, "GPIO113", MRAA_PIN_NAME_SIZE);
-            b->pins[74].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+            b->pins[74].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
         }
     } else {
         strncpy(b->pins[74].name, "MCASP0XX", MRAA_PIN_NAME_SIZE);
-        b->pins[74].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+        b->pins[74].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     }
     b->pins[74].gpio.pinmap = 113;
     b->pins[74].gpio.parent_id = 0;
@@ -1263,14 +1263,14 @@ mraa_beaglebone()
     if (emmc_enabled != 1) {
         if (spi1_enabled == 1) {
             strncpy(b->pins[75].name, "SPI1D0", MRAA_PIN_NAME_SIZE);
-            b->pins[75].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+            b->pins[75].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
         } else {
             strncpy(b->pins[75].name, "GPIO111", MRAA_PIN_NAME_SIZE);
-            b->pins[75].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+            b->pins[75].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
         }
     } else {
         strncpy(b->pins[75].name, "MMC1_SD", MRAA_PIN_NAME_SIZE);
-        b->pins[75].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[75].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[75].gpio.pinmap = 111;
     b->pins[75].gpio.parent_id = 0;
@@ -1280,14 +1280,14 @@ mraa_beaglebone()
     if (emmc_enabled != 1) {
         if (spi1_enabled == 1) {
             strncpy(b->pins[76].name, "SPI1D1", MRAA_PIN_NAME_SIZE);
-            b->pins[76].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+            b->pins[76].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
         } else {
             strncpy(b->pins[76].name, "GPIO112", MRAA_PIN_NAME_SIZE);
-            b->pins[76].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+            b->pins[76].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
         }
     } else {
         strncpy(b->pins[76].name, "MMC2_SD", MRAA_PIN_NAME_SIZE);
-        b->pins[76].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[76].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[76].gpio.pinmap = 112;
     b->pins[76].gpio.parent_id = 0;
@@ -1297,14 +1297,14 @@ mraa_beaglebone()
     if (emmc_enabled != 1) {
         if (spi1_enabled == 1) {
             strncpy(b->pins[77].name, "SPI1CLK", MRAA_PIN_NAME_SIZE);
-            b->pins[77].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+            b->pins[77].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
         } else {
             strncpy(b->pins[77].name, "GPIO110", MRAA_PIN_NAME_SIZE);
-            b->pins[77].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+            b->pins[77].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
         }
     } else {
         strncpy(b->pins[77].name, "MMC0_SD", MRAA_PIN_NAME_SIZE);
-        b->pins[77].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[77].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[77].gpio.pinmap = 110;
     b->pins[77].gpio.parent_id = 0;
@@ -1313,60 +1313,60 @@ mraa_beaglebone()
 
 
     strncpy(b->pins[78].name, "VDD_ADC", MRAA_PIN_NAME_SIZE);
-    b->pins[78].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[78].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     // TODO AIN4
     strncpy(b->pins[79].name, "AIN4", MRAA_PIN_NAME_SIZE);
-    b->pins[79].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[79].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
 
     strncpy(b->pins[80].name, "GND_ADC", MRAA_PIN_NAME_SIZE);
-    b->pins[80].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[80].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     // TODO AIN6
     strncpy(b->pins[81].name, "AIN6", MRAA_PIN_NAME_SIZE);
-    b->pins[81].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[81].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
     // TODO AIN5
     strncpy(b->pins[82].name, "AIN5", MRAA_PIN_NAME_SIZE);
-    b->pins[82].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[82].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
     // TODO AIN2
     strncpy(b->pins[83].name, "AIN2", MRAA_PIN_NAME_SIZE);
-    b->pins[83].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[83].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
     // TODO AIN3
     strncpy(b->pins[84].name, "AIN3", MRAA_PIN_NAME_SIZE);
-    b->pins[84].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[84].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
     // TODO AIN0
     strncpy(b->pins[85].name, "AIN0", MRAA_PIN_NAME_SIZE);
-    b->pins[85].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[85].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
     // TODO AIN1
     strncpy(b->pins[86].name, "AIN1", MRAA_PIN_NAME_SIZE);
-    b->pins[86].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[86].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
 
     strncpy(b->pins[87].name, "GPIO20", MRAA_PIN_NAME_SIZE);
-    b->pins[87].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[87].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[87].gpio.pinmap = 20;
     b->pins[87].gpio.parent_id = 0;
     b->pins[87].gpio.mux_total = 0;
 
     strncpy(b->pins[88].name, "GPIO7", MRAA_PIN_NAME_SIZE);
-    b->pins[88].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[88].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[88].gpio.pinmap = 7;
     b->pins[88].gpio.parent_id = 0;
     b->pins[88].gpio.mux_total = 0;
 
     // GND
     strncpy(b->pins[89].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[89].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[89].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     // GND
     strncpy(b->pins[90].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[90].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[90].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     // GND
     strncpy(b->pins[91].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[91].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[91].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     // GND
     strncpy(b->pins[92].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[92].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[92].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     // BUS DEFINITIONS
     b->i2c_bus_count = 2;
@@ -1417,7 +1417,7 @@ mraa_beaglebone()
     b->gpio_count = 0;
     int i;
     for (i = 0; i < b->phy_pin_count; i++)
-        if (b->pins[i].capabilites.gpio)
+        if (b->pins[i].capabilities.gpio)
             b->gpio_count++;
 
     return b;

@@ -233,7 +233,7 @@ mraa_pwm_init(int pin)
         syslog(LOG_ERR, "pwm_init: pin %i beyond platform definition", pin);
         return NULL;
     }
-    if (board->pins[pin].capabilites.pwm != 1) {
+    if (board->pins[pin].capabilities.pwm != 1) {
         syslog(LOG_ERR, "pwm_init: pin %i not capable of pwm", pin);
         return NULL;
     }

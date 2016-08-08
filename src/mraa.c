@@ -580,35 +580,35 @@ mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
 
     switch (mode) {
         case MRAA_PIN_VALID:
-            if (current_plat->pins[pin].capabilites.valid == 1)
+            if (current_plat->pins[pin].capabilities.valid == 1)
                 return 1;
             break;
         case MRAA_PIN_GPIO:
-            if (current_plat->pins[pin].capabilites.gpio == 1)
+            if (current_plat->pins[pin].capabilities.gpio == 1)
                 return 1;
             break;
         case MRAA_PIN_PWM:
-            if (current_plat->pins[pin].capabilites.pwm == 1)
+            if (current_plat->pins[pin].capabilities.pwm == 1)
                 return 1;
             break;
         case MRAA_PIN_FAST_GPIO:
-            if (current_plat->pins[pin].capabilites.fast_gpio == 1)
+            if (current_plat->pins[pin].capabilities.fast_gpio == 1)
                 return 1;
             break;
         case MRAA_PIN_SPI:
-            if (current_plat->pins[pin].capabilites.spi == 1)
+            if (current_plat->pins[pin].capabilities.spi == 1)
                 return 1;
             break;
         case MRAA_PIN_I2C:
-            if (current_plat->pins[pin].capabilites.i2c == 1)
+            if (current_plat->pins[pin].capabilities.i2c == 1)
                 return 1;
             break;
         case MRAA_PIN_AIO:
-            if (current_plat->pins[pin].capabilites.aio == 1)
+            if (current_plat->pins[pin].capabilities.aio == 1)
                 return 1;
             break;
         case MRAA_PIN_UART:
-            if (current_plat->pins[pin].capabilites.uart == 1)
+            if (current_plat->pins[pin].capabilities.uart == 1)
                 return 1;
             break;
         default:

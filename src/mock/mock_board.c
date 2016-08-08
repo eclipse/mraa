@@ -104,25 +104,25 @@ mraa_mock_board()
     int pos = 0;
 
     strncpy(b->pins[pos].name, "GPIO0", 8);
-    b->pins[pos].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 0;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "ADC0", 8);
-    b->pins[pos].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
     b->pins[pos].aio.pinmap = 0;
     b->pins[pos].aio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "I2C0SDA", 8);
-    b->pins[pos].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[pos].i2c.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "I2C0SCL", 8);
-    b->pins[pos].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[pos].i2c.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
     pos++;

@@ -1063,14 +1063,14 @@ mraa_ftdi_ft4222()
     // I2c pins (these are virtual, entries are required to configure i2c layer)
     // We currently assume that GPIO 0/1 are reserved for i2c operation
     strncpy(sub_plat->pins[pinIndex].name, "IGPIO0/SCL0", MRAA_PIN_NAME_SIZE);
-    sub_plat->pins[pinIndex].capabilites = pinCapsI2cGpio;
+    sub_plat->pins[pinIndex].capabilities = pinCapsI2cGpio;
     sub_plat->pins[pinIndex].gpio.pinmap = pinIndex;
     sub_plat->pins[pinIndex].gpio.mux_total = 0;
     sub_plat->pins[pinIndex].i2c.mux_total = 0;
     sub_plat->i2c_bus[bus].scl = pinIndex;
     pinIndex++;
     strncpy(sub_plat->pins[pinIndex].name, "IGPIO1/SDA0", MRAA_PIN_NAME_SIZE);
-    sub_plat->pins[pinIndex].capabilites = pinCapsI2cGpio;
+    sub_plat->pins[pinIndex].capabilities = pinCapsI2cGpio;
     sub_plat->pins[pinIndex].gpio.pinmap = pinIndex;
     sub_plat->pins[pinIndex].gpio.mux_total = 0;
     sub_plat->pins[pinIndex].i2c.mux_total = 0;
@@ -1079,12 +1079,12 @@ mraa_ftdi_ft4222()
 
     // FTDI4222 gpio
     strncpy(sub_plat->pins[pinIndex].name, "INT-GPIO2", MRAA_PIN_NAME_SIZE);
-    sub_plat->pins[pinIndex].capabilites = pinCapsGpio;
+    sub_plat->pins[pinIndex].capabilities = pinCapsGpio;
     sub_plat->pins[pinIndex].gpio.pinmap = pinIndex;
     sub_plat->pins[pinIndex].gpio.mux_total = 0;
     pinIndex++;
     strncpy(sub_plat->pins[pinIndex].name, "INT-GPIO3", MRAA_PIN_NAME_SIZE);
-    sub_plat->pins[pinIndex].capabilites = pinCapsGpio;
+    sub_plat->pins[pinIndex].capabilities = pinCapsGpio;
     sub_plat->pins[pinIndex].gpio.pinmap = pinIndex;
     sub_plat->pins[pinIndex].gpio.mux_total = 0;
     pinIndex++;
@@ -1093,7 +1093,7 @@ mraa_ftdi_ft4222()
     int i;
     for (i = 0; i < numI2cGpioExpanderPins; ++i) {
         snprintf(sub_plat->pins[pinIndex].name, MRAA_PIN_NAME_SIZE, "EXP-GPIO%d", i);
-        sub_plat->pins[pinIndex].capabilites = pinCapsGpio;
+        sub_plat->pins[pinIndex].capabilities = pinCapsGpio;
         sub_plat->pins[pinIndex].gpio.pinmap = pinIndex;
         sub_plat->pins[pinIndex].gpio.mux_total = 0;
         pinIndex++;
@@ -1104,11 +1104,11 @@ mraa_ftdi_ft4222()
         sub_plat->i2c_bus[bus].bus_id = bus;
         sub_plat->pins[pinIndex].i2c.mux_total = 0;
         snprintf(sub_plat->pins[pinIndex].name, MRAA_PIN_NAME_SIZE, "SDA%d", bus);
-        sub_plat->pins[pinIndex].capabilites = pinCapsI2c;
+        sub_plat->pins[pinIndex].capabilities = pinCapsI2c;
         sub_plat->i2c_bus[bus].sda = pinIndex;
         pinIndex++;
         snprintf(sub_plat->pins[pinIndex].name, MRAA_PIN_NAME_SIZE, "SCL%d", bus);
-        sub_plat->pins[pinIndex].capabilites = pinCapsI2c;
+        sub_plat->pins[pinIndex].capabilities = pinCapsI2c;
         sub_plat->pins[pinIndex].i2c.mux_total = 0;
         sub_plat->i2c_bus[bus].scl = pinIndex;
         pinIndex++;

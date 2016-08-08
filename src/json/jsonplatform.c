@@ -222,9 +222,9 @@ mraa_init_json_platform_io(json_object* jobj_io, mraa_board_t* board, int index)
         invalid = json_object_get_boolean(jobj_temp);
     }
     if (invalid) {
-        board->pins[pos].capabilites = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
+        board->pins[pos].capabilities = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
     } else {
-        board->pins[pos].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        board->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     }
     return MRAA_SUCCESS;
 }
@@ -247,7 +247,7 @@ mraa_init_json_platform_gpio(json_object* jobj_gpio, mraa_board_t* board, int in
     if (ret != MRAA_SUCCESS) {
         return ret;
     }
-    board->pins[pos].capabilites.gpio = 1;
+    board->pins[pos].capabilities.gpio = 1;
     return MRAA_SUCCESS;
 }
 
@@ -270,7 +270,7 @@ mraa_init_json_platform_aio(json_object* jobj_aio, mraa_board_t* board, int inde
         return ret;
     }
 
-    board->pins[pos].capabilites.aio = 1;
+    board->pins[pos].capabilities.aio = 1;
     return MRAA_SUCCESS;
 }
 
@@ -299,7 +299,7 @@ mraa_init_json_platform_i2c(json_object* jobj_i2c, mraa_board_t* board, int inde
     if (ret == MRAA_ERROR_NO_DATA_AVAILABLE) {
         board->i2c_bus[pos].sda = -1;
     } else if (ret == MRAA_SUCCESS) {
-        board->pins[pin].capabilites.i2c = 1;
+        board->pins[pin].capabilities.i2c = 1;
         board->pins[pin].i2c.pinmap = sysfs_pin;
         board->i2c_bus[pos].sda = pin;
     } else {
@@ -311,7 +311,7 @@ mraa_init_json_platform_i2c(json_object* jobj_i2c, mraa_board_t* board, int inde
     if (ret == MRAA_ERROR_NO_DATA_AVAILABLE) {
         board->i2c_bus[pos].scl = -1;
     } else if (ret == MRAA_SUCCESS) {
-        board->pins[pin].capabilites.i2c = 1;
+        board->pins[pin].capabilities.i2c = 1;
         board->pins[pin].i2c.pinmap = sysfs_pin;
         board->i2c_bus[pos].scl = pin;
     } else {
@@ -357,7 +357,7 @@ mraa_init_json_platform_pwm(json_object* jobj_pwm, mraa_board_t* board, int inde
         return ret;
     }
 
-    board->pins[pos].capabilites.pwm = 1;
+    board->pins[pos].capabilities.pwm = 1;
     board->pins[pos].pwm.pinmap = sysfs_pin;
     board->pins[pos].pwm.parent_id = parent_id;
     return ret;
@@ -389,7 +389,7 @@ mraa_init_json_platform_spi(json_object* jobj_spi, mraa_board_t* board, int inde
     if (ret == MRAA_ERROR_NO_DATA_AVAILABLE) {
         board->spi_bus[pos].sclk = -1;
     } else if (ret == MRAA_SUCCESS) {
-        board->pins[pin].capabilites.spi = 1;
+        board->pins[pin].capabilities.spi = 1;
         board->pins[pin].spi.parent_id = parent_id;
         board->spi_bus[pos].sclk = pin;
     } else {
@@ -400,7 +400,7 @@ mraa_init_json_platform_spi(json_object* jobj_spi, mraa_board_t* board, int inde
     if (ret == MRAA_ERROR_NO_DATA_AVAILABLE) {
         board->spi_bus[pos].miso = -1;
     } else if (ret == MRAA_SUCCESS) {
-        board->pins[pin].capabilites.spi = 1;
+        board->pins[pin].capabilities.spi = 1;
         board->pins[pin].spi.parent_id = parent_id;
         board->spi_bus[pos].miso = pin;
     } else {
@@ -411,7 +411,7 @@ mraa_init_json_platform_spi(json_object* jobj_spi, mraa_board_t* board, int inde
     if (ret == MRAA_ERROR_NO_DATA_AVAILABLE) {
         board->spi_bus[pos].mosi = -1;
     } else if (ret == MRAA_SUCCESS) {
-        board->pins[pin].capabilites.spi = 1;
+        board->pins[pin].capabilities.spi = 1;
         board->pins[pin].spi.parent_id = parent_id;
         board->spi_bus[pos].mosi = pin;
     } else {
@@ -422,7 +422,7 @@ mraa_init_json_platform_spi(json_object* jobj_spi, mraa_board_t* board, int inde
     if (ret == MRAA_ERROR_NO_DATA_AVAILABLE) {
         board->spi_bus[pos].cs = -1;
     } else if (ret == MRAA_SUCCESS) {
-        board->pins[pin].capabilites.spi = 1;
+        board->pins[pin].capabilities.spi = 1;
         board->pins[pin].spi.parent_id = parent_id;
         board->spi_bus[pos].cs = pin;
     } else {
@@ -477,7 +477,7 @@ mraa_init_json_platform_uart(json_object* jobj_uart, mraa_board_t* board, int in
     if (ret == MRAA_ERROR_NO_DATA_AVAILABLE) {
         board->uart_dev[pos].rx = -1;
     } else if (ret == MRAA_SUCCESS) {
-        board->pins[pin].capabilites.uart = 1;
+        board->pins[pin].capabilities.uart = 1;
         board->pins[pin].uart.pinmap = sysfs_pin;
         board->pins[pin].uart.parent_id = parent_id;
         board->uart_dev[pos].rx = pin;
@@ -491,7 +491,7 @@ mraa_init_json_platform_uart(json_object* jobj_uart, mraa_board_t* board, int in
     if (ret == MRAA_ERROR_NO_DATA_AVAILABLE) {
         board->uart_dev[pos].tx = -1;
     } else if (ret == MRAA_SUCCESS) {
-        board->pins[pin].capabilites.uart = 1;
+        board->pins[pin].capabilities.uart = 1;
         board->pins[pin].uart.pinmap = sysfs_pin;
         board->pins[pin].uart.parent_id = parent_id;
         board->uart_dev[pos].tx = pin;
