@@ -5,6 +5,10 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**1.2.3**
+  * Revert 1.2.1 binding.gyp changed that had side effect of enabling JSONPLAT in mraa.c
+  * improve travis.ci to load mraa.node as compiled from make npmpkg target
+
 **1.2.2**
   * remove jsonplat from prehashed npm builds (see docs/npm.md for details)
   * internal spelling fix
