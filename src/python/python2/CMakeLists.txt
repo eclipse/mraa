@@ -6,7 +6,7 @@ if (PYTHON2_LIBRARY)
 
     swig_add_module (python2-mraa python mraa2.i ../mraapy.c)
     swig_link_libraries (python2-mraa ${PYTHON2_LIBRARIES} mraa)
-    
+
     target_include_directories(${SWIG_MODULE_python2-mraa_REAL_NAME}
       PUBLIC
       "${CMAKE_CURRENT_SOURCE_DIR}/../.."
@@ -20,7 +20,7 @@ if (PYTHON2_LIBRARY)
       add_dependencies (${SWIG_MODULE_python2-mraa_REAL_NAME} common_hpp_doc_i)
 
       add_custom_target (pydoc
-        pydoc -w ${CMAKE_CURRENT_BINARY_DIR}/mraa.py ${CMAKE_CURRENT_BINARY_DIR}/
+        python2 /usr/bin/pydoc -w ${CMAKE_CURRENT_BINARY_DIR}/mraa.py ${CMAKE_CURRENT_BINARY_DIR}/
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         COMMENT "Generating API documentation with pydoc" VERBATIM
       )

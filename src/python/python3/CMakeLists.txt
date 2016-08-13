@@ -13,6 +13,20 @@ if (PYTHON3_LIBRARY)
       "${PYTHON3_INCLUDE_DIR}"
     )
 
+    if (DOXYGEN_FOUND AND PYTHON3_EXECUTABLE)
+      foreach (_file ${DOCCLASSES})
+        add_dependencies (${SWIG_MODULE_python3-mraa_REAL_NAME} ${_file}class_doc_i)
+      endforeach ()
+      add_dependencies (${SWIG_MODULE_python3-mraa_REAL_NAME} common_hpp_doc_i)
+
+      add_custom_target (pydoc3
+        python3 /usr/bin/pydoc -w ${CMAKE_CURRENT_BINARY_DIR}/mraa.py ${CMAKE_CURRENT_BINARY_DIR}/
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with pydoc" VERBATIM
+      )
+    endif ()
+
+
     set_target_properties (${SWIG_MODULE_python3-mraa_REAL_NAME} PROPERTIES
       OUTPUT_NAME _mraa
       COMPILE_FLAGS "${CMAKE_C_FLAGS} -DSWIGPYTHON=${SWIG_FOUND}"
