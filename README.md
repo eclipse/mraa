@@ -45,6 +45,10 @@ Mock
 ----
 * [Generic simulated board](../master/docs/mock.md)
 
+JSON platform
+----
+* [Platform loading](../master/docs/jsonplatform.md)
+
 Installing on your board
 ========
 
