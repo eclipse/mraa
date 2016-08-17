@@ -22,6 +22,14 @@ add_test (NAME py_i2c_read_bytes_data COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMA
 add_test (NAME py_i2c_read_word_data COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/i2c_checks_read_word_data.py)
 add_test (NAME py_i2c_write_word_data COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/i2c_checks_write_word_data.py)
 
+add_test (NAME py_spi_bit_per_word COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/spi_checks_bit_per_word.py)
+add_test (NAME py_spi_checks_lsbmode COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/spi_checks_lsbmode.py)
+add_test (NAME py_spi_checks_mode COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/spi_checks_mode.py)
+add_test (NAME py_spi_checks_freq COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/spi_checks_freq.py)
+add_test (NAME py_spi_checks_write_byte COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/spi_checks_write_byte.py)
+add_test (NAME py_spi_checks_write_word COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/spi_checks_write_word.py)
+add_test (NAME py_spi_checks_write COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/spi_checks_write.py)
+
 set_tests_properties(py_general
                      py_platform
                      py_gpio_basic
@@ -42,4 +50,11 @@ set_tests_properties(py_general
                      py_i2c_read_bytes_data
                      py_i2c_read_word_data
                      py_i2c_write_word_data
+                     py_spi_bit_per_word
+                     py_spi_checks_lsbmode
+                     py_spi_checks_mode
+                     py_spi_checks_freq
+                     py_spi_checks_write_byte
+                     py_spi_checks_write_word
+                     py_spi_checks_write
                      PROPERTIES ENVIRONMENT "PYTHONPATH=${PYTHON_DEFAULT_PYTHONPATH}")
