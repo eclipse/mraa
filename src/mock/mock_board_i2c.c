@@ -26,9 +26,6 @@
 #include <string.h>
 
 #include "common.h"
-#include "mock/mock_board.h"
-#include "mock/mock_board_gpio.h"
-#include "mock/mock_board_aio.h"
 #include "mock/mock_board_i2c.h"
 
 mraa_result_t
