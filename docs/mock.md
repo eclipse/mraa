@@ -19,6 +19,10 @@ Right now we simulate a single generic board with:
 which can be read or written in bytes or words (big-endian). Technically those
 registers are just an array of `uint8_t`, so you can treat them as 10 single-byte
 registers or 5 single-word ones or a mix thereof.
+* Single SPI bus with one Chip Select. All write functions are supported, received
+data items (words or bytes) are calculated from the sent ones using
+`sent_byte (or word) XOR constant` formula.
+See [SPI mock header](../include/mock/mock_board_spi.h#L38-L39) for constant values.
 
 We plan to develop it further and all [contributions](../CONTRIBUTING.md) are more than welcome.
 
@@ -30,6 +34,10 @@ See the table below for pin layout and features
 | 1           | ADC0     | AIO pin, returns random value on read |
 | 2           | I2C0SDA  | SDA pin for I2C0 bus                  |
 | 3           | I2C0SCL  | SCL pin for I2C0 bus                  |
+| 4           | SPI0CS   | CS pin for SPI0 bus                   |
+| 5           | SPI0MOSI | MOSI pin for SPI0 bus                 |
+| 6           | SPI0MISO | MISO pin for SPI0 bus                 |
+| 7           | SPI0SCLK | SCLK pin for SPI0 bus                 |
 
 Building
 --------

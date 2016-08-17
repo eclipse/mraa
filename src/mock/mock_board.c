@@ -30,6 +30,7 @@
 #include "mock/mock_board_gpio.h"
 #include "mock/mock_board_aio.h"
 #include "mock/mock_board_i2c.h"
+#include "mock/mock_board_spi.h"
 
 #define PLATFORM_NAME "MRAA mock platform"
 
@@ -55,7 +56,14 @@ mraa_mock_board()
     b->i2c_bus[0].scl = 3;
     b->def_i2c_bus = b->i2c_bus[0].bus_id;
 
-    b->spi_bus_count = 0;
+    b->spi_bus_count = 1;
+    b->def_spi_bus = 0;
+    b->spi_bus[0].bus_id = 0;
+    b->spi_bus[0].slave_s = 0;
+    b->spi_bus[0].cs = 4;
+    b->spi_bus[0].mosi = 5;
+    b->spi_bus[0].miso = 6;
+    b->spi_bus[0].sclk = 7;
 
     b->pwm_default_period = 0;
     b->pwm_max_period = 0;
@@ -99,6 +107,16 @@ mraa_mock_board()
     b->adv_func->i2c_write_byte_replace = &mraa_mock_i2c_write_byte_replace;
     b->adv_func->i2c_write_byte_data_replace = &mraa_mock_i2c_write_byte_data_replace;
     b->adv_func->i2c_write_word_data_replace = &mraa_mock_i2c_write_word_data_replace;
+    b->adv_func->spi_init_raw_replace = &mraa_mock_spi_init_raw_replace;
+    b->adv_func->spi_stop_replace = &mraa_mock_spi_stop_replace;
+    b->adv_func->spi_bit_per_word_replace = &mraa_mock_spi_bit_per_word_replace;
+    b->adv_func->spi_lsbmode_replace = &mraa_mock_spi_lsbmode_replace;
+    b->adv_func->spi_mode_replace = &mraa_mock_spi_mode_replace;
+    b->adv_func->spi_frequency_replace = &mraa_mock_spi_frequency_replace;
+    b->adv_func->spi_write_replace = &mraa_mock_spi_write_replace;
+    b->adv_func->spi_write_word_replace = &mraa_mock_spi_write_word_replace;
+    b->adv_func->spi_transfer_buf_replace = &mraa_mock_spi_transfer_buf_replace;
+    b->adv_func->spi_transfer_buf_word_replace = &mraa_mock_spi_transfer_buf_word_replace;
 
     // Pin definitions
     int pos = 0;
@@ -125,6 +143,30 @@ mraa_mock_board()
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[pos].i2c.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
+    pos++;
+
+    strncpy(b->pins[pos].name, "SPI0CS", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+    b->pins[pos].spi.mux_total = 0;
+    b->pins[pos].spi.pinmap = 0;
+    pos++;
+
+    strncpy(b->pins[pos].name, "SPI0MOSI", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+    b->pins[pos].spi.mux_total = 0;
+    b->pins[pos].spi.pinmap = 0;
+    pos++;
+
+    strncpy(b->pins[pos].name, "SPI0MISO", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+    b->pins[pos].spi.mux_total = 0;
+    b->pins[pos].spi.pinmap = 0;
+    pos++;
+
+    strncpy(b->pins[pos].name, "SPI0SCLK", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+    b->pins[pos].spi.mux_total = 0;
+    b->pins[pos].spi.pinmap = 0;
     pos++;
 
     return b;
