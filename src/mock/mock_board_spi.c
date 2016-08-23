@@ -99,7 +99,7 @@ mraa_mock_spi_mode_replace(mraa_spi_context dev, mraa_spi_mode_t mode)
         spi_mode = SPI_MODE_3;
         break;
     default:
-        syslog(LOG_ERR, "spi: mode: Invalid SPI mode selected", mode);
+        syslog(LOG_ERR, "spi: mode: Invalid SPI mode %d selected", mode);
         return MRAA_ERROR_INVALID_PARAMETER;
     }
 
