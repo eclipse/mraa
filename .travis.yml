@@ -10,6 +10,10 @@ env:
   - JSONPLAT=true NODE012=true
   - JSONPLAT=true NODE4=true
   - JSONPLAT=true NODE5=true
+  - MOCK=true NODE010=true
+  - MOCK=true NODE012=true
+  - MOCK=true NODE4=true
+  - MOCK=true NODE5=true
   # node010 npm builds don't work in clang and anyone using npm should want to
   # use something newer
   - NPM=true NODE4=true
@@ -26,6 +30,7 @@ before_script:
   # Turn off JAVA SWIG for clang++, use 4.8 for all g++ builds
   - if [ "$CC" == "gcc" ]; then export BUILDJAVA=ON; export CC=gcc-4.8; export CXX=g++-4.8; else export BUILDJAVA=OFF; fi
   - if [ "${JSONPLAT}" ]; then export JSONPLAT=ON; else export JSONPLAT=OFF; fi
+  - if [ "${MOCK}" ]; then export BUILDARCH="MOCK"; else export BUILDARCH=""; fi
   - if [ "${NODE010}" ]; then nvm install 0.10; fi
   - if [ "${NODE012}" ]; then nvm install 0.12; fi
   - if [ "${NODE4}" ]; then nvm install 4.1; fi
@@ -34,8 +39,8 @@ before_script:
   # Handle 0.10 NODE_ROOT_DIR differently than other versions
   - wget http://prdownloads.sourceforge.net/swig/swig-3.0.10.tar.gz && tar xf swig-3.0.10.tar.gz && cd swig-3.0.10 && ./configure --prefix=/home/travis/ && make && make install && cd ..
 script:
-  - echo "CC=$CC BUILDJAVA=$BUILDJAVA JSONPLAT=$JSONPLAT NODE010=$NODE010 NODE012=$NODE012 NODE4=$NODE4 NODE5=$NODE5 NODE_ROOT_DIR=$NODE_ROOT_DIR"
-  - if [ -z ${NPM} ]; then mkdir build && cd build && cmake -DBUILDSWIGJAVA="$BUILDJAVA" -DJSONPLAT=$JSONPLAT -DNODE_ROOT_DIR:PATH="${NVM_BIN}/.." -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make install && make test; else mkdir build && cd build && cmake -DBUILDSWIGJAVA="$BUILDJAVA" -DJSONPLAT=$JSONPLAT -DNODE_ROOT_DIR:PATH="${NVM_BIN}/.." -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make npmpkg && cd .. && ${NODE_GYP} configure && ${NODE_GYP} build; fi
+  - echo "CC=$CC BUILDJAVA=$BUILDJAVA BUILDARCH=$BUILDARCH JSONPLAT=$JSONPLAT NODE010=$NODE010 NODE012=$NODE012 NODE4=$NODE4 NODE5=$NODE5 NODE_ROOT_DIR=$NODE_ROOT_DIR"
+  - if [ -z ${NPM} ]; then mkdir build && cd build && cmake -DBUILDSWIGJAVA="$BUILDJAVA" -DBUILDARCH="$BUILDARCH" -DJSONPLAT=$JSONPLAT -DNODE_ROOT_DIR:PATH="${NVM_BIN}/.." -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make install && make test; else mkdir build && cd build && cmake -DBUILDSWIGJAVA="$BUILDJAVA" -DJSONPLAT=$JSONPLAT -DNODE_ROOT_DIR:PATH="${NVM_BIN}/.." -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make npmpkg && cd .. && ${NODE_GYP} configure && ${NODE_GYP} build; fi
   # simple test to see if we can load our node module
   - if [ ${NPM} ]; then cd build/Release/obj.target/ && node -e  "var m = require('./mraa.node'); m.getVersion()";fi
 addons:
