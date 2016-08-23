@@ -145,7 +145,8 @@ mraa_mock_spi_transfer_buf_replace(mraa_spi_context dev, uint8_t* data, uint8_t*
     }
 
     if (rxbuf != NULL) {
-        for (int i = 0; i < length; ++i) {
+        int i;
+        for (i = 0; i < length; ++i) {
             rxbuf[i] = data[i] ^ MOCK_SPI_REPLY_DATA_MODIFIER_BYTE;
         }
     }
@@ -168,7 +169,8 @@ mraa_mock_spi_transfer_buf_word_replace(mraa_spi_context dev, uint16_t* data, ui
 
     if (rxbuf != NULL) {
         // length is given in bytes, but arrays are comprised of words
-        for (int i = 0; i < (length / 2); ++i) {
+        int i;
+        for (i = 0; i < (length / 2); ++i) {
             rxbuf[i] = data[i] ^ MOCK_SPI_REPLY_DATA_MODIFIER_WORD;
         }
     }
