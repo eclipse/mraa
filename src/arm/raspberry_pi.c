@@ -38,6 +38,7 @@
 #define PLATFORM_NAME_RASPBERRY_PI_COMPUTE_MODULE_REV_1 "Raspberry Pi Compute Module Rev 1"
 #define PLATFORM_NAME_RASPBERRY_PI_A_PLUS_REV_1 "Raspberry Pi Model A+ Rev 1"
 #define PLATFORM_NAME_RASPBERRY_PI2_B_REV_1 "Raspberry Pi 2 Model B Rev 1"
+#define PLATFORM_NAME_RASPBERRY_PI_ZERO "Raspberry Pi Zero"
 #define PLATFORM_RASPBERRY_PI_B_REV_1 1
 #define PLATFORM_RASPBERRY_PI_A_REV_2 2
 #define PLATFORM_RASPBERRY_PI_B_REV_2 3
@@ -45,6 +46,7 @@
 #define PLATFORM_RASPBERRY_PI_COMPUTE_MODULE_REV_1 5
 #define PLATFORM_RASPBERRY_PI_A_PLUS_REV_1 6
 #define PLATFORM_RASPBERRY_PI2_B_REV_1 7
+#define PLATFORM_RASPBERRY_PI_ZERO "Raspberry Pi Zero"
 #define MMAP_PATH "/dev/mem"
 #define BCM2835_PERI_BASE 0x20000000
 #define BCM2835_GPIO_BASE (BCM2835_PERI_BASE + 0x200000)
@@ -230,6 +232,10 @@ mraa_raspberry_pi()
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_2;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_2;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_REV_2_PINCOUNT;
+                } else if (strstr(line, "900092")) {
+                    b->platform_name = PLATFORM_NAME_RASPBERRY_PI_ZERO;
+                    platform_detected = PLATFORM_RASPBERRY_PI_ZERO;
+                    b->phy_pin_count = MRAA_RASPBERRY_PI_ZERO_PINCOUNT;
                 } else if (strstr(line, "0007") || strstr(line, "0008") || strstr(line, "0009")) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_A_REV_2;
                     platform_detected = PLATFORM_RASPBERRY_PI_A_REV_2;
@@ -490,7 +496,8 @@ mraa_raspberry_pi()
 
     if ((platform_detected == PLATFORM_RASPBERRY_PI_A_PLUS_REV_1) ||
         (platform_detected == PLATFORM_RASPBERRY_PI_B_PLUS_REV_1) ||
-        (platform_detected == PLATFORM_RASPBERRY_PI2_B_REV_1)) {
+        (platform_detected == PLATFORM_RASPBERRY_PI2_B_REV_1) ||
+        (platform_detected == PLATFORM_RASPBERRY_PI_ZERO)) {
 
         strncpy(b->pins[27].name, "ID_SD", MRAA_PIN_NAME_SIZE);
         b->pins[27].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
