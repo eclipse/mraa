@@ -620,8 +620,7 @@ mraa_gt_tuchuck_board()
 
     strncpy(b->pins[pos].name, "LED101", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    // if BIOS is pre-L then this is 338
-    b->pins[pos].gpio.pinmap = 395;
+    b->pins[pos].gpio.pinmap = 338;
     pos++;
 
     strncpy(b->pins[pos].name, "LED102", 8);
