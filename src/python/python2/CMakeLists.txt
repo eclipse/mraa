@@ -18,12 +18,6 @@ if (PYTHON2_LIBRARY)
         add_dependencies (${SWIG_MODULE_python2-mraa_REAL_NAME} ${_file}class_doc_i)
       endforeach ()
       add_dependencies (${SWIG_MODULE_python2-mraa_REAL_NAME} common_hpp_doc_i)
-
-      add_custom_target (pydoc
-        pydoc -w ${CMAKE_CURRENT_BINARY_DIR}/mraa.py ${CMAKE_CURRENT_BINARY_DIR}/
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMENT "Generating API documentation with pydoc" VERBATIM
-      )
     endif ()
 
     set_target_properties (${SWIG_MODULE_python2-mraa_REAL_NAME} PROPERTIES
