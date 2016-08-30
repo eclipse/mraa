@@ -1,7 +1,7 @@
-Grosse Tete {#grossetete}
+Intel Joule {#grossetete}
 ===========
 
-The Grosse Tete with the Tuchuck board is supported by Mraa
+The Joule Board with the daughterboard (Tuchuck) board is supported by Mraa
 
 Revision Support
 ----------------
@@ -107,6 +107,8 @@ LEDs are numbered from 100-103.
 | 101         | LED101       | GPIO 	|
 | 102         | LED102       | GPIO 	|
 | 103         | LED103       | GPIO 	|
+| 104         | LEDWIFI      | GPIO     |
+| 105         | LEDBT        | GPIO     |
 
 To see a live pin mapping use the command:
 $ mraa-gpio list
