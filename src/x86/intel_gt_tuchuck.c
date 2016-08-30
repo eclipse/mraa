@@ -47,7 +47,7 @@ mraa_gt_tuchuck_board()
     b->adc_raw = 0;
     b->adc_supported = 0;
 
-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_INTEL_GT_TUCHUCK_PINCOUNT);
+    b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_GT_TUCHUCK_PINCOUNT, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
         goto error;
     }
@@ -558,6 +558,7 @@ mraa_gt_tuchuck_board()
     strncpy(b->pins[pos].name, "UART1TX", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[pos].gpio.pinmap = 484;
+    b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
     b->pins[pos].uart.mux_total = 0;
@@ -574,6 +575,7 @@ mraa_gt_tuchuck_board()
     strncpy(b->pins[pos].name, "UART1RX", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[pos].gpio.pinmap = 483;
+    b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
     b->pins[pos].uart.mux_total = 0;
@@ -590,6 +592,7 @@ mraa_gt_tuchuck_board()
     strncpy(b->pins[pos].name, "UART1RT", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[pos].gpio.pinmap = 485;
+    b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
     b->pins[pos].uart.mux_total = 0;
@@ -598,6 +601,7 @@ mraa_gt_tuchuck_board()
     strncpy(b->pins[pos].name, "RTC_CLK", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 367;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "UART1CT", 8);
@@ -616,31 +620,37 @@ mraa_gt_tuchuck_board()
     strncpy(b->pins[pos].name, "LED100", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 337;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "LED101", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 338;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "LED102", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 339;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "LED103", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 340;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "LEDWIFI", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 438;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "LEDBT", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 439;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     return b;
