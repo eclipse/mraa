@@ -537,7 +537,7 @@ mraa_firmata_plat_init(const char* uart_dev)
 
     // if this isn't working then we have an issue with our uart
     int retry = 20;
-    while (!firmata_dev->isReady && retry--) {
+    while (!firmata_dev->isReady && --retry) {
        firmata_pull(firmata_dev);
     }
 
