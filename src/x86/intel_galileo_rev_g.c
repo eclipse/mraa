@@ -808,9 +808,9 @@ mraa_intel_galileo_gen2()
     b->pins[18].aio.mux[0].pincmd = PINCMD_SET_DIRECTION;
     b->pins[18].aio.mux[0].pin = 57;
     b->pins[18].aio.mux[0].value = MRAA_GPIO_IN;
-    b->pins[18].aio.mux[1].pincmd = PINCMD_SET_OUT_VALUE;
+    b->pins[18].aio.mux[1].pincmd = PINCMD_SET_DIRECTION;
     b->pins[18].aio.mux[1].pin = 60;
-    b->pins[18].aio.mux[1].value = 1;
+    b->pins[18].aio.mux[1].value = MRAA_GPIO_OUT_HIGH;
     b->pins[18].aio.mux[2].pincmd = PINCMD_SET_VALUE;
     b->pins[18].aio.mux[2].pin = 78;
     b->pins[18].aio.mux[2].value = 0;
@@ -819,9 +819,9 @@ mraa_intel_galileo_gen2()
     b->pins[18].gpio.mux[0].pincmd = PINCMD_SET_DIRECTION;
     b->pins[18].gpio.mux[0].pin = 57;
     b->pins[18].gpio.mux[0].value = MRAA_GPIO_IN;
-    b->pins[18].gpio.mux[1].pincmd = PINCMD_SET_OUT_VALUE;
+    b->pins[18].gpio.mux[1].pincmd = PINCMD_SET_DIRECTION;
     b->pins[18].gpio.mux[1].pin = 60;
-    b->pins[18].gpio.mux[1].value = 1;
+    b->pins[18].gpio.mux[1].value = MRAA_GPIO_OUT_HIGH;
     b->pins[18].gpio.mux[2].pincmd = PINCMD_SET_VALUE;
     b->pins[18].gpio.mux[2].pin = 78;
     b->pins[18].gpio.mux[2].value = 1;
@@ -845,9 +845,9 @@ mraa_intel_galileo_gen2()
     b->pins[19].aio.mux[0].pincmd = PINCMD_SET_DIRECTION;
     b->pins[19].aio.mux[0].pin = 59;
     b->pins[19].aio.mux[0].value = MRAA_GPIO_IN;
-    b->pins[19].aio.mux[1].pincmd = PINCMD_SET_OUT_VALUE;
+    b->pins[19].aio.mux[1].pincmd = PINCMD_SET_DIRECTION;
     b->pins[19].aio.mux[1].pin = 60;
-    b->pins[19].aio.mux[1].value = 1;
+    b->pins[19].aio.mux[1].value = MRAA_GPIO_OUT_HIGH;
     b->pins[19].aio.mux[2].pincmd = PINCMD_SET_VALUE;
     b->pins[19].aio.mux[2].pin = 79;
     b->pins[19].aio.mux[2].value = 0;
@@ -856,9 +856,9 @@ mraa_intel_galileo_gen2()
     b->pins[19].gpio.mux[0].pincmd = PINCMD_SET_DIRECTION;
     b->pins[19].gpio.mux[0].pin = 59;
     b->pins[19].gpio.mux[0].value = MRAA_GPIO_IN;
-    b->pins[19].gpio.mux[1].pincmd = PINCMD_SET_OUT_VALUE;
+    b->pins[19].gpio.mux[1].pincmd = PINCMD_SET_DIRECTION;
     b->pins[19].gpio.mux[1].pin = 60;
-    b->pins[19].gpio.mux[1].value = 1;
+    b->pins[19].gpio.mux[1].value = MRAA_GPIO_OUT_HIGH;
     b->pins[19].gpio.mux[2].pincmd = PINCMD_SET_VALUE;
     b->pins[19].gpio.mux[2].pin = 79;
     b->pins[19].gpio.mux[2].value = 1;
