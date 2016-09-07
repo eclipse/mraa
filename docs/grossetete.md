@@ -10,7 +10,28 @@ Tuchuck
 Interface notes
 ---------------
 
-**SPI** Currently not working
+**SPI**
+
+Two SPI buses are available, with one chipselect each. Pins listed are MRAA
+numbered pins. Other chip selects are available if enabled in BIOS/EEPROM but
+cannot be enabled as BIOS options. You will need the spidev kernel module
+loaded, Ostro-XT does this by default.
+
+Bus 0 (32765)
+MOSI = 2
+MISO = 4
+CS = 6
+CLK = 10
+
+Bus 1 (32766)
+MOSI = 67
+MISO = 69
+CS0 = 59
+CS1 = 61
+CLK = 65
+
+(remove 40 from numbers to get pin header number for pins on low speed header
+2)
 
 **UART** Some pins are labelled as UARTs but are not configured in BIOS as UART
 so only available UART is on the FTDI header
@@ -24,15 +45,15 @@ LEDs are numbered from 100-103.
 | MRAA Number | Physical Pin | Function |
 |-------------|--------------|----------|
 | 1           | GPIO         | GPIO     |
-| 2           | SPP1RX       | GPIO     |
+| 2           | SPP1RX       | GPIO SPI |
 | 3           | PMICRST      | NONE     |
-| 4           | SPP1TX       | GPIO     |
+| 4           | SPP1TX       | GPIO SPI |
 | 5           | 19.2mhz      | GPIO     |
-| 6           | SPP1FS0      | GPIO     |
+| 6           | SPP1FS0      | GPIO SPI |
 | 7           | UART0TX      | GPIO     |
-| 8           | SPP1FS2      | GPIO     |
+| 8           | SPP1FS2      | GPIO SPI |
 | 9           | PWRGD        | NONE     |
-| 10          | SPP1CLK      | GPIO     |
+| 10          | SPP1CLK      | GPIO SPI |
 | 11          | I2C0SDA      | I2C      |
 | 12          | I2S1SDI      | GPIO     |
 | 13          | I2C0SCL      | I2C      |
@@ -81,17 +102,17 @@ LEDs are numbered from 100-103.
 | 56          | CAMERA       | NONE     |
 | 57          | PANEL        | GPIO     |
 | 58          | CAMERA       | NONE     |
-| 59          | SPP0FS0      | GPIO     |
+| 59          | SPP0FS0      | GPIO SPI |
 | 60          | CAMERA       | NONE     |
-| 61          | SPP0FS1      | GPIO     |
+| 61          | SPP0FS1      | GPIO SPI |
 | 62          | SPI_DAT      | SPI      |
-| 63          | SPP0FS2      | GPIO     |
-| 64          | SPICLKB      | GPIO SPI |
-| 65          | SPP0FS3      | GPIO     |
-| 66          | SPICLKA      | GPIO SPI |
-| 67          | SPP0TX       | GPIO     |
+| 63          | SPP0FS2      | GPIO SPI |
+| 64          | SPICLKB      | GPIO     |
+| 65          | SPP0FS3      | GPIO SPI |
+| 66          | SPICLKA      | GPIO     |
+| 67          | SPP0TX       | GPIO SPI |
 | 68          | UART0RX      | GPIO UART|
-| 69          | SPP0RX       | GPIO     |
+| 69          | SPP0RX       | GPIO SPI |
 | 70          | UART0RT      | GPIO UART|
 | 71          | I2C1SDA      | GPIO I2C |
 | 72          | UART0CT      | GPIO UART|
