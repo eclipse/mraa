@@ -34,7 +34,9 @@ CLK = 65
 2)
 
 **UART** Some pins are labelled as UARTs but are not configured in BIOS as UART
-so only available UART is on the FTDI header
+so only available UART is on the FTDI header. Disable the getty on ttyS2 and
+use mraa's uart raw mode to initialise on ttyS2. The Jumper J8 can be used to
+switch between using the FTDI 6 pin header and the micro USB output.
 
 Pin Mapping
 -----------
