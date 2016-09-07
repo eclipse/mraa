@@ -70,6 +70,12 @@ class Spi
         }
     }
 
+    /**
+     * Initialise SPI object using 'raw' mode. Mraa will go and grab the spidev device lablled /dev/spidev<bus>.<cs>
+     *
+     * @param bus to use
+     * @param cs to use
+     */
     Spi(int bus, int cs)
     {
         m_spi = mraa_spi_init_raw(bus, cs);
