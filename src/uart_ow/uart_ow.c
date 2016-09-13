@@ -320,7 +320,7 @@ mraa_uart_ow_bit(mraa_uart_ow_context dev, uint8_t bit)
     /* return the bit present on the bus (0xff is a '1', anything else
      * (typically 0xfc or 0x00) is a 0
      */
-    if (_ow_read_byte(dev, &ch) == -1 || ret == -1) {
+    if (_ow_read_byte(dev, &ch) != MRAA_SUCCESS || ret == -1) {
          return -1;
     }
     return (ch == 0xff);

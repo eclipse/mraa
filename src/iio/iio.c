@@ -309,7 +309,7 @@ mraa_iio_wait_event(int fd, char* data, int* read_size)
 
     // Wait for it forever or until pthread_cancel
     // poll is a cancelable point like sleep()
-    int x = poll(&pfd, 1, -1);
+    poll(&pfd, 1, -1);
 
     memset(data, 0, 100);
     *read_size = read(fd, data, 100);
@@ -376,10 +376,7 @@ mraa_iio_get_event_data(mraa_iio_context dev)
     char buf[MAX_SIZE];
     char readbuf[32];
     int fd;
-    int ret = 0;
-    int padint = 0;
-    int curr_bytes = 0;
-    char shortbuf, signchar;
+
     memset(buf, 0, MAX_SIZE);
     memset(readbuf, 0, 32);
     snprintf(buf, MAX_SIZE, IIO_SYSFS_DEVICE "%d/" IIO_EVENTS, dev->num);
@@ -441,7 +438,7 @@ mraa_iio_event_poll_nonblock(int fd, struct iio_event_data* data)
 
     // Wait for it forever or until pthread_cancel
     // poll is a cancelable point like sleep()
-    int x = poll(&pfd, 1, -1);
+    poll(&pfd, 1, -1);
 
     read(fd, data, sizeof(struct iio_event_data));
 
@@ -573,9 +570,7 @@ mraa_result_t
 mraa_iio_create_trigger(mraa_iio_context dev, const char* trigger)
 {
     struct stat configfs_status;
-    struct stat trigger_status;
     char buf[MAX_SIZE];
-    int ret;
 
     if (stat(IIO_CONFIGFS_TRIGGER, &configfs_status) == 0) {
         memset(buf, 0, MAX_SIZE);

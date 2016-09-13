@@ -69,7 +69,6 @@ mraa_iio_info_t* plat_iio = NULL;
 mraa_lang_func_t* lang_func = NULL;
 
 char* platform_name = NULL;
-static char* platform_long_name = NULL;
 
 static int num_i2c_devices = 0;
 static int num_iio_devices = 0;
@@ -953,7 +952,7 @@ mraa_find_i2c_bus(const char* devname, int startfrom)
     // i2c devices are numbered numerically so 0 must exist otherwise there is
     // no i2c-dev loaded
     if (mraa_file_exist("/sys/class/i2c-dev/i2c-0")) {
-        for (i; i < num_i2c_devices; i++) {
+        for (;i < num_i2c_devices; i++) {
             off_t size, err;
             snprintf(path, 64, "/sys/class/i2c-dev/i2c-%u/name", i);
             fd = open(path, O_RDONLY);

@@ -102,6 +102,10 @@ Override build architecture (this is useful because on x86 ARM code is not
 compiled so use this flag to force the target arch)
  `-DBUILDARCH=arm`
 
+You can also enable -Wall for gcc before running cmake by exporting your wanted
+CC flags to the CC env var
+  `export CC="gcc -Wall"`
+
 ## Dependencies continued
 
 You'll need at least SWIG version 3.0.2 and we recommend 3.0.5 to build the

@@ -80,7 +80,6 @@ mraa_init_json_platform_platform(json_object* jobj_platform, mraa_board_t* board
 {
     json_object* jobj_temp = NULL;
     const char* temp_string = NULL;
-    int temp_count = 0;
     int length = 0;
     mraa_result_t ret = MRAA_SUCCESS;
 
@@ -600,8 +599,8 @@ mraa_init_json_platform(const char* platform_json)
     mraa_result_t ret = MRAA_SUCCESS;
     char* buffer = NULL;
     struct stat st;
-    int file_lock = 0, array_length = 0, i = 0;
-    json_object *jobj_platform = NULL, *jobj_temp = NULL;
+    int file_lock = 0, i = 0;
+    json_object *jobj_platform = NULL;
     mraa_board_t* board = NULL;
 
     // Try to lock the file for use

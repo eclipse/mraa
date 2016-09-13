@@ -86,7 +86,7 @@ mraa_up_board()
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
 
     struct utsname running_uname;
-    int uname_major, uname_minor, max_pins[27];
+    int uname_major, uname_minor;
 
     if (b == NULL) {
         return NULL;

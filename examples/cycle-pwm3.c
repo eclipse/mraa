@@ -49,6 +49,7 @@ main()
             value = 0.0f;
         }
         float output = mraa_pwm_read(pwm);
+        printf("PWM value is %f\n", output);
     }
     //! [Interesting]
     return 0;

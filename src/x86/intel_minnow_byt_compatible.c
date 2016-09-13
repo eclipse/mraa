@@ -89,7 +89,7 @@ mraa_intel_minnowboard_byt_compatible(mraa_boolean_t turbot)
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
 
     struct utsname running_uname;
-    int uname_major, uname_minor, max_pins[28];
+    int uname_major, uname_minor;
 
     if (b == NULL) {
         return NULL;

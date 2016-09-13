@@ -144,7 +144,6 @@ i2c_set_exit:
 void
 i2c_detect_devices(int bus)
 {
-    mraa_result_t status = MRAA_SUCCESS;
     mraa_i2c_context i2c = mraa_i2c_init(bus);
     if (i2c == NULL) {
         return;
