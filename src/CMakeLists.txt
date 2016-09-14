@@ -240,7 +240,7 @@ if (BUILDSWIG)
       configure_file (${CMAKE_CURRENT_SOURCE_DIR}/java/manifest.txt.in
           ${CMAKE_CURRENT_BINARY_DIR}/java/manifest.txt)
       configure_file (${CMAKE_CURRENT_SOURCE_DIR}/java/pom.xml.in
-          ${CMAKE_CURRENT_BINARY_DIR}/java/pom.xml)
+          ${CMAKE_CURRENT_BINARY_DIR}/java/mraa-${VERSION_SHORT}.pom)
       add_subdirectory (java)
     endif ()
     if (BUILDSWIGNODE)
