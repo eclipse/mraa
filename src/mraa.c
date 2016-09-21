@@ -1039,6 +1039,10 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
             return MRAA_SUCCESS;
         }
     }
+#else
+    if (subplatformtype == MRAA_GENERIC_FIRMATA) {
+        syslog(LOG_NOTICE, "mraa: Cannot add Firmata platform as support not compiled in");
+    }
 #endif
 
     return MRAA_ERROR_INVALID_PARAMETER;
