@@ -30,7 +30,6 @@ make
 After you've built mraa you can install using `make install`.
 
 ## Running Imraa
-
 Before being able to use mraa to program the Arduino101 you will need to run
 imraa to flash the sketch file onto the board. The sketch file that imraa will
 look for is located here: [Arduino101 Sketch](http://iotdk.intel.com/misc/ConfigurableFirmataCurieImu.ino.bin).

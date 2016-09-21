@@ -1,10 +1,11 @@
-add_executable (imraa imraa.c)
+add_executable (imraa imraa.c imraa_arduino.c)
 
 include_directories (${PROJECT_SOURCE_DIR}/api)
 include_directories (${PROJECT_SOURCE_DIR}/include)
 include_directories (${PROJECT_SOURCE_DIR}/api/mraa)
+include_directories (${PROJECT_SOURCE_DIR}/imraa)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DIMRAA=1")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DIMRAA=1")
 
 find_package (JSON-C REQUIRED)
 include_directories (${JSON-C_INCLUDE_DIR})
