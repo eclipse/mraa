@@ -208,11 +208,14 @@ mraa_intel_edison_gpio_init_post(mraa_gpio_context dev)
 mraa_result_t
 mraa_intel_edison_gpio_close_pre(mraa_gpio_context dev)
 {
-    if (dev->phy_pin >= 0) {
-        int pin = dev->phy_pin;
-        if (agpioOutputen[pin]) {
-            mraa_gpio_close(agpioOutputen[pin]);
-            agpioOutputen[pin] = NULL;
+    // check if we own it
+    if (dev->owner != 0) {
+        if (dev->phy_pin >= 0) {
+            int pin = dev->phy_pin;
+            if (agpioOutputen[pin]) {
+                mraa_gpio_close(agpioOutputen[pin]);
+                agpioOutputen[pin] = NULL;
+            }
         }
     }
     return MRAA_SUCCESS;
