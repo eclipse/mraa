@@ -60,7 +60,7 @@ https://launchpad.net/~mraa/+archive/ubuntu/mraa
 
 ```bash
 sudo add-apt-repository ppa:mraa/mraa
-sudo apt-get install libmraa1 libmraa-dev mraa-gpio mraa-tools python2-mraa python3-mraa
+sudo apt-get install libmraa1 libmraa-dev mraa-tools python-mraa python3-mraa
 ```
 
 Node.js package is available seperately.
