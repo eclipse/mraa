@@ -81,9 +81,9 @@ imraa_list_serialport()
     udev_unref(udev);
 
     if (ret) {
-        printf("Ardunio 101 Device Node Path: %s\n", ret);
+        printf("Arduino 101 Device Node Path: %s\n", ret);
     } else {
-        printf("Can't detect any Ardunio 101 Device on tty\n");
+        printf("Can't detect any Arduino 101 Device on tty\n");
     }
     return ret;
 }
@@ -108,7 +108,7 @@ int
 imraa_flash_101(const char* bin_path, const char* bin_file_name, const char* tty)
 {
     if (imraa_reset_arduino(tty) != MRAA_SUCCESS) {
-        fprintf(stderr, "Failed to reset arduino on %s for unknown reason, carrying on...\n", tty);
+        fprintf(stderr, "Failed to reset Arduino on %s for unknown reason, carrying on...\n", tty);
     }
 
     char* ln = NULL;
@@ -501,7 +501,7 @@ main(int argc, char** argv)
             printf("imraa conf reading error");
         }
     } else {
-        printf("imraa read_conf buffer can't allocated\n");
+        printf("imraa read_conf buffer can't be allocated\n");
         exit(1);
     }
 
@@ -514,7 +514,7 @@ main(int argc, char** argv)
         mraa_platform_t type = mraa_get_platform_type();
         imraa_handle_subplatform(jobj, force_update);
         if (type == MRAA_NULL_PLATFORM || type == MRAA_UNKNOWN_PLATFORM) {
-            printf("imraa: Failed to do IO pinmuxing on null/unkown platform\n");
+            printf("imraa: Failed to do IO pinmuxing on null/unknown platform\n");
         } else {
             imraa_handle_IO(jobj);
         }
