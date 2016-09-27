@@ -1116,7 +1116,15 @@ mraa_add_from_lockfile(const char* imraa_lock_file)
                 uartdev = NULL;
             }
         }
-    } else {
+        if (json_object_object_get_ex(jobj_lock, "IO", &ioarray) == true &&
+            json_object_is_type(ioarray, json_type_array)) {
+	    /* assume we have declared IO so we are preinitialised and wipe the
+	     * advance func array
+             */
+            memset(plat->adv_func, 0, sizeof(mraa_adv_func_t));
+        }
+    }
+    else {
         ret = MRAA_ERROR_INVALID_RESOURCE;
     }
     json_object_put(jobj_lock);

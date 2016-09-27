@@ -1,4 +1,4 @@
-add_executable (imraa imraa.c imraa_arduino.c)
+add_executable (imraa imraa.c imraa_arduino.c imraa_io.c imraa_lock.c)
 
 include_directories (${PROJECT_SOURCE_DIR}/api)
 include_directories (${PROJECT_SOURCE_DIR}/include)
