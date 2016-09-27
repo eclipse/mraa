@@ -41,6 +41,7 @@
 #include <mraa/pwm.h>
 
 #include <mraa_internal.h>
+#include <imraa_lock.h>
 
 const char*
 imraa_list_serialport()
@@ -180,35 +181,6 @@ imraa_flash_101(const char* bin_path, const char* bin_file_name, const char* tty
     free(full_dfu_upload);
     sleep(5);
     return 0;
-}
-
-void
-imraa_write_lockfile(const char* lock_file_location, const char* serialport)
-{
-    FILE* fh;
-    char str[10];
-    json_object* platform1 = json_object_new_object();
-    snprintf(str, 10, "%d", MRAA_NULL_PLATFORM);
-    json_object_object_add(platform1, "id", json_object_new_string(str));
-
-    json_object* platform2 = json_object_new_object();
-    snprintf(str, 10, "%d", MRAA_GENERIC_FIRMATA);
-    json_object_object_add(platform2, "id", json_object_new_string(str));
-    json_object_object_add(platform2, "uart", json_object_new_string(serialport));
-
-    json_object* platfroms = json_object_new_array();
-    json_object_array_add(platfroms, platform1);
-    json_object_array_add(platfroms, platform2);
-    json_object* lock_file = json_object_new_object();
-    json_object_object_add(lock_file, "Platform", platfroms);
-    fh = fopen(lock_file_location, "w");
-    if (fh != NULL) {
-        fputs(json_object_to_json_string_ext(lock_file, JSON_C_TO_STRING_PRETTY), fh);
-        fclose(fh);
-    } else {
-        fprintf(stderr, "can't write to lock file\n");
-    }
-    json_object_put(lock_file);
 }
 
 void
