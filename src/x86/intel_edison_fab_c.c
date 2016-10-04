@@ -30,6 +30,7 @@
 #include <sys/ioctl.h>
 #include <linux/spi/spidev.h>
 #include <errno.h>
+#include <time.h>
 
 #include "common.h"
 #include "x86/intel_edison_fab_c.h"
@@ -374,7 +375,18 @@ mraa_result_t
 mraa_intel_edison_pwm_enable_pre(mraa_pwm_context dev, int enable) {
     // PWM 0% duty workaround: update state array
     // if someone first ran write(0) and then enable(1).
-    if ((pwm_disabled[dev->pin] == 1) && (enable == 1)) { pwm_disabled[dev->pin] = 0; }
+    if ((pwm_disabled[dev->pin] == 1) && (enable == 1)) {
+        pwm_disabled[dev->pin] = 0;
+        return MRAA_SUCCESS;
+    }
+    if (enable == 0) {
+        // Set duty cycle to 0 before disable pwm.
+        // Edison PWM output stuck at high if disabled during ON period
+        mraa_pwm_pulsewidth_us(dev, 0);
+        // Sleep 2 period to allow change take effect
+        usleep(dev->period / 500);
+    }
+
     return MRAA_SUCCESS;
 }
 
