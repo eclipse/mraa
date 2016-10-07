@@ -51,7 +51,7 @@ mraa_x86_platform()
     FILE* fh = fopen("/sys/devices/virtual/dmi/id/board_name", "r");
     if (fh != NULL) {
         if (getline(&line, &len, fh) != -1) {
-            if (strncmp(line, "GalileoGen2", 11) == 0) {
+            if (strncmp(line, "GalileoGen2", 11) == 0 || strncmp(line, "SIMATIC IOT2000", 15) == 0) {
                 platform_type = MRAA_INTEL_GALILEO_GEN2;
                 plat = mraa_intel_galileo_gen2();
             } else if (strncmp(line, "BODEGA BAY", 10) == 0) {
