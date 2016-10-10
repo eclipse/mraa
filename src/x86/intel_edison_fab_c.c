@@ -646,9 +646,25 @@ mraa_intel_edison_uart_init_pre(int index)
         mraa_gpio_close(io1_output);
         mraa_gpio_close(io1_pullup);
     }
+
+    /**
+     * Change pinmode for uart pins
+     */
     mraa_result_t ret;
-    ret = mraa_intel_edison_pinmode_change(130, 1); // IO0 RX
-    ret = mraa_intel_edison_pinmode_change(131, 1); // IO1 TX
+    int i = 128;
+    for (; i < 132; i++) {
+        /**
+         * 128 == CTS
+         * 129 == RTS
+         * 130 == RX
+         * 131 = Tx
+         *
+         */
+        ret = mraa_intel_edison_pinmode_change(i, 1); // IO0 RX
+        if (ret != MRAA_SUCCESS) {
+            return ret;
+        }
+    }
     return ret;
 }
 
