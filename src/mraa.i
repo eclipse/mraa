@@ -6,7 +6,7 @@
 
 #ifdef DOXYGEN
   //and doesn't seem to work correctly in SWIG's preprocessor
-  #ifdef SWIGPYTHON
+  #ifdef SWIGPYTHON2
         %include common_hpp_doc.i
         %include gpio_class_doc.i
         %include i2c_class_doc.i
