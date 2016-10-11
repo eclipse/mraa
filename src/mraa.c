@@ -1062,9 +1062,7 @@ mraa_result_t
 mraa_add_from_lockfile(const char* imraa_lock_file)
 {
     mraa_result_t ret = MRAA_SUCCESS;
-    mraa_platform_t type = plat->platform_type;
     char* buffer = NULL;
-    off_t file_size;
     struct stat st;
     int i = 0;
     uint32_t subplat_num = 0;
