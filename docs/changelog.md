@@ -5,6 +5,15 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**1.4.0**
+  * Add support for Siemens SIMATIC IOT2000
+  * Cmake now enables much more error detection depending on compiler support
+  * Mraa Maven packages now enabled
+  * Galileo Gen2 AIO fix using pincmd
+  * Adding an already added firmata platform now returns MRAA_SUCCESS
+  * Cmake no longer tags builds without git as '-dirty' version.c for easier
+    packaging support
+
 **1.3.0**
   * Fix GT GPIO bugs
   * Mock SPI and travis now uses mock and tests it
