@@ -282,7 +282,7 @@ imraa_handle_subplatform(struct json_object* jobj, bool force_update)
     // got flash? do flash
     if (access(lockfile_loc, F_OK) != -1 && force_update == false) {
         printf("already exist a lock file, skip flashing\n");
-        printf("force upgrade? remove the lockfile or run with force\n", lockfile_loc);
+        printf("force upgrade? remove the lockfile or run with force\n");
         return;
     } else {
         fprintf(stdout, "Starting to flash board\n");
@@ -463,8 +463,6 @@ main(int argc, char** argv)
     char* imraa_conf_file = IMRAA_CONF_FILE;
     long fsize;
     bool force_update = false;
-    int i = 0;
-    uint32_t ionum = 0;
 
     if (argc > 2) {
         print_command_error();
