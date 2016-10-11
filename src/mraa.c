@@ -1051,6 +1051,7 @@ mraa_remove_subplatform(mraa_platform_t subplatformtype)
         free(plat->sub_platform->adv_func);
         free(plat->sub_platform->pins);
         free(plat->sub_platform);
+        return MRAA_SUCCESS;
     }
 #endif
     return MRAA_ERROR_INVALID_PARAMETER;
