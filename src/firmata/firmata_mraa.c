@@ -182,7 +182,7 @@ static mraa_result_t
 mraa_firmata_i2c_wait(int addr, int reg)
 {
     int i = 0;
-    for (i = 0; firmata_dev->i2cmsg[addr][reg] == -1; i++) {
+    for (; firmata_dev->i2cmsg[addr][reg] == -1; i++) {
         if (i > 50) {
             return MRAA_ERROR_UNSPECIFIED;
         }
@@ -239,7 +239,7 @@ mraa_firmata_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
     if (mraa_firmata_send_i2c_read_req(dev, length) == MRAA_SUCCESS) {
         if (mraa_firmata_i2c_wait(dev->addr, 0) == MRAA_SUCCESS) {
             int i = 0;
-            for (i = 0; i < length; i++) {
+            for (; i < length; i++) {
                 data[i] = firmata_dev->i2cmsg[dev->addr][i];
             }
             return length;
@@ -277,7 +277,7 @@ mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWri
     buffer[2] = dev->addr;
     buffer[3] = I2C_MODE_WRITE << 3;
     // we need to write until FIRMATA_END_SYSEX
-    for (i; i < (buffer_size-1); i++) {
+    for (; i < (buffer_size-1); i++) {
         buffer[ii] = data[i] & 0x7F;
         buffer[ii+1] = (data[i] >> 7) & 0x7f;
         ii = ii+2;
