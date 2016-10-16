@@ -263,7 +263,7 @@ class Uart
      * @return Result of operation
      */
     Result
-    SetNonBlocking(bool nonblock)
+    setNonBlocking(bool nonblock)
     {
         return (Result) mraa_uart_set_non_blocking(m_uart, nonblock);
     }
