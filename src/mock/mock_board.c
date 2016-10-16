@@ -31,8 +31,10 @@
 #include "mock/mock_board_aio.h"
 #include "mock/mock_board_i2c.h"
 #include "mock/mock_board_spi.h"
+#include "mock/mock_board_uart.h"
 
 #define PLATFORM_NAME "MRAA mock platform"
+#define UART_DEV_PATH "dummy"
 
 mraa_board_t*
 mraa_mock_board()
@@ -68,6 +70,12 @@ mraa_mock_board()
     b->pwm_default_period = 0;
     b->pwm_max_period = 0;
     b->pwm_min_period = 0;
+
+    b->uart_dev_count = 1;
+    b->def_uart_dev = 0;
+    b->uart_dev[0].rx = 8;
+    b->uart_dev[0].tx = 9;
+    b->uart_dev[0].device_path = UART_DEV_PATH;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_MOCK_PINCOUNT);
     if (b->pins == NULL) {
@@ -117,6 +125,16 @@ mraa_mock_board()
     b->adv_func->spi_write_word_replace = &mraa_mock_spi_write_word_replace;
     b->adv_func->spi_transfer_buf_replace = &mraa_mock_spi_transfer_buf_replace;
     b->adv_func->spi_transfer_buf_word_replace = &mraa_mock_spi_transfer_buf_word_replace;
+    b->adv_func->uart_init_raw_replace = &mraa_mock_uart_init_raw_replace;
+    b->adv_func->uart_set_baudrate_replace = &mraa_mock_uart_set_baudrate_replace;
+    b->adv_func->uart_flush_replace = &mraa_mock_uart_flush_replace;
+    b->adv_func->uart_set_flowcontrol_replace = &mraa_mock_uart_set_flowcontrol_replace;
+    b->adv_func->uart_set_mode_replace = &mraa_mock_uart_set_mode_replace;
+    b->adv_func->uart_set_non_blocking_replace = &mraa_mock_uart_set_non_blocking_replace;
+    b->adv_func->uart_set_timeout_replace = &mraa_mock_uart_set_timeout_replace;
+    b->adv_func->uart_data_available_replace = &mraa_mock_uart_data_available_replace;
+    b->adv_func->uart_write_replace = &mraa_mock_uart_write_replace;
+    b->adv_func->uart_read_replace = &mraa_mock_uart_read_replace;
 
     // Pin definitions
     int pos = 0;
@@ -167,6 +185,20 @@ mraa_mock_board()
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     b->pins[pos].spi.mux_total = 0;
     b->pins[pos].spi.pinmap = 0;
+    pos++;
+
+    strncpy(b->pins[pos].name, "UART0RX", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].uart.pinmap = 0;
+    b->pins[pos].uart.parent_id = 0;
+    b->pins[pos].uart.mux_total = 0;
+    pos++;
+
+    strncpy(b->pins[pos].name, "UART0TX", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].uart.pinmap = 0;
+    b->pins[pos].uart.parent_id = 0;
+    b->pins[pos].uart.mux_total = 0;
     pos++;
 
     return b;

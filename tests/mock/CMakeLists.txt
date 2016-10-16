@@ -30,6 +30,16 @@ add_test (NAME py_spi_checks_write_byte COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${C
 add_test (NAME py_spi_checks_write_word COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/spi_checks_write_word.py)
 add_test (NAME py_spi_checks_write COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/spi_checks_write.py)
 
+add_test (NAME py_uart_checks_set_baudrate COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_set_baudrate.py)
+add_test (NAME py_uart_checks_flush COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_flush.py)
+add_test (NAME py_uart_checks_set_flowcontrol COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_set_flowcontrol.py)
+add_test (NAME py_uart_checks_set_mode COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_set_mode.py)
+add_test (NAME py_uart_checks_set_nonblocking COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_set_nonblocking.py)
+add_test (NAME py_uart_checks_set_timeout COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_set_timeout.py)
+add_test (NAME py_uart_checks_data_available COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_data_available.py)
+add_test (NAME py_uart_checks_write COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_write.py)
+add_test (NAME py_uart_checks_read COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_read.py)
+
 set_tests_properties(py_general
                      py_platform
                      py_gpio_basic
@@ -57,4 +67,13 @@ set_tests_properties(py_general
                      py_spi_checks_write_byte
                      py_spi_checks_write_word
                      py_spi_checks_write
+                     py_uart_checks_set_baudrate
+                     py_uart_checks_flush
+                     py_uart_checks_set_flowcontrol
+                     py_uart_checks_set_mode
+                     py_uart_checks_set_nonblocking
+                     py_uart_checks_set_timeout
+                     py_uart_checks_data_available
+                     py_uart_checks_write
+                     py_uart_checks_read
                      PROPERTIES ENVIRONMENT "PYTHONPATH=${PYTHON_DEFAULT_PYTHONPATH}")
