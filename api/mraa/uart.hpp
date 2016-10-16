@@ -124,7 +124,7 @@ class Uart
     }
 
     /**
-     * Write bytes in String object to a device
+     * Write bytes in char* buffer to a device
      *
      * @param data buffer pointer
      * @param length maximum size of buffer
