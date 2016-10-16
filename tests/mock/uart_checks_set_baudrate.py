@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
-# Author: Costin Constantin <costin.c.constantin@intel.com>
-# Copyright (c) 2015 Intel Corporation.
-#
-# Contributors: Alex Tereschenko <alext.mkrs@gmail.com>
+# Author: Alex Tereschenko <alext.mkrs@gmail.com>
+# Copyright (c) 2016 Alex Tereschenko.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,23 +25,26 @@
 import mraa as m
 import unittest as u
 
-PLATFORM_PINCOUNT = 10
-PLATFORM_STD_ADC_RES_BITS = 10
-PLATFORM_MAX_ADC_RES_BITS = 12
+from uart_checks_shared import *
 
-class PlatformChecks(u.TestCase):
-  def test_platform_pin_count(self):
-    self.assertEqual(m.getPinCount(), PLATFORM_PINCOUNT, "Wrong number of pins reported by platform")
+class UartChecksSetBaudrate(u.TestCase):
+  def setUp(self):
+    self.uart = m.Uart(MRAA_UART_DEV_NUM)
 
-  def test_adc_std_res(self):
-    adc_std_res = m.adcSupportedBits()
-    print("Platform ADC standard resolution is: " + str(adc_std_res) + " bits")
-    self.assertEqual(adc_std_res, PLATFORM_STD_ADC_RES_BITS, "Wrong ADC standard resolution")
+  def tearDown(self):
+    del self.uart
 
-  def test_adc_max_res(self):
-    adc_max_res = m.adcRawBits()
-    print("Platform ADC max. resolution is: " + str(adc_max_res) + " bits")
-    self.assertEqual(adc_max_res, PLATFORM_MAX_ADC_RES_BITS, "Wrong ADC max. resolution")
+  def test_uart_baudrate_115200(self):
+    TEST_BAUDRATE = 115200
+    self.assertEqual(self.uart.setBaudRate(TEST_BAUDRATE),
+                     m.SUCCESS,
+                     "Setting baudrate to %d did not return success" % TEST_BAUDRATE)
+
+  def test_uart_baudrate_invalid_bigger_than_max(self):
+    TEST_BAUDRATE = 10000000
+    self.assertEqual(self.uart.setBaudRate(TEST_BAUDRATE),
+                     m.ERROR_INVALID_PARAMETER,
+                     "Setting baudrate to %d did not return INVALID_PARAMETER" % TEST_BAUDRATE)
 
 if __name__ == "__main__":
   u.main()

@@ -261,7 +261,7 @@ mraa_uart_init_raw(const char* path)
 init_raw_cleanup:
     if (status != MRAA_SUCCESS) {
         if (dev != NULL) {
-            if (dev->fd != -1) {
+            if (dev->fd >= 0) {
                 close(dev->fd);
             }
             free(dev);
