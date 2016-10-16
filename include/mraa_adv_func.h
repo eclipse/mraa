@@ -110,4 +110,14 @@ typedef struct {
 
     mraa_result_t (*uart_init_pre) (int index);
     mraa_result_t (*uart_init_post) (mraa_uart_context uart);
+    mraa_result_t (*uart_init_raw_replace) (mraa_uart_context dev, const char* path);
+    mraa_result_t (*uart_flush_replace) (mraa_uart_context dev);
+    mraa_result_t (*uart_set_baudrate_replace) (mraa_uart_context dev, unsigned int baud);
+    mraa_result_t (*uart_set_mode_replace) (mraa_uart_context dev, int bytesize, mraa_uart_parity_t parity, int stopbits);
+    mraa_result_t (*uart_set_flowcontrol_replace) (mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_boolean_t rtscts);
+    mraa_result_t (*uart_set_timeout_replace) (mraa_uart_context dev, int read, int write, int interchar);
+    mraa_result_t (*uart_set_non_blocking_replace) (mraa_uart_context dev, mraa_boolean_t nonblock);
+    int (*uart_read_replace) (mraa_uart_context dev, char* buf, size_t len);
+    int (*uart_write_replace)(mraa_uart_context dev, const char* buf, size_t len);
+    mraa_boolean_t (*uart_data_available_replace) (mraa_uart_context dev, unsigned int millis);
 } mraa_adv_func_t;
