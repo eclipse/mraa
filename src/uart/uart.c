@@ -201,23 +201,27 @@ mraa_uart_init(int index)
 mraa_uart_context
 mraa_uart_init_raw(const char* path)
 {
+    mraa_result_t status = MRAA_SUCCESS;
+
     if (!path) {
         syslog(LOG_ERR, "uart: device path undefined");
-        return NULL;
+        status = MRAA_ERROR_INVALID_PARAMETER;
+        goto init_raw_cleanup;
     }
 
     mraa_uart_context dev = mraa_uart_init_internal(plat == NULL ? NULL : plat->adv_func);
     if (dev == NULL) {
         syslog(LOG_ERR, "uart: Failed to allocate memory for context");
-        return NULL;
+        status = MRAA_ERROR_NO_RESOURCES;
+        goto init_raw_cleanup;
     }
     dev->path = path;
 
     // now open the device
     if ((dev->fd = open(dev->path, O_RDWR)) == -1) {
         syslog(LOG_ERR, "uart: open(%s) failed: %s", path, strerror(errno));
-        free(dev);
-        return NULL;
+        status = MRAA_ERROR_INVALID_RESOURCE;
+        goto init_raw_cleanup;
     }
 
     // now setup the tty and the selected baud rate
@@ -226,9 +230,8 @@ mraa_uart_init_raw(const char* path)
     // get current modes
     if (tcgetattr(dev->fd, &termio)) {
         syslog(LOG_ERR, "uart: tcgetattr(%s) failed: %s", path, strerror(errno));
-        close(dev->fd);
-        free(dev);
-        return NULL;
+        status = MRAA_ERROR_INVALID_RESOURCE;
+        goto init_raw_cleanup;
     }
 
     // setup for a 'raw' mode.  8N1, no echo or special character
@@ -237,14 +240,23 @@ mraa_uart_init_raw(const char* path)
     cfmakeraw(&termio);
     if (tcsetattr(dev->fd, TCSAFLUSH, &termio) < 0) {
         syslog(LOG_ERR, "uart: tcsetattr(%s) failed after cfmakeraw(): %s", path, strerror(errno));
-        close(dev->fd);
-        free(dev);
-        return NULL;
+        status = MRAA_ERROR_INVALID_RESOURCE;
+        goto init_raw_cleanup;
     }
 
     if (mraa_uart_set_baudrate(dev, 9600) != MRAA_SUCCESS) {
-        close(dev->fd);
-        free(dev);
+        status = MRAA_ERROR_INVALID_RESOURCE;
+        goto init_raw_cleanup;
+    }
+
+init_raw_cleanup:
+    if (status != MRAA_SUCCESS) {
+        if (dev != NULL) {
+            if (dev->fd != -1) {
+                close(dev->fd);
+            }
+            free(dev);
+        }
         return NULL;
     }
 
