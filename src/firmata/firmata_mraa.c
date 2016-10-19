@@ -92,7 +92,7 @@ static mraa_result_t
 mraa_firmata_i2c_init_bus_replace(mraa_i2c_context dev)
 {
     int delay = 1; // this should be either 1 or 0, I don't know :)
-    uint8_t buff[4];
+    char buff[4];
     buff[0] = FIRMATA_START_SYSEX;
     buff[1] = FIRMATA_I2C_CONFIG;
     buff[2] = delay & 0xFF, (delay >> 8) & 0xFF;
@@ -120,7 +120,7 @@ mraa_firmata_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 static mraa_result_t
 mraa_firmata_send_i2c_read_req(mraa_i2c_context dev, int length)
 {
-    uint8_t* buffer = calloc(7, 0);
+    char* buffer = calloc(7, 0);
     if (buffer == NULL) {
         return MRAA_ERROR_NO_RESOURCES;
     }
@@ -149,7 +149,7 @@ mraa_firmata_send_i2c_read_req(mraa_i2c_context dev, int length)
 static mraa_result_t
 mraa_firmata_send_i2c_read_reg_req(mraa_i2c_context dev, uint8_t command, int length)
 {
-    uint8_t* buffer = calloc(9, 0);
+    char* buffer = calloc(9, 0);
     if (buffer == NULL) {
         return MRAA_ERROR_NO_RESOURCES;
     }
@@ -266,7 +266,7 @@ mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWri
 {
     // buffer needs 5 bytes for firmata, and 2 bytes for every byte of data
     int buffer_size = (bytesToWrite*2) + 5;
-    uint8_t* buffer = calloc(buffer_size, 0);
+    char* buffer = calloc(buffer_size, 0);
     if (buffer == NULL) {
         return MRAA_ERROR_NO_RESOURCES;
     }
@@ -291,7 +291,7 @@ mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWri
 static mraa_result_t
 mraa_firmata_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
 {
-    uint8_t* buffer = calloc(7, 0);
+    char* buffer = calloc(7, 0);
     if (buffer == NULL) {
         return MRAA_ERROR_NO_RESOURCES;
     }
@@ -310,7 +310,7 @@ mraa_firmata_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
 static mraa_result_t
 mraa_firmata_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
 {
-    uint8_t* buffer = calloc(9, 0);
+    char* buffer = calloc(9, 0);
     if (buffer == NULL) {
         return MRAA_ERROR_NO_RESOURCES;
     }
@@ -517,6 +517,8 @@ mraa_firmata_pull_handler(void* vp)
         isr_prev = isr_now;
         usleep(100);
     }
+
+    return NULL;
 }
 
 mraa_board_t*
