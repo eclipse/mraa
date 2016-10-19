@@ -29,8 +29,8 @@ LOCAL_SRC_FILES := \
     src/uart/uart.c \
     src/x86/x86.c \
     src/iio/iio.c \
-    src/x86/intel_galileo_rev_d.c \
-    src/x86/intel_galileo_rev_g.c \
+    src/x86/intel_galileo_gen_1.c \
+    src/x86/intel_galileo_gen_2.c \
     src/x86/intel_edison_fab_c.c  \
     src/x86/intel_de3815.c \
     src/x86/intel_nuc5.c \

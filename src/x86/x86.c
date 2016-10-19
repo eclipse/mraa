@@ -28,8 +28,8 @@
 
 #include "mraa_internal.h"
 
-#include "x86/intel_galileo_rev_d.h"
-#include "x86/intel_galileo_rev_g.h"
+#include "x86/intel_galileo_gen_1.h"
+#include "x86/intel_galileo_gen_2.h"
 #include "x86/intel_edison_fab_c.h"
 #include "x86/intel_de3815.h"
 #include "x86/intel_nuc5.h"
@@ -53,7 +53,7 @@ mraa_x86_platform()
         if (getline(&line, &len, fh) != -1) {
             if (strncmp(line, "GalileoGen2", 11) == 0 || strncmp(line, "SIMATIC IOT2000", 15) == 0) {
                 platform_type = MRAA_INTEL_GALILEO_GEN2;
-                plat = mraa_intel_galileo_gen2();
+                plat = mraa_intel_galileo_g2();
             } else if (strncmp(line, "BODEGA BAY", 10) == 0) {
                 platform_type = MRAA_INTEL_EDISON_FAB_C;
                 plat = mraa_intel_edison_fab_c();
@@ -74,7 +74,7 @@ mraa_x86_platform()
                 plat = mraa_intel_minnowboard_byt_compatible(0);
             } else if (strncasecmp(line, "Galileo", 7) == 0) {
                 platform_type = MRAA_INTEL_GALILEO_GEN1;
-                plat = mraa_intel_galileo_rev_d();
+                plat = mraa_intel_galileo_g1();
             } else if (strncasecmp(line, "MinnowBoard Compatible", 22) == 0) {
                 platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
                 plat = mraa_intel_minnowboard_byt_compatible(1);
@@ -116,7 +116,7 @@ mraa_x86_platform()
     return platform_type;
 #else
     #if defined(xMRAA_INTEL_GALILEO_GEN2)
-    plat = mraa_intel_galileo_gen2();
+    plat = mraa_intel_galileo_g2();
     #elif defined(xMRAA_INTEL_EDISON_FAB_C)
     plat = mraa_intel_edison_fab_c();
     #elif defined(xMRAA_INTEL_DE3815)
@@ -124,7 +124,7 @@ mraa_x86_platform()
     #elif defined(xMRAA_INTEL_MINNOWBOARD_MAX)
     plat = mraa_intel_minnowboard_byt_compatible();
     #elif defined(xMRAA_INTEL_GALILEO_GEN1)
-    plat = mraa_intel_galileo_rev_d();
+    plat = mraa_intel_galileo_g1();
     #elif defined(xMRAA_INTEL_NUC5)
     plat = mraa_intel_nuc5();
     #elif defined(xMRAA_INTEL_SOFIA_3GR)

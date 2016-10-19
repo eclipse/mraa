@@ -28,7 +28,7 @@
 #include <sys/mman.h>
 
 #include "common.h"
-#include "x86/intel_galileo_rev_g.h"
+#include "x86/intel_galileo_gen_2.h"
 
 #define MAX_SIZE 64
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
@@ -262,7 +262,7 @@ mraa_intel_galileo_g2_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
 }
 
 mraa_board_t*
-mraa_intel_galileo_gen2()
+mraa_intel_galileo_g2()
 {
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {

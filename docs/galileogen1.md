@@ -1,10 +1,12 @@
-Galileo Gen 1 - Rev D                            {#galileorevd}
+Galileo Gen 1 (Rev D)                            {#galileogen1}
 =====================
 
 Galileo is a microcontroller board based on the Intel(R) Quark(TM) SoC X1000
-Application Processor, a 32-bit Intel Pentium-class system on a chip.
+Application Processor, a 32-bit Intel Pentium-class system on a chip. The gen1
+board is smaller than the gen2 board and can be easily identified by it's lack
+of full size USB port and it has a 3.5mm jack serial connector.
 
-The rev D board has the following limitations in libmraa:
+The gen1 board has the following limitations in libmraa:
 
 - gpio 13 will not switch the LED as it's a different Gpio, use raw gpio '3' to do this
 - gpio register access via /dev/uio is limited to pin2 and 3

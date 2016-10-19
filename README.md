@@ -22,8 +22,8 @@ Supported Boards
 
 X86
 ---
-* [Galileo Gen 1 - Rev D](../master/docs/galileorevd.md)
-* [Galileo Gen 2 - Rev H](../master/docs/galileorevh.md)
+* [Galileo Gen 1 - Rev D](../master/docs/galileogen1.md)
+* [Galileo Gen 2 - Rev H](../master/docs/galileogen2.md)
 * [Edison](../master/docs/edison.md)
 * [Intel DE3815](../master/docs/intel_de3815.md)
 * [Minnowboard Max](../master/docs/minnow_max.md)

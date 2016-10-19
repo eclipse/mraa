@@ -32,8 +32,8 @@ set (mraa_LIB_SRCS_NOAUTO
 
 set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/x86.c
-  ${PROJECT_SOURCE_DIR}/src/x86/intel_galileo_rev_d.c
-  ${PROJECT_SOURCE_DIR}/src/x86/intel_galileo_rev_g.c
+  ${PROJECT_SOURCE_DIR}/src/x86/intel_galileo_gen_1.c
+  ${PROJECT_SOURCE_DIR}/src/x86/intel_galileo_gen_2.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_edison_fab_c.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_de3815.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_nuc5.c
@@ -50,9 +50,9 @@ message (STATUS "INFO - Adding support for platform ${MRAAPLATFORMFORCE}")
 if (NOT ${MRAAPLATFORMFORCE} STREQUAL "ALL")
   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Dx${MRAAPLATFORMFORCE} -DMRAA_PLATFORM_FORCE=${MRAAPLATFORMFORCE}")
   if (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_GALILEO_GEN2")
-    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_galileo_rev_g.c)
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_galileo_gen_2.c)
   elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_GALILEO_GEN1")
-    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_galileo_rev_d.c)
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_galileo_gen_1.c)
   elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_DE3815")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_de3815.c)
   elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_EDISON_FAB_C")

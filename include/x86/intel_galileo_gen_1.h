@@ -30,10 +30,10 @@ extern "C" {
 
 #include "mraa_internal.h"
 
-#define MRAA_INTEL_GALILEO_REV_D_PINCOUNT 25
+#define MRAA_INTEL_GALILEO_GEN_1_PINCOUNT 25
 
 mraa_board_t*
-mraa_intel_galileo_rev_d();
+mraa_intel_galileo_g1();
 
 #ifdef __cplusplus
 }

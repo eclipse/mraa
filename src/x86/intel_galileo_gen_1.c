@@ -29,7 +29,7 @@
 #include <linux/spi/spidev.h>
 
 #include "common.h"
-#include "x86/intel_galileo_rev_d.h"
+#include "x86/intel_galileo_gen_1.h"
 
 #define UIO_PATH "/dev/uio0"
 #define PLATFORM_NAME "Intel Galileo Gen 1"
@@ -169,7 +169,7 @@ mraa_intel_galileo_g1_pwm_init_pre(int pin)
 }
 
 mraa_board_t*
-mraa_intel_galileo_rev_d()
+mraa_intel_galileo_g1()
 {
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
@@ -196,7 +196,7 @@ mraa_intel_galileo_rev_d()
     b->adv_func->spi_lsbmode_replace = &mraa_intel_galileo_g1_spi_lsbmode_replace;
     b->adv_func->pwm_init_pre = mraa_intel_galileo_g1_pwm_init_pre;
 
-    b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_GALILEO_REV_D_PINCOUNT, sizeof(mraa_pininfo_t));
+    b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_GALILEO_GEN_1_PINCOUNT, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
         free(b->adv_func);
         goto error;

@@ -19,8 +19,8 @@ Welcome to mraa's documentation!
 Supported Platforms
 ===================
 
-   * `Galileo Gen 1 - Rev D <../galileorevd.html>`_
-   * `Galileo Gen 2 - Rev H <../galileorevh.html>`_
+   * `Galileo Gen 1 <../galileogen1.html>`_
+   * `Galileo Gen 2 <../galileogen2.html>`_
    * `Intel Edison <../edison.html>`_
    * `Intel(R) NUC DE3815tykhe <../de3815.html>`_
    * `Intel(R) Minnowboard Max <../minnowmax.html>`_

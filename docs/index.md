@@ -37,8 +37,8 @@ functionality.
 
 Specific platform information for supported platforms is documented here:
 
-- @ref galileorevd
-- @ref galileorevh
+- @ref galileogen1
+- @ref galileogen2
 - @ref edison
 - @ref de3815
 - @ref minnowmax
