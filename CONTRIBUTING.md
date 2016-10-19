@@ -10,7 +10,8 @@ with:
 
 The recommended method to contribute is to fork on github, and then send pull
 requests to the main project. You can open issues if you find any bugs/have
-questions.
+questions. If you want to work on a large feature then we suggest you file an
+issue first so we can avoid dissapointments come merging time!
 
 If you'd rather not use github you are more than welcome to send git formatted
 patches to our mailing list mraa@lists.01.org which you can register for access
@@ -41,6 +42,16 @@ job. Few exceptions to coding styles:
   wild west ;-)
 
 Use common sense and don't be afraid to challenge something if it doesn't make sense!
+
+Author Rules
+------------
+
+If you create a file, then add yourself as the Author at the top. If you did a
+large contribution to it (or if you want to ;-)), then fee free to add yourself
+to the contributors list in that file. You can also add your own copyright
+statement to the file but cannot add a license of your own. If you're borrowing
+code that comes from a project with another license, make sure to explicitly
+note this in your PR.
 
 Code signing
 ------------
