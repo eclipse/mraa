@@ -56,7 +56,7 @@ main()
 
     mraa_firmata_response(firm, interrupt);
 
-    uint8_t* buffer = calloc(4, 0);
+    char* buffer = calloc(4, 0);
     if (buffer == NULL) {
         free(firm);
         return EXIT_FAILURE;
