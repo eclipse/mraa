@@ -84,6 +84,7 @@ mraa_result_t
 mraa_firmata_close(mraa_firmata_context dev)
 {
     mraa_firmata_response_stop(dev);
+    pthread_spin_destroy(&firmata_dev->lock);
     free(dev);
     return MRAA_SUCCESS;
 }
@@ -182,11 +183,17 @@ static mraa_result_t
 mraa_firmata_i2c_wait(int addr, int reg)
 {
     int i = 0;
-    for (; firmata_dev->i2cmsg[addr][reg] == -1; i++) {
+    if (pthread_spin_lock(&firmata_dev->lock) != 0) return MRAA_ERROR_UNSPECIFIED;
+    int res = firmata_dev->i2cmsg[addr][reg];
+    if (pthread_spin_unlock(&firmata_dev->lock) != 0) return MRAA_ERROR_UNSPECIFIED;
+    for (; res == -1; i++) {
         if (i > 50) {
             return MRAA_ERROR_UNSPECIFIED;
         }
         usleep(500);
+        if (pthread_spin_lock(&firmata_dev->lock) != 0) return MRAA_ERROR_UNSPECIFIED;
+        res = firmata_dev->i2cmsg[addr][reg];
+        if (pthread_spin_unlock(&firmata_dev->lock) != 0) return MRAA_ERROR_UNSPECIFIED;
     }
     return MRAA_SUCCESS;
 }
@@ -345,7 +352,10 @@ mraa_firmata_aio_read(mraa_aio_context dev)
 {
     // careful, whilst you need to enable '0' for A0 you then need to read 14
     // in t_firmata because well that makes sense doesn't it...
-    return (int) firmata_dev->pins[dev->channel].value;
+    if (pthread_spin_lock(&firmata_dev->lock) != 0) return -1;
+    int ret = (int) firmata_dev->pins[dev->channel].value;
+    if (pthread_spin_unlock(&firmata_dev->lock) != 0) return -1;
+    return ret;
 }
 
 static mraa_result_t
@@ -380,7 +390,10 @@ mraa_firmata_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 static int
 mraa_firmata_gpio_read_replace(mraa_gpio_context dev)
 {
-    return firmata_dev->pins[dev->pin].value;
+    if (pthread_spin_lock(&firmata_dev->lock) != 0) return -1;
+    int res = firmata_dev->pins[dev->pin].value;
+    if (pthread_spin_unlock(&firmata_dev->lock) != 0) return -1;
+    return res;
 }
 
 static mraa_result_t

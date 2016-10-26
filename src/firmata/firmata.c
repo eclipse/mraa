@@ -39,6 +39,13 @@ firmata_new(const char* name)
         return NULL;
     }
 
+    int ret = pthread_spin_init(&res->lock, PTHREAD_PROCESS_SHARED);
+    if (ret != 0) {
+        syslog(LOG_ERR, "firmata; could not init locking");
+        free(res);
+        return NULL;
+    }
+
     res->uart = mraa_uart_init_raw(name);
     if (res->uart == NULL) {
         syslog(LOG_ERR, "firmata: UART failed to setup");
@@ -133,7 +140,9 @@ firmata_endParse(t_firmata* firmata)
         int analog_val = firmata->parse_buff[1] | (firmata->parse_buff[2] << 7);
         for (pin = 0; pin < 128; pin++) {
             if (firmata->pins[pin].analog_channel == analog_ch) {
+                if (pthread_spin_lock(&firmata->lock) != 0) return;
                 firmata->pins[pin].value = analog_val;
+                if (pthread_spin_unlock(&firmata->lock) != 0) syslog(LOG_ERR, "firmata: Fatal spinlock deadlock");
                 return;
             }
         }
@@ -147,7 +156,9 @@ firmata_endParse(t_firmata* firmata)
         for (mask = 1; mask & 0xFF; mask <<= 1, pin++) {
             if (firmata->pins[pin].mode == MODE_INPUT) {
                 uint32_t val = (port_val & mask) ? 1 : 0;
+                if (pthread_spin_lock(&firmata->lock)) return;
                 firmata->pins[pin].value = val;
+                if (pthread_spin_unlock(&firmata->lock) != 0) syslog(LOG_ERR, "firmata: Fatal spinlock deadlock");
             }
         }
         return;
@@ -240,10 +251,12 @@ firmata_endParse(t_firmata* firmata)
             int reg = (firmata->parse_buff[4] & 0x7f) | ((firmata->parse_buff[5] & 0x7f) << 7);
             int i = 6;
             int ii = 0;
+            if (pthread_spin_lock(&firmata->lock) != 0) syslog(LOG_ERR, "firmata: Fatal spinlock deadlock, skipping i2c msg");
             for (; ii < (firmata->parse_count - 7) / 2; ii++) {
                 firmata->i2cmsg[addr][reg+ii] = (firmata->parse_buff[i] & 0x7f) | ((firmata->parse_buff[i+1] & 0x7f) << 7);
                 i = i+2;
             }
+            if (pthread_spin_unlock(&firmata->lock) != 0) syslog(LOG_ERR, "firmata: Fatal spinlock deadlock");
         } else {
             if (firmata->devs != NULL) {
                 struct _firmata* devs = firmata->devs[0];
