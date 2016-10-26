@@ -138,7 +138,7 @@ option (IPK "Generate IPK using CPack" OFF)
 option (RPM "Generate RPM using CPack" OFF)
 option (ENABLEEXAMPLES "Disable building of examples" ON)
 option (INSTALLGPIOTOOL "Install gpio tool" OFF)
-option (INSTALLTOOLS "Install all tools" OFF)
+option (INSTALLTOOLS "Install all tools" ON)
 option (BUILDTESTS "Override the addition of tests" ON)
 
 set (BUILDARCH "" CACHE STRING "Override architecture to build for")
