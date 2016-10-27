@@ -1144,7 +1144,9 @@ mraa_add_from_lockfile(const char* imraa_lock_file)
             struct json_object *ioobj = json_object_array_get_idx(ioarray, i);
             json_object_object_foreach(ioobj, key, val) {
                 if (strcmp(key, "id") == 0) {
-                    id = atoi(json_object_get_string(val));
+                    if (mraa_atoi(json_object_get_string(val), &id) != MRAA_SUCCESS) {
+                        id = -1;
+                    }
                 } else if (strcmp(key, "uart") == 0) {
                     uartdev = json_object_get_string(val);
                 }
