@@ -62,22 +62,77 @@ mraa_gt_tuchuck_board()
     b->pwm_max_period = 218453;
     b->pwm_min_period = 1;
 
-    b->i2c_bus_count = 3;
-    b->i2c_bus[0].bus_id = 0;
-    b->i2c_bus[0].sda = 11;
-    b->i2c_bus[0].scl = 13;
+    b->i2c_bus_count = 0;
 
-    if (mraa_find_i2c_bus("designware", 5) != 5) {
-        b->i2c_bus[1].bus_id = 9;
-        b->i2c_bus[2].bus_id = 10;
-    } else {
-        b->i2c_bus[1].bus_id = 5;
-        b->i2c_bus[2].bus_id = 6;
+    int i2c_bus_num = -1;
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:16.0", "i2c_designware.0");
+    if (i2c_bus_num != -1) {
+        b->i2c_bus[0].bus_id = i2c_bus_num;
+        b->i2c_bus[0].sda = 11;
+        b->i2c_bus[0].scl = 13;
+        b->i2c_bus_count++;
     }
-    b->i2c_bus[1].sda = 15;
-    b->i2c_bus[1].scl = 17;
-    b->i2c_bus[2].sda = 19;
-    b->i2c_bus[2].scl = 21;
+
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:17.1", "i2c_designware.5");
+    if (i2c_bus_num != -1) {
+        b->i2c_bus[b->i2c_bus_count].bus_id = i2c_bus_num;
+        b->i2c_bus[b->i2c_bus_count].sda = 15;
+        b->i2c_bus[b->i2c_bus_count].scl = 17;
+        b->i2c_bus_count++;
+    }
+
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:17.2", "i2c_designware.6");
+    if (i2c_bus_num != -1) {
+        b->i2c_bus[b->i2c_bus_count].bus_id = i2c_bus_num;
+        b->i2c_bus[b->i2c_bus_count].sda = 19;
+        b->i2c_bus[b->i2c_bus_count].scl = 21;
+        b->i2c_bus_count++;
+    }
+
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:16.1", "i2c_designware.1");
+    if (i2c_bus_num != -1) {
+        b->i2c_bus[b->i2c_bus_count].bus_id = i2c_bus_num;
+        b->i2c_bus[b->i2c_bus_count].sda = 71;
+        b->i2c_bus[b->i2c_bus_count].scl = 73;
+        b->i2c_bus_count++;
+    }
+
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:16.2", "i2c_designware.2");
+    if (i2c_bus_num != -1) {
+        b->i2c_bus[b->i2c_bus_count].bus_id = i2c_bus_num;
+        b->i2c_bus[b->i2c_bus_count].sda = 75;
+        b->i2c_bus[b->i2c_bus_count].scl = 77;
+        b->i2c_bus_count++;
+    }
+
+    /**
+     * Old i2c detection method, very poor, avoid, but keep as fallback if
+     * above failed We check for /dev/i2c-0 because we can assume i2c-dev is
+     * not loaded if we haven't enumerated a single i2c-dev node
+     */
+    if (b->i2c_bus_count == 0) {
+        if (mraa_file_exist("/dev/i2c-0")) {
+            syslog(LOG_WARNING, "joule: Failed to detect i2c buses, making wild assumptions!");
+            b->i2c_bus_count = 3;
+            b->i2c_bus[0].bus_id = 0;
+            b->i2c_bus[0].sda = 11;
+            b->i2c_bus[0].scl = 13;
+
+            if (mraa_find_i2c_bus("designware", 5) != 5) {
+                b->i2c_bus[1].bus_id = 9;
+                b->i2c_bus[2].bus_id = 10;
+            } else {
+                b->i2c_bus[1].bus_id = 5;
+                b->i2c_bus[2].bus_id = 6;
+            }
+            b->i2c_bus[1].sda = 15;
+            b->i2c_bus[1].scl = 17;
+            b->i2c_bus[2].sda = 19;
+            b->i2c_bus[2].scl = 21;
+        } else {
+            syslog(LOG_WARNING, "joule: Failed to detect any i2c buses, is i2c-dev loaded?");
+        }
+    }
 
     b->def_i2c_bus = b->i2c_bus[0].bus_id;
 
