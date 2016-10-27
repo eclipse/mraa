@@ -140,6 +140,15 @@ mraa_boolean_t mraa_link_targets(const char* filename, const char* targetname);
  */
 int mraa_find_i2c_bus(const char* devname, int startfrom);
 
+/**
+ * helper function to wrap strtol for our basic usage
+ *
+ * @param string representing int
+ * @param converted string
+ * @return Result of the operation
+ */
+mraa_result_t mraa_atoi(char* intStr, int* value);
+
 #if defined(IMRAA)
 /**
  * read Imraa subplatform lock file, caller is responsible to free return
