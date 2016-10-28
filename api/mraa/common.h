@@ -44,6 +44,7 @@
                                       if (res != MRAA_SUCCESS) \
                                       return res;} while(0)
 
+
 /** @file
  *
  * This file defines the basic shared values for libmraa
@@ -305,6 +306,16 @@ mraa_result_t mraa_remove_subplatform(mraa_platform_t subplatformtype);
  * @return void* to IO context or NULL
  */
 void* mraa_init_io(const char* desc);
+
+/**
+ * Instantiate an unknown board using a json file
+ *
+ * @param Path to the json file, relative to the folder the program
+ * was initially run in or a direct path
+ *
+ * @return mraa_result indicating success
+ */
+mraa_result_t mraa_init_json_platform(const char* path);
 
 #ifdef __cplusplus
 }

@@ -124,7 +124,7 @@ class Uart
     }
 
     /**
-     * Write bytes in String object to a device
+     * Write bytes in char* buffer to a device
      *
      * @param data buffer pointer
      * @param length maximum size of buffer
@@ -263,7 +263,7 @@ class Uart
      * @return Result of operation
      */
     Result
-    SetNonBlocking(bool nonblock)
+    setNonBlocking(bool nonblock)
     {
         return (Result) mraa_uart_set_non_blocking(m_uart, nonblock);
     }

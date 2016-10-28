@@ -40,6 +40,46 @@
 #define MRAA_IO_SETUP_FAILURE -2
 #define MRAA_NO_SUCH_IO -1
 
+// Json platform keys
+#define INDEX_KEY "index"
+#define NAME_KEY "name"
+#define PIN_COUNT_KEY "pin_count"
+#define GPIO_COUNT_KEY "gpio_count"
+#define AIO_COUNT_KEY "aio_count"
+#define SPI_COUNT_KEY "spi_count"
+#define I2C_COUNT_KEY "i2c_count"
+#define UART_COUNT_KEY "uart_count"
+#define PWMDEFAULT_KEY "pwmDefPeriod"
+#define PWMMAX_KEY "pwmMaxPeriod"
+#define PWMMIN_KEY "pwmMinPeriod"
+#define LABEL_KEY "label"
+#define DEFAULT_KEY "default"
+#define INVALID_KEY "invalid"
+#define SCLPIN_KEY "sclpin"
+#define SDAPIN_KEY "sdapin"
+#define CHIP_ID_KEY "chipID"
+#define RAW_PIN_KEY "rawpin"
+#define RXPIN_KEY "rx"
+#define TXPIN_KEY "tx"
+#define UART_PATH_KEY "path"
+#define CLOCK_KEY "clock"
+#define MISO_KEY "miso"
+#define MOSI_KEY "mosi"
+#define CS_KEY "chipselect"
+#define PIN_KEY "pin"
+#define IO_KEY "layout"
+#define PLATFORM_KEY "platform"
+
+// IO keys
+#define GPIO_KEY "GPIO"
+#define SPI_KEY "SPI"
+#define UART_KEY "UART"
+#define I2C_KEY "I2C"
+#define PWM_KEY "PWM"
+#define AIO_KEY "AIO"
+
+#define MRAA_JSONPLAT_ENV_VAR "MRAA_JSON_PLATFORM"
+
 #ifdef FIRMATA
 struct _firmata {
     /*@*/
@@ -71,6 +111,10 @@ struct _gpio {
     mraa_result_t (*mmap_write) (mraa_gpio_context dev, int value);
     int (*mmap_read) (mraa_gpio_context dev);
     mraa_adv_func_t* advance_func; /**< override function table */
+#if defined(MOCKPLAT)
+    mraa_gpio_dir_t mock_dir; /**< mock direction of the pin */
+    int mock_state; /**< mock state of the pin */
+#endif
     /*@}*/
 };
 
@@ -85,6 +129,11 @@ struct _i2c {
     unsigned long funcs; /**< /dev/i2c-* device capabilities as per https://www.kernel.org/doc/Documentation/i2c/functionality */
     void *handle; /**< generic handle for non-standard drivers that don't use file descriptors  */
     mraa_adv_func_t* advance_func; /**< override function table */
+#if defined(MOCKPLAT)
+    uint8_t mock_dev_addr; /**< address of the mock I2C device */
+    uint8_t mock_dev_data_len; /**< mock device data register block length in bytes */
+    uint8_t* mock_dev_data; /**< mock device data register block contents */
+#endif
     /*@}*/
 };
 
@@ -213,7 +262,7 @@ typedef struct {
 
 typedef struct {
     /*@{*/
-    unsigned int pinmap; /**< sysfs pin */
+    int pinmap; /**< sysfs pin */
     unsigned int parent_id; /** parent chip id */
     unsigned int mux_total; /** Numfer of muxes needed for operation of pin */
     mraa_mux_t mux[6]; /** Array holding information about mux */
@@ -237,7 +286,7 @@ typedef struct {
 typedef struct {
     /*@{*/
     char name[MRAA_PIN_NAME_SIZE]; /**< Pin's real world name */
-    mraa_pincapabilities_t capabilites; /**< Pin Capabiliites */
+    mraa_pincapabilities_t capabilities; /**< Pin Capabiliites */
     mraa_pin_t gpio; /**< GPIO structure */
     mraa_pin_t pwm;  /**< PWM structure */
     mraa_pin_t aio;  /**< Anaglog Pin */
@@ -283,7 +332,7 @@ typedef struct {
     unsigned int index; /**< ID as exposed in the system */
     int rx; /**< uart rx */
     int tx; /**< uart tx */
-    const char* device_path; /**< To store "/dev/ttyS1" for example */
+    char* device_path; /**< To store "/dev/ttyS1" for example */
     /*@}*/
 } mraa_uart_dev_t;
 
@@ -294,8 +343,8 @@ typedef struct {
 typedef struct _board_t {
     /*@{*/
     int phy_pin_count; /**< The Total IO pins on board */
-    unsigned int gpio_count; /**< GPIO Count */
-    unsigned int aio_count;  /**< Analog side Count */
+    int gpio_count; /**< GPIO Count */
+    int aio_count;  /**< Analog side Count */
     int i2c_bus_count; /**< Usable i2c Count */
     mraa_i2c_bus_t  i2c_bus[12]; /**< Array of i2c */
     unsigned int def_i2c_bus; /**< Position in array of default i2c bus */
@@ -312,7 +361,7 @@ typedef struct _board_t {
     int pwm_max_period; /**< Maximum period in us */
     int pwm_min_period; /**< Minimum period in us */
     mraa_platform_t platform_type; /**< Platform type */
-    const char* platform_name; /**< Platform Name pointer */
+    char* platform_name; /**< Platform Name pointer */
     const char* platform_version; /**< Platform versioning info */
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
     mraa_adv_func_t* adv_func;    /**< Pointer to advanced function disptach table */

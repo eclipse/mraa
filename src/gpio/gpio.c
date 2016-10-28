@@ -44,7 +44,7 @@ static mraa_result_t
 mraa_gpio_get_valfp(mraa_gpio_context dev)
 {
     char bu[MAX_SIZE];
-    sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
+    snprintf(bu, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
     dev->value_fp = open(bu, O_RDWR);
     if (dev->value_fp == -1) {
         syslog(LOG_ERR, "gpio%i: Failed to open 'value': %s", dev->pin, strerror(errno));
@@ -151,7 +151,7 @@ mraa_gpio_init(int pin)
         syslog(LOG_ERR, "gpio: init: pin %i beyond platform pin count (%i)", pin, board->phy_pin_count);
         return NULL;
     }
-    if (board->pins[pin].capabilites.gpio != 1) {
+    if (board->pins[pin].capabilities.gpio != 1) {
         syslog(LOG_ERR, "gpio: init: pin %i not capable of gpio", pin);
         return NULL;
     }
@@ -382,6 +382,10 @@ mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t mode, void (*fptr)(void*),
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
+    if (IS_FUNC_DEFINED(dev, gpio_isr_replace)) {
+        return dev->advance_func->gpio_isr_replace(dev, mode, fptr, args);
+    }
+
     // we only allow one isr per mraa_gpio_context
     if (dev->thread_id != 0) {
         return MRAA_ERROR_NO_RESOURCES;
@@ -415,6 +419,10 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
 
     if (dev == NULL) {
         return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, gpio_isr_exit_replace)) {
+        return dev->advance_func->gpio_isr_exit_replace(dev);
     }
 
     // wasting our time, there is no isr to exit from
@@ -603,6 +611,15 @@ mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
     if (dev == NULL) {
         syslog(LOG_ERR, "gpio: read_dir: context is invalid");
         return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (dir == NULL) {
+        syslog(LOG_ERR, "gpio: read_dir: output parameter for dir is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, gpio_read_dir_replace)) {
+        return dev->advance_func->gpio_read_dir_replace(dev, dir);
     }
 
     snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/direction", dev->pin);

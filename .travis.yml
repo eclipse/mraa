@@ -1,34 +1,60 @@
 language: cpp
+sudo: required
+dist: trusty
 env:
   - NODE010=true
   - NODE012=true
   - NODE4=true
   - NODE5=true
+  - JSONPLAT=true NODE010=true
+  - JSONPLAT=true NODE012=true
+  - JSONPLAT=true NODE4=true
+  - JSONPLAT=true NODE5=true
+  - MOCK=true NODE010=true
+  - MOCK=true NODE012=true
+  - MOCK=true NODE4=true
+  - MOCK=true NODE5=true
+  # node010 npm builds don't work in clang and anyone using npm should want to
+  # use something newer
+  - NPM=true NODE4=true
+  - NPM=true NODE5=true
 compiler:
   - clang
   - gcc
+before_install:
+  # Via https://github.com/travis-ci/travis-ci/issues/5326
+  - export PATH="$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")"
 install:
   - if [ "${NODE4}" ]; then export CC=gcc-4.8 CXX=g++-4.8; fi
-  - sudo add-apt-repository --yes ppa:kalakris/cmake
-  - sudo add-apt-repository --yes ppa:fenics-packages/fenics-exp/swig
-  - sudo apt-get update -qq
-  - sudo apt-get install -y -qq swig3.0 python git cmake
-  - sudo ln -s /usr/bin/swig3.0 /usr/bin/swig
-  - sudo update-java-alternatives -s java-8-oracle
 before_script:
   # Turn off JAVA SWIG for clang++, use 4.8 for all g++ builds
   - if [ "$CC" == "gcc" ]; then export BUILDJAVA=ON; export CC=gcc-4.8; export CXX=g++-4.8; else export BUILDJAVA=OFF; fi
+  - if [ "${JSONPLAT}" ]; then export JSONPLAT=ON; else export JSONPLAT=OFF; fi
+  - if [ "${MOCK}" ]; then export BUILDARCH="MOCK"; else export BUILDARCH=""; fi
+  - if [ "${NODE010}" ]; then nvm install 0.10; fi
   - if [ "${NODE012}" ]; then nvm install 0.12; fi
   - if [ "${NODE4}" ]; then nvm install 4.1; fi
   - if [ "${NODE5}" ]; then nvm install 5; fi
+  - npm install node-gyp && export NODE_GYP="/home/travis/build/intel-iot-devkit/mraa/node_modules/node-gyp/bin/node-gyp.js"
   # Handle 0.10 NODE_ROOT_DIR differently than other versions
-  - if [ -z ${NODE010} ]; then export NODE_ROOT_DIR="/home/travis/.nvm/versions/node/`nvm version`"; else export NODE_ROOT_DIR=/home/travis/.nvm/v0.10.36; fi
+  - wget http://prdownloads.sourceforge.net/swig/swig-3.0.10.tar.gz && tar xf swig-3.0.10.tar.gz && cd swig-3.0.10 && ./configure --prefix=/home/travis/ && make && make install && cd ..
 script:
-  - echo "CC=$CC BUILDJAVA=$BUILDJAVA NODE010=$NODE010 NODE012=$NODE012 NODE4=$NODE4 NODE5=$NODE5 NODE_ROOT_DIR=$NODE_ROOT_DIR"
-  - mkdir build && cd build && cmake -DBUILDSWIGJAVA=$BUILDJAVA -DNODE_ROOT_DIR:PATH="${NODE_ROOT_DIR}" -DCMAKE_INSTALL_PREFIX:PATH=../install .. && make install && make test
+  - echo "CC=$CC BUILDJAVA=$BUILDJAVA BUILDARCH=$BUILDARCH JSONPLAT=$JSONPLAT NODE010=$NODE010 NODE012=$NODE012 NODE4=$NODE4 NODE5=$NODE5 NODE_ROOT_DIR=$NODE_ROOT_DIR"
+  - if [ -z ${NPM} ]; then mkdir build && cd build && cmake -DBUILDSWIGJAVA="$BUILDJAVA" -DBUILDARCH="$BUILDARCH" -DJSONPLAT=$JSONPLAT -DNODE_ROOT_DIR:PATH="${NVM_BIN}/.." -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make install && make test; else mkdir build && cd build && cmake -DBUILDSWIGJAVA="$BUILDJAVA" -DJSONPLAT=$JSONPLAT -DNODE_ROOT_DIR:PATH="${NVM_BIN}/.." -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make npmpkg && cd .. && ${NODE_GYP} configure && ${NODE_GYP} build; fi
+  # simple test to see if we can load our node module
+  - if [ ${NPM} ]; then cd build/Release/obj.target/ && node -e  "var m = require('./mraa.node'); m.getVersion()";fi
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
+      - kalakris-cmake
     packages:
       - g++-4.8
+      - cmake
+      - python
+      - python-dev
+      - python3
+      - python3-dev
+      - git
+      - libjson0
+      - libjson0-dev

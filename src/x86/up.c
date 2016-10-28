@@ -42,7 +42,7 @@ set_pininfo(mraa_board_t* board, int mraa_index, char* name, mraa_pincapabilitie
     if (mraa_index < board->phy_pin_count) {
         mraa_pininfo_t* pin_info = &board->pins[mraa_index];
         strncpy(pin_info->name, name, MAX_LENGTH);
-        pin_info->capabilites = caps;
+        pin_info->capabilities = caps;
         if (caps.gpio) {
             pin_info->gpio.pinmap = sysfs_pin;
             pin_info->gpio.mux_total = 0;
@@ -86,7 +86,7 @@ mraa_up_board()
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
 
     struct utsname running_uname;
-    int uname_major, uname_minor, max_pins[27];
+    int uname_major, uname_minor;
 
     if (b == NULL) {
         return NULL;

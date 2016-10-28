@@ -33,7 +33,6 @@ main(int argc, char** argv)
     //! [Interesting]
     mraa_spi_context spi;
     spi = mraa_spi_init(0);
-    unsigned int response = 0;
     printf("Hello, SPI initialised\n");
     uint8_t data[] = { 0x00, 100 };
     uint8_t* recv;

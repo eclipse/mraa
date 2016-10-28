@@ -305,37 +305,37 @@ mraa_banana()
     b->adv_func->gpio_mmap_setup = &mraa_banana_mmap_setup;
 
     strncpy(b->pins[0].name, "INVALID", MRAA_PIN_NAME_SIZE);
-    b->pins[0].capabilites = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[0].capabilities = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[1].name, "3V3", MRAA_PIN_NAME_SIZE);
-    b->pins[1].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[1].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[2].name, "5V", MRAA_PIN_NAME_SIZE);
-    b->pins[2].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[2].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     if (i2c2 == 1) {
         strncpy(b->pins[3].name, "TWI2-SDA", MRAA_PIN_NAME_SIZE); // PB21 Pin53 TWI2-SDA
-        b->pins[3].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
+        b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
     } else {
         strncpy(b->pins[3].name, "PB21", MRAA_PIN_NAME_SIZE); // PB21 Pin53 TWI2-SDA
-        b->pins[3].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[3].gpio.pinmap = 53;
 
     strncpy(b->pins[4].name, "5V", MRAA_PIN_NAME_SIZE);
-    b->pins[4].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[4].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     if (i2c2 == 1) {
         strncpy(b->pins[5].name, "TWI2-SCK", MRAA_PIN_NAME_SIZE); // PB20 Pin52 TWI2-SCK
-        b->pins[5].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
+        b->pins[5].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
     } else {
         strncpy(b->pins[5].name, "PB20", MRAA_PIN_NAME_SIZE); // PB20 Pin52 TWI2-SCK
-        b->pins[5].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[5].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     }
     b->pins[5].gpio.pinmap = 52;
 
     strncpy(b->pins[6].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[6].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[6].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     if (platform_detected == PLATFORM_BANANA_PRO) {
         strncpy(b->pins[7].name, "PH02", MRAA_PIN_NAME_SIZE); // PH2 Pin226
@@ -344,7 +344,7 @@ mraa_banana()
         strncpy(b->pins[7].name, "PI03", MRAA_PIN_NAME_SIZE); // PI3 Pin259 PWM
         b->pins[7].gpio.pinmap = 259;
     }
-    b->pins[7].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[7].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
 
     if (platform_detected == PLATFORM_BANANA_PRO) {
         strncpy(b->pins[8].name, "UART4_TX", MRAA_PIN_NAME_SIZE); // PH4 Pin228 UART4_TX
@@ -353,10 +353,10 @@ mraa_banana()
         strncpy(b->pins[8].name, "UART3_TX", MRAA_PIN_NAME_SIZE); // PH0 Pin224 UART3_TX
         b->pins[8].gpio.pinmap = 224;
     }
-    b->pins[8].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[8].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
 
     strncpy(b->pins[9].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[9].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[9].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     if (platform_detected == PLATFORM_BANANA_PRO) {
         strncpy(b->pins[10].name, "UART4_RX", MRAA_PIN_NAME_SIZE); // PH5 Pin229 UART4_RX
@@ -365,10 +365,10 @@ mraa_banana()
         strncpy(b->pins[10].name, "UART3_RX", MRAA_PIN_NAME_SIZE); // PH1 Pin225 UART3_RX
         b->pins[10].gpio.pinmap = 225;
     }
-    b->pins[10].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[10].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
 
     strncpy(b->pins[11].name, "PI19", MRAA_PIN_NAME_SIZE); // PI19 Pin275 IO+UART2_RX
-    b->pins[11].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[11].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[11].gpio.pinmap = 275;
 
     if (platform_detected == PLATFORM_BANANA_PRO) {
@@ -378,143 +378,143 @@ mraa_banana()
         strncpy(b->pins[12].name, "PH02", MRAA_PIN_NAME_SIZE); // PH2 Pin226
         b->pins[12].gpio.pinmap = 226;
     }
-    b->pins[12].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    b->pins[12].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[13].name, "PI18", MRAA_PIN_NAME_SIZE); // PI18 Pin274 UART2_TX
-    b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[13].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[13].gpio.pinmap = 274;
 
     strncpy(b->pins[14].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[14].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[14].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[15].name, "PI17", MRAA_PIN_NAME_SIZE); // PI17 Pin273 UART2_CTS
-    b->pins[15].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[15].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[15].gpio.pinmap = 273;
 
     strncpy(b->pins[16].name, "PH20", MRAA_PIN_NAME_SIZE); // PH20 Pin 244 CAN_TX
-    b->pins[16].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[16].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[16].gpio.pinmap = 244;
 
     strncpy(b->pins[17].name, "3V3", MRAA_PIN_NAME_SIZE);
-    b->pins[17].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[17].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[18].name, "PH21", MRAA_PIN_NAME_SIZE); // PH21 Pin245 CAN_RX
-    b->pins[18].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[18].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[18].gpio.pinmap = 245;
 
     strncpy(b->pins[19].name, "SPI0MOSI", MRAA_PIN_NAME_SIZE); // PI12 SPI0
-    b->pins[19].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+    b->pins[19].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
     b->pins[19].gpio.pinmap = 268;
 
     strncpy(b->pins[20].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[20].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[20].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[21].name, "SPI0MISO", MRAA_PIN_NAME_SIZE); // PI13 SPI0
-    b->pins[21].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+    b->pins[21].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
     b->pins[21].gpio.pinmap = 269;
 
     strncpy(b->pins[22].name, "PI16", MRAA_PIN_NAME_SIZE); // PI16 UART2_RTS
-    b->pins[22].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[22].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[22].gpio.pinmap = 272;
 
     strncpy(b->pins[23].name, "SPI0CLK", MRAA_PIN_NAME_SIZE); // PI11 SPI0
-    b->pins[23].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+    b->pins[23].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
     b->pins[23].gpio.pinmap = 267;
 
     strncpy(b->pins[24].name, "SPI0CS0", MRAA_PIN_NAME_SIZE); // PI10 SPI0
-    b->pins[24].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+    b->pins[24].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
     b->pins[24].gpio.pinmap = 266;
 
     strncpy(b->pins[25].name, "GND", MRAA_PIN_NAME_SIZE);
-    b->pins[25].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    b->pins[25].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[26].name, "SPI0CS1", MRAA_PIN_NAME_SIZE); // PI14 SPI0
-    b->pins[26].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+    b->pins[26].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
     b->pins[26].gpio.pinmap = 270;
 
     if (platform_detected == PLATFORM_BANANA_PI) {
         strncpy(b->pins[27].name, "5V", MRAA_PIN_NAME_SIZE);
-        b->pins[27].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[27].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
         strncpy(b->pins[28].name, "3V3", MRAA_PIN_NAME_SIZE);
-        b->pins[28].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[28].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
         strncpy(b->pins[29].name, "PH05", MRAA_PIN_NAME_SIZE); // PH5
-        b->pins[29].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[29].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
         b->pins[29].gpio.pinmap = 229;
 
         strncpy(b->pins[30].name, "PI21", MRAA_PIN_NAME_SIZE); // PI21 UART7_RX
-        b->pins[30].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+        b->pins[30].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
         b->pins[30].gpio.pinmap = 277;
 
         strncpy(b->pins[31].name, "PH03", MRAA_PIN_NAME_SIZE); // PH3
-        b->pins[31].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[31].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
         b->pins[31].gpio.pinmap = 227;
 
         strncpy(b->pins[32].name, "PI20", MRAA_PIN_NAME_SIZE); // PI20 UART7_TX
-        b->pins[32].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+        b->pins[32].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
         b->pins[32].gpio.pinmap = 276;
 
         strncpy(b->pins[33].name, "GND", MRAA_PIN_NAME_SIZE);
-        b->pins[33].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[33].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
         strncpy(b->pins[34].name, "GND", MRAA_PIN_NAME_SIZE);
-        b->pins[34].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[34].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     }
 
     if (platform_detected == PLATFORM_BANANA_PRO) {
 
         strncpy(b->pins[27].name, "HAT_SDA", MRAA_PIN_NAME_SIZE); // PI1 TWI3-SDA i2c3
-        b->pins[27].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[27].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
         b->pins[27].gpio.pinmap = 257;
 
         strncpy(b->pins[28].name, "HAT_SCK", MRAA_PIN_NAME_SIZE); // PI0 TWI3-SCK i2c3
-        b->pins[28].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[28].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
         b->pins[28].gpio.pinmap = 256;
 
         strncpy(b->pins[29].name, "PB03", MRAA_PIN_NAME_SIZE); // PB3 IR0_TX/SPDIF_MCLK
-        b->pins[29].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[29].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
         b->pins[29].gpio.pinmap = 35;
 
         strncpy(b->pins[30].name, "GND", MRAA_PIN_NAME_SIZE);
-        b->pins[30].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[30].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
         strncpy(b->pins[31].name, "PI21", MRAA_PIN_NAME_SIZE); // PI21 UART7_RX
-        b->pins[31].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+        b->pins[31].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
         b->pins[31].gpio.pinmap = 277;
 
         strncpy(b->pins[32].name, "PI20", MRAA_PIN_NAME_SIZE); // PI20 UART7_TX
-        b->pins[32].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+        b->pins[32].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
         b->pins[32].gpio.pinmap = 276;
 
         strncpy(b->pins[33].name, "PB13", MRAA_PIN_NAME_SIZE); // PB13 SPDIF_D0
-        b->pins[33].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[33].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
         b->pins[33].gpio.pinmap = 45;
 
         strncpy(b->pins[34].name, "GND", MRAA_PIN_NAME_SIZE);
-        b->pins[34].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[34].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
         strncpy(b->pins[35].name, "PB07", MRAA_PIN_NAME_SIZE); // PB07 I2S0_LRCK
-        b->pins[35].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[35].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
         b->pins[35].gpio.pinmap = 39;
 
         strncpy(b->pins[36].name, "PB06", MRAA_PIN_NAME_SIZE); // PB06 I2S0BCLK
-        b->pins[36].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[36].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
         b->pins[36].gpio.pinmap = 38;
 
         strncpy(b->pins[37].name, "PB05", MRAA_PIN_NAME_SIZE); // PB05 I2S0MCK
-        b->pins[37].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[37].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
         b->pins[37].gpio.pinmap = 37;
 
         strncpy(b->pins[38].name, "PB12", MRAA_PIN_NAME_SIZE); // PB12 I2S0_DI
-        b->pins[38].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[38].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
         b->pins[38].gpio.pinmap = 44;
 
         strncpy(b->pins[39].name, "GND", MRAA_PIN_NAME_SIZE);
-        b->pins[39].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[39].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
         strncpy(b->pins[40].name, "PB08", MRAA_PIN_NAME_SIZE); // PB08 I2S0_DO0
-        b->pins[40].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[40].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
         b->pins[40].gpio.pinmap = 40;
     }
 
@@ -528,7 +528,7 @@ mraa_banana()
     b->gpio_count = 0;
     int i;
     for (i = 0; i < b->phy_pin_count; i++) {
-        if (b->pins[i].capabilites.gpio) {
+        if (b->pins[i].capabilities.gpio) {
             b->gpio_count++;
         }
     }

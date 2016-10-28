@@ -25,8 +25,17 @@
 
 #include <stdlib.h>
 #include <string.h>
+#if defined(MSYS)
+#define __USE_LINUX_IOCTL_DEFS
+#endif
 #include <sys/ioctl.h>
+#if defined(MSYS)
+// There's no spidev.h on MSYS, so we need to provide our own,
+// and only *after* including ioctl.h as that one contains prerequisites.
+#include "linux/spi_kernel_headers.h"
+#else
 #include <linux/spi/spidev.h>
+#endif
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -126,10 +135,22 @@ mraa_spi_init(int bus)
 mraa_spi_context
 mraa_spi_init_raw(unsigned int bus, unsigned int cs)
 {
+    mraa_result_t status = MRAA_SUCCESS;
+
     mraa_spi_context dev = mraa_spi_init_internal(plat == NULL ? NULL : plat->adv_func);
     if (dev == NULL) {
         syslog(LOG_CRIT, "spi: Failed to allocate memory for context");
-        return NULL;
+        status = MRAA_ERROR_NO_RESOURCES;
+        goto init_raw_cleanup;
+    }
+
+    if (IS_FUNC_DEFINED(dev, spi_init_raw_replace)) {
+        status = dev->advance_func->spi_init_raw_replace(dev, bus, cs);
+        if (status == MRAA_SUCCESS) {
+            return dev;
+        } else {
+            goto init_raw_cleanup;
+        }
     }
 
     char path[MAX_SIZE];
@@ -138,8 +159,8 @@ mraa_spi_init_raw(unsigned int bus, unsigned int cs)
     dev->devfd = open(path, O_RDWR);
     if (dev->devfd < 0) {
         syslog(LOG_ERR, "spi: Failed opening SPI Device. bus:%s", path);
-        free(dev);
-        return NULL;
+        status = MRAA_ERROR_INVALID_RESOURCE;
+        goto init_raw_cleanup;
     }
 
     int speed = 0;
@@ -151,18 +172,26 @@ mraa_spi_init_raw(unsigned int bus, unsigned int cs)
         syslog(LOG_WARNING, "spi: Max speed query failed, setting %d", dev->clock);
     }
 
-    if (mraa_spi_mode(dev, MRAA_SPI_MODE0) != MRAA_SUCCESS) {
-        free(dev);
-        return NULL;
+    status = mraa_spi_mode(dev, MRAA_SPI_MODE0);
+    if (status != MRAA_SUCCESS) {
+        goto init_raw_cleanup;
     }
 
-    if (mraa_spi_lsbmode(dev, 0) != MRAA_SUCCESS) {
-        free(dev);
-        return NULL;
+    status = mraa_spi_lsbmode(dev, 0);
+    if (status != MRAA_SUCCESS) {
+        goto init_raw_cleanup;
     }
 
-    if (mraa_spi_bit_per_word(dev, 8) != MRAA_SUCCESS) {
-        free(dev);
+    status = mraa_spi_bit_per_word(dev, 8);
+    if (status != MRAA_SUCCESS) {
+        goto init_raw_cleanup;
+    }
+
+init_raw_cleanup:
+    if (status != MRAA_SUCCESS) {
+        if (dev != NULL) {
+            free(dev);
+        }
         return NULL;
     }
 
@@ -172,6 +201,15 @@ mraa_spi_init_raw(unsigned int bus, unsigned int cs)
 mraa_result_t
 mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "spi: mode: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, spi_mode_replace)) {
+        return dev->advance_func->spi_mode_replace(dev, mode);
+    }
+
     uint8_t spi_mode = 0;
     switch (mode) {
         case MRAA_SPI_MODE0:
@@ -203,6 +241,15 @@ mraa_spi_mode(mraa_spi_context dev, mraa_spi_mode_t mode)
 mraa_result_t
 mraa_spi_frequency(mraa_spi_context dev, int hz)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "spi: frequency: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, spi_frequency_replace)) {
+        return dev->advance_func->spi_frequency_replace(dev, hz);
+    }
+
     int speed = 0;
     dev->clock = hz;
     if (ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) != -1) {
@@ -217,6 +264,11 @@ mraa_spi_frequency(mraa_spi_context dev, int hz)
 mraa_result_t
 mraa_spi_lsbmode(mraa_spi_context dev, mraa_boolean_t lsb)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "spi: lsbmode: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
     if (IS_FUNC_DEFINED(dev, spi_lsbmode_replace)) {
         return dev->advance_func->spi_lsbmode_replace(dev, lsb);
     }
@@ -237,6 +289,15 @@ mraa_spi_lsbmode(mraa_spi_context dev, mraa_boolean_t lsb)
 mraa_result_t
 mraa_spi_bit_per_word(mraa_spi_context dev, unsigned int bits)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "spi: bit_per_word: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, spi_bit_per_word_replace)) {
+        return dev->advance_func->spi_bit_per_word_replace(dev, bits);
+    }
+
     if (ioctl(dev->devfd, SPI_IOC_WR_BITS_PER_WORD, &bits) < 0) {
         syslog(LOG_ERR, "spi: Failed to set bit per word");
         return MRAA_ERROR_INVALID_RESOURCE;
@@ -248,6 +309,15 @@ mraa_spi_bit_per_word(mraa_spi_context dev, unsigned int bits)
 int
 mraa_spi_write(mraa_spi_context dev, uint8_t data)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "spi: write: context is invalid");
+        return -1;
+    }
+
+    if (IS_FUNC_DEFINED(dev, spi_write_replace)) {
+        return dev->advance_func->spi_write_replace(dev, data);
+    }
+
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
 
@@ -270,6 +340,15 @@ mraa_spi_write(mraa_spi_context dev, uint8_t data)
 int
 mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "spi: write_word: context is invalid");
+        return -1;
+    }
+
+    if (IS_FUNC_DEFINED(dev, spi_write_word_replace)) {
+        return dev->advance_func->spi_write_word_replace(dev, data);
+    }
+
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
 
@@ -292,6 +371,15 @@ mraa_spi_write_word(mraa_spi_context dev, uint16_t data)
 mraa_result_t
 mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int length)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "spi: transfer_buf: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, spi_transfer_buf_replace)) {
+        return dev->advance_func->spi_transfer_buf_replace(dev, data, rxbuf, length);
+    }
+
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
 
@@ -311,6 +399,15 @@ mraa_spi_transfer_buf(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int l
 mraa_result_t
 mraa_spi_transfer_buf_word(mraa_spi_context dev, uint16_t* data, uint16_t* rxbuf, int length)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "spi: transfer_buf_word: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, spi_transfer_buf_word_replace)) {
+        return dev->advance_func->spi_transfer_buf_word_replace(dev, data, rxbuf, length);
+    }
+
     struct spi_ioc_transfer msg;
     memset(&msg, 0, sizeof(msg));
 
@@ -330,6 +427,11 @@ mraa_spi_transfer_buf_word(mraa_spi_context dev, uint16_t* data, uint16_t* rxbuf
 uint8_t*
 mraa_spi_write_buf(mraa_spi_context dev, uint8_t* data, int length)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "spi: write_buf: context is invalid");
+        return NULL;
+    }
+
     uint8_t* recv = malloc(sizeof(uint8_t) * length);
 
     if (mraa_spi_transfer_buf(dev, data, recv, length) != MRAA_SUCCESS) {
@@ -342,6 +444,11 @@ mraa_spi_write_buf(mraa_spi_context dev, uint8_t* data, int length)
 uint16_t*
 mraa_spi_write_buf_word(mraa_spi_context dev, uint16_t* data, int length)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "spi: write_buf_word: context is invalid");
+        return NULL;
+    }
+
     uint16_t* recv = malloc(sizeof(uint16_t) * length);
 
     if (mraa_spi_transfer_buf_word(dev, data, recv, length) != MRAA_SUCCESS) {
@@ -354,6 +461,15 @@ mraa_spi_write_buf_word(mraa_spi_context dev, uint16_t* data, int length)
 mraa_result_t
 mraa_spi_stop(mraa_spi_context dev)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "spi: stop: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, spi_stop_replace)) {
+        return dev->advance_func->spi_stop_replace(dev);
+    }
+
     close(dev->devfd);
     free(dev);
     return MRAA_SUCCESS;

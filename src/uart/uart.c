@@ -102,10 +102,12 @@ uint2speed(unsigned int speed)
             return B2500000;
         case 3000000:
             return B3000000;
+#if !defined(MSYS)
         case 3500000:
             return B3500000;
         case 4000000:
             return B4000000;
+#endif
         default:
             // if we are here, then an unsupported baudrate was selected.
             return 0;
@@ -199,23 +201,36 @@ mraa_uart_init(int index)
 mraa_uart_context
 mraa_uart_init_raw(const char* path)
 {
+    mraa_result_t status = MRAA_SUCCESS;
+
     if (!path) {
         syslog(LOG_ERR, "uart: device path undefined");
-        return NULL;
+        status = MRAA_ERROR_INVALID_PARAMETER;
+        goto init_raw_cleanup;
     }
 
     mraa_uart_context dev = mraa_uart_init_internal(plat == NULL ? NULL : plat->adv_func);
     if (dev == NULL) {
         syslog(LOG_ERR, "uart: Failed to allocate memory for context");
-        return NULL;
+        status = MRAA_ERROR_NO_RESOURCES;
+        goto init_raw_cleanup;
     }
     dev->path = path;
+
+    if (IS_FUNC_DEFINED(dev, uart_init_raw_replace)) {
+        status = dev->advance_func->uart_init_raw_replace(dev, path);
+        if (status == MRAA_SUCCESS) {
+            return dev;
+        } else {
+            goto init_raw_cleanup;
+        }
+    }
 
     // now open the device
     if ((dev->fd = open(dev->path, O_RDWR)) == -1) {
         syslog(LOG_ERR, "uart: open(%s) failed: %s", path, strerror(errno));
-        free(dev);
-        return NULL;
+        status = MRAA_ERROR_INVALID_RESOURCE;
+        goto init_raw_cleanup;
     }
 
     // now setup the tty and the selected baud rate
@@ -224,9 +239,8 @@ mraa_uart_init_raw(const char* path)
     // get current modes
     if (tcgetattr(dev->fd, &termio)) {
         syslog(LOG_ERR, "uart: tcgetattr(%s) failed: %s", path, strerror(errno));
-        close(dev->fd);
-        free(dev);
-        return NULL;
+        status = MRAA_ERROR_INVALID_RESOURCE;
+        goto init_raw_cleanup;
     }
 
     // setup for a 'raw' mode.  8N1, no echo or special character
@@ -235,14 +249,23 @@ mraa_uart_init_raw(const char* path)
     cfmakeraw(&termio);
     if (tcsetattr(dev->fd, TCSAFLUSH, &termio) < 0) {
         syslog(LOG_ERR, "uart: tcsetattr(%s) failed after cfmakeraw(): %s", path, strerror(errno));
-        close(dev->fd);
-        free(dev);
-        return NULL;
+        status = MRAA_ERROR_INVALID_RESOURCE;
+        goto init_raw_cleanup;
     }
 
     if (mraa_uart_set_baudrate(dev, 9600) != MRAA_SUCCESS) {
-        close(dev->fd);
-        free(dev);
+        status = MRAA_ERROR_INVALID_RESOURCE;
+        goto init_raw_cleanup;
+    }
+
+init_raw_cleanup:
+    if (status != MRAA_SUCCESS) {
+        if (dev != NULL) {
+            if (dev->fd >= 0) {
+                close(dev->fd);
+            }
+            free(dev);
+        }
         return NULL;
     }
 
@@ -275,6 +298,10 @@ mraa_uart_flush(mraa_uart_context dev)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
+    if (IS_FUNC_DEFINED(dev, uart_flush_replace)) {
+        return dev->advance_func->uart_flush_replace(dev);
+    }
+
     if (tcdrain(dev->fd) == -1) {
         return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
     }
@@ -288,6 +315,10 @@ mraa_uart_set_baudrate(mraa_uart_context dev, unsigned int baud)
     if (!dev) {
         syslog(LOG_ERR, "uart: set_baudrate: context is NULL");
         return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, uart_set_baudrate_replace)) {
+        return dev->advance_func->uart_set_baudrate_replace(dev, baud);
     }
 
     struct termios termio;
@@ -320,6 +351,10 @@ mraa_uart_set_mode(mraa_uart_context dev, int bytesize, mraa_uart_parity_t parit
     if (!dev) {
         syslog(LOG_ERR, "uart: set_mode: context is NULL");
         return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, uart_set_mode_replace)) {
+        return dev->advance_func->uart_set_mode_replace(dev, bytesize, parity, stopbits);
     }
 
     struct termios termio;
@@ -394,6 +429,10 @@ mraa_uart_set_flowcontrol(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_bo
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
+    if (IS_FUNC_DEFINED(dev, uart_set_flowcontrol_replace)) {
+        return dev->advance_func->uart_set_flowcontrol_replace(dev, xonxoff, rtscts);
+    }
+
     // hardware flow control
     int action = TCIOFF;
     if (xonxoff) {
@@ -434,6 +473,10 @@ mraa_uart_set_timeout(mraa_uart_context dev, int read, int write, int interchar)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
+    if (IS_FUNC_DEFINED(dev, uart_set_timeout_replace)) {
+        return dev->advance_func->uart_set_timeout_replace(dev, read, write, interchar);
+    }
+
     struct termios termio;
     // get current modes
     if (tcgetattr(dev->fd, &termio)) {
@@ -461,6 +504,10 @@ mraa_uart_set_non_blocking(mraa_uart_context dev, mraa_boolean_t nonblock)
     if (!dev) {
         syslog(LOG_ERR, "uart: non_blocking: context is NULL");
         return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, uart_set_non_blocking_replace)) {
+        return dev->advance_func->uart_set_non_blocking_replace(dev, nonblock);
     }
 
     // get current flags
@@ -503,6 +550,10 @@ mraa_uart_read(mraa_uart_context dev, char* buf, size_t len)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
+    if (IS_FUNC_DEFINED(dev, uart_read_replace)) {
+        return dev->advance_func->uart_read_replace(dev, buf, len);
+    }
+
     if (dev->fd < 0) {
         syslog(LOG_ERR, "uart%i: read: port is not open", dev->index);
         return MRAA_ERROR_INVALID_RESOURCE;
@@ -519,6 +570,10 @@ mraa_uart_write(mraa_uart_context dev, const char* buf, size_t len)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
+    if (IS_FUNC_DEFINED(dev, uart_write_replace)) {
+        return dev->advance_func->uart_write_replace(dev, buf, len);
+    }
+
     if (dev->fd < 0) {
         syslog(LOG_ERR, "uart%i: write: port is not open", dev->index);
         return MRAA_ERROR_INVALID_RESOURCE;
@@ -533,6 +588,10 @@ mraa_uart_data_available(mraa_uart_context dev, unsigned int millis)
     if (!dev) {
         syslog(LOG_ERR, "uart: data_available: context is NULL");
         return 0;
+    }
+
+    if (IS_FUNC_DEFINED(dev, uart_data_available_replace)) {
+        return dev->advance_func->uart_data_available_replace(dev, millis);
     }
 
     if (dev->fd < 0) {

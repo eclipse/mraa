@@ -27,7 +27,7 @@ import time
 
 print (mraa.getVersion())
 mraa.addSubplatform(mraa.BLE_FIRMATA_BY_NAME, "FIRMATA")
-x = mraa.Gpio(3 + 512)
+x = mraa.Gpio(13 + 512)
 x.dir(mraa.DIR_OUT)
 print "Blinking"
 for i in range(5):

@@ -233,7 +233,7 @@ mraa_pwm_init(int pin)
         syslog(LOG_ERR, "pwm_init: pin %i beyond platform definition", pin);
         return NULL;
     }
-    if (board->pins[pin].capabilites.pwm != 1) {
+    if (board->pins[pin].capabilities.pwm != 1) {
         syslog(LOG_ERR, "pwm_init: pin %i not capable of pwm", pin);
         return NULL;
     }
@@ -247,28 +247,6 @@ mraa_pwm_init(int pin)
     if (board->adv_func->pwm_init_pre != NULL) {
         if (board->adv_func->pwm_init_pre(pin) != MRAA_SUCCESS)
             return NULL;
-    }
-
-    if (board->pins[pin].capabilites.gpio == 1) {
-        // This deserves more investigation
-        mraa_gpio_context mux_i;
-        mux_i = mraa_gpio_init_raw(board->pins[pin].gpio.pinmap);
-        if (mux_i == NULL) {
-            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_init", pin);
-            return NULL;
-        }
-        if (mraa_gpio_dir(mux_i, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_dir", pin);
-            return NULL;
-        }
-        if (mraa_gpio_write(mux_i, 1) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_write", pin);
-            return NULL;
-        }
-        if (mraa_gpio_close(mux_i) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_close", pin);
-            return NULL;
-        }
     }
 
     if (board->pins[pin].pwm.mux_total > 0) {
@@ -338,6 +316,13 @@ mraa_pwm_write(mraa_pwm_context dev, float percentage)
     if (!dev) {
         syslog(LOG_ERR, "pwm: write: context is NULL");
         return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, pwm_write_pre)) {
+        if (dev->advance_func->pwm_write_pre(dev, percentage) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "mraa_pwm_write (pwm%i): pwm_write_pre failed, see syslog", dev->pin);
+            return MRAA_ERROR_UNSPECIFIED;
+        }
     }
 
     if (dev->period == -1) {
@@ -431,6 +416,13 @@ mraa_pwm_enable(mraa_pwm_context dev, int enable)
 
     if (IS_FUNC_DEFINED(dev, pwm_enable_replace)) {
         return dev->advance_func->pwm_enable_replace(dev, enable);
+    }
+
+    if (IS_FUNC_DEFINED(dev, pwm_enable_pre)) {
+        if (dev->advance_func->pwm_enable_pre(dev, enable) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "mraa_pwm_enable (pwm%i): pwm_enable_pre failed, see syslog", dev->pin);
+            return MRAA_ERROR_UNSPECIFIED;
+        }
     }
 
     char bu[MAX_SIZE];

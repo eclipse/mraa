@@ -1,10 +1,70 @@
 cmake_minimum_required (VERSION 2.8)
-project (mraa C)
+project (mraa C CXX)
 
 FIND_PACKAGE (Threads REQUIRED)
 
-set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -fno-omit-frame-pointer ")
-set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall ")
+###############################################################################
+# Detect supported warning flags
+# Modified from work By Dan Liew (fpbench - MIT)
+# https://github.com/delcypher/fp-bench/blob/master/CMakeLists.txt
+###############################################################################
+# Warnings for both the C and C++ compiler
+
+set (MRAA_BOTH_WARNING_FLAGS
+  -Wall
+  -Werror=main
+  -Wformat
+  -Wmain
+  -Wuninitialized
+  -Winit-self
+)
+
+# Warning flags for the C compiler only
+set (MRAA_C_WARNING_FLAGS
+  -Werror=implicit
+  -Werror=missing-parameter-type
+)
+
+# Warning flags for the C++ compiler only
+set (MRAA_CXX_WARNING_FLAGS
+  -Wnon-virtual-dtor
+  -Woverloaded-virtual
+  -Wreorder
+)
+
+include (CheckCCompilerFlag)
+include (CheckCXXCompilerFlag)
+function (MRAA_SANITIZE_FLAG_NAME OUTPUT_VAR FLAG)
+  string (REPLACE "-" "_" SANITIZED_FLAG_NAME "${FLAG}")
+  string (REPLACE "/" "_" SANITIZED_FLAG_NAME "${SANITIZED_FLAG_NAME}")
+  string (REPLACE "=" "_" SANITIZED_FLAG_NAME "${SANITIZED_FLAG_NAME}")
+  string (REPLACE " " "_" SANITIZED_FLAG_NAME "${SANITIZED_FLAG_NAME}")
+  set (${OUTPUT_VAR} "${SANITIZED_FLAG_NAME}" PARENT_SCOPE)
+endfunction ()
+
+# Globally set C compiler warning flags that are supported and emit
+# a warning about unsupported flags
+foreach (flag ${MRAA_BOTH_WARNING_FLAGS} ${MRAA_C_WARNING_FLAGS})
+  MRAA_SANITIZE_FLAG_NAME(SANITIZED_FLAG_NAME "${flag}")
+  CHECK_C_COMPILER_FLAG("${flag}" HAS_C_${SANITIZED_FLAG_NAME})
+  if (HAS_C_${SANITIZED_FLAG_NAME})
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${flag}")
+  else ()
+    message (WARNING "C compiler does not support flag \"${flag}\"")
+  endif ()
+endforeach ()
+
+# Globally set C++ compiler warning flags that are supported and emit
+# a warning about unsupported flags
+foreach (flag ${MRAA_BOTH_WARNING_FLAGS} ${MRAA_CXX_WARNING_FLAGS})
+  MRAA_SANITIZE_FLAG_NAME (SANITIZED_FLAG_NAME "${flag}")
+  CHECK_CXX_COMPILER_FLAG ("${flag}" HAS_CXX_${SANITIZED_FLAG_NAME})
+  if (HAS_CXX_${SANITIZED_FLAG_NAME})
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
+  else ()
+    message (WARNING "C++ compiler does not support flag \"${flag}\"")
+  endif ()
+endforeach ()
 
 # Set CMAKE_INSTALL_LIBDIR if not defined
 include(GNUInstallDirs)
@@ -31,7 +91,7 @@ include (GetGitRevisionDescription)
 git_describe (VERSION "--tags")
 if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND" OR "x_${VERSION}" STREQUAL "x_HEAD-HASH-NOTFOUND" OR "x_${VERSION}" STREQUAL "x_-128-NOTFOUND")
   message (WARNING " - Install git to compile a production libmraa!")
-  set (VERSION "v1.0.0-dirty")
+  set (VERSION "v1.4.0")
 endif ()
 
 message (STATUS "INFO - libmraa Version ${VERSION}")
@@ -72,17 +132,19 @@ option (USBPLAT "Detection USB platform." OFF)
 option (FIRMATA "Add Firmata support to mraa." OFF)
 option (FIRMATABLE "Add Firmata BLE support to mraa." OFF)
 option (ONEWIRE "Add Onewire support to mraa." ON)
+option (JSONPLAT "Add Platform loading via a json file." ON)
 option (IMRAA "Add Imraa support to mraa." OFF)
 option (FTDI4222 "Build with FTDI FT4222 subplatform support." OFF)
 option (IPK "Generate IPK using CPack" OFF)
 option (RPM "Generate RPM using CPack" OFF)
 option (ENABLEEXAMPLES "Disable building of examples" ON)
 option (INSTALLGPIOTOOL "Install gpio tool" OFF)
-option (INSTALLTOOLS "Install all tools" OFF)
-option (BUILDARCH "Override architecture to build for - override" OFF)
+option (INSTALLTOOLS "Install all tools" ON)
 option (BUILDTESTS "Override the addition of tests" ON)
 
-set (MRAAPLATFORMFORCE "" CACHE STRING "ALL")
+set (BUILDARCH "" CACHE STRING "Override architecture to build for")
+
+set (MRAAPLATFORMFORCE "ALL" CACHE STRING "Override platform to build for")
 
 if (NOT BUILDSWIG)
   set (BUILDSWIGPYTHON OFF)
@@ -104,8 +166,10 @@ if (DETECTED_ARCH STREQUAL "i586" OR DETECTED_ARCH STREQUAL "x86_64"
   set (X86PLAT ON)
 elseif (DETECTED_ARCH MATCHES "arm.*")
   set (ARMPLAT ON)
+elseif (DETECTED_ARCH STREQUAL "MOCK")
+  set (MOCKPLAT ON)
 else ()
-  message (FATAL_ERROR "Only x86 and arm platforms currently supported")
+  message (FATAL_ERROR "Only x86, arm and mock platforms currently supported")
 endif()
 
 if (BUILDSWIGPYTHON OR BUILDTESTS)

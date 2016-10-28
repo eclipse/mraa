@@ -37,6 +37,7 @@ extern "C" {
 #include "mraa_lang_func.h"
 
 extern mraa_board_t* plat;
+extern char* platform_name;
 extern mraa_iio_info_t* plat_iio;
 extern mraa_lang_func_t* lang_func;
 
@@ -61,6 +62,13 @@ mraa_platform_t mraa_x86_platform();
  * @return mraa_platform_t of the init'ed platform
  */
 mraa_platform_t mraa_arm_platform();
+
+/**
+ * setup a mock platform
+ *
+ * @return mraa_platform_t of the init'ed platform
+ */
+mraa_platform_t mraa_mock_platform();
 
 /**
  * runtime detect running usb platform extender

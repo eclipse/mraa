@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <pthread.h>
+
 #include "uart.h"
 #ifdef FIRMATABLE
 #include "firmata_ble.h"
@@ -94,7 +96,6 @@ typedef struct s_pin {
 typedef struct s_firmata {
     mraa_uart_context uart;
 #ifdef FIRMATABLE
-    lb_context lb_ctx;
     lb_bl_device* bl_dev;
 #endif
     t_pin pins[128];
@@ -106,6 +107,7 @@ typedef struct s_firmata {
     char firmware[140];
     uint8_t dev_count;
     struct _firmata** devs;
+    pthread_spinlock_t lock;
 } t_firmata;
 
 t_firmata* firmata_new(const char* name);

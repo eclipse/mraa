@@ -84,7 +84,7 @@ mraa_result_t
 mraa_firmata_close(mraa_firmata_context dev)
 {
     mraa_firmata_response_stop(dev);
-    firmata_close(firmata_dev);
+    pthread_spin_destroy(&firmata_dev->lock);
     free(dev);
     return MRAA_SUCCESS;
 }
@@ -93,7 +93,7 @@ static mraa_result_t
 mraa_firmata_i2c_init_bus_replace(mraa_i2c_context dev)
 {
     int delay = 1; // this should be either 1 or 0, I don't know :)
-    uint8_t buff[4];
+    char buff[4];
     buff[0] = FIRMATA_START_SYSEX;
     buff[1] = FIRMATA_I2C_CONFIG;
     buff[2] = delay & 0xFF, (delay >> 8) & 0xFF;
@@ -107,7 +107,7 @@ static mraa_result_t
 mraa_firmata_i2c_address(mraa_i2c_context dev, uint8_t addr)
 {
     // only thing needed and it's already done
-    // dev->addr = (int) addr;
+    //dev->addr = (int) addr;
 
     return MRAA_SUCCESS;
 }
@@ -121,7 +121,7 @@ mraa_firmata_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 static mraa_result_t
 mraa_firmata_send_i2c_read_req(mraa_i2c_context dev, int length)
 {
-    uint8_t* buffer = calloc(7, 0);
+    char* buffer = calloc(7, 0);
     if (buffer == NULL) {
         return MRAA_ERROR_NO_RESOURCES;
     }
@@ -141,7 +141,7 @@ mraa_firmata_send_i2c_read_req(mraa_i2c_context dev, int length)
     }
 
     // this needs a lock :)
-    memset(&firmata_dev->i2cmsg[dev->addr][0], -1, sizeof(int) * length);
+    memset(&firmata_dev->i2cmsg[dev->addr][0], -1, sizeof(int)*length);
 
     free(buffer);
     return MRAA_SUCCESS;
@@ -150,7 +150,7 @@ mraa_firmata_send_i2c_read_req(mraa_i2c_context dev, int length)
 static mraa_result_t
 mraa_firmata_send_i2c_read_reg_req(mraa_i2c_context dev, uint8_t command, int length)
 {
-    uint8_t* buffer = calloc(9, 0);
+    char* buffer = calloc(9, 0);
     if (buffer == NULL) {
         return MRAA_ERROR_NO_RESOURCES;
     }
@@ -173,7 +173,7 @@ mraa_firmata_send_i2c_read_reg_req(mraa_i2c_context dev, uint8_t command, int le
     }
 
     // this needs a lock :)
-    memset(&firmata_dev->i2cmsg[dev->addr][command], -1, sizeof(int) * length);
+    memset(&firmata_dev->i2cmsg[dev->addr][command], -1, sizeof(int)*length);
 
     free(buffer);
     return MRAA_SUCCESS;
@@ -183,11 +183,17 @@ static mraa_result_t
 mraa_firmata_i2c_wait(int addr, int reg)
 {
     int i = 0;
-    for (i = 0; firmata_dev->i2cmsg[addr][reg] == -1; i++) {
+    if (pthread_spin_lock(&firmata_dev->lock) != 0) return MRAA_ERROR_UNSPECIFIED;
+    int res = firmata_dev->i2cmsg[addr][reg];
+    if (pthread_spin_unlock(&firmata_dev->lock) != 0) return MRAA_ERROR_UNSPECIFIED;
+    for (; res == -1; i++) {
         if (i > 50) {
             return MRAA_ERROR_UNSPECIFIED;
         }
         usleep(500);
+        if (pthread_spin_lock(&firmata_dev->lock) != 0) return MRAA_ERROR_UNSPECIFIED;
+        res = firmata_dev->i2cmsg[addr][reg];
+        if (pthread_spin_unlock(&firmata_dev->lock) != 0) return MRAA_ERROR_UNSPECIFIED;
     }
     return MRAA_SUCCESS;
 }
@@ -210,7 +216,7 @@ mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
         if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
             uint8_t rawdata[2];
             rawdata[0] = firmata_dev->i2cmsg[dev->addr][command];
-            rawdata[1] = firmata_dev->i2cmsg[dev->addr][command + 1];
+            rawdata[1] = firmata_dev->i2cmsg[dev->addr][command+1];
             uint16_t data = (uint16_t) rawdata;
             uint8_t high = (data & 0xFF00) >> 8;
             data = (data << 8) & 0xFF00;
@@ -227,7 +233,7 @@ mraa_firmata_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t*
 {
     if (mraa_firmata_send_i2c_read_reg_req(dev, command, length) == MRAA_SUCCESS) {
         if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
-            memcpy(data, &firmata_dev->i2cmsg[dev->addr][command], sizeof(int) * length);
+            memcpy(data, &firmata_dev->i2cmsg[dev->addr][command], sizeof(int)*length);
             return length;
         }
     }
@@ -240,7 +246,7 @@ mraa_firmata_i2c_read(mraa_i2c_context dev, uint8_t* data, int length)
     if (mraa_firmata_send_i2c_read_req(dev, length) == MRAA_SUCCESS) {
         if (mraa_firmata_i2c_wait(dev->addr, 0) == MRAA_SUCCESS) {
             int i = 0;
-            for (i = 0; i < length; i++) {
+            for (; i < length; i++) {
                 data[i] = firmata_dev->i2cmsg[dev->addr][i];
             }
             return length;
@@ -266,8 +272,8 @@ static mraa_result_t
 mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWrite)
 {
     // buffer needs 5 bytes for firmata, and 2 bytes for every byte of data
-    int buffer_size = (bytesToWrite * 2) + 5;
-    uint8_t* buffer = calloc(buffer_size, 0);
+    int buffer_size = (bytesToWrite*2) + 5;
+    char* buffer = calloc(buffer_size, 0);
     if (buffer == NULL) {
         return MRAA_ERROR_NO_RESOURCES;
     }
@@ -278,12 +284,12 @@ mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWri
     buffer[2] = dev->addr;
     buffer[3] = I2C_MODE_WRITE << 3;
     // we need to write until FIRMATA_END_SYSEX
-    for (i; i < (buffer_size - 1); i++) {
+    for (; i < (buffer_size-1); i++) {
         buffer[ii] = data[i] & 0x7F;
-        buffer[ii + 1] = (data[i] >> 7) & 0x7f;
-        ii = ii + 2;
+        buffer[ii+1] = (data[i] >> 7) & 0x7f;
+        ii = ii+2;
     }
-    buffer[buffer_size - 1] = FIRMATA_END_SYSEX;
+    buffer[buffer_size-1] = FIRMATA_END_SYSEX;
     firmata_write_internal(firmata_dev, buffer, buffer_size);
     free(buffer);
     return MRAA_SUCCESS;
@@ -292,7 +298,7 @@ mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWri
 static mraa_result_t
 mraa_firmata_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
 {
-    uint8_t* buffer = calloc(7, 0);
+    char* buffer = calloc(7, 0);
     if (buffer == NULL) {
         return MRAA_ERROR_NO_RESOURCES;
     }
@@ -311,7 +317,7 @@ mraa_firmata_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
 static mraa_result_t
 mraa_firmata_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
 {
-    uint8_t* buffer = calloc(9, 0);
+    char* buffer = calloc(9, 0);
     if (buffer == NULL) {
         return MRAA_ERROR_NO_RESOURCES;
     }
@@ -346,12 +352,18 @@ mraa_firmata_aio_read(mraa_aio_context dev)
 {
     // careful, whilst you need to enable '0' for A0 you then need to read 14
     // in t_firmata because well that makes sense doesn't it...
-    return (int) firmata_dev->pins[dev->channel].value;
+    if (pthread_spin_lock(&firmata_dev->lock) != 0) return -1;
+    int ret = (int) firmata_dev->pins[dev->channel].value;
+    if (pthread_spin_unlock(&firmata_dev->lock) != 0) return -1;
+    return ret;
 }
 
 static mraa_result_t
 mraa_firmata_aio_init_internal_replace(mraa_aio_context dev, int aio)
 {
+    // set the channel, since we override internal it's never set
+    // offset by 14 because it makes total logical sense.
+    dev->channel = aio + 14;
     // firmata considers A0 pin0 as well as actual pin0 :/
     firmata_pinMode(firmata_dev, aio, MODE_ANALOG);
     // register for updates on that ADC channel
@@ -378,7 +390,10 @@ mraa_firmata_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 static int
 mraa_firmata_gpio_read_replace(mraa_gpio_context dev)
 {
-    return firmata_dev->pins[dev->pin].value;
+    if (pthread_spin_lock(&firmata_dev->lock) != 0) return -1;
+    int res = firmata_dev->pins[dev->pin].value;
+    if (pthread_spin_unlock(&firmata_dev->lock) != 0) return -1;
+    return res;
 }
 
 static mraa_result_t
@@ -470,7 +485,7 @@ mraa_firmata_pwm_init_internal_replace(void* func_table, int pin)
 static mraa_result_t
 mraa_firmata_pwm_write_replace(mraa_pwm_context dev, float percentage)
 {
-    int value = (int) ((percentage - 1) / 8000);
+    int value = (int)((percentage - 1) / 8000);
     firmata_analogWrite(firmata_dev, dev->pin, value);
     firmata_dev->pins[dev->pin].value = value;
     return MRAA_SUCCESS;
@@ -503,18 +518,20 @@ mraa_firmata_pull_handler(void* vp)
 {
     int i, isr_now, isr_prev;
     isr_prev = 0;
-    while (1) {
+    while(1) {
         isr_now = 0;
         firmata_pull(firmata_dev);
         // would prefer to send board pointer as argument
-        for (i = 0; i < 14; i++) {
+        for(i = 0; i < 14; i++) {
             isr_now |= (firmata_dev->pins[i].value & 1) << i;
         }
         // might want to lock here?
-        isr_detected = isr_prev ^ isr_now; // both edges for now
+        isr_detected = isr_prev ^ isr_now; //both edges for now
         isr_prev = isr_now;
         usleep(100);
     }
+
+    return NULL;
 }
 
 mraa_board_t*
@@ -534,17 +551,11 @@ mraa_firmata_plat_init(const char* uart_dev, mraa_platform_t type)
             return NULL;
         }
 
-        // if this isn't working then we have an issue with our uart
-        int retry = 20;
-        while (!firmata_dev->isReady && retry--) {
-            firmata_pull(firmata_dev);
-        }
-        if (!retry) {
-            syslog(LOG_ERR, "firmata: Failed to find a valid Firmata board on %s", uart_dev);
-            firmata_close(firmata_dev);
-            free(b);
-            return NULL;
-        }
+    // if this isn't working then we have an issue with our uart
+    int retry = 20;
+    while (!firmata_dev->isReady && --retry) {
+       firmata_pull(firmata_dev);
+    }
 
         pthread_create(&thread_id, NULL, mraa_firmata_pull_handler, NULL);
     }
@@ -585,69 +596,69 @@ mraa_firmata_plat_init(const char* uart_dev, mraa_platform_t type)
     }
 
     strncpy(b->pins[0].name, "IO0", 8);
-    b->pins[0].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[0].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[0].gpio.pinmap = 0;
     strncpy(b->pins[1].name, "IO1", 8);
-    b->pins[1].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[1].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[1].gpio.pinmap = 1;
     strncpy(b->pins[2].name, "IO2", 8);
-    b->pins[2].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[2].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[2].gpio.pinmap = 2;
     strncpy(b->pins[3].name, "IO3", 8);
-    b->pins[3].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[3].gpio.pinmap = 3;
     strncpy(b->pins[4].name, "IO4", 8);
-    b->pins[4].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[4].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[4].gpio.pinmap = 4;
     strncpy(b->pins[5].name, "IO5", 8);
-    b->pins[5].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    b->pins[5].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[5].gpio.pinmap = 5;
     strncpy(b->pins[6].name, "IO6", 8);
-    b->pins[6].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    b->pins[6].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[6].gpio.pinmap = 6;
     strncpy(b->pins[7].name, "IO7", 8);
-    b->pins[7].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[7].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[7].gpio.pinmap = 7;
     strncpy(b->pins[8].name, "IO8", 8);
-    b->pins[8].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[8].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[8].gpio.pinmap = 8;
     strncpy(b->pins[9].name, "IO9", 8);
-    b->pins[9].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    b->pins[9].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[9].gpio.pinmap = 9;
     strncpy(b->pins[10].name, "IO10", 8);
-    b->pins[10].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[10].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[10].gpio.pinmap = 10;
     strncpy(b->pins[11].name, "IO11", 8);
-    b->pins[11].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[11].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[11].gpio.pinmap = 11;
     strncpy(b->pins[12].name, "IO12", 8);
-    b->pins[12].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[12].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[12].gpio.pinmap = 12;
     strncpy(b->pins[13].name, "IO13", 8);
-    b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[13].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[13].gpio.pinmap = 13;
     strncpy(b->pins[10].name, "A0", 8);
-    b->pins[14].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[14].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[14].gpio.pinmap = 14;
     b->pins[14].aio.pinmap = 14;
     strncpy(b->pins[11].name, "A1", 8);
-    b->pins[15].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[15].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[15].gpio.pinmap = 15;
     b->pins[15].aio.pinmap = 15;
     strncpy(b->pins[12].name, "A2", 8);
-    b->pins[16].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[16].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[16].gpio.pinmap = 16;
     b->pins[16].aio.pinmap = 16;
     strncpy(b->pins[13].name, "A3", 8);
-    b->pins[17].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[17].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[17].gpio.pinmap = 17;
     b->pins[17].aio.pinmap = 17;
     strncpy(b->pins[13].name, "A4", 8);
-    b->pins[18].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[18].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[18].gpio.pinmap = 18;
     b->pins[18].aio.pinmap = 18;
     strncpy(b->pins[13].name, "A5", 8);
-    b->pins[19].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[19].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[19].gpio.pinmap = 19;
     b->pins[19].aio.pinmap = 19;
 
