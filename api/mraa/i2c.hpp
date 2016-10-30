@@ -45,7 +45,7 @@ class I2c
   public:
     /**
      * Instantiates an i2c bus. Multiple instances of the same bus can
-     * exist and the bus is not guarranteed to be on the correct address
+     * exist and the bus is not guaranteed to be on the correct address
      * before read/write.
      *
      * @param bus The i2c bus to use
@@ -76,7 +76,7 @@ class I2c
     }
 
     /**
-     * Closes the I2c Bus used. This does not guarrantee the bus will not
+     * Closes the I2c Bus used. This does not guarantee the bus will not
      * be usable by anyone else or communicates this disconnect to any
      * slaves.
      */
