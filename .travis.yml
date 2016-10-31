@@ -37,7 +37,7 @@ before_script:
   - if [ "${NODE5}" ]; then nvm install 5; fi
   - npm install node-gyp && export NODE_GYP="/home/travis/build/intel-iot-devkit/mraa/node_modules/node-gyp/bin/node-gyp.js"
   # Handle 0.10 NODE_ROOT_DIR differently than other versions
-  - wget http://prdownloads.sourceforge.net/swig/swig-3.0.10.tar.gz && tar xf swig-3.0.10.tar.gz && cd swig-3.0.10 && ./configure --prefix=/home/travis/ && make && make install && cd ..
+  - wget http://iotdk.intel.com/misc/tr/swig-3.0.10.tar.gz && tar xf swig-3.0.10.tar.gz && cd swig-3.0.10 && ./configure --prefix=/home/travis/ && make && make install && cd ..
 script:
   - echo "CC=$CC BUILDJAVA=$BUILDJAVA BUILDARCH=$BUILDARCH JSONPLAT=$JSONPLAT NODE010=$NODE010 NODE012=$NODE012 NODE4=$NODE4 NODE5=$NODE5 NODE_ROOT_DIR=$NODE_ROOT_DIR"
   - if [ -z ${NPM} ]; then mkdir build && cd build && cmake -DBUILDSWIGJAVA="$BUILDJAVA" -DBUILDARCH="$BUILDARCH" -DJSONPLAT=$JSONPLAT -DNODE_ROOT_DIR:PATH="${NVM_BIN}/.." -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make install && make test; else mkdir build && cd build && cmake -DBUILDSWIGJAVA="$BUILDJAVA" -DJSONPLAT=$JSONPLAT -DNODE_ROOT_DIR:PATH="${NVM_BIN}/.." -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make npmpkg && cd .. && ${NODE_GYP} configure && ${NODE_GYP} build; fi
