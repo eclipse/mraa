@@ -282,6 +282,9 @@ mraa_init_json_platform_i2c(json_object* jobj_i2c, mraa_board_t* board, int inde
     mraa_result_t ret = MRAA_SUCCESS;
     json_object* jobj_temp = NULL;
 
+    // disable bus if we error out
+    board->i2c_bus[pos].bus_id = -1;
+
     // Get the I2C bus array index
     ret = mraa_init_json_platform_get_index(jobj_i2c, I2C_KEY, INDEX_KEY, index, &pos, board->i2c_bus_count - 1);
     if (ret != MRAA_SUCCESS) {
