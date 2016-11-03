@@ -44,7 +44,7 @@
 #include <imraa_lock.h>
 
 const char*
-imraa_list_serialport()
+imraa_get_101_serialport()
 {
     struct udev* udev;
     struct udev_enumerate* enumerate;
@@ -257,7 +257,7 @@ imraa_handle_subplatform(struct json_object* jobj, bool force_update)
         }
 
         // TODO flash img checksum, and serialport validation?
-        const char* detected_serialport = imraa_list_serialport();
+        const char* detected_serialport = imraa_get_101_serialport();
         if (detected_serialport == NULL) {
             printf("No subplatform detected, check USB connection, skip flashing\n");
             return;
