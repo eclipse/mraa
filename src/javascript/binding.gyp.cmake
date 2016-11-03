@@ -11,8 +11,8 @@
         @mraa_LIB_INCLUDE_DIRS_GYP@
       ],
       'variables': {
-        "v8_version%": "<!(node -e 'console.log(process.versions.v8)' | sed 's/\.//g' | cut -c 1-5)",
-        "arch%": "<!(node -e 'console.log(process.arch)')"
+        "v8_version%": "<!(`command -v nodejs 2> /dev/null || echo node` -e 'console.log(process.versions.v8)' | sed 's/\.//g' | cut -c 1-5)",
+        "arch%": "<!(`command -v nodejs 2> /dev/null || echo node` -e 'console.log(process.arch)')"
       },
       'cflags_cc!': [ '-fno-rtti', '-fno-exceptions' ],
       'cflags!': [ '-fno-exceptions' ],
