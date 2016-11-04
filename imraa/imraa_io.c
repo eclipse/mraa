@@ -121,8 +121,8 @@ imraa_handle_IO(struct json_object* jobj)
                             if (r != MRAA_SUCCESS) {
                                 mraa_result_print(r);
                             }
-                            mraa_gpio_close(gpio);
                         }
+                        mraa_gpio_close(gpio);
                     } else if (strcmp(mraa_io_obj[i].type, "i2c") == 0) {
                         mraa_i2c_context i2c = NULL;
                         if (mraa_io_obj[i].raw) {
