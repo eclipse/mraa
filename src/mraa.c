@@ -948,6 +948,10 @@ mraa_find_i2c_bus_pci(const char* pci_device, const char *pci_id, const char* ad
         else {
             while (n--) {
 	        char* dup = strdup(namelist[n]->d_name);
+                if (dup == NULL) {
+                    syslog(LOG_ERR, "Ran out of memory!");
+                    break;
+                }
                 const char delim = '-';
                 char* token;
                 token = strsep(&dup, &delim);
@@ -969,6 +973,9 @@ mraa_find_i2c_bus_pci(const char* pci_device, const char *pci_id, const char* ad
                             return -1;
                         }
                     }
+                    free(token);
+                } else {
+                    free(dup);
                 }
                 free(namelist[n]);
             }
