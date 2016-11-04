@@ -5,6 +5,11 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**1.5.1**
+  * Small memleaks plugged
+  * imraa useless arp statements removed
+  * NPM 1.5.0 did not 100% match real 1.5.0 tag, this resolves this
+
 **1.5.0**
   * imraa now uses argp, slight option changes, you need to use -a to flash a 101
   * Joule i2c enumeration much improved, uses pci id
