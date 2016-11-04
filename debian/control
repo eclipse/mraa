@@ -1,0 +1,12 @@
+Source: mraa
+Section: unknown
+Priority: optional
+Maintainer: nobody <nobody@nobody.com>
+Build-Depends: autotools-dev
+Standards-Version: 3.9.4
+Homepage: <insert the upstream URL, if relevant>
+
+Package: mraa
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: libmraa - Low Level Skeleton Library for Communication on GNU/Linux platforms
