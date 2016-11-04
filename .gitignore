@@ -13,6 +13,10 @@ build/
 *.swo
 *~
 
+cscope.files
+cscope.out
+tags
+
 # npmpub files
 src/mraajsJAVASCRIPT_wrap.cxx
 src/version.c
@@ -20,3 +24,8 @@ package.json
 binding.gyp
 READMEFIRST
 npm-debug.log
+
+#dpkg-buildpackage files
+obj-*
+debian/mraa
+debian/mraa*
