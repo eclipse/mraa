@@ -5,6 +5,12 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**1.5.0**
+  * imraa now uses argp, slight option changes, you need to use -a to flash a 101
+  * Joule i2c enumeration much improved, uses pci id
+  * Firmata add a spinlock to remove possible race condition
+  * Mock Uart functionality
+
 **1.4.0**
   * Add support for Siemens SIMATIC IOT2000
   * Cmake now enables much more error detection depending on compiler support
