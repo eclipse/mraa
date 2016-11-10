@@ -147,7 +147,7 @@ int mraa_find_i2c_bus(const char* devname, int startfrom);
  * @param converted string
  * @return Result of the operation
  */
-mraa_result_t mraa_atoi(char* intStr, int* value);
+mraa_result_t mraa_atoi(const char* intStr, int* value);
 
 /**
  * helper function to find an i2c bus based on pci data

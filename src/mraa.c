@@ -1202,7 +1202,7 @@ mraa_to_upper(char* s)
 }
 
 mraa_result_t
-mraa_atoi(char* intStr, int* value)
+mraa_atoi(const char* intStr, int* value)
 {
     char* end;
     // here 10 determines the number base in which strol is to work
@@ -1273,10 +1273,20 @@ mraa_init_io(const char* desc)
     if (mraa_atoi(token, &pin) != MRAA_SUCCESS) {
         mraa_to_upper(token);
         if (strncmp(token, "RAW", 3)) {
-            syslog(LOG_ERR, "mraa_init_io: Description does not adhere to a known format");
-            return NULL;
+            int i = 0;
+            for (; i < plat->phy_pin_count; i++) {
+                if (strncmp(token, plat->pins[i].name, strlen(token))) {
+                    pin = i;
+                    break;
+                }
+            }
+            if (i >= plat->phy_pin_count) {
+                syslog(LOG_ERR, "mraa_init_io: Description does not adhere to a known format");
+                return NULL;
+            }
+        } else {
+            raw = 1;
         }
-        raw = 1;
     }
     if (!raw && str != NULL) {
         syslog(LOG_ERR, "mraa_init_io: More information than required was provided");
