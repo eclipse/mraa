@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "platform": [
     {
       "id":300,
@@ -59,14 +59,14 @@
     { "index": 27, "rawpin": 360 }
     ],
   "I2C": [
-    { "sclpin":13, "sdapin":15, "rawpin": 0, "index": 0, "default":true }
+    { "sclpin":13, "sdapin":15, "bus": 9, "index": 0, "default":true }
     ],
   "PWM": [
     { "index":22, "rawpin":0, "chipID":0},
     { "index":24, "rawpin":0, "chipID":1 }
   ],
   "SPI": [
-    { "index":0, "chipID": 0, "clock": 11, "miso": 7, "mosi": 9, "chipselect": 5, "default": true}
+    { "index":0, "bus": 0, "slaveselect": 0, "clock": 11, "miso": 7, "mosi": 9, "chipselect": 5, "default": true}
   ],
   "UART": [
     { "index":0, "chipID":0, "rawpin":0, "path":"/dev/ttyS0", "default":true}

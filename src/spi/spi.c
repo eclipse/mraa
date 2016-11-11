@@ -39,6 +39,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "spi.h"
 #include "mraa_internal.h"
@@ -88,7 +89,7 @@ mraa_spi_init(int bus)
 
     if (!plat->no_bus_mux) {
         int pos = plat->spi_bus[bus].sclk;
-        if (plat->pins[pos].spi.mux_total > 0) {
+        if (pos >= 0 && plat->pins[pos].spi.mux_total > 0) {
             if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
                 syslog(LOG_ERR, "spi: failed to set-up spi sclk multiplexer");
                 return NULL;
@@ -96,7 +97,7 @@ mraa_spi_init(int bus)
         }
 
         pos = plat->spi_bus[bus].mosi;
-        if (plat->pins[pos].spi.mux_total > 0) {
+        if (pos >= 0 && plat->pins[pos].spi.mux_total > 0) {
             if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
                 syslog(LOG_ERR, "spi: failed to set-up spi mosi multiplexer");
                 return NULL;
@@ -104,7 +105,7 @@ mraa_spi_init(int bus)
         }
 
         pos = plat->spi_bus[bus].miso;
-        if (plat->pins[pos].spi.mux_total > 0) {
+        if (pos >= 0 && plat->pins[pos].spi.mux_total > 0) {
             if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
                 syslog(LOG_ERR, "spi: failed to set-up spi miso multiplexer");
                 return NULL;
@@ -112,7 +113,7 @@ mraa_spi_init(int bus)
         }
 
         pos = plat->spi_bus[bus].cs;
-        if (plat->pins[pos].spi.mux_total > 0) {
+        if (pos >= 0 && plat->pins[pos].spi.mux_total > 0) {
             if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
                 syslog(LOG_ERR, "spi: failed to set-up spi cs multiplexer");
                 return NULL;
@@ -158,7 +159,7 @@ mraa_spi_init_raw(unsigned int bus, unsigned int cs)
 
     dev->devfd = open(path, O_RDWR);
     if (dev->devfd < 0) {
-        syslog(LOG_ERR, "spi: Failed opening SPI Device. bus:%s", path);
+        syslog(LOG_ERR, "spi: Failed opening SPI Device. bus:%s. Error %d %s", path, errno, strerror(errno));
         status = MRAA_ERROR_INVALID_RESOURCE;
         goto init_raw_cleanup;
     }

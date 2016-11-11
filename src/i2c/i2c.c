@@ -167,7 +167,7 @@ mraa_i2c_init(int bus)
     }
     if (!board->no_bus_mux) {
         int pos = board->i2c_bus[bus].sda;
-        if (board->pins[pos].i2c.mux_total > 0) {
+        if (pos >=0 && board->pins[pos].i2c.mux_total > 0) {
             if (mraa_setup_mux_mapped(board->pins[pos].i2c) != MRAA_SUCCESS) {
                 syslog(LOG_ERR, "i2c%i_init: Failed to set-up i2c sda multiplexer", bus);
                 return NULL;
@@ -175,7 +175,7 @@ mraa_i2c_init(int bus)
         }
 
         pos = board->i2c_bus[bus].scl;
-        if (board->pins[pos].i2c.mux_total > 0) {
+        if (pos >=0 && board->pins[pos].i2c.mux_total > 0) {
             if (mraa_setup_mux_mapped(board->pins[pos].i2c) != MRAA_SUCCESS) {
                 syslog(LOG_ERR, "i2c%i_init: Failed to set-up i2c scl multiplexer", bus);
                 return NULL;
