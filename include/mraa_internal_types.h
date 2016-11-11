@@ -35,6 +35,12 @@
 #define HAVE_PTHREAD_CANCEL
 #endif
 
+// Max count for various busses
+#define MAX_I2C_BUS_COUNT 12
+#define MAX_SPI_BUS_COUNT 12
+#define MAX_UART_COUNT 6
+
+
 // general status failures for internal functions
 #define MRAA_PLATFORM_NO_INIT -3
 #define MRAA_IO_SETUP_FAILURE -2
@@ -66,9 +72,11 @@
 #define MISO_KEY "miso"
 #define MOSI_KEY "mosi"
 #define CS_KEY "chipselect"
+#define SS_KEY "slaveselect"
 #define PIN_KEY "pin"
 #define IO_KEY "layout"
 #define PLATFORM_KEY "platform"
+#define BUS_KEY "bus"
 
 // IO keys
 #define GPIO_KEY "GPIO"
@@ -346,16 +354,16 @@ typedef struct _board_t {
     int gpio_count; /**< GPIO Count */
     int aio_count;  /**< Analog side Count */
     int i2c_bus_count; /**< Usable i2c Count */
-    mraa_i2c_bus_t  i2c_bus[12]; /**< Array of i2c */
+    mraa_i2c_bus_t  i2c_bus[MAX_I2C_BUS_COUNT]; /**< Array of i2c */
     unsigned int def_i2c_bus; /**< Position in array of default i2c bus */
     int spi_bus_count; /**< Usable spi Count */
-    mraa_spi_bus_t spi_bus[12];       /**< Array of spi */
+    mraa_spi_bus_t spi_bus[MAX_SPI_BUS_COUNT];       /**< Array of spi */
     unsigned int def_spi_bus; /**< Position in array of defult spi bus */
     unsigned int adc_raw; /**< ADC raw bit value */
     unsigned int adc_supported; /**< ADC supported bit value */
     unsigned int def_uart_dev; /**< Position in array of defult uart */
     int uart_dev_count; /**< Usable spi Count */
-    mraa_uart_dev_t uart_dev[6]; /**< Array of UARTs */
+    mraa_uart_dev_t uart_dev[MAX_UART_COUNT]; /**< Array of UARTs */
     mraa_boolean_t no_bus_mux; /**< i2c/spi/adc/pwm/uart bus muxing setup not required */
     int pwm_default_period; /**< The default PWM period is US */
     int pwm_max_period; /**< Maximum period in us */
