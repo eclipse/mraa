@@ -229,7 +229,7 @@ mraa_pwm_init(int pin)
         }
         pin = mraa_get_sub_platform_index(pin);
     }
-    if (pin < 0 || pin > board->phy_pin_count) {
+    if (pin < 0 || pin >= board->phy_pin_count) {
         syslog(LOG_ERR, "pwm_init: pin %i beyond platform definition", pin);
         return NULL;
     }
