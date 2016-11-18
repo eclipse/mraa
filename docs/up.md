@@ -1,11 +1,11 @@
 UP Board   {#up}
 ============
 
-UP Board is based on the Intel(R) Atom(TM) x5-Z83xx SoC (formerly Cherry Trail).
-It includes 2GB RAM, 16/32GB eMMC flash, 6 USB2.0 ports, 1 USB 3.0 OTG port,
-1 Gigabit Ethernet, HDMI and DSI Graphics ports, RTC and a 40-pin I/O header.
-The form-factor for the board is based on the Raspberry Pi 2, and can be used
-with many of the add-on HAT boards designed for the Raspberry Pi 2.
+UP Board is based on the Intel(R) Atom(TM) x5-Z8350 SoC (formerly Cherry Trail).
+It includes 1/2/4GB RAM, 16/32/64GB eMMC flash, 6 USB2.0 ports, 1 USB 3.0 OTG
+port, 1 Gigabit Ethernet, HDMI and DSI/eDP Graphics ports, RTC and a 40-pin I/O
+header. The form-factor for the board is based on the Raspberry Pi 2, and can be
+used with many of the add-on HAT boards designed for the Raspberry Pi.
 
 Interface notes
 ---------------
@@ -25,12 +25,15 @@ granular at higher speeds.  E.g. Available speeds include:
  25MHz, 12.5MHz, 8.33MHz, 6.25MHz, 5MHz, 4.167MHz, 3.571MHz, 3.125MHz, etc.
 Please be aware that speeds in between those steps will be rounded UP to the
 next nearest available speed, and capped at 25MHz.
-At the time of writing, only a single native chip-select is available (SPI CS0).
+2 chip-selects are available, one natively (SPI CS0) and one by GPIO (SPI CS1).
 
-**UART** 2 high-speed UARTs are available, supporting baud rates up to
-support baud rates between 300 and 3686400.  Hardware flow-control signals are
-not exposed, so software flow-control may be needed for rates above 115200.
-A console UART is also available but is not fully supported at this time.
+**UART** 1 high-speed UART is available, supporting baud rates between 300 and
+3686400.  Hardware flow-control signals are available on pins 11/36 (RTS/CTS).
+
+**ADC** 1 8-bit single-channel ADC (TI ADC081C021) is available on pin 7.
+
+Please note that a kernel with UP board support is required to enable the I/O
+interfaces above.  Refer to https://up-community.org for more information.
 
 Pin Mapping
 -----------
@@ -48,13 +51,13 @@ Note that there is an enum to use wiringPi style numbers.
 | 4           | P1-04        | 5V VCC   |            |                      |
 | 5           | P1-05        | I2C SCL1 |  3         | I2C1 (/dev/i2c-1)    |
 | 6           | P1-06        | GND      |            |                      |
-| 7           | P1-07        | GPIO(4)  |  4         |                      |
+| 7           | P1-07        | GPIO(4)  |  4         | ADC0 (iio:device0)   |
 | 8           | P1-08        | UART TX1 | 14         | UART1 (/dev/ttyS1)   |
 | 9           | P1-09        | GND      |            |                      |
 | 10          | P1-10        | UART RX1 | 15         | UART1 (/dev/ttyS1)   |
 | 11          | P1-11        | GPIO(17) | 17         |                      |
 | 12          | P1-12        | I2S CLK  | 18         | I2S0 (PCM Audio)     |
-| 13          | P1-13        | UART RX2 | 27         | UART2 (/dev/ttyS2)   |
+| 13          | P1-13        | GPIO(27) | 27         |                      |
 | 14          | P1-14        | GND      |            |                      |
 | 15          | P1-15        | GPIO(22) | 22         |                      |
 | 16          | P1-16        | GPIO(23) | 23         |                      |
@@ -63,7 +66,7 @@ Note that there is an enum to use wiringPi style numbers.
 | 19          | P1-19        | SPI MOSI | 10         | SPI2 (/dev/spidev2.x)|
 | 20          | P1-20        | GND      |            |                      |
 | 21          | P1-21        | SPI MISO | 9          | SPI2 (/dev/spidev2.x)|
-| 22          | P1-22        | UART TX2 | 25         | UART2 (/dev/ttyS2)   |
+| 22          | P1-22        | GPIO(25) | 25         |                      |
 | 23          | P1-23        | SPI SCL  | 11         | SPI2 (/dev/spidev2.x)|
 | 24          | P1-24        | SPI CS0  | 8          | SPI2 (/dev/spidev2.0)|
 | 25          | P1-25        | GND      |            |                      |

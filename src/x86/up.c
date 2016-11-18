@@ -62,6 +62,13 @@ set_pininfo(mraa_board_t* board, int mraa_index, char* name, mraa_pincapabilitie
         if (caps.spi) {
             pin_info->spi.mux_total = 0;
         }
+        if (caps.aio) {
+            pin_info->aio.mux_total = 0;
+            pin_info->aio.pinmap = 0;
+        }
+        if (caps.uart) {
+            pin_info->uart.mux_total = 0;
+        }
         return MRAA_SUCCESS;
     }
     return MRAA_ERROR_INVALID_RESOURCE;
@@ -78,6 +85,28 @@ get_pin_index(mraa_board_t* board, char* name, int* pin_index)
         }
     }
     return MRAA_ERROR_INVALID_RESOURCE;
+}
+
+static mraa_result_t
+aio_get_valid_fp(mraa_aio_context dev)
+{
+    char file_path[64] = "";
+
+    /*
+     * Open file Analog device input channel raw voltage file for reading.
+     *
+     * The UP ADC has only 1 channel, so the channel number is not included
+     * in the filename
+     */
+    snprintf(file_path, 64, "/sys/bus/iio/devices/iio:device0/in_voltage_raw");
+
+    dev->adc_in_fp = open(file_path, O_RDONLY);
+    if (dev->adc_in_fp == -1) {
+        syslog(LOG_ERR, "aio: Failed to open input raw file %s for reading!", file_path);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return MRAA_SUCCESS;
 }
 
 mraa_board_t*
@@ -107,6 +136,8 @@ mraa_up_board()
         goto error;
     }
 
+    b->adv_func->aio_get_valid_fp = &aio_get_valid_fp;
+
     if (uname(&running_uname) != 0) {
         free(b->pins);
         free(b->adv_func);
@@ -122,13 +153,13 @@ mraa_up_board()
     set_pininfo(b, 4, "5v",        (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
     set_pininfo(b, 5, "I2C1_SCL",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 }, 3);
     set_pininfo(b, 6, "GND",       (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    set_pininfo(b, 7, "GPIO4",     (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 4);
+    set_pininfo(b, 7, "ADC0",      (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 }, 4);
     set_pininfo(b, 8, "UART1_TX",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 14);
     set_pininfo(b, 9, "GND",       (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
     set_pininfo(b, 10, "UART1_RX", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 15);
     set_pininfo(b, 11, "GPIO17",   (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 17);
     set_pininfo(b, 12, "I2S_CLK",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 18);
-    set_pininfo(b, 13, "UART2_RX", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 1 }, 27);
+    set_pininfo(b, 13, "GPIO27",   (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 27);
     set_pininfo(b, 14, "GND",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
     set_pininfo(b, 15, "GPIO22",   (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 }, 22);
     set_pininfo(b, 16, "GPIO23",   (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 23);
@@ -137,7 +168,7 @@ mraa_up_board()
     set_pininfo(b, 19, "SPI_MOSI", (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 }, 10);
     set_pininfo(b, 20, "GND",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
     set_pininfo(b, 21, "SPI_MISO", (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 }, 9);
-    set_pininfo(b, 22, "UART2_TX", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 25);
+    set_pininfo(b, 22, "GPIO25",   (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 25);
     set_pininfo(b, 23, "SPI_CLK",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 }, 11);
     set_pininfo(b, 24, "SPI_CS0",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 }, 8);
     set_pininfo(b, 25, "GND",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
@@ -196,15 +227,16 @@ mraa_up_board()
     get_pin_index(b, "SPI_CLK", (int*) &(b->spi_bus[1].sclk));
 
     // Configure UART #1 (default)
-    b->uart_dev_count = 2;
+    b->uart_dev_count = 1;
     get_pin_index(b, "UART1_RX", &(b->uart_dev[0].rx));
     get_pin_index(b, "UART1_TX", &(b->uart_dev[0].tx));
     b->uart_dev[0].device_path = "/dev/ttyS1";
     b->def_uart_dev = 0;
-    // Configure UART #2
-    get_pin_index(b, "UART2_RX", &(b->uart_dev[1].rx));
-    get_pin_index(b, "UART2_TX", &(b->uart_dev[1].tx));
-    b->uart_dev[1].device_path = "/dev/ttyS2";
+
+    // Configure ADC #0
+    b->aio_count = 1;
+    b->adc_raw = 8;
+    b->adc_supported = 8;
 
     return b;
 error:
