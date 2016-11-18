@@ -120,5 +120,5 @@ if (BUILDDOC)
   endif ()
 endif ()
 
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.node
+install (TARGETS ${SWIG_MODULE_mraajs_REAL_NAME}
          DESTINATION ${NODE_MODULE_INSTALL_PATH})
