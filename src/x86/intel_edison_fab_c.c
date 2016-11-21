@@ -127,7 +127,7 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
     }
 
     if (modef == -1) {
-        syslog(LOG_ERR, "edison: Failed to open SoC pinmode for opening");
+        syslog(LOG_ERR, "edison: Failed to open SoC pinmode %i for opening", sysfs);
         mraa_gpio_close(mode_gpio);
         return MRAA_ERROR_INVALID_RESOURCE;
     }
