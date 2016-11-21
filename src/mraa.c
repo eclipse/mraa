@@ -1152,6 +1152,20 @@ mraa_add_from_lockfile(const char* imraa_lock_file)
     if (json_object_object_get_ex(jobj_lock, "Platform", &ioarray) == true &&
         json_object_is_type(ioarray, json_type_array)) {
         subplat_num = json_object_array_length(ioarray);
+        if (subplat_num == 1) {
+	    // this means we're just doing I/O, wipe board advanced functions
+	    // which on a platform like edison we can't do
+	    //memset(plat->adv_func, 0, sizeof(mraa_adv_func_t));
+            // now wipe IO muxes
+            for (i = 0; i < plat->phy_pin_count; i++) {
+                plat->pins[i].gpio.mux_total = 0;
+                plat->pins[i].spi.mux_total = 0;
+                plat->pins[i].i2c.mux_total = 0;
+                plat->pins[i].aio.mux_total = 0;
+                plat->pins[i].uart.mux_total = 0;
+            }
+            syslog(LOG_NOTICE, "imraa: IO pre-muxing detected, wiping board config");
+        }
         int id = -1;
         const char* uartdev = NULL;
         for (i = 0; i < subplat_num; i++) {
