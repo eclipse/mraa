@@ -82,6 +82,7 @@ mraa_init_json_platform_platform(json_object* jobj_platform, mraa_board_t* board
     const char* temp_string = NULL;
     int length = 0;
     mraa_result_t ret = MRAA_SUCCESS;
+    int i;
 
     // Set the platform name
     if (json_object_object_get_ex(jobj_platform, NAME_KEY, &jobj_temp)) {
@@ -148,7 +149,7 @@ mraa_init_json_platform_platform(json_object* jobj_platform, mraa_board_t* board
     if (ret != MRAA_SUCCESS && ret != MRAA_ERROR_NO_DATA_AVAILABLE) {
         return ret;
     }
-    for (int i = 0; i < board->i2c_bus_count; ++i)
+    for (i = 0; i < board->i2c_bus_count; ++i)
         board->i2c_bus[i].bus_id = -1;
 
     // Check to see if they've provided a SPI count
@@ -157,7 +158,7 @@ mraa_init_json_platform_platform(json_object* jobj_platform, mraa_board_t* board
     if (ret != MRAA_SUCCESS && ret != MRAA_ERROR_NO_DATA_AVAILABLE) {
         return ret;
     }
-    for (int i = 0; i < board->spi_bus_count; ++i)
+    for (i = 0; i < board->spi_bus_count; ++i)
         board->spi_bus[i].bus_id = -1;
 
     // Set the PWM default numbers
