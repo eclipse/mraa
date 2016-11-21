@@ -168,12 +168,13 @@ main(int argc, char** argv)
 
         if (arguments.arduino) {
             imraa_handle_subplatform(jobj, arguments.force);
+        } else {
+            imraa_handle_IO(jobj);
         }
 
         if (type == MRAA_NULL_PLATFORM || type == MRAA_UNKNOWN_PLATFORM) {
             printf("imraa: attempting to do IO pinmuxing on null/unkown platform\n");
         }
-        imraa_handle_IO(jobj);
     }
 
     fclose(fh);

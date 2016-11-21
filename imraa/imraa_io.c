@@ -43,9 +43,15 @@
 #include <mraa_internal.h>
 
 #include <imraa_arduino.h>
+#include <imraa_lock.h>
 
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
 #define MAX_SIZE 64
+
+// Naughty!
+#include "mraa_internal_types.h"
+
+extern mraa_board_t* plat;
 
 typedef struct mraa_io_objects_t {
     const char* type;
@@ -107,14 +113,31 @@ imraa_handle_IO(struct json_object* jobj)
                             int sysfs_gpio_pin = mraa_gpio_get_pin_raw(gpio);
                             if (sysfs_gpio_pin >= 0) {
                                 char bu[MAX_SIZE];
-                                snprintf(bu, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/value", sysfs_gpio_pin);
                                 struct passwd* user = getpwnam(mraa_io_obj[i].user);
                                 if (user != NULL) {
+                                   snprintf(bu, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/value", sysfs_gpio_pin);
+                                   if (chown(bu, user->pw_uid, user->pw_gid) == -1) {
+                                        fprintf(stderr, "Couldn't change ownership of file %s to %d:%d\n", bu, user->pw_uid, user->pw_gid);
+                                    }
+                                    snprintf(bu, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/direction", sysfs_gpio_pin);
                                     if (chown(bu, user->pw_uid, user->pw_gid) == -1) {
                                         fprintf(stderr, "Couldn't change ownership of file %s to %d:%d\n", bu, user->pw_uid, user->pw_gid);
-                                    } else {
-                                        fprintf(stderr, "Invalid user %s\n", mraa_io_obj[i].user);
                                     }
+                                    snprintf(bu, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/edge", sysfs_gpio_pin);
+                                    if (chown(bu, user->pw_uid, user->pw_gid) == -1) {
+                                        fprintf(stderr, "Couldn't change ownership of file %s to %d:%d\n", bu, user->pw_uid, user->pw_gid);
+                                    }
+                                    snprintf(bu, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/pinmux", sysfs_gpio_pin);
+                                    if (chown(bu, user->pw_uid, user->pw_gid) == -1) {
+                                        fprintf(stderr, "Couldn't change ownership of file %s to %d:%d\n", bu, user->pw_uid, user->pw_gid);
+                                    }
+                                    snprintf(bu, MAX_SIZE, "/sys/kernel/debug/gpio_debug/gpio%i/current_pinmux", sysfs_gpio_pin);
+                                    if (chown(bu, user->pw_uid, user->pw_gid) == -1) {
+                                        fprintf(stderr, "Couldn't change ownership of file %s to %d:%d\n", bu, user->pw_uid, user->pw_gid);
+                                    }
+                                }
+                                else {
+                                    fprintf(stderr, "Invalid user %s\n", mraa_io_obj[i].user);
                                 }
                             }
                             mraa_result_t r = mraa_gpio_owner(gpio, 0);
@@ -123,50 +146,94 @@ imraa_handle_IO(struct json_object* jobj)
                             }
                         }
                         mraa_gpio_close(gpio);
-                    } else if (strcmp(mraa_io_obj[i].type, "i2c") == 0) {
-                        mraa_i2c_context i2c = NULL;
-                        if (mraa_io_obj[i].raw) {
-                            i2c = mraa_i2c_init_raw(mraa_io_obj[i].index);
-                        } else {
-                            i2c = mraa_i2c_init(mraa_io_obj[i].index);
-                        }
-                        if (i2c != NULL) {
-                            mraa_i2c_stop(i2c);
-                        }
-                    } else if (strcmp(mraa_io_obj[i].type, "pwm") == 0) {
-                        mraa_pwm_context pwm = NULL;
-                        if (mraa_io_obj[i].raw) {
-                            pwm = mraa_pwm_init_raw(index2, mraa_io_obj[i].index);
-                        } else {
-                            pwm = mraa_pwm_init(mraa_io_obj[i].index);
-                        }
-                        if (pwm != NULL) {
-                            mraa_result_t r = mraa_pwm_owner(pwm, 0);
-                            if (r != MRAA_SUCCESS) {
-                                mraa_result_print(r);
+                    }
+                } else if (strcmp(mraa_io_obj[i].type, "i2c") == 0) {
+                    mraa_i2c_context i2c = NULL;
+                    if (mraa_io_obj[i].raw) {
+                        i2c = mraa_i2c_init_raw(mraa_io_obj[i].index);
+                    } else {
+                        i2c = mraa_i2c_init(mraa_io_obj[i].index);
+                    }
+                    if (i2c != NULL) {
+                        char bu[MAX_SIZE];
+                        struct passwd* user = getpwnam(mraa_io_obj[i].user);
+                        if (user != NULL) {
+                            int index = 0;
+                            if (mraa_io_obj[i].raw) {
+                                index = mraa_io_obj[i].index;
+                            } else {
+                                index = plat->i2c_bus[mraa_io_obj[i].index].bus_id;
+                                if (index == -1) {
+				    // revert to default i2c bus if we got a
+				    // valid bus but it turns out it's invalid
+				    // in the plat config
+				    index = plat->def_i2c_bus;
+                                }
                             }
-                            mraa_pwm_close(pwm);
+                            snprintf(bu, MAX_SIZE, "/dev/i2c-%d", index);
+                            if (chown(bu, user->pw_uid, user->pw_gid) == -1) {
+                                fprintf(stderr, "Couldn't change ownership of file %s to %d:%d\n", bu, user->pw_uid, user->pw_gid);
+                            }
                         }
-                    } else if (strcmp(mraa_io_obj[i].type, "spi") == 0) {
-                        mraa_spi_context spi = NULL;
-                        if (mraa_io_obj[i].raw) {
-                            spi = mraa_spi_init_raw(mraa_io_obj[i].index, index2);
-                        } else {
-                            spi = mraa_spi_init(mraa_io_obj[i].index);
+                        // since no owner, just let the handle leak, we'll never close anything!
+                        //mraa_i2c_stop(i2c);
+                    }
+                } else if (strcmp(mraa_io_obj[i].type, "pwm") == 0) {
+                    mraa_pwm_context pwm = NULL;
+                    if (mraa_io_obj[i].raw) {
+                        pwm = mraa_pwm_init_raw(index2, mraa_io_obj[i].index);
+                    } else {
+                        pwm = mraa_pwm_init(mraa_io_obj[i].index);
+                    }
+                    if (pwm != NULL) {
+                        mraa_result_t r = mraa_pwm_owner(pwm, 0);
+                        if (r != MRAA_SUCCESS) {
+                            mraa_result_print(r);
                         }
-                        if (spi != NULL) {
-                            mraa_spi_stop(spi);
+                        mraa_pwm_close(pwm);
+                    }
+                } else if (strcmp(mraa_io_obj[i].type, "spi") == 0) {
+                    mraa_spi_context spi = NULL;
+                    if (mraa_io_obj[i].raw) {
+                        spi = mraa_spi_init_raw(mraa_io_obj[i].index, index2);
+                    } else {
+                        spi = mraa_spi_init(mraa_io_obj[i].index);
+                    }
+                    if (spi != NULL) {
+                        char bu[MAX_SIZE];
+                        struct passwd* user = getpwnam(mraa_io_obj[i].user);
+                        if (user != NULL) {
+                            int index, cs = 0;
+                            if (mraa_io_obj[i].raw) {
+                                index = mraa_io_obj[i].index;
+                                cs = index2;
+                            } else {
+                                index = plat->spi_bus[mraa_io_obj[i].index].bus_id;
+                                cs = plat->spi_bus[mraa_io_obj[i].index].slave_s;
+                                if (index == -1) {
+                                    // revert to default spi bus if we got a
+                                    // valid bus but it turns out it's invalid
+                                    // in the plat config
+                                    index = plat->def_spi_bus;
+                                }
+                            }
+                            snprintf(bu, MAX_SIZE, "/dev/spidev%d.%d", index, cs);
+                            if (chown(bu, user->pw_uid, user->pw_gid) == -1) {
+                                fprintf(stderr, "Couldn't change ownership of file %s to %d:%d\n", bu, user->pw_uid, user->pw_gid);
+                            }
                         }
-                    } else if (strcmp(mraa_io_obj[i].type, "uart") == 0) {
-                        mraa_uart_context uart = NULL;
-                        if (mraa_io_obj[i].raw) {
-                            uart = mraa_uart_init_raw(mraa_io_obj[i].label);
-                        } else {
-                            uart = mraa_uart_init(mraa_io_obj[i].index);
-                        }
-                        if (uart != NULL) {
-                            mraa_uart_stop(uart);
-                        }
+                        // since no owner, just let the handle leak, we'll never close anything!
+                        //mraa_spi_stop(spi);
+                    }
+                } else if (strcmp(mraa_io_obj[i].type, "uart") == 0) {
+                    mraa_uart_context uart = NULL;
+                    if (mraa_io_obj[i].raw) {
+                        uart = mraa_uart_init_raw(mraa_io_obj[i].label);
+                    } else {
+                        uart = mraa_uart_init(mraa_io_obj[i].index);
+                    }
+                    if (uart != NULL) {
+                        mraa_uart_stop(uart);
                     }
                 }
             }
@@ -174,5 +241,9 @@ imraa_handle_IO(struct json_object* jobj)
             fprintf(stderr, "IO array incorrectly parsed\n");
         }
         free(mraa_io_obj);
+    }
+    if (i > 0) {
+        // write lockfile
+        imraa_write_lockfile(IMRAA_LOCKFILE_LOCATION, NULL);
     }
 }

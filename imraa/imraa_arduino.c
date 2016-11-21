@@ -189,7 +189,6 @@ imraa_handle_subplatform(struct json_object* jobj, bool force_update)
     struct json_object* platform;
     int i, ionum;
     const char* dfu_loc = NULL;
-    const char* lockfile_loc = NULL;
     const char* flash_loc = NULL;
     const char* usbserial = NULL;
 
@@ -200,16 +199,6 @@ imraa_handle_subplatform(struct json_object* jobj, bool force_update)
             dfu_loc = json_object_get_string(dfu_location);
         } else {
             fprintf(stderr, "dfu location string incorrectly parsed\n");
-        }
-    }
-
-    struct json_object* lockfile_location;
-    if (json_object_object_get_ex(jobj, "lockfile-location", &lockfile_location) == true) {
-        if (json_object_is_type(lockfile_location, json_type_string)) {
-            printf("lock file location: %s\n", json_object_get_string(lockfile_location));
-            lockfile_loc = json_object_get_string(lockfile_location);
-        } else {
-            fprintf(stderr, "lock file string incorrectly parsed\n");
         }
     }
 
@@ -240,13 +229,9 @@ imraa_handle_subplatform(struct json_object* jobj, bool force_update)
         dfu_loc = "/usr/bin";
         printf("No dfu path found, using default path /usr/bin instead");
     }
-    if (!lockfile_loc) {
-        lockfile_loc = "/tmp/imraa.lock";
-        printf("No lock path found, using default lock file /tmp/imraa.lock instead");
-    }
 
     // got flash? do flash
-    if (access(lockfile_loc, F_OK) != -1 && force_update == false) {
+    if (access(IMRAA_LOCKFILE_LOCATION, F_OK) != -1 && force_update == false) {
         printf("already exist a lock file, skip flashing\n");
         printf("force upgrade? remove the lockfile or run with force\n");
         return;
@@ -267,7 +252,7 @@ imraa_handle_subplatform(struct json_object* jobj, bool force_update)
             return;
         }
         if (imraa_flash_101(dfu_loc, flash_loc, detected_serialport) == 0) {
-            imraa_write_lockfile(lockfile_loc, detected_serialport);
+            imraa_write_lockfile(IMRAA_LOCKFILE_LOCATION, detected_serialport);
         } else {
             fprintf(stderr, "invalid flashing paramenters, please check agian\n");
             fprintf(stderr, "DFU Util location: %s\n", dfu_loc);

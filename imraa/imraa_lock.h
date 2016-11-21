@@ -24,5 +24,7 @@
 
 #pragma once
 
+#define IMRAA_LOCKFILE_LOCATION "/tmp/imraa.lock"
+
 void imraa_write_lockfile(const char* lock_file_location, const char* serialport);
 
