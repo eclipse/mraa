@@ -114,3 +114,10 @@ Please see the following table on how the physical pins map to mraa pin numbers
 | 53          | J20-12       | GP79          |                         | GPIO-79  | SD         |          |
 | 54          | J20-13       | GP80          |                         | GPIO-80  | SD         |          |
 | 55          | J20-14       | GP81          |                         | GPIO-81  | SD         |          |
+
+Using imraa
+-----------
+
+To use imraa with edison look at the imraa.io.edison.conf file. You will need to:
+chmod +x /sys/kernel/debug/
+Before SoC pinmodes will work
