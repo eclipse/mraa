@@ -215,7 +215,13 @@ mraa_uart_init_raw(const char* path)
         status = MRAA_ERROR_NO_RESOURCES;
         goto init_raw_cleanup;
     }
-    dev->path = path;
+    dev->path = (char*) calloc(strlen(path)+1, sizeof(char));
+    if (dev->path == NULL) {
+        syslog(LOG_ERR, "uart: Failed to allocate memory for path");
+        status =  MRAA_ERROR_NO_RESOURCES;
+        goto init_raw_cleanup;
+    }
+    strncpy(dev->path, path, strlen(path));
 
     if (IS_FUNC_DEFINED(dev, uart_init_raw_replace)) {
         status = dev->advance_func->uart_init_raw_replace(dev, path);
@@ -264,6 +270,9 @@ init_raw_cleanup:
             if (dev->fd >= 0) {
                 close(dev->fd);
             }
+            if (dev->path != NULL) {
+                free(dev->path);
+            }
             free(dev);
         }
         return NULL;
@@ -283,6 +292,9 @@ mraa_uart_stop(mraa_uart_context dev)
     // just close the device and reset our fd.
     if (dev->fd >= 0) {
         close(dev->fd);
+    }
+    if (dev->path != NULL) {
+        free(dev->path);
     }
 
     free(dev);
