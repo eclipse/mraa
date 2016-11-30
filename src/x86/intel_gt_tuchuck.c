@@ -189,7 +189,7 @@ mraa_gt_tuchuck_board()
     pos++;
 
     strncpy(b->pins[pos].name, "UART0TX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     // not configured as GPIO
     //b->pins[pos].gpio.pinmap = 462;
     //b->pins[pos].gpio.mux_total = 0;
@@ -297,7 +297,7 @@ mraa_gt_tuchuck_board()
     pos++;
 
     strncpy(b->pins[pos].name, "UART1TX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     //b->pins[pos].gpio.pinmap = 472;
     //b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
@@ -313,7 +313,7 @@ mraa_gt_tuchuck_board()
     pos++;
 
     strncpy(b->pins[pos].name, "UART1RX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     //b->pins[pos].gpio.pinmap = 471;
     //b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
@@ -554,7 +554,7 @@ mraa_gt_tuchuck_board()
     pos++;
 
     strncpy(b->pins[pos].name, "UART0RX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 467;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
@@ -569,7 +569,7 @@ mraa_gt_tuchuck_board()
     pos++;
 
     strncpy(b->pins[pos].name, "UART0RT", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 469;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
@@ -586,7 +586,7 @@ mraa_gt_tuchuck_board()
     pos++;
 
     strncpy(b->pins[pos].name, "UART0CT", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 412;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
@@ -603,7 +603,7 @@ mraa_gt_tuchuck_board()
     pos++;
 
     strncpy(b->pins[pos].name, "UART1TX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 484;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
@@ -620,7 +620,7 @@ mraa_gt_tuchuck_board()
     pos++;
 
     strncpy(b->pins[pos].name, "UART1RX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 483;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
@@ -637,7 +637,7 @@ mraa_gt_tuchuck_board()
     pos++;
 
     strncpy(b->pins[pos].name, "UART1RT", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 485;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
@@ -652,7 +652,7 @@ mraa_gt_tuchuck_board()
     pos++;
 
     strncpy(b->pins[pos].name, "UART1CT", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 486;
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
