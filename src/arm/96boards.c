@@ -53,7 +53,7 @@ int hikey_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
 
 const char* hikey_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyAMA2", "/dev/ttyAMA3" };
 
-int bbgum_ls_gpio_pins[MRAA_96BOARDS_LS_UART_COUNT] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 155, 154 };
+int bbgum_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 155, 154 };
 
 const char* bbgum_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyS3", "/dev/ttyS5" };
 
@@ -117,10 +117,17 @@ mraa_96boards()
     b->def_uart_dev = 0;
 
     // I2C
-    b->i2c_bus_count = MRAA_96BOARDS_LS_I2C_COUNT;
-    b->def_i2c_bus = 0;
-    b->i2c_bus[0].bus_id = 0;
-    b->i2c_bus[1].bus_id = 1;
+    if (b->platform_name == PLATFORM_NAME_BBGUM) {
+        b->i2c_bus_count = MRAA_96BOARDS_LS_I2C_COUNT;
+        b->def_i2c_bus = 0;
+        b->i2c_bus[0].bus_id = 1;
+        b->i2c_bus[1].bus_id = 2;
+    } else {
+        b->i2c_bus_count = MRAA_96BOARDS_LS_I2C_COUNT;
+        b->def_i2c_bus = 0;
+        b->i2c_bus[0].bus_id = 0;
+        b->i2c_bus[1].bus_id = 1;
+    }
 
     // SPI
     b->spi_bus_count = MRAA_96BOARDS_LS_SPI_COUNT;
