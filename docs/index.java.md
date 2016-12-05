@@ -46,8 +46,6 @@ Specific platform information for supported platforms is documented here:
 - @ref bananapi
 - @ref beaglebone
 - @ref nuc5
-- @ref up
-- @ref grossetete
 - @ref ft4222
 
 ## DEBUGGING

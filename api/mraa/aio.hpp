@@ -47,24 +47,11 @@ class Aio
      *
      * @param pin channel number to read ADC inputs
      */
-    Aio(int pin)
+    Aio(unsigned int pin)
     {
         m_aio = mraa_aio_init(pin);
         if (m_aio == NULL) {
             throw std::invalid_argument("Invalid AIO pin specified - do you have an ADC?");
-        }
-    }
-    /**
-     * Aio Constructor, takes a pointer to the AIO context and initialises
-     * the AIO class
-     *
-     * @param void * to an AIO context
-     */
-    Aio(void* aio_context)
-    {
-        m_aio = (mraa_aio_context) aio_context;
-        if (m_aio == NULL) {
-            throw std::invalid_argument("Invalid AIO context");
         }
     }
     /**
@@ -78,32 +65,22 @@ class Aio
      * Read a value from the AIO pin. By default mraa will shift
      * the raw value up or down to a 10 bit value.
      *
-     * @throws std::invalid_argument in case of error
      * @returns The current input voltage. By default, a 10bit value
      */
-    unsigned int
+    int
     read()
     {
-        int x = mraa_aio_read(m_aio);
-	if (x == -1) {
-            throw std::invalid_argument("Unknown error in Aio::read()");
-        }
-        return (unsigned int) x;
+        return mraa_aio_read(m_aio);
     }
     /**
      * Read a value from the AIO pin and return it as a normalized float.
      *
-     * @throws std::invalid_argument in case of error
      * @returns The current input voltage as a normalized float (0.0f-1.0f)
      */
     float
     readFloat()
     {
-        float x = mraa_aio_read_float(m_aio);
-	if (x == -1.0f) {
-            throw std::invalid_argument("Unknown error in Aio::readFloat()");
-        }
-        return x;
+        return mraa_aio_read_float(m_aio);
     }
     /**
      * Set the bit value which mraa will shift the raw reading

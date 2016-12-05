@@ -37,7 +37,6 @@
 #include "x86/intel_sofia_3gr.h"
 #include "x86/intel_cherryhills.h"
 #include "x86/up.h"
-#include "x86/intel_gt_tuchuck.h"
 
 mraa_platform_t
 mraa_x86_platform()
@@ -51,7 +50,7 @@ mraa_x86_platform()
     FILE* fh = fopen("/sys/devices/virtual/dmi/id/board_name", "r");
     if (fh != NULL) {
         if (getline(&line, &len, fh) != -1) {
-            if (strncmp(line, "GalileoGen2", 11) == 0 || strncmp(line, "SIMATIC IOT2000", 15) == 0) {
+            if (strncmp(line, "GalileoGen2", 11) == 0) {
                 platform_type = MRAA_INTEL_GALILEO_GEN2;
                 plat = mraa_intel_galileo_gen2();
             } else if (strncmp(line, "BODEGA BAY", 10) == 0) {
@@ -87,12 +86,6 @@ mraa_x86_platform()
             } else if (strncasecmp(line, "UP-CHT01", 8) == 0) {
                 platform_type = MRAA_UP;
                 plat = mraa_up_board();
-            } else if (strncasecmp(line, "RVP", 3) == 0) {
-                platform_type = MRAA_INTEL_GT_TUCHUCK;
-                plat = mraa_gt_tuchuck_board();
-            } else if (strncasecmp(line, "SDS", 3) == 0) {
-                platform_type = MRAA_INTEL_GT_TUCHUCK;
-                plat = mraa_gt_tuchuck_board();
             } else {
                 syslog(LOG_ERR, "Platform not supported, not initialising");
                 platform_type = MRAA_UNKNOWN_PLATFORM;
@@ -133,8 +126,6 @@ mraa_x86_platform()
     plat = mraa_intel_cherryhills();
     #elif defined(xMRAA_UP)
     plat = mraa_up_board();
-    #elif defined(xMRAA_INTEL_GT_TUCHUCK)
-    plat = mraa_gt_tuchuck_board();
     #else
         #error "Not using a valid platform value from mraa_platform_t - cannot compile"
     #endif

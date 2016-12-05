@@ -60,13 +60,13 @@ typedef enum {
 } Dir;
 
 /**
- * Gpio Edge types for interrupts
+ * Gpio Edge types for interupts
  */
 typedef enum {
     EDGE_NONE = 0,   /**< No interrupt on Gpio */
-    EDGE_BOTH = 1,   /**< Interrupt on rising & falling */
-    EDGE_RISING = 2, /**< Interrupt on rising only */
-    EDGE_FALLING = 3 /**< Interrupt on falling only */
+    EDGE_BOTH = 1,   /**< Interupt on rising & falling */
+    EDGE_RISING = 2, /**< Interupt on rising only */
+    EDGE_FALLING = 3 /**< Interupt on falling only */
 } Edge;
 
 /**
@@ -80,7 +80,7 @@ class Gpio
 {
   public:
     /**
-     * Instantiates a Gpio object
+     * Instanciates a Gpio object
      *
      * @param pin pin number to use
      * @param owner (optional) Set pin owner, default behaviour is to 'own'
@@ -105,19 +105,6 @@ class Gpio
 
         if (!owner) {
             mraa_gpio_owner(m_gpio, 0);
-        }
-    }
-    /**
-     * Gpio Constructor, takes a pointer to the GPIO context and initialises
-     * the GPIO class
-     *
-     * @param void * to GPIO context
-     */
-    Gpio(void* gpio_context)
-    {
-        m_gpio = (mraa_gpio_context) gpio_context;
-        if (m_gpio == NULL) {
-            throw std::invalid_argument("Invalid GPIO context");
         }
     }
     /**
@@ -199,7 +186,7 @@ class Gpio
      * Sets a callback to be called when pin value changes
      *
      * @param mode The edge mode to set
-     * @param fptr Function pointer to function to be called when interrupt is
+     * @param fptr Function pointer to function to be called when interupt is
      * triggered
      * @param args Arguments passed to the interrupt handler (fptr)
      * @return Result of operation
@@ -211,7 +198,7 @@ class Gpio
     }
 
     /**
-     * Exits callback - this call will not kill the isr thread immediately
+     * Exits callback - this call will not kill the isr thread immediatly
      * but only when it is out of it's critical section
      *
      * @return Result of operation

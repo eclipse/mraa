@@ -35,58 +35,10 @@
 #define HAVE_PTHREAD_CANCEL
 #endif
 
-// Max count for various busses
-#define MAX_I2C_BUS_COUNT 12
-#define MAX_SPI_BUS_COUNT 12
-#define MAX_UART_COUNT 6
-
-
 // general status failures for internal functions
 #define MRAA_PLATFORM_NO_INIT -3
 #define MRAA_IO_SETUP_FAILURE -2
 #define MRAA_NO_SUCH_IO -1
-
-// Json platform keys
-#define INDEX_KEY "index"
-#define NAME_KEY "name"
-#define PIN_COUNT_KEY "pin_count"
-#define GPIO_COUNT_KEY "gpio_count"
-#define AIO_COUNT_KEY "aio_count"
-#define SPI_COUNT_KEY "spi_count"
-#define I2C_COUNT_KEY "i2c_count"
-#define UART_COUNT_KEY "uart_count"
-#define PWMDEFAULT_KEY "pwmDefPeriod"
-#define PWMMAX_KEY "pwmMaxPeriod"
-#define PWMMIN_KEY "pwmMinPeriod"
-#define LABEL_KEY "label"
-#define DEFAULT_KEY "default"
-#define INVALID_KEY "invalid"
-#define SCLPIN_KEY "sclpin"
-#define SDAPIN_KEY "sdapin"
-#define CHIP_ID_KEY "chipID"
-#define RAW_PIN_KEY "rawpin"
-#define RXPIN_KEY "rx"
-#define TXPIN_KEY "tx"
-#define UART_PATH_KEY "path"
-#define CLOCK_KEY "clock"
-#define MISO_KEY "miso"
-#define MOSI_KEY "mosi"
-#define CS_KEY "chipselect"
-#define SS_KEY "slaveselect"
-#define PIN_KEY "pin"
-#define IO_KEY "layout"
-#define PLATFORM_KEY "platform"
-#define BUS_KEY "bus"
-
-// IO keys
-#define GPIO_KEY "GPIO"
-#define SPI_KEY "SPI"
-#define UART_KEY "UART"
-#define I2C_KEY "I2C"
-#define PWM_KEY "PWM"
-#define AIO_KEY "AIO"
-
-#define MRAA_JSONPLAT_ENV_VAR "MRAA_JSON_PLATFORM"
 
 #ifdef FIRMATA
 struct _firmata {
@@ -107,8 +59,8 @@ struct _gpio {
     int pin; /**< the pin number, as known to the os. */
     int phy_pin; /**< pin passed to clean init. -1 none and raw*/
     int value_fp; /**< the file pointer to the value of the gpio */
-    void (* isr)(void *); /**< the interrupt service request */
-    void *isr_args; /**< args return when interrupt service request triggered */
+    void (* isr)(void *); /**< the interupt service request */
+    void *isr_args; /**< args return when interupt service request triggered */
     pthread_t thread_id; /**< the isr handler thread id */
     int isr_value_fp; /**< the isr file pointer on the value */
 #ifndef HAVE_PTHREAD_CANCEL
@@ -119,10 +71,6 @@ struct _gpio {
     mraa_result_t (*mmap_write) (mraa_gpio_context dev, int value);
     int (*mmap_read) (mraa_gpio_context dev);
     mraa_adv_func_t* advance_func; /**< override function table */
-#if defined(MOCKPLAT)
-    mraa_gpio_dir_t mock_dir; /**< mock direction of the pin */
-    int mock_state; /**< mock state of the pin */
-#endif
     /*@}*/
 };
 
@@ -137,11 +85,6 @@ struct _i2c {
     unsigned long funcs; /**< /dev/i2c-* device capabilities as per https://www.kernel.org/doc/Documentation/i2c/functionality */
     void *handle; /**< generic handle for non-standard drivers that don't use file descriptors  */
     mraa_adv_func_t* advance_func; /**< override function table */
-#if defined(MOCKPLAT)
-    uint8_t mock_dev_addr; /**< address of the mock I2C device */
-    uint8_t mock_dev_data_len; /**< mock device data register block length in bytes */
-    uint8_t* mock_dev_data; /**< mock device data register block contents */
-#endif
     /*@}*/
 };
 
@@ -205,9 +148,9 @@ struct _iio {
     char* name; /**< IIO device name */
     int fp; /**< IIO device in /dev */
     int fp_event;  /**<  event file descriptor for IIO device */
-    void (* isr)(char* data); /**< the interrupt service request */
-    void *isr_args; /**< args return when interrupt service request triggered */
-    void (* isr_event)(struct iio_event_data* data, void* args); /**< the event interrupt service request */
+    void (* isr)(char* data); /**< the interupt service request */
+    void *isr_args; /**< args return when interupt service request triggered */
+    void (* isr_event)(struct iio_event_data* data, void* args); /**< the event interupt service request */
     int chan_num;
     pthread_t thread_id; /**< the isr handler thread id */
     mraa_iio_channel* channels;
@@ -270,7 +213,7 @@ typedef struct {
 
 typedef struct {
     /*@{*/
-    int pinmap; /**< sysfs pin */
+    unsigned int pinmap; /**< sysfs pin */
     unsigned int parent_id; /** parent chip id */
     unsigned int mux_total; /** Numfer of muxes needed for operation of pin */
     mraa_mux_t mux[6]; /** Array holding information about mux */
@@ -294,7 +237,7 @@ typedef struct {
 typedef struct {
     /*@{*/
     char name[MRAA_PIN_NAME_SIZE]; /**< Pin's real world name */
-    mraa_pincapabilities_t capabilities; /**< Pin Capabiliites */
+    mraa_pincapabilities_t capabilites; /**< Pin Capabiliites */
     mraa_pin_t gpio; /**< GPIO structure */
     mraa_pin_t pwm;  /**< PWM structure */
     mraa_pin_t aio;  /**< Anaglog Pin */
@@ -310,9 +253,9 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
-    int bus_id; /**< ID as exposed in the system */
-    int scl; /**< i2c SCL */
-    int sda; /**< i2c SDA */
+    unsigned int bus_id; /**< ID as exposed in the system */
+    unsigned int scl; /**< i2c SCL */
+    unsigned int sda; /**< i2c SDA */
     // mraa_drv_api_t drv_type; /**< Driver type */
     /*@}*/
 } mraa_i2c_bus_t;
@@ -325,10 +268,10 @@ typedef struct {
     unsigned int bus_id; /**< The Bus ID as exposed to the system. */
     unsigned int slave_s; /**< Slave select */
     mraa_boolean_t three_wire; /**< Is the bus only a three wire system */
-    int sclk; /**< Serial Clock */
-    int mosi; /**< Master Out, Slave In. */
-    int miso; /**< Master In, Slave Out. */
-    int cs; /**< Chip Select, used when the board is a spi slave */
+    unsigned int sclk; /**< Serial Clock */
+    unsigned int mosi; /**< Master Out, Slave In. */
+    unsigned int miso; /**< Master In, Slave Out. */
+    unsigned int cs; /**< Chip Select, used when the board is a spi slave */
     /*@}*/
 } mraa_spi_bus_t;
 
@@ -340,7 +283,7 @@ typedef struct {
     unsigned int index; /**< ID as exposed in the system */
     int rx; /**< uart rx */
     int tx; /**< uart tx */
-    char* device_path; /**< To store "/dev/ttyS1" for example */
+    const char* device_path; /**< To store "/dev/ttyS1" for example */
     /*@}*/
 } mraa_uart_dev_t;
 
@@ -350,26 +293,26 @@ typedef struct {
 
 typedef struct _board_t {
     /*@{*/
-    int phy_pin_count; /**< The Total IO pins on board */
-    int gpio_count; /**< GPIO Count */
-    int aio_count;  /**< Analog side Count */
-    int i2c_bus_count; /**< Usable i2c Count */
-    mraa_i2c_bus_t  i2c_bus[MAX_I2C_BUS_COUNT]; /**< Array of i2c */
+    unsigned int phy_pin_count; /**< The Total IO pins on board */
+    unsigned int gpio_count; /**< GPIO Count */
+    unsigned int aio_count;  /**< Analog side Count */
+    unsigned int i2c_bus_count; /**< Usable i2c Count */
+    mraa_i2c_bus_t  i2c_bus[12]; /**< Array of i2c */
     unsigned int def_i2c_bus; /**< Position in array of default i2c bus */
-    int spi_bus_count; /**< Usable spi Count */
-    mraa_spi_bus_t spi_bus[MAX_SPI_BUS_COUNT];       /**< Array of spi */
+    unsigned int spi_bus_count; /**< Usable spi Count */
+    mraa_spi_bus_t spi_bus[12];       /**< Array of spi */
     unsigned int def_spi_bus; /**< Position in array of defult spi bus */
     unsigned int adc_raw; /**< ADC raw bit value */
     unsigned int adc_supported; /**< ADC supported bit value */
     unsigned int def_uart_dev; /**< Position in array of defult uart */
-    int uart_dev_count; /**< Usable spi Count */
-    mraa_uart_dev_t uart_dev[MAX_UART_COUNT]; /**< Array of UARTs */
+    unsigned int uart_dev_count; /**< Usable spi Count */
+    mraa_uart_dev_t uart_dev[6]; /**< Array of UARTs */
     mraa_boolean_t no_bus_mux; /**< i2c/spi/adc/pwm/uart bus muxing setup not required */
     int pwm_default_period; /**< The default PWM period is US */
     int pwm_max_period; /**< Maximum period in us */
     int pwm_min_period; /**< Minimum period in us */
     mraa_platform_t platform_type; /**< Platform type */
-    char* platform_name; /**< Platform Name pointer */
+    const char* platform_name; /**< Platform Name pointer */
     const char* platform_version; /**< Platform versioning info */
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
     mraa_adv_func_t* adv_func;    /**< Pointer to advanced function disptach table */

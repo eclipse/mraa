@@ -33,7 +33,7 @@ add_custom_command (TARGET mraajava
   COMMAND cmake -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/mraa
   COMMAND ${JAVAC} *.java -d ${CMAKE_CURRENT_BINARY_DIR}
   COMMAND cmake -E echo "Creating jar"
-  COMMAND ${JAR} cvmf manifest.txt mraa.jar mraa
+  COMMAND ${JAR} cvf mraa.jar mraa
 )
 
 if (DOXYGEN_FOUND)
@@ -42,7 +42,7 @@ if (DOXYGEN_FOUND)
   endforeach ()
 endif ()
 
-mraa_create_install_pkgconfig (mraajava.pc ${LIB_INSTALL_DIR}/pkgconfig)
+mraa_create_install_pkgconfig (mraajava.pc ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
-install (TARGETS mraajava LIBRARY DESTINATION ${LIB_INSTALL_DIR})
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.jar DESTINATION ${LIB_INSTALL_DIR}/../lib/java)
+install (TARGETS mraajava LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.jar DESTINATION ${CMAKE_INSTALL_LIBDIR}/../lib/java)

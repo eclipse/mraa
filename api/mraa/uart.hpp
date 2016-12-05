@@ -76,20 +76,6 @@ class Uart
     }
 
     /**
-     * Uart Constructor, takes a pointer to the UART context and initialises
-     * the UART class
-     *
-     * @param void * to a UART context
-     */
-    Uart(void* uart_context)
-    {
-        m_uart = (mraa_uart_context) uart_context;
-
-        if (m_uart == NULL) {
-            throw std::invalid_argument("Invalid UART context");
-        }
-    }
-    /**
      * Uart destructor
      */
     ~Uart()
@@ -124,7 +110,7 @@ class Uart
     }
 
     /**
-     * Write bytes in char* buffer to a device
+     * Write bytes in String object to a device
      *
      * @param data buffer pointer
      * @param length maximum size of buffer
@@ -263,7 +249,7 @@ class Uart
      * @return Result of operation
      */
     Result
-    setNonBlocking(bool nonblock)
+    SetNonBlocking(bool nonblock)
     {
         return (Result) mraa_uart_set_non_blocking(m_uart, nonblock);
     }

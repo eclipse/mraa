@@ -1,3 +1,7 @@
+%module(docstring="Python interface to libmraa") mraa
+
+%feature("autodoc", "3");
+
 %include typemaps.i
 %include carrays.i
 
