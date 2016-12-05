@@ -55,7 +55,7 @@ interrupt(char* data)
     mraa_iio_channel* channels = mraa_iio_get_channels(iio_device0);
     int i = 0;
 
-    for (i; i < mraa_iio_get_channel_count(iio_device0); i++) {
+    for (; i < mraa_iio_get_channel_count(iio_device0); i++) {
         if (channels[i].enabled) {
             printf("channel %d - bytes %d\n", channels[i].index, channels[i].bytes);
             switch (channels[i].bytes) {

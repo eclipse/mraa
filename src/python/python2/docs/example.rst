@@ -16,13 +16,13 @@ Here is the simplest Gpio program in mraa.
   :prepend: import mraa
   :start-after: import mraa
 
-GPIO Interupt (isr)
+GPIO Interrupt (isr)
 ===================
 
-The GPIO module allows you to set an interupt on a GPIO. This interupt is
+The GPIO module allows you to set an interrupt on a GPIO. This interrupt is
 controlled by the mode that the 'edge' is in. Before setting another isr please
 remove the first one, multiple isrs on one pin are not supported. Some
-platforms will not support interupts on all pins so please check your return
+platforms will not support interrupts on all pins so please check your return
 values.
 
 **Note:** Galileo Gen1 only supports EDGE_BOTH

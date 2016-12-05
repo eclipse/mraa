@@ -96,5 +96,34 @@ class Spi;
             System.err.println("Native code library failed to load. \n" + e);
             System.exit(1);
         }
+
+        String javaAPIVersion = mraa.class.getPackage().getSpecificationVersion();
+        String nativeAPIVersion = mraa.getVersion().substring(1);
+
+        String javaMajor = javaAPIVersion.substring(0, javaAPIVersion.indexOf('.'));
+        String nativeMajor = nativeAPIVersion.substring(0, nativeAPIVersion.indexOf('.'));
+
+        if(Integer.parseInt(javaMajor) < Integer.parseInt(nativeMajor)){
+            System.err.println("Java library is out of date. Please update the Java library.");
+            System.err.println("Native library version is " + nativeAPIVersion + ". Java library version is " + javaAPIVersion + ".");
+            System.exit(1);
+        }
+        if(Integer.parseInt(javaMajor) > Integer.parseInt(nativeMajor)){
+            System.err.println("Native library is out of date. Please update the Native library.");
+            System.err.println("Native library version is " + nativeAPIVersion + ". Java library version is " + javaAPIVersion + ".");
+            System.exit(1);
+        }
+
+        String javaMinor = javaAPIVersion.substring(javaMajor.length() + 1, javaAPIVersion.indexOf('.', javaMajor.length() + 1));
+        String nativeMinor = nativeAPIVersion.substring(nativeMajor.length() + 1, nativeAPIVersion.indexOf('.', nativeMajor.length() + 1));
+
+        if(Integer.parseInt(javaMinor) < Integer.parseInt(nativeMinor)){
+            System.err.println("Java library is out of date. Please consider updating the Java library.");
+            System.err.println("Native library version is " + nativeAPIVersion + ". Java library version is " + javaAPIVersion + ".");
+        }
+        if(Integer.parseInt(javaMinor) > Integer.parseInt(nativeMinor)){
+            System.err.println("Native library is out of date. Please consider updating the Native library.");
+            System.err.println("Native library version is " + nativeAPIVersion + ". Java library version is " + javaAPIVersion + ".");
+        }
     }
 %}

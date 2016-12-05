@@ -1,0 +1,74 @@
+{
+  "version": "1.1.0",
+  "platform": [
+    {
+      "id":300,
+      "name":"Turbot",
+      "pin_count": 28,
+      "gpio_count": 28,
+      "i2c_count": 1,
+      "aio_count": 0,
+      "spi_count": 1,
+      "uart_count": 1,
+      "pwmDefPeriod":500,
+      "pwmMaxPeriod":1000000000,
+      "pwmMinPeriod":1
+    }
+  ],
+  "layout": [
+    {"label": "INVALID", "invalid": true},
+    {"label": "GND"},
+    {"label": "GND"},
+    {"label": "5v"},
+    {"label": "3.3v"},
+    {"label": "SPI_CS"},
+    {"label": "UART1TX"},
+    {"label": "SPIMISO"},
+    {"label": "UART1RX"},
+    {"label": "SPIMOSI"},
+    {"label": "UART1CT"},
+    {"label": "SPI_CLK"},
+    {"label": "UART1RT"},
+    {"label": "I2C_SCL"},
+    {"label": "I2S_CLK"},
+    {"label": "I2C_SDA"},
+    {"label": "I2S_FRM"},
+    {"label": "UART2TX"},
+    {"label": "I2S_DO"},
+    {"label": "UART2RX"},
+    {"label": "I2S_DI"},
+    {"label": "S5_0"},
+    {"label": "PWM0"},
+    {"label": "S5_1"},
+    {"label": "PWM1"},
+    {"label": "S5_4"},
+    {"label": "I2S_MCLK"},
+    {"label": "S5_22"}
+  ],
+  "GPIO": [
+    { "index": 10, "rawpin": 483 },
+    { "index": 12, "rawpin": 482 },
+    { "index": 14, "rawpin": 472 },
+    { "index": 16, "rawpin": 473 },
+    { "index": 18, "rawpin": 475 },
+    { "index": 20, "rawpin": 474 },
+    { "index": 21, "rawpin": 338 },
+    { "index": 23, "rawpin": 339 },
+    { "index": 25, "rawpin": 340 },
+    { "index": 26, "rawpin": 509 },
+    { "index": 27, "rawpin": 360 }
+    ],
+  "I2C": [
+    { "sclpin":13, "sdapin":15, "bus": 9, "index": 0, "default":true }
+    ],
+  "PWM": [
+    { "index":22, "rawpin":0, "chipID":0},
+    { "index":24, "rawpin":0, "chipID":1 }
+  ],
+  "SPI": [
+    { "index":0, "bus": 0, "slaveselect": 0, "clock": 11, "miso": 7, "mosi": 9, "chipselect": 5, "default": true}
+  ],
+  "UART": [
+    { "index":0, "chipID":0, "rawpin":0, "path":"/dev/ttyS0", "default":true}
+  ]
+}

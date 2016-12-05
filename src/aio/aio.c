@@ -56,7 +56,7 @@ aio_get_valid_fp(mraa_aio_context dev)
 }
 
 static mraa_aio_context
-mraa_aio_init_internal(mraa_adv_func_t* func_table, int aio)
+mraa_aio_init_internal(mraa_adv_func_t* func_table, int aio, unsigned int channel)
 {
     mraa_aio_context dev = calloc(1, sizeof(struct _aio));
     if (dev == NULL) {
@@ -71,6 +71,8 @@ mraa_aio_init_internal(mraa_adv_func_t* func_table, int aio)
         free(dev);
         return NULL;
     }
+
+    dev->channel = channel;
 
     // Open valid  analog input file and get the pointer.
     if (MRAA_SUCCESS != aio_get_valid_fp(dev)) {
@@ -111,7 +113,7 @@ mraa_aio_init(unsigned int aio)
         syslog(LOG_ERR, "aio: requested channel out of range");
         return NULL;
     }
-    if (board->pins[pin].capabilites.aio != 1) {
+    if (board->pins[pin].capabilities.aio != 1) {
         syslog(LOG_ERR, "aio: pin %i not capable of aio", pin);
         return NULL;
     }
@@ -123,12 +125,11 @@ mraa_aio_init(unsigned int aio)
     }
 
     // Create ADC device connected to specified channel
-    mraa_aio_context dev = mraa_aio_init_internal(board->adv_func, aio);
+    mraa_aio_context dev = mraa_aio_init_internal(board->adv_func, aio, board->pins[pin].aio.pinmap);
     if (dev == NULL) {
         syslog(LOG_ERR, "aio: Insufficient memory for specified input channel %d", aio);
         return NULL;
     }
-    dev->channel = board->pins[pin].aio.pinmap;
     dev->value_bit = DEFAULT_BITS;
 
     if (IS_FUNC_DEFINED(dev, aio_init_pre)) {
@@ -152,9 +153,14 @@ mraa_aio_init(unsigned int aio)
     return dev;
 }
 
-unsigned int
+int
 mraa_aio_read(mraa_aio_context dev)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "aio: read: context is invalid");
+        return -1;
+    }
+
     if (IS_FUNC_DEFINED(dev, aio_read_replace)) {
         return dev->advance_func->aio_read_replace(dev);
     }
@@ -165,7 +171,7 @@ mraa_aio_read(mraa_aio_context dev)
     if (dev->adc_in_fp == -1) {
         if (aio_get_valid_fp(dev) != MRAA_SUCCESS) {
             syslog(LOG_ERR, "aio: Failed to get to the device");
-            return 0;
+            return -1;
         }
     }
 
@@ -182,8 +188,10 @@ mraa_aio_read(mraa_aio_context dev)
     unsigned int analog_value = (unsigned int) strtoul(buffer, &end, 10);
     if (end == &buffer[0]) {
         syslog(LOG_ERR, "aio: Value is not a decimal number");
+        return -1;
     } else if (errno != 0) {
         syslog(LOG_ERR, "aio: Errno was set");
+        return -1;
     }
 
     if (dev->value_bit != raw_bits) {
@@ -205,7 +213,7 @@ mraa_aio_read_float(mraa_aio_context dev)
 {
     if (dev == NULL) {
         syslog(LOG_ERR, "aio: Device not valid");
-        return 0.0;
+        return -1.0;
     }
 
     float max_analog_value = (1 << dev->value_bit) - 1;
@@ -217,13 +225,22 @@ mraa_aio_read_float(mraa_aio_context dev)
 mraa_result_t
 mraa_aio_close(mraa_aio_context dev)
 {
-    if (NULL != dev) {
-        if (dev->adc_in_fp != -1)
-            close(dev->adc_in_fp);
-        free(dev);
+    if (dev == NULL) {
+        syslog(LOG_ERR, "aio: close: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    return (MRAA_SUCCESS);
+    if (IS_FUNC_DEFINED(dev, aio_close_replace)) {
+        return dev->advance_func->aio_close_replace(dev);
+    }
+
+    if (dev->adc_in_fp != -1) {
+        close(dev->adc_in_fp);
+    }
+
+    free(dev);
+
+    return MRAA_SUCCESS;
 }
 
 mraa_result_t

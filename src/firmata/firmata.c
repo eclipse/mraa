@@ -33,10 +33,16 @@ t_firmata*
 firmata_new(const char* name)
 {
     t_firmata* res;
-    mraa_result_t uart_res = MRAA_ERROR_UNSPECIFIED;
 
     res = calloc(1, sizeof(t_firmata));
     if (!res) {
+        return NULL;
+    }
+
+    int ret = pthread_spin_init(&res->lock, PTHREAD_PROCESS_SHARED);
+    if (ret != 0) {
+        syslog(LOG_ERR, "firmata; could not init locking");
+        free(res);
         return NULL;
     }
 
@@ -69,7 +75,7 @@ firmata_close(t_firmata* firmata)
 int
 firmata_pull(t_firmata* firmata)
 {
-    uint8_t buff[FIRMATA_MSG_LEN];
+    char buff[FIRMATA_MSG_LEN];
     int r;
 
     r = mraa_uart_data_available(firmata->uart, 40);
@@ -79,7 +85,7 @@ firmata_pull(t_firmata* firmata)
             return 0;
         }
         if (r > 0) {
-            firmata_parse(firmata, buff, r);
+            firmata_parse(firmata, (uint8_t*) buff, r);
             return r;
         }
     }
@@ -134,7 +140,9 @@ firmata_endParse(t_firmata* firmata)
         int analog_val = firmata->parse_buff[1] | (firmata->parse_buff[2] << 7);
         for (pin = 0; pin < 128; pin++) {
             if (firmata->pins[pin].analog_channel == analog_ch) {
+                if (pthread_spin_lock(&firmata->lock) != 0) return;
                 firmata->pins[pin].value = analog_val;
+                if (pthread_spin_unlock(&firmata->lock) != 0) syslog(LOG_ERR, "firmata: Fatal spinlock deadlock");
                 return;
             }
         }
@@ -148,7 +156,9 @@ firmata_endParse(t_firmata* firmata)
         for (mask = 1; mask & 0xFF; mask <<= 1, pin++) {
             if (firmata->pins[pin].mode == MODE_INPUT) {
                 uint32_t val = (port_val & mask) ? 1 : 0;
+                if (pthread_spin_lock(&firmata->lock)) return;
                 firmata->pins[pin].value = val;
+                if (pthread_spin_unlock(&firmata->lock) != 0) syslog(LOG_ERR, "firmata: Fatal spinlock deadlock");
             }
         }
         return;
@@ -174,7 +184,7 @@ firmata_endParse(t_firmata* firmata)
             // not ready to communicate for some time, so the only
             // way to reliably query their capabilities is to wait
             // until the REPORT_FIRMWARE message is heard.
-            uint8_t buf[80];
+            char buf[80];
             len = 0;
             buf[len++] = FIRMATA_START_SYSEX;
             buf[len++] = FIRMATA_ANALOG_MAPPING_QUERY; // read analog to pin # info
@@ -209,7 +219,7 @@ firmata_endParse(t_firmata* firmata)
             }
             // send a state query for for every pin with any modes
             for (pin = 0; pin < 128; pin++) {
-                uint8_t buf[512];
+                char buf[512];
                 int len = 0;
                 if (firmata->pins[pin].supported_modes) {
                     buf[len++] = FIRMATA_START_SYSEX;
@@ -241,15 +251,17 @@ firmata_endParse(t_firmata* firmata)
             int reg = (firmata->parse_buff[4] & 0x7f) | ((firmata->parse_buff[5] & 0x7f) << 7);
             int i = 6;
             int ii = 0;
-            for (ii; ii < (firmata->parse_count - 7) / 2; ii++) {
+            if (pthread_spin_lock(&firmata->lock) != 0) syslog(LOG_ERR, "firmata: Fatal spinlock deadlock, skipping i2c msg");
+            for (; ii < (firmata->parse_count - 7) / 2; ii++) {
                 firmata->i2cmsg[addr][reg+ii] = (firmata->parse_buff[i] & 0x7f) | ((firmata->parse_buff[i+1] & 0x7f) << 7);
                 i = i+2;
             }
+            if (pthread_spin_unlock(&firmata->lock) != 0) syslog(LOG_ERR, "firmata: Fatal spinlock deadlock");
         } else {
             if (firmata->devs != NULL) {
                 struct _firmata* devs = firmata->devs[0];
                 int i = 0;
-                for (i; i < firmata->dev_count; i++, devs++) {
+                for (; i < firmata->dev_count; i++, devs++) {
                     if (devs != NULL) {
                         if (firmata->parse_buff[1] == devs->feature) {
                             // call func
@@ -284,7 +296,7 @@ firmata_initPins(t_firmata* firmata)
 int
 firmata_askFirmware(t_firmata* firmata)
 {
-    uint8_t buf[3];
+    char buf[3];
     int res;
 
     buf[0] = FIRMATA_START_SYSEX;
@@ -298,7 +310,7 @@ int
 firmata_pinMode(t_firmata* firmata, int pin, int mode)
 {
     int res;
-    uint8_t buff[4];
+    char buff[4];
 
     firmata->pins[pin].mode = mode;
     buff[0] = FIRMATA_SET_PIN_MODE;
@@ -313,7 +325,7 @@ firmata_analogWrite(t_firmata* firmata, int pin, int value)
 {
     int res;
 
-    uint8_t buff[3];
+    char buff[3];
     buff[0] = 0xE0 | pin;
     buff[1] = value & 0x7F;
     buff[2] = (value >> 7) & 0x7F;
@@ -326,7 +338,7 @@ firmata_analogRead(t_firmata *firmata, int pin)
 {
     int res;
     int value = 1;
-    uint8_t buff[2];
+    char buff[2];
     buff[0] = FIRMATA_REPORT_ANALOG | pin;
     buff[1] = value;
     res = mraa_uart_write(firmata->uart, buff, 2);
@@ -338,7 +350,7 @@ firmata_digitalWrite(t_firmata* firmata, int pin, int value)
 {
     int i;
     int res;
-    uint8_t buff[4];
+    char buff[4];
 
     if (pin < 0 || pin > 127)
         return (0);

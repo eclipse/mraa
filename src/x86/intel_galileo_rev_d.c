@@ -140,6 +140,34 @@ mraa_intel_galileo_g1_spi_lsbmode_replace(mraa_spi_context dev, mraa_boolean_t l
     return MRAA_SUCCESS;
 }
 
+mraa_result_t
+mraa_intel_galileo_g1_pwm_init_pre(int pin)
+{
+    // Gen1 galileo has no kernel muxing for GPIOs/PWM so ends up with leakage
+    // on the PWM pins from the GPIO pins if not set to output high
+    if (plat->pins[pin].capabilities.gpio == 1) {
+        mraa_gpio_context mux_i;
+        mux_i = mraa_gpio_init_raw(plat->pins[pin].gpio.pinmap);
+        if (mux_i == NULL) {
+            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_init", pin);
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        if (mraa_gpio_dir(mux_i, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_dir", pin);
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        if (mraa_gpio_write(mux_i, 1) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_write", pin);
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+        if (mraa_gpio_close(mux_i) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "pwm_init: error in gpio->pwm%i transition. gpio_close", pin);
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+    }
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_intel_galileo_rev_d()
 {
@@ -166,6 +194,7 @@ mraa_intel_galileo_rev_d()
     }
     b->adv_func->gpio_mmap_setup = &mraa_intel_galileo_g1_mmap_setup;
     b->adv_func->spi_lsbmode_replace = &mraa_intel_galileo_g1_spi_lsbmode_replace;
+    b->adv_func->pwm_init_pre = mraa_intel_galileo_g1_pwm_init_pre;
 
     b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_GALILEO_REV_D_PINCOUNT, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
@@ -175,7 +204,7 @@ mraa_intel_galileo_rev_d()
 
     // GPIO IO0 - IO10
     strncpy(b->pins[0].name, "IO0", 8);
-    b->pins[0].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[0].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[0].gpio.pinmap = 50;
     b->pins[0].gpio.parent_id = 0;
     b->pins[0].gpio.mux_total = 1;
@@ -190,7 +219,7 @@ mraa_intel_galileo_rev_d()
     b->pins[0].uart.mux[0].value = 0;
 
     strncpy(b->pins[1].name, "IO1", 8);
-    b->pins[1].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[1].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[1].gpio.pinmap = 51;
     b->pins[1].gpio.mux_total = 1;
     b->pins[1].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
@@ -204,7 +233,7 @@ mraa_intel_galileo_rev_d()
     b->pins[1].uart.mux[0].value = 0;
 
     strncpy(b->pins[2].name, "IO2", 8);
-    b->pins[2].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 1, 0, 0, 0, 0 };
+    b->pins[2].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 1, 0, 0, 0, 0 };
     b->pins[2].gpio.pinmap = 32;
     b->pins[2].gpio.mux_total = 1;
     b->pins[2].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
@@ -226,7 +255,7 @@ mraa_intel_galileo_rev_d()
     b->pins[2].mmap.bit_pos = 6;
 
     strncpy(b->pins[3].name, "IO3", 8);
-    b->pins[3].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 1, 0, 0, 0, 0 };
+    b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 1, 0, 0, 0, 0 };
     b->pins[3].gpio.pinmap = 18;
     b->pins[3].gpio.mux_total = 1;
     b->pins[3].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
@@ -255,12 +284,12 @@ mraa_intel_galileo_rev_d()
 
 
     strncpy(b->pins[4].name, "IO4", 8);
-    b->pins[4].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[4].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[4].gpio.pinmap = 28;
     b->pins[4].gpio.mux_total = 0;
 
     strncpy(b->pins[5].name, "IO5", 8);
-    b->pins[5].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    b->pins[5].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[5].gpio.pinmap = 17;
     b->pins[5].gpio.mux_total = 0;
     b->pins[5].pwm.pinmap = 5;
@@ -269,24 +298,24 @@ mraa_intel_galileo_rev_d()
 
     strncpy(b->pins[6].name, "IO6", 8);
     b->pins[6].gpio.pinmap = 24;
-    b->pins[6].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    b->pins[6].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[6].gpio.mux_total = 0;
     b->pins[6].pwm.pinmap = 6;
     b->pins[6].pwm.parent_id = 0;
     b->pins[6].pwm.mux_total = 0;
 
     strncpy(b->pins[7].name, "IO7", 8);
-    b->pins[7].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[7].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[7].gpio.pinmap = 27;
     b->pins[7].gpio.mux_total = 0;
 
     strncpy(b->pins[8].name, "IO8", 8);
-    b->pins[8].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[8].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[8].gpio.pinmap = 26;
     b->pins[8].gpio.mux_total = 0;
 
     strncpy(b->pins[9].name, "IO9", 8);
-    b->pins[9].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    b->pins[9].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[9].gpio.pinmap = 19;
     b->pins[9].gpio.mux_total = 0;
     b->pins[9].pwm.pinmap = 1;
@@ -294,7 +323,7 @@ mraa_intel_galileo_rev_d()
     b->pins[9].pwm.mux_total = 0;
 
     strncpy(b->pins[10].name, "IO10", 8);
-    b->pins[10].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 1, 0, 0, 0 };
+    b->pins[10].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 1, 0, 0, 0 };
     b->pins[10].gpio.pinmap = 16;
     b->pins[10].gpio.mux_total = 1;
     b->pins[10].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
@@ -313,7 +342,7 @@ mraa_intel_galileo_rev_d()
     b->pins[10].spi.mux[0].value = 0;
 
     strncpy(b->pins[11].name, "IO11", 8);
-    b->pins[11].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 1, 0, 0, 0 };
+    b->pins[11].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 1, 0, 0, 0 };
     b->pins[11].gpio.pinmap = 25;
     b->pins[11].gpio.mux_total = 1;
     b->pins[11].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
@@ -332,7 +361,7 @@ mraa_intel_galileo_rev_d()
     b->pins[11].spi.mux[0].value = 0;
 
     strncpy(b->pins[12].name, "IO12", 8);
-    b->pins[12].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+    b->pins[12].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
     b->pins[12].gpio.pinmap = 38;
     b->pins[12].gpio.mux_total = 1;
     b->pins[12].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
@@ -345,7 +374,7 @@ mraa_intel_galileo_rev_d()
     b->pins[12].spi.mux[0].value = 0;
 
     strncpy(b->pins[13].name, "IO13", 8);
-    b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+    b->pins[13].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
     b->pins[13].gpio.pinmap = 39;
     b->pins[13].gpio.mux_total = 1;
     b->pins[13].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
@@ -358,7 +387,7 @@ mraa_intel_galileo_rev_d()
     b->pins[13].spi.mux[0].value = 0;
 
     strncpy(b->pins[14].name, "A0", 8);
-    b->pins[14].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[14].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[14].gpio.pinmap = 44;
     b->pins[14].gpio.mux_total = 1;
     b->pins[14].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
@@ -371,7 +400,7 @@ mraa_intel_galileo_rev_d()
     b->pins[14].aio.mux[0].value = 0;
 
     strncpy(b->pins[15].name, "A1", 8);
-    b->pins[15].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[15].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[15].gpio.pinmap = 45;
     b->pins[15].gpio.mux_total = 1;
     b->pins[15].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
@@ -384,7 +413,7 @@ mraa_intel_galileo_rev_d()
     b->pins[15].aio.mux[0].value = 0;
 
     strncpy(b->pins[16].name, "A2", 8);
-    b->pins[16].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[16].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[16].gpio.pinmap = 46;
     b->pins[16].gpio.mux_total = 1;
     b->pins[16].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
@@ -397,7 +426,7 @@ mraa_intel_galileo_rev_d()
     b->pins[16].aio.mux[0].value = 0;
 
     strncpy(b->pins[17].name, "A3", 8);
-    b->pins[17].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
+    b->pins[17].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
     b->pins[17].gpio.pinmap = 47;
     b->pins[17].gpio.mux_total = 1;
     b->pins[17].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
@@ -410,7 +439,7 @@ mraa_intel_galileo_rev_d()
     b->pins[17].aio.mux[0].value = 0;
 
     strncpy(b->pins[18].name, "A4", 8);
-    b->pins[18].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 1, 0 };
+    b->pins[18].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 1, 0 };
     b->pins[18].gpio.pinmap = 48;
     b->pins[18].gpio.mux_total = 2;
     b->pins[18].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;
@@ -434,7 +463,7 @@ mraa_intel_galileo_rev_d()
     b->pins[18].aio.mux[1].value = 0;
 
     strncpy(b->pins[19].name, "A5", 8);
-    b->pins[19].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 1, 0 };
+    b->pins[19].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 1, 0 };
     b->pins[19].gpio.pinmap = 49;
     b->pins[19].gpio.mux_total = 2;
     b->pins[19].gpio.mux[0].pincmd = PINCMD_SET_OUT_VALUE;

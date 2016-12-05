@@ -65,7 +65,7 @@
         },
         "func": {
           "type": "Function",
-          "description": "Function to be called when interupt is triggered"
+          "description": "Function to be called when interrupt is triggered"
         }
       },
       "return": {

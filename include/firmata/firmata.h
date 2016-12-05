@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <pthread.h>
+
 #include "uart.h"
 
 #define MODE_INPUT 0x00
@@ -99,6 +101,7 @@ typedef struct s_firmata {
     char firmware[140];
     uint8_t dev_count;
     struct _firmata** devs;
+    pthread_spinlock_t lock;
 } t_firmata;
 
 t_firmata* firmata_new(const char* name);

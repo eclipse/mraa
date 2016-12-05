@@ -24,11 +24,15 @@ dir which matches the npm pkg name so we create one with a symlink and add the
 ~~~~~~~~~~~~~{.sh}
 mkdir build
 cd build
-cmake -DBUILDSWIGNODE=ON  ..
+cmake -DBUILDSWIGNODE=ON -DJSONPLAT=OFF ..
 make npmpkg
 ln -s ../ mraa
 tar hczv --exclude='build*' --exclude='.gitignore' --exclude='.git' --exclude='build*/*' --exclude='.git/*' -f mraa.tar.gz mraa
 ~~~~~~~~~~~~~
+
+You need to disable jsonplatform otherwise you will need to change the
+binding.gyp file to include those sources and make sure target platform has
+json-c headers & libs.
 
 Building with node-gyp
 ----------------------

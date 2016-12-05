@@ -1,0 +1,26 @@
+{
+  "version": "0.1.0",
+  "platform":[
+    {
+      "id":301,
+	  "name":"Intel Aero",
+	  "pin_count": 0,
+	  "gpio_count": 0,
+	  "i2c_count": 1,
+	  "aio_count": 0,
+	  "spi_count": 1,
+	  "uart_count": 0,
+    }
+  ],
+  "layout":[
+    ],
+  "GPIO":[
+  ],
+  "I2C": [
+	{ "index": 0, "bus" : 2, "default":true }
+  ],
+  "SPI": [
+    { "index":0, "bus": 3, "slaveselect": 0, "default": true}
+  ],
+
+}

@@ -35,6 +35,11 @@ target_link_libraries (mraa-i2c mraa)
 target_link_libraries (spi_max7219 mraa)
 target_link_libraries (iio_driver mraa)
 
+if (ONEWIRE)
+  add_executable (uart_ow uart_ow.c)
+  target_link_libraries (uart_ow mraa)
+endif ()
+
 if (FIRMATA)
   add_executable (firmata_curie_imu firmata_curie_imu.c)
   add_executable (i2c_firmata i2c_firmata.c)

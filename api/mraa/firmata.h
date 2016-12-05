@@ -71,7 +71,7 @@ mraa_result_t mraa_firmata_write_sysex(mraa_firmata_context dev, char* msg, int 
  * calling it need to make sure they are the only thread calling this.
  *
  * @param dev The Firmata context
- * @param fptr Function pointer to function to be called when interupt is
+ * @param fptr Function pointer to function to be called when interrupt is
  * triggered, the returned buffer and length are the arguments.
  * @return Result of operation
  */

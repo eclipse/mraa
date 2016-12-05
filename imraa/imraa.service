@@ -3,7 +3,7 @@ Description=imraa
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/imraa
+ExecStart=/usr/bin/imraa -a
 
 [Install]
-WantedBy = multi-user.target
+WantedBy=multi-user.target

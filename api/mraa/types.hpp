@@ -50,6 +50,8 @@ typedef enum {
     A96BOARDS = 9,             /**< Linaro 96boards, A prefix for 'ARM' since not allowed numerical */
     INTEL_SOFIA_3GR = 10,      /**< The Intel SoFIA 3GR */
     INTEL_CHERRYHILLS = 11,    /**< The Intel Braswell Cherryhills */
+    INTEL_UP = 12,             /**< The UP Board */
+    INTEL_GT_TUCHUCK = 13,     /**< The Intel GT Board */
 
     FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 
@@ -204,7 +206,9 @@ typedef enum {
     ERROR_NO_DATA_AVAILABLE = 9,             /**< No data available */
     ERROR_INVALID_PLATFORM = 10,             /**< Platform not recognised */
     ERROR_PLATFORM_NOT_INITIALISED = 11,     /**< Board information not initialised */
-    ERROR_PLATFORM_ALREADY_INITIALISED = 0,  /**< Board is already initialised, same as SUCCESS */
+    ERROR_UART_OW_SHORTED = 12,              /**< UART OW Short Circuit Detected*/
+    ERROR_UART_OW_NO_DEVICES = 13,           /**< UART OW No devices detected */
+    ERROR_UART_OW_DATA_ERROR = 14,           /**< UART OW Data/Bus error detected */
 
     ERROR_UNSPECIFIED = 99 /**< Unknown Error */
 } Result;

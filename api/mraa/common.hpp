@@ -78,7 +78,7 @@ getVersion()
  * @return The priority value set
  */
 inline int
-setPriority(const unsigned int priority)
+setPriority(const int priority)
 {
     return mraa_set_priority(priority);
 }
@@ -195,7 +195,7 @@ getI2cBusCount()
  * @return I2C adapter number in sysfs. Function will return -1 on failure
  */
 inline int
-getI2cBusId(unsigned int i2c_bus)
+getI2cBusId(int i2c_bus)
 {
     return mraa_get_i2c_bus_id(i2c_bus);
 }
@@ -301,6 +301,44 @@ inline Result
 addSubplatform(Platform subplatformtype, std::string uart_dev)
 {
     return (Result) mraa_add_subplatform((mraa_platform_t) subplatformtype, uart_dev.c_str());
+}
+
+inline Result
+removeSubplatform(Platform subplatformtype)
+{
+    return (Result) mraa_remove_subplatform((mraa_platform_t) subplatformtype);
+}
+
+/**
+ * Create IO using a description in the format:
+ * [io]-[pin]
+ * [io]-[raw]-[pin]
+ * [io]-[raw]-[id]-[pin]
+ * [io]-[raw]-[path]
+ *
+ * @param IO description
+ *
+ * @return class T initialised using pointer to IO or NULL
+ */
+template <class T>
+inline T*
+initIo(std::string desc)
+{
+    return new T(mraa_init_io(desc.c_str()));
+}
+
+/**
+ * Instantiate an unknown board using a json file
+ *
+ * @param Path to the json file, relative to the folder the program
+ * was initially run in or a direct path
+ *
+ * @return Result indicating success
+ */
+inline Result
+initJsonPlatform(std::string path)
+{
+    return (Result) mraa_init_json_platform(path.c_str());
 }
 
 }

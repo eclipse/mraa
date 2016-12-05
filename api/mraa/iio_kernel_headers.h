@@ -106,7 +106,12 @@ enum iio_event_direction {
 };
 
 //linux/iio/events.h
+#if defined(MSYS)
+#define __USE_LINUX_IOCTL_DEFS
+#include <sys/ioctl.h>
+#else
 #include <linux/ioctl.h>
+#endif
 
 /**
  * struct iio_event_data - The actual event being pushed to userspace
