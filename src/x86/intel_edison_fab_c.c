@@ -77,8 +77,13 @@ static int mmap_fd = 0;
 static int mmap_size;
 static unsigned int mmap_count = 0;
 
-// PWM 0% duty workaround state array
-static int pwm_disabled[4] = { 0 };
+// Pin state for PWM 0% duty and enable/disable bug workaround
+typedef struct {
+    float duty_cycle;
+    int pwm_disabled;
+} mraa_edison_pwm_wa_pinstate_t;
+
+static mraa_edison_pwm_wa_pinstate_t pwm_wa_state[4] = {{.duty_cycle = 0, .pwm_disabled = 0}};
 
 mraa_result_t
 mraa_intel_edison_spi_lsbmode_replace(mraa_spi_context dev, mraa_boolean_t lsb)
@@ -375,16 +380,23 @@ mraa_result_t
 mraa_intel_edison_pwm_enable_pre(mraa_pwm_context dev, int enable) {
     // PWM 0% duty workaround: update state array
     // if someone first ran write(0) and then enable(1).
-    if ((pwm_disabled[dev->pin] == 1) && (enable == 1)) {
-        pwm_disabled[dev->pin] = 0;
+    if ((pwm_wa_state[dev->pin].pwm_disabled == 1) && (enable == 1)) {
+        pwm_wa_state[dev->pin].pwm_disabled = 0;
         return MRAA_SUCCESS;
     }
+
     if (enable == 0) {
-        // Set duty cycle to 0 before disable pwm.
+        // Set duty cycle to 0 before disabling PWM, but save it first
+        pwm_wa_state[dev->pin].duty_cycle = mraa_pwm_read(dev);
         // Edison PWM output stuck at high if disabled during ON period
         mraa_pwm_pulsewidth_us(dev, 0);
-        // Sleep 2 period to allow change take effect
+        // Sleep for 2 periods to allow the change to take effect
         usleep(dev->period / 500);
+    } else if (enable == 1) {
+        // Restore the duty before re-enabling, but not if it's 0, to avoid recursion
+        if (pwm_wa_state[dev->pin].duty_cycle != 0) {
+            mraa_pwm_write(dev, pwm_wa_state[dev->pin].duty_cycle);
+        }
     }
 
     return MRAA_SUCCESS;
@@ -395,11 +407,11 @@ mraa_intel_edison_pwm_write_pre(mraa_pwm_context dev, float percentage) {
     // PWM 0% duty workaround: set the state array and enable/disable pin accordingly
     if (percentage == 0.0f) {
         syslog(LOG_INFO, "edison_pwm_write_pre (pwm%i): requested zero duty cycle, disabling PWM on the pin", dev->pin);
-        pwm_disabled[dev->pin] = 1;
+        pwm_wa_state[dev->pin].pwm_disabled = 1;
         return mraa_pwm_enable(dev, 0);
-    } else if (pwm_disabled[dev->pin] == 1) {
+    } else if (pwm_wa_state[dev->pin].pwm_disabled == 1) {
         syslog(LOG_INFO, "edison_pwm_write_pre (pwm%i): Re-enabling the pin after setting non-zero duty", dev->pin);
-        pwm_disabled[dev->pin] = 0;
+        pwm_wa_state[dev->pin].pwm_disabled = 0;
         return mraa_pwm_enable(dev, 1);
     }
 
@@ -453,7 +465,8 @@ mraa_intel_edison_pwm_init_pre(int pin)
 mraa_result_t
 mraa_intel_edison_pwm_init_post(mraa_pwm_context pwm)
 {
-    pwm_disabled[pwm->pin] = 0;
+    pwm_wa_state[pwm->pin].pwm_disabled = 0;
+    pwm_wa_state[pwm->pin].duty_cycle = 0.0f;
     return mraa_gpio_write(tristate, 1);
 }
 
