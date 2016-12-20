@@ -190,7 +190,7 @@ mraa_firmata_i2c_wait(int addr, int reg)
         if (i > 1000) {
             return MRAA_ERROR_UNSPECIFIED;
         }
-        usleep(500);
+        usleep(50);
         if (pthread_spin_lock(&firmata_dev->lock) != 0) return MRAA_ERROR_UNSPECIFIED;
         res = firmata_dev->i2cmsg[addr][reg];
         if (pthread_spin_unlock(&firmata_dev->lock) != 0) return MRAA_ERROR_UNSPECIFIED;
