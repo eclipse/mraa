@@ -231,9 +231,16 @@ mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 static int
 mraa_firmata_i2c_read_bytes_data(mraa_i2c_context dev, uint8_t command, uint8_t* data, int length)
 {
+    uint32_t *local_storage = (uint32_t*) calloc(length, sizeof(int));
     if (mraa_firmata_send_i2c_read_reg_req(dev, command, length) == MRAA_SUCCESS) {
         if (mraa_firmata_i2c_wait(dev->addr, command) == MRAA_SUCCESS) {
-            memcpy(data, &firmata_dev->i2cmsg[dev->addr][command], sizeof(int)*length);
+            memcpy(local_storage, &firmata_dev->i2cmsg[dev->addr][command], sizeof(int)*length);
+			int x=0;
+            for(x=0; x<length; x++){
+                data[x] = (uint8_t) local_storage[x];
+            }
+            free(local_storage);
+
             return length;
         }
     }
