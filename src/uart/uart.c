@@ -626,8 +626,10 @@ mraa_uart_data_available(mraa_uart_context dev, unsigned int millis)
 
     fd_set readfds;
 
+#if !defined(PERIPHERALMAN)
     FD_ZERO(&readfds);
     FD_SET(dev->fd, &readfds);
+#endif
 
     if (select(dev->fd + 1, &readfds, NULL, NULL, &timeout) > 0) {
         return 1; // data is ready

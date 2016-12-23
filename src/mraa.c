@@ -68,12 +68,13 @@
 #elif
 #define IIO_DEVICE_WILDCARD "iio:device*"
 
-mraa_board_t* plat = NULL;
 mraa_iio_info_t* plat_iio = NULL;
 
 static int num_i2c_devices = 0;
 static int num_iio_devices = 0;
 #endif
+
+mraa_board_t* plat = NULL;
 mraa_lang_func_t* lang_func = NULL;
 
 char* platform_name = NULL;
@@ -190,7 +191,7 @@ imraa_init()
     mraa_add_from_lockfile(subplatform_lockfile);
 #endif
 
-#if !defined(PLATFORMAN)
+#if !defined(PERIPHERALMAN)
     // Look for IIO devices
     mraa_iio_detect();
 
@@ -287,7 +288,6 @@ mraa_set_priority(const int priority)
 }
 
 #if !defined(PERIPHERALMAN)
-
 static int
 mraa_count_iio_devices(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
 {
@@ -502,6 +502,12 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
     }
 
     return MRAA_SUCCESS;
+}
+#else
+mraa_result_t
+mraa_setup_mux_mapped(mraa_pin_t meta)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 #endif
 

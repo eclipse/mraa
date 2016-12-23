@@ -102,12 +102,12 @@ set (mraa_LIB_MOCK_SRCS_NOAUTO
 
 set (mraa_LIB_PERIPHERALMAN_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman.c
-  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_aio.c
-  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_gpio.c
-  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_i2c.c
-  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_pwm.c
-  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_spi.c
-  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_uart.c
+#  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_aio.c
+#  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_gpio.c
+#  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_i2c.c
+#  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_pwm.c
+#  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_spi.c
+#  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_uart.c
 )
 
 if (JSONPLAT)
@@ -143,6 +143,7 @@ endif()
 if (PERIPHERALMAN)
   add_subdirectory(peripheralman)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPERIPHERALMAN=1")
+  set (mraa_LIBS ${mraa_LIBS} -l/home/brendan/git/mraa/libperipheralman.so)
 endif()
 
 if (USBPLAT)
