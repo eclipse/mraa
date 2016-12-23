@@ -12,7 +12,9 @@ add_executable (uart uart.c)
 add_executable (mraa-gpio mraa-gpio.c)
 add_executable (mraa-i2c mraa-i2c.c)
 add_executable (spi_max7219 spi_max7219.c)
-add_executable (iio_driver iio_driver.c)
+if (NOT ANDROID_TOOLCHAIN)
+  add_executable (iio_driver iio_driver.c)
+endif ()
 
 include_directories(${PROJECT_SOURCE_DIR}/api)
 # FIXME Hack to access mraa internal types used by mraa-i2c
@@ -33,8 +35,9 @@ target_link_libraries (uart mraa)
 target_link_libraries (mraa-gpio mraa)
 target_link_libraries (mraa-i2c mraa)
 target_link_libraries (spi_max7219 mraa)
-target_link_libraries (iio_driver mraa)
-
+if (NOT ANDROID_TOOLCHAIN)
+  target_link_libraries (iio_driver mraa)
+endif ()
 if (ONEWIRE)
   add_executable (uart_ow uart_ow.c)
   target_link_libraries (uart_ow mraa)
@@ -47,7 +50,9 @@ if (FIRMATA)
   target_link_libraries (i2c_firmata mraa)
 endif ()
 
-add_subdirectory (c++)
+if (NOT ANDROID_TOOLCHAIN)
+  add_subdirectory (c++)
+endif ()
 
 install (DIRECTORY ${PROJECT_SOURCE_DIR}/examples/ DESTINATION ${CMAKE_INSTALL_DATADIR}/mraa/examples)
 
