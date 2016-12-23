@@ -33,8 +33,10 @@
 #include <sched.h>
 #include <string.h>
 #include <pwd.h>
+#if !defined(PERIPHERALMAN)
 #include <glob.h>
 #include <ftw.h>
+#endif
 #include <dirent.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -61,17 +63,20 @@
 #include "spi.h"
 #include "uart.h"
 
+#if defined(PERIPHERALMAN)
+#include "peripheralman.h"
+#elif
 #define IIO_DEVICE_WILDCARD "iio:device*"
-
 
 mraa_board_t* plat = NULL;
 mraa_iio_info_t* plat_iio = NULL;
-mraa_lang_func_t* lang_func = NULL;
-
-char* platform_name = NULL;
 
 static int num_i2c_devices = 0;
 static int num_iio_devices = 0;
+#endif
+mraa_lang_func_t* lang_func = NULL;
+
+char* platform_name = NULL;
 
 const char*
 mraa_get_version()
@@ -141,6 +146,9 @@ imraa_init()
 #elif defined(MOCKPLAT)
         // Use mock platform
         platform_type = mraa_mock_platform();
+#elif defined(PERIPHERALMAN)
+        // Use peripheralmanager
+        platform_type = mraa_peripheralman_platform();
 #else
 #error mraa_ARCH NOTHING
 #endif
@@ -182,6 +190,7 @@ imraa_init()
     mraa_add_from_lockfile(subplatform_lockfile);
 #endif
 
+#if !defined(PLATFORMAN)
     // Look for IIO devices
     mraa_iio_detect();
 
@@ -198,6 +207,7 @@ imraa_init()
             strncpy(platform_name, plat->platform_name, length);
         }
     }
+#endif
 
     lang_func = (mraa_lang_func_t*) calloc(1, sizeof(mraa_lang_func_t));
     if (lang_func == NULL) {
@@ -225,7 +235,6 @@ mraa_init()
 void
 mraa_deinit()
 {
-    int i = 0;
     if (plat != NULL) {
         if (plat->pins != NULL) {
             free(plat->pins);
@@ -242,6 +251,7 @@ mraa_deinit()
             // Free the platform name
             free(plat->platform_name);
 
+            int i = 0;
             // Free the UART device path
             for (i = 0; i < plat->uart_dev_count; i++) {
                 if (plat->uart_dev[i].device_path != NULL) {
@@ -253,9 +263,11 @@ mraa_deinit()
         free(plat);
 
     }
+#if !defined(PERIPHERALMAN)
     if (plat_iio != NULL) {
         free(plat_iio);
     }
+#endif
     closelog();
 }
 
@@ -273,6 +285,8 @@ mraa_set_priority(const int priority)
 
     return sched_setscheduler(0, SCHED_RR, &sched_s);
 }
+
+#if !defined(PERIPHERALMAN)
 
 static int
 mraa_count_iio_devices(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
@@ -489,6 +503,7 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
 
     return MRAA_SUCCESS;
 }
+#endif
 
 void
 mraa_result_print(mraa_result_t result)
@@ -791,6 +806,7 @@ mraa_get_default_i2c_bus(uint8_t platform_offset)
     }
 }
 
+#if !defined(PERIPHERALMAN)
 
 mraa_boolean_t
 mraa_file_exist(const char* filename)
@@ -1054,6 +1070,8 @@ mraa_find_i2c_bus(const char* devname, int startfrom)
     return ret;
 }
 
+#endif
+
 mraa_boolean_t
 mraa_is_sub_platform_id(int pin_or_bus)
 {
@@ -1075,7 +1093,11 @@ mraa_get_sub_platform_index(int pin_or_bus)
 int
 mraa_get_iio_device_count()
 {
+#if defined(PERIPHERALMAN)
+    return -1;
+#else
     return plat_iio->iio_device_count;
+#endif
 }
 
 mraa_result_t
