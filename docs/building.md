@@ -187,6 +187,9 @@ cmake -DRPM=ON -DCMAKE_INSTALL_PREFIX=/usr ..
 
 ## Building for Peripheralmanager Android Things
 
+Change src/CMakeLists.txt:146 to the location of libperipheralman.so on your
+machine or have it in your Android NDK
+
 ~~~~~~~~~~~~~{.sh}
-cmake -DBUILDSWIG=OFF -DBUILDARCH=PERIPHERALMAN -DCMAKE_TOOLCHAIN_FILE=/opt/android-ndk-r13b/build/cmake/android.toolchain.cmake ..
+cmake -DBUILDSWIG=OFF -DBUILDARCH=PERIPHERALMAN -DANDROID_TOOLCHAIN_NAME=x86-i686 -DCMAKE_TOOLCHAIN_FILE=/opt/android-ndk-r13b/build/cmake/android.toolchain.cmake ..
 ~~~~~~~~~~~~~
