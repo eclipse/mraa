@@ -38,7 +38,9 @@ extern "C" {
 
 extern mraa_board_t* plat;
 extern char* platform_name;
+#if !defined(PERIPHERALMAN)
 extern mraa_iio_info_t* plat_iio;
+#endif
 extern mraa_lang_func_t* lang_func;
 
 /**

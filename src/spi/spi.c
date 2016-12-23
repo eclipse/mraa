@@ -29,7 +29,10 @@
 #define __USE_LINUX_IOCTL_DEFS
 #endif
 #include <sys/ioctl.h>
-#if defined(MSYS)
+#if defined(PERIPHERALMAN)
+#include "peripheralmanager/spi_device.h"
+#include "linux/spi_kernel_headers.h"
+#elif defined(MSYS)
 // There's no spidev.h on MSYS, so we need to provide our own,
 // and only *after* including ioctl.h as that one contains prerequisites.
 #include "linux/spi_kernel_headers.h"

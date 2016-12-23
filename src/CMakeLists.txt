@@ -26,9 +26,15 @@ set (mraa_LIB_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/spi/spi.c
   ${PROJECT_SOURCE_DIR}/src/aio/aio.c
   ${PROJECT_SOURCE_DIR}/src/uart/uart.c
-  ${PROJECT_SOURCE_DIR}/src/iio/iio.c
   ${mraa_LIB_SRCS_NOAUTO}
 )
+
+if (NOT PERIPHERALMAN)
+  set (mraa_LIB_SRCS_NOAUTO
+    ${mraa_LIB_SRCS_NOAUTO}
+    ${PROJECT_SOURCE_DIR}/src/iio/iio.c
+  )
+endif ()
 
 set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/x86.c
@@ -96,6 +102,16 @@ set (mraa_LIB_MOCK_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board_uart.c
 )
 
+set (mraa_LIB_PERIPHERALMAN_SRCS_NOAUTO
+  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman.c
+  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_aio.c
+  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_gpio.c
+  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_i2c.c
+  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_pwm.c
+  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_spi.c
+  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman_uart.c
+)
+
 if (JSONPLAT)
   find_package (JSON-C QUIET)
   if (${JSON-C_FOUND})
@@ -107,7 +123,6 @@ if (JSONPLAT)
 endif ()
 
 set (mraa_LIBS ${CMAKE_THREAD_LIBS_INIT})
-
 
 if (X86PLAT)
   add_subdirectory(x86)
@@ -125,6 +140,11 @@ if (MOCKPLAT)
   if (MSYS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMSYS=1")
   endif ()
+endif()
+
+if (PERIPHERALMAN)
+  add_subdirectory(peripheralman)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPERIPHERALMAN=1")
 endif()
 
 if (USBPLAT)

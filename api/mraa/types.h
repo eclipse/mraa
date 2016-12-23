@@ -63,6 +63,7 @@ typedef enum {
     // contains bit 9 so is subplatform
     MRAA_GENERIC_FIRMATA = 1280,    /**< Firmata uart platform/bridge */
 
+    MRAA_ANDROID_PERIPHERALMANAGER = 95, /**< Android Things peripheral manager platform */
     MRAA_MOCK_PLATFORM = 96,        /**< Mock platform, which requires no real hardware */
     MRAA_JSON_PLATFORM = 97,        /**< User initialised platform from json*/
     MRAA_NULL_PLATFORM = 98,        /**< Platform with no capabilities that hosts a sub platform  */

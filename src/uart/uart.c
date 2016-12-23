@@ -314,9 +314,11 @@ mraa_uart_flush(mraa_uart_context dev)
         return dev->advance_func->uart_flush_replace(dev);
     }
 
+#if !defined(PERIPHERALMAN)
     if (tcdrain(dev->fd) == -1) {
         return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
     }
+#endif
 
     return MRAA_SUCCESS;
 }

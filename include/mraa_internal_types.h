@@ -25,10 +25,16 @@
 
 #pragma once
 
+#ifdef PERIPHERALMAN
+#include <peripheralmanager/peripheral_manager_client.h>
+#endif
+
 #include "common.h"
 #include "mraa.h"
 #include "mraa_adv_func.h"
+#if !defined(PERIPHERALMAN)
 #include "iio.h"
+#endif
 
 // Bionic does not implement pthread cancellation API
 #ifndef __BIONIC__
@@ -124,6 +130,9 @@ struct _gpio {
     int mock_state; /**< mock state of the pin */
 #endif
     /*@}*/
+#ifdef PERIPHERALMAN
+    BGpio *bgpio;
+#endif
 };
 
 /**
@@ -143,6 +152,10 @@ struct _i2c {
     uint8_t* mock_dev_data; /**< mock device data register block contents */
 #endif
     /*@}*/
+#ifdef PERIPHERALMAN
+    BI2cDevice *bi2c;
+    char bus_name[256];
+#endif
 };
 
 /**
@@ -157,6 +170,9 @@ struct _spi {
     unsigned int bpw;   /**< Bits per word */
     mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
+#ifdef PERIPHERALMAN
+    BSpiDevice *bspi;
+#endif
 };
 
 /**
@@ -195,8 +211,12 @@ struct _uart {
     int fd; /**< file descriptor for device. */
     mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
+#if defined(PERIPHERALMAN)
+    struct BUartDevice *buart;
+#endif
 };
 
+#if !defined(PERIPHERALMAN)
 /**
  * A structure representing an IIO device
  */
@@ -215,6 +235,7 @@ struct _iio {
     mraa_iio_event* events;
     int datasize;
 };
+#endif
 
 /**
  * A bitfield representing the capabilities of a pin.
@@ -377,7 +398,9 @@ typedef struct _board_t {
     /*@}*/
 } mraa_board_t;
 
+#if !defined(PERIPHERALMAN)
 typedef struct {
     struct _iio* iio_devices; /**< Pointer to IIO devices */
     uint8_t iio_device_count; /**< IIO device count */
 } mraa_iio_info_t;
+#endif
