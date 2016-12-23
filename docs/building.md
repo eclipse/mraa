@@ -184,3 +184,9 @@ build machine.
 ~~~~~~~~~~~~~{.sh}
 cmake -DRPM=ON -DCMAKE_INSTALL_PREFIX=/usr ..
 ~~~~~~~~~~~~~
+
+## Building for Peripheralmanager Android Things
+
+~~~~~~~~~~~~~{.sh}
+cmake -DBUILDSWIG=OFF -DBUILDARCH=PERIPHERALMAN -DCMAKE_TOOLCHAIN_FILE=/opt/android-ndk-r13b/build/cmake/android.toolchain.cmake ..
+~~~~~~~~~~~~~
