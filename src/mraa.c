@@ -65,7 +65,7 @@
 
 #if defined(PERIPHERALMAN)
 #include "peripheralman.h"
-#elif
+#else
 #define IIO_DEVICE_WILDCARD "iio:device*"
 
 mraa_iio_info_t* plat_iio = NULL;
