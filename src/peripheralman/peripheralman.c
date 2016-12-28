@@ -30,6 +30,155 @@
 #include "peripheralman.h"
 
 BPeripheralManagerClient *client = NULL;
+char **gpios = NULL;
+int gpios_count = 0;
+char **i2c_busses = NULL;
+int i2c_busses_count = 0;
+char **spi_busses = NULL;
+int spi_busses_count = 0;
+char **uart_devices = NULL;
+int uart_busses_count = 0;
+
+static mraa_result_t
+mraa_pman_gpio_init_internal_replace(mraa_gpio_context dev, int pin)
+{
+    int rc = BPeripheralManagerClient_openGpio(client, gpios[pin], &dev->bgpio);
+    if (rc != 0) {
+        syslog(LOG_ERR, "peripheralmanager: Failed to init gpio");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+    dev->pin = pin;
+    dev->phy_pin = pin;
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_gpio_close_replace(mraa_gpio_context dev)
+{
+    if (dev->bgpio != NULL) {
+        BGpio_delete(dev->bgpio);
+    }
+
+    free(dev);
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
+{
+    int rc;
+
+    if (dev->bgpio == NULL) {
+        syslog(LOG_ERR, "peripheralman: Invalid internal gpio handle");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    switch (dir) {
+        case MRAA_GPIO_IN:
+            rc = BGpio_setDirection(dev->bgpio, DIRECTION_IN);
+            break;
+        case MRAA_GPIO_OUT:
+        case MRAA_GPIO_OUT_HIGH:
+            rc = BGpio_setDirection(dev->bgpio, DIRECTION_OUT_INITIALLY_HIGH);
+            break;
+        case MRAA_GPIO_OUT_LOW:
+            rc = BGpio_setDirection(dev->bgpio, DIRECTION_OUT_INITIALLY_LOW);
+            break;
+    }
+    if (rc != 0) {
+        syslog(LOG_ERR, "peripheralman: Failed to switch direction");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_gpio_read_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
+{
+    syslog(LOG_WARNING, "peripheralman: mraa_gpio_read_dir() dunction not implemented on this backend");
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static mraa_result_t
+mraa_pman_gpio_write_replace(mraa_gpio_context dev, int val)
+{
+    int rc;
+
+    if (dev->bgpio == NULL) {
+        syslog(LOG_ERR, "peripheralman: Invalid internal gpio handle");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    rc = BGpio_setValue(dev->bgpio, val);
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static int
+mraa_pman_gpio_read_replace(mraa_gpio_context dev)
+{
+    int rc, val;
+
+    if (dev->bgpio == NULL) {
+        syslog(LOG_ERR, "peripheralman: Invalid internal gpio handle");
+        return -1;
+    }
+
+    rc = BGpio_getValue(dev->bgpio, &val);
+    if (rc != 0) {
+        syslog(LOG_ERR, "peripheralman: Unable to read internal gpio");
+        return -1;
+    }
+
+    return val;
+}
+
+static mraa_result_t
+mraa_pman_gpio_edge_mode_replace(mraa_gpio_context dev, mraa_gpio_edge_t mode)
+{
+    int rc;
+
+    if (dev->bgpio == NULL) {
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    switch (mode) {
+        case MRAA_GPIO_EDGE_BOTH:
+            rc = BGpio_setEdgeTriggerType(dev->bgpio, BOTH_EDGE);
+            break;
+        case MRAA_GPIO_EDGE_FALLING:
+            rc = BGpio_setEdgeTriggerType(dev->bgpio, FALLING_EDGE);
+            break;
+        case MRAA_GPIO_EDGE_RISING:
+            rc = BGpio_setEdgeTriggerType(dev->bgpio, RISING_EDGE);
+            break;
+        case MRAA_GPIO_EDGE_NONE:
+            rc = BGpio_setEdgeTriggerType(dev->bgpio, NONE_EDGE);
+            break;
+    }
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    return MRAA_SUCCESS;
+};
+
+static mraa_result_t
+mraa_pman_gpio_isr_replace(mraa_gpio_context dev, mraa_gpio_edge_t edge, void (*fptr)(void*), void* args)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static mraa_result_t
+mraa_pman_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
 
 mraa_board_t*
 mraa_peripheralman_plat_init()
@@ -48,27 +197,26 @@ mraa_peripheralman_plat_init()
         return NULL;
     }
 
-    int gpios_count, i2c_busses_count, spi_busses_count, uart_busses_count;
-    int gpios = BPeripheralManagerClient_listGpio(client, &gpios_count);
-    int i2c_busses = BPeripheralManagerClient_listI2cBuses(client, &i2c_busses_count);
-    int spi_busses = BPeripheralManagerClient_listSpiBuses(client, &spi_busses_count);
-    int uart_devices = BPeripheralManagerClient_listUartDevices(client, &uart_busses_count);
+    // error checking?
+    gpios = BPeripheralManagerClient_listGpio(client, &gpios_count);
+    i2c_busses = BPeripheralManagerClient_listI2cBuses(client, &i2c_busses_count);
+    spi_busses = BPeripheralManagerClient_listSpiBuses(client, &spi_busses_count);
+    uart_devices = BPeripheralManagerClient_listUartDevices(client, &uart_busses_count);
 
     b->platform_name = "peripheralmanager";
     // query this from peripheral manager?
     b->platform_version = "1.0";
-    b->gpio_count = 14;
+
     // disable AIO support
     b->aio_count = 0;
     b->adc_supported = 0;
 
-    // get this from PM
-    b->phy_pin_count = 20;
-    b->i2c_bus_count = 1;
+    b->gpio_count = gpios_count;
+    b->phy_pin_count = gpios_count;
+    b->i2c_bus_count = i2c_busses_count;
+    b->spi_bus_count = spi_busses_count;
+    b->uart_dev_count = uart_busses_count;
     b->def_i2c_bus = 0;
-    b->i2c_bus[0].bus_id = 0;
-    b->pwm_min_period = 2048;
-    b->pwm_max_period = 2048;
 
     b->pins = (mraa_pininfo_t*) calloc(b->phy_pin_count, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
@@ -76,74 +224,12 @@ mraa_peripheralman_plat_init()
         return NULL;
     }
 
-#if 0
-    strncpy(b->pins[0].name, "IO0", 8);
-    b->pins[0].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[0].gpio.pinmap = 0;
-    strncpy(b->pins[1].name, "IO1", 8);
-    b->pins[1].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[1].gpio.pinmap = 1;
-    strncpy(b->pins[2].name, "IO2", 8);
-    b->pins[2].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[2].gpio.pinmap = 2;
-    strncpy(b->pins[3].name, "IO3", 8);
-    b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
-    b->pins[3].gpio.pinmap = 3;
-    strncpy(b->pins[4].name, "IO4", 8);
-    b->pins[4].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[4].gpio.pinmap = 4;
-    strncpy(b->pins[5].name, "IO5", 8);
-    b->pins[5].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
-    b->pins[5].gpio.pinmap = 5;
-    strncpy(b->pins[6].name, "IO6", 8);
-    b->pins[6].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
-    b->pins[6].gpio.pinmap = 6;
-    strncpy(b->pins[7].name, "IO7", 8);
-    b->pins[7].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[7].gpio.pinmap = 7;
-    strncpy(b->pins[8].name, "IO8", 8);
-    b->pins[8].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[8].gpio.pinmap = 8;
-    strncpy(b->pins[9].name, "IO9", 8);
-    b->pins[9].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
-    b->pins[9].gpio.pinmap = 9;
-    strncpy(b->pins[10].name, "IO10", 8);
-    b->pins[10].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[10].gpio.pinmap = 10;
-    strncpy(b->pins[11].name, "IO11", 8);
-    b->pins[11].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[11].gpio.pinmap = 11;
-    strncpy(b->pins[12].name, "IO12", 8);
-    b->pins[12].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[12].gpio.pinmap = 12;
-    strncpy(b->pins[13].name, "IO13", 8);
-    b->pins[13].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[13].gpio.pinmap = 13;
-    strncpy(b->pins[10].name, "A0", 8);
-    b->pins[14].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
-    b->pins[14].gpio.pinmap = 14;
-    b->pins[14].aio.pinmap = 14;
-    strncpy(b->pins[11].name, "A1", 8);
-    b->pins[15].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
-    b->pins[15].gpio.pinmap = 15;
-    b->pins[15].aio.pinmap = 15;
-    strncpy(b->pins[12].name, "A2", 8);
-    b->pins[16].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
-    b->pins[16].gpio.pinmap = 16;
-    b->pins[16].aio.pinmap = 16;
-    strncpy(b->pins[13].name, "A3", 8);
-    b->pins[17].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
-    b->pins[17].gpio.pinmap = 17;
-    b->pins[17].aio.pinmap = 17;
-    strncpy(b->pins[13].name, "A4", 8);
-    b->pins[18].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
-    b->pins[18].gpio.pinmap = 18;
-    b->pins[18].aio.pinmap = 18;
-    strncpy(b->pins[13].name, "A5", 8);
-    b->pins[19].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 };
-    b->pins[19].gpio.pinmap = 19;
-    b->pins[19].aio.pinmap = 19;
-#endif
+    int i = 0;
+    for (; i < gpios_count; i++) {
+        b->pins[i].name = gpios[i];
+        b->pins[i].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[i].gpio.pinmap = -1;
+    }
 
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
     if (b->adv_func == NULL) {
@@ -152,38 +238,38 @@ mraa_peripheralman_plat_init()
         return NULL;
     }
 
+    b->adv_func->gpio_init_internal_replace = &mraa_pman_gpio_init_internal_replace;
+    b->adv_func->gpio_close_replace = &mraa_pman_gpio_close_replace;
+    b->adv_func->gpio_dir_replace = &mraa_pman_gpio_dir_replace;
+    b->adv_func->gpio_read_dir_replace = &mraa_pman_gpio_read_dir_replace;
+    b->adv_func->gpio_write_replace = &mraa_pman_gpio_write_replace;
+    b->adv_func->gpio_read_replace = &mraa_pman_gpio_read_replace;
+    b->adv_func->gpio_edge_mode_replace = &mraa_pman_gpio_edge_mode_replace;
+    b->adv_func->gpio_mode_replace = &mraa_pman_gpio_mode_replace;
+    b->adv_func->gpio_isr_replace = &mraa_pman_gpio_isr_replace;
+
 #if 0
-    b->adv_func->gpio_init_internal_replace = &mraa_firmata_gpio_init_internal_replace;
-    b->adv_func->gpio_mode_replace = &mraa_firmata_gpio_mode_replace;
-    b->adv_func->gpio_dir_replace = &mraa_firmata_gpio_dir_replace;
-    b->adv_func->gpio_edge_mode_replace = &mraa_firmata_gpio_edge_mode_replace;
-    b->adv_func->gpio_interrupt_handler_init_replace = &mraa_firmata_gpio_interrupt_handler_init_replace;
-    b->adv_func->gpio_wait_interrupt_replace = &mraa_firmata_gpio_wait_interrupt_replace;
-    b->adv_func->gpio_read_replace = &mraa_firmata_gpio_read_replace;
-    b->adv_func->gpio_write_replace = &mraa_firmata_gpio_write_replace;
-    b->adv_func->gpio_close_replace = &mraa_firmata_gpio_close_replace;
+    b->adv_func->aio_init_internal_replace = &mraa_pman_aio_init_internal_replace;
+    b->adv_func->aio_read_replace = &mraa_pman_aio_read;
 
-    b->adv_func->aio_init_internal_replace = &mraa_firmata_aio_init_internal_replace;
-    b->adv_func->aio_read_replace = &mraa_firmata_aio_read;
+    b->adv_func->pwm_init_internal_replace = &mraa_pman_pwm_init_internal_replace;
+    b->adv_func->pwm_write_replace = &mraa_pman_pwm_write_replace;
+    b->adv_func->pwm_read_replace = &mraa_pman_pwm_read_replace;
+    b->adv_func->pwm_enable_replace = &mraa_pman_pwm_enable_replace;
 
-    b->adv_func->pwm_init_internal_replace = &mraa_firmata_pwm_init_internal_replace;
-    b->adv_func->pwm_write_replace = &mraa_firmata_pwm_write_replace;
-    b->adv_func->pwm_read_replace = &mraa_firmata_pwm_read_replace;
-    b->adv_func->pwm_enable_replace = &mraa_firmata_pwm_enable_replace;
-
-    b->adv_func->i2c_init_bus_replace = &mraa_firmata_i2c_init_bus_replace;
-    b->adv_func->i2c_set_frequency_replace = &mraa_firmata_i2c_frequency;
-    b->adv_func->i2c_address_replace = &mraa_firmata_i2c_address;
-    b->adv_func->i2c_read_replace = &mraa_firmata_i2c_read;
-    b->adv_func->i2c_read_byte_replace = &mraa_firmata_i2c_read_byte;
-    b->adv_func->i2c_read_byte_data_replace = &mraa_firmata_i2c_read_byte_data;
-    b->adv_func->i2c_read_word_data_replace = &mraa_firmata_i2c_read_word_data;
-    b->adv_func->i2c_read_bytes_data_replace = &mraa_firmata_i2c_read_bytes_data;
-    b->adv_func->i2c_write_replace = &mraa_firmata_i2c_write;
-    b->adv_func->i2c_write_byte_replace = &mraa_firmata_i2c_write_byte;
-    b->adv_func->i2c_write_byte_data_replace = &mraa_firmata_i2c_write_byte_data;
-    b->adv_func->i2c_write_word_data_replace = &mraa_firmata_i2c_write_word_data;
-    b->adv_func->i2c_stop_replace = &mraa_firmata_i2c_stop;
+    b->adv_func->i2c_init_bus_replace = &mraa_pman_i2c_init_bus_replace;
+    b->adv_func->i2c_set_frequency_replace = &mraa_pman_i2c_frequency;
+    b->adv_func->i2c_address_replace = &mraa_pman_i2c_address;
+    b->adv_func->i2c_read_replace = &mraa_pman_i2c_read;
+    b->adv_func->i2c_read_byte_replace = &mraa_pman_i2c_read_byte;
+    b->adv_func->i2c_read_byte_data_replace = &mraa_pman_i2c_read_byte_data;
+    b->adv_func->i2c_read_word_data_replace = &mraa_pman_i2c_read_word_data;
+    b->adv_func->i2c_read_bytes_data_replace = &mraa_pman_i2c_read_bytes_data;
+    b->adv_func->i2c_write_replace = &mraa_pman_i2c_write;
+    b->adv_func->i2c_write_byte_replace = &mraa_pman_i2c_write_byte;
+    b->adv_func->i2c_write_byte_data_replace = &mraa_pman_i2c_write_byte_data;
+    b->adv_func->i2c_write_word_data_replace = &mraa_pman_i2c_write_word_data;
+    b->adv_func->i2c_stop_replace = &mraa_pman_i2c_stop;
 #endif
     return b;
 }
@@ -194,4 +280,33 @@ mraa_peripheralman_platform()
     plat = mraa_peripheralman_plat_init();
 
     return MRAA_ANDROID_PERIPHERALMANAGER;
+}
+
+static void
+free_resources(char ***resources, int count)
+{
+    int i;
+
+    if (*resources != NULL) {
+        for(i = 0; i < count; i++) {
+            free((*resources)[i]);
+        }
+        free(*resources);
+    }
+
+    *resources = NULL;
+}
+
+void
+pman_mraa_deinit()
+{
+    free_resources(&uart_devices, uart_busses_count);
+    free_resources(&spi_busses, spi_busses_count);
+    free_resources(&i2c_busses, i2c_busses_count);
+    free_resources(&gpios, gpios_count);
+
+    if (client != NULL) {
+        BPeripheralManagerClient_delete(client);
+        client = NULL;
+    }
 }
