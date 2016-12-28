@@ -268,6 +268,8 @@ mraa_deinit()
     if (plat_iio != NULL) {
         free(plat_iio);
     }
+#else
+    pman_mraa_deinit();
 #endif
     closelog();
 }

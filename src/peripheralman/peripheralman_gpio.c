@@ -1,5 +1,6 @@
 /*
  * Author: Constantin Musca <constantin.musca@intel.com>
+ *         Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -36,39 +37,22 @@ extern BPeripheralManagerClient *client;
 extern char **gpios;
 extern int gpios_count;
 
-mraa_gpio_context
-mraa_gpio_init_raw(int pin)
+static mraa_result_t
+mraa_pman_gpio_init_internal_replace(mraa_gpio_context dev, int pin)
 {
-    return NULL;
-}
-
-mraa_gpio_context
-mraa_gpio_init(int pin)
-{
-    mraa_gpio_context dev;
-    int rc;
-
-    if (pin > gpios_count) {
-        // invalid pin number specified
-        return NULL;
-    }
-
-    if ((dev = (mraa_gpio_context)calloc(sizeof(struct _gpio), 1)) == NULL) {
-        return NULL;
-    }
-
     rc = BPeripheralManagerClient_openGpio(client, gpios[pin], &dev->bgpio);
     if (rc != 0) {
-        free(dev);
-        return NULL;
+        syslog(LOG_ERROR, "peripheralmanager: Failed to init gpio");
+        return MRAA_ERROR_INVALID_HANDLE;
     }
     dev->pin = pin;
+    dev->phy_pin = pin;
 
     return dev;
 }
 
-mraa_result_t
-mraa_gpio_close(mraa_gpio_context dev)
+static mraa_result_t
+mraa_pman_gpio_close_replace(mraa_gpio_context dev)
 {
     if (dev->bgpio != NULL) {
         BGpio_delete(dev->bgpio);
@@ -78,12 +62,13 @@ mraa_gpio_close(mraa_gpio_context dev)
     return MRAA_SUCCESS;
 }
 
-mraa_result_t
-mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
+static mraa_result_t
+mraa_pman_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
     int rc;
 
     if (dev->bgpio == NULL) {
+        syslog(LOG_ERROR, "peripheralman: Invalid internal gpio handle");
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
@@ -100,25 +85,27 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
             break;
     }
     if (rc != 0) {
+        syslog(LOG_ERROR, "peripheralman: Failed to switch direction");
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
     return MRAA_SUCCESS;
 }
 
-mraa_result_t
-mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
+static mraa_result_t
+mraa_pman_gpio_read_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
 {
-    syslog(LOG_WARNING, "gpio mraa: function not implemented in PMRAA\n");
+    syslog(LOG_WARNING, "peripheralman: mraa_gpio_read_dir() dunction not implemented on this backend");
     return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-mraa_result_t
-mraa_gpio_write(mraa_gpio_context dev, int val)
+static mraa_result_t
+mraa_pman_gpio_write_replace(mraa_gpio_context dev, int val)
 {
     int rc;
 
     if (dev->bgpio == NULL) {
+        syslog(LOG_ERROR, "peripheralman: Invalid internal gpio handle");
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
@@ -130,25 +117,27 @@ mraa_gpio_write(mraa_gpio_context dev, int val)
     return MRAA_SUCCESS;
 }
 
-int
-mraa_gpio_read(mraa_gpio_context dev)
+static int
+mraa_pman_gpio_read_replace(mraa_gpio_context dev)
 {
     int rc, val;
 
     if (dev->bgpio == NULL) {
+        syslog(LOG_ERROR, "peripheralman: Invalid internal gpio handle");
         return -1;
     }
 
     rc = BGpio_getValue(dev->bgpio, &val);
     if (rc != 0) {
+        syslog(LOG_ERROR, "peripheralman: Unable to read internal gpio")
         return -1;
     }
 
     return val;
 }
 
-mraa_result_t
-mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode)
+static mraa_result_t
+mraa_pman_gpio_edge_mode_replace(mraa_gpio_context dev, mraa_gpio_edge_t mode)
 {
     int rc;
 
@@ -177,46 +166,15 @@ mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode)
     return MRAA_SUCCESS;
 };
 
-mraa_result_t
-mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t edge, void (*fptr)(void*), void* args)
+static mraa_result_t
+mraa_pman_gpio_isr_replace(mraa_gpio_context dev, mraa_gpio_edge_t edge, void (*fptr)(void*), void* args)
 {
     return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-mraa_result_t
-mraa_gpio_isr_exit(mraa_gpio_context dev)
+static mraa_result_t
+mraa_pman_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode)
 {
     return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
-mraa_result_t
-mraa_gpio_owner(mraa_gpio_context dev, mraa_boolean_t own)
-{
-    syslog(LOG_WARNING, "gpio mraa: function not implemented in PMRAA");
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
-}
-
-mraa_result_t
-mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
-{
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
-}
-
-mraa_result_t
-mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap_en)
-{
-    syslog(LOG_WARNING, "gpio mraa: function not implemented in PMRAA");
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
-}
-
-int
-mraa_gpio_get_pin(mraa_gpio_context dev)
-{
-    return dev->pin;
-}
-int
-mraa_gpio_get_pin_raw(mraa_gpio_context dev)
-{
-    syslog(LOG_WARNING, "mraa: function not implemented in PMRAA");
-    return -1;
-}

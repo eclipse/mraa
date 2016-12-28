@@ -30,8 +30,9 @@ extern "C" {
 
 #include "mraa_internal.h"
 
-mraa_platform_t
-mraa_peripheralman_platform();
+mraa_platform_t mraa_peripheralman_platform();
+
+void pman_mraa_deinit();
 
 #ifdef __cplusplus
 }
