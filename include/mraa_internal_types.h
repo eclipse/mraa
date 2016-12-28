@@ -314,7 +314,11 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
+#if defined(PERIPHERALMAN)
+    char *name; /**< Peripheral manager's pin name */
+#else
     char name[MRAA_PIN_NAME_SIZE]; /**< Pin's real world name */
+#endif
     mraa_pincapabilities_t capabilities; /**< Pin Capabiliites */
     mraa_pin_t gpio; /**< GPIO structure */
     mraa_pin_t pwm;  /**< PWM structure */
