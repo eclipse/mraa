@@ -40,6 +40,105 @@ char **uart_devices = NULL;
 int uart_busses_count = 0;
 
 static mraa_result_t
+mraa_pman_uart_init_raw_replace(mraa_uart_context dev, const char* path)
+{
+    if (BPeripheralManagerClient_openUartDevice(client, path, &dev->buart) != 0) {
+        BUartDevice_delete(dev->buart);
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_uart_set_baudrate_replace(mraa_uart_context dev, unsigned int baud)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: stop: context is NULL");
+        return 0;
+    }
+
+    if (BUartDevice_setBaudrate(dev->buart, baud) != 0) {
+        return 0;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_uart_flush_replace(mraa_uart_context dev)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static int
+mraa_pman_uart_read_replace(mraa_uart_context dev, char* buf, size_t len)
+{
+    int rc;
+    uint32_t bytes_read;
+
+    if (dev->buart == NULL) {
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    rc = BUartDevice_read(dev->buart, buf, len, &bytes_read);
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return bytes_read;
+}
+
+static int
+mraa_pman_uart_write_replace(mraa_uart_context dev, const char* buf, size_t len)
+{
+    int rc;
+    uint32_t bytes_written;
+
+    if (dev->buart == NULL) {
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    rc = BUartDevice_write(dev->buart, buf, len, &bytes_written);
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return bytes_written;
+}
+
+static mraa_result_t
+mraa_pman_uart_set_mode_replace(mraa_uart_context dev, int bytesize, mraa_uart_parity_t parity, int stopbits)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static mraa_result_t
+mraa_pman_uart_set_flowcontrol_replace(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_boolean_t rtscts)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static mraa_result_t
+mraa_pman_uart_set_non_blocking_replace(mraa_uart_context dev, mraa_boolean_t nonblock)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static mraa_result_t
+mraa_pman_uart_set_timeout_replace(mraa_uart_context dev, int read, int write, int interchar)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
+static mraa_boolean_t
+mraa_pman_uart_data_available_replace(mraa_uart_context dev, unsigned int millis)
+{
+    // FIXME! We probably should say yes sometimes ;-)
+    return 0;
+}
+
+static mraa_result_t
 mraa_pman_spi_init_raw_replace(mraa_spi_context dev, unsigned int bus, unsigned int cs)
 {
     int rc;
@@ -650,7 +749,6 @@ mraa_peripheralman_plat_init()
     b->adv_func->spi_transfer_buf_replace = &mraa_pman_spi_transfer_buf_replace;
     b->adv_func->spi_transfer_buf_word_replace = &mraa_pman_spi_transfer_buf_word_replace;
 
-#if 0
     b->adv_func->uart_init_raw_replace = &mraa_pman_uart_init_raw_replace;
     b->adv_func->uart_set_baudrate_replace = &mraa_pman_uart_set_baudrate_replace;
     b->adv_func->uart_flush_replace = &mraa_pman_uart_flush_replace;
@@ -661,7 +759,6 @@ mraa_peripheralman_plat_init()
     b->adv_func->uart_data_available_replace = &mraa_pman_uart_data_available_replace;
     b->adv_func->uart_write_replace = &mraa_pman_uart_write_replace;
     b->adv_func->uart_read_replace = &mraa_pman_uart_read_replace;
-#endif
 
     return b;
 }
