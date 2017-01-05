@@ -40,6 +40,381 @@ char **uart_devices = NULL;
 int uart_busses_count = 0;
 
 static mraa_result_t
+mraa_pman_spi_init_raw_replace(mraa_spi_context dev, unsigned int bus, unsigned int cs)
+{
+    int rc;
+    rc = BPeripheralManagerClient_openSpiDevice(client, spi_busses[bus], &dev->bspi);
+    if (rc != 0) {
+        free(dev);
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_spi_mode_replace(mraa_spi_context dev, mraa_spi_mode_t mode)
+{
+    int rc;
+
+    if (dev->bspi == NULL) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    switch (mode) {
+        case MRAA_SPI_MODE0:
+            rc = BSpiDevice_setMode(dev->bspi, SPI_MODE0);
+            break;
+        case MRAA_SPI_MODE1:
+            rc = BSpiDevice_setMode(dev->bspi, SPI_MODE1);
+            break;
+        case MRAA_SPI_MODE2:
+            rc = BSpiDevice_setMode(dev->bspi, SPI_MODE2);
+            break;
+        case MRAA_SPI_MODE3:
+            rc = BSpiDevice_setMode(dev->bspi, SPI_MODE3);
+            break;
+        default:
+            rc = BSpiDevice_setMode(dev->bspi, SPI_MODE0);
+            break;
+    }
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    dev->mode = mode;
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_spi_frequency_replace(mraa_spi_context dev, int hz)
+{
+    int rc;
+
+    if (dev->bspi == NULL) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    rc = BSpiDevice_setFrequency(dev->bspi, hz);
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    dev->clock = hz;
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_spi_lsbmode_replace(mraa_spi_context dev, mraa_boolean_t lsb)
+{
+    int rc;
+
+    if (dev->bspi == NULL) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    if (lsb) {
+        rc = BSpiDevice_setBitJustification(dev->bspi, SPI_LSB_FIRST);
+    } else {
+        rc = BSpiDevice_setBitJustification(dev->bspi, SPI_MSB_FIRST);
+    }
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    dev->lsb = lsb;
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_spi_bit_per_word_replace(mraa_spi_context dev, unsigned int bits)
+{
+    if (dev->bspi == NULL) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    if (BSpiDevice_setBitsPerWord(dev->bspi, bits) != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static int
+mraa_pman_spi_write_replace(mraa_spi_context dev, uint8_t data)
+{
+    int rc;
+    uint8_t recv = 0;
+
+    if (dev->bspi == NULL) {
+        return -1;
+    }
+
+    rc = BSpiDevice_transfer(dev->bspi, &data, &recv, 1);
+    if (rc != 0) {
+        return -1;
+    }
+
+    return (int) recv;
+}
+
+static int
+mraa_pman_spi_write_word_replace(mraa_spi_context dev, uint16_t data)
+{
+    int rc;
+    uint16_t recv = 0;
+
+    if (dev->bspi == NULL) {
+        return -1;
+    }
+
+    rc = BSpiDevice_transfer(dev->bspi, &data, &recv, 2);
+    if (rc != 0) {
+        return -1;
+    }
+
+    return (int) recv;
+}
+
+static mraa_result_t
+mraa_pman_spi_transfer_buf_replace(mraa_spi_context dev, uint8_t* data, uint8_t* rxbuf, int length)
+{
+    int rc;
+
+    if (dev->bspi == NULL) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    rc = BSpiDevice_transfer(dev->bspi, data, rxbuf, length);
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_spi_transfer_buf_word_replace(mraa_spi_context dev, uint16_t* data, uint16_t* rxbuf, int length)
+{
+    int rc;
+
+    if (dev->bspi == NULL) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    // IS IT CORRECT ?
+    rc = BSpiDevice_transfer(dev->bspi, data, rxbuf, length * 2);
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_spi_stop_replace(mraa_spi_context dev)
+{
+    if (dev->bspi != NULL) {
+        BSpiDevice_delete(dev->bspi);
+        dev->bspi = NULL;
+    }
+
+    free(dev);
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_i2c_init_bus_replace(mraa_i2c_context dev)
+{
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_i2c_stop_replace(mraa_i2c_context dev)
+{
+    if (dev->bi2c != NULL) {
+        BI2cDevice_delete(dev->bi2c);
+        dev->bi2c = NULL;
+    }
+
+    free(dev);
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_i2c_set_frequency_replace(mraa_i2c_context dev, mraa_i2c_mode_t mode)
+{
+    return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+}
+
+static mraa_result_t
+mraa_pman_i2c_address_replace(mraa_i2c_context dev, uint8_t addr)
+{
+    int rc;
+
+    if (dev == NULL || dev->busnum > (int)i2c_busses_count) {
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    dev->addr = (int) addr;
+
+    if (strlen(dev->bus_name) > 0) {
+        rc = BPeripheralManagerClient_openI2cDevice(client,
+            dev->bus_name, addr, &dev->bi2c);
+    } else {
+        rc = BPeripheralManagerClient_openI2cDevice(client,
+            i2c_busses[dev->busnum], addr, &dev->bi2c);
+    }
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static int
+mraa_pman_i2c_read_replace(mraa_i2c_context dev, uint8_t* data, int length)
+{
+    int rc;
+
+    if (dev->bi2c == NULL) {
+        return 0;
+    }
+
+    rc = BI2cDevice_read(dev->bi2c, data, length);
+
+    return rc;
+}
+
+static int
+mraa_pman_i2c_read_byte_replace(mraa_i2c_context dev)
+{
+    int rc;
+    uint8_t val;
+
+    if (dev->bi2c == NULL) {
+        return 0;
+    }
+
+    rc = BI2cDevice_read(dev->bi2c, &val, 1);
+    if (rc != 0 ) {
+        return rc;
+    }
+
+    return val;
+}
+
+static int
+mraa_pman_i2c_read_byte_data_replace(mraa_i2c_context dev, uint8_t command)
+{
+    int rc;
+    uint8_t val;
+
+    if (dev->bi2c == NULL) {
+        return 0;
+    }
+
+    rc = BI2cDevice_readRegByte(dev->bi2c, command, &val);
+    if (rc != 0) {
+        return 0;
+    }
+
+    return val;
+}
+
+static int
+mraa_pman_i2c_read_bytes_data_replace(mraa_i2c_context dev, uint8_t command, uint8_t* data, int length)
+{
+    int rc;
+
+    if (dev->bi2c == NULL) {
+        return -1;
+    }
+
+    rc = BI2cDevice_readRegBuffer(dev->bi2c, command, data, length);
+
+    return rc;
+}
+
+static int
+mraa_pman_i2c_read_word_data_replace(mraa_i2c_context dev, uint8_t command)
+{
+    int rc;
+    uint16_t val;
+
+    if (dev->bi2c == NULL) {
+        return 0;
+    }
+
+    rc = BI2cDevice_readRegWord(dev->bi2c, command, &val);
+    if (rc != 0) {
+        return 0;
+    }
+
+    return val;
+}
+
+static mraa_result_t
+mraa_pman_i2c_write_replace(mraa_i2c_context dev, const uint8_t* data, int length)
+{
+    int rc;
+
+    if (dev->bi2c == NULL) {
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    rc = BI2cDevice_write(dev->bi2c, data, length);
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_i2c_write_byte_replace(mraa_i2c_context dev, const uint8_t data)
+{
+    return mraa_i2c_write(dev, &data, 1);
+}
+
+static mraa_result_t
+mraa_pman_i2c_write_byte_data_replace(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
+{
+    int rc;
+
+    if (dev->bi2c == NULL) {
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    rc = BI2cDevice_writeRegByte(dev->bi2c, command, data);
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_i2c_write_word_data_replace(mraa_i2c_context dev, const uint16_t data, const uint8_t command)
+{
+    int rc;
+
+    if (dev->bi2c == NULL) {
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    rc = BI2cDevice_writeRegWord(dev->bi2c, command, data);
+    if (rc != 0) {
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
 mraa_pman_gpio_init_internal_replace(mraa_gpio_context dev, int pin)
 {
     int rc = BPeripheralManagerClient_openGpio(client, gpios[pin], &dev->bgpio);
@@ -217,6 +592,8 @@ mraa_peripheralman_plat_init()
     b->spi_bus_count = spi_busses_count;
     b->uart_dev_count = uart_busses_count;
     b->def_i2c_bus = 0;
+    b->def_spi_bus = 0;
+    b->def_uart_dev = 0;
 
     b->pins = (mraa_pininfo_t*) calloc(b->phy_pin_count, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
@@ -248,29 +625,44 @@ mraa_peripheralman_plat_init()
     b->adv_func->gpio_mode_replace = &mraa_pman_gpio_mode_replace;
     b->adv_func->gpio_isr_replace = &mraa_pman_gpio_isr_replace;
 
-#if 0
-    b->adv_func->aio_init_internal_replace = &mraa_pman_aio_init_internal_replace;
-    b->adv_func->aio_read_replace = &mraa_pman_aio_read;
-
-    b->adv_func->pwm_init_internal_replace = &mraa_pman_pwm_init_internal_replace;
-    b->adv_func->pwm_write_replace = &mraa_pman_pwm_write_replace;
-    b->adv_func->pwm_read_replace = &mraa_pman_pwm_read_replace;
-    b->adv_func->pwm_enable_replace = &mraa_pman_pwm_enable_replace;
-
     b->adv_func->i2c_init_bus_replace = &mraa_pman_i2c_init_bus_replace;
-    b->adv_func->i2c_set_frequency_replace = &mraa_pman_i2c_frequency;
-    b->adv_func->i2c_address_replace = &mraa_pman_i2c_address;
-    b->adv_func->i2c_read_replace = &mraa_pman_i2c_read;
-    b->adv_func->i2c_read_byte_replace = &mraa_pman_i2c_read_byte;
-    b->adv_func->i2c_read_byte_data_replace = &mraa_pman_i2c_read_byte_data;
-    b->adv_func->i2c_read_word_data_replace = &mraa_pman_i2c_read_word_data;
-    b->adv_func->i2c_read_bytes_data_replace = &mraa_pman_i2c_read_bytes_data;
-    b->adv_func->i2c_write_replace = &mraa_pman_i2c_write;
-    b->adv_func->i2c_write_byte_replace = &mraa_pman_i2c_write_byte;
-    b->adv_func->i2c_write_byte_data_replace = &mraa_pman_i2c_write_byte_data;
-    b->adv_func->i2c_write_word_data_replace = &mraa_pman_i2c_write_word_data;
-    b->adv_func->i2c_stop_replace = &mraa_pman_i2c_stop;
+    b->adv_func->i2c_set_frequency_replace = &mraa_pman_i2c_set_frequency_replace;
+    b->adv_func->i2c_address_replace = &mraa_pman_i2c_address_replace;
+    b->adv_func->i2c_read_replace = &mraa_pman_i2c_read_replace;
+    b->adv_func->i2c_read_byte_replace = &mraa_pman_i2c_read_byte_replace;
+    b->adv_func->i2c_read_byte_data_replace = &mraa_pman_i2c_read_byte_data_replace;
+    b->adv_func->i2c_read_word_data_replace = &mraa_pman_i2c_read_word_data_replace;
+    b->adv_func->i2c_read_bytes_data_replace = &mraa_pman_i2c_read_bytes_data_replace;
+    b->adv_func->i2c_write_replace = &mraa_pman_i2c_write_replace;
+    b->adv_func->i2c_write_byte_replace = &mraa_pman_i2c_write_byte_replace;
+    b->adv_func->i2c_write_byte_data_replace = &mraa_pman_i2c_write_byte_data_replace;
+    b->adv_func->i2c_write_word_data_replace = &mraa_pman_i2c_write_word_data_replace;
+    b->adv_func->i2c_stop_replace = &mraa_pman_i2c_stop_replace;
+
+    b->adv_func->spi_init_raw_replace = &mraa_pman_spi_init_raw_replace;
+    b->adv_func->spi_stop_replace = &mraa_pman_spi_stop_replace;
+    b->adv_func->spi_bit_per_word_replace = &mraa_pman_spi_bit_per_word_replace;
+    b->adv_func->spi_lsbmode_replace = &mraa_pman_spi_lsbmode_replace;
+    b->adv_func->spi_mode_replace = &mraa_pman_spi_mode_replace;
+    b->adv_func->spi_frequency_replace = &mraa_pman_spi_frequency_replace;
+    b->adv_func->spi_write_replace = &mraa_pman_spi_write_replace;
+    b->adv_func->spi_write_word_replace = &mraa_pman_spi_write_word_replace;
+    b->adv_func->spi_transfer_buf_replace = &mraa_pman_spi_transfer_buf_replace;
+    b->adv_func->spi_transfer_buf_word_replace = &mraa_pman_spi_transfer_buf_word_replace;
+
+#if 0
+    b->adv_func->uart_init_raw_replace = &mraa_pman_uart_init_raw_replace;
+    b->adv_func->uart_set_baudrate_replace = &mraa_pman_uart_set_baudrate_replace;
+    b->adv_func->uart_flush_replace = &mraa_pman_uart_flush_replace;
+    b->adv_func->uart_set_flowcontrol_replace = &mraa_pman_uart_set_flowcontrol_replace;
+    b->adv_func->uart_set_mode_replace = &mraa_pman_uart_set_mode_replace;
+    b->adv_func->uart_set_non_blocking_replace = &mraa_pman_uart_set_non_blocking_replace;
+    b->adv_func->uart_set_timeout_replace = &mraa_pman_uart_set_timeout_replace;
+    b->adv_func->uart_data_available_replace = &mraa_pman_uart_data_available_replace;
+    b->adv_func->uart_write_replace = &mraa_pman_uart_write_replace;
+    b->adv_func->uart_read_replace = &mraa_pman_uart_read_replace;
 #endif
+
     return b;
 }
 
