@@ -256,6 +256,10 @@ mraa_raspberry_pi()
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI2_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI2_B_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI2_B_REV_1_PINCOUNT;
+                } else if (strstr(line, "a21041")) {
+                    b->platform_name = PLATFORM_NAME_RASPBERRY_PI2_B_REV_1;
+                    platform_detected = PLATFORM_RASPBERRY_PI2_B_REV_1;
+                    b->phy_pin_count = MRAA_RASPBERRY_PI2_B_REV_1_PINCOUNT;
                 } else {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
