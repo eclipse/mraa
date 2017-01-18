@@ -151,9 +151,9 @@ mraa_gt_tuchuck_board()
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
     pos++;
 
-    strncpy(b->pins[pos].name, "GPIO", 8);
+    strncpy(b->pins[pos].name, "GPIO22", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[pos].gpio.pinmap = 446;
+    b->pins[pos].gpio.pinmap = 451;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
@@ -288,6 +288,7 @@ mraa_gt_tuchuck_board()
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
+    // pin 21
     strncpy(b->pins[pos].name, "I2C2SCL", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[pos].gpio.pinmap = 334;
@@ -305,11 +306,10 @@ mraa_gt_tuchuck_board()
     b->pins[pos].uart.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2S4SDO", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-    // doesn't work so disable
-    //b->pins[pos].gpio.pinmap = 396;
-    //b->pins[pos].gpio.mux_total = 0;
+    strncpy(b->pins[pos].name, "ISH_IO6", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[pos].gpio.pinmap = 343;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "UART1RX", 8);
@@ -321,11 +321,10 @@ mraa_gt_tuchuck_board()
     b->pins[pos].uart.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2S4SDI", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-    // doesnt work
-    //b->pins[pos].gpio.pinmap = 395;
-    //b->pins[pos].gpio.mux_total = 0;
+    strncpy(b->pins[pos].name, "ISH_IO5", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[pos].gpio.pinmap = 342;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "PWM0", 8);
@@ -337,10 +336,9 @@ mraa_gt_tuchuck_board()
     b->pins[pos].pwm.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2S4BLK", 8);
+    strncpy(b->pins[pos].name, "ISH_IO4", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    // this pin has a voltage of 0.34V in 'low' mode - beware!
-    b->pins[pos].gpio.pinmap = 397;
+    b->pins[pos].gpio.pinmap = 341;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
@@ -353,11 +351,11 @@ mraa_gt_tuchuck_board()
     b->pins[pos].pwm.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2S4WS", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-    // not working
-    //b->pins[pos].gpio.pinmap = 398;
-    //b->pins[pos].gpio.mux_total = 0;
+    strncpy(b->pins[pos].name, "ISH_IO3", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    // High level will be V1P8 - VBE on MBT3904D
+    b->pins[pos].gpio.pinmap = 340;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "PWM2", 8);
@@ -369,10 +367,12 @@ mraa_gt_tuchuck_board()
     b->pins[pos].pwm.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2S3SDO", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-    //b->pins[pos].gpio.pinmap = 400;
-    //b->pins[pos].gpio.mux_total = 0;
+    // pin 31
+    strncpy(b->pins[pos].name, "ISH_IO2", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    // High level will be V1P8 - VBE on MBT3904D
+    b->pins[pos].gpio.pinmap = 339;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "PWM3", 8);
@@ -384,19 +384,21 @@ mraa_gt_tuchuck_board()
     b->pins[pos].pwm.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2S3SDI", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-    //b->pins[pos].gpio.pinmap = 399;
-    //b->pins[pos].gpio.mux_total = 0;
+    strncpy(b->pins[pos].name, "ISH_IO1", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    // High level will be V1P8 - VBE on MBT3904D
+    b->pins[pos].gpio.pinmap = 338;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "1.8V", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     pos++;
 
-    strncpy(b->pins[pos].name, "I2S4BLK", 8);
+    strncpy(b->pins[pos].name, "ISH_IO0", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[pos].gpio.pinmap = 393;
+    // High level will be V1P8 - VBE on MBT3904D
+    b->pins[pos].gpio.pinmap = 337;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
