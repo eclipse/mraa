@@ -59,7 +59,7 @@ main(int argc, char** argv)
     while (!id.empty()) {
         // hack so we don't need to cast each element of the romcode
         // for printf purposes
-        uint8_t* ptr = (uint8_t*) id.c_str();
+        uint8_t* ptr = (uint8_t*) id.data();
 
         // The first byte (0) is the device type (family) code.
         // The last byte (7) is the rom code CRC value.  The
