@@ -233,7 +233,7 @@ class UartOW
     mraa::Result
     command(uint8_t command, std::string id)
     {
-        if (id.empty() == 0)
+        if (id.empty())
             return (mraa::Result) mraa_uart_ow_command(m_uart, command, NULL);
         else {
             if (id.size() != 8) {
@@ -241,7 +241,7 @@ class UartOW
                 throw std::invalid_argument(std::string(__FUNCTION__) +
                                             ": id must be 8 bytes only");
             }
-            return (mraa::Result) mraa_uart_ow_command(m_uart, command, (uint8_t*) id.c_str());
+            return (mraa::Result) mraa_uart_ow_command(m_uart, command, (uint8_t*) id.data());
         }
     }
 
@@ -268,7 +268,7 @@ class UartOW
     uint8_t
     crc8(std::string buffer)
     {
-        return mraa_uart_ow_crc8((uint8_t*) buffer.c_str(), buffer.size());
+        return mraa_uart_ow_crc8((uint8_t*) buffer.data(), buffer.size());
     }
 
   private:
