@@ -29,6 +29,7 @@
 #include "arm/96boards.h"
 #include "arm/banana.h"
 #include "arm/beaglebone.h"
+#include "arm/phyboard.h"
 #include "arm/raspberry_pi.h"
 #include "mraa_internal.h"
 
@@ -49,7 +50,11 @@ mraa_arm_platform()
                 } else if (strstr(line, "BCM2709")) {
                     platform_type = MRAA_RASPBERRY_PI;
                 } else if (strstr(line, "Generic AM33XX")) {
-                    platform_type = MRAA_BEAGLEBONE;
+                    if(mraa_file_contains("/sys/firmware/devicetree/base/model", "phyBOARD-WEGA")) {
+                        platform_type = MRAA_PHYBOARD_WEGA;
+                    } else {
+                        platform_type = MRAA_BEAGLEBONE;
+                    }
                 } else if (strstr(line, "HiKey Development Board")) {
                     platform_type = MRAA_96BOARDS;
                 } else if (strstr(line, "s900")) {
@@ -90,6 +95,9 @@ mraa_arm_platform()
             break;
         case MRAA_BEAGLEBONE:
             plat = mraa_beaglebone();
+            break;
+        case MRAA_PHYBOARD_WEGA:
+            plat = mraa_phyboard();
             break;
         case MRAA_BANANA:
             plat = mraa_banana();

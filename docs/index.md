@@ -45,6 +45,7 @@ Specific platform information for supported platforms is documented here:
 - @ref rasppi
 - @ref bananapi
 - @ref beaglebone
+- @ref phyboard-wega
 - @ref nuc5
 - @ref up
 - @ref grossetete
