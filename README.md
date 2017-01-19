@@ -36,6 +36,7 @@ ARM
 * [Raspberry Pi](../master/docs/raspberry_pi.md)
 * [Banana Pi](../master/docs/banana_pi.md)
 * [Beaglebone Black](../master/docs/beaglebone.md)
+* [phyBOARD-Wega](../master/docs/phyboard-wega.md)
 
 USB
 ---
