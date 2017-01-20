@@ -306,7 +306,7 @@ mraa_gt_tuchuck_board()
     b->pins[pos].uart.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "ISHGPIO6", 8);
+    strncpy(b->pins[pos].name, "ISH_IO6", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 343;
     b->pins[pos].gpio.mux_total = 0;
@@ -321,7 +321,7 @@ mraa_gt_tuchuck_board()
     b->pins[pos].uart.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "ISHGPIO5", 8);
+    strncpy(b->pins[pos].name, "ISH_IO5", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 342;
     b->pins[pos].gpio.mux_total = 0;
@@ -336,7 +336,7 @@ mraa_gt_tuchuck_board()
     b->pins[pos].pwm.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "ISHGPIO4", 8);
+    strncpy(b->pins[pos].name, "ISH_IO4", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 341;
     b->pins[pos].gpio.mux_total = 0;
@@ -351,7 +351,7 @@ mraa_gt_tuchuck_board()
     b->pins[pos].pwm.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "ISHGPIO3", 8);
+    strncpy(b->pins[pos].name, "ISH_IO3", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     // High level will be V1P8 - VBE on MBT3904D
     b->pins[pos].gpio.pinmap = 340;
@@ -368,7 +368,7 @@ mraa_gt_tuchuck_board()
     pos++;
 
     // pin 31
-    strncpy(b->pins[pos].name, "ISHGPIO2", 8);
+    strncpy(b->pins[pos].name, "ISH_IO2", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     // High level will be V1P8 - VBE on MBT3904D
     b->pins[pos].gpio.pinmap = 339;
@@ -384,7 +384,7 @@ mraa_gt_tuchuck_board()
     b->pins[pos].pwm.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "ISHGPIO1", 8);
+    strncpy(b->pins[pos].name, "ISH_IO1", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     // High level will be V1P8 - VBE on MBT3904D
     b->pins[pos].gpio.pinmap = 338;
@@ -395,7 +395,7 @@ mraa_gt_tuchuck_board()
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     pos++;
 
-    strncpy(b->pins[pos].name, "ISHGPIO0", 8);
+    strncpy(b->pins[pos].name, "ISH_IO0", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     // High level will be V1P8 - VBE on MBT3904D
     b->pins[pos].gpio.pinmap = 337;
