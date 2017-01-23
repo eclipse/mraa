@@ -400,7 +400,7 @@ mraa_phyboard()
     b->pins[44].gpio.mux_total = 0;
 
     /* changed name "X_AM335_NMIn" to "X_AM335_NMI" for fitting in b->pins[45].name*/
-    strncpy(b->pins[45].name, "X_AM335_NMIn", MRAA_PIN_NAME_SIZE);
+    strncpy(b->pins[45].name, "X_AM335_NMI", MRAA_PIN_NAME_SIZE);
     b->pins[45].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[46].name, "GND", MRAA_PIN_NAME_SIZE);
