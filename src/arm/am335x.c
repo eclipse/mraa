@@ -1,5 +1,6 @@
 /*
  * Author: Norbert Wesp <nwesp@phytec.de>
+ * Author: Stefan Müller-Klieser <S.Mueller-Klieser@phytec.de>
  * Copyright (c) 2016 Phytec Messtechnik GmbH.
  *
  * Based on src/arm/beaglebone.c
@@ -76,7 +77,6 @@ mraa_am335x_mmap_read(mraa_gpio_context dev)
 {
     uint32_t value = *(volatile uint32_t*) (mmap_gpio[dev->pin / 32] + AM335X_IN);
     if (value & (uint32_t)(1 << (dev->pin % 32))) {
-
         return 1;
     }
 

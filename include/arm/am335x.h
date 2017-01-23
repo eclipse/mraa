@@ -1,5 +1,6 @@
 /*
  * Author: Norbert Wesp <nwesp@phytec.de>
+ * Author: Stefan Müller-Klieser <S.Mueller-Klieser@phytec.de>
  * Copyright (c) 2016 Phytec Messtechnik GmbH.
  *
  * Based on src/arm/beaglebone.c

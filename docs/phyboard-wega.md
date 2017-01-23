@@ -1,13 +1,13 @@
 phyBOARD-Wega    {#phyboard-wega}
 =============
 
-The phyBOARD-Wega for phyCORA-AM335x is a low-cost, feature-rich software 
+The phyBOARD-Wega for phyCORE-AM335x is a low-cost, feature-rich software 
 development platform supporting the Texas Instruments AM335x microcontroller.
 
 Moreover, due to the numerous standard interfaces the phyBOARD-Wega AM335x can
 serve as bedrock for your application. At the core of the phyBOARD-Wega is the
 PCL-051/phyCORE-AM335x System on Module (SOM) in a direct solder form factor,
-containing the prozessor, DRAM, NAND Flash, power regulation, supervision,
+containing the processor, DRAM, NAND Flash, power regulation, supervision,
 transceivers, and other core functions required to support the AM335x 
 processor. Surrounding the SOM is the PBA-CD-02/phyBOARD-Wega carrier board,
 adding power input, buttons, connectors, signal breakout, and Ethernet 
@@ -26,7 +26,9 @@ Interface notes
 ---------------
 
 **SPI**
-/* TODO */
+Spi0 can be used over pins on X69 connector. There are no more spi-devices.
+Independent of the given index in mraa_phyboard_spi_init_pre() function,
+it will be always initialized spi0.
 
 **I2C**
 /* TODO */
@@ -211,7 +213,7 @@ A/V Jumper configuration J77
 | 1+2 | X_MCASP0_AHCLKX_GPIO3_21 |
 | 2+3 | nUSB1_OC_GPIO3_19        |
 
-Caution:    If J77 is set to 2+3 , J78 also has to be set to 2+3 !
+Caution: If J77 is set to 2+3 , J78 also has to be set to 2+3 !
 
 
 GPIO - Pin-mapping (with installed expansion board)
@@ -221,9 +223,9 @@ GPIO - Pin-mapping (with installed expansion board)
 |--------------|---------------|----------------------|------------|----------|
 | 31           | X_GPIO3_9     | 105                  | OUT  LED3  | X69      |
 | 33           | X_GPIO3_10    | 106                  | IN   S3    | X69      |
-| 35           | X_GPIO2_18    |  82 (buisy)          | OUT  LED1  | X69      |
+| 35           | X_GPIO2_18    |  82 (busy)           | OUT  LED1  | X69      |
 | 36           | X_GPIO2_19    |  83                  | OUT  LED2  | X69      |
-| 37           | X_GPIO0_20    |  20 (buisy)          | IN   S1    | X69      |
+| 37           | X_GPIO0_20    |  20 (busy)           | IN   S1    | X69      |
 | 38           | X_GPIO0_7     |   7                  | IN   S2    | X69      |
 | 42           | X_GPIO3_7     | 103                  | IN         | X69      |
 | 44           | X_GPIO1_31    |  63                  | IN         | X69      |
@@ -232,4 +234,4 @@ GPIO - Pin-mapping (with installed expansion board)
 | 6 (106)      | X_GPIO3_19 or | 115                  | IN         | X71      |
 |              | X_GPIO3_21    | 117                  | IN         | X71      |
 
-Info: (buisy) means, that it is used by kernel driver!
+Info: (busy) means, that it is used by kernel driver!

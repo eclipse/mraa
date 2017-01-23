@@ -1,5 +1,6 @@
 /*
  * Author: Norbert Wesp <nwesp@phytec.de>
+ * Author: Stefan Müller-Klieser <S.Mueller-Klieser@phytec.de>
  * Copyright (c) 2016 Phytec Messtechnik GmbH.
  *
  * Based on src/arm/beaglebone.c
@@ -40,7 +41,7 @@ mraa_phyboard_uart_init_pre(int index)
 {
     char devpath[MAX_SIZE];
 
-    sprintf(devpath, "/dev/ttyO%u", index);
+    snprintf(devpath, 11, "/dev/ttyO%u", index);
     if (!mraa_file_exist(devpath)) {
         syslog(LOG_ERR, "uart: Device not initialized");
     } else {
@@ -48,27 +49,27 @@ mraa_phyboard_uart_init_pre(int index)
         return MRAA_SUCCESS;
     }
 
-    return MRAA_ERROR_NO_RESOURCES;
+    return MRAA_ERROR_INVALID_PARAMETER;
 }
 
-/* NOT DONE / TESTED YET */
 mraa_result_t
 mraa_phyboard_spi_init_pre(int index)
 {
-    mraa_result_t ret = MRAA_ERROR_NO_RESOURCES;
+    mraa_result_t ret = MRAA_ERROR_INVALID_PARAMETER;
     char devpath[MAX_SIZE];
     int deviceindex = 0;
 
-    if ((index == 0) && mraa_link_targets("/sys/class/spidev/spidev1.0", "48030000"))
+    if ((index == 0) && mraa_link_targets("/sys/class/spidev/spidev1.0", "48030000")) {
         deviceindex = 1;
-    if (deviceindex == 0)
+    }
+    if (deviceindex == 0) {
         deviceindex = 1;
+    }
 
-    sprintf(devpath, "/dev/spidev%u.0", deviceindex);
+    snprintf(devpath, 15, "/dev/spidev%u.0", deviceindex);
     if (mraa_file_exist(devpath)) {
         plat->spi_bus[index].bus_id = deviceindex;
         ret = MRAA_SUCCESS;
-
     } else {
         syslog(LOG_NOTICE, "spi: Device not initialized");
     }
@@ -79,12 +80,12 @@ mraa_phyboard_spi_init_pre(int index)
 mraa_result_t
 mraa_phyboard_i2c_init_pre(unsigned int bus)
 {
-    mraa_result_t ret = MRAA_ERROR_NO_RESOURCES;
+    mraa_result_t ret = MRAA_ERROR_INVALID_PARAMETER;
     char devpath[MAX_SIZE];
 
-    sprintf(devpath, "/dev/i2c-%u", plat->i2c_bus[bus].bus_id);
+    snprintf(devpath, 11, "/dev/i2c-%u", plat->i2c_bus[bus].bus_id);
     if (!mraa_file_exist(devpath)) {
-        syslog(LOG_INFO, "i2c: %s doesn't exist ", devpath);
+        syslog(LOG_ERR, "i2c: %s doesn't exist ", devpath);
         syslog(LOG_ERR, "i2c: Device not initialized");
 
         return ret;
@@ -97,6 +98,7 @@ mraa_pwm_context
 mraa_phyboard_pwm_init_replace(int pin)
 {
     char devpath[MAX_SIZE];
+    int length = strlen(SYSFS_CLASS_PWM) + 5;
 
     if (plat == NULL) {
         syslog(LOG_ERR, "pwm: Platform Not Initialised");
@@ -111,35 +113,36 @@ mraa_phyboard_pwm_init_replace(int pin)
         return NULL;
     }
 
-    sprintf(devpath, SYSFS_CLASS_PWM "pwm%u", plat->pins[pin].pwm.pinmap);
+    snprintf(devpath, length, SYSFS_CLASS_PWM "pwm%u", plat->pins[pin].pwm.pinmap);
     if (!mraa_file_exist(devpath)) {
         FILE* fh;
         fh = fopen(SYSFS_CLASS_PWM "export", "w");
         if (fh == NULL) {
-            syslog(LOG_ERR, "pwm: Failed to open /sys/class/pwm/export for writing, check access "
-                            "rights for user");
+            syslog(LOG_ERR, "pwm: Failed to open %s for writing, check access "
+                            "rights for user", SYSFS_CLASS_PWM "export");
             return NULL;
         }
         if (fprintf(fh, "%d", plat->pins[pin].pwm.pinmap) < 0) {
-            syslog(LOG_ERR, "pwm: Failed to write to sysfs-pwm-export");
+            syslog(LOG_ERR, "pwm: Failed to write to %s", SYSFS_CLASS_PWM "export");
         }
         fclose(fh);
     }
 
     if (mraa_file_exist(devpath)) {
         mraa_pwm_context dev = (mraa_pwm_context) calloc(1, sizeof(struct _pwm));
-        if (dev == NULL)
+        if (dev == NULL) {
             return NULL;
+        }
         dev->duty_fp = -1;
         dev->chipid = -1;
         dev->pin = plat->pins[pin].pwm.pinmap;
         dev->period = -1;
         return dev;
-    } else
+    } else {
         syslog(LOG_ERR, "pwm: pin not initialized");
+    }
     return NULL;
 }
-
 
 mraa_board_t*
 mraa_phyboard()
@@ -147,19 +150,22 @@ mraa_phyboard()
     unsigned int uart2_enabled = 0;
     unsigned int uart3_enabled = 0;
 
-    if (mraa_file_exist("/sys/class/tty/ttyO2"))
+    if (mraa_file_exist("/sys/class/tty/ttyO2")) {
         uart2_enabled = 1;
-    else
+    } else {
         uart2_enabled = 0;
+    }
 
-    if (mraa_file_exist("/sys/class/tty/ttyO3"))
+    if (mraa_file_exist("/sys/class/tty/ttyO3")) {
         uart3_enabled = 1;
-    else
+    } else {
         uart3_enabled = 0;
+    }
 
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
-    if (b == NULL)
+    if (b == NULL) {
         return NULL;
+    }
     b->platform_name = PLATFORM_NAME_PHYBOARD_WEGA;
     b->phy_pin_count = MRAA_PHYBOARD_WEGA_PINCOUNT;
 
@@ -168,8 +174,8 @@ mraa_phyboard()
     }
 
     b->aio_count = 4;
-    b->adc_raw = 1;
-    b->adc_supported = 1;
+    b->adc_raw = 12;
+    b->adc_supported = 12;
 
     b->pwm_default_period = 500;
     b->pwm_max_period = 2147483;
@@ -248,7 +254,8 @@ mraa_phyboard()
     strncpy(b->pins[15].name, "X_JTAG_TMS", MRAA_PIN_NAME_SIZE);
     b->pins[15].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
-    strncpy(b->pins[16].name, "X_nJTAG_TRST", MRAA_PIN_NAME_SIZE);
+    /* changed name "X_nJTAG_TRST" to "X_JTAG_TRST" for fitting in b->pins[16].name*/
+    strncpy(b->pins[16].name, "X_JTAG_TRST", MRAA_PIN_NAME_SIZE);
     b->pins[16].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[17].name, "X_JTAG_TDI", MRAA_PIN_NAME_SIZE);
@@ -263,10 +270,12 @@ mraa_phyboard()
     strncpy(b->pins[20].name, "X_JTAG_TCK", MRAA_PIN_NAME_SIZE);
     b->pins[20].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
-    strncpy(b->pins[21].name, "X_USB_DP_EXP", MRAA_PIN_NAME_SIZE);
+    /* changed name "X_USB_DP_EXP" to "X_USB_DP" for fitting in b->pins[21].name*/
+    strncpy(b->pins[21].name, "X_USB_DP", MRAA_PIN_NAME_SIZE);
     b->pins[21].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
-    strncpy(b->pins[22].name, "X_USB_DM_EXP", MRAA_PIN_NAME_SIZE);
+    /* changed name "X_USB_DM_EXP" to "X_USB_DM" for fitting in b->pins[22].name*/
+    strncpy(b->pins[22].name, "X_USB_DM", MRAA_PIN_NAME_SIZE);
     b->pins[22].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[23].name, "nRESET_OUT", MRAA_PIN_NAME_SIZE);
@@ -364,7 +373,8 @@ mraa_phyboard()
     b->pins[38].gpio.parent_id = 0;
     b->pins[38].gpio.mux_total = 0;
 
-    strncpy(b->pins[39].name, "X_AM335_EXT_WAKEUP", MRAA_PIN_NAME_SIZE);
+    /* changed name "X_AM335_EXT_WAKEUP" to "X_AM335_WUP" for fitting in b->pins[39].name*/
+    strncpy(b->pins[39].name, "X_AM335_WUP", MRAA_PIN_NAME_SIZE);
     b->pins[39].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[40].name, "X_INT_RTCn", MRAA_PIN_NAME_SIZE);
@@ -389,6 +399,7 @@ mraa_phyboard()
     b->pins[44].gpio.parent_id = 0;
     b->pins[44].gpio.mux_total = 0;
 
+    /* changed name "X_AM335_NMIn" to "X_AM335_NMI" for fitting in b->pins[45].name*/
     strncpy(b->pins[45].name, "X_AM335_NMIn", MRAA_PIN_NAME_SIZE);
     b->pins[45].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -415,13 +426,16 @@ mraa_phyboard()
     b->pins[51].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     /* to CHECK X_GPIO_CKSYNC */
-    strncpy(b->pins[52].name, "X_GPIO_CKSYNC", MRAA_PIN_NAME_SIZE);
+    /* changed name "X_GPIO_CKSYNC" to "X_GPIO_CSYN" for fitting in b->pins[52].name*/
+    strncpy(b->pins[52].name, "X_GPIO_CSYN", MRAA_PIN_NAME_SIZE);
     b->pins[52].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
-    strncpy(b->pins[53].name, "X_USB_ID_EXP", MRAA_PIN_NAME_SIZE);
+    /* changed name "X_USB_ID_EXP" to "X_USB_ID" for fitting in b->pins[53].name*/
+    strncpy(b->pins[53].name, "X_USB_ID", MRAA_PIN_NAME_SIZE);
     b->pins[53].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
-    strncpy(b->pins[54].name, "USB_VBUS_EXP", MRAA_PIN_NAME_SIZE);
+    /* changed name "USB_VBUS_EXP" to "USB_VBUS" for fitting in b->pins[54].name*/
+    strncpy(b->pins[54].name, "USB_VBUS", MRAA_PIN_NAME_SIZE);
     b->pins[54].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[55].name, "X_USB1_CE", MRAA_PIN_NAME_SIZE);
@@ -539,7 +553,8 @@ mraa_phyboard()
     strncpy(b->pins[60+32].name, "X_LCD_PCLK", MRAA_PIN_NAME_SIZE);
     b->pins[60+32].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
-    strncpy(b->pins[60+33].name, "X_LCD_BIAS_EN", MRAA_PIN_NAME_SIZE);
+    /* changed name "X_LCD_BIAS_EN" to "X_LCD_BIAS" for fitting in b->pins[60+33].name*/
+    strncpy(b->pins[60+33].name, "X_LCD_BIAS", MRAA_PIN_NAME_SIZE);
     b->pins[60+33].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[60+34].name, "X_LCD_HSYNC", MRAA_PIN_NAME_SIZE);
@@ -585,8 +600,7 @@ mraa_phyboard()
     b->pins[60+40+5].gpio.parent_id = 0;
     b->pins[60+40+5].gpio.mux_total = 0;
 
-    /* PIN-Number "60+40+6" with name "nUSB1_OC_GPIO3_19 or" */
-    /* PIN-Number "60+40+6" with name "X_MCASP0_AHCLKX_GPIO3_21" */
+    /* PIN-Number "60+40+6" with name "nUSB1_OC_GPIO3_19" or "X_MCASP0_AHCLKX_GPIO3_21" */
     // TODO -> Check settings of Jumper J77
     strncpy(b->pins[60+40+6].name, "X_GPIO3_19", MRAA_PIN_NAME_SIZE);
     b->pins[60+40+6].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
@@ -660,9 +674,11 @@ mraa_phyboard()
 
     b->gpio_count = 0;
     int i;
-    for (i = 0; i < b->phy_pin_count; i++)
-        if (b->pins[i].capabilities.gpio)
+    for (i = 0; i < b->phy_pin_count; i++) {
+        if (b->pins[i].capabilities.gpio) {
             b->gpio_count++;
+        }
+    }
     return b;
 error:
     syslog(LOG_CRIT, "phyboard: failed to initialize");
