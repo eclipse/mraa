@@ -27,6 +27,7 @@ Supported Platforms
    * `Raspberry Pi <../rasppi.html>`_
    * `Banana Pi/Pro <../bananapi.html>`_
    * `Beaglebone Black <../beaglebone.html>`_
+   * `phyBOARD-Wega <../phyboard-wega.html>`_
    * `Intel NUC NUC5i5MYBE <../nuc5.html>`_
    * `UP <../up.html>`_
    * `FTDI FT4222H <../ft4222.html>`_
