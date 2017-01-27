@@ -41,7 +41,7 @@ mraa_phyboard_uart_init_pre(int index)
 {
     char devpath[MAX_SIZE];
 
-    snprintf(devpath, 11, "/dev/ttyO%u", index);
+    snprintf(devpath, MAX_SIZE, "/dev/ttyO%u", index);
     if (!mraa_file_exist(devpath)) {
         syslog(LOG_ERR, "uart: Device not initialized");
     } else {
@@ -66,7 +66,7 @@ mraa_phyboard_spi_init_pre(int index)
         deviceindex = 1;
     }
 
-    snprintf(devpath, 15, "/dev/spidev%u.0", deviceindex);
+    snprintf(devpath, MAX_SIZE, "/dev/spidev%u.0", deviceindex);
     if (mraa_file_exist(devpath)) {
         plat->spi_bus[index].bus_id = deviceindex;
         ret = MRAA_SUCCESS;
@@ -83,7 +83,7 @@ mraa_phyboard_i2c_init_pre(unsigned int bus)
     mraa_result_t ret = MRAA_ERROR_INVALID_PARAMETER;
     char devpath[MAX_SIZE];
 
-    snprintf(devpath, 11, "/dev/i2c-%u", plat->i2c_bus[bus].bus_id);
+    snprintf(devpath, MAX_SIZE, "/dev/i2c-%u", plat->i2c_bus[bus].bus_id);
     if (!mraa_file_exist(devpath)) {
         syslog(LOG_ERR, "i2c: %s doesn't exist ", devpath);
         syslog(LOG_ERR, "i2c: Device not initialized");
@@ -113,7 +113,7 @@ mraa_phyboard_pwm_init_replace(int pin)
         return NULL;
     }
 
-    snprintf(devpath, length, SYSFS_CLASS_PWM "pwm%u", plat->pins[pin].pwm.pinmap);
+    snprintf(devpath, MAX_SIZE, SYSFS_CLASS_PWM "pwm%u", plat->pins[pin].pwm.pinmap);
     if (!mraa_file_exist(devpath)) {
         FILE* fh;
         fh = fopen(SYSFS_CLASS_PWM "export", "w");
