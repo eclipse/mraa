@@ -87,7 +87,8 @@ mraa_aio_context
 mraa_aio_init(unsigned int aio)
 {
     mraa_board_t* board = plat;
-    int pin;
+    int pin, adc_pin_index = -1;
+
     if (board == NULL) {
         syslog(LOG_ERR, "aio: Platform not initialised");
         return NULL;
@@ -102,21 +103,23 @@ mraa_aio_init(unsigned int aio)
         aio = mraa_get_sub_platform_index(aio);
     }
 
-    // aio are always past the gpio_count in the pin array
-    pin = aio + board->gpio_count;
-
-    if (pin < 0 || pin >= board->phy_pin_count) {
-        syslog(LOG_ERR, "aio: pin %i beyond platform definition", pin);
-        return NULL;
-    }
     if (aio >= board->aio_count) {
         syslog(LOG_ERR, "aio: requested channel out of range");
         return NULL;
     }
-    if (board->pins[pin].capabilities.aio != 1) {
-        syslog(LOG_ERR, "aio: pin %i not capable of aio", pin);
+
+    for (pin = 0; pin < board->phy_pin_count; pin++) {
+        // Assumes that AIO channels numbers match their order of appearance in the pin list
+        if (board->pins[pin].capabilities.aio == 1)
+            if (aio == ++adc_pin_index)
+                break;
+    }
+
+    if (adc_pin_index != aio) {
+        syslog(LOG_ERR, "aio: unable to find pin for aio channel %i", aio);
         return NULL;
     }
+
     if (board->pins[pin].aio.mux_total > 0) {
         if (mraa_setup_mux_mapped(board->pins[pin].aio) != MRAA_SUCCESS) {
             syslog(LOG_ERR, "aio: unable to setup multiplexers for pin");
