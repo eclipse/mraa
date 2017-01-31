@@ -441,6 +441,7 @@ mraa_i2c_stop(mraa_i2c_context dev)
         return dev->advance_func->i2c_stop_replace(dev);
     }
 
+    close(dev->fh);
     free(dev);
     return MRAA_SUCCESS;
 }
