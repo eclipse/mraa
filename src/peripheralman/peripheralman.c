@@ -704,7 +704,7 @@ mraa_peripheralman_plat_init()
     for (; i < gpios_count; i++) {
         b->pins[i].name = gpios[i];
         b->pins[i].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-        b->pins[i].gpio.pinmap = -1;
+        b->pins[i].gpio.pinmap = i;
     }
 
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
