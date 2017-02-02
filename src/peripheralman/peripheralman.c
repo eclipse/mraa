@@ -707,6 +707,13 @@ mraa_peripheralman_plat_init()
         b->pins[i].gpio.pinmap = i;
     }
 
+    for (i = 0; i < i2c_busses_count; i++) {
+        b->i2c_bus[i].bus_id = i;
+        b->i2c_bus[i].sda = -1;
+        b->i2c_bus[i].scl = -1;
+    }
+
+
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
     if (b->adv_func == NULL) {
         free(b->pins);
