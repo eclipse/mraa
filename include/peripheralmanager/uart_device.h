@@ -19,8 +19,6 @@
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
-#include <termios.h>
-#include <unistd.h>
 
 __BEGIN_DECLS
 
@@ -31,133 +29,130 @@ __BEGIN_DECLS
 /// @{
 
 /// UART Parity
-enum UartParity {
-  UART_PARITY_NONE, /**< No parity */
-  UART_PARITY_EVEN, /**< Even parity */
-  UART_PARITY_ODD,  /**< Odd parity */
-  UART_PARITY_MARK, /**< Mark parity, always 1 */
-  UART_PARITY_SPACE /**< Space parity, always 0 */
-};
+typedef enum AUartParity {
+  AUART_PARITY_NONE = 0, /**< No parity */
+  AUART_PARITY_EVEN = 1, /**< Even parity */
+  AUART_PARITY_ODD = 2,  /**< Odd parity */
+  AUART_PARITY_MARK = 3, /**< Mark parity, always 1 */
+  AUART_PARITY_SPACE = 4 /**< Space parity, always 0 */
+} AUartParity;
 
-/// Modem control Bits
-enum UartModemControlBits {
-  UART_MC_LE = TIOCM_LE,   /**< Data set ready/Line enable */
-  UART_MC_DTR = TIOCM_DTR, /**< Data terminal ready */
-  UART_MC_RTS = TIOCM_RTS, /**< Request to send */
-  UART_MC_ST = TIOCM_ST,   /**< Secondary TXD */
-  UART_MC_SR = TIOCM_SR,   /**< Secondary RXD */
-  UART_MC_CTS = TIOCM_CTS, /**< Clear to send */
-  UART_MC_CD = TIOCM_CAR,  /**< Data carrier detect */
-  UART_MC_RI = TIOCM_RI,   /**< Ring */
-  UART_MC_DSR = TIOCM_DSR  /**< Data set ready */
-};
+/// Modem control lines.
+typedef enum AUartModemControlLine {
+  AUART_MODEM_CONTROL_LE = 1 << 0,  /**< Data set ready/Line enable */
+  AUART_MODEM_CONTROL_DTR = 1 << 1, /**< Data terminal ready */
+  AUART_MODEM_CONTROL_RTS = 1 << 2, /**< Request to send */
+  AUART_MODEM_CONTROL_ST = 1 << 3,  /**< Secondary TXD */
+  AUART_MODEM_CONTROL_SR = 1 << 4,  /**< Secondary RXD */
+  AUART_MODEM_CONTROL_CTS = 1 << 5, /**< Clear to send */
+  AUART_MODEM_CONTROL_CD = 1 << 6,  /**< Data carrier detect */
+  AUART_MODEM_CONTROL_RI = 1 << 7,  /**< Ring */
+  AUART_MODEM_CONTROL_DSR = 1 << 8  /**< Data set ready */
+} AUartModemControlLine;
 
 // Hardware Flow Control
-enum UartHardwareFlowControlType {
-  UART_HW_FLOW_NONE,       /**< No hardware flow control */
-  UART_HW_FLOW_AUTO_RTSCTS /**< Auto RTS/CTS */
-};
+typedef enum AUartHardwareFlowControl {
+  AUART_HARDWARE_FLOW_CONTROL_NONE = 0,       /**< No hardware flow control */
+  AUART_HARDWARE_FLOW_CONTROL_AUTO_RTSCTS = 1 /**< Auto RTS/CTS */
+} AUartHardwareFlowControl;
 
 /// Flush queue selection
-enum UartFlushQueueSelection {
-  UART_FLUSH_IN = TCIFLUSH,     /**< Flushes data received but not read */
-  UART_FLUSH_OUT = TCOFLUSH,    /**< Flushes data written but not transmitted */
-  UART_FLUSH_IN_OUT = TCIOFLUSH /**< Flushes both in and out */
-};
+typedef enum AUartFlushDirection {
+  AUART_FLUSH_IN = 0,    /**< Flushes data received but not read */
+  AUART_FLUSH_OUT = 1,   /**< Flushes data written but not transmitted */
+  AUART_FLUSH_IN_OUT = 2 /**< Flushes both in and out */
+} AUartFlushDirection;
 
-typedef struct BUartDevice BUartDevice;
+typedef struct AUartDevice AUartDevice;
 
 /// Writes to a UART device.
-/// @param device Pointer to the BUartDevice struct.
+/// @param device Pointer to the AUartDevice struct.
 /// @param data Data to write.
 /// @param len Size of the data to write.
 /// @param bytes_written Output pointer to the number of bytes written.
 /// @return 0 on success, errno on error.
-int BUartDevice_write(const BUartDevice* device,
+int AUartDevice_write(const AUartDevice* device,
                       const void* data,
                       uint32_t len,
                       uint32_t* bytes_written);
 
 /// Reads from a UART device.
-/// @param device Pointer to the BUartDevice struct.
+/// @param device Pointer to the AUartDevice struct.
 /// @param data Buffer to read the data into.
 /// @param len Number of bytes to read.
 /// @param bytes_read Output pointer to the number of bytes read.
 /// @return 0 on success, errno on error.
-int BUartDevice_read(const BUartDevice* device,
+int AUartDevice_read(const AUartDevice* device,
                      void* data,
                      uint32_t len,
                      uint32_t* bytes_read);
 
 /// Sets the input and output speed of a UART device.
-/// @param device Pointer to the BUartDevice struct.
+/// @param device Pointer to the AUartDevice struct.
 /// @param baudrate Speed in baud.
 /// @return 0 on success, errno on error.
-int BUartDevice_setBaudrate(const BUartDevice* device, uint32_t baudrate);
+int AUartDevice_setBaudrate(const AUartDevice* device, uint32_t baudrate);
 
 /// Sets number of stop bits for the UART device.
-/// @param device Pointer to the BUartDevice struct.
+/// @param device Pointer to the AUartDevice struct.
 /// @param stop_bits Number of stop bits. Typically 1 or 2.
 /// @return 0 on success, errno on error.
-int BUartDevice_setStopBits(const BUartDevice* device, uint32_t stop_bits);
+int AUartDevice_setStopBits(const AUartDevice* device, uint32_t stop_bits);
 
 /// Sets the data size of a character for the UART device.
-/// @param device Pointer to the BUartDevice struct.
+/// @param device Pointer to the AUartDevice struct.
 /// @param data_size Number of bits per character. Typically between 5 and 8.
 /// @return 0 on success, errno on error.
-int BUartDevice_setDataSize(const BUartDevice* device, uint32_t data_size);
+int AUartDevice_setDataSize(const AUartDevice* device, uint32_t data_size);
 
 /// Sets the parity mode for the UART device.
-/// @param device Pointer to the BUartDevice struct.
-/// @param mode Parity mode. One of UART_PARITY_NONE, UART_PARITY_EVEN,
-/// UART_PARITY_ODD, UART_PARITY_MARK, UART_PARITY_SPACE.
+/// @param device Pointer to the AUartDevice struct.
+/// @param mode Parity mode.
 /// @return 0 on success, errno on error.
-int BUartDevice_setParity(const BUartDevice* device, uint32_t mode);
+int AUartDevice_setParity(const AUartDevice* device, AUartParity mode);
 
 /// Sets the hardware flow control mode for the UART device.
-/// @param device Pointer to the BUartDevice struct.
-/// @param mode Flow control mode. Either UART_HW_FLOW_NONE or
-/// UART_HW_FLOW_AUTO_RTSCTS.
+/// @param device Pointer to the AUartDevice struct.
+/// @param mode Flow control mode.
 /// @return 0 on success, errno on error.
-int BUartDevice_setHardwareFlowControl(const BUartDevice* device,
-                                       uint32_t mode);
+int AUartDevice_setHardwareFlowControl(const AUartDevice* device,
+                                       AUartHardwareFlowControl mode);
 
 /// Sets the modem control bits for the UART device.
-/// @param device Pointer to the BUartDevice struct.
-/// @param bits Modem control bits to set.
+/// @param device Pointer to the AUartDevice struct.
+/// @param lines Lines to set. AUartModemControlLine values OR'ed together.
 /// @return 0 on success, errno on error.
-int BUartDevice_setModemControl(const BUartDevice* device, uint32_t bits);
+int AUartDevice_setModemControl(const AUartDevice* device, uint32_t lines);
 
 /// Clears the modem control bits for the UART device.
-/// @param device Pointer to the BUartDevice struct.
-/// @param bits Modem control bits to clear.
+/// @param device Pointer to the AUartDevice struct.
+/// @param lines Lines to clear. AUartModemControlLine values OR'ed together.
 /// @return 0 on success, errno on error.
-int BUartDevice_clearModemControl(const BUartDevice* device, uint32_t bits);
+int AUartDevice_clearModemControl(const AUartDevice* device, uint32_t lines);
 
 /// Sends a break to the UART device.
-/// @param device Pointer to the BUartDevice struct.
+/// @param device Pointer to the AUartDevice struct.
 /// @param duration Duration of break transmission in milliseconds. If 0,
 /// transmits zero-valued bits for at least 0.25 seconds, and not more
 /// than 0.5 seconds.
 /// @return 0 on success, errno on error.
-int BUartDevice_sendBreak(const BUartDevice* device, uint32_t duration_msecs);
+int AUartDevice_sendBreak(const AUartDevice* device, uint32_t duration_msecs);
 
 /// Flushes specified queue for the UART device.
-/// @param device Pointer to the BUartDevice struct.
-/// @param queue Queue to flush. One of UART_FLUSH_IN, UART_FLUSH_OUT,
-/// UART_FLUSH_IN_OUT.
+/// @param device Pointer to the AUartDevice struct.
+/// @param direction Direction to flush.
 /// @return 0 on success, errno on error.
-int BUartDevice_flush(const BUartDevice* device, uint32_t queue);
+int AUartDevice_flush(const AUartDevice* device, AUartFlushDirection direction);
 
 /// Gets a file descriptor to be notified when data can be read.
 ///
 /// You can use this file descriptor to poll on incoming data instead of
 /// actively reading for new data.
 ///
-/// @param device Pointer to the BUartDevice struct.
+/// @param device Pointer to the AUartDevice struct.
 /// @param fd Output pointer to the file descriptor.
 /// @return 0 on success, errno on error.
-int BUartDevice_getPollingFd(const BUartDevice* device, int* fd);
+int AUartDevice_getPollingFd(const AUartDevice* device, int* fd);
 
 /// Acknowledges an input event.
 ///
@@ -170,11 +165,11 @@ int BUartDevice_getPollingFd(const BUartDevice* device, int* fd);
 ///
 /// @param fd File descriptor to acknowledge the event on.
 /// @return 0 on success, errno on error.
-int BUartDevice_ackInputEvent(int fd);
+int AUartDevice_ackInputEvent(int fd);
 
-/// Destroys a BUartDevice struct.
-/// @param device Pointer to the BUartDevice struct.
-void BUartDevice_delete(BUartDevice* device);
+/// Destroys a AUartDevice struct.
+/// @param device Pointer to the AUartDevice struct.
+void AUartDevice_delete(AUartDevice* device);
 
 /// @}
 
