@@ -31,112 +31,108 @@ __BEGIN_DECLS
 /// @brief Functions to access embedded peripherals
 /// @{
 
-typedef struct BPeripheralManagerClient BPeripheralManagerClient;
+typedef struct APeripheralManagerClient APeripheralManagerClient;
 
 /// Returns the list of GPIOs.
 /// This does not take ownership into account.
 /// The list must be freed by the caller.
-/// @param client Pointer to the BPeripheralManagerClient struct.
+/// @param client Pointer to the APeripheralManagerClient struct.
 /// @param num_gpio Output pointer to the number of elements in the list.
 /// @return The list of gpios.
-char** BPeripheralManagerClient_listGpio(const BPeripheralManagerClient* client,
+char** APeripheralManagerClient_listGpio(const APeripheralManagerClient* client,
                                          int* num_gpio);
 
 /// Opens a GPIO and takes ownership of it.
-/// @param client Pointer to the BPeripheralManagerClient struct.
+/// @param client Pointer to the APeripheralManagerClient struct.
 /// @param name Name of the GPIO.
-/// @param gpio Output pointer to the BGpio struct. Empty on error.
+/// @param gpio Output pointer to the AGpio struct. Empty on error.
 /// @return 0 on success, errno on error.
-int BPeripheralManagerClient_openGpio(const BPeripheralManagerClient* client,
+int APeripheralManagerClient_openGpio(const APeripheralManagerClient* client,
                                       const char* name,
-                                      BGpio** gpio);
+                                      AGpio** gpio);
 
 /// Returns the list of PWMs.
 /// This does not take ownership into account.
 /// The list must be freed by the caller.
-/// @param client Pointer to the BPeripheralManagerClient struct.
+/// @param client Pointer to the APeripheralManagerClient struct.
 /// @param num_gpio Output pointer to the number of elements in the list.
 /// @return The list of pwms.
-char** BPeripheralManagerClient_listPwm(const BPeripheralManagerClient* client,
+char** APeripheralManagerClient_listPwm(const APeripheralManagerClient* client,
                                         int* num_pwm);
 
 /// Opens a PWM and takes ownership of it.
-/// @param client Pointer to the BPeripheralManagerClient struct.
+/// @param client Pointer to the APeripheralManagerClient struct.
 /// @param name Name of the PWM.
-/// @param gpio Output pointer to the BGpio struct. Empty on error.
+/// @param gpio Output pointer to the AGpio struct. Empty on error.
 /// @return 0 on success, errno on error.
-int BPeripheralManagerClient_openPwm(const BPeripheralManagerClient* client,
+int APeripheralManagerClient_openPwm(const APeripheralManagerClient* client,
                                      const char* name,
-                                     BPwm** pwm);
+                                     APwm** pwm);
 
 /// Returns the list of SPI buses.
 /// This does not take ownership into account.
 /// The list must be freed by the caller.
-/// @param client Pointer to the BPeripheralManagerClient struct.
+/// @param client Pointer to the APeripheralManagerClient struct.
 /// @param num_spi_buses Output pointer to the number of elements in the list.
 /// @return The list of spi buses.
-char** BPeripheralManagerClient_listSpiBuses(
-    const BPeripheralManagerClient* client,
-    int* num_spi_buses);
+char** APeripheralManagerClient_listSpiBuses(
+    const APeripheralManagerClient* client, int* num_spi_buses);
 
 /// Opens a SPI device and takes ownership of it.
-/// @oaram client Pointer to the BPeripheralManagerClient struct.
+/// @oaram client Pointer to the APeripheralManagerClient struct.
 /// @param name Name of the SPI device.
-/// @param dev Output pointer to the BSpiDevice struct. Empty on error.
+/// @param dev Output pointer to the ASpiDevice struct. Empty on error.
 /// @return 0 on success, errno on error.
-int BPeripheralManagerClient_openSpiDevice(
-    const BPeripheralManagerClient* client,
-    const char* name,
-    BSpiDevice** dev);
+int APeripheralManagerClient_openSpiDevice(
+    const APeripheralManagerClient* client, const char* name, ASpiDevice** dev);
 
 /// Returns the list of I2C buses.
 /// This does not take ownership into account.
 /// The list must be freed by the caller.
-/// @param client Pointer to the BPeripheralManagerClient struct.
+/// @param client Pointer to the APeripheralManagerClient struct.
 /// @param num_i2c_buses Output pointer to the number of elements in the list.
 /// @return The list of i2c buses.
-char** BPeripheralManagerClient_listI2cBuses(
-    const BPeripheralManagerClient* client,
-    int* num_i2c_buses);
+char** APeripheralManagerClient_listI2cBuses(
+    const APeripheralManagerClient* client, int* num_i2c_buses);
 
 /// Opens an I2C device and takes ownership of it.
-/// @param client Pointer to the BPeripheralManagerClient struct.
+/// @param client Pointer to the APeripheralManagerClient struct.
 /// @param name Name of the I2C bus.
 /// @param address Address of the I2C device.
-/// @param dev Output pointer to the BI2cDevice struct. Empty on error.
+/// @param dev Output pointer to the AI2cDevice struct. Empty on error.
 /// @return 0 on success, errno on error
-int BPeripheralManagerClient_openI2cDevice(
-    const BPeripheralManagerClient* client,
+int APeripheralManagerClient_openI2cDevice(
+    const APeripheralManagerClient* client,
     const char* name,
     uint32_t address,
-    BI2cDevice** dev);
+    AI2cDevice** dev);
 
 /// Returns the list of UART buses.
 /// This does not take ownership into account.
 /// The list must be freed by the caller.
-/// @param client Pointer to the BPeripheralManagerClient struct.
+/// @param client Pointer to the APeripheralManagerClient struct.
 /// @param num_uart_buses Output pointer to the number of elements in the list.
 /// @return The list of uart buses.
-char** BPeripheralManagerClient_listUartDevices(
-    const BPeripheralManagerClient* client, int* num_uart_buses);
+char** APeripheralManagerClient_listUartDevices(
+    const APeripheralManagerClient* client, int* num_uart_buses);
 
 /// Opens an UART device and takes ownership of it.
-/// @param client Pointer to the BPeripheralManagerClient struct.
+/// @param client Pointer to the APeripheralManagerClient struct.
 /// @param name Name of the UART device.
-/// @param dev Output pointer to the BUartDevice struct. Empty on error.
+/// @param dev Output pointer to the AUartDevice struct. Empty on error.
 /// @return 0 on success, errno on error
-int BPeripheralManagerClient_openUartDevice(
-    const BPeripheralManagerClient* client,
+int APeripheralManagerClient_openUartDevice(
+    const APeripheralManagerClient* client,
     const char* name,
-    BUartDevice** dev);
+    AUartDevice** dev);
 
 /// Creates a new client.
 /// @return A pointer to the created client. nullptr on errors.
-BPeripheralManagerClient* BPeripheralManagerClient_new();
+APeripheralManagerClient* APeripheralManagerClient_new();
 
 /// Destroys the peripheral manager client.
-/// @param client Pointer to the BPeripheralManagerClient struct.
-void BPeripheralManagerClient_delete(BPeripheralManagerClient* client);
+/// @param client Pointer to the APeripheralManagerClient struct.
+void APeripheralManagerClient_delete(APeripheralManagerClient* client);
 
 /// @}
 

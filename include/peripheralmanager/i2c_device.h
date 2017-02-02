@@ -28,79 +28,79 @@ __BEGIN_DECLS
 /// These functions can be used to control an I2C device.
 /// @{
 
-typedef struct BI2cDevice BI2cDevice;
+typedef struct AI2cDevice AI2cDevice;
 
 /// Reads from the device.
-/// @param device Pointer to the BI2cDevice struct.
+/// @param device Pointer to the AI2cDevice struct.
 /// @param data Output buffer to write the data to.
 /// @param len Number of bytes to read.
 /// @return 0 on success, errno on error
-int BI2cDevice_read(const BI2cDevice* device, void* data, uint32_t len);
+int AI2cDevice_read(const AI2cDevice* device, void* data, uint32_t len);
 
 /// Reads a byte from an I2C register.
-/// @param device Pointer to the BI2cDevice struct.
+/// @param device Pointer to the AI2cDevice struct.
 /// @param reg Register to read from.
 /// @param val Output pointer to value to read.
 /// @return 0 on success, errno on error
-int BI2cDevice_readRegByte(const BI2cDevice* device, uint8_t reg, uint8_t* val);
+int AI2cDevice_readRegByte(const AI2cDevice* device, uint8_t reg, uint8_t* val);
 
 /// Reads a word from an I2C register.
-/// @param device Pointer to the BI2cDevice struct.
+/// @param device Pointer to the AI2cDevice struct.
 /// @param reg Register to read from.
 /// @param val Output pointer to value to read.
 /// @return 0 on success, errno on error
-int BI2cDevice_readRegWord(const BI2cDevice* device,
+int AI2cDevice_readRegWord(const AI2cDevice* device,
                            uint8_t reg,
                            uint16_t* val);
 
 /// Reads from an I2C register.
-/// @param device Pointer to the BI2cDevice struct.
+/// @param device Pointer to the AI2cDevice struct.
 /// @param reg Register to read from.
 /// @param data Output buffer to write the data to.
 /// @param len Number of bytes to read.
 /// @return 0 on success, errno on error
-int BI2cDevice_readRegBuffer(const BI2cDevice* device,
+int AI2cDevice_readRegBuffer(const AI2cDevice* device,
                              uint8_t reg,
                              void* data,
                              uint32_t len);
 
 /// Writes to the device.
-/// @param device Pointer to the BI2cDevice struct.
+/// @param device Pointer to the AI2cDevice struct.
 /// @param data Buffer to write.
 /// @param len Number of bytes to write.
 /// @return 0 on success, errno on error
-int BI2cDevice_write(const BI2cDevice* device, const void* data, uint32_t len);
+int AI2cDevice_write(const AI2cDevice* device, const void* data, uint32_t len);
 
 /// Writes a byte to an I2C register.
-/// @param device Pointer to the BI2cDevice struct.
+/// @param device Pointer to the AI2cDevice struct.
 /// @param reg Register to write to.
 /// @param val Value to write.
 /// @return 0 on success, errno on error
-int BI2cDevice_writeRegByte(const BI2cDevice* device, uint8_t reg, uint8_t val);
+int AI2cDevice_writeRegByte(const AI2cDevice* device, uint8_t reg, uint8_t val);
 
 /// Writes a word to an I2C register.
-/// @param device Pointer to the BI2cDevice struct.
+/// @param device Pointer to the AI2cDevice struct.
 /// @param reg Register to write to.
 /// @param val Value to write.
 /// @return 0 on success, errno on error
-int BI2cDevice_writeRegWord(const BI2cDevice* device,
+int AI2cDevice_writeRegWord(const AI2cDevice* device,
                             uint8_t reg,
                             uint16_t val);
 
 /// Writes to an I2C register.
-/// @param device Pointer to the BI2cDevice struct.
+/// @param device Pointer to the AI2cDevice struct.
 /// @param reg Register to write to.
 /// @param data Data to write.
 /// @param len Number of bytes to write.
 /// @return 0 on success, errno on error
-int BI2cDevice_writeRegBuffer(const BI2cDevice* device,
+int AI2cDevice_writeRegBuffer(const AI2cDevice* device,
                               uint8_t reg,
                               const void* data,
                               uint32_t len);
 
-/// Destroys a BI2cDevice struct.
-/// @param device Pointer to the BI2cDevice struct.
-void BI2cDevice_delete(BI2cDevice* device);
+/// Destroys a AI2cDevice struct.
+/// @param device Pointer to the AI2cDevice struct.
+void AI2cDevice_delete(AI2cDevice* device);
 
 /// @}
 
