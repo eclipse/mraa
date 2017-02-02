@@ -29,76 +29,76 @@ __BEGIN_DECLS
 /// @{
 
 /// Edge trigger types.
-enum {
-  NONE_EDGE,  /**<  None */
-  RISING_EDGE,  /**<  Rising edge */
-  FALLING_EDGE,  /**<  Falling edge */
-  BOTH_EDGE  /**<  Both edges */
-};
+typedef enum AGpioEdge {
+  AGPIO_EDGE_NONE = 0,    /**<  None */
+  AGPIO_EDGE_RISING = 1,  /**<  Rising edge */
+  AGPIO_EDGE_FALLING = 2, /**<  Falling edge */
+  AGPIO_EDGE_BOTH = 3     /**<  Both edges */
+} AGpioEdge;
 
 /// GPIO direction types.
-enum {
-  DIRECTION_IN,  /**<  Input mode */
-  DIRECTION_OUT_INITIALLY_HIGH,  /**<  Output mode, initially set to high */
-  DIRECTION_OUT_INITIALLY_LOW  /**<  Output mode, initially set to low */
-};
+typedef enum AGpioDirection {
+  AGPIO_DIRECTION_IN = 0,                 /**<  Input mode */
+  AGPIO_DIRECTION_OUT_INITIALLY_HIGH = 1, /**<  Output mode, initially high */
+  AGPIO_DIRECTION_OUT_INITIALLY_LOW = 2   /**<  Output mode, initially low */
+} AGpioDirection;
 
 /// Possible active types.
-enum {
-  ACTIVE_LOW,  /**<  Active Low */
-  ACTIVE_HIGH  /**<  Active High */
-};
+typedef enum AGpioActiveType {
+  AGPIO_ACTIVE_LOW = 0, /**<  Active Low */
+  AGPIO_ACTIVE_HIGH = 1 /**<  Active High */
+} AGpioActiveType;
 
-typedef struct BGpio BGpio;
+typedef struct AGpio AGpio;
 
 /// Sets the GPIO direction to output.
-/// @param gpio Pointer to the BGpio struct
+/// @param gpio Pointer to the AGpio struct
 /// @param direction One of DIRECTION_IN,
 /// DIRECTION_OUT_INITIALLY_HIGH, DIRECTION_OUT_INITIALLY_LOW.
 /// @return 0 on success, errno on error.
-int BGpio_setDirection(const BGpio* gpio, int direction);
+int AGpio_setDirection(const AGpio* gpio, AGpioDirection direction);
 
 /// Sets the interrupt edge trigger type.
-/// @param gpio Pointer to the BGpio struct
+/// @param gpio Pointer to the AGpio struct
 /// @param type One of NONE_EDGE, RISING_EDGE, FALLING_EDGE or BOTH_EDGE.
 /// @return 0 on success, errno on error.
-int BGpio_setEdgeTriggerType(const BGpio* gpio, int type);
+int AGpio_setEdgeTriggerType(const AGpio* gpio, AGpioEdge type);
 
 /// Sets the GPIO’s active low/high status.
-/// @param gpio Pointer to the BGpio struct.
+/// @param gpio Pointer to the AGpio struct.
 /// @param type One of ACTIVE_HIGH, ACTIVE_LOW.
 /// @return 0 on success, errno on error.
-int BGpio_setActiveType(const BGpio* gpio, int type);
+int AGpio_setActiveType(const AGpio* gpio, AGpioActiveType type);
 
 /// Sets the GPIO value (for output GPIO only).
-/// @param gpio Pointer to the BGpio struct.
+/// @param gpio Pointer to the AGpio struct.
 /// @param value Value to set.
 /// @return 0 on success, errno on error.
-int BGpio_setValue(const BGpio* gpio, int value);
+int AGpio_setValue(const AGpio* gpio, int value);
 
 /// Gets the GPIO value (for input GPIO only).
-/// @param gpio Pointer to the BGpio struct.
+/// @param gpio Pointer to the AGpio struct.
 /// @param value Output pointer to the value of the GPIO.
 /// @return 0 on success, errno on error.
-int BGpio_getValue(const BGpio* gpio, int* value);
+int AGpio_getValue(const AGpio* gpio, int* value);
 
 /// Returns a file descriptor that can be used to poll on new data.
 /// Can be passed to select/epoll to wait for data to become available.
-/// @param gpio Pointer to the BGpio struct.
+/// @param gpio Pointer to the AGpio struct.
 /// @param fd Output pointer to the file descriptor number.
 /// @return 0 on success, errno on error.
-int BGpio_getPollingFd(const BGpio* gpio, int* fd);
+int AGpio_getPollingFd(const AGpio* gpio, int* fd);
 
 /// Acknowledges the interrupt and resets the file descriptor.
 /// This must be called after each event triggers in order to be able to
 /// poll/select for another event.
 /// @param fd Polling file descriptor to reset.
 /// @return 0 on success, errno on error.
-int BGpio_ackInterruptEvent(int fd);
+int AGpio_ackInterruptEvent(int fd);
 
-/// Destroys a BGpio struct.
-/// @param gpio Pointer to the BGpio struct.
-void BGpio_delete(BGpio* gpio);
+/// Destroys a AGpio struct.
+/// @param gpio Pointer to the AGpio struct.
+void AGpio_delete(AGpio* gpio);
 
 /// @}
 
