@@ -29,7 +29,7 @@
 #include "mraa_internal.h"
 #include "peripheralman.h"
 
-BPeripheralManagerClient *client = NULL;
+APeripheralManagerClient *client = NULL;
 char **gpios = NULL;
 int gpios_count = 0;
 char **i2c_busses = NULL;
@@ -42,8 +42,8 @@ int uart_busses_count = 0;
 static mraa_result_t
 mraa_pman_uart_init_raw_replace(mraa_uart_context dev, const char* path)
 {
-    if (BPeripheralManagerClient_openUartDevice(client, path, &dev->buart) != 0) {
-        BUartDevice_delete(dev->buart);
+    if (APeripheralManagerClient_openUartDevice(client, path, &dev->buart) != 0) {
+        AUartDevice_delete(dev->buart);
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
@@ -58,7 +58,7 @@ mraa_pman_uart_set_baudrate_replace(mraa_uart_context dev, unsigned int baud)
         return 0;
     }
 
-    if (BUartDevice_setBaudrate(dev->buart, baud) != 0) {
+    if (AUartDevice_setBaudrate(dev->buart, baud) != 0) {
         return 0;
     }
 
@@ -81,7 +81,7 @@ mraa_pman_uart_read_replace(mraa_uart_context dev, char* buf, size_t len)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    rc = BUartDevice_read(dev->buart, buf, len, &bytes_read);
+    rc = AUartDevice_read(dev->buart, buf, len, &bytes_read);
     if (rc != 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -99,7 +99,7 @@ mraa_pman_uart_write_replace(mraa_uart_context dev, const char* buf, size_t len)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    rc = BUartDevice_write(dev->buart, buf, len, &bytes_written);
+    rc = AUartDevice_write(dev->buart, buf, len, &bytes_written);
     if (rc != 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -142,7 +142,7 @@ static mraa_result_t
 mraa_pman_spi_init_raw_replace(mraa_spi_context dev, unsigned int bus, unsigned int cs)
 {
     int rc;
-    rc = BPeripheralManagerClient_openSpiDevice(client, spi_busses[bus], &dev->bspi);
+    rc = APeripheralManagerClient_openSpiDevice(client, spi_busses[bus], &dev->bspi);
     if (rc != 0) {
         free(dev);
         return MRAA_ERROR_INVALID_HANDLE;
@@ -162,19 +162,19 @@ mraa_pman_spi_mode_replace(mraa_spi_context dev, mraa_spi_mode_t mode)
 
     switch (mode) {
         case MRAA_SPI_MODE0:
-            rc = BSpiDevice_setMode(dev->bspi, SPI_MODE0);
+            rc = ASpiDevice_setMode(dev->bspi, ASPI_MODE0);
             break;
         case MRAA_SPI_MODE1:
-            rc = BSpiDevice_setMode(dev->bspi, SPI_MODE1);
+            rc = ASpiDevice_setMode(dev->bspi, ASPI_MODE1);
             break;
         case MRAA_SPI_MODE2:
-            rc = BSpiDevice_setMode(dev->bspi, SPI_MODE2);
+            rc = ASpiDevice_setMode(dev->bspi, ASPI_MODE2);
             break;
         case MRAA_SPI_MODE3:
-            rc = BSpiDevice_setMode(dev->bspi, SPI_MODE3);
+            rc = ASpiDevice_setMode(dev->bspi, ASPI_MODE3);
             break;
         default:
-            rc = BSpiDevice_setMode(dev->bspi, SPI_MODE0);
+            rc = ASpiDevice_setMode(dev->bspi, ASPI_MODE0);
             break;
     }
     if (rc != 0) {
@@ -195,7 +195,7 @@ mraa_pman_spi_frequency_replace(mraa_spi_context dev, int hz)
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
-    rc = BSpiDevice_setFrequency(dev->bspi, hz);
+    rc = ASpiDevice_setFrequency(dev->bspi, hz);
     if (rc != 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -215,9 +215,9 @@ mraa_pman_spi_lsbmode_replace(mraa_spi_context dev, mraa_boolean_t lsb)
     }
 
     if (lsb) {
-        rc = BSpiDevice_setBitJustification(dev->bspi, SPI_LSB_FIRST);
+        rc = ASpiDevice_setBitJustification(dev->bspi, ASPI_LSB_FIRST);
     } else {
-        rc = BSpiDevice_setBitJustification(dev->bspi, SPI_MSB_FIRST);
+        rc = ASpiDevice_setBitJustification(dev->bspi, ASPI_MSB_FIRST);
     }
     if (rc != 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
@@ -234,7 +234,7 @@ mraa_pman_spi_bit_per_word_replace(mraa_spi_context dev, unsigned int bits)
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
-    if (BSpiDevice_setBitsPerWord(dev->bspi, bits) != 0) {
+    if (ASpiDevice_setBitsPerWord(dev->bspi, bits) != 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -251,7 +251,7 @@ mraa_pman_spi_write_replace(mraa_spi_context dev, uint8_t data)
         return -1;
     }
 
-    rc = BSpiDevice_transfer(dev->bspi, &data, &recv, 1);
+    rc = ASpiDevice_transfer(dev->bspi, &data, &recv, 1);
     if (rc != 0) {
         return -1;
     }
@@ -269,7 +269,7 @@ mraa_pman_spi_write_word_replace(mraa_spi_context dev, uint16_t data)
         return -1;
     }
 
-    rc = BSpiDevice_transfer(dev->bspi, &data, &recv, 2);
+    rc = ASpiDevice_transfer(dev->bspi, &data, &recv, 2);
     if (rc != 0) {
         return -1;
     }
@@ -286,7 +286,7 @@ mraa_pman_spi_transfer_buf_replace(mraa_spi_context dev, uint8_t* data, uint8_t*
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
-    rc = BSpiDevice_transfer(dev->bspi, data, rxbuf, length);
+    rc = ASpiDevice_transfer(dev->bspi, data, rxbuf, length);
     if (rc != 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -304,7 +304,7 @@ mraa_pman_spi_transfer_buf_word_replace(mraa_spi_context dev, uint16_t* data, ui
     }
 
     // IS IT CORRECT ?
-    rc = BSpiDevice_transfer(dev->bspi, data, rxbuf, length * 2);
+    rc = ASpiDevice_transfer(dev->bspi, data, rxbuf, length * 2);
     if (rc != 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -316,7 +316,7 @@ static mraa_result_t
 mraa_pman_spi_stop_replace(mraa_spi_context dev)
 {
     if (dev->bspi != NULL) {
-        BSpiDevice_delete(dev->bspi);
+        ASpiDevice_delete(dev->bspi);
         dev->bspi = NULL;
     }
 
@@ -334,7 +334,7 @@ static mraa_result_t
 mraa_pman_i2c_stop_replace(mraa_i2c_context dev)
 {
     if (dev->bi2c != NULL) {
-        BI2cDevice_delete(dev->bi2c);
+        AI2cDevice_delete(dev->bi2c);
         dev->bi2c = NULL;
     }
 
@@ -361,10 +361,10 @@ mraa_pman_i2c_address_replace(mraa_i2c_context dev, uint8_t addr)
     dev->addr = (int) addr;
 
     if (strlen(dev->bus_name) > 0) {
-        rc = BPeripheralManagerClient_openI2cDevice(client,
+        rc = APeripheralManagerClient_openI2cDevice(client,
             dev->bus_name, addr, &dev->bi2c);
     } else {
-        rc = BPeripheralManagerClient_openI2cDevice(client,
+        rc = APeripheralManagerClient_openI2cDevice(client,
             i2c_busses[dev->busnum], addr, &dev->bi2c);
     }
     if (rc != 0) {
@@ -383,7 +383,7 @@ mraa_pman_i2c_read_replace(mraa_i2c_context dev, uint8_t* data, int length)
         return 0;
     }
 
-    rc = BI2cDevice_read(dev->bi2c, data, length);
+    rc = AI2cDevice_read(dev->bi2c, data, length);
 
     return rc;
 }
@@ -398,7 +398,7 @@ mraa_pman_i2c_read_byte_replace(mraa_i2c_context dev)
         return 0;
     }
 
-    rc = BI2cDevice_read(dev->bi2c, &val, 1);
+    rc = AI2cDevice_read(dev->bi2c, &val, 1);
     if (rc != 0 ) {
         return rc;
     }
@@ -416,7 +416,7 @@ mraa_pman_i2c_read_byte_data_replace(mraa_i2c_context dev, uint8_t command)
         return 0;
     }
 
-    rc = BI2cDevice_readRegByte(dev->bi2c, command, &val);
+    rc = AI2cDevice_readRegByte(dev->bi2c, command, &val);
     if (rc != 0) {
         return 0;
     }
@@ -433,7 +433,7 @@ mraa_pman_i2c_read_bytes_data_replace(mraa_i2c_context dev, uint8_t command, uin
         return -1;
     }
 
-    rc = BI2cDevice_readRegBuffer(dev->bi2c, command, data, length);
+    rc = AI2cDevice_readRegBuffer(dev->bi2c, command, data, length);
 
     return rc;
 }
@@ -448,7 +448,7 @@ mraa_pman_i2c_read_word_data_replace(mraa_i2c_context dev, uint8_t command)
         return 0;
     }
 
-    rc = BI2cDevice_readRegWord(dev->bi2c, command, &val);
+    rc = AI2cDevice_readRegWord(dev->bi2c, command, &val);
     if (rc != 0) {
         return 0;
     }
@@ -465,7 +465,7 @@ mraa_pman_i2c_write_replace(mraa_i2c_context dev, const uint8_t* data, int lengt
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    rc = BI2cDevice_write(dev->bi2c, data, length);
+    rc = AI2cDevice_write(dev->bi2c, data, length);
     if (rc != 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -488,7 +488,7 @@ mraa_pman_i2c_write_byte_data_replace(mraa_i2c_context dev, const uint8_t data, 
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    rc = BI2cDevice_writeRegByte(dev->bi2c, command, data);
+    rc = AI2cDevice_writeRegByte(dev->bi2c, command, data);
     if (rc != 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -505,7 +505,7 @@ mraa_pman_i2c_write_word_data_replace(mraa_i2c_context dev, const uint16_t data,
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    rc = BI2cDevice_writeRegWord(dev->bi2c, command, data);
+    rc = AI2cDevice_writeRegWord(dev->bi2c, command, data);
     if (rc != 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -516,7 +516,7 @@ mraa_pman_i2c_write_word_data_replace(mraa_i2c_context dev, const uint16_t data,
 static mraa_result_t
 mraa_pman_gpio_init_internal_replace(mraa_gpio_context dev, int pin)
 {
-    int rc = BPeripheralManagerClient_openGpio(client, gpios[pin], &dev->bgpio);
+    int rc = APeripheralManagerClient_openGpio(client, gpios[pin], &dev->bgpio);
     if (rc != 0) {
         syslog(LOG_ERR, "peripheralmanager: Failed to init gpio");
         return MRAA_ERROR_INVALID_HANDLE;
@@ -531,7 +531,7 @@ static mraa_result_t
 mraa_pman_gpio_close_replace(mraa_gpio_context dev)
 {
     if (dev->bgpio != NULL) {
-        BGpio_delete(dev->bgpio);
+        AGpio_delete(dev->bgpio);
     }
 
     free(dev);
@@ -550,14 +550,14 @@ mraa_pman_gpio_dir_replace(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 
     switch (dir) {
         case MRAA_GPIO_IN:
-            rc = BGpio_setDirection(dev->bgpio, DIRECTION_IN);
+            rc = AGpio_setDirection(dev->bgpio, AGPIO_DIRECTION_IN);
             break;
         case MRAA_GPIO_OUT:
         case MRAA_GPIO_OUT_HIGH:
-            rc = BGpio_setDirection(dev->bgpio, DIRECTION_OUT_INITIALLY_HIGH);
+            rc = AGpio_setDirection(dev->bgpio, AGPIO_DIRECTION_OUT_INITIALLY_HIGH);
             break;
         case MRAA_GPIO_OUT_LOW:
-            rc = BGpio_setDirection(dev->bgpio, DIRECTION_OUT_INITIALLY_LOW);
+            rc = AGpio_setDirection(dev->bgpio, AGPIO_DIRECTION_OUT_INITIALLY_LOW);
             break;
     }
     if (rc != 0) {
@@ -585,7 +585,7 @@ mraa_pman_gpio_write_replace(mraa_gpio_context dev, int val)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    rc = BGpio_setValue(dev->bgpio, val);
+    rc = AGpio_setValue(dev->bgpio, val);
     if (rc != 0) {
         return MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -603,7 +603,7 @@ mraa_pman_gpio_read_replace(mraa_gpio_context dev)
         return -1;
     }
 
-    rc = BGpio_getValue(dev->bgpio, &val);
+    rc = AGpio_getValue(dev->bgpio, &val);
     if (rc != 0) {
         syslog(LOG_ERR, "peripheralman: Unable to read internal gpio");
         return -1;
@@ -623,16 +623,16 @@ mraa_pman_gpio_edge_mode_replace(mraa_gpio_context dev, mraa_gpio_edge_t mode)
 
     switch (mode) {
         case MRAA_GPIO_EDGE_BOTH:
-            rc = BGpio_setEdgeTriggerType(dev->bgpio, BOTH_EDGE);
+            rc = AGpio_setEdgeTriggerType(dev->bgpio, AGPIO_EDGE_BOTH);
             break;
         case MRAA_GPIO_EDGE_FALLING:
-            rc = BGpio_setEdgeTriggerType(dev->bgpio, FALLING_EDGE);
+            rc = AGpio_setEdgeTriggerType(dev->bgpio, AGPIO_EDGE_FALLING);
             break;
         case MRAA_GPIO_EDGE_RISING:
-            rc = BGpio_setEdgeTriggerType(dev->bgpio, RISING_EDGE);
+            rc = AGpio_setEdgeTriggerType(dev->bgpio, AGPIO_EDGE_RISING);
             break;
         case MRAA_GPIO_EDGE_NONE:
-            rc = BGpio_setEdgeTriggerType(dev->bgpio, NONE_EDGE);
+            rc = AGpio_setEdgeTriggerType(dev->bgpio, AGPIO_EDGE_NONE);
             break;
     }
     if (rc != 0) {
@@ -663,19 +663,19 @@ mraa_peripheralman_plat_init()
     }
 
     if (client != NULL) {
-        BPeripheralManagerClient_delete(client);
+        APeripheralManagerClient_delete(client);
     }
 
-    client = BPeripheralManagerClient_new();
+    client = APeripheralManagerClient_new();
     if (client == NULL) {
         return NULL;
     }
 
     // error checking?
-    gpios = BPeripheralManagerClient_listGpio(client, &gpios_count);
-    i2c_busses = BPeripheralManagerClient_listI2cBuses(client, &i2c_busses_count);
-    spi_busses = BPeripheralManagerClient_listSpiBuses(client, &spi_busses_count);
-    uart_devices = BPeripheralManagerClient_listUartDevices(client, &uart_busses_count);
+    gpios = APeripheralManagerClient_listGpio(client, &gpios_count);
+    i2c_busses = APeripheralManagerClient_listI2cBuses(client, &i2c_busses_count);
+    spi_busses = APeripheralManagerClient_listSpiBuses(client, &spi_busses_count);
+    uart_devices = APeripheralManagerClient_listUartDevices(client, &uart_busses_count);
 
     b->platform_name = "peripheralmanager";
     // query this from peripheral manager?
@@ -704,15 +704,8 @@ mraa_peripheralman_plat_init()
     for (; i < gpios_count; i++) {
         b->pins[i].name = gpios[i];
         b->pins[i].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-        b->pins[i].gpio.pinmap = i;
+        b->pins[i].gpio.pinmap = -1;
     }
-
-    for (i = 0; i < i2c_busses_count; i++) {
-        b->i2c_bus[i].bus_id = i;
-        b->i2c_bus[i].sda = -1;
-        b->i2c_bus[i].scl = -1;
-    }
-
 
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
     if (b->adv_func == NULL) {
@@ -802,7 +795,7 @@ pman_mraa_deinit()
     free_resources(&gpios, gpios_count);
 
     if (client != NULL) {
-        BPeripheralManagerClient_delete(client);
+        APeripheralManagerClient_delete(client);
         client = NULL;
     }
 }

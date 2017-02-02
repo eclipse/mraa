@@ -29,96 +29,88 @@ __BEGIN_DECLS
 /// @{
 
 /// Endianness.
-enum {
-  SPI_LSB_FIRST,  /**< Least significant bits first */
-  SPI_MSB_FIRST  /**< Most significant bits first */
-};
-
-/// SPI phase modes.
-enum {
-  SPI_CPHA = 0x01,  /**< Clock phase */
-  SPI_CPOL = 0x02  /**< Clock polarity */
-};
+typedef enum ASpiBitJustification {
+  ASPI_LSB_FIRST = 0, /**< Least significant bits first */
+  ASPI_MSB_FIRST = 1  /**< Most significant bits first */
+} ASpiBitJustification;
 
 /// SPI modes (similar to the Linux kernel's modes).
-enum {
-  SPI_MODE0 = 0,  /**< CPHA=0, CPOL=0 */
-  SPI_MODE1 = SPI_CPHA,  /**< CPHA=1, CPOL=0 */
-  SPI_MODE2 = SPI_CPOL,  /**< CPHA=0, CPOL=1 */
-  SPI_MODE3 = SPI_CPHA + SPI_CPOL  /**< CPHA=1, CPOL=1 */
-};
+typedef enum ASpiMode {
+  ASPI_MODE0 = 0, /**< CPHA=0, CPOL=0 */
+  ASPI_MODE1 = 1, /**< CPHA=1, CPOL=0 */
+  ASPI_MODE2 = 2, /**< CPHA=0, CPOL=1 */
+  ASPI_MODE3 = 3  /**< CPHA=1, CPOL=1 */
+} ASpiMode;
 
-typedef struct BSpiDevice BSpiDevice;
+typedef struct ASpiDevice ASpiDevice;
 
 /// Writes a buffer to the device.
-/// @param device Pointer to the BSpiDevice struct.
+/// @param device Pointer to the ASpiDevice struct.
 /// @param data Buffer to write.
 /// @param len Length of the buffer.
 /// @return 0 on success, errno on error.
-int BSpiDevice_writeBuffer(const BSpiDevice* device,
+int ASpiDevice_writeBuffer(const ASpiDevice* device,
                            const void* data,
                            size_t len);
 
 /// Reads a buffer from the device.
-/// @param device Pointer to the BSpiDevice struct.
+/// @param device Pointer to the ASpiDevice struct.
 /// @param data Buffer to read into.
 /// @param len Length of the buffer.
 /// @return 0 on success, errno on error.
-int BSpiDevice_readBuffer(const BSpiDevice* device,
-                          void* data,
-                          size_t len);
+int ASpiDevice_readBuffer(const ASpiDevice* device, void* data, size_t len);
 
 /// Transfer data to the device.
-/// @param device Pointer to the BSpiDevice struct.
+/// @param device Pointer to the ASpiDevice struct.
 /// @param tx_data Buffer to write.
 /// @param rx_data Buffer to read data in. If NULL, no data will be read.
 /// @param len Length of the buffers.
 /// @return 0 on success, errno on error.
-int BSpiDevice_transfer(const BSpiDevice* device,
+int ASpiDevice_transfer(const ASpiDevice* device,
                         const void* tx_data,
                         void* rx_data,
                         size_t len);
 
 /// Sets the frequency in Hertz.
-/// @param device Pointer to the BSpiDevice struct.
+/// @param device Pointer to the ASpiDevice struct.
 /// @param freq_hz Frequency to set.
 /// @return 0 on success, errno on error.
-int BSpiDevice_setFrequency(const BSpiDevice* device, uint32_t freq_hz);
+int ASpiDevice_setFrequency(const ASpiDevice* device, uint32_t freq_hz);
 
 /// Sets the SPI mode.
-/// @param device Pointer to the BSpiDevice struct.
+/// @param device Pointer to the ASpiDevice struct.
 /// @param mode Mode to use. One of SPI_MODE0, SPI_MODE1, SPI_MODE2, SPI_MODE3.
 /// @return 0 on success, errno on error.
-int BSpiDevice_setMode(const BSpiDevice* device, int mode);
+int ASpiDevice_setMode(const ASpiDevice* device, ASpiMode mode);
 
 /// Sets the bit justification.
-/// @param device Pointer to the BSpiDevice struct.
+/// @param device Pointer to the ASpiDevice struct.
 /// @param bit_justification One of SPI_LSB_FIRST OR SPI_MSB_FIRST.
 /// @return 0 on success, errno on error.
-int BSpiDevice_setBitJustification(const BSpiDevice* device,
-                                   int bit_justification);
+int ASpiDevice_setBitJustification(const ASpiDevice* device,
+                                   ASpiBitJustification bit_justification);
 
 /// Sets the number of bits per words.
-/// @param device Pointer to the BSpiDevice struct.
+/// @param device Pointer to the ASpiDevice struct.
 /// @param bits_per_word Number of bits per word.
 /// @return 0 on success, errno on error.
-int BSpiDevice_setBitsPerWord(const BSpiDevice* device, uint8_t bits_per_word);
+int ASpiDevice_setBitsPerWord(const ASpiDevice* device, uint8_t bits_per_word);
 
 /// Sets the delay to wait after each transfer.
-/// @param device Pointer to the BSpiDevice struct.
+/// @param device Pointer to the ASpiDevice struct.
 /// @param delay_usecs Delay in microseconds.
 /// @return 0 on success, errno on error.
-int BSpiDevice_setDelay(const BSpiDevice* device, uint16_t delay_usecs);
+int ASpiDevice_setDelay(const ASpiDevice* device, uint16_t delay_usecs);
 
 /// Sets the chip select behavior after each transfer.
-/// @param device Pointer to the BSpiDevice struct.
+/// @param device Pointer to the ASpiDevice struct.
 /// @param change If set, cs will be active between transfers.
 /// @return 0 on success, errno on error.
-int BSpiDevice_setCsChange(const BSpiDevice* device, int change);
+int ASpiDevice_setCsChange(const ASpiDevice* device, int change);
 
-/// Destroys a BSpiDevice struct.
-/// @param device Pointer to the BSpiDevice struct.
-void BSpiDevice_delete(BSpiDevice* device);
+/// Destroys a ASpiDevice struct.
+/// @param device Pointer to the ASpiDevice struct.
+void ASpiDevice_delete(ASpiDevice* device);
 
 /// @}
 

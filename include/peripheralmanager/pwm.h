@@ -28,33 +28,29 @@ __BEGIN_DECLS
 /// These functions can be used to control PWM.
 /// @{
 
-typedef struct BPwm BPwm;
+typedef struct APwm APwm;
 
 /// Sets the PWM duty cycle.
-/// @param gpio Pointer to the BPwm struct
+/// @param gpio Pointer to the APwm struct.
 /// @param duty_cycle Double between 0 and 100 inclusive.
 /// @return 0 on success, errno on error.
-int BPwm_setDutyCycle(const BPwm* pwm, double duty_cycle);
+int APwm_setDutyCycle(const APwm* pwm, double duty_cycle);
 
 /// Sets the PWM frequency.
-/// @param gpio Pointer to the BPwm struct
+/// @param gpio Pointer to the APwm struct.
 /// @param freq Double denoting the frequency in Hz.
 /// @return 0 on success, errno on error.
-int BPwm_setFrequencyHz(const BPwm* pwm, double frequency);
+int APwm_setFrequencyHz(const APwm* pwm, double frequency);
 
 /// Enables the PWM.
-/// @param gpio Pointer to the BPwm struct
+/// @param gpio Pointer to the APwm struct.
+/// @param enabled Non-zero to enable.
 /// @return 0 on success, errno on error.
-int BPwm_enable(const BPwm* pwm);
+int APwm_setEnabled(const APwm* pwm, int enabled);
 
-/// Disables the PWM.
-/// @param gpio Pointer to the BPwm struct
-/// @return 0 on success, errno on error.
-int BPwm_disable(const BPwm* pwm);
-
-/// Destroys a BPwm struct.
-/// @param pwm Pointer to the BPwm struct.
-void BPwm_delete(BPwm* pwm);
+/// Destroys a APwm struct.
+/// @param pwm Pointer to the APwm struct.
+void APwm_delete(APwm* pwm);
 
 /// @}
 
