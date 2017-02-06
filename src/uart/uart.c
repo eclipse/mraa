@@ -221,7 +221,7 @@ mraa_uart_init_raw(const char* path)
         status =  MRAA_ERROR_NO_RESOURCES;
         goto init_raw_cleanup;
     }
-    strncpy(dev->path, path, strlen(path));
+    strncpy((char *) dev->path, path, strlen(path));
 
     if (IS_FUNC_DEFINED(dev, uart_init_raw_replace)) {
         status = dev->advance_func->uart_init_raw_replace(dev, path);
@@ -271,7 +271,7 @@ init_raw_cleanup:
                 close(dev->fd);
             }
             if (dev->path != NULL) {
-                free(dev->path);
+                free((void *) dev->path);
             }
             free(dev);
         }
@@ -294,7 +294,7 @@ mraa_uart_stop(mraa_uart_context dev)
         close(dev->fd);
     }
     if (dev->path != NULL) {
-        free(dev->path);
+        free((void *) dev->path);
     }
 
     free(dev);
