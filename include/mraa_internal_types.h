@@ -131,7 +131,7 @@ struct _gpio {
 #endif
     /*@}*/
 #ifdef PERIPHERALMAN
-    BGpio *bgpio;
+    AGpio *bgpio;
 #endif
 };
 
@@ -153,7 +153,7 @@ struct _i2c {
 #endif
     /*@}*/
 #ifdef PERIPHERALMAN
-    BI2cDevice *bi2c;
+    AI2cDevice *bi2c;
     char bus_name[256];
 #endif
 };
@@ -171,7 +171,7 @@ struct _spi {
     mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
 #ifdef PERIPHERALMAN
-    BSpiDevice *bspi;
+    ASpiDevice *bspi;
 #endif
 };
 
@@ -212,7 +212,7 @@ struct _uart {
     mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
 #if defined(PERIPHERALMAN)
-    struct BUartDevice *buart;
+    struct AUartDevice *buart;
 #endif
 };
 
