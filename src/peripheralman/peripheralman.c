@@ -704,8 +704,15 @@ mraa_peripheralman_plat_init()
     for (; i < gpios_count; i++) {
         b->pins[i].name = gpios[i];
         b->pins[i].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-        b->pins[i].gpio.pinmap = -1;
+        b->pins[i].gpio.pinmap = i;
     }
+
+    for (i = 0; i < i2c_busses_count; i++) {
+        b->i2c_bus[i].bus_id = i;
+        b->i2c_bus[i].sda = -1;
+        b->i2c_bus[i].scl = -1;
+    }
+
 
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
     if (b->adv_func == NULL) {
