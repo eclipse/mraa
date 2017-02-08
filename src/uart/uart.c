@@ -465,6 +465,29 @@ mraa_uart_set_flowcontrol(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_bo
 
     if (rtscts) {
         termio.c_cflag |= CRTSCTS;
+
+        // TODO: implement a way to "free" pins after setting flow control to off
+        if (!plat->no_bus_mux) {
+            int pos = plat->uart_dev[dev->index].cts;
+            if (pos >= 0) {
+                if (plat->pins[pos].uart.mux_total > 0) {
+                    if (mraa_setup_mux_mapped(plat->pins[pos].uart) != MRAA_SUCCESS) {
+                        syslog(LOG_ERR, "uart%i: init: failed to setup muxes for CTS pin", dev->index);
+                        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+                    }
+                }
+            }
+
+            pos = plat->uart_dev[dev->index].rts;
+            if (pos >= 0) {
+                if (plat->pins[pos].uart.mux_total > 0) {
+                    if (mraa_setup_mux_mapped(plat->pins[pos].uart) != MRAA_SUCCESS) {
+                        syslog(LOG_ERR, "uart%i: init: failed to setup muxes for RTS pin", dev->index);
+                        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+                    }
+                }
+            }
+        }
     } else {
         termio.c_cflag &= ~CRTSCTS;
     }
