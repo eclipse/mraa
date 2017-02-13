@@ -33,6 +33,24 @@
 
 #define PLATFORM_NAME "Intel GT Tuchuck"
 
+mraa_result_t
+mraa_gt_tuchuck_i2c_freq(mraa_i2c_context dev, mraa_i2c_mode_t mode)
+{
+    switch (mode) {
+        case MRAA_I2C_STD:
+            break;
+        case MRAA_I2C_FAST:
+            break;
+        case MRAA_I2C_HIGH:
+            break;
+        default:
+            syslog(LOG_ERR, "Invalid i2c mode selected");
+            return MRAA_ERROR_INVALID_PARAMETER;
+    }
+    syslog(LOG_NOTICE, "GT Tuchuck: i2c_frequency not implemented yet, using default speed");
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_gt_tuchuck_board()
 {
@@ -57,6 +75,8 @@ mraa_gt_tuchuck_board()
         free(b->pins);
         goto error;
     }
+
+    b->adv_func->i2c_set_frequency_replace = &mraa_gt_tuchuck_i2c_freq;
 
     b->pwm_default_period = 5000;
     b->pwm_max_period = 218453;
