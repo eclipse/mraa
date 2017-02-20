@@ -55,6 +55,7 @@ typedef enum {
     MRAA_INTEL_GT_TUCHUCK = MRAA_INTEL_JOULE_EXPANSION, // deprecated
 #endif
     MRAA_PHYBOARD_WEGA = 14,        /**< The phyBOARD-Wega */
+    MRAA_ALTERA_SOCFPGA = 15,       /** < Terasic DE-Nano-SoC Board */
 
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
