@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "arm/96boards.h"
+#include "arm/altera_socfpga.h"
 #include "arm/banana.h"
 #include "arm/beaglebone.h"
 #include "arm/phyboard.h"
@@ -70,6 +71,8 @@ mraa_arm_platform()
                     else if (mraa_file_exist("/sys/class/leds/green:ph24:led1")) {
                         platform_type = MRAA_BANANA;
                     }
+                } else if (strstr(line, "Altera SOCFPGA")) {
+                        platform_type = MRAA_ALTERA_SOCFPGA;
                 }
             }
         }
@@ -106,6 +109,9 @@ mraa_arm_platform()
             break;
         case MRAA_96BOARDS:
             plat = mraa_96boards();
+            break;
+        case MRAA_ALTERA_SOCFPGA:
+            plat = mraa_altera_socfpga();
             break;
         default:
             plat = NULL;

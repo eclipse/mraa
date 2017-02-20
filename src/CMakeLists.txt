@@ -83,6 +83,7 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/arm/beaglebone.c
   ${PROJECT_SOURCE_DIR}/src/arm/phyboard.c
   ${PROJECT_SOURCE_DIR}/src/arm/banana.c
+  ${PROJECT_SOURCE_DIR}/src/arm/altera_socfpga.c
 )
 
 set (mraa_LIB_MOCK_SRCS_NOAUTO
