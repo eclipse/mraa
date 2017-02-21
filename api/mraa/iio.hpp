@@ -47,6 +47,7 @@ class IioHandler
 {
 public:
   virtual void onIioEvent(const IioEventData& eventData) = 0;
+  virtual ~IioHandler() {};     // add an empty destructor to get rid of warning
 };
 
 
