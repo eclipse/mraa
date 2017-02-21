@@ -106,6 +106,9 @@ You can also enable -Wall for gcc before running cmake by exporting your wanted
 CC flags to the CC env var
   `export CC="gcc -Wall"`
 
+Sometimes it's nice to build a static libary, on Linux systems just set
+   `-DBUILD_SHARED_LIBS=OFF`
+
 ## Dependencies continued
 
 You'll need at least SWIG version 3.0.2 and we recommend 3.0.5 to build the
