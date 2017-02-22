@@ -39,6 +39,7 @@
 #define PLATFORM_NAME_RASPBERRY_PI_A_PLUS_REV_1 "Raspberry Pi Model A+ Rev 1"
 #define PLATFORM_NAME_RASPBERRY_PI2_B_REV_1 "Raspberry Pi 2 Model B Rev 1"
 #define PLATFORM_NAME_RASPBERRY_PI_ZERO "Raspberry Pi Zero"
+#define PLATFORM_NAME_RASPBERRY_PI3_B "Raspberry Pi 3 Model B"
 #define PLATFORM_RASPBERRY_PI_B_REV_1 1
 #define PLATFORM_RASPBERRY_PI_A_REV_2 2
 #define PLATFORM_RASPBERRY_PI_B_REV_2 3
@@ -47,6 +48,7 @@
 #define PLATFORM_RASPBERRY_PI_A_PLUS_REV_1 6
 #define PLATFORM_RASPBERRY_PI2_B_REV_1 7
 #define PLATFORM_RASPBERRY_PI_ZERO 8
+#define PLATFORM_RASPBERRY_PI3_B 9
 #define MMAP_PATH "/dev/mem"
 #define BCM2835_PERI_BASE 0x20000000
 #define BCM2835_GPIO_BASE (BCM2835_PERI_BASE + 0x200000)
@@ -255,10 +257,15 @@ mraa_raspberry_pi()
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_A_PLUS_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_A_PLUS_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_PLUS_PINCOUNT;
-                } else if (strstr(line, "a01041") || strstr(line, "a21041") || strstr(line, "a02082")) {
+                } else if (strstr(line, "a01041") || strstr(line, "a21041")) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI2_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI2_B_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI2_B_REV_1_PINCOUNT;
+                } else if (strstr(line, "a02082") || strstr(line, "a020a0") ||
+                           strstr(line, "a22082") || strstr(line, "a32082")) {
+                    b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_B;
+                    platform_detected = PLATFORM_RASPBERRY_PI3_B;
+                    b->phy_pin_count = MRAA_RASPBERRY_PI3_B_PINCOUNT;
                 } else {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
@@ -313,6 +320,10 @@ mraa_raspberry_pi()
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
             platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
             b->phy_pin_count = MRAA_RASPBERRY_PI_B_REV_1_PINCOUNT;
+        } else if (mraa_file_contains(compatible_path, "raspberrypi,3-model-b")) {
+            b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_B;
+            platform_detected = PLATFORM_RASPBERRY_PI3_B;
+            b->phy_pin_count = MRAA_RASPBERRY_PI3_B_PINCOUNT;
         }
     }
 
