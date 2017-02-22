@@ -37,7 +37,7 @@
 #define PLATFORM_NAME_BANANA_PRO "Banana Pro"
 #define PLATFORM_BANANA_PRO 2
 #define MMAP_PATH "/dev/mem"
-#define DT_BASE "/sys/firmware/devicetree/base"
+#define DT_BASE "/proc/device-tree"
 
 #define SUNXI_BASE (0x01C20000)
 #define SUNXI_BLOCK_SIZE (4 * 1024)
