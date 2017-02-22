@@ -87,6 +87,8 @@ mraa_arm_platform()
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/model", "s900"))
             platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
+            platform_type = MRAA_RASPBERRY_PI;
     }
 
     switch (platform_type) {
