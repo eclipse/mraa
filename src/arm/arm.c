@@ -50,7 +50,7 @@ mraa_arm_platform()
                 } else if (strstr(line, "BCM2709")) {
                     platform_type = MRAA_RASPBERRY_PI;
                 } else if (strstr(line, "Generic AM33XX")) {
-                    if(mraa_file_contains("/sys/firmware/devicetree/base/model", "phyBOARD-WEGA")) {
+                    if(mraa_file_contains("/proc/device-tree/model", "phyBOARD-WEGA")) {
                         platform_type = MRAA_PHYBOARD_WEGA;
                     } else {
                         platform_type = MRAA_BEAGLEBONE;
@@ -60,9 +60,9 @@ mraa_arm_platform()
                 } else if (strstr(line, "s900")) {
                     platform_type = MRAA_96BOARDS;
                 } else if (strstr(line, "sun7i")) {
-                    if (mraa_file_contains("/sys/firmware/devicetree/base/model", "Banana Pro")) {
+                    if (mraa_file_contains("/proc/device-tree/model", "Banana Pro")) {
                         platform_type = MRAA_BANANA;
-                    } else if (mraa_file_contains("/sys/firmware/devicetree/base/model",
+                    } else if (mraa_file_contains("/proc/device-tree/model",
                                                   "Banana Pi")) {
                         platform_type = MRAA_BANANA;
                     }
@@ -80,9 +80,9 @@ mraa_arm_platform()
     /* Get compatible string from Device tree for boards that dont have enough info in /proc/cpuinfo
      */
     if (platform_type == MRAA_UNKNOWN_PLATFORM) {
-        if (mraa_file_contains("/sys/firmware/devicetree/base/compatible", "qcom,apq8016-sbc"))
+        if (mraa_file_contains("/proc/device-tree/compatible", "qcom,apq8016-sbc"))
             platform_type = MRAA_96BOARDS;
-        else if (mraa_file_contains("/sys/firmware/devicetree/base/model",
+        else if (mraa_file_contains("/proc/device-tree/model",
                                     "HiKey Development Board"))
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/model", "s900"))
