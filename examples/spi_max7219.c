@@ -85,4 +85,5 @@ main(int argc, char** argv)
     mraa_spi_stop(spi);
 
     //! [Interesting]
+    return 0;
 }
