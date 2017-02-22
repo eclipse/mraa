@@ -219,10 +219,13 @@ mraa_raspberry_pi()
     size_t len = 100;
     char* line = calloc(len, sizeof(char));
 
+    mraa_boolean_t tweakedCpuinfo = 0;
+
     FILE* fh = fopen("/proc/cpuinfo", "r");
     if (fh != NULL) {
         while (getline(&line, &len, fh) != -1) {
             if (strncmp(line, "Revision", 8) == 0) {
+                tweakedCpuinfo = 1;
                 if (strstr(line, "0002") || strstr(line, "0003")) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
@@ -266,6 +269,52 @@ mraa_raspberry_pi()
         fclose(fh);
     }
     free(line);
+
+    // Some distros have a Revision line in /proc/cpuinfo for rpi.
+    // As this may not be the case for all distros, we need to find
+    // another way to guess the raspberry pi model.
+    if (!tweakedCpuinfo) {
+        // See Documentation/devicetree/bindings/arm/bcm/brcm,bcm2835.txt
+        // for the values
+        const char *compatible_path = "/proc/device-tree/compatible";
+        if (mraa_file_contains(compatible_path, "raspberrypi,model-b")) {
+            b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
+            platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
+            b->phy_pin_count = MRAA_RASPBERRY_PI_B_REV_1_PINCOUNT;
+        } else if (mraa_file_contains(compatible_path, "raspberrypi,model-b-rev2")) {
+            b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_2;
+            platform_detected = PLATFORM_RASPBERRY_PI_B_REV_2;
+            b->phy_pin_count = MRAA_RASPBERRY_PI_AB_REV_2_PINCOUNT;
+        } else if (mraa_file_contains(compatible_path, "raspberrypi,model-zero")) {
+            b->platform_name = PLATFORM_NAME_RASPBERRY_PI_ZERO;
+            platform_detected = PLATFORM_RASPBERRY_PI_ZERO;
+            b->phy_pin_count = MRAA_RASPBERRY_PI_ZERO_PINCOUNT;
+        } else if (mraa_file_contains(compatible_path, "raspberrypi,model-a")) {
+            b->platform_name = PLATFORM_NAME_RASPBERRY_PI_A_REV_2;
+            platform_detected = PLATFORM_RASPBERRY_PI_A_REV_2;
+            b->phy_pin_count = MRAA_RASPBERRY_PI_AB_REV_2_PINCOUNT;
+        } else if (mraa_file_contains(compatible_path, "raspberrypi,model-b-plus")) {
+            b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_PLUS_REV_1;
+            platform_detected = PLATFORM_RASPBERRY_PI_B_PLUS_REV_1;
+            b->phy_pin_count = MRAA_RASPBERRY_PI_AB_PLUS_PINCOUNT;
+        } else if (mraa_file_contains(compatible_path, "raspberrypi,compute-module")) {
+            b->platform_name = PLATFORM_NAME_RASPBERRY_PI_COMPUTE_MODULE_REV_1;
+            platform_detected = PLATFORM_RASPBERRY_PI_COMPUTE_MODULE_REV_1;
+            b->phy_pin_count = MRAA_RASPBERRY_PI_COMPUTE_MODULE_PINCOUNT;
+        } else if (mraa_file_contains(compatible_path, "raspberrypi,model-a-plus")) {
+            b->platform_name = PLATFORM_NAME_RASPBERRY_PI_A_PLUS_REV_1;
+            platform_detected = PLATFORM_RASPBERRY_PI_A_PLUS_REV_1;
+            b->phy_pin_count = MRAA_RASPBERRY_PI_AB_PLUS_PINCOUNT;
+        } else if (mraa_file_contains(compatible_path, "raspberrypi,2-model-b")) {
+            b->platform_name = PLATFORM_NAME_RASPBERRY_PI2_B_REV_1;
+            platform_detected = PLATFORM_RASPBERRY_PI2_B_REV_1;
+            b->phy_pin_count = MRAA_RASPBERRY_PI2_B_REV_1_PINCOUNT;
+        } else if (mraa_file_contains(compatible_path, "raspberrypi,model-b")) {
+            b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
+            platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
+            b->phy_pin_count = MRAA_RASPBERRY_PI_B_REV_1_PINCOUNT;
+        }
+    }
 
     b->aio_count = 0;
     b->adc_raw = 0;
