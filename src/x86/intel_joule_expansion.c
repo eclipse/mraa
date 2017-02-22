@@ -1,5 +1,6 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Author: Mihai Tudor Panu <mihai.tudor.panu@intel.com>
  * Copyright (c) 2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -24,32 +25,63 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/i2c-dev.h>
+
+// Debug
+#include <syslog.h>
+#include <sys/errno.h>
 
 #include "common.h"
 #include "x86/intel_joule_expansion.h"
 
 #define PLATFORM_NAME "INTEL JOULE EXPANSION"
 
+typedef union i2c_smbus_data_union {
+    uint8_t byte;        ///< data byte
+    unsigned short word; ///< data short word
+    uint8_t block[I2C_SMBUS_BLOCK_MAX + 2];
+    ///< block[0] is used for length and one more for PEC
+} i2c_smbus_data_t;
+
+typedef struct i2c_smbus_ioctl_data_struct {
+    uint8_t read_write;     ///< operation direction
+    uint8_t command;        ///< ioctl command
+    int size;               ///< data size
+    i2c_smbus_data_t* data; ///< data
+} i2c_smbus_ioctl_data_t;
+
+typedef enum {NO_SHIELD, DFROBOT, GROVE} shield_t;
+
+static mraa_result_t
+mraa_joule_expansion_board_get_valid_fp(mraa_aio_context dev)
+{
+    char file_path[64] = "";
+
+    // 4 channels per ADC
+    snprintf(file_path, 64, "/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw", dev->channel / 4, dev->channel % 4);
+
+    dev->adc_in_fp = open(file_path, O_RDONLY);
+    if (dev->adc_in_fp == -1) {
+        syslog(LOG_ERR, "aio: Failed to open input raw file %s for reading!", file_path);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_joule_expansion_board()
 {
+    shield_t shield = NO_SHIELD;
+    int pincount = MRAA_INTEL_JOULE_EXPANSION_PINCOUNT;
+
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
         return NULL;
-    }
-
-    b->platform_name = PLATFORM_NAME;
-    b->phy_pin_count = MRAA_INTEL_JOULE_EXPANSION_PINCOUNT;
-    b->aio_count = 0;
-    b->adc_raw = 0;
-    b->adc_supported = 0;
-
-    b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_JOULE_EXPANSION_PINCOUNT, sizeof(mraa_pininfo_t));
-    if (b->pins == NULL) {
-        goto error;
     }
 
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
@@ -58,14 +90,18 @@ mraa_joule_expansion_board()
         goto error;
     }
 
+    b->platform_name = PLATFORM_NAME;
+    b->gpio_count = pincount;
+
     b->pwm_default_period = 5000;
     b->pwm_max_period = 218453;
     b->pwm_min_period = 1;
 
     b->i2c_bus_count = 0;
 
-    int i2c_bus_num = -1;
-    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:16.0", "i2c_designware.0");
+    //int i2c_bus_num = -1;
+    int i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:16.0", "i2c_designware.0");
+    int i2c_aio_bus = i2c_bus_num;
     if (i2c_bus_num != -1) {
         b->i2c_bus[0].bus_id = i2c_bus_num;
         b->i2c_bus[0].sda = 11;
@@ -148,6 +184,115 @@ mraa_joule_expansion_board()
     b->spi_bus[3].slave_s = 0;
     b->spi_bus[4].bus_id = 32765;
     b->spi_bus[4].slave_s = 2;
+
+    // Aio shield detection
+    // Only if i2c_designware.0 was successfully found
+    if (i2c_aio_bus != -1) {
+
+        syslog(LOG_NOTICE, "Attempting shield autodetection on I2C bus %d...", i2c_aio_bus);
+
+        i2c_smbus_ioctl_data_t sm;
+        i2c_smbus_data_t d;
+        int fp;
+
+        char i2c_fh[64];
+        snprintf(i2c_fh, 64, "/dev/i2c-%d", i2c_aio_bus);
+
+        sm.read_write = I2C_SMBUS_READ;
+        sm.command = 0x01;
+        sm.size = I2C_SMBUS_WORD_DATA; // LSB first
+        sm.data = &d;
+
+        if ((fp = open(i2c_fh, O_RDWR)) < 1)
+            syslog(LOG_ERR, "Failed to open I2C bus: %s", strerror(errno));
+        if (ioctl(fp, I2C_SLAVE_FORCE, 0x49) < 0)
+            syslog(LOG_ERR, "Failed to set I2C address: %s", strerror(errno));
+        if (ioctl(fp, I2C_SMBUS, &sm) < 0) {
+            syslog(LOG_NOTICE, "No device at I2C address 0x49");
+
+            // no DFRobot shield, try Grove
+            if (ioctl(fp, I2C_SLAVE_FORCE, 0x48) < 0)
+                syslog(LOG_ERR, "Failed to set I2C address: %s", strerror(errno));
+            if (ioctl(fp, I2C_SMBUS, &sm) < 0)
+                syslog(LOG_NOTICE, "No device at I2C address 0x48");
+                // no shield
+            else {
+                // load ads1015 at 0x48
+                syslog(LOG_NOTICE, "Loading ti-ads1015 module for Grove Shield");
+                if (system("modprobe ti-ads1015") < 0) {
+                    syslog(LOG_NOTICE, "Failed, are you running the latest Joule kernel?");
+                } else {
+                    char command[128];
+                    snprintf(command, 128, "echo ads1015 0x48 >/sys/bus/i2c/devices/i2c-%d/new_device", i2c_aio_bus);
+                    if (system(command) < 0) {
+                        syslog(LOG_ERR, "Failed to add ads1015 device");
+                    } else {
+                        // success, setup aio pins
+                        b->aio_count = 4;
+                        b->adc_raw = 11; // 12-bit ads1015 - sign bit
+                        b->adc_supported = 10;
+                        pincount += b->aio_count;
+                        shield = GROVE;
+
+                        // max sample rate and 6.144 V reference
+                        // additional aio functions can be added to make up for loss of precision at 3V3, 5V, etc
+                        for (int i = 0; i < b->aio_count; i++) {
+                            snprintf(command, 128, "echo 3300 >/sys/bus/iio/devices/iio:device0/in_voltage%d_sampling_frequency", i);
+                            system(command);
+                            snprintf(command, 128, "echo 3 >/sys/bus/iio/devices/iio:device0/in_voltage%d_scale", i);
+                            system(command);
+                        }
+                    }
+                }
+            }
+        } else {
+            // load ads1115 at 0x48 and 0x49
+            syslog(LOG_NOTICE, "Loading ti-ads1015 module for DFRobot Shield");
+            if (system("modprobe ti-ads1015") < 0) {
+                syslog(LOG_NOTICE, "Failed, are you running the latest Joule kernel?");
+            } else {
+                char command[128];
+                snprintf(command, 128, "echo ads1115 0x48 >/sys/bus/i2c/devices/i2c-%d/new_device", i2c_aio_bus);
+                if (system(command) < 0)
+                    syslog(LOG_ERR, "Failed to add ads1115 device");
+                else {
+                    snprintf(command, 128, "echo ads1115 0x49 >/sys/bus/i2c/devices/i2c-%d/new_device", i2c_aio_bus);
+                    if (system(command) < 0)
+                        syslog(LOG_ERR, "Failed to add ads1115 device");
+                    else {
+                        // success, setup aio pins
+                        b->aio_count = 8;
+                        b->adc_raw = 15; // 16-bit ads1115 - sign bit
+                        b->adc_supported = 10;
+                        b->adv_func->aio_get_valid_fp = &mraa_joule_expansion_board_get_valid_fp;
+                        pincount += b->aio_count;
+                        shield = DFROBOT;
+
+                        // max sample rate and 6.144 V reference
+                        // additional aio functions can be added to make up for loss of precision at 3V3, 5V, etc
+                        for (int i = 0; i < b->aio_count; i++) {
+                            snprintf(command, 128, "echo 860 >/sys/bus/iio/devices/iio:device%d/in_voltage%d_sampling_frequency", i / 4, i % 4);
+                            system(command);
+                            snprintf(command, 128, "echo 3 >/sys/bus/iio/devices/iio:device%d/in_voltage%d_scale", i / 4, i % 4);
+                            system(command);
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        b->aio_count = 0;
+        b->adc_raw = 0;
+        b->adc_supported = 0;
+    }
+
+    // initialize pins
+    b->phy_pin_count = pincount;
+
+    b->pins = (mraa_pininfo_t*) calloc(pincount, sizeof(mraa_pininfo_t));
+    if (b->pins == NULL) {
+        goto error;
+    }
 
     int pos = 0;
 
@@ -710,6 +855,56 @@ mraa_joule_expansion_board()
     b->pins[pos].gpio.pinmap = 439;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
+
+    switch (shield) {
+
+        case DFROBOT:
+
+            strncpy(b->pins[pos + 4].name, "A4", 8);
+            b->pins[pos + 4].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+            b->pins[pos + 4].aio.pinmap = 4;
+            b->pins[pos + 4].aio.mux_total = 0;
+
+            strncpy(b->pins[pos + 5].name, "A5", 8);
+            b->pins[pos + 5].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+            b->pins[pos + 5].aio.pinmap = 5;
+            b->pins[pos + 5].aio.mux_total = 0;
+
+            strncpy(b->pins[pos + 6].name, "A6", 8);
+            b->pins[pos + 6].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+            b->pins[pos + 6].aio.pinmap = 6;
+            b->pins[pos + 6].aio.mux_total = 0;
+
+            strncpy(b->pins[pos + 5].name, "A7", 8);
+            b->pins[pos + 7].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+            b->pins[pos + 7].aio.pinmap = 7;
+            b->pins[pos + 7].aio.mux_total = 0;
+
+        case GROVE:
+
+            strncpy(b->pins[pos].name, "A0", 8);
+            b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+            b->pins[pos].aio.pinmap = 0;
+            b->pins[pos].aio.mux_total = 0;
+
+            strncpy(b->pins[pos + 1].name, "A1", 8);
+            b->pins[pos + 1].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+            b->pins[pos + 1].aio.pinmap = 1;
+            b->pins[pos + 1].aio.mux_total = 0;
+
+            strncpy(b->pins[pos + 2].name, "A2", 8);
+            b->pins[pos + 2].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+            b->pins[pos + 2].aio.pinmap = 2;
+            b->pins[pos + 2].aio.mux_total = 0;
+
+            strncpy(b->pins[pos + 3].name, "A3", 8);
+            b->pins[pos + 3].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+            b->pins[pos + 3].aio.pinmap = 3;
+            b->pins[pos + 3].aio.mux_total = 0;
+
+        case NO_SHIELD:
+        default: break;
+    }
 
     return b;
 
