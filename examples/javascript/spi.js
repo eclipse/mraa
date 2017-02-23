@@ -24,15 +24,13 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var m = require('mraa'); //require mraa
+const mraa = require('mraa'); //require mraa
 
-x = new m.Spi(0)
-buf = new Buffer(4)
+let spiDevice = new mraa.Spi(0)
+let buf = new Buffer(4)
 buf[0] = 0xf4
 buf[1] = 0x2e
 buf[2] = 0x3e
 buf[3] = 0x4e
-buf2 = x.write(buf)
+let buf2 = x.write(buf)
 console.log("Sent: " + buf.toString('hex') + ". Received: " + buf2.toString('hex'))
-
-

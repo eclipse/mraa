@@ -22,9 +22,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var m = require('mraa'); //require mraa
-console.log('MRAA Version: ' + m.getVersion()); //write the mraa version to the console
+const mraa = require('mraa'); //require mraa
+console.log('MRAA Version: ' + mraa.getVersion()); //write the mraa version to the console
 
-var myDigitalPin = new m.Gpio(5); //setup digital read on pin 5
+var myDigitalPin = new mraa.Gpio(5); //setup digital read on pin 5
 myDigitalPin.dir(m.DIR_OUT); //set the gpio direction to output
 myDigitalPin.write(1); //set the digital pin to high (1)
