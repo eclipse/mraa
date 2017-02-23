@@ -22,13 +22,15 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var m = require('mraa'); //require mraa
+"use strict";
 
-x = new m.I2c(0)
-x.address(0x62)
-x.writeReg(0, 0)
-x.writeReg(1, 0)
+const mraa = require('mraa'); //require mraa
 
-x.writeReg(0x08, 0xAA)
-x.writeReg(0x04, 255)
-x.writeReg(0x02, 255)
+let i2cDevice = new mraa.I2c(0);
+i2cDevice.address(0x62);
+i2cDevice.writeReg(0, 0);
+i2cDevice.writeReg(1, 0);
+
+i2cDevice.writeReg(0x08, 0xAA);
+i2cDevice.writeReg(0x04, 255);
+i2cDevice.writeReg(0x02, 255);
