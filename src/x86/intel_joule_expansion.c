@@ -29,12 +29,12 @@
 #include <fcntl.h>
 
 #include "common.h"
-#include "x86/intel_gt_tuchuck.h"
+#include "x86/intel_joule_expansion.h"
 
-#define PLATFORM_NAME "Intel GT Tuchuck"
+#define PLATFORM_NAME "INTEL JOULE EXPANSION"
 
 mraa_board_t*
-mraa_gt_tuchuck_board()
+mraa_joule_expansion_board()
 {
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
@@ -42,12 +42,12 @@ mraa_gt_tuchuck_board()
     }
 
     b->platform_name = PLATFORM_NAME;
-    b->phy_pin_count = MRAA_INTEL_GT_TUCHUCK_PINCOUNT;
+    b->phy_pin_count = MRAA_INTEL_JOULE_EXPANSION_PINCOUNT;
     b->aio_count = 0;
     b->adc_raw = 0;
     b->adc_supported = 0;
 
-    b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_GT_TUCHUCK_PINCOUNT, sizeof(mraa_pininfo_t));
+    b->pins = (mraa_pininfo_t*) calloc(MRAA_INTEL_JOULE_EXPANSION_PINCOUNT, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
         goto error;
     }
@@ -705,7 +705,7 @@ mraa_gt_tuchuck_board()
     return b;
 
 error:
-    syslog(LOG_CRIT, "GT Tuchuck: Platform failed to initialise");
+    syslog(LOG_CRIT, "Intel Joule Expansion: Platform failed to initialise");
     free(b);
     return NULL;
 }

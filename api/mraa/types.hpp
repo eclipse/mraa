@@ -51,7 +51,7 @@ typedef enum {
     INTEL_SOFIA_3GR = 10,      /**< The Intel SoFIA 3GR */
     INTEL_CHERRYHILLS = 11,    /**< The Intel Braswell Cherryhills */
     INTEL_UP = 12,             /**< The UP Board */
-    INTEL_GT_TUCHUCK = 13,     /**< The Intel GT Board */
+    INTEL_JOULE_EXPANSION = 13,     /**< The Intel Joule Expansion Board */
     PHYBOARD_WEGA = 14,        /**< The phyBOARD-Wega */
 
     FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */

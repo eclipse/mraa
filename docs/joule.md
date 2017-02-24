@@ -1,11 +1,13 @@
-Intel Joule {#grossetete}
+Intel Joule {#joule}
 ===========
 
-The Joule Board with the daughterboard (Tuchuck) board is supported by Mraa
+[http://www.intel.com/joule](http://www.intel.com/joule)
+
+The Intel Joule expansion board is supported by Mraa
 
 Revision Support
 ----------------
-Tuchuck
+Intel Joule expansion board
 
 Interface notes
 ---------------
@@ -41,7 +43,7 @@ switch between using the FTDI 6 pin header and the micro USB output.
 Pin Mapping
 -----------
 
-Tuchuck has two breakouts, breakout #1 is 1-40 whilst breakout2 is 41-80. The
+The Intel Joule expansion board has two breakouts, breakout #1 is 1-40 whilst breakout2 is 41-80. The
 LEDs are numbered from 100-103.
 
 | MRAA Number | Physical Pin | Function |
