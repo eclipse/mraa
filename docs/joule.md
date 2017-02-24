@@ -1,7 +1,7 @@
-Intel Joule {#grossetete}
+Intel Joule
 ===========
 
-The Joule Board with the daughterboard (Tuchuck) board is supported by Mraa
+The Intel Joule expansion board (Tuchuck) is supported by Mraa
 
 Revision Support
 ----------------

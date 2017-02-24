@@ -44,25 +44,25 @@ they are listed here. Anything pre 0.2.x is ignored.
 **1.2.0**
   * JSON platform support
   * mock I2c functionality
-  * Intel Grosse Tete PWM fix
+  * Intel Joule PWM fix
   * AIO firmata bug fix
 
 **1.1.2**
   * Mock platform support
   * mraa-i2c treats i2c buses by default as linux
-  * grosse tete i2c fixes
+  * Intel Joule i2c fixes
   * travis now uses 14.04 instead of 12.04
 
 **1.1.1**
   * IIO 4.6 kernel matrix support
-  * Intel Grosse Tete radio led support
+  * Intel Joule radio led support
   * mraa_init_io() examples
   * MRAAPLATFORMFORCE fixes
   * fix python documentation
 
 **1.1.0**
   * build python2 & python3 bindings
-  * Intel Grosse Tete support
+  * Intel Joule support
   * mraa_init_io() generic funtion
   * mraa-gpio fixes
   * edison PWM 0% improvements
