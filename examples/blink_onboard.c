@@ -46,6 +46,9 @@ main(int argc, char** argv)
             // lure put an LED on pin 21
             gpio = mraa_gpio_init(21);
             break;
+        case MRAA_INTEL_JOULE_EXPANSION:
+            gpio = mraa_gpio_init(101);
+            break;
         default:
             gpio = mraa_gpio_init(13);
     }
