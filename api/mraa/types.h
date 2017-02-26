@@ -51,6 +51,7 @@ typedef enum {
     MRAA_INTEL_CHERRYHILLS = 11,     /**< The Intel Braswell Cherryhills */
     MRAA_UP = 12,                    /**< The UP Board */
     MRAA_INTEL_JOULE_EXPANSION = 13,      /**< The Intel Joule Expansion Board */
+    MRAA_INTEL_GT_TUCHUCK __attribute__((deprecated)) = MRAA_INTEL_JOULE_EXPANSION, // deprecated
     MRAA_PHYBOARD_WEGA = 14,        /**< The phyBOARD-Wega */
 
     // USB platform extenders start at 256
