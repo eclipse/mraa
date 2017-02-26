@@ -124,7 +124,7 @@ LEDs are numbered from 100-103.
 | 74          | UART1TX      | GPIO UART|
 | 75          | I2C2SDA      | GPIO I2C |
 | 76          | UART1RX      | GPIO UART|
-| 77          | I2C1SCL      | GPIO I2C |
+| 77          | I2C2SCL      | GPIO I2C |
 | 78          | UART1RT      | GPIO UART|
 | 79          | RTC_CLK      | GPIO     |
 | 80          | UART1CT      | GPIO UART|
