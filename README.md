@@ -72,6 +72,18 @@ Install on Arch Linux
 
 There is an AUR package for mraa here: https://aur.archlinux.org/packages/mraa
 
+Install on openSUSE
+-------------------
+
+```bash
+REPO="openSUSE_Tumbleweed"
+if test "$(arch)" == "aarch64"; then
+  REPO="openSUSE_Factory_ARM"
+fi
+sudo zypper ar http://download.opensuse.org/repositories/hardware/$REPO/hardware.repo
+sudo zypper in mraa
+```
+
 Installing for Node.js only
 ---------------------------
 
