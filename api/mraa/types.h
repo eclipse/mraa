@@ -52,7 +52,7 @@ typedef enum {
     MRAA_UP = 12,                    /**< The UP Board */
     MRAA_INTEL_JOULE_EXPANSION = 13,      /**< The Intel Joule Expansion Board */
 #if __STDC_VERSION__ >= 199901L
-    MRAA_INTEL_GT_TUCHUCK __attribute__((deprecated)) = MRAA_INTEL_JOULE_EXPANSION, // deprecated
+    MRAA_INTEL_GT_TUCHUCK = MRAA_INTEL_JOULE_EXPANSION, // deprecated
 #endif
     MRAA_PHYBOARD_WEGA = 14,        /**< The phyBOARD-Wega */
 
