@@ -50,6 +50,8 @@ mraa_arm_platform()
                     platform_type = MRAA_RASPBERRY_PI;
                 } else if (strstr(line, "BCM2709")) {
                     platform_type = MRAA_RASPBERRY_PI;
+                } else if (strstr(line, "BCM2835")) {
+                    platform_type = MRAA_RASPBERRY_PI;
                 } else if (strstr(line, "Generic AM33XX")) {
                     if(mraa_file_contains("/proc/device-tree/model", "phyBOARD-WEGA")) {
                         platform_type = MRAA_PHYBOARD_WEGA;
