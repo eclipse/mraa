@@ -585,6 +585,7 @@ mraa_raspberry_pi()
     if ((platform_detected == PLATFORM_RASPBERRY_PI_A_PLUS_REV_1) ||
         (platform_detected == PLATFORM_RASPBERRY_PI_B_PLUS_REV_1) ||
         (platform_detected == PLATFORM_RASPBERRY_PI2_B_REV_1) ||
+        (platform_detected == PLATFORM_RASPBERRY_PI3_B) ||
         (platform_detected == PLATFORM_RASPBERRY_PI_ZERO)) {
 
         strncpy(b->pins[27].name, "ID_SD", MRAA_PIN_NAME_SIZE);
