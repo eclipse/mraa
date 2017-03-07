@@ -46,6 +46,9 @@ Pin Mapping
 The Intel Joule expansion board has two breakouts, breakout #1 is 1-40 whilst breakout2 is 41-80. The
 LEDs are numbered from 100-103.
 
+ISH UART are named as: IURT
+ISH I2C are named as:IIC
+
 | MRAA Number | Physical Pin | Function |
 |-------------|--------------|----------|
 | 1           | GPIO         | GPIO     |
@@ -118,16 +121,16 @@ LEDs are numbered from 100-103.
 | 68          | UART0RX      | GPIO UART|
 | 69          | SPP0RX       | GPIO SPI |
 | 70          | UART0RT      | GPIO UART|
-| 71          | I2C1SDA      | GPIO I2C |
+| 71          | IIC0SDA      | GPIO I2C |
 | 72          | UART0CT      | GPIO UART|
-| 73          | I2C1SCL      | GPIO I2C |
-| 74          | UART1TX      | GPIO UART|
-| 75          | I2C2SDA      | GPIO I2C |
-| 76          | UART1RX      | GPIO UART|
-| 77          | I2C2SCL      | GPIO I2C |
-| 78          | UART1RT      | GPIO UART|
+| 73          | IIC0SCL      | GPIO I2C |
+| 74          | IURT1TX      | GPIO UART|
+| 75          | IIC1SDA      | GPIO I2C |
+| 76          | IURT1RX      | GPIO UART|
+| 77          | IIC1SCL      | GPIO I2C |
+| 78          | IURT1RT      | GPIO UART|
 | 79          | RTC_CLK      | GPIO     |
-| 80          | UART1CT      | GPIO UART|
+| 80          | IURT1CT      | GPIO UART|
 | 100         | LED100       | GPIO     |
 | 101         | LED101       | GPIO 	|
 | 102         | LED102       | GPIO 	|

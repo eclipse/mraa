@@ -151,6 +151,7 @@ mraa_joule_expansion_board()
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
     pos++;
 
+    // pin 1
     strncpy(b->pins[pos].name, "GPIO22", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 451;
@@ -189,10 +190,9 @@ mraa_joule_expansion_board()
     pos++;
 
     strncpy(b->pins[pos].name, "UART0TX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-    // not configured as GPIO
-    //b->pins[pos].gpio.pinmap = 462;
-    //b->pins[pos].gpio.mux_total = 0;
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].gpio.pinmap = 468;
+    b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
     b->pins[pos].uart.mux_total = 0;
@@ -211,13 +211,13 @@ mraa_joule_expansion_board()
     //b->pins[pos].gpio.mux_total = 0;
     pos++;
 
+    // pin 10
     strncpy(b->pins[pos].name, "SPP1CLK", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 416;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
-    // pin 11
     strncpy(b->pins[pos].name, "I2C0SDA", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[pos].gpio.pinmap = 315;
@@ -248,7 +248,7 @@ mraa_joule_expansion_board()
 
     strncpy(b->pins[pos].name, "I2C1SDA", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
-    b->pins[pos].gpio.pinmap = 331;
+    b->pins[pos].gpio.pinmap = 317;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].i2c.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
@@ -262,7 +262,7 @@ mraa_joule_expansion_board()
 
     strncpy(b->pins[pos].name, "I2C1SCL", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
-    b->pins[pos].gpio.pinmap = 332;
+    b->pins[pos].gpio.pinmap = 318;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
     b->pins[pos].i2c.mux_total = 0;
@@ -276,31 +276,31 @@ mraa_joule_expansion_board()
 
     strncpy(b->pins[pos].name, "I2C2SDA", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
-    b->pins[pos].gpio.pinmap = 333;
+    b->pins[pos].gpio.pinmap = 319;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
     b->pins[pos].i2c.mux_total = 0;
     pos++;
 
+    // pin 20
     strncpy(b->pins[pos].name, "I2S1MCL", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 378;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
-    // pin 21
     strncpy(b->pins[pos].name, "I2C2SCL", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
-    b->pins[pos].gpio.pinmap = 334;
+    b->pins[pos].gpio.pinmap = 320;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].i2c.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "UART1TX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-    //b->pins[pos].gpio.pinmap = 472;
-    //b->pins[pos].gpio.mux_total = 0;
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].gpio.pinmap = 472;
+    b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
     b->pins[pos].uart.mux_total = 0;
@@ -313,9 +313,9 @@ mraa_joule_expansion_board()
     pos++;
 
     strncpy(b->pins[pos].name, "UART1RX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-    //b->pins[pos].gpio.pinmap = 471;
-    //b->pins[pos].gpio.mux_total = 0;
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].gpio.pinmap = 471;
+    b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
     b->pins[pos].uart.mux_total = 0;
@@ -358,6 +358,7 @@ mraa_joule_expansion_board()
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
+    // pin 30
     strncpy(b->pins[pos].name, "PWM2", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 465;
@@ -367,12 +368,10 @@ mraa_joule_expansion_board()
     b->pins[pos].pwm.mux_total = 0;
     pos++;
 
-    // pin 31
-    strncpy(b->pins[pos].name, "ISH_IO2", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    // High level will be V1P8 - VBE on MBT3904D
-    b->pins[pos].gpio.pinmap = 339;
-    b->pins[pos].gpio.mux_total = 0;
+    strncpy(b->pins[pos].name, "I2S3SDO", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    //b->pins[pos].gpio.pinmap = 400;
+    //b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "PWM3", 8);
@@ -418,6 +417,7 @@ mraa_joule_expansion_board()
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     pos++;
 
+    // pin 40
     strncpy(b->pins[pos].name, "3.3V", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     pos++;
@@ -459,6 +459,7 @@ mraa_joule_expansion_board()
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     pos++;
 
+    // pin 50
     strncpy(b->pins[pos].name, "1.8V", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     pos++;
@@ -509,6 +510,7 @@ mraa_joule_expansion_board()
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
+    // pin 60
     strncpy(b->pins[pos].name, "CAMERA", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     pos++;
@@ -527,7 +529,7 @@ mraa_joule_expansion_board()
 
     strncpy(b->pins[pos].name, "SPP0FS2", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
-    b->pins[pos].gpio.pinmap = 411;
+    b->pins[pos].gpio.pinmap = 413;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
@@ -538,8 +540,9 @@ mraa_joule_expansion_board()
     pos++;
 
     strncpy(b->pins[pos].name, "SPP0FS3", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
-    b->pins[pos].gpio.pinmap = 410;
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+    // There is nothing called SPP0FS3
+    //b->pins[pos].gpio.pinmap = 410;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
@@ -570,8 +573,9 @@ mraa_joule_expansion_board()
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
+    // pin 70
     strncpy(b->pins[pos].name, "UART0RT", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[pos].gpio.pinmap = 469;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
@@ -579,67 +583,69 @@ mraa_joule_expansion_board()
     b->pins[pos].uart.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2C1SDA", 8);
+    strncpy(b->pins[pos].name, "IIC0SDA", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
-    b->pins[pos].gpio.pinmap = 317;
+    b->pins[pos].gpio.pinmap = 331;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
     b->pins[pos].i2c.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "UART0CT", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[pos].gpio.pinmap = 412;
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[pos].gpio.pinmap = 470;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
     b->pins[pos].uart.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2C1SCL", 8);
+    strncpy(b->pins[pos].name, "IIC0SCL", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
-    b->pins[pos].gpio.pinmap = 318;
+    b->pins[pos].gpio.pinmap = 332;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
     b->pins[pos].i2c.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "UART1TX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[pos].gpio.pinmap = 484;
-    b->pins[pos].gpio.mux_total = 0;
+    strncpy(b->pins[pos].name, "IURT1TX", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    // Not available in breakout
+    //b->pins[pos].gpio.pinmap = 484;
+    //b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
     b->pins[pos].uart.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2C2SDA", 8);
+    strncpy(b->pins[pos].name, "IIC1SDA", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
-    b->pins[pos].gpio.pinmap = 319;
+    b->pins[pos].gpio.pinmap = 333;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
     b->pins[pos].i2c.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "UART1RX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[pos].gpio.pinmap = 483;
-    b->pins[pos].gpio.mux_total = 0;
+    strncpy(b->pins[pos].name, "IURT1RX", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    // Not available in breakout
+    //b->pins[pos].gpio.pinmap = 483;
+    //b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
     b->pins[pos].uart.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2C1SCL", 8);
+    strncpy(b->pins[pos].name, "IIC1SCL", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
-    b->pins[pos].gpio.pinmap = 320;
+    b->pins[pos].gpio.pinmap = 334;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
     b->pins[pos].i2c.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "UART1RT", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    strncpy(b->pins[pos].name, "IURT1RT", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[pos].gpio.pinmap = 485;
     b->pins[pos].gpio.mux_total = 0;
     b->pins[pos].uart.pinmap = 0;
@@ -653,8 +659,9 @@ mraa_joule_expansion_board()
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "UART1CT", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    // pin 80
+    strncpy(b->pins[pos].name, "IURT1CT", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[pos].gpio.pinmap = 486;
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
@@ -690,13 +697,13 @@ mraa_joule_expansion_board()
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "LEDWIFI", 8);
+    strncpy(b->pins[pos].name, "LEDBT", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 438;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "LEDBT", 8);
+    strncpy(b->pins[pos].name, "LEDWIFI", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 439;
     b->pins[pos].gpio.mux_total = 0;
