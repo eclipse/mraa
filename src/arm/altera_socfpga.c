@@ -45,8 +45,9 @@ static uint8_t* mmap_reg = NULL;
 static int mmap_fd = 0;
 static int mmap_size = FPGA_REGION_SIZE;
 static unsigned int mmap_count = 0;
-//static int platform_detected = 0;
 
+
+// MMAP stubbed functions
 mraa_result_t
 mraa_altera_socfpga_spi_init_pre(int index)
 {
@@ -55,21 +56,13 @@ mraa_altera_socfpga_spi_init_pre(int index)
 
 mraa_result_t
 mraa_altera_socfpga_i2c_init_pre(unsigned int bus)
-{   
+{
     return MRAA_SUCCESS;
 }
 
 mraa_result_t
 mraa_altera_socfpga_mmap_write(mraa_gpio_context dev, int value)
 {
-    // volatile uint32_t* addr;
-    // if (value) {
-        // *(volatile uint32_t*) (mmap_reg + (dev->pin / 32) * 4) =
-        // (uint32_t)(1 << (dev->pin % 32));
-    // } else {
-        // *(volatile uint32_t*) (mmap_reg + (dev->pin / 32) * 4) =
-        // (uint32_t)(1 << (dev->pin % 32));
-    // }
     return MRAA_SUCCESS;
 }
 
@@ -91,17 +84,13 @@ mraa_altera_socfpga_mmap_unsetup()
 int
 mraa_altera_socfpga_mmap_read(mraa_gpio_context dev)
 {
-    // uint32_t value = *(volatile uint32_t*) (mmap_reg  + (dev->pin / 32) * 4);
-    // if (value & (uint32_t)(1 << (dev->pin % 32))) {
-        // return 1;
-    // }
     return 0;
 }
 
 mraa_result_t
 mraa_altera_socfpga_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
 {
-    
+
     if (dev == NULL) {
         syslog(LOG_ERR, "altera_socfpga mmap: context not valid");
         return MRAA_ERROR_INVALID_HANDLE;
@@ -161,7 +150,7 @@ mraa_altera_socfpga()
 
     b->platform_name = PLATFORM_NAME;
     b->phy_pin_count = MRAA_ALTERA_SOCFPGA_PINCOUNT;
-    b->gpio_count = 96;
+    b->gpio_count = 96; // update as needed when adding ADC pins
     b->aio_count = 8;
     //b->pwm_default_period = 5000;
     //b->pwm_max_period = 218453;
@@ -179,18 +168,18 @@ mraa_altera_socfpga()
         free(b);
         return NULL;
     }
-   
+
     int pos = 0;
 
     strncpy(b->pins[pos].name, "D0/RX", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
-    //b->pins[pos].gpio.pinmap = 480;
+    //b->pins[pos].gpio.pinmap = 0;
     //b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "D1/TX", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
-    //b->pins[pos].gpio.pinmap = 481;
+    //b->pins[pos].gpio.pinmap = 0;
     //b->pins[pos].gpio.mux_total = 0;
     pos++;
 
@@ -229,7 +218,7 @@ mraa_altera_socfpga()
     b->pins[pos].gpio.pinmap = 208;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
-    
+
     strncpy(b->pins[pos].name, "D8", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 209;
@@ -241,24 +230,21 @@ mraa_altera_socfpga()
     b->pins[pos].gpio.pinmap = 210;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
-    
+
     // TODO: add rest of the Arduino header
     while (pos < 32) {
         b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
         pos++;
     }
-    
+
     // FPGA GPIO-0/JP1
     int jp = 1;
-    int os_index = 75; // Guessed, need to confirm
-    while (pos < 72) {
+    int os_index = 171;
+    while (pos < 52) {
         if (jp == 11) {
             strncpy(b->pins[pos].name, "5V", 8);
             b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-        } else if (jp == 29) {
-            strncpy(b->pins[pos].name, "3V3", 8);
-            b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-        } else if (jp == 12 || jp == 30) {
+        } else if (jp == 12) {
             strncpy(b->pins[pos].name, "GND", 8);
             b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
         } else {
@@ -270,20 +256,35 @@ mraa_altera_socfpga()
         }
         pos++;
         jp++;
-        //os_index++;
+    }
+
+    os_index = 139;
+    while (pos < 72) {
+        if (jp == 29) {
+            strncpy(b->pins[pos].name, "3V3", 8);
+            b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        } else if (jp == 30) {
+            strncpy(b->pins[pos].name, "GND", 8);
+            b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        } else {
+            snprintf(b->pins[pos].name, 8, "JP1-%d", jp);
+            b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+            b->pins[pos].gpio.pinmap = os_index;
+            b->pins[pos].gpio.mux_total = 0;
+            os_index++;
+        }
+        pos++;
+        jp++;
     }
 
     // FPGA GPIO-1/JP7
     jp = 1;
-    os_index = 139; // Guessed, need to confirm
-    while (pos < 112) {
+    os_index = 107;
+    while (pos < 92) {
         if (jp == 11) {
             strncpy(b->pins[pos].name, "5V", 8);
             b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-        } else if (jp == 29) {
-            strncpy(b->pins[pos].name, "3V3", 8);
-            b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-        } else if (jp == 12 || jp == 30) {
+        } else if (jp == 12) {
             strncpy(b->pins[pos].name, "GND", 8);
             b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
         } else {
@@ -295,9 +296,27 @@ mraa_altera_socfpga()
         }
         pos++;
         jp++;
-        //os_index++;
     }
-    
+
+    os_index = 75;
+    while (pos < 112) {
+        if (jp == 29) {
+            strncpy(b->pins[pos].name, "3V3", 8);
+            b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        } else if (jp == 30) {
+            strncpy(b->pins[pos].name, "GND", 8);
+            b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+        } else {
+            snprintf(b->pins[pos].name, 8, "JP7-%d", jp);
+            b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+            b->pins[pos].gpio.pinmap = os_index;
+            b->pins[pos].gpio.mux_total = 0;
+            os_index++;
+        }
+        pos++;
+        jp++;
+    }
+
     // 4 Switches
     jp = 0;
     os_index = 363;
@@ -310,7 +329,7 @@ mraa_altera_socfpga()
         jp++;
         os_index++;
     }
-    
+
     // 8 LEDs
     jp = 0;
     os_index = 395;
@@ -323,7 +342,7 @@ mraa_altera_socfpga()
         jp++;
         os_index++;
     }
-    
+
     // HPS_LED, HPS_KEY0, KEY0, KEY1
     strncpy(b->pins[pos].name, "HPS_LED", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
@@ -336,7 +355,7 @@ mraa_altera_socfpga()
     b->pins[pos].gpio.pinmap = 479;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
-    
+
     strncpy(b->pins[pos].name, "KEY0", 8);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 331;
@@ -348,11 +367,11 @@ mraa_altera_socfpga()
     b->pins[pos].gpio.pinmap = 332;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
-    
+
     // Bus definitions
     // No function muxing needed for buses (stubbed pins if added later)
     b->no_bus_mux = 1;
-    
+
     // 3 I2C buses (default 2 from Arduino header)
     b->i2c_bus_count = 3;
     b->def_i2c_bus = 2;
@@ -364,11 +383,11 @@ mraa_altera_socfpga()
     b->i2c_bus[1].bus_id = 1;
     //b->i2c_bus[1].sda = 0;
     //b->i2c_bus[1].scl = 0;
-    
+
     b->i2c_bus[2].bus_id = 2;
     //b->i2c_bus[2].sda = 0;
     //b->i2c_bus[2].scl = 0;
-    
+
     // 1 SPI bus
     b->spi_bus_count = 1;
     b->def_spi_bus = 0;
@@ -378,13 +397,13 @@ mraa_altera_socfpga()
     //b->spi_bus[0].mosi = 0;
     //b->spi_bus[0].miso = 0;
     //b->spi_bus[0].sclk = 0;
-    
+
     // Arduino header UART (default)
     b->uart_dev_count = 1;
     b->def_uart_dev = 0;
     b->uart_dev[0].device_path = "/dev/ttyS1";
     //b->uart_dev[0].rx = 0;
     //b->uart_dev[0].tx = 0;
-    
+
     return b;
 }
