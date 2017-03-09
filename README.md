@@ -38,6 +38,10 @@ ARM
 * [Beaglebone Black](../master/docs/beaglebone.md)
 * [phyBOARD-Wega](../master/docs/phyboard-wega.md)
 
+FPGA
+----
+* [DE10-Nano](../master/docs/altera-socfpga.md)
+
 USB
 ---
 * [FT4222](../master/docs/ftdi_ft4222.md)
