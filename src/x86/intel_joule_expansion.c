@@ -185,6 +185,15 @@ mraa_joule_expansion_board()
     b->spi_bus[4].bus_id = 32765;
     b->spi_bus[4].slave_s = 2;
 
+    b->uart_dev_count = 2;
+    b->def_uart_dev = 0;
+    b->uart_dev[0].device_path = "/dev/ttyS0";
+    b->uart_dev[0].rx = 68;
+    b->uart_dev[0].tx = 7;    
+    b->uart_dev[1].device_path = "/dev/ttyS1";
+    b->uart_dev[1].rx = 24;
+    b->uart_dev[1].tx = 22;
+
     // Aio shield detection
     // Only if i2c_designware.0 was successfully found
     if (i2c_aio_bus != -1) {
