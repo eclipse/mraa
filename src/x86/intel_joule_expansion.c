@@ -109,22 +109,6 @@ mraa_joule_expansion_board()
         b->i2c_bus_count++;
     }
 
-    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:17.1", "i2c_designware.5");
-    if (i2c_bus_num != -1) {
-        b->i2c_bus[b->i2c_bus_count].bus_id = i2c_bus_num;
-        b->i2c_bus[b->i2c_bus_count].sda = 15;
-        b->i2c_bus[b->i2c_bus_count].scl = 17;
-        b->i2c_bus_count++;
-    }
-
-    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:17.2", "i2c_designware.6");
-    if (i2c_bus_num != -1) {
-        b->i2c_bus[b->i2c_bus_count].bus_id = i2c_bus_num;
-        b->i2c_bus[b->i2c_bus_count].sda = 19;
-        b->i2c_bus[b->i2c_bus_count].scl = 21;
-        b->i2c_bus_count++;
-    }
-
     i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:16.1", "i2c_designware.1");
     if (i2c_bus_num != -1) {
         b->i2c_bus[b->i2c_bus_count].bus_id = i2c_bus_num;
@@ -138,6 +122,22 @@ mraa_joule_expansion_board()
         b->i2c_bus[b->i2c_bus_count].bus_id = i2c_bus_num;
         b->i2c_bus[b->i2c_bus_count].sda = 75;
         b->i2c_bus[b->i2c_bus_count].scl = 77;
+        b->i2c_bus_count++;
+    }
+
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:17.1", "i2c_designware.5");
+    if (i2c_bus_num != -1) {
+        b->i2c_bus[b->i2c_bus_count].bus_id = i2c_bus_num;
+        b->i2c_bus[b->i2c_bus_count].sda = 15;
+        b->i2c_bus[b->i2c_bus_count].scl = 17;
+        b->i2c_bus_count++;
+    }
+
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:17.2", "i2c_designware.6");
+    if (i2c_bus_num != -1) {
+        b->i2c_bus[b->i2c_bus_count].bus_id = i2c_bus_num;
+        b->i2c_bus[b->i2c_bus_count].sda = 19;
+        b->i2c_bus[b->i2c_bus_count].scl = 21;
         b->i2c_bus_count++;
     }
 
