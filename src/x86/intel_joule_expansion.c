@@ -245,7 +245,8 @@ mraa_joule_expansion_board()
 
                         // max sample rate and 6.144 V reference
                         // additional aio functions can be added to make up for loss of precision at 3V3, 5V, etc
-                        for (int i = 0; i < b->aio_count; i++) {
+                        int i;
+                        for (i = 0; i < b->aio_count; i++) {
                             snprintf(command, 128, "echo 3300 >/sys/bus/iio/devices/iio:device0/in_voltage%d_sampling_frequency", i);
                             system(command);
                             snprintf(command, 128, "echo 3 >/sys/bus/iio/devices/iio:device0/in_voltage%d_scale", i);
@@ -279,7 +280,8 @@ mraa_joule_expansion_board()
 
                         // max sample rate and 6.144 V reference
                         // additional aio functions can be added to make up for loss of precision at 3V3, 5V, etc
-                        for (int i = 0; i < b->aio_count; i++) {
+                        int i;
+                        for (i = 0; i < b->aio_count; i++) {
                             snprintf(command, 128, "echo 860 >/sys/bus/iio/devices/iio:device%d/in_voltage%d_sampling_frequency", i / 4, i % 4);
                             system(command);
                             snprintf(command, 128, "echo 3 >/sys/bus/iio/devices/iio:device%d/in_voltage%d_scale", i / 4, i % 4);
