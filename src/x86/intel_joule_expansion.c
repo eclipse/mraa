@@ -368,10 +368,11 @@ mraa_joule_expansion_board()
     b->pins[pos].pwm.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2S3SDO", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-    //b->pins[pos].gpio.pinmap = 400;
-    //b->pins[pos].gpio.mux_total = 0;
+    strncpy(b->pins[pos].name, "ISH_IO2", 8);
+    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    // High level will be V1P8 - VBE on MBT3904D
+    b->pins[pos].gpio.pinmap = 339;
+    b->pins[pos].gpio.mux_total = 0;
     pos++;
 
     strncpy(b->pins[pos].name, "PWM3", 8);
