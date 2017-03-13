@@ -124,13 +124,13 @@ ISH I2C are named as:IIC
 | 71          | IIC0SDA      | GPIO I2C |
 | 72          | UART0CT      | GPIO UART|
 | 73          | IIC0SCL      | GPIO I2C |
-| 74          | IURT1TX      | GPIO UART|
+| 74          | IURT0TX      | GPIO UART|
 | 75          | IIC1SDA      | GPIO I2C |
-| 76          | IURT1RX      | GPIO UART|
+| 76          | IURT0RX      | GPIO UART|
 | 77          | IIC1SCL      | GPIO I2C |
-| 78          | IURT1RT      | GPIO UART|
+| 78          | IURT0RT      | GPIO UART|
 | 79          | RTC_CLK      | GPIO     |
-| 80          | IURT1CT      | GPIO UART|
+| 80          | IURT0CT      | GPIO UART|
 | 100         | LED100       | GPIO     |
 | 101         | LED101       | GPIO 	|
 | 102         | LED102       | GPIO 	|
