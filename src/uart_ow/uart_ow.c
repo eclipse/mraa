@@ -35,7 +35,7 @@
 #include <termios.h>
 #include <fcntl.h>
 #include <errno.h>
-
+#include <time.h>
 #include "uart.h"
 #include "uart_ow.h"
 #include "mraa_internal.h"
@@ -44,10 +44,21 @@
 static mraa_result_t
 _ow_read_byte(mraa_uart_ow_context dev, uint8_t *ch)
 {
-    while (!mraa_uart_read(dev->uart, (char*) ch, 1))
-        ;
+    time_t thetime = time(NULL);
+    // add 5 seconds -- our crude timeout
+    thetime += 5;
 
-    return MRAA_SUCCESS;
+    int rv;
+    do {
+        rv = mraa_uart_read(dev->uart, (char*) ch, 1);
+    } while (rv == 0 && (time(NULL) < thetime));
+
+    if (rv == 0) {
+        return MRAA_ERROR_NO_DATA_AVAILABLE; // we timed out
+    }
+    else {
+        return MRAA_SUCCESS;
+    }
 }
 
 // low-level write byte
@@ -402,7 +413,9 @@ mraa_uart_ow_reset(mraa_uart_ow_context dev)
     /* pull the data line low */
     _ow_write_byte(dev, 0xf0);
 
-    _ow_read_byte(dev, &rv);
+    if (_ow_read_byte(dev, &rv) != MRAA_SUCCESS) {
+        return MRAA_ERROR_NO_DATA_AVAILABLE;
+    }
 
     /* back up to high speed for normal data transmissions */
     if (_ow_set_speed(dev, 1) != MRAA_SUCCESS) {
