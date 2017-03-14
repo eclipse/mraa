@@ -184,7 +184,7 @@ cmake -DRPM=ON -DCMAKE_INSTALL_PREFIX=/usr ..
 
 ## Building for Peripheralmanager Android Things
 
-Change src/CMakeLists.txt:146 to the location of libandroidthings.so on your
+Change src/CMakeLists.txt:140 to the location of libandroidthings.so on your
 machine or have it in your Android NDK. Switch the toolchain file var to point
 to where your Android NDK is (here android-ndk is in /opt).
 
