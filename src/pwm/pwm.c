@@ -493,6 +493,9 @@ mraa_pwm_close(mraa_pwm_context dev)
     }
 
     mraa_pwm_unexport(dev);
+    if (dev->duty_fp != -1) {
+        close(dev->duty_fp);
+    }
     free(dev);
     return MRAA_SUCCESS;
 }
