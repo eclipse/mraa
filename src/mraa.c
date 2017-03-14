@@ -947,7 +947,8 @@ mraa_find_i2c_bus_pci(const char* pci_device, const char *pci_id, const char* ad
         }
         else {
             while (n--) {
-	        char* dup = strdup(namelist[n]->d_name);
+                char* dup = strdup(namelist[n]->d_name);
+                char* orig_dup = dup;
                 if (dup == NULL) {
                     syslog(LOG_ERR, "Ran out of memory!");
                     break;
@@ -961,22 +962,20 @@ mraa_find_i2c_bus_pci(const char* pci_device, const char *pci_id, const char* ad
                         if (token != NULL) {
                             int ret = -1;
                             if (mraa_atoi(token, &ret) == MRAA_SUCCESS) {
-                                free(dup);
+                                free(orig_dup);
                                 free(namelist[n]);
                                 free(namelist);
                                 syslog(LOG_NOTICE, "Adding i2c bus found on i2c-%d on adapter %s", ret, adapter_name);
                                 return ret;
                             }
-                            free(dup);
+                            free(orig_dup);
                             free(namelist[n]);
                             free(namelist);
                             return -1;
                         }
                     }
-                    free(token);
-                } else {
-                    free(dup);
                 }
+                free(orig_dup);
                 free(namelist[n]);
             }
             free(namelist);
