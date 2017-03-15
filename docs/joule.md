@@ -65,13 +65,13 @@ ISH I2C are named as:IIC
 | 12          | I2S1SDI      | GPIO     |
 | 13          | I2C0SCL      | I2C      |
 | 14          | I2S1SDO      | GPIO     |
-| 15          | I2C1SDA      | I2C      |
+| 15          | IIC0SDA      | I2C      |
 | 16          | I2S1WS       | GPIO     |
-| 17          | I2C1SCL      | I2C      |
+| 17          | IIC0SCL      | I2C      |
 | 18          | I2S1CLK      | GPIO     |
-| 19          | I2C2SDA      | I2C      |
+| 19          | IIC1SDA      | I2C      |
 | 20          | I2S1MCL      | GPIO     |
-| 21          | I2C2SCL	     | I2CO     |
+| 21          | IIC1SCL	     | I2CO     |
 | 22          | UART1TX	     | UART     |
 | 23          | I2S4SDO      | NONE     |
 | 24          | UART1RX      | UART     |
@@ -115,19 +115,19 @@ ISH I2C are named as:IIC
 | 62          | SPI_DAT      | SPI      |
 | 63          | SPP0FS2      | GPIO SPI |
 | 64          | SPICLKB      | GPIO     |
-| 65          | SPP0FS3      | GPIO SPI |
+| 65          | SPI0CLK      | GPIO SPI |
 | 66          | SPICLKA      | GPIO     |
 | 67          | SPP0TX       | GPIO SPI |
 | 68          | UART0RX      | GPIO UART|
 | 69          | SPP0RX       | GPIO SPI |
 | 70          | UART0RT      | GPIO UART|
-| 71          | IIC0SDA      | GPIO I2C |
+| 71          | I2C1SDA      | GPIO I2C |
 | 72          | UART0CT      | GPIO UART|
-| 73          | IIC0SCL      | GPIO I2C |
+| 73          | I2C1SCL      | GPIO I2C |
 | 74          | IURT0TX      | GPIO UART|
-| 75          | IIC1SDA      | GPIO I2C |
+| 75          | I2C2SDA      | GPIO I2C |
 | 76          | IURT0RX      | GPIO UART|
-| 77          | IIC1SCL      | GPIO I2C |
+| 77          | I2C2SCL      | GPIO I2C |
 | 78          | IURT0RT      | GPIO UART|
 | 79          | RTC_CLK      | GPIO     |
 | 80          | IURT0CT      | GPIO UART|
