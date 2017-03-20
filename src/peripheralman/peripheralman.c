@@ -38,6 +38,77 @@ char **spi_busses = NULL;
 int spi_busses_count = 0;
 char **uart_devices = NULL;
 int uart_busses_count = 0;
+char **pwm_devices = NULL;
+int pwm_dev_count = 0;
+
+static mraa_pwm_context
+mraa_pman_pwm_init_replace(int pin)
+{
+    mraa_pwm_context dev;
+    if (APeripheralManagerClient_openPwm(client, pwm_devices[pin], &dev->bpwm) != 0) {
+        APwmDevice_delete(dev->bpwm);
+        return NULL;
+    }
+
+    return dev;
+}
+
+static mraa_result_t
+mraa_pman_pwm_period_replace(mraa_pwm_context dev, int period)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "pwm: stop: context is NULL");
+        return 0;
+    }
+
+    if (APwm_setFrequencyHz(dev->bpwm, period) != 0) {
+        return 0;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_pwm_duty_cycle_replace(mraa_pwm_context dev, int duty_cycle)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "pwm: stop: context is NULL");
+        return 0;
+    }
+
+    if (APwm_setDutyCycle(dev->bpwm, duty_cycle) != 0) {
+        return 0;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_pwm_enable_replace(mraa_pwm_context dev, int enable)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "pwm: stop: context is NULL");
+        return 0;
+    }
+
+    if (APwm_setEnabled(dev->bpwm, enable) != 0) {
+        return 0;
+    }
+
+    return MRAA_SUCCESS;
+}
+
+static float
+mraa_pman_pwm_read_replace(mraa_pwm_context dev)
+{
+    return -MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+}
+
+static mraa_result_t
+mraa_pman_pwm_write_replace(mraa_pwm_context dev, fload duty)
+{
+    return -MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+}
 
 static mraa_result_t
 mraa_pman_uart_init_raw_replace(mraa_uart_context dev, const char* path)
@@ -676,6 +747,7 @@ mraa_peripheralman_plat_init()
     i2c_busses = APeripheralManagerClient_listI2cBuses(client, &i2c_busses_count);
     spi_busses = APeripheralManagerClient_listSpiBuses(client, &spi_busses_count);
     uart_devices = APeripheralManagerClient_listUartDevices(client, &uart_busses_count);
+    pwm_devices = APeripheralManagerClient_listPwmDevices(client, &pwm_dev_count);
 
     b->platform_name = "peripheralmanager";
     // query this from peripheral manager?
@@ -690,9 +762,14 @@ mraa_peripheralman_plat_init()
     b->i2c_bus_count = i2c_busses_count;
     b->spi_bus_count = spi_busses_count;
     b->uart_dev_count = uart_busses_count;
+    b->pwm_dev_count = pwm_dev_count;
+    b->pwm_default_period = 5000;
+    b->pwm_max_period = 218453;
+    b->pwm_min_period = 1;
     b->def_i2c_bus = 0;
     b->def_spi_bus = 0;
     b->def_uart_dev = 0;
+    b->def_pwm_dev = 0;
 
     b->pins = (mraa_pininfo_t*) calloc(b->phy_pin_count, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
@@ -725,6 +802,11 @@ mraa_peripheralman_plat_init()
         b->spi_bus[i].mosi = -1;
         b->spi_bus[i].miso = -1;
         b->spi_bus[i].cs = -1;
+    }
+
+    //Updating PWM structure
+    for (i = 0; i < pwm_dev_count; i++) {
+        b->pwm_dev[i].index = i;
     }
 
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
@@ -780,6 +862,12 @@ mraa_peripheralman_plat_init()
     b->adv_func->uart_write_replace = &mraa_pman_uart_write_replace;
     b->adv_func->uart_read_replace = &mraa_pman_uart_read_replace;
 
+    b->adv_func->pwm_init_replace = &mraa_pman_pwm_init_replace;
+    b->adv_func->pwm_period_replace = &mraa_pman_pwm_period_replace;
+    b->adv_func->pwm_duty_cycle_replace = &mraa_pman_pwm_duty_cycle_replace;
+    b->adv_func->pwm_enable_replace = &mraa_pman_pwm_enable_replace;
+    b->adv_func->pwm_read_replace = &mraa_pman_pwm_read_replace;
+    b->adv_func->pwm_write_replace = &mraa_pman_pwm_write_replace;
     return b;
 }
 
@@ -809,6 +897,7 @@ free_resources(char ***resources, int count)
 void
 pman_mraa_deinit()
 {
+    free_resources(&pwm_devices, pwm_dev_count);
     free_resources(&uart_devices, uart_busses_count);
     free_resources(&spi_busses, spi_busses_count);
     free_resources(&i2c_busses, i2c_busses_count);
