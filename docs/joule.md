@@ -46,8 +46,8 @@ Pin Mapping
 The Intel Joule expansion board has two breakouts, breakout #1 is 1-40 whilst breakout2 is 41-80. The
 LEDs are numbered from 100-103.
 
-ISH UART are named as: IURT
-ISH I2C are named as:IIC
+ISH UART are named as: IURT.
+ISH I2C are named as:IIC.
 
 | MRAA Number | Physical Pin | Function |
 |-------------|--------------|----------|
@@ -71,7 +71,7 @@ ISH I2C are named as:IIC
 | 18          | I2S1CLK      | GPIO     |
 | 19          | IIC1SDA      | I2C      |
 | 20          | I2S1MCL      | GPIO     |
-| 21          | IIC1SCL	     | I2CO     |
+| 21          | IIC1SCL	     | I2C      |
 | 22          | UART1TX	     | UART     |
 | 23          | I2S4SDO      | NONE     |
 | 24          | UART1RX      | UART     |
@@ -121,13 +121,13 @@ ISH I2C are named as:IIC
 | 68          | UART0RX      | GPIO UART|
 | 69          | SPP0RX       | GPIO SPI |
 | 70          | UART0RT      | GPIO UART|
-| 71          | I2C1SDA      | GPIO I2C |
+| 71          | I2C1SDA      | I2C |
 | 72          | UART0CT      | GPIO UART|
-| 73          | I2C1SCL      | GPIO I2C |
+| 73          | I2C1SCL      | I2C |
 | 74          | IURT0TX      | GPIO UART|
-| 75          | I2C2SDA      | GPIO I2C |
+| 75          | I2C2SDA      | I2C |
 | 76          | IURT0RX      | GPIO UART|
-| 77          | I2C2SCL      | GPIO I2C |
+| 77          | I2C2SCL      | I2C |
 | 78          | IURT0RT      | GPIO UART|
 | 79          | RTC_CLK      | GPIO     |
 | 80          | IURT0CT      | GPIO UART|
