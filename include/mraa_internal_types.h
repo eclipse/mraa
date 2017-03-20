@@ -45,6 +45,7 @@
 #define MAX_I2C_BUS_COUNT 12
 #define MAX_SPI_BUS_COUNT 12
 #define MAX_UART_COUNT 6
+#define MAX_PWM_COUNT 6
 
 
 // general status failures for internal functions
@@ -187,6 +188,9 @@ struct _pwm {
     mraa_boolean_t owner; /**< Owner of pwm context*/
     mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
+#ifdef PERIPHERALMAN
+    APwmDevice *bpwm;
+#endif
 };
 
 /**
@@ -370,6 +374,16 @@ typedef struct {
 } mraa_uart_dev_t;
 
 /**
+ * A Structure representing a pwm device.
+ */
+typedef struct {
+    /*@{*/
+    unsigned int index; /**< ID as exposed in the system */
+    char* device_path; /**< To store "/dev/pwm" for example */
+    /*@}*/
+} mraa_pwm_dev_t;
+
+/**
  * A Structure representing a platform/board.
  */
 
@@ -386,10 +400,13 @@ typedef struct _board_t {
     unsigned int def_spi_bus; /**< Position in array of defult spi bus */
     unsigned int adc_raw; /**< ADC raw bit value */
     unsigned int adc_supported; /**< ADC supported bit value */
-    unsigned int def_uart_dev; /**< Position in array of defult uart */
-    int uart_dev_count; /**< Usable spi Count */
+    unsigned int def_uart_dev; /**< Position in array of default uart */
+    unsigned int def_pwm_dev; /**< Position in array of default pwm */
+    int uart_dev_count; /**< Usable uart Count */
     mraa_uart_dev_t uart_dev[MAX_UART_COUNT]; /**< Array of UARTs */
     mraa_boolean_t no_bus_mux; /**< i2c/spi/adc/pwm/uart bus muxing setup not required */
+    int pwm_dev_count; /**< Usable pwm Count */
+    mraa_pwm_dev_t pwm_dev[MAX_PWM_COUNT]; /**< Array of PWMs */
     int pwm_default_period; /**< The default PWM period is US */
     int pwm_max_period; /**< Maximum period in us */
     int pwm_min_period; /**< Minimum period in us */
