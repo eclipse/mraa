@@ -53,6 +53,7 @@ typedef enum {
     INTEL_UP = 12,             /**< The UP Board */
     INTEL_JOULE_EXPANSION = 13,     /**< The Intel Joule Expansion Board */
     PHYBOARD_WEGA = 14,        /**< The phyBOARD-Wega */
+    MRAA_ALTERA_SOCFPGA = 15,  /**< Terasic DE-Nano-SoC Board */
 
     FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 

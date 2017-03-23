@@ -14,18 +14,18 @@ applications.
 Board Support
 -------------
 
-Terasic DE10-Nano
-Terasic DE0-Nano-SoC
+* Terasic DE10-Nano
+* Terasic DE0-Nano-SoC
 
 Protocol Notes
 ---------------
 
-**GPIO** Fully supported through sysfs (both FPGA + HPC). Mmap not yet supported. Static map.
-**PWM** Currently not supported.
-**I2C** Fully supported with i2cdev. Default bus 2 is exposed on Arduino header, 3 buses total.
-**SPI** Supported with spidev on Arduino header.
-**UART** Working, default bus is on Arduino header. Console also accessible as `ttyS0` in raw mode.
-**ADC** Currently not supported.
+* **GPIO** Fully supported through sysfs (both FPGA + HPC). Mmap not yet supported. Static map.
+* **PWM** Currently not supported.
+* **I2C** Fully supported with i2cdev. Default bus 2 is exposed on Arduino header, 3 buses total.
+* **SPI** Supported with spidev on Arduino header.
+* **UART** Working, default bus is on Arduino header. Console also accessible as `ttyS0` in raw mode.
+* **ADC** Currently not supported.
 
 No muxes available for multi-function pins yet (e.g. you won't be able to use D0 & D1 on Arduino
 header as GPIOs).
@@ -70,7 +70,7 @@ Pin Mapping
 | 30          | A4           | JP6-5     | AIO      |
 | 31          | A5           | JP6-6     | AIO      |
 
-** GPIO0 (JP1) Side Header **
+**GPIO0 (JP1) Side Header**
 
 | MRAA Number | Board Pin | Function |
 |-------------|-----------|----------|
@@ -88,7 +88,7 @@ Pin Mapping
 | ...         | ...       | GPIO     |
 | 71          | JP1-40    | GPIO     |
 
-** GPIO1 (JP7) Side Header **
+**GPIO1 (JP7) Side Header**
 
 | MRAA Number | Board Pin | Function |
 |-------------|-----------|----------|
@@ -106,7 +106,7 @@ Pin Mapping
 | ...         | ...       | GPIO     |
 | 111         | JP7-40    | GPIO     |
 
-** Switches, Buttons, LEDs **
+**Switches, Buttons, LEDs**
 
 These are already in use by kernel drivers with the default image, except for KEY0 and KEY1.
 To use them with MRAA remove them from the device tree.
@@ -143,3 +143,11 @@ echo ff203000.gpio >/sys/bus/platform/drivers/altera_gpio/bind
 | 125         | HPS_KEY   | GPIO     |
 | 126         | KEY0      | GPIO     |
 | 127         | KEY1      | GPIO     |
+
+**Built-in ADXL345**
+
+Exposed on I2C bus 0. To use you will have to unbind the device driver first:
+
+```sh
+echo 0-0053 > /sys/bus/i2c/drivers/adxl34x/unbind
+```
