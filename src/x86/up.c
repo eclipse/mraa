@@ -25,7 +25,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <sys/utsname.h>
 #include <ctype.h>
 
 #include "common.h"
@@ -112,9 +111,6 @@ mraa_up_board()
 {
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
 
-    struct utsname running_uname;
-    int uname_major, uname_minor;
-
     if (b == NULL) {
         return NULL;
     }
@@ -135,14 +131,6 @@ mraa_up_board()
     }
 
     b->adv_func->aio_get_valid_fp = &mraa_up_aio_get_valid_fp;
-
-    if (uname(&running_uname) != 0) {
-        free(b->pins);
-        free(b->adv_func);
-        goto error;
-    }
-
-    sscanf(running_uname.release, "%d.%d", &uname_major, &uname_minor);
 
     mraa_up_set_pininfo(b, 0, "INVALID",   (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_up_set_pininfo(b, 1, "3.3v",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
