@@ -46,7 +46,7 @@ mraa_pman_pwm_init_replace(int pin)
 {
     mraa_pwm_context dev;
     if (APeripheralManagerClient_openPwm(client, pwm_devices[pin], &dev->bpwm) != 0) {
-        APwmDevice_delete(dev->bpwm);
+        APwm_delete(dev->bpwm);
         return NULL;
     }
 
@@ -105,7 +105,7 @@ mraa_pman_pwm_read_replace(mraa_pwm_context dev)
 }
 
 static mraa_result_t
-mraa_pman_pwm_write_replace(mraa_pwm_context dev, fload duty)
+mraa_pman_pwm_write_replace(mraa_pwm_context dev, float duty)
 {
     return -MRAA_ERROR_FEATURE_NOT_SUPPORTED;
 }
@@ -747,7 +747,7 @@ mraa_peripheralman_plat_init()
     i2c_busses = APeripheralManagerClient_listI2cBuses(client, &i2c_busses_count);
     spi_busses = APeripheralManagerClient_listSpiBuses(client, &spi_busses_count);
     uart_devices = APeripheralManagerClient_listUartDevices(client, &uart_busses_count);
-    pwm_devices = APeripheralManagerClient_listPwmDevices(client, &pwm_dev_count);
+    pwm_devices = APeripheralManagerClient_listPwm(client, &pwm_dev_count);
 
     b->platform_name = "peripheralmanager";
     // query this from peripheral manager?
