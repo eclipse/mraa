@@ -189,7 +189,7 @@ struct _pwm {
     mraa_adv_func_t* advance_func; /**< override function table */
     /*@}*/
 #ifdef PERIPHERALMAN
-    APwmDevice *bpwm;
+    APwm *bpwm;
 #endif
 };
 
