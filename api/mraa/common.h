@@ -85,7 +85,7 @@ mraa_result_t mraa_init() __attribute__((constructor));
  * people who like super clean code. If dynamically loading & unloading
  * libmraa you need to call this before unloading the library.
  */
-void mraa_deinit();
+void mraa_deinit() __attribute__((destructor));
 
 /**
  * Checks if a pin is able to use the passed in mode.
