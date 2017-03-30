@@ -105,7 +105,7 @@ mraa_pman_pwm_read_replace(mraa_pwm_context dev)
 }
 
 static mraa_result_t
-mraa_pman_pwm_write_replace(mraa_pwm_context dev, fload duty)
+mraa_pman_pwm_write_replace(mraa_pwm_context dev, float duty)
 {
     return -MRAA_ERROR_FEATURE_NOT_SUPPORTED;
 }
