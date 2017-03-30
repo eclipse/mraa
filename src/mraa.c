@@ -230,10 +230,16 @@ mraa_deinit()
         if (plat->pins != NULL) {
             free(plat->pins);
         }
+        if (plat->adv_func != NULL) {
+            free(plat->adv_func);
+        }
         mraa_board_t* sub_plat = plat->sub_platform;
         if (sub_plat != NULL) {
             if (sub_plat->pins != NULL) {
                 free(sub_plat->pins);
+            }
+            if (sub_plat->adv_func != NULL) {
+                free(sub_plat->adv_func);
             }
             free(sub_plat);
         }
@@ -252,6 +258,11 @@ mraa_deinit()
 #endif
         free(plat);
 
+        if (lang_func != NULL)
+            free(lang_func);
+
+        if (platform_name != NULL)
+            free(platform_name);
     }
     if (plat_iio != NULL) {
         free(plat_iio);
