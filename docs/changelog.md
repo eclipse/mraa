@@ -5,6 +5,13 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**1.6.0**
+  * de-10 nano board support
+  * Improved Intel Joule support & renamed from GT_TUCHUCK to Joule
+  * Improved RPI3 support
+  * Fixes for UP, 96boards & phyboard-wega
+  * Call mraa_deinit with a gcc destructor attribute
+
 **1.5.1**
   * Small memleaks plugged
   * imraa useless arp statements removed
