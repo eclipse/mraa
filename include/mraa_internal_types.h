@@ -339,6 +339,10 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
+#if defined(PERIPHERALMAN)
+    char *name; /**< Peripheral manager's i2c name */
+#endif
+
     int bus_id; /**< ID as exposed in the system */
     int scl; /**< i2c SCL */
     int sda; /**< i2c SDA */
@@ -351,6 +355,9 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
+#if defined(PERIPHERALMAN)
+    char *name; /**< Peripheral manager's spi name */
+#endif
     unsigned int bus_id; /**< The Bus ID as exposed to the system. */
     unsigned int slave_s; /**< Slave select */
     mraa_boolean_t three_wire; /**< Is the bus only a three wire system */
@@ -366,6 +373,9 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
+#if defined(PERIPHERALMAN)
+    char *name; /**< Peripheral manager's uart name */
+#endif
     unsigned int index; /**< ID as exposed in the system */
     int rx; /**< uart rx */
     int tx; /**< uart tx */
@@ -378,6 +388,9 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
+#if defined(PERIPHERALMAN)
+    char *name; /**< Peripheral manager's pwm name */
+#endif
     unsigned int index; /**< ID as exposed in the system */
     char* device_path; /**< To store "/dev/pwm" for example */
     /*@}*/
