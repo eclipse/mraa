@@ -2,6 +2,7 @@
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Contributions: Jon Trulson <jtrulson@ics.com>
  *                Brendan le Foll <brendan.le.foll@intel.com>
+ *                Nicola Lunghi <nicola.lunghi@emutex.com>
  * Copyright (c) 2014 - 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -607,6 +608,29 @@ mraa_uart_set_flowcontrol(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_bo
 
     if (IS_FUNC_DEFINED(dev, uart_set_flowcontrol_replace)) {
         return dev->advance_func->uart_set_flowcontrol_replace(dev, xonxoff, rtscts);
+    }
+
+    if (rtscts) {
+        // assign the CTS and RTS pin to UART when enabling flow control
+        if (!plat->no_bus_mux) {
+            int pos_cts = plat->uart_dev[dev->index].cts;
+            int pos_rts = plat->uart_dev[dev->index].rts;
+
+            if ((pos_cts >= 0) && (pos_rts >= 0)) {
+                if (plat->pins[pos_cts].uart.mux_total > 0) {
+                    if (mraa_setup_mux_mapped(plat->pins[pos_cts].uart) != MRAA_SUCCESS) {
+                        syslog(LOG_ERR, "uart%i: init: failed to setup muxes for CTS pin", dev->index);
+                        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+                    }
+                }
+                if (plat->pins[pos_rts].uart.mux_total > 0) {
+                    if (mraa_setup_mux_mapped(plat->pins[pos_rts].uart) != MRAA_SUCCESS) {
+                        syslog(LOG_ERR, "uart%i: init: failed to setup muxes for RTS pin", dev->index);
+                        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+                    }
+                }
+            }
+        }
     }
 
     // hardware flow control
