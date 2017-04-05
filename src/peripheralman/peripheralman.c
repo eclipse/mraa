@@ -782,12 +782,14 @@ mraa_peripheralman_plat_init()
     //Updating GPIO bus structure
     for (; i < gpios_count; i++) {
         b->pins[i].name = gpios[i];
+        b->pins[i].gpio.name = gpios[i];
         b->pins[i].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
         b->pins[i].gpio.pinmap = i;
     }
 
     //Updating I2C bus structure
     for (i = 0; i < i2c_busses_count; i++) {
+        b->pins[i].i2c.name = i2c_busses[i];
         b->i2c_bus[i].bus_id = i;
         b->i2c_bus[i].sda = -1;
         b->i2c_bus[i].scl = -1;
@@ -795,6 +797,7 @@ mraa_peripheralman_plat_init()
 
     //Updating SPI bus structure
     for (i =0; i < spi_busses_count; i++) {
+        b->pins[i].spi.name = spi_busses[i];
         b->spi_bus[i].bus_id = i;
         b->spi_bus[i].slave_s = -1;
         b->spi_bus[i].three_wire = -1;
@@ -806,6 +809,7 @@ mraa_peripheralman_plat_init()
 
     //Updating PWM structure
     for (i = 0; i < pwm_dev_count; i++) {
+        b->pins[i].pwm.name = pwm_devices[i];
         b->pwm_dev[i].index = i;
     }
 

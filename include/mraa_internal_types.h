@@ -295,6 +295,7 @@ typedef struct {
 
 typedef struct {
     /*@{*/
+    char *name; /**< Peripheral manager's pin/bus name */
     int pinmap; /**< sysfs pin */
     unsigned int parent_id; /** parent chip id */
     unsigned int mux_total; /** Numfer of muxes needed for operation of pin */

@@ -234,6 +234,43 @@ unsigned int mraa_get_platform_pin_count(uint8_t platform_offset);
 char* mraa_get_pin_name(int pin);
 
 /**
+* Get pin number, board must be initialised.
+*
+* @param pin_name: GPIO Pin Name. Eg: IO0
+* @return int of MRAA index for gpio
+*/
+
+int mraa_gpio_lookup(char* pin_name);
+
+/**
+* Get pin number, board must be initialised.
+*
+* @param i2c_name: I2c Bus Name. Eg: I2C6
+* @return int of MRAA index of i2c bus
+*/
+
+int mraa_i2c_lookup(char* i2c_name);
+
+/**
+* Get pin number, board must be initialised.
+*
+* @param spi_name: Name of spi bus. Eg: SPI2
+* @return int for MRAA index of spi bus
+*/
+
+int mraa_spi_lookup(char* spi_name);
+
+/**
+* Get pin number, board must be initialised.
+*
+* @param pwm_name: Name of pwm. Eg:PWM0
+* @return int of MRAA index for pwm bus
+*/
+
+int mraa_pwm_lookup(char* pwm_name);
+
+
+/**
  * Get default i2c bus, board must be initialised.
  *
  * @return int default i2c bus index
