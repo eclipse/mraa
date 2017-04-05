@@ -799,6 +799,56 @@ mraa_get_pin_name(int pin)
     return (char*) current_plat->pins[pin].name;
 }
 
+#if defined(PERIPHERALMAN)
+int mraa_gpio_lookup(char* pin_name)
+{
+    if (plat == NULL)
+        return -1;
+
+    for (int i =0; i < plat->gpio_count; i++) {
+         if (0 == strcmp(pin_name, plat->pins[i].gpio.name))
+             return plat->pins[i].gpio.pinmap;
+    }
+    return -1;
+}
+
+int mraa_i2c_lookup(char* bus_name)
+{
+    if (plat == NULL)
+        return -1;
+
+    for (int i =0; i < plat->i2c_bus_count; i++) {
+         if (0 == strcmp(bus_name, plat->i2c_bus[i].name))
+             return plat->i2c_bus[i].bus_id;
+    }
+    return -1;
+}
+
+int mraa_spi_lookup(char* spi_name)
+{
+    if (plat == NULL)
+        return -1;
+
+    for (int i =0; i < plat->spi_bus_count; i++) {
+         if (0 == strcmp(spi_name, plat->spi_bus[i].name))
+             return plat->spi_bus[i].bus_id;
+    }
+    return -1;
+}
+
+int mraa_pwm_lookup(char* pwm_name)
+{
+    if (plat == NULL)
+        return -1;
+
+    for (int i =0; i < plat->pwm_dev_count; i++) {
+         if (0 == strcmp(pwm_name, plat->pwm_dev[i].name))
+             return plat->pwm_dev[i].index;
+    }
+    return -1;
+}
+#endif
+
 int
 mraa_get_default_i2c_bus(uint8_t platform_offset)
 {
