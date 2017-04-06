@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "arm/96boards.h"
-#include "arm/altera_socfpga.h"
+#include "arm/de_nano_soc.h"
 #include "arm/banana.h"
 #include "arm/beaglebone.h"
 #include "arm/phyboard.h"
@@ -73,8 +73,8 @@ mraa_arm_platform()
                     else if (mraa_file_exist("/sys/class/leds/green:ph24:led1")) {
                         platform_type = MRAA_BANANA;
                     }
-                } else if (strstr(line, "Altera SOCFPGA")) {
-                        platform_type = MRAA_ALTERA_SOCFPGA;
+                } else if (strstr(line, "DE0/DE10-Nano-SoC")) {
+                        platform_type = MRAA_DE_NANO_SOC;
                 }
             }
         }
@@ -112,8 +112,8 @@ mraa_arm_platform()
         case MRAA_96BOARDS:
             plat = mraa_96boards();
             break;
-        case MRAA_ALTERA_SOCFPGA:
-            plat = mraa_altera_socfpga();
+        case MRAA_DE_NANO_SOC:
+            plat = mraa_de_nano_soc();
             break;
         default:
             plat = NULL;

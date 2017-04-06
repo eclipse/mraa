@@ -40,7 +40,7 @@ ARM
 
 FPGA
 ----
-* [DE10-Nano](../master/docs/altera-socfpga.md)
+* [DE10-Nano](../master/docs/de_nano_soc.md)
 
 USB
 ---
