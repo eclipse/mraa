@@ -28,9 +28,9 @@
 #include <mraa/common.h>
 
 #include "common.h"
-#include "arm/altera_socfpga.h"
+#include "arm/de_nano_soc.h"
 
-#define PLATFORM_NAME "DE10-Nano-SoC"
+#define PLATFORM_NAME "DE0/DE10-Nano-SoC"
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
 #define DEBUGFS_PINMODE_PATH "/sys/kernel/debug/gpio"
 
@@ -49,28 +49,28 @@ static unsigned int mmap_count = 0;
 
 // MMAP stubbed functions
 mraa_result_t
-mraa_altera_socfpga_spi_init_pre(int index)
+mraa_de_nano_soc_spi_init_pre(int index)
 {
     return MRAA_SUCCESS;
 }
 
 mraa_result_t
-mraa_altera_socfpga_i2c_init_pre(unsigned int bus)
+mraa_de_nano_soc_i2c_init_pre(unsigned int bus)
 {
     return MRAA_SUCCESS;
 }
 
 mraa_result_t
-mraa_altera_socfpga_mmap_write(mraa_gpio_context dev, int value)
+mraa_de_nano_soc_mmap_write(mraa_gpio_context dev, int value)
 {
     return MRAA_SUCCESS;
 }
 
 static mraa_result_t
-mraa_altera_socfpga_mmap_unsetup()
+mraa_de_nano_soc_mmap_unsetup()
 {
     if (mmap_reg == NULL) {
-        syslog(LOG_ERR, "altera_socfpga mmap: null register cant unsetup");
+        syslog(LOG_ERR, "de_nano_soc mmap: null register cant unsetup");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     munmap(mmap_reg, mmap_size);
@@ -82,36 +82,36 @@ mraa_altera_socfpga_mmap_unsetup()
 }
 
 int
-mraa_altera_socfpga_mmap_read(mraa_gpio_context dev)
+mraa_de_nano_soc_mmap_read(mraa_gpio_context dev)
 {
     return 0;
 }
 
 mraa_result_t
-mraa_altera_socfpga_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
+mraa_de_nano_soc_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
 {
 
     if (dev == NULL) {
-        syslog(LOG_ERR, "altera_socfpga mmap: context not valid");
+        syslog(LOG_ERR, "de_nano_soc mmap: context not valid");
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
     if (en == 0) {
         if (dev->mmap_write == NULL && dev->mmap_read == NULL) {
-            syslog(LOG_ERR, "altera_socfpga mmap: can't disable disabled mmap gpio");
+            syslog(LOG_ERR, "de_nano_soc mmap: can't disable disabled mmap gpio");
             return MRAA_ERROR_INVALID_PARAMETER;
         }
         dev->mmap_write = NULL;
         dev->mmap_read = NULL;
         mmap_count--;
         if (mmap_count == 0) {
-            return mraa_altera_socfpga_mmap_unsetup();
+            return mraa_de_nano_soc_mmap_unsetup();
         }
         return MRAA_SUCCESS;
     }
 
     if (dev->mmap_write != NULL && dev->mmap_read != NULL) {
-        syslog(LOG_ERR, "altera_socfpga mmap: can't enable enabled mmap gpio");
+        syslog(LOG_ERR, "de_nano_soc mmap: can't enable enabled mmap gpio");
         return MRAA_ERROR_INVALID_PARAMETER;
     }
 
@@ -120,28 +120,28 @@ mraa_altera_socfpga_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
     // to prevent mmap'ing twice.
     if (mmap_reg == NULL) {
         if ((mmap_fd = open(MMAP_PATH, O_RDWR)) < 0) {
-            syslog(LOG_ERR, "altera_socfpga map: unable to open resource0 file");
+            syslog(LOG_ERR, "de_nano_soc map: unable to open resource0 file");
             return MRAA_ERROR_INVALID_HANDLE;
         }
 
 
         mmap_reg = (uint8_t*) mmap(NULL, mmap_size, PROT_READ | PROT_WRITE, MAP_FILE | MAP_SHARED, mmap_fd, FPGA_REGION_BASE);
         if (mmap_reg == MAP_FAILED) {
-            syslog(LOG_ERR, "altera_socfpga mmap: failed to mmap");
+            syslog(LOG_ERR, "de_nano_soc mmap: failed to mmap");
             mmap_reg = NULL;
             close(mmap_fd);
             return MRAA_ERROR_NO_RESOURCES;
         }
     }
-    dev->mmap_write = &mraa_altera_socfpga_mmap_write;
-    dev->mmap_read = &mraa_altera_socfpga_mmap_read;
+    dev->mmap_write = &mraa_de_nano_soc_mmap_write;
+    dev->mmap_read = &mraa_de_nano_soc_mmap_read;
     mmap_count++;
 
     return MRAA_SUCCESS;
 }
 
 mraa_board_t*
-mraa_altera_socfpga()
+mraa_de_nano_soc()
 {
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
@@ -149,7 +149,7 @@ mraa_altera_socfpga()
     }
 
     b->platform_name = PLATFORM_NAME;
-    b->phy_pin_count = MRAA_ALTERA_SOCFPGA_PINCOUNT;
+    b->phy_pin_count = MRAA_DE_NANO_SOC_PINCOUNT;
     b->gpio_count = 96; // update as needed when adding ADC pins
     b->aio_count = 8;
     //b->pwm_default_period = 5000;
