@@ -46,7 +46,7 @@ mraa_pman_pwm_init_replace(int pin)
 {
     mraa_pwm_context dev;
     if (APeripheralManagerClient_openPwm(client, pwm_devices[pin], &dev->bpwm) != 0) {
-        APwmDevice_delete(dev->bpwm);
+        APwm_delete(dev->bpwm);
         return NULL;
     }
 
