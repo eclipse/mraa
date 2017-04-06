@@ -106,8 +106,9 @@ class Spi;
             System.exit(1);
         }
 
-        if ((getSpecificationVersion() != null && getSpecificationVersion()  != "0.0")
-                && (mraa.getVersion() != null ))
+        if ((mraa.class.getPackage().getSpecificationVersion() != null 
+              && mraa.class.getPackage().getSpecificationVersion()  != "0.0") 
+              && (mraa.getVersion() != null ))
         {
                 String javaAPIVersion = mraa.class.getPackage().getSpecificationVersion();
                 String nativeAPIVersion = mraa.getVersion().substring(1);
