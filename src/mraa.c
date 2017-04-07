@@ -247,6 +247,7 @@ mraa_deinit()
         if (plat->platform_type == MRAA_JSON_PLATFORM) {
             // Free the platform name
             free(plat->platform_name);
+            plat->platform_name = NULL;
 
             // Free the UART device path
             for (i = 0; i < plat->uart_dev_count; i++) {
@@ -257,15 +258,21 @@ mraa_deinit()
         }
 #endif
         free(plat);
+        plat = NULL;
 
-        if (lang_func != NULL)
+        if (lang_func != NULL) {
             free(lang_func);
+            lang_func = NULL;
+        }
 
-        if (platform_name != NULL)
+        if (platform_name != NULL) {
             free(platform_name);
+            platform_name = NULL;
+        }
     }
     if (plat_iio != NULL) {
         free(plat_iio);
+        plat_iio = NULL;
     }
     closelog();
 }

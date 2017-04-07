@@ -33,10 +33,10 @@ extern "C" {
 // 1x32 Arduino header, 1x40 GPIO_0/JP1, 1x40 GPIO_1/JP7,
 // 9 LEDs (8 User + HPS_LED), 4 switches, 3 buttons (2 User + HPS_KEY)
 // 10 ADC pins
-#define MRAA_ALTERA_SOCFPGA_PINCOUNT 138
+#define MRAA_DE_NANO_SOC_PINCOUNT 138
 
 mraa_board_t *
-        mraa_altera_socfpga();
+        mraa_de_nano_soc();
 
 #ifdef __cplusplus
 }
