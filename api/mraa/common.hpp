@@ -27,6 +27,8 @@
 #include "common.h"
 #include "types.hpp"
 #include <string>
+#include <sstream>
+#include <stdexcept>
 
 /**
  * @namespace mraa namespace
@@ -212,6 +214,90 @@ getPinName(int pin)
 {
     std::string ret_val(mraa_get_pin_name(pin));
     return ret_val;
+}
+
+/**
+* Get pin number, board must be initialised.
+*
+* @param pin_name: GPIO Pin Name. Eg: IO0
+* @throws std::invalid_argument if name is not valid
+* @return int of MRAA index for gpio
+*/
+inline int
+getGpioLookup(std::string pin_name)
+{
+    int index = mraa_gpio_lookup(pin_name.c_str());
+
+    if (index < 0){
+        std::ostringstream oss;
+        oss << "Gpio name " << pin_name << " is not valid";
+        throw std::invalid_argument(oss.str());
+    }
+
+    return index;
+}
+
+/**
+* Get pin number, board must be initialised.
+*
+* @param i2c_name: I2c Bus Name. Eg: I2C6
+* @throws std::invalid_argument if name is not valid
+* @return int of MRAA index of i2c bus
+*/
+inline int
+getI2cLookup(std::string i2c_name)
+{
+    int index = mraa_i2c_lookup(i2c_name.c_str());
+
+    if (index < 0){
+        std::ostringstream oss;
+        oss << "i2c name " << i2c_name << " is not valid";
+        throw std::invalid_argument(oss.str());
+    }
+
+    return index;
+}
+
+/**
+* Get pin number, board must be initialised.
+*
+* @param spi_name: Name of spi bus. Eg: SPI2
+* @throws std::invalid_argument if name is not valid
+* @return int for MRAA index of spi bus
+*/
+inline int
+getSpiLookup(std::string spi_name)
+{
+    int index = mraa_spi_lookup(spi_name.c_str());
+
+    if (index < 0){
+        std::ostringstream oss;
+        oss << "Spi name " << spi_name << " is not valid";
+        throw std::invalid_argument(oss.str());
+    }
+
+    return index;
+}
+
+/**
+* Get pin number, board must be initialised.
+*
+* @param pwm_name: Name of pwm. Eg:PWM0
+* @throws std::invalid_argument if name is not valid
+* @return int of MRAA index for pwm bus
+*/
+inline int
+getPwmLookup(std::string pwm_name)
+{
+    int index = mraa_pwm_lookup(pwm_name.c_str());
+
+    if (index < 0){
+        std::ostringstream oss;
+        oss << "PWM name " << pwm_name << " is not valid";
+        throw std::invalid_argument(oss.str());
+    }
+
+    return index;
 }
 
 /**
