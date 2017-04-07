@@ -214,6 +214,60 @@ getPinName(int pin)
     return ret_val;
 }
 
+#if defined(PERIPHERALMAN)
+/**
+* Get pin number, board must be initialised.
+*
+* @param pin_name: GPIO Pin Name. Eg: IO0
+*
+* @return int of MRAA index for gpio
+*/
+inline int
+getGpioLookup(char* pin_name)
+{
+    return mraa_gpio_lookup(pin_name);
+}
+
+/**
+* Get pin number, board must be initialised.
+*
+* @param i2c_name: I2c Bus Name. Eg: I2C6
+*
+* @return int of MRAA index of i2c bus
+*/
+inline int
+getI2cLookup(char* i2c_name)
+{
+    return mraa_i2c_lookup(i2c_name);
+}
+
+/**
+* Get pin number, board must be initialised.
+*
+* @param spi_name: Name of spi bus. Eg: SPI2
+*
+* @return int for MRAA index of spi bus
+*/
+inline int
+getSpiLookup(char* spi_name)
+{
+    return mraa_spi_lookup(spi_name);
+}
+
+/**
+* Get pin number, board must be initialised.
+*
+* @param pwm_name: Name of pwm. Eg:PWM0
+*
+* @return int of MRAA index for pwm bus
+*/
+inline int
+getPwmLookup(char* pwm_name)
+{
+    return mraa_pwm_lookup(pwm_name);
+}
+#endif
+
 /**
  * Sets the log level to use from 0-7 where 7 is very verbose. These are the
  * syslog log levels, see syslog(3) for more information on the levels.
