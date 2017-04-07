@@ -799,8 +799,9 @@ mraa_get_platform_pin_count(uint8_t platform_offset)
 char*
 mraa_get_pin_name(int pin)
 {
-    if (plat == NULL)
+    if (plat == NULL) {
         return 0;
+    }
 
     mraa_board_t* current_plat = plat;
     if (mraa_is_sub_platform_id(pin)) {
@@ -812,9 +813,86 @@ mraa_get_pin_name(int pin)
         pin = mraa_get_sub_platform_index(pin);
     }
 
-    if (pin > (current_plat->phy_pin_count - 1) || pin < 0)
+    if (pin > (current_plat->phy_pin_count - 1) || pin < 0) {
         return NULL;
+    }
     return (char*) current_plat->pins[pin].name;
+}
+
+int mraa_gpio_lookup(const char* pin_name)
+{
+    if (plat == NULL) {
+        return -1;
+    }
+
+    if (strlen(pin_name) == 0) {
+        return -1;
+    }
+
+    int i = 0;
+    for (; i < plat->gpio_count; i++) {
+         if (0 == strcmp(pin_name, plat->pins[i].name)) {
+             return plat->pins[i].gpio.pinmap;
+         }
+    }
+    return -1;
+}
+
+int mraa_i2c_lookup(const char* i2c_name)
+{
+    if (plat == NULL) {
+        return -1;
+    }
+
+    if (strlen(i2c_name) == 0) {
+        return -1;
+    }
+
+    int i = 0;
+    for (; i < plat->i2c_bus_count; i++) {
+         if (0 == strcmp(i2c_name, plat->i2c_bus[i].name)) {
+             return plat->i2c_bus[i].bus_id;
+         }
+    }
+    return -1;
+}
+
+int mraa_spi_lookup(const char* spi_name)
+{
+    if (plat == NULL) {
+        return -1;
+    }
+
+    if (strlen(spi_name) == 0) {
+        return -1;
+    }
+
+    int i = 0;
+    for (; i < plat->spi_bus_count; i++) {
+         if (0 == strcmp(spi_name, plat->spi_bus[i].name)) {
+             return plat->spi_bus[i].bus_id;
+         }
+    }
+    return -1;
+}
+
+int mraa_pwm_lookup(const char* pwm_name)
+{
+    if (plat == NULL) {
+        return -1;
+    }
+
+    if (strlen(pwm_name) == 0) {
+        return -1;
+    }
+
+    int i = 0;
+    for (; i < plat->pwm_dev_count; i++) {
+         if (0 == strcmp(pwm_name, plat->pwm_dev[i].name)) {
+             return plat->pwm_dev[i].index;
+         }
+    }
+    return -1;
 }
 
 int

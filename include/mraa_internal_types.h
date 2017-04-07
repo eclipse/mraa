@@ -339,6 +339,7 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
+    char *name; /**< i2c bus name */
     int bus_id; /**< ID as exposed in the system */
     int scl; /**< i2c SCL */
     int sda; /**< i2c SDA */
@@ -351,6 +352,7 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
+    char *name; /**< spi bus name */
     unsigned int bus_id; /**< The Bus ID as exposed to the system. */
     unsigned int slave_s; /**< Slave select */
     mraa_boolean_t three_wire; /**< Is the bus only a three wire system */
@@ -366,6 +368,7 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
+    char *name; /**< uart name */
     unsigned int index; /**< ID as exposed in the system */
     int rx; /**< uart rx */
     int tx; /**< uart tx */
@@ -378,6 +381,7 @@ typedef struct {
  */
 typedef struct {
     /*@{*/
+    char *name; /**< pwm device name */
     unsigned int index; /**< ID as exposed in the system */
     char* device_path; /**< To store "/dev/pwm" for example */
     /*@}*/
