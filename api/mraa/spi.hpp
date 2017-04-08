@@ -70,6 +70,15 @@ class Spi
         }
     }
 
+    Spi(int bus, int cs)
+    {
+        m_spi = mraa_spi_init_raw(bus, cs);
+
+        if (m_spi == NULL) {
+            throw std::invalid_argument("Error initialising SPI bus");
+        }
+    }
+
     /**
      * Initialise SPI object using 'raw' mode. Mraa will go and grab the spidev device lablled /dev/spidev<bus>.<cs>
      *
