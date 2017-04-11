@@ -137,9 +137,12 @@ if (MOCKPLAT)
 endif()
 
 if (PERIPHERALMAN)
-  add_subdirectory(peripheralman)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPERIPHERALMAN=1")
-  set (mraa_LIBS ${mraa_LIBS} -l/home/brendan/git/mraa/libperipheralman.so)
+  # Use the find_package provided by Android Things.  Make sure this is
+  # available in CMAKE_MODULE_PATH.
+  find_package(AndroidThings REQUIRED)
+  set (mraa_LIBS ${mraa_LIBS} ${ANDROIDTHINGS_LIBRARIES})
+  add_subdirectory(peripheralman)
 endif()
 
 if (USBPLAT)
