@@ -1,4 +1,11 @@
 FIND_PACKAGE (JNI REQUIRED)
+
+if (PERIPHERALMAN)
+  # Override the JNI include directory for Android Things since these
+  # will require an Android-friendly jni.h
+  set(JAVA_INCLUDE_PATH "${ANDROID_SYSROOT}/usr/include")
+endif()
+
 include_directories (
   ${JAVA_INCLUDE_PATH}
   ${JAVA_INCLUDE_PATH2}
