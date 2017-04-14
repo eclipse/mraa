@@ -1,12 +1,14 @@
-Intel(R) Minnowboard Max               {#minnowmax}
-========================
+Intel(R) MinnowBoard Max / MinnowBoard Turbot              {#minnowmax}
+=============================================
 MinnowBoard MAX is an open hardware embedded board designed with the Intel(R)
-Atom(TM) E38xx series SOC (Fromerly Bay Trail).
+Atom(TM) E38xx series SOC (formely Bay Trail). The MinnowBoard Turbot is a
+backward compatible revision with performance and hardware improvements.
+https://www.minnowboard.org/learn-more/minnowboard-max-compatible-with-upgrades
 
-For product overview and faq see
-http://www.minnowboard.org/faq-minnowboard-max/
+For product overview and faq see https://www.minnowboard.org/faq
 
-For technical details see http://www.elinux.org/Minnowboard:MinnowMax
+For technical details see https://www.minnowboard.org/board-viewer or the
+legacy board https://www.minnowboard.org/minnowboard-max
 
 Supported Firmware
 ------------------
@@ -55,4 +57,6 @@ bus #7.
 | 23          | 23            | GPIO_S5_1  |  83        | GPIO                 |
 | 24          | 24            | PWM1       | 249        | PWM Chip 1 Channel 0 |
 | 25          | 25            | S5_4       |  84        | GPIO                 |
-| 26          | 26            | IBL_8254   | 208        | GPIO                 |
+| 26          | 26            | IBL_8254   | 208        | GPIO / I2S MCLK (tb) |
+
+*(tb) New assignment on the MinnowBoard Turbot
