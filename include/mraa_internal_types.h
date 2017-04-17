@@ -26,15 +26,14 @@
 #pragma once
 
 #ifdef PERIPHERALMAN
-#include <peripheralmanager/peripheral_manager_client.h>
+#include <pio/peripheral_manager_client.h>
+#else
+#include "iio.h"
 #endif
 
 #include "common.h"
 #include "mraa.h"
 #include "mraa_adv_func.h"
-#if !defined(PERIPHERALMAN)
-#include "iio.h"
-#endif
 
 // Bionic does not implement pthread cancellation API
 #ifndef __BIONIC__

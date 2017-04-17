@@ -64,7 +64,7 @@
 #include "uart.h"
 
 #if defined(PERIPHERALMAN)
-#include "peripheralman.h"
+#include "peripheralmanager/peripheralman.h"
 #else
 #define IIO_DEVICE_WILDCARD "iio:device*"
 

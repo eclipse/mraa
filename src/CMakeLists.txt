@@ -138,10 +138,18 @@ endif()
 
 if (PERIPHERALMAN)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPERIPHERALMAN=1")
+
   # Use the find_package provided by Android Things.  Make sure this is
   # available in CMAKE_MODULE_PATH.
   find_package(AndroidThings REQUIRED)
+
+  # Add Android Things libraries
   set (mraa_LIBS ${mraa_LIBS} ${ANDROIDTHINGS_LIBRARIES})
+
+  # Add Android Things include directories
+  include_directories(${ANDROIDTHINGS_INCLUDE_DIRS})
+
+  # Add the peripheral manager source to the build
   add_subdirectory(peripheralman)
 endif()
 

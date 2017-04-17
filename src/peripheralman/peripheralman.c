@@ -27,7 +27,7 @@
 #include <syslog.h>
 
 #include "mraa_internal.h"
-#include "peripheralman.h"
+#include "peripheralmanager/peripheralman.h"
 
 APeripheralManagerClient *client = NULL;
 char **gpios = NULL;

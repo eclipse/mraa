@@ -30,7 +30,6 @@
 #endif
 #include <sys/ioctl.h>
 #if defined(PERIPHERALMAN)
-#include "peripheralmanager/spi_device.h"
 #include "linux/spi_kernel_headers.h"
 #elif defined(MSYS)
 // There's no spidev.h on MSYS, so we need to provide our own,
