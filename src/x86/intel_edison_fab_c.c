@@ -36,6 +36,8 @@
 #include "x86/intel_edison_fab_c.h"
 
 #define PLATFORM_NAME "Intel Edison"
+#define PLATFORM_NAME_ARDUINO "Intel Edison (Arduino)"
+#define PLATFORM_NAME_MINIBOARD "Intel Edison (Miniboard)"
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
 #define DEBUGFS_PINMODE_PATH "/sys/kernel/debug/gpio_debug/gpio"
 #define MAX_SIZE 64
@@ -1294,9 +1296,11 @@ mraa_intel_edison_fab_c()
         if (mraa_intel_edison_miniboard(b) != MRAA_SUCCESS) {
             goto error;
         }
+		b->platform_name = PLATFORM_NAME_MINIBOARD;
         return b;
     }
     // Now Assuming the edison is attached to the Arduino board.
+    b->platform_name = PLATFORM_NAME_ARDUINO;
     b->phy_pin_count = 20;
     b->gpio_count = 14;
     b->aio_count = 6;
