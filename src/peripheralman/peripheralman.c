@@ -44,7 +44,7 @@ int pwm_dev_count = 0;
 static mraa_pwm_context
 mraa_pman_pwm_init_replace(int pin)
 {
-    mraa_pwm_context dev;
+    mraa_pwm_context dev = (mraa_pwm_context) calloc(1, sizeof(struct _pwm));
     if (APeripheralManagerClient_openPwm(client, pwm_devices[pin], &dev->bpwm) != 0) {
         APwm_delete(dev->bpwm);
         return NULL;
