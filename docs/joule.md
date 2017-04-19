@@ -17,11 +17,11 @@ Interface notes
 Two SPI buses are available, with one chipselect each. Pins listed are MRAA
 numbered pins. Other chip selects are available if enabled in BIOS/EEPROM but
 cannot be enabled as BIOS options. You will need the spidev kernel module
-loaded, Ostro-XT does this by default.
+loaded, Ostro-XT and ref-os-iot does this by default.
 
 Bus 0 (32765)
-MOSI = 2
-MISO = 4
+MOSI = 4
+MISO = 2
 CS = 6
 CLK = 10
 
