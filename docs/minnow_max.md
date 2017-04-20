@@ -59,4 +59,4 @@ bus #7.
 | 25          | 25            | S5_4       |  84        | GPIO                 |
 | 26          | 26            | IBL_8254   | 208        | GPIO / I2S MCLK (tb) |
 
-*(tb) New assignemnt on the Turbot
+*(tb) New assignemnt on the MinnowBoard Turbot
