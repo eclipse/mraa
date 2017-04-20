@@ -132,15 +132,15 @@ imraa_init()
 
     // Not an else because if the env var didn't load what we wanted maybe we can still load something
     if (platform_type == MRAA_NULL_PLATFORM) {
-#if defined(X86PLAT)
+#if defined(MOCKPLAT)
+        // Use mock platform (check first since X86PLAT is set when detected)
+        platform_type = mraa_mock_platform();
+#elif defined(X86PLAT)
         // Use runtime x86 platform detection
         platform_type = mraa_x86_platform();
 #elif defined(ARMPLAT)
         // Use runtime ARM platform detection
         platform_type = mraa_arm_platform();
-#elif defined(MOCKPLAT)
-        // Use mock platform
-        platform_type = mraa_mock_platform();
 #else
 #error mraa_ARCH NOTHING
 #endif
