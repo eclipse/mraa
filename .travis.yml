@@ -35,7 +35,7 @@ before_script:
   - if [ "${NODE012}" ]; then nvm install 0.12; fi
   - if [ "${NODE4}" ]; then nvm install 4.1; fi
   - if [ "${NODE5}" ]; then nvm install 5; fi
-  - npm install node-gyp && export NODE_GYP="/home/travis/build/intel-iot-devkit/mraa/node_modules/node-gyp/bin/node-gyp.js"
+  - npm install node-gyp && export NODE_GYP="$TRAVIS_BUILD_DIR/node_modules/node-gyp/bin/node-gyp.js"
   # Handle 0.10 NODE_ROOT_DIR differently than other versions
   - wget http://iotdk.intel.com/misc/tr/swig-3.0.10.tar.gz && tar xf swig-3.0.10.tar.gz && cd swig-3.0.10 && ./configure --prefix=/home/travis/ && make && make install && cd ..
 script:
