@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var mraa = require('mraa');
+const mraa = require('mraa');
 console.log('MRAA Version: ' + mraa.getVersion());
 
 // open connection to firmata
