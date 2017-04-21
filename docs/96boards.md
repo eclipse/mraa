@@ -4,3 +4,10 @@
 96Boards is a range of hardware specifications created by Linaro to make the latest ARM-based processors available to developers at a reasonable cost. The specifications are open and define a standard board layout for SoC-agnostic (processor independent)  development platforms that can be used by software application, hardware device, kernel and other system software developers. Boards produced to the 96Boards specifications are suitable for rapid prototyping, hobbyist projects or incorporation into new systems for a wide range of applications including desktop and laptop computing, the digital home, digital signage, point of sale (POS), high-end audio, robotics and drones, artificial intelligence, virtual reality, IoT and industrial control. 
 
 Standardized expansion buses for peripheral I/O have led to a wide range of compatible add-on mezzanine boards  that will work across a variety of 96Boards products. Users have access to a wide range of boards with different features at various price points. In addition, some SoC vendors have announced long term availability of the SoC to encourage their use in products with long life cycles.
+
+Board Support
+-------------
+
+- [DragonBoard 410c](http://www.96boards.org/product/dragonboard410c/)
+- [HiKey](http://www.96boards.org/product/hikey/)
+- [Bubblegum-96](http://www.96boards.org/product/bubblegum-96/)
