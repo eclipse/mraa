@@ -12,6 +12,12 @@ Board Support
 - [HiKey](http://www.96boards.org/product/hikey/)
 - [Bubblegum-96](http://www.96boards.org/product/bubblegum-96/)
 
+Interface notes
+---------------
+
+- **GPIO**: Pin 28 / GPIO-F is a Multi-Purpose pin
+- **UART**: UART1 can be used for serial access
+
 Pin Mapping
 -----------
 
