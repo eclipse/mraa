@@ -45,3 +45,12 @@ Pin mapping table shows signals pertaining to 40-pin low speed expansion header 
 |     +1V8          |   35  |   36  |    SYS_DCIN        |
 |     +5V           |   37  |   38  |    SYC_DCIN        |
 |     GND           |   39  |   40  |    GND             |
+
+Resources
+---------
+
+The following links will take you to addition 96Boards resources
+
+- [Website](http://www.96boards.org/)
+- [Forums](https://discuss.96boards.org/)
+- [Documentation Repo](https://github.com/96boards/documentation)
