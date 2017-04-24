@@ -188,15 +188,14 @@ cmake -DRPM=ON -DCMAKE_INSTALL_PREFIX=/usr ..
 ## Building for the Android Things Peripheralmanager Client
 
 Requirements:
-    Android Things Native Library (https://github.com/androidthings/native-libandroidthings)
-    Android NDK >= 14b
+* Android [Things Native Library](https://github.com/androidthings/native-libandroidthings)
+* Android NDK >= 14b
 
-The Android Things Native Library contains a CMake find_package module
-(FindAndroidThings.cmake). Make sure the directory containing this module is
+The [Things Native Library](https://github.com/androidthings/native-libandroidthings) contains a CMake find_package module
+[FindAndroidThings.cmake](https://github.com/androidthings/native-libandroidthings/blob/master/FindAndroidThings.cmake). Make sure the directory containing this module is
 added to the CMAKE_MODULE_PATH.
-    Example cmake -DCMAKE_MODULE_PATH=/path/to/native-libandroidthings
 
-NDK r14b
+#### NDK r14b
 ~~~~~~~~~~~~~{.sh}
 cmake -DBUILDSWIG=OFF -DBUILDARCH=PERIPHERALMAN -DANDROID_TOOLCHAIN_NAME=x86-i686 -DCMAKE_TOOLCHAIN_FILE=/path/to/android-ndk-r14b/build/cmake/android.toolchain.cmake -DCMAKE_MODULE_PATH=/path/to/native-libandroidthings ..
 ~~~~~~~~~~~~~
