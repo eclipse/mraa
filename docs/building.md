@@ -185,20 +185,18 @@ build machine.
 cmake -DRPM=ON -DCMAKE_INSTALL_PREFIX=/usr ..
 ~~~~~~~~~~~~~
 
-## Building for Peripheralmanager Android Things
+## Building for the Android Things Peripheralmanager Client
 
-Change src/CMakeLists.txt:140 to the location of libandroidthings.so on your
-machine or have it in your Android NDK. Switch the toolchain file var to point
-to where your Android NDK is (here android-ndk is in /opt).
+Requirements:
+    Android Things Native Library (https://github.com/androidthings/native-libandroidthings)
+    Android NDK >= 14b
 
-NDK r13b
+The Android Things Native Library contains a CMake find_package module
+(FindAndroidThings.cmake). Make sure the directory containing this module is
+added to the CMAKE_MODULE_PATH.
+    Example cmake -DCMAKE_MODULE_PATH=/path/to/native-libandroidthings
+
+NDK r14b
 ~~~~~~~~~~~~~{.sh}
-cmake -DBUILDSWIG=OFF -DBUILDARCH=PERIPHERALMAN -DANDROID_TOOLCHAIN_NAME=x86-i686 -DCMAKE_TOOLCHAIN_FILE=/opt/android-ndk-r13b/build/cmake/android.toolchain.cmake ..
+cmake -DBUILDSWIG=OFF -DBUILDARCH=PERIPHERALMAN -DANDROID_TOOLCHAIN_NAME=x86-i686 -DCMAKE_TOOLCHAIN_FILE=/path/to/android-ndk-r14b/build/cmake/android.toolchain.cmake -DCMAKE_MODULE_PATH=/path/to/native-libandroidthings ..
 ~~~~~~~~~~~~~
-
-NDK r14-beta1
-~~~~~~~~~~~~~{.sh}
-cmake -DBUILDSWIG=OFF -DBUILDARCH=PERIPHERALMAN -DANDROID_TOOLCHAIN_NAME=x86-i686 -DCMAKE_TOOLCHAIN_FILE=/opt/android-ndk-r14-beta1/build/cmake/android.toolchain.cmake ..
-~~~~~~~~~~~~~
-
-For some reason this is broken on cmake 3.7+ Use cmake 3.6+ for the time being

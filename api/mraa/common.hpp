@@ -217,11 +217,11 @@ getPinName(int pin)
 }
 
 /**
-* Get pin number, board must be initialised.
+* Get GPIO index by pin name, board must be initialised.
 *
-* @param pin_name: GPIO Pin Name. Eg: IO0
-* @throws std::invalid_argument if name is not valid
-* @return int of MRAA index for gpio
+* @param pin_name: GPIO pin name. Eg: IO0
+* @throws std::invalid_argument if name is not found
+* @return int of MRAA index for GPIO
 */
 inline int
 getGpioLookup(std::string pin_name)
@@ -238,11 +238,11 @@ getGpioLookup(std::string pin_name)
 }
 
 /**
-* Get pin number, board must be initialised.
+* Get I2C bus index by bus name, board must be initialised.
 *
-* @param i2c_name: I2c Bus Name. Eg: I2C6
-* @throws std::invalid_argument if name is not valid
-* @return int of MRAA index of i2c bus
+* @param i2c_name: I2C bus name. Eg: I2C6
+* @throws std::invalid_argument if name is not found
+* @return int of MRAA index for I2C bus
 */
 inline int
 getI2cLookup(std::string i2c_name)
@@ -259,11 +259,11 @@ getI2cLookup(std::string i2c_name)
 }
 
 /**
-* Get pin number, board must be initialised.
+* Get SPI bus index by bus name, board must be initialised.
 *
-* @param spi_name: Name of spi bus. Eg: SPI2
-* @throws std::invalid_argument if name is not valid
-* @return int for MRAA index of spi bus
+* @param spi_name: Name of SPI bus. Eg: SPI2
+* @throws std::invalid_argument if name is not found
+* @return int of MRAA index for SPI bus
 */
 inline int
 getSpiLookup(std::string spi_name)
@@ -280,11 +280,11 @@ getSpiLookup(std::string spi_name)
 }
 
 /**
-* Get pin number, board must be initialised.
+* Get PWM index by PWM name, board must be initialised.
 *
-* @param pwm_name: Name of pwm. Eg:PWM0
-* @throws std::invalid_argument if name is not valid
-* @return int of MRAA index for pwm bus
+* @param pwm_name: Name of PWM. Eg:PWM0
+* @throws std::invalid_argument if name is not found
+* @return int of MRAA index for PWM
 */
 inline int
 getPwmLookup(std::string pwm_name)

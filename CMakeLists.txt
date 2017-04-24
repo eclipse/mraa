@@ -170,7 +170,7 @@ elseif (DETECTED_ARCH STREQUAL "MOCK")
 elseif (DETECTED_ARCH STREQUAL "PERIPHERALMAN")
   set (PERIPHERALMAN ON)
 else ()
-  message (FATAL_ERROR "Only x86, arm, peripheral manager and mock platforms currently supported")
+  message (FATAL_ERROR "Only x86, arm, PERIPHERALMAN and mock platforms currently supported")
 endif()
 
 if (BUILDSWIGPYTHON OR BUILDTESTS)
