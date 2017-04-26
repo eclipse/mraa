@@ -782,7 +782,8 @@ mraa_peripheralman_plat_init()
     //Updating GPIO bus structure
     for (; i < gpios_count; i++) {
         b->pins[i].name = gpios[i];
-        b->pins[i].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        //Retrieve this information from PIO once the API is available
+        b->pins[i].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 1, 1, 1, 1, 1 };
         b->pins[i].gpio.pinmap = i;
     }
 
