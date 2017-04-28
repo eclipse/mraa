@@ -269,7 +269,12 @@ mraa_pwm_init(int pin)
         }
         return pret;
     }
+
+#if defined(PERIPHERALMAN)
+    return mraa_pwm_init_raw(chip, pin);
+#else
     return mraa_pwm_init_raw(chip, pinn);
+#endif
 }
 
 mraa_pwm_context
