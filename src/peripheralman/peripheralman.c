@@ -68,14 +68,16 @@ mraa_pman_pwm_period_replace(mraa_pwm_context dev, int period)
 }
 
 static mraa_result_t
-mraa_pman_pwm_duty_cycle_replace(mraa_pwm_context dev, int duty_cycle)
+mraa_pman_pwm_write_replace(mraa_pwm_context dev, float duty)
 {
     if (!dev) {
         syslog(LOG_ERR, "pwm: stop: context is NULL");
         return 0;
     }
 
-    if (APwm_setDutyCycle(dev->bpwm, duty_cycle) != 0) {
+    // PIO can only take values between 0 <= duty <= 100
+    int d = (int) (duty > 100 ) ? 100 : duty;
+    if (APwm_setDutyCycle(dev->bpwm, d) != 0) {
         return 0;
     }
 
@@ -99,12 +101,6 @@ mraa_pman_pwm_enable_replace(mraa_pwm_context dev, int enable)
 
 static float
 mraa_pman_pwm_read_replace(mraa_pwm_context dev)
-{
-    return -MRAA_ERROR_FEATURE_NOT_SUPPORTED;
-}
-
-static mraa_result_t
-mraa_pman_pwm_write_replace(mraa_pwm_context dev, float duty)
 {
     return -MRAA_ERROR_FEATURE_NOT_SUPPORTED;
 }
@@ -867,7 +863,6 @@ mraa_peripheralman_plat_init()
 
     b->adv_func->pwm_init_raw_replace = &mraa_pman_pwm_init_raw_replace;
     b->adv_func->pwm_period_replace = &mraa_pman_pwm_period_replace;
-    b->adv_func->pwm_duty_cycle_replace = &mraa_pman_pwm_duty_cycle_replace;
     b->adv_func->pwm_enable_replace = &mraa_pman_pwm_enable_replace;
     b->adv_func->pwm_read_replace = &mraa_pman_pwm_read_replace;
     b->adv_func->pwm_write_replace = &mraa_pman_pwm_write_replace;
