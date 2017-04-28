@@ -86,6 +86,7 @@ typedef struct {
 
     mraa_pwm_context (*pwm_init_replace) (int pin);
     mraa_pwm_context (*pwm_init_internal_replace) (void* func_table, int pin);
+    mraa_result_t (*pwm_init_raw_replace) (mraa_pwm_context dev, int pin);
     mraa_result_t (*pwm_init_pre) (int pin);
     mraa_result_t (*pwm_init_post) (mraa_pwm_context pwm);
     mraa_result_t (*pwm_period_replace) (mraa_pwm_context dev, int period);

@@ -41,16 +41,15 @@ int uart_busses_count = 0;
 char **pwm_devices = NULL;
 int pwm_dev_count = 0;
 
-static mraa_pwm_context
-mraa_pman_pwm_init_replace(int pin)
+static mraa_result_t
+mraa_pman_pwm_init_raw_replace(mraa_pwm_context dev, int pin)
 {
-    mraa_pwm_context dev = (mraa_pwm_context) calloc(1, sizeof(struct _pwm));
     if (APeripheralManagerClient_openPwm(client, pwm_devices[pin], &dev->bpwm) != 0) {
         APwm_delete(dev->bpwm);
-        return NULL;
+        return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    return dev;
+    return MRAA_SUCCESS;
 }
 
 static mraa_result_t
@@ -866,7 +865,7 @@ mraa_peripheralman_plat_init()
     b->adv_func->uart_write_replace = &mraa_pman_uart_write_replace;
     b->adv_func->uart_read_replace = &mraa_pman_uart_read_replace;
 
-    b->adv_func->pwm_init_replace = &mraa_pman_pwm_init_replace;
+    b->adv_func->pwm_init_raw_replace = &mraa_pman_pwm_init_raw_replace;
     b->adv_func->pwm_period_replace = &mraa_pman_pwm_period_replace;
     b->adv_func->pwm_duty_cycle_replace = &mraa_pman_pwm_duty_cycle_replace;
     b->adv_func->pwm_enable_replace = &mraa_pman_pwm_enable_replace;
