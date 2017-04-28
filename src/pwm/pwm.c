@@ -233,6 +233,7 @@ mraa_pwm_init(int pin)
         syslog(LOG_ERR, "pwm_init: pin %i beyond platform definition", pin);
         return NULL;
     }
+
     if (board->pins[pin].capabilities.pwm != 1) {
         syslog(LOG_ERR, "pwm_init: pin %i not capable of pwm", pin);
         return NULL;
@@ -274,9 +275,23 @@ mraa_pwm_init(int pin)
 mraa_pwm_context
 mraa_pwm_init_raw(int chipin, int pin)
 {
+    mraa_result_t status = MRAA_SUCCESS;
+
     mraa_pwm_context dev = mraa_pwm_init_internal(plat == NULL ? NULL : plat->adv_func , chipin, pin);
-    if (dev == NULL)
+    if (dev == NULL) {
+        syslog(LOG_CRIT, "pwm: Failed to allocate memory for context");
+        status = MRAA_ERROR_NO_RESOURCES;
         return NULL;
+    }
+
+    if (IS_FUNC_DEFINED(dev, pwm_init_raw_replace)) {
+        status = dev->advance_func->pwm_init_raw_replace(dev, pin);
+        if (status == MRAA_SUCCESS) {
+            return dev;
+        } else {
+            goto init_raw_cleanup;
+        }
+    }
 
     char directory[MAX_SIZE];
     snprintf(directory, MAX_SIZE, SYSFS_PWM "/pwmchip%d/pwm%d", dev->chipid, dev->pin);
@@ -306,7 +321,17 @@ mraa_pwm_init_raw(int chipin, int pin)
         mraa_pwm_period_us(dev, plat->pwm_default_period);
         close(export_f);
     }
+
     mraa_pwm_setup_duty_fp(dev);
+
+init_raw_cleanup:
+    if (status != MRAA_SUCCESS) {
+        if (dev != NULL) {
+            free(dev);
+        }
+        return NULL;
+    }
+
     return dev;
 }
 
