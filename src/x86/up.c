@@ -31,14 +31,13 @@
 #include "x86/up.h"
 
 #define PLATFORM_NAME "UP"
-#define MAX_LENGTH 8
 
 static mraa_result_t
 mraa_up_set_pininfo(mraa_board_t* board, int mraa_index, char* name, mraa_pincapabilities_t caps, int sysfs_pin)
 {
     if (mraa_index < board->phy_pin_count) {
         mraa_pininfo_t* pin_info = &board->pins[mraa_index];
-        strncpy(pin_info->name, name, MAX_LENGTH);
+        strncpy(pin_info->name, name, MRAA_PIN_NAME_SIZE);
         pin_info->capabilities = caps;
         if (caps.gpio) {
             pin_info->gpio.pinmap = sysfs_pin;
@@ -76,7 +75,7 @@ mraa_up_get_pin_index(mraa_board_t* board, char* name, int* pin_index)
 {
     int i;
     for (i = 0; i < board->phy_pin_count; ++i) {
-        if (strncmp(name, board->pins[i].name, MAX_LENGTH) == 0) {
+        if (strncmp(name, board->pins[i].name, MRAA_PIN_NAME_SIZE) == 0) {
             *pin_index = i;
             return MRAA_SUCCESS;
         }
