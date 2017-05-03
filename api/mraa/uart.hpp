@@ -198,6 +198,21 @@ class Uart
     }
 
     /**
+     * Send a break to the device.
+     * Blocks until complete.
+     *
+     * @param duration When 0, send a break lasting at least 250
+     * milliseconds, and not more than 500 milliseconds.  When non zero,
+     * the break duration is implementation specific.
+     * @return Result of operation
+     */
+    Result
+    sendBreak(int duration)
+    {
+        return (Result) mraa_uart_sendbreak(m_uart, duration);
+    }
+
+    /**
      * Set the baudrate.
      * Takes an int and will attempt to decide what baudrate  is
      * to be used on the UART hardware.

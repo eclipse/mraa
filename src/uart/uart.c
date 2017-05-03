@@ -324,6 +324,27 @@ mraa_uart_flush(mraa_uart_context dev)
 }
 
 mraa_result_t
+mraa_uart_sendbreak(mraa_uart_context dev, int duration)
+{
+    if (!dev) {
+        syslog(LOG_ERR, "uart: sendbreak: context is NULL");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, uart_sendbreak_replace)) {
+        return dev->advance_func->uart_sendbreak_replace(dev, duration);
+    }
+
+#if !defined(PERIPHERALMAN)
+    if (tcsendbreak(dev->fd, duration) == -1) {
+        return MRAA_ERROR_INVALID_PARAMETER;
+    }
+#endif
+
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
 mraa_uart_set_baudrate(mraa_uart_context dev, unsigned int baud)
 {
     if (!dev) {
