@@ -137,6 +137,12 @@ mraa_pman_uart_flush_replace(mraa_uart_context dev)
     return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
+static mraa_result_t
+mraa_pman_uart_sendbreak_replace(mraa_uart_context dev)
+{
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
 static int
 mraa_pman_uart_read_replace(mraa_uart_context dev, char* buf, size_t len)
 {
@@ -853,6 +859,7 @@ mraa_peripheralman_plat_init()
     b->adv_func->uart_init_raw_replace = &mraa_pman_uart_init_raw_replace;
     b->adv_func->uart_set_baudrate_replace = &mraa_pman_uart_set_baudrate_replace;
     b->adv_func->uart_flush_replace = &mraa_pman_uart_flush_replace;
+    b->adv_func->uart_sendbreak_replace = &mraa_pman_uart_sendbreak_replace;
     b->adv_func->uart_set_flowcontrol_replace = &mraa_pman_uart_set_flowcontrol_replace;
     b->adv_func->uart_set_mode_replace = &mraa_pman_uart_set_mode_replace;
     b->adv_func->uart_set_non_blocking_replace = &mraa_pman_uart_set_non_blocking_replace;

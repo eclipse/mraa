@@ -39,6 +39,7 @@ add_test (NAME py_uart_checks_set_timeout COMMAND ${PYTHON_DEFAULT_EXECUTABLE} $
 add_test (NAME py_uart_checks_data_available COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_data_available.py)
 add_test (NAME py_uart_checks_write COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_write.py)
 add_test (NAME py_uart_checks_read COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_read.py)
+add_test (NAME py_uart_checks_sendbreak COMMAND ${PYTHON_DEFAULT_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/uart_checks_sendbreak.py)
 
 set_tests_properties(py_general
                      py_platform
@@ -76,4 +77,5 @@ set_tests_properties(py_general
                      py_uart_checks_data_available
                      py_uart_checks_write
                      py_uart_checks_read
+                     py_uart_checks_sendbreak
                      PROPERTIES ENVIRONMENT "PYTHONPATH=${PYTHON_DEFAULT_PYTHONPATH}")

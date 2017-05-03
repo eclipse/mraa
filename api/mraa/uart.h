@@ -73,6 +73,18 @@ mraa_uart_context mraa_uart_init_raw(const char* path);
 mraa_result_t mraa_uart_flush(mraa_uart_context dev);
 
 /**
+ * Send a break to the device.
+ * Blocks until complete.
+ *
+ * @param dev The UART context
+ * @param duration When 0, send a break lasting at least 250
+ * milliseconds, and not more than 500 milliseconds.  When non zero,
+ * the break duration is implementation specific.
+ * @return Result of operation
+ */
+mraa_result_t mraa_uart_sendbreak(mraa_uart_context dev, int duration);
+
+/**
  * Set the baudrate.
  * Takes an int and will attempt to decide what baudrate  is
  * to be used on the UART hardware.

@@ -43,6 +43,9 @@ mraa_result_t
 mraa_mock_uart_flush_replace(mraa_uart_context dev);
 
 mraa_result_t
+mraa_mock_uart_sendbreak_replace(mraa_uart_context dev, int duration);
+
+mraa_result_t
 mraa_mock_uart_set_flowcontrol_replace(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_boolean_t rtscts);
 
 mraa_result_t
