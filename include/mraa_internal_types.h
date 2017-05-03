@@ -372,6 +372,8 @@ typedef struct {
     unsigned int index; /**< ID as exposed in the system */
     int rx; /**< uart rx */
     int tx; /**< uart tx */
+    int cts; /**< uart cts */
+    int rts; /**< uart rts */
     char* device_path; /**< To store "/dev/ttyS1" for example */
     /*@}*/
 } mraa_uart_dev_t;
