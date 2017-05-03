@@ -499,9 +499,10 @@ mraa_pman_i2c_read_bytes_data_replace(mraa_i2c_context dev, uint8_t command, uin
         return -1;
     }
 
+    //TODO Replace with I2C_RDWR Ioctl from PIO when available since i2c_read_bytes_data expects length on success
     rc = AI2cDevice_readRegBuffer(dev->bi2c, command, data, length);
 
-    return rc;
+    return ((rc == 0)?length:rc);
 }
 
 static int
