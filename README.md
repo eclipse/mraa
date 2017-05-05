@@ -1,8 +1,9 @@
 <p align="center">
   <img src="http://iotdk.intel.com/misc/logos/mraa.png" height="150px" width="auto" algt="Mraa Logo"/>
 </p>
+
 libmraa - Low Level Skeleton Library for Communication on GNU/Linux platforms
-==============
+=============================================================================
 
 Libmraa is a C/C++ library with bindings to Java, Python and JavaScript to
 interface with the IO on Galileo, Edison & other platforms, with a structured
@@ -26,7 +27,7 @@ X86
 * [Galileo Gen 2 - Rev H](../master/docs/galileorevh.md)
 * [Edison](../master/docs/edison.md)
 * [Intel DE3815](../master/docs/intel_de3815.md)
-* [Minnowboard Max](../master/docs/minnow_max.md)
+* [Minnowboard](../master/docs/minnow_max.md)
 * [NUC 5th generation](../master/docs/intel_nuc5.md)
 * [UP](../master/docs/up.md)
 * [Intel Joule](../master/docs/joule.md)
@@ -45,6 +46,7 @@ FPGA
 USB
 ---
 * [FT4222](../master/docs/ftdi_ft4222.md)
+* [Firmata](../master/docs/firmata.md)
 
 Mock
 ----
@@ -69,7 +71,7 @@ sudo apt-get update
 sudo apt-get install libmraa1 libmraa-dev mraa-tools python-mraa python3-mraa
 ```
 
-Node.js package is available seperately.
+Node.js package is available separately.
 
 Install on Arch Linux
 ---------------------
@@ -105,6 +107,9 @@ Note that installing mraa in this way builds mraa without json-c so you cannot
 use mraa_init_json_platform(). Also building this way means the mraa.node
 includes a static version of libmraa rather than relying on a dynamic library
 in /usr/lib.
+
+Subplatforms (i.e. Firmata) have to be added manually with this kind of install
+from your application, as shown in [this example](examples/javascript/firmata.js).
 
 Installing on Intel 32bit Yocto based opkg image
 ------------------------------------------------
