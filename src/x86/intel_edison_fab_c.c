@@ -1689,6 +1689,10 @@ mraa_intel_edison_fab_c()
     for (ici = 0; ici < 9; ici++) {
         b->i2c_bus[ici].bus_id = -1;
     }
+    b->i2c_bus[1].bus_id = 1;
+    b->i2c_bus[1].sda = 7;
+    b->i2c_bus[1].scl = 19;
+    
     b->i2c_bus[6].bus_id = 6;
     b->i2c_bus[6].sda = 18;
     b->i2c_bus[6].scl = 19;
