@@ -102,7 +102,7 @@ mraa_pman_pwm_enable_replace(mraa_pwm_context dev, int enable)
 static float
 mraa_pman_pwm_read_replace(mraa_pwm_context dev)
 {
-    return -MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    return -1;
 }
 
 static mraa_result_t
@@ -150,12 +150,12 @@ mraa_pman_uart_read_replace(mraa_uart_context dev, char* buf, size_t len)
     uint32_t bytes_read;
 
     if (dev->buart == NULL) {
-        return MRAA_ERROR_INVALID_HANDLE;
+        return -1;
     }
 
     rc = AUartDevice_read(dev->buart, buf, len, &bytes_read);
     if (rc != 0) {
-        return MRAA_ERROR_INVALID_RESOURCE;
+        return rc;
     }
 
     return bytes_read;
@@ -168,12 +168,12 @@ mraa_pman_uart_write_replace(mraa_uart_context dev, const char* buf, size_t len)
     uint32_t bytes_written;
 
     if (dev->buart == NULL) {
-        return MRAA_ERROR_INVALID_HANDLE;
+        return -1;
     }
 
     rc = AUartDevice_write(dev->buart, buf, len, &bytes_written);
     if (rc != 0) {
-        return MRAA_ERROR_INVALID_RESOURCE;
+        return rc;
     }
 
     return bytes_written;
@@ -325,7 +325,7 @@ mraa_pman_spi_write_replace(mraa_spi_context dev, uint8_t data)
 
     rc = ASpiDevice_transfer(dev->bspi, &data, &recv, 1);
     if (rc != 0) {
-        return -1;
+        return rc;
     }
 
     return (int) recv;
@@ -343,7 +343,7 @@ mraa_pman_spi_write_word_replace(mraa_spi_context dev, uint16_t data)
 
     rc = ASpiDevice_transfer(dev->bspi, &data, &recv, 2);
     if (rc != 0) {
-        return -1;
+        return rc;
     }
 
     return (int) recv;
@@ -452,12 +452,15 @@ mraa_pman_i2c_read_replace(mraa_i2c_context dev, uint8_t* data, int length)
     int rc;
 
     if (dev->bi2c == NULL) {
-        return 0;
+        return -1;
     }
 
     rc = AI2cDevice_read(dev->bi2c, data, length);
+    if (rc != 0) {
+        return rc;
+    }
 
-    return rc;
+    return length;
 }
 
 static int
@@ -467,7 +470,7 @@ mraa_pman_i2c_read_byte_replace(mraa_i2c_context dev)
     uint8_t val;
 
     if (dev->bi2c == NULL) {
-        return 0;
+        return -1;
     }
 
     rc = AI2cDevice_read(dev->bi2c, &val, 1);
@@ -485,12 +488,12 @@ mraa_pman_i2c_read_byte_data_replace(mraa_i2c_context dev, uint8_t command)
     uint8_t val;
 
     if (dev->bi2c == NULL) {
-        return 0;
+        return -1;
     }
 
     rc = AI2cDevice_readRegByte(dev->bi2c, command, &val);
     if (rc != 0) {
-        return 0;
+        return rc;
     }
 
     return val;
@@ -507,8 +510,11 @@ mraa_pman_i2c_read_bytes_data_replace(mraa_i2c_context dev, uint8_t command, uin
 
     //TODO Replace with I2C_RDWR Ioctl from PIO when available since i2c_read_bytes_data expects length on success
     rc = AI2cDevice_readRegBuffer(dev->bi2c, command, data, length);
+    if (rc != 0) {
+        return rc;
+    }
 
-    return ((rc == 0)?length:rc);
+    return length;
 }
 
 static int
@@ -518,12 +524,12 @@ mraa_pman_i2c_read_word_data_replace(mraa_i2c_context dev, uint8_t command)
     uint16_t val;
 
     if (dev->bi2c == NULL) {
-        return 0;
+        return -1;
     }
 
     rc = AI2cDevice_readRegWord(dev->bi2c, command, &val);
     if (rc != 0) {
-        return 0;
+        return rc;
     }
 
     return val;
@@ -679,7 +685,7 @@ mraa_pman_gpio_read_replace(mraa_gpio_context dev)
     rc = AGpio_getValue(dev->bgpio, &val);
     if (rc != 0) {
         syslog(LOG_ERR, "peripheralman: Unable to read internal gpio");
-        return -1;
+        return rc;
     }
 
     return val;
