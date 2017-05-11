@@ -142,7 +142,7 @@ mraa_uart_init(int index)
         return NULL;
     }
 
-    if (plat->adv_func->uart_init_pre != NULL) {
+    if (plat->adv_func != NULL && plat->adv_func->uart_init_pre != NULL) {
         if (plat->adv_func->uart_init_pre(index) != MRAA_SUCCESS) {
             syslog(LOG_ERR, "uart%i: init: failure in pre-init platform hook", index);
             return NULL;
