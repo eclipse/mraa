@@ -31,6 +31,8 @@
 #include "mraa_internal.h"
 #include "peripheralmanager/peripheralman.h"
 
+#define UART_PATH_SIZE 11
+
 APeripheralManagerClient *client = NULL;
 char **gpios = NULL;
 int gpios_count = 0;
@@ -39,9 +41,10 @@ int i2c_busses_count = 0;
 char **spi_busses = NULL;
 int spi_busses_count = 0;
 char **uart_devices = NULL;
-int uart_busses_count = 0;
+int uart_dev_count = 0;
 char **pwm_devices = NULL;
 int pwm_dev_count = 0;
+const char uart_dev_path_prefix[UART_PATH_SIZE] = "/dev/ttyS";
 
 static mraa_result_t
 mraa_pman_pwm_init_raw_replace(mraa_pwm_context dev, int pin)
@@ -110,7 +113,13 @@ mraa_pman_pwm_read_replace(mraa_pwm_context dev)
 static mraa_result_t
 mraa_pman_uart_init_raw_replace(mraa_uart_context dev, const char* path)
 {
-    if (APeripheralManagerClient_openUartDevice(client, path, &dev->buart) != 0) {
+    return MRAA_SUCCESS;
+}
+
+static mraa_result_t
+mraa_pman_uart_init_post(mraa_uart_context dev)
+{
+    if (APeripheralManagerClient_openUartDevice(client, uart_devices[dev->index], &dev->buart) != 0) {
         AUartDevice_delete(dev->buart);
         return MRAA_ERROR_INVALID_HANDLE;
     }
@@ -184,13 +193,43 @@ mraa_pman_uart_write_replace(mraa_uart_context dev, const char* buf, size_t len)
 static mraa_result_t
 mraa_pman_uart_set_mode_replace(mraa_uart_context dev, int bytesize, mraa_uart_parity_t parity, int stopbits)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    int rc;
+
+    if (dev->buart == NULL) {
+        return -1;
+    }
+
+    rc = AUartDevice_setStopBits(dev->buart, stopbits);
+    if (rc != 0) {
+        return -1;
+    }
+
+    rc = AUartDevice_setDataSize(dev->buart, bytesize);
+    if (rc != 0) {
+        return -1;
+    }
+
+    return MRAA_SUCCESS;
 }
 
 static mraa_result_t
 mraa_pman_uart_set_flowcontrol_replace(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_boolean_t rtscts)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    int rc;
+
+    if (dev->buart == NULL) {
+        return -1;
+    }
+
+    // There are only two modes to choose from.
+    // AUART_HARDWARE_FLOW_CONTROL_NONE = 0,       < No hardware flow control
+    // AUART_HARDWARE_FLOW_CONTROL_AUTO_RTSCTS = 1 < Auto RTS/CTS
+    rc = AUartDevice_setHardwareFlowControl(dev->buart, rtscts ? 1 : 0);
+    if (rc != 0) {
+        return -1;
+    }
+
+    return MRAA_SUCCESS;
 }
 
 static mraa_result_t
@@ -840,6 +879,9 @@ mraa_board_t*
 mraa_peripheralman_plat_init()
 {
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
+    char* buf1 = (char*) calloc(0, sizeof(UART_PATH_SIZE));
+    char buf2[2] = {0};
+
     if (b == NULL) {
         return NULL;
     }
@@ -857,7 +899,7 @@ mraa_peripheralman_plat_init()
     gpios = APeripheralManagerClient_listGpio(client, &gpios_count);
     i2c_busses = APeripheralManagerClient_listI2cBuses(client, &i2c_busses_count);
     spi_busses = APeripheralManagerClient_listSpiBuses(client, &spi_busses_count);
-    uart_devices = APeripheralManagerClient_listUartDevices(client, &uart_busses_count);
+    uart_devices = APeripheralManagerClient_listUartDevices(client, &uart_dev_count);
     pwm_devices = APeripheralManagerClient_listPwm(client, &pwm_dev_count);
 
     b->platform_name = "peripheralmanager";
@@ -872,7 +914,7 @@ mraa_peripheralman_plat_init()
     b->phy_pin_count = gpios_count;
     b->i2c_bus_count = i2c_busses_count;
     b->spi_bus_count = spi_busses_count;
-    b->uart_dev_count = uart_busses_count;
+    b->uart_dev_count = uart_dev_count;
     b->pwm_dev_count = pwm_dev_count;
     b->pwm_default_period = 5000;
     b->pwm_max_period = 218453;
@@ -924,6 +966,18 @@ mraa_peripheralman_plat_init()
         b->pwm_dev[i].index = i;
     }
 
+    //Updating UART structure
+    for (i = 0; i < uart_dev_count; i++) {
+        b->uart_dev[i].name = uart_devices[i];
+        b->uart_dev[i].index = i;
+        b->uart_dev[i].rx = 0;
+        b->uart_dev[i].tx = 0;
+        strcpy(buf1, uart_dev_path_prefix);
+        sprintf(buf2, "%d", i);
+        strcat(buf1, buf2);
+        b->uart_dev[i].device_path = buf1;
+    }
+
     b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
     if (b->adv_func == NULL) {
         free(b->pins);
@@ -967,6 +1021,7 @@ mraa_peripheralman_plat_init()
     b->adv_func->spi_transfer_buf_word_replace = &mraa_pman_spi_transfer_buf_word_replace;
 
     b->adv_func->uart_init_raw_replace = &mraa_pman_uart_init_raw_replace;
+    b->adv_func->uart_init_post = &mraa_pman_uart_init_post;
     b->adv_func->uart_set_baudrate_replace = &mraa_pman_uart_set_baudrate_replace;
     b->adv_func->uart_flush_replace = &mraa_pman_uart_flush_replace;
     b->adv_func->uart_sendbreak_replace = &mraa_pman_uart_sendbreak_replace;
@@ -1013,7 +1068,7 @@ void
 pman_mraa_deinit()
 {
     free_resources(&pwm_devices, pwm_dev_count);
-    free_resources(&uart_devices, uart_busses_count);
+    free_resources(&uart_devices, uart_dev_count);
     free_resources(&spi_busses, spi_busses_count);
     free_resources(&i2c_busses, i2c_busses_count);
     free_resources(&gpios, gpios_count);
