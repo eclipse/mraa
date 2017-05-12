@@ -5,6 +5,11 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**1.7.0**
+  * Peripheral I/O support for Android Things
+  * Deprecation of node v0.10.x and 0.12.x
+  * Documetnatino improvements
+
 **1.6.1**
   * mraa-deinit bug fix
   * rpi3 fix
