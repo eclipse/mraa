@@ -83,7 +83,7 @@ mraa_spi_init(int bus)
         syslog(LOG_ERR, "spi: requested bus above spi bus count");
         return NULL;
     }
-    if (plat->adv_func->spi_init_pre != NULL) {
+    if (plat->adv_func != NULL && plat->adv_func->spi_init_pre != NULL) {
         if (plat->adv_func->spi_init_pre(bus) != MRAA_SUCCESS) {
             return NULL;
         }
@@ -124,7 +124,7 @@ mraa_spi_init(int bus)
     }
     mraa_spi_context dev = mraa_spi_init_raw(plat->spi_bus[bus].bus_id, plat->spi_bus[bus].slave_s);
 
-    if (plat->adv_func->spi_init_post != NULL) {
+    if (plat->adv_func != NULL && plat->adv_func->spi_init_post != NULL) {
         mraa_result_t ret = plat->adv_func->spi_init_post(dev);
         if (ret != MRAA_SUCCESS) {
             free(dev);
