@@ -249,9 +249,11 @@ run_interactive_mode()
         if (strcmp(command, "q") == 0)
             return;
         char* str = strtok(command, " ");
+        int len = 0;
         while (str != NULL) {
-            arg = malloc(strlen(str) + 1);
-            argv[argc++] = strcpy(arg, str);
+            len = strlen(str) + 1;
+            arg = malloc(len);
+            argv[argc++] = strncpy(arg, str, len);
             str = strtok(NULL, " ");
         }
         process_command(argc, argv);
