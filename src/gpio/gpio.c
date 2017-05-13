@@ -248,7 +248,7 @@ mraa_gpio_interrupt_handler(void* arg)
     } else {
         // open gpio value with open(3)
         char bu[MAX_SIZE];
-        sprintf(bu, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
+        snprintf(bu, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
         fp = open(bu, O_RDONLY);
         if (fp < 0) {
             syslog(LOG_ERR, "gpio%i: interrupt_handler: failed to open 'value' : %s", dev->pin, strerror(errno));

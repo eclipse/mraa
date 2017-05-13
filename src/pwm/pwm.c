@@ -102,8 +102,8 @@ mraa_pwm_write_duty(mraa_pwm_context dev, int duty)
             return MRAA_ERROR_INVALID_RESOURCE;
         }
     }
-    char bu[64];
-    int length = sprintf(bu, "%d", duty);
+    char bu[MAX_SIZE];
+    int length = snprintf(bu, MAX_SIZE, "%d", duty);
     if (write(dev->duty_fp, bu, length * sizeof(char)) == -1)
     {
         syslog(LOG_ERR, "pwm%i write_duty: Failed to write to duty_cycle: %s", dev->pin, strerror(errno));
