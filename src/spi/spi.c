@@ -157,7 +157,7 @@ mraa_spi_init_raw(unsigned int bus, unsigned int cs)
     }
 
     char path[MAX_SIZE];
-    sprintf(path, "/dev/spidev%u.%u", bus, cs);
+    snprintf(path, MAX_SIZE, "/dev/spidev%u.%u", bus, cs);
 
     dev->devfd = open(path, O_RDWR);
     if (dev->devfd < 0) {
