@@ -828,12 +828,12 @@ mraa_gpio_lookup(const char* pin_name)
         return -1;
     }
 
-    if (strlen(pin_name) == 0) {
+    if (pin_name == NULL || strlen(pin_name) == 0) {
         return -1;
     }
 
     for (i = 0; i < plat->gpio_count; i++) {
-         if (strcmp(pin_name, plat->pins[i].name) == 0) {
+         if (plat->pins[i].name != NULL && strcmp(pin_name, plat->pins[i].name) == 0) {
              return plat->pins[i].gpio.pinmap;
          }
     }
@@ -849,12 +849,12 @@ mraa_i2c_lookup(const char* i2c_name)
         return -1;
     }
 
-    if (strlen(i2c_name) == 0) {
+    if (i2c_name == NULL || strlen(i2c_name) == 0) {
         return -1;
     }
 
     for (i = 0; i < plat->i2c_bus_count; i++) {
-         if (strcmp(i2c_name, plat->i2c_bus[i].name) == 0) {
+         if (plat->i2c_bus[i].name != NULL && strcmp(i2c_name, plat->i2c_bus[i].name) == 0) {
              return plat->i2c_bus[i].bus_id;
          }
     }
@@ -870,12 +870,12 @@ mraa_spi_lookup(const char* spi_name)
         return -1;
     }
 
-    if (strlen(spi_name) == 0) {
+    if (spi_name == NULL || strlen(spi_name) == 0) {
         return -1;
     }
 
     for (i = 0; i < plat->spi_bus_count; i++) {
-         if (strcmp(spi_name, plat->spi_bus[i].name) == 0) {
+         if (plat->spi_bus[i].name != NULL && strcmp(spi_name, plat->spi_bus[i].name) == 0) {
              return plat->spi_bus[i].bus_id;
          }
     }
@@ -891,12 +891,12 @@ mraa_pwm_lookup(const char* pwm_name)
         return -1;
     }
 
-    if (strlen(pwm_name) == 0) {
+    if (pwm_name == NULL || strlen(pwm_name) == 0) {
         return -1;
     }
 
     for (i = 0; i < plat->pwm_dev_count; i++) {
-         if (strcmp(pwm_name, plat->pwm_dev[i].name) == 0) {
+         if (plat->pwm_dev[i].name != NULL && strcmp(pwm_name, plat->pwm_dev[i].name) == 0) {
              return plat->pwm_dev[i].index;
          }
     }
