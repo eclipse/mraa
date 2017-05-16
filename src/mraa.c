@@ -904,6 +904,27 @@ mraa_pwm_lookup(const char* pwm_name)
 }
 
 int
+mraa_uart_lookup(const char* uart_name)
+{
+    int i;
+
+    if (plat == NULL) {
+        return -1;
+    }
+
+    if (uart_name == NULL || strlen(uart_name) == 0) {
+        return -1;
+    }
+
+    for (i = 0; i < plat->uart_dev_count; i++) {
+         if (plat->uart_dev[i].name != NULL && strcmp(uart_name, plat->uart_dev[i].name) == 0) {
+             return plat->uart_dev[i].index;
+         }
+    }
+    return -1;
+}
+
+int
 mraa_get_default_i2c_bus(uint8_t platform_offset)
 {
     if (plat == NULL)
