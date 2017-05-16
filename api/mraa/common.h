@@ -266,6 +266,14 @@ int mraa_spi_lookup(const char* spi_name);
 int mraa_pwm_lookup(const char* pwm_name);
 
 /**
+* Get UART index by name, board must be initialised.
+*
+* @param uart_name: Name of UART. Eg:UART1
+* @return int of MRAA index for UART, or -1 if not found.
+*/
+int mraa_uart_lookup(const char* uart_name);
+
+/**
  * Get default i2c bus, board must be initialised.
  *
  * @return int default i2c bus index

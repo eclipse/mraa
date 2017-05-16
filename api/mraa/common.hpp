@@ -301,6 +301,27 @@ getPwmLookup(std::string pwm_name)
 }
 
 /**
+* Get UART index by UART name, board must be initialised.
+*
+* @param pwm_name: Name of the UART. Eg: UART2
+* @throws std::invalid_argument if name is not found
+* @return MRAA index for the UART
+*/
+inline int
+getUartLookup(std::string uart_name)
+{
+    int index = mraa_uart_lookup(uart_name.c_str());
+
+    if (index < 0) {
+        std::ostringstream oss;
+        oss << "UART name " << uart_name << " is not valid";
+        throw std::invalid_argument(oss.str());
+    }
+
+    return index;
+}
+
+/**
  * Sets the log level to use from 0-7 where 7 is very verbose. These are the
  * syslog log levels, see syslog(3) for more information on the levels.
  *
