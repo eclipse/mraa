@@ -280,12 +280,12 @@ getSpiLookup(std::string spi_name)
 }
 
 /**
-* Get PWM index by PWM name, board must be initialised.
-*
-* @param pwm_name: Name of PWM. Eg:PWM0
-* @throws std::invalid_argument if name is not found
-* @return int of MRAA index for PWM
-*/
+ * Get PWM index by PWM name, board must be initialised.
+ *
+ * @param pwm_name: Name of PWM. Eg:PWM0
+ * @throws std::invalid_argument if name is not found
+ * @return int of MRAA index for PWM
+ */
 inline int
 getPwmLookup(std::string pwm_name)
 {

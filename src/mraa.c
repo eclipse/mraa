@@ -819,8 +819,11 @@ mraa_get_pin_name(int pin)
     return (char*) current_plat->pins[pin].name;
 }
 
-int mraa_gpio_lookup(const char* pin_name)
+int
+mraa_gpio_lookup(const char* pin_name)
 {
+    int i;
+
     if (plat == NULL) {
         return -1;
     }
@@ -829,17 +832,19 @@ int mraa_gpio_lookup(const char* pin_name)
         return -1;
     }
 
-    int i = 0;
-    for (; i < plat->gpio_count; i++) {
-         if (0 == strcmp(pin_name, plat->pins[i].name)) {
+    for (i = 0; i < plat->gpio_count; i++) {
+         if (strcmp(pin_name, plat->pins[i].name) == 0) {
              return plat->pins[i].gpio.pinmap;
          }
     }
     return -1;
 }
 
-int mraa_i2c_lookup(const char* i2c_name)
+int
+mraa_i2c_lookup(const char* i2c_name)
 {
+    int i;
+
     if (plat == NULL) {
         return -1;
     }
@@ -848,17 +853,19 @@ int mraa_i2c_lookup(const char* i2c_name)
         return -1;
     }
 
-    int i = 0;
-    for (; i < plat->i2c_bus_count; i++) {
-         if (0 == strcmp(i2c_name, plat->i2c_bus[i].name)) {
+    for (i = 0; i < plat->i2c_bus_count; i++) {
+         if (strcmp(i2c_name, plat->i2c_bus[i].name) == 0) {
              return plat->i2c_bus[i].bus_id;
          }
     }
     return -1;
 }
 
-int mraa_spi_lookup(const char* spi_name)
+int
+mraa_spi_lookup(const char* spi_name)
 {
+    int i;
+
     if (plat == NULL) {
         return -1;
     }
@@ -867,17 +874,19 @@ int mraa_spi_lookup(const char* spi_name)
         return -1;
     }
 
-    int i = 0;
-    for (; i < plat->spi_bus_count; i++) {
-         if (0 == strcmp(spi_name, plat->spi_bus[i].name)) {
+    for (i = 0; i < plat->spi_bus_count; i++) {
+         if (strcmp(spi_name, plat->spi_bus[i].name) == 0) {
              return plat->spi_bus[i].bus_id;
          }
     }
     return -1;
 }
 
-int mraa_pwm_lookup(const char* pwm_name)
+int
+mraa_pwm_lookup(const char* pwm_name)
 {
+    int i;
+
     if (plat == NULL) {
         return -1;
     }
@@ -886,9 +895,8 @@ int mraa_pwm_lookup(const char* pwm_name)
         return -1;
     }
 
-    int i = 0;
-    for (; i < plat->pwm_dev_count; i++) {
-         if (0 == strcmp(pwm_name, plat->pwm_dev[i].name)) {
+    for (i = 0; i < plat->pwm_dev_count; i++) {
+         if (strcmp(pwm_name, plat->pwm_dev[i].name) == 0) {
              return plat->pwm_dev[i].index;
          }
     }

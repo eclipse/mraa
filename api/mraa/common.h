@@ -258,11 +258,11 @@ int mraa_i2c_lookup(const char* i2c_name);
 int mraa_spi_lookup(const char* spi_name);
 
 /**
-* Get PWM index by PWM name, board must be initialised.
-*
-* @param pwm_name: Name of PWM. Eg:PWM0
-* @return int of MRAA index for PWM or -1 if not found.
-*/
+ * Get PWM index by PWM name, board must be initialised.
+ *
+ * @param pwm_name: Name of PWM. Eg:PWM0
+ * @return int of MRAA index for PWM or -1 if not found.
+ */
 int mraa_pwm_lookup(const char* pwm_name);
 
 /**
