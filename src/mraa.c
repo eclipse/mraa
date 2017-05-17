@@ -833,7 +833,8 @@ mraa_gpio_lookup(const char* pin_name)
     }
 
     for (i = 0; i < plat->gpio_count; i++) {
-         if (plat->pins[i].name != NULL && strcmp(pin_name, plat->pins[i].name) == 0) {
+         if (plat->pins[i].name != NULL &&
+             strncmp(pin_name, plat->pins[i].name, strlen(plat->pins[i].name) + 1) == 0) {
              return plat->pins[i].gpio.pinmap;
          }
     }
@@ -854,7 +855,8 @@ mraa_i2c_lookup(const char* i2c_name)
     }
 
     for (i = 0; i < plat->i2c_bus_count; i++) {
-         if (plat->i2c_bus[i].name != NULL && strcmp(i2c_name, plat->i2c_bus[i].name) == 0) {
+         if (plat->i2c_bus[i].name != NULL &&
+             strncmp(i2c_name, plat->i2c_bus[i].name, strlen(plat->i2c_bus[i].name) + 1) == 0) {
              return plat->i2c_bus[i].bus_id;
          }
     }
@@ -875,7 +877,8 @@ mraa_spi_lookup(const char* spi_name)
     }
 
     for (i = 0; i < plat->spi_bus_count; i++) {
-         if (plat->spi_bus[i].name != NULL && strcmp(spi_name, plat->spi_bus[i].name) == 0) {
+         if (plat->spi_bus[i].name != NULL &&
+             strncmp(spi_name, plat->spi_bus[i].name, strlen(plat->spi_bus[i].name) + 1) == 0) {
              return plat->spi_bus[i].bus_id;
          }
     }
@@ -896,7 +899,8 @@ mraa_pwm_lookup(const char* pwm_name)
     }
 
     for (i = 0; i < plat->pwm_dev_count; i++) {
-         if (plat->pwm_dev[i].name != NULL && strcmp(pwm_name, plat->pwm_dev[i].name) == 0) {
+         if (plat->pwm_dev[i].name != NULL &&
+             strncmp(pwm_name, plat->pwm_dev[i].name, strlen(plat->pwm_dev[i].name) + 1) == 0) {
              return plat->pwm_dev[i].index;
          }
     }
@@ -917,7 +921,8 @@ mraa_uart_lookup(const char* uart_name)
     }
 
     for (i = 0; i < plat->uart_dev_count; i++) {
-         if (plat->uart_dev[i].name != NULL && strcmp(uart_name, plat->uart_dev[i].name) == 0) {
+         if (plat->uart_dev[i].name != NULL &&
+             strncmp(uart_name, plat->uart_dev[i].name, strlen(plat->uart_dev[i].name) + 1) == 0) {
              return plat->uart_dev[i].index;
          }
     }
@@ -1311,11 +1316,11 @@ mraa_add_from_lockfile(const char* imraa_lock_file)
         for (i = 0; i < subplat_num; i++) {
             struct json_object *ioobj = json_object_array_get_idx(ioarray, i);
             json_object_object_foreach(ioobj, key, val) {
-                if (strcmp(key, "id") == 0) {
+                if (strncmp(key, "id", strlen("id") + 1) == 0) {
                     if (mraa_atoi(json_object_get_string(val), &id) != MRAA_SUCCESS) {
                         id = -1;
                     }
-                } else if (strcmp(key, "uart") == 0) {
+                } else if (strncmp(key, "uart", strlen("uart") + 1) == 0) {
                     uartdev = json_object_get_string(val);
                 }
             }
