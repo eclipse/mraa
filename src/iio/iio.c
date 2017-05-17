@@ -465,7 +465,7 @@ mraa_iio_event_poll(mraa_iio_context dev, struct iio_event_data* data)
     if (ret == -1 || event_fd == -1)
         return MRAA_ERROR_UNSPECIFIED;
 
-    ret = read(event_fd, data, sizeof(struct iio_event_data));
+    read(event_fd, data, sizeof(struct iio_event_data));
 
     close(event_fd);
     return MRAA_SUCCESS;

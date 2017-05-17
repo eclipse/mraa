@@ -37,6 +37,11 @@ static int raw_bits;
 static mraa_result_t
 aio_get_valid_fp(mraa_aio_context dev)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "aio: get_valid_fp: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
     if (IS_FUNC_DEFINED(dev, aio_get_valid_fp)) {
         return dev->advance_func->aio_get_valid_fp(dev);
     }

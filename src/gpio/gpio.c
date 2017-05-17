@@ -238,6 +238,11 @@ mraa_gpio_wait_interrupt(int fd
 static void*
 mraa_gpio_interrupt_handler(void* arg)
 {
+    if (arg == NULL) {
+        syslog(LOG_ERR, "gpio: interrupt_handler: context is invalid");
+        return NULL;
+    }
+
     mraa_gpio_context dev = (mraa_gpio_context) arg;
     int fp = -1;
     mraa_result_t ret;
