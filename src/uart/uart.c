@@ -110,7 +110,7 @@ uint2speed(unsigned int speed)
 #endif
         default:
             // if we are here, then an unsupported baudrate was selected.
-            return 0;
+            return B0;
     }
 }
 
@@ -412,7 +412,7 @@ mraa_uart_set_baudrate(mraa_uart_context dev, unsigned int baud)
 
     // set our baud rates
     speed_t speed = uint2speed(baud);
-    if (speed == 0)
+    if (speed == B0)
     {
         syslog(LOG_ERR, "uart%i: set_baudrate: invalid baudrate: %i", dev->index, baud);
         return MRAA_ERROR_INVALID_PARAMETER;
