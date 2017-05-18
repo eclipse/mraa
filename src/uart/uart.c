@@ -114,6 +114,55 @@ uint2speed(unsigned int speed)
     }
 }
 
+static unsigned int speed_to_uint(speed_t speedt) {
+    struct baud_table {
+        speed_t speedt;
+        unsigned int baudrate;
+    };
+    static const struct baud_table bauds[] = {
+        { B50, 50 },
+        { B75, 75 },
+        { B110, 110 },
+        { B150, 150 },
+        { B200, 200 },
+        { B300, 300 },
+        { B600, 600 },
+        { B1200, 1200 },
+        { B1800, 1800 },
+        { B2400, 2400 },
+        { B9600, 9600 },
+        { B19200, 19200 },
+        { B38400, 38400 },
+        { B57600, 57600 },
+        { B115200, 115200 },
+        { B230400, 230400 },
+        { B460800, 460800 },
+        { B500000, 500000 },
+        { B576000, 576000 },
+        { B921600, 921600 },
+        { B1000000, 1000000 },
+        { B1152000, 1152000 },
+        { B1500000, 1500000 },
+        { B2000000, 2000000 },
+        { B2500000, 2500000 },
+        { B3000000, 3000000 },
+#if !defined(MSYS)
+        { B3500000, 3500000 },
+        { B4000000, 4000000 },
+#endif
+        { B0, 0} /* Must be last in this table */
+    };
+    int i = 0;
+
+    while (bauds[i].baudrate > 0) {
+        if (speedt == bauds[i].speedt) {
+            return bauds[i].baudrate;
+        }
+        i++;
+    }
+    return 0;
+}
+
 static mraa_uart_context
 mraa_uart_init_internal(mraa_adv_func_t* func_table)
 {
