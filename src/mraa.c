@@ -751,6 +751,15 @@ mraa_get_platform_version(int platform_offset)
 }
 
 int
+mraa_get_uart_count(void)
+{
+    if (plat == NULL) {
+        return -1;
+    }
+    return plat->uart_dev_count;
+}
+
+int
 mraa_get_i2c_bus_count()
 {
     if (plat == NULL) {

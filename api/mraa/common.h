@@ -202,6 +202,13 @@ int mraa_get_platform_combined_type();
 unsigned int mraa_get_pin_count();
 
 /**
+ * Get the number of usable UARTs, board must be initialised.
+ *
+ * @return number of usable UARTs on the platform, returns -1 on failure.
+ */
+int mraa_get_uart_count(void);
+
+/**
  * Get platform usable I2C bus count, board must be initialised.
  *
  * @return number f usable I2C bus count on the current platform. Function will
