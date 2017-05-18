@@ -179,6 +179,18 @@ getPinCount()
 }
 
 /**
+ * Get platform usable UART count, board must be initialised.
+ *
+ * @return number of usable UARTs on the current platform. Function will
+ * return -1 on failure
+ */
+inline int
+getUartCount()
+{
+    return mraa_get_uart_count();
+}
+
+/**
  * Get platform usable I2C bus count, board must be initialised.
  *
  * @return number f usable I2C bus count on the current platform. Function will
