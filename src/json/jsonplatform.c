@@ -95,8 +95,8 @@ mraa_init_json_platform_platform(json_object* jobj_platform, mraa_board_t* board
             syslog(LOG_ERR, "init_json_platform: Empty string provided for \"%s\" key in platform", NAME_KEY);
             return MRAA_ERROR_NO_DATA_AVAILABLE;
         }
-        board->platform_name = (char*) calloc(length, sizeof(char));
-        strncpy(board->platform_name, temp_string, length);
+        board->platform_name = (char*) calloc(length + 1, sizeof(char));
+        strncpy(board->platform_name, temp_string, length + 1);
     } else {
         syslog(LOG_ERR, "init_json_platform: No \"%s\" key in platform", NAME_KEY);
         return MRAA_ERROR_NO_DATA_AVAILABLE;
@@ -299,7 +299,7 @@ mraa_init_json_platform_i2c(json_object* jobj_i2c, mraa_board_t* board, int inde
     }
     // Get the bus number (e.g. 2 for /dev/i2c-2). If it doesn't exist, default to bus = pos
     bus = pos;
-    ret = mraa_init_json_platform_get_pin(jobj_i2c, I2C_KEY, BUS_KEY, index, &bus);
+    mraa_init_json_platform_get_pin(jobj_i2c, I2C_KEY, BUS_KEY, index, &bus);
     // Setup the sda pin
     ret = mraa_init_json_platform_get_index(jobj_i2c, I2C_KEY, SDAPIN_KEY, index, &pin,
                                             board->phy_pin_count - 1);
@@ -521,8 +521,8 @@ mraa_init_json_platform_uart(json_object* jobj_uart, mraa_board_t* board, int in
             syslog(LOG_ERR, "init_json_platform: UART Path at index: %d was empty", index);
             return MRAA_ERROR_NO_DATA_AVAILABLE;
         }
-        board->uart_dev[pos].device_path = (char*) calloc(length, sizeof(char));
-        strncpy(board->uart_dev[pos].device_path, temp_string, length);
+        board->uart_dev[pos].device_path = (char*) calloc(length + 1, sizeof(char));
+        strncpy(board->uart_dev[pos].device_path, temp_string, length + 1);
     } else {
         syslog(LOG_ERR, "init_json_platform: UART config at index: %d needs a path", index);
         return MRAA_ERROR_NO_DATA_AVAILABLE;
