@@ -760,6 +760,42 @@ mraa_get_uart_count(void)
 }
 
 int
+mraa_get_spi_count(void)
+{
+    if (plat == NULL) {
+        return -1;
+    }
+    return plat->spi_bus_count;
+}
+
+int
+mraa_get_pwm_count(void)
+{
+    if (plat == NULL) {
+        return -1;
+    }
+    return plat->pwm_dev_count;
+}
+
+int
+mraa_get_gpio_count(void)
+{
+    if (plat == NULL) {
+        return -1;
+    }
+    return plat->gpio_count;
+}
+
+int
+mraa_get_aio_count(void)
+{
+    if (plat == NULL) {
+        return -1;
+    }
+    return plat->aio_count;
+}
+
+int
 mraa_get_i2c_bus_count()
 {
     if (plat == NULL) {
