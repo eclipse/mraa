@@ -352,6 +352,97 @@ mraa_uart_stop(mraa_uart_context dev)
 }
 
 mraa_result_t
+mraa_uart_settings(int index, const char **devpath, const char **name, int* baudrate, int* databits, int* stopbits, mraa_uart_parity_t* parity, unsigned int* ctsrts, unsigned int* xonxoff) {
+    struct termios term;
+    int fd;
+
+    if (plat == NULL) {
+        return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
+    }
+
+    /* Access through UART index? */
+    if (index >= 0 && index < plat->uart_dev_count) {
+        if (devpath != NULL) {
+            *devpath = plat->uart_dev[index].device_path;
+        }
+        if (name != NULL) {
+            *name = plat->uart_dev[index].name;
+        }
+    }
+
+    /* is any information that requires opening the device requested?  */
+    if (baudrate != NULL || stopbits != NULL || parity != NULL || databits != NULL || ctsrts != NULL || xonxoff != NULL) {
+       const char *dev;
+
+       /* Access UART by index or devpath? */
+       if (index >=0 && index < plat->uart_dev_count) {
+           dev = plat->uart_dev[index].device_path;
+       } else
+       if (devpath != NULL) {
+           dev = *devpath;
+       } else {
+           return MRAA_ERROR_INVALID_RESOURCE;
+       }
+
+       fd = open(dev, O_RDONLY | O_NOCTTY);
+
+       if (fd < 0) {
+           return MRAA_ERROR_INVALID_RESOURCE;
+       }
+
+       if (tcgetattr(fd, &term)) {
+           close(fd);
+           return MRAA_ERROR_INVALID_RESOURCE;
+       }
+
+       if (databits != NULL) {
+           switch (term.c_cflag & CSIZE) {
+           case CS8:
+               *databits = 8;
+               break;
+           case CS7:
+               *databits = 7;
+               break;
+           case CS6:
+               *databits = 6;
+               break;
+           case CS5:
+               *databits = 5;
+           default: /* Cannot happen? Linux kernel CSIZE mask is exactly two bits wide */
+               break;
+           }
+       }
+
+       if (stopbits != NULL) {
+           *stopbits = term.c_cflag & CSTOPB ? 2 : 1;
+       }
+
+       if (parity != NULL) {
+           if (term.c_cflag & PARODD) *parity = MRAA_UART_PARITY_ODD;
+           else
+           if (term.c_cflag & PARENB) *parity = MRAA_UART_PARITY_EVEN;
+           else
+           *parity = MRAA_UART_PARITY_NONE;
+       }
+
+       if (baudrate != NULL) {
+           *baudrate = speed_to_uint(cfgetospeed(&term));
+       }
+
+       if (ctsrts != NULL) {
+           *ctsrts = term.c_cflag & CRTSCTS;
+       }
+
+       if (xonxoff != NULL) {
+           *xonxoff = term.c_cflag & (IXON|IXOFF);
+       }
+
+       close(fd);
+    }
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
 mraa_uart_flush(mraa_uart_context dev)
 {
     if (!dev) {
