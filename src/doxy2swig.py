@@ -121,6 +121,7 @@ class Doxy2SWIG:
         # ignore pure whitespace
         m = self.space_re.match(txt)
         if m and len(m.group()) == len(txt):
+            # do nothing
             pass
         else:
             self.add_text(textwrap.fill(txt, break_long_words=False))
@@ -347,9 +348,7 @@ class Doxy2SWIG:
 
     def do_simplesect(self, node):
         kind = node.attributes['kind'].value
-        if kind in ('date', 'rcs', 'version'):
-            pass
-        elif kind == 'warning':
+        if kind == 'warning':
             self.add_text(['\n', 'WARNING: '])
             self.generic_parse(node)
         elif kind == 'see':
