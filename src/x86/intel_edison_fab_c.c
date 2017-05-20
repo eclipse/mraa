@@ -233,7 +233,6 @@ mraa_intel_edison_i2c_init_pre(unsigned int bus)
     if (miniboard == 0) {
         if (bus != 6) {
             syslog(LOG_ERR, "edison: You can't use that bus, switching to bus 6");
-            bus = 6;
         }
         mraa_gpio_write(tristate, 0);
         mraa_gpio_context io18_gpio = mraa_gpio_init_raw(14);
@@ -674,9 +673,18 @@ mraa_intel_edison_uart_init_pre(int index)
         mraa_gpio_close(io1_output);
         mraa_gpio_close(io1_pullup);
     }
+
     mraa_result_t ret;
     ret = mraa_intel_edison_pinmode_change(130, 1); // IO0 RX
+    if (ret != MRAA_SUCCESS) {
+        syslog(LOG_ERR, "edison: Failed to preinit UART RX pin");
+        return ret;
+    }
     ret = mraa_intel_edison_pinmode_change(131, 1); // IO1 TX
+    if (ret != MRAA_SUCCESS) {
+        syslog(LOG_ERR, "edison: Failed to preinit UART TX pin");
+    }
+
     return ret;
 }
 
