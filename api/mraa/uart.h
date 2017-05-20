@@ -149,6 +149,41 @@ mraa_result_t mraa_uart_set_non_blocking(mraa_uart_context dev, mraa_boolean_t n
 const char* mraa_uart_get_dev_path(mraa_uart_context dev);
 
 /**
+ * Get the current settings of an UART. This is an unintrusive function. Meaning
+ * it intends not to change anything, only read the values without disturbing.
+ *
+ * All but the first index parameter are "outparameters". That means they can
+ * contain values on return. If any parameter is not interesting, a null pointer
+ * can be sent instead as a placeholder.
+ * The devpath parameter can be either in or out parameter. In case of a negative
+ * index,  the UART is identified using *devpath instead. This functionality is
+ * intended for and needed by for instance USB serial adapters.
+ *
+ * In case of a non-success return value, the outparameters are undefined.
+ *
+ * @param index uart index to look up, if negative, *devpath will be used instead
+ * @param devpath points to the device path of the UART, eg: /dev/ttyS0
+ * @param name outparameter that on return will point to the name of the UART
+ * @param baudrate pointer to an integer to contain the current baudrate (0--4M)
+ * @param databits pointer to an integer to contain the number databits (5--8)
+ * @param stopbits pointer to an integer to contain the number stopbits (1--2)
+ * @param parity will contain the current parity mode
+ * @param rtscts will point to non-zero if CTS/RTS flow control is enabled, zero otherwise
+ * @param xonxoff will point to a non-zero value if xon/xoff flow control is enabled
+ * @return result
+ */
+mraa_result_t
+mraa_uart_settings(int index,
+    const char **devpath,
+    const char **name,
+    int* baudrate,
+    int* databits,
+    int* stopbits,
+    mraa_uart_parity_t* parity,
+    unsigned int* rtscts,
+    unsigned int* xonxoff);
+
+/**
  * Destroy a mraa_uart_context
  *
  * @param dev uart context

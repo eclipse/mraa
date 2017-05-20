@@ -202,6 +202,41 @@ int mraa_get_platform_combined_type();
 unsigned int mraa_get_pin_count();
 
 /**
+ * Get the number of usable UARTs, board must be initialised.
+ *
+ * @return number of usable UARTs on the platform, returns -1 on failure.
+ */
+int mraa_get_uart_count(void);
+
+/**
+ * Get the number of usable SPI buses, board must be initialised.
+ *
+ * @return number of usable SPI buses on the platform, returns -1 on failure.
+ */
+int mraa_get_spi_bus_count(void);
+
+/**
+ * Get the number of usable PWM pins, board must be initialised.
+ *
+ * @return number of PWMs on the current platform, -1 on failure.
+ */
+int mraa_get_pwm_count(void);
+
+/**
+ * Get the number of usable GPIOs, board must be initialised.
+ *
+ * @return number of usable external GPIO pins on the board, -1 on failure.
+ */
+int mraa_get_gpio_count(void);
+
+/**
+ * Get the number of usable analog pins, board must be initialised.
+ *
+ * @return number of usable ADC inputs on the platform and -1 on failure.
+ */
+int mraa_get_aio_bus_count(void);
+
+/**
  * Get platform usable I2C bus count, board must be initialised.
  *
  * @return number f usable I2C bus count on the current platform. Function will

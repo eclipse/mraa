@@ -110,8 +110,57 @@ uint2speed(unsigned int speed)
 #endif
         default:
             // if we are here, then an unsupported baudrate was selected.
-            return 0;
+            return B0;
     }
+}
+
+static unsigned int speed_to_uint(speed_t speedt) {
+    struct baud_table {
+        speed_t speedt;
+        unsigned int baudrate;
+    };
+    static const struct baud_table bauds[] = {
+        { B50, 50 },
+        { B75, 75 },
+        { B110, 110 },
+        { B150, 150 },
+        { B200, 200 },
+        { B300, 300 },
+        { B600, 600 },
+        { B1200, 1200 },
+        { B1800, 1800 },
+        { B2400, 2400 },
+        { B9600, 9600 },
+        { B19200, 19200 },
+        { B38400, 38400 },
+        { B57600, 57600 },
+        { B115200, 115200 },
+        { B230400, 230400 },
+        { B460800, 460800 },
+        { B500000, 500000 },
+        { B576000, 576000 },
+        { B921600, 921600 },
+        { B1000000, 1000000 },
+        { B1152000, 1152000 },
+        { B1500000, 1500000 },
+        { B2000000, 2000000 },
+        { B2500000, 2500000 },
+        { B3000000, 3000000 },
+#if !defined(MSYS)
+        { B3500000, 3500000 },
+        { B4000000, 4000000 },
+#endif
+        { B0, 0} /* Must be last in this table */
+    };
+    int i = 0;
+
+    while (bauds[i].baudrate > 0) {
+        if (speedt == bauds[i].speedt) {
+            return bauds[i].baudrate;
+        }
+        i++;
+    }
+    return 0;
 }
 
 static mraa_uart_context
@@ -303,6 +352,97 @@ mraa_uart_stop(mraa_uart_context dev)
 }
 
 mraa_result_t
+mraa_uart_settings(int index, const char **devpath, const char **name, int* baudrate, int* databits, int* stopbits, mraa_uart_parity_t* parity, unsigned int* ctsrts, unsigned int* xonxoff) {
+    struct termios term;
+    int fd;
+
+    if (plat == NULL) {
+        return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
+    }
+
+    /* Access through UART index? */
+    if (index >= 0 && index < plat->uart_dev_count) {
+        if (devpath != NULL) {
+            *devpath = plat->uart_dev[index].device_path;
+        }
+        if (name != NULL) {
+            *name = plat->uart_dev[index].name;
+        }
+    }
+
+    /* is any information that requires opening the device requested?  */
+    if (baudrate != NULL || stopbits != NULL || parity != NULL || databits != NULL || ctsrts != NULL || xonxoff != NULL) {
+       const char *dev;
+
+       /* Access UART by index or devpath? */
+       if (index >=0 && index < plat->uart_dev_count) {
+           dev = plat->uart_dev[index].device_path;
+       } else
+       if (devpath != NULL) {
+           dev = *devpath;
+       } else {
+           return MRAA_ERROR_INVALID_RESOURCE;
+       }
+
+       fd = open(dev, O_RDONLY | O_NOCTTY);
+
+       if (fd < 0) {
+           return MRAA_ERROR_INVALID_RESOURCE;
+       }
+
+       if (tcgetattr(fd, &term)) {
+           close(fd);
+           return MRAA_ERROR_INVALID_RESOURCE;
+       }
+
+       if (databits != NULL) {
+           switch (term.c_cflag & CSIZE) {
+           case CS8:
+               *databits = 8;
+               break;
+           case CS7:
+               *databits = 7;
+               break;
+           case CS6:
+               *databits = 6;
+               break;
+           case CS5:
+               *databits = 5;
+           default: /* Cannot happen? Linux kernel CSIZE mask is exactly two bits wide */
+               break;
+           }
+       }
+
+       if (stopbits != NULL) {
+           *stopbits = term.c_cflag & CSTOPB ? 2 : 1;
+       }
+
+       if (parity != NULL) {
+           if (term.c_cflag & PARODD) *parity = MRAA_UART_PARITY_ODD;
+           else
+           if (term.c_cflag & PARENB) *parity = MRAA_UART_PARITY_EVEN;
+           else
+           *parity = MRAA_UART_PARITY_NONE;
+       }
+
+       if (baudrate != NULL) {
+           *baudrate = speed_to_uint(cfgetospeed(&term));
+       }
+
+       if (ctsrts != NULL) {
+           *ctsrts = term.c_cflag & CRTSCTS;
+       }
+
+       if (xonxoff != NULL) {
+           *xonxoff = term.c_cflag & (IXON|IXOFF);
+       }
+
+       close(fd);
+    }
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
 mraa_uart_flush(mraa_uart_context dev)
 {
     if (!dev) {
@@ -364,7 +504,7 @@ mraa_uart_set_baudrate(mraa_uart_context dev, unsigned int baud)
 
     // set our baud rates
     speed_t speed = uint2speed(baud);
-    if (speed == 0)
+    if (speed == B0)
     {
         syslog(LOG_ERR, "uart%i: set_baudrate: invalid baudrate: %i", dev->index, baud);
         return MRAA_ERROR_INVALID_PARAMETER;
