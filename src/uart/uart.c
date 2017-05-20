@@ -251,6 +251,7 @@ mraa_uart_context
 mraa_uart_init_raw(const char* path)
 {
     mraa_result_t status = MRAA_SUCCESS;
+    mraa_uart_context dev = NULL;
 
     if (!path) {
         syslog(LOG_ERR, "uart: device path undefined");
@@ -258,7 +259,7 @@ mraa_uart_init_raw(const char* path)
         goto init_raw_cleanup;
     }
 
-    mraa_uart_context dev = mraa_uart_init_internal(plat == NULL ? NULL : plat->adv_func);
+    dev = mraa_uart_init_internal(plat == NULL ? NULL : plat->adv_func);
     if (dev == NULL) {
         syslog(LOG_ERR, "uart: Failed to allocate memory for context");
         status = MRAA_ERROR_NO_RESOURCES;
