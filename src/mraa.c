@@ -108,7 +108,6 @@ imraa_init()
         return MRAA_SUCCESS;
     }
     char* env_var;
-    mraa_result_t ret;
     mraa_platform_t platform_type = MRAA_NULL_PLATFORM;
     uid_t proc_euid = geteuid();
     struct passwd* proc_user = getpwuid(proc_euid);
@@ -127,7 +126,7 @@ imraa_init()
     env_var = getenv(MRAA_JSONPLAT_ENV_VAR);
     if (env_var != NULL) {
         // We only care about success, the init will write to syslog if things went wrong
-        switch ((ret = mraa_init_json_platform(env_var))) {
+        switch (mraa_init_json_platform(env_var)) {
             case MRAA_SUCCESS:
                 platform_type = plat->platform_type;
                 break;
@@ -967,16 +966,11 @@ mraa_file_contains(const char* filename, const char* content)
 
     char* file = mraa_file_unglob(filename);
     if (file != NULL) {
-        size_t len = 1024;
-        char* line = calloc(len, sizeof(char));
-        if (line == NULL) {
-            free(file);
-            return 0;
-        }
+        size_t len = 0;
+        char* line = NULL;
         FILE* fh = fopen(file, "r");
         if (fh == NULL) {
             free(file);
-            free(line);
             return 0;
         }
         while ((getline(&line, &len, fh) != -1) && (found == 0)) {
@@ -1002,16 +996,11 @@ mraa_file_contains_both(const char* filename, const char* content, const char* c
 
     char* file = mraa_file_unglob(filename);
     if (file != NULL) {
-        size_t len = 1024;
-        char* line = calloc(len, sizeof(char));
-        if (line == NULL) {
-            free(file);
-            return 0;
-        }
+        size_t len = 0;
+        char* line = NULL;
         FILE* fh = fopen(file, "r");
         if (fh == NULL) {
             free(file);
-            free(line);
             return 0;
         }
         while ((getline(&line, &len, fh) != -1) && (found == 0)) {
@@ -1143,14 +1132,10 @@ mraa_find_i2c_bus(const char* devname, int startfrom)
 {
     char path[64];
     int fd;
-    int i = startfrom;
-    int ret = -1;
-
     // because feeding mraa_find_i2c_bus result back into the function is
     // useful treat -1 as 0
-    if (startfrom < 0) {
-        startfrom = 0;
-    }
+    int i = (startfrom < 0) ? 0 : startfrom;
+    int ret = -1;
 
     // find how many i2c buses we have if we haven't already
     if (num_i2c_devices == 0) {
