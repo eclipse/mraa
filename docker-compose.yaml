@@ -1,0 +1,83 @@
+version: '2'
+
+services:
+
+  main:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - http_proxy
+        - https_proxy
+        - no_proxy
+        - BUILDDOC=OFF
+        - BUILDSWIG=OFF
+        - BUILDSWIGPYTHON=OFF
+        - BUILDSWIGJAVA=OFF
+        - BUILDSWIGNODE=OFF
+        - USBPLAT=OFF
+        - FIRMATA=OFF
+        - ONEWIRE=OFF
+        - JSONPLAT
+        - IMRAA=OFF
+        - FTDI4222=OFF
+        - IPK=OFF
+        - RPM=OFF
+        - ENABLEEXAMPLES=ON
+        - INSTALLGPIOTOOL=OFF
+        - INSTALLTOOLS=OFF
+        - BUILDTESTS=ON
+        - CC=clang-3.8
+        - CXX=clang++-3.8
+        - NODE_VERSION=v4.4.7
+        - BUILDARCH
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy
+
+  doc:
+    extends: main
+    build:
+      args:
+        - BUILDDOC=ON
+    command: bash -c "make doc"
+    volumes:
+      - ./build/html:/usr/src/app/build/html
+
+  python2:
+    extends: main
+    build:
+      args:
+        - BUILDSWIG=ON
+        - BUILDSWIGPYTHON=ON
+    command: bash -c "make _python2-mraa && ctest --output-on-failure"
+
+  python3:
+    extends: python2
+    command: bash -c "make _python3-mraa && ctest --output-on-failure"
+
+  java:
+    extends: main
+    build:
+      args:
+        - BUILDSWIG=ON
+        - BUILDSWIGJAVA=ON
+        - CC=gcc-4.8
+        - CXX=g++-4.8
+    command: bash -c "make mraajava && ctest --output-on-failure"
+
+  node4:
+    extends: main
+    build:
+      args:
+        - BUILDSWIG=ON
+        - BUILDSWIGNODE=ON
+        - NODE_VERSION=v4.4.7
+    command: bash -c "source /root/.nvm/nvm.sh && make npmpkg && cd .. && node-gyp configure && node-gyp build && npm test"
+
+  node5:
+    extends: node4
+    build:
+      args:
+        - NODE_VERSION=v5.12.0
