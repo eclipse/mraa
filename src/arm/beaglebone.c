@@ -198,7 +198,6 @@ set_pin_mode(int pin, const char* mode)
     return MRAA_SUCCESS;
 }
 
-
 mraa_result_t
 mraa_beaglebone_uart_init_pre(int index)
 {
@@ -1341,27 +1340,34 @@ mraa_beaglebone()
     // TODO AIN4
     strncpy(b->pins[BUILD_PIN(P9, 33)].name, "AIN4", MRAA_PIN_NAME_SIZE);
     b->pins[BUILD_PIN(P9, 33)].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[BUILD_PIN(P9, 33)].aio.pinmap = 4;
 
     strncpy(b->pins[BUILD_PIN(P9, 34)].name, "GND_ADC", MRAA_PIN_NAME_SIZE);
     b->pins[BUILD_PIN(P9, 34)].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
     // TODO AIN6
     strncpy(b->pins[BUILD_PIN(P9, 35)].name, "AIN6", MRAA_PIN_NAME_SIZE);
     b->pins[BUILD_PIN(P9, 35)].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[BUILD_PIN(P9, 35)].aio.pinmap = 6;
     // TODO AIN5
     strncpy(b->pins[BUILD_PIN(P9, 36)].name, "AIN5", MRAA_PIN_NAME_SIZE);
     b->pins[BUILD_PIN(P9, 36)].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[BUILD_PIN(P9, 36)].aio.pinmap = 5;
     // TODO AIN2
     strncpy(b->pins[BUILD_PIN(P9, 37)].name, "AIN2", MRAA_PIN_NAME_SIZE);
     b->pins[BUILD_PIN(P9, 37)].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[BUILD_PIN(P9, 37)].aio.pinmap = 2;
     // TODO AIN3
     strncpy(b->pins[BUILD_PIN(P9, 38)].name, "AIN3", MRAA_PIN_NAME_SIZE);
     b->pins[BUILD_PIN(P9, 38)].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[BUILD_PIN(P9, 38)].aio.pinmap = 3;
     // TODO AIN0
     strncpy(b->pins[BUILD_PIN(P9, 39)].name, "AIN0", MRAA_PIN_NAME_SIZE);
     b->pins[BUILD_PIN(P9, 39)].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[BUILD_PIN(P9, 39)].aio.pinmap = 0;
     // TODO AIN1
     strncpy(b->pins[BUILD_PIN(P9, 40)].name, "AIN1", MRAA_PIN_NAME_SIZE);
     b->pins[BUILD_PIN(P9, 40)].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+    b->pins[BUILD_PIN(P9, 40)].aio.pinmap = 1;
 
     strncpy(b->pins[BUILD_PIN(P9, 41)].name, "GPIO20", MRAA_PIN_NAME_SIZE);
     b->pins[BUILD_PIN(P9, 41)].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
@@ -1445,13 +1451,18 @@ mraa_beaglebone()
     b->uart_dev[4].tx = BUILD_PIN(P8, 37);
     b->uart_dev[4].device_path = "/dev/ttyO5";
 
-    b->gpio_count = 0;
-    int i;
-    for (i = 0; i < b->phy_pin_count; i++)
-        if (b->pins[i].capabilities.gpio)
-            b->gpio_count++;
+    b->aio_non_seq = 1;
+    b->aio_dev[0].pin = BUILD_PIN(P9, 39);
+    b->aio_dev[1].pin = BUILD_PIN(P9, 40);
+    b->aio_dev[2].pin = BUILD_PIN(P9, 37);
+    b->aio_dev[3].pin = BUILD_PIN(P9, 38);
+    b->aio_dev[4].pin = BUILD_PIN(P9, 33);
+    b->aio_dev[5].pin = BUILD_PIN(P9, 36);
+    b->aio_dev[6].pin = BUILD_PIN(P9, 35);
+    b->gpio_count = 81;
 
     return b;
+
 error:
     syslog(LOG_CRIT, "Beaglebone: failed to initialize");
     free(b);
