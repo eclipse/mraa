@@ -156,20 +156,15 @@ main(int argc, const char** argv) {
     } else {
         for (i=1; i<argc; i++) {
             if (!strcmp(argv[i], "dev")) {
-                if (argc <= 1) {
-                    fprintf(stderr, "%s : dev needs uart device as argument\n", argv[0]);
+                uart = uarttool_find(argv[i+1]);
+                if (uart == NULL) {
+                    fprintf(stderr, "%s : cannot find uart %s\n", argv[0], argv[i+1]);
                     break;
-                } else {
-                    uart = uarttool_find(argv[i+1]);
-                    if (uart == NULL) {
-                        fprintf(stderr, "%s : cannot find uart %s\n", argv[0], argv[i+1]);
-                        break;
-                    }
-                    dev = mraa_uart_get_dev_path(uart);
-                    mraa_result_t res = mraa_uart_settings(-1, &dev, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
-                    if (res != MRAA_SUCCESS) {
-                        fprintf(stderr, "warning: problems accessing uart settings, attempting to continue\n");
-                    }
+                }
+                dev = mraa_uart_get_dev_path(uart);
+                mraa_result_t res = mraa_uart_settings(-1, &dev, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
+                if (res != MRAA_SUCCESS) {
+                    fprintf(stderr, "warning: problems accessing uart settings, attempting to continue\n");
                 }
             } else
 
