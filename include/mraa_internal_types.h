@@ -43,6 +43,7 @@
 // Max count for various busses
 #define MAX_I2C_BUS_COUNT 12
 #define MAX_SPI_BUS_COUNT 12
+#define MAX_AIO_COUNT 7
 #define MAX_UART_COUNT 6
 #define MAX_PWM_COUNT 6
 
@@ -387,15 +388,24 @@ typedef struct {
 } mraa_pwm_dev_t;
 
 /**
+* A structure representing an aio device.
+*/
+typedef struct {
+    /*@{*/
+    unsigned int pin; /**< Pin as exposed in the system */
+    /*@}*/
+} mraa_aio_dev_t;
+
+/**
  * A Structure representing a platform/board.
  */
-
 typedef struct _board_t {
     /*@{*/
     int phy_pin_count; /**< The Total IO pins on board */
     int gpio_count; /**< GPIO Count */
     int aio_count;  /**< Analog side Count */
     int i2c_bus_count; /**< Usable i2c Count */
+    unsigned int aio_non_seq; /**< Are AIO pins non sequential? Usually 0. */
     mraa_i2c_bus_t  i2c_bus[MAX_I2C_BUS_COUNT]; /**< Array of i2c */
     unsigned int def_i2c_bus; /**< Position in array of default i2c bus */
     int spi_bus_count; /**< Usable spi Count */
@@ -404,9 +414,11 @@ typedef struct _board_t {
     unsigned int adc_raw; /**< ADC raw bit value */
     unsigned int adc_supported; /**< ADC supported bit value */
     unsigned int def_uart_dev; /**< Position in array of default uart */
+    unsigned int def_aio_dev; /**< Position in array of default aio */
     unsigned int def_pwm_dev; /**< Position in array of default pwm */
     int uart_dev_count; /**< Usable uart Count */
     mraa_uart_dev_t uart_dev[MAX_UART_COUNT]; /**< Array of UARTs */
+    mraa_aio_dev_t aio_dev[MAX_AIO_COUNT]; /**<Array of AIOs */
     mraa_boolean_t no_bus_mux; /**< i2c/spi/adc/pwm/uart bus muxing setup not required */
     int pwm_dev_count; /**< Usable pwm Count */
     mraa_pwm_dev_t pwm_dev[MAX_PWM_COUNT]; /**< Array of PWMs */
