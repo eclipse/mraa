@@ -282,7 +282,9 @@ if (BUILDSWIG)
   endif ()
 endif ()
 
-add_library (mraa ${mraa_LIB_SRCS})
+add_library (mraa SHARED ${mraa_LIB_SRCS})
+add_library (mraa_static STATIC ${mraa_LIB_SRCS})
+set_target_properties(mraa_static PROPERTIES OUTPUT_NAME mraa)
 target_link_libraries (mraa ${mraa_LIBS})
 set_target_properties(
    mraa
