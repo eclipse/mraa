@@ -46,7 +46,7 @@ LEDs are numbered from 100-103.
 
 | MRAA Number | Physical Pin | Function |
 |-------------|--------------|----------|
-| 1           | BTN_N        | GPIO     |
+| 1           | GPIO         | GPIO     |
 | 2           | SPP1RX       | GPIO SPI |
 | 3           | PMICRST      | NONE     |
 | 4           | SPP1TX       | GPIO SPI |
@@ -126,14 +126,10 @@ LEDs are numbered from 100-103.
 | 78          | UART1RT      | GPIO UART|
 | 79          | RTC_CLK      | GPIO     |
 | 80          | UART1CT      | GPIO UART|
-| 81          | GPIO_4       | GPIO     |
-| 82          | GPIO_5       | GPIO     |
-| 83          | GPIO_6       | GPIO     |
-| 84          | GPIO_22      | GPIO     |
-| 100         | GPIO_0       | GPIO     |
-| 101         | GPIO_1       | GPIO 	|
-| 102         | GPIO_2       | GPIO 	|
-| 103         | GPIO_3       | GPIO 	|
+| 100         | LED100       | GPIO     |
+| 101         | LED101       | GPIO 	|
+| 102         | LED102       | GPIO 	|
+| 103         | LED103       | GPIO 	|
 | 104         | LEDWIFI      | GPIO     |
 | 105         | LEDBT        | GPIO     |
 

@@ -36,11 +36,6 @@ cmake ..
 make
 ~~~~~~~~~~~~~
 
-# Debian Package Building
-```
-dpkg-buildpackage -b -uc -us -tc
-```
-
 If this goes wrong and you have all the dependencies installed, then please
 file an issue with the full output of `cmake ..` and `make` or however far you
 got.
