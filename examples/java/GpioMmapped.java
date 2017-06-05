@@ -44,6 +44,7 @@ public class GpioMmapped {
     String version = mraa.getVersion();
     System.out.println("hello mraa");
     System.out.println(String.format("Version: %s", version));
+    System.out.println(String.format("Platform: %s", board));
     
     Gpio gpio = new Gpio(1);
     
