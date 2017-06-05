@@ -61,7 +61,7 @@ public class BlinkIO {
             System.exit(1);
         }
 
-        while (true) {
+        for (int i = 100; i > 0; --i) {
             gpio.write(1);
             Thread.sleep(1000);
             gpio.write(0);

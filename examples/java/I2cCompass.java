@@ -110,7 +110,7 @@ public class I2cCompass {
         conf_buf[1] = HMC5883L_CONT_MODE;
         i2c.write(conf_buf);
 
-        while (true) {
+        for (int i = 100; i > 0; --i) {
             i2c.address(HMC5883L_I2C_ADDR);
             i2c.writeByte(HMC5883L_DATA_REG);
 

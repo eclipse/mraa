@@ -50,7 +50,7 @@ public class GpioMmapped {
     
     gpio.useMmap(true);
     
-    while (true) {
+    for (int i = 1000; i > 0; --i) {
         gpio.write(1);
         Thread.sleep(50);
         gpio.write(0);
