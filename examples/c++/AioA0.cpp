@@ -33,9 +33,6 @@ main()
     mraa::Aio* a0;
 
     a0 = new mraa::Aio(0);
-    if (a0 == NULL) {
-        return MRAA_ERROR_UNSPECIFIED;
-    }
 
     for (;;) {
         adc_value = a0->read();

@@ -56,12 +56,10 @@ main(int argc, char** argv)
 
     //! [Interesting]
     mraa::Gpio* gpio = new mraa::Gpio(iopin);
-    if (gpio == NULL) {
-        return mraa::ERROR_UNSPECIFIED;
-    }
     mraa::Result response = gpio->dir(mraa::DIR_OUT);
     if (response != mraa::SUCCESS) {
         mraa::printError(response);
+        delete gpio;
         return 1;
     }
 

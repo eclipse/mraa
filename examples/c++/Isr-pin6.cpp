@@ -53,5 +53,6 @@ main()
         sleep(1);
     }
 
+    delete x;
     return EXIT_SUCCESS;
 }

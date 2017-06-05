@@ -46,9 +46,6 @@ main()
     mraa::Pwm* pwm;
 
     pwm = new mraa::Pwm(3);
-    if (pwm == NULL) {
-        return MRAA_ERROR_UNSPECIFIED;
-    }
     fprintf(stdout, "Cycling PWM on IO3 (pwm3) \n");
     pwm->enable(true);
 
