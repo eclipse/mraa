@@ -1,5 +1,6 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Contributors: Alex Tereschenko <alext.mkrs@gmail.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -25,8 +26,20 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "mraa/gpio.h"
+
+int running = 0;
+
+void
+sig_handler(int signo)
+{
+    if (signo == SIGINT) {
+        printf("closing down nicely\n");
+        running = -1;
+    }
+}
 
 int
 main(int argc, char** argv)
@@ -35,6 +48,7 @@ main(int argc, char** argv)
     mraa_gpio_context gpio, gpio_in = NULL;
     const char* board_name = mraa_get_platform_name();
     int ledstate = 0;
+    mraa_result_t r = MRAA_SUCCESS;
 
     switch (platform) {
         case MRAA_INTEL_GALILEO_GEN1:
@@ -53,7 +67,7 @@ main(int argc, char** argv)
             gpio = mraa_gpio_init(13);
     }
 
-    fprintf(stdout, "Welcome to libmraa\n Version: %s\n Running on %s\n", mraa_get_version(), board_name);
+    fprintf(stdout, "Welcome to libmraa\n Version: %s\n Running on %s (Ctrl+C to exit)\n", mraa_get_version(), board_name);
 
 
     if (gpio == NULL) {
@@ -73,8 +87,11 @@ main(int argc, char** argv)
 
     mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
 
-    for (;;) {
+    signal(SIGINT, sig_handler);
+
+    while (running == 0) {
         if (gpio_in != NULL && mraa_gpio_read(gpio_in) == 0) {
+            mraa_gpio_close(gpio_in);
             return 0;
         }
         ledstate = !ledstate;
@@ -82,5 +99,10 @@ main(int argc, char** argv)
         sleep(1);
     }
 
-    return 0;
+    r = mraa_gpio_close(gpio);
+    if (r != MRAA_SUCCESS) {
+        mraa_result_print(r);
+    }
+
+    return r;
 }

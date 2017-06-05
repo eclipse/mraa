@@ -44,11 +44,12 @@ public class AioA0 {
     public static void main(String[] args) {
         Aio a0 = new Aio(0);
 
-        while (true) {
+        for (int i = 100; i > 0; --i) {
             int adc_value = a0.read();
             float adc_value_float = a0.readFloat();
             System.out.println(String.format("ADC A0 read %X - %d", adc_value, adc_value));
             System.out.println(String.format("ADC A0 read %.5f", adc_value_float));
+            Thread.sleep(500);
         }
 
     }

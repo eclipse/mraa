@@ -64,7 +64,7 @@ public class BlinkOnboard {
         }
 
         boolean state = false;
-        while (true) {
+        for (int i = 100; i > 0; --i) {
             if (gpio_in != null && gpio_in.read() == 0) {
                 return;
             }

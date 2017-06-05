@@ -1,5 +1,6 @@
 /*
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+ * Contributors: Alex Tereschenko <alext.mkrs@gmail.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -24,14 +25,28 @@
 
 #include "stdio.h"
 #include "unistd.h"
+#include <signal.h>
 
 #include "mraa.h"
+
+int running = 0;
+
+void
+sig_handler(int signo)
+{
+    if (signo == SIGINT) {
+        printf("closing down nicely\n");
+        running = -1;
+    }
+}
 
 int
 main(int argc, char** argv)
 {
+    mraa_result_t r = MRAA_SUCCESS;
+
     mraa_init();
-    fprintf(stdout, "MRAA Version: %s\nStarting Read on IO6\n", mraa_get_version());
+    fprintf(stdout, "MRAA Version: %s\nStarting Read on IO6 (Ctrl+C to exit)\n", mraa_get_version());
 
     //! [Interesting]
     mraa_gpio_context gpio;
@@ -40,13 +55,18 @@ main(int argc, char** argv)
 
     mraa_gpio_dir(gpio, MRAA_GPIO_IN);
 
-    for (;;) {
+    signal(SIGINT, sig_handler);
+
+    while (running == 0) {
         fprintf(stdout, "Gpio is %d\n", mraa_gpio_read(gpio));
         sleep(1);
     }
 
-    mraa_gpio_close(gpio);
+    r = mraa_gpio_close(gpio);
     //! [Interesting]
+    if (r != MRAA_SUCCESS) {
+        mraa_result_print(r);
+    }
 
-    return 0;
+    return r;
 }

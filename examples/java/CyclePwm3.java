@@ -44,7 +44,7 @@ public class CyclePwm3 {
         pwm.enable(true);
 
         float value = 0;
-        while (true) {
+        for (int i = 100; i > 0; --i) {
             value += 0.01;
             pwm.write(value);
             Thread.sleep(50);

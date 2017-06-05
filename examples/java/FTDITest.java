@@ -50,8 +50,8 @@ public class FTDITest {
             /* Blink FTDI board LED */
             Gpio led = new Gpio(514);
             led.dir(Dir.DIR_OUT);
-            for (int i = 0;; i = (i + 1) % 2) {
-                led.write(i);
+            for (int i = 100; i > 0; --i) {
+                led.write(i % 2);
                 Thread.sleep(500);
             }
         } else {
