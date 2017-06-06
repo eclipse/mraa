@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 
 services:
 
@@ -10,27 +10,27 @@ services:
         - http_proxy
         - https_proxy
         - no_proxy
-        - BUILDDOC=OFF
-        - BUILDSWIG=OFF
-        - BUILDSWIGPYTHON=OFF
-        - BUILDSWIGJAVA=OFF
-        - BUILDSWIGNODE=OFF
-        - USBPLAT=OFF
-        - FIRMATA=OFF
-        - ONEWIRE=OFF
-        - JSONPLAT
-        - IMRAA=OFF
-        - FTDI4222=OFF
-        - IPK=OFF
-        - RPM=OFF
-        - ENABLEEXAMPLES=ON
-        - INSTALLGPIOTOOL=OFF
-        - INSTALLTOOLS=OFF
-        - BUILDTESTS=ON
-        - CC=clang-3.8
-        - CXX=clang++-3.8
-        - NODE_VERSION=v4.4.7
-        - BUILDARCH
+        - BUILDDOC=${BUILDDOC:-OFF}
+        - BUILDSWIG=${BUILDSWIG:-OFF}
+        - BUILDSWIGPYTHON=${BUILDSWIGPYTHON:-OFF}
+        - BUILDSWIGJAVA=${BUILDSWIGJAVA:-OFF}
+        - BUILDSWIGNODE=${BUILDSWIGNODE:-OFF}
+        - USBPLAT=${USBPLAT:-OFF}
+        - FIRMATA=${FIRMATA:-OFF}
+        - ONEWIRE=${ONEWIRE:-OFF}
+        - JSONPLAT=${JSONPLAT:-OFF}
+        - IMRAA=${IMRAA:-OFF}
+        - FTDI4222=${FTDI4222:-OFF}
+        - IPK=${IPK:-OFF}
+        - RPM=${RPM:-OFF}
+        - ENABLEEXAMPLES=${ENABLEEXAMPLES:-ON}
+        - INSTALLGPIOTOOL=${INSTALLGPIOTOOL:-OFF}
+        - INSTALLTOOLS=${INSTALLTOOLS:-OFF}
+        - BUILDTESTS=${BUILDTESTS:-ON}
+        - CC=${CC:-clang-3.8}
+        - CXX=${CXX:-clang++-3.8}
+        - NODE_VERSION=${NODE_VERSION:-v4.4.7}
+        - BUILDARCH=${BUILDARCH}
     environment:
       - http_proxy
       - https_proxy
@@ -42,8 +42,6 @@ services:
       args:
         - BUILDDOC=ON
     command: bash -c "make doc"
-    volumes:
-      - ./build/html:/usr/src/app/build/html
 
   python2:
     extends: main
