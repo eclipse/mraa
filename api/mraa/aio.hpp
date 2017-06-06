@@ -56,7 +56,9 @@ class Aio
     }
     /**
      * Aio Constructor, takes a pointer to the AIO context and initialises
-     * the AIO class
+     * the AIO class. Aio pins are always 0 indexed reguardless of their
+     * position. Check your board mapping for details. An arduino style layout
+     * will have A0 as pin14 but AIO0.
      *
      * @param void * to an AIO context
      */
