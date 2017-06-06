@@ -41,6 +41,30 @@ int uart_busses_count = 0;
 char **pwm_devices = NULL;
 int pwm_dev_count = 0;
 
+typedef enum {
+    EDISON_ARDUINO = 0,
+    EDISON_SPARKFUN = 1,
+    JOULE_TUCHUCK = 2,
+    INVALID = 3
+} Board;
+
+static unsigned int
+get_board_variant(void)
+{
+    if (gpios == NULL) {
+        return INVALID;
+    }
+
+    if (!strncmp("IO0", gpios[0], 3)) {
+        return EDISON_ARDUINO;
+    } else if (!strncmp("GP12", gpios[0], 4)) {
+        return EDISON_SPARKFUN;
+    } else if (!strncmp("J6_1", gpios[0], 4)) {
+        return JOULE_TUCHUCK;
+    }
+    return INVALID;
+}
+
 static mraa_result_t
 mraa_pman_pwm_init_raw_replace(mraa_pwm_context dev, int pin)
 {
@@ -418,7 +442,30 @@ mraa_pman_i2c_stop_replace(mraa_i2c_context dev)
 static mraa_result_t
 mraa_pman_i2c_set_frequency_replace(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 {
-    return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    Board board = get_board_variant();
+
+    switch (board) {
+        case EDISON_ARDUINO:
+        case EDISON_SPARKFUN:
+            if (mode == MRAA_I2C_FAST) {
+                return MRAA_SUCCESS;
+            } else {
+                syslog(LOG_ERR, "i2c%i: set_frequency: I2C frequency not supported", dev->busnum);
+                return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+            }
+
+        case JOULE_TUCHUCK:
+            if (mode == MRAA_I2C_FAST) {
+                return MRAA_SUCCESS;
+            } else {
+                syslog(LOG_ERR, "i2c%i: set_frequency: I2C frequency not supported", dev->busnum);
+                return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+            }
+
+        default:
+            syslog(LOG_ERR, "i2c%i: set_frequency: Board not supported", dev->busnum);
+            return MRAA_ERROR_INVALID_PARAMETER;
+    }
 }
 
 static mraa_result_t
