@@ -26,7 +26,7 @@ services:
         - ENABLEEXAMPLES=${ENABLEEXAMPLES:-ON}
         - INSTALLGPIOTOOL=${INSTALLGPIOTOOL:-OFF}
         - INSTALLTOOLS=${INSTALLTOOLS:-OFF}
-        - BUILDTESTS${BUILDTESTS:-ON}
+        - BUILDTESTS=${BUILDTESTS:-ON}
         - CC=${CC:-clang-3.8}
         - CXX=${CXX:-clang++-3.8}
         - NODE_VERSION=${NODE_VERSION:-v4.4.7}
