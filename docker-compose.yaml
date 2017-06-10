@@ -31,10 +31,20 @@ services:
         - CXX=${CXX:-clang++-3.8}
         - NODE_VERSION=${NODE_VERSION:-v4.4.7}
         - BUILDARCH=${BUILDARCH}
+        - MRAA_SRC_DIR=${MRAA_SRC_DIR:-/usr/src/app}
     environment:
       - http_proxy
       - https_proxy
       - no_proxy
+      - MRAA_SRC_DIR=/usr/src/app
+      - SONAR_TOKEN
+      - SONAR_ORG
+      - SONAR_PROJ_KEY
+      - TRAVIS_BRANCH
+      - TRAVIS_PULL_REQUEST
+      - TRAVIS_REPO_SLUG
+      - TRAVIS_PULL_REQUEST_SLUG
+      - GITHUB_TOKEN
 
   doc:
     extends: main
@@ -82,3 +92,15 @@ services:
     build:
       args:
         - NODE_VERSION=v5.12.0
+
+  sonar-scan:
+    extends: main
+    build:
+      args:
+        - BUILDSWIG=ON
+        - BUILDSWIGPYTHON=ON
+        - BUILDSWIGNODE=ON
+        - BUILDSWIGJAVA=ON
+        - ONEWIRE=ON
+        - JSONPLAT=ON
+    command: bash -c "$${MRAA_SRC_DIR}/sonar-scan.sh"

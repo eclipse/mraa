@@ -1,2 +1,4 @@
 Dockerfile
 docker-compose.yaml
+.scannerwork/
+.vscode/
