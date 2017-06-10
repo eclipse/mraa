@@ -23,6 +23,7 @@ env:
   - TARGET=java BUILDARCH=MOCK
   - TARGET=node4 BUILDARCH=MOCK
   - TARGET=node5 BUILDARCH=MOCK
+  - TARGET=sonar-scan
 
 matrix:
   exclude:
@@ -32,6 +33,8 @@ matrix:
       env: TARGET=java JSONPLAT=ON
     - compiler: clang
       env: TARGET=java BUILDARCH=MOCK
+    - compiler: clang
+      env: TARGET=sonar-scan
   allow_failures:
     - compiler: gcc
       env: TARGET=node4 JSONPLAT=ON
