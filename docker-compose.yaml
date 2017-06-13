@@ -53,6 +53,9 @@ services:
 
   python3:
     extends: python2
+    build:
+      args:
+        - USEPYTHON3TESTS=ON
     command: bash -c "make _python3-mraa && ctest --output-on-failure"
 
   java:
