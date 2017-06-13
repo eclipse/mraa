@@ -15,6 +15,8 @@ if (BUILDSWIGPYTHON)
     elseif (PYTHON3INTERP_FOUND AND EXISTS "${CMAKE_BINARY_DIR}/src/python/python3")
         set (PYTHON_DEFAULT_PYTHONPATH "${CMAKE_BINARY_DIR}/src/python/python3")
         set (PYTHON_DEFAULT_INTERP "${PYTHON3_EXECUTABLE}")
+    elseif (USEPYTHON3TESTS)
+        message (FATAL "Failed to find python3{,-dev} but forced python3 tests")
     endif ()
 
     if (DEFINED PYTHON_DEFAULT_INTERP)
