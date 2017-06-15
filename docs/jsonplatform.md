@@ -41,7 +41,7 @@ The number of json objects in layout should be equal to the pin_count.
 
 |Key        |Type   |Required   |Description                                    |
 |-----------|-------|-----------|-----------------------------------------------|
-|label      |string |yes        | The label used to describe the pin            |
+|label      |string |yes        | The label used to describe the pin (11 characters max) |
 |invalid    |boolean|no         | Sets the labeled pin as an invalid pin        |
 
 ### GPIO

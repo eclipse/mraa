@@ -214,7 +214,8 @@ mraa_init_json_platform_io(json_object* jobj_io, mraa_board_t* board, int index)
         }
         temp_string = json_object_get_string(jobj_temp);
         // set the gpio label
-        strncpy(board->pins[pos].name, temp_string, 8);
+        memset(board->pins[pos].name, 0, MRAA_PIN_NAME_SIZE);
+        strncpy(board->pins[pos].name, temp_string, MRAA_PIN_NAME_SIZE - 1);
     } else {
         syslog(LOG_ERR, "init_json_platform: No IO Label");
         return MRAA_ERROR_INVALID_RESOURCE;
