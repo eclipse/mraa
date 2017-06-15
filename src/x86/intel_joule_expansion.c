@@ -136,14 +136,18 @@ mraa_joule_expansion_board()
 
     b->def_i2c_bus = b->i2c_bus[0].bus_id;
 
-    b->spi_bus_count = 3;
+    b->spi_bus_count = 5;
     b->def_spi_bus = 0;
-    b->spi_bus[0].bus_id = 32765;
+    b->spi_bus[0].bus_id = 32766;
     b->spi_bus[0].slave_s = 0;
     b->spi_bus[1].bus_id = 32766;
-    b->spi_bus[1].slave_s = 0;
+    b->spi_bus[1].slave_s = 1;
     b->spi_bus[2].bus_id = 32766;
-    b->spi_bus[2].slave_s = 1;
+    b->spi_bus[2].slave_s = 2;
+    b->spi_bus[3].bus_id = 32765;
+    b->spi_bus[3].slave_s = 0;
+    b->spi_bus[4].bus_id = 32765;
+    b->spi_bus[4].slave_s = 2;
 
     int pos = 0;
 
