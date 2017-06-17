@@ -1461,7 +1461,7 @@ mraa_init_io(const char* desc)
     // If we cannot convert the pin to a number maybe it says raw?
     if (mraa_atoi(token, &pin) != MRAA_SUCCESS) {
         mraa_to_upper(token);
-        if (strncmp(token, "RAW", 3)) {
+        if (strncmp(token, "RAW", strlen("RAW") + 1)) {
             syslog(LOG_ERR, "mraa_init_io: Description does not adhere to a known format");
             return NULL;
         }
@@ -1472,7 +1472,7 @@ mraa_init_io(const char* desc)
         return NULL;
     }
 
-    if (strncmp(type, GPIO_KEY, strlen(GPIO_KEY)) == 0) {
+    if (strncmp(type, GPIO_KEY, strlen(GPIO_KEY) + 1) == 0) {
         if (raw) {
             if (mraa_init_io_helper(&str, &pin, delim) == MRAA_SUCCESS) {
                 return (void*) mraa_gpio_init_raw(pin);
@@ -1481,7 +1481,7 @@ mraa_init_io(const char* desc)
             return NULL;
         }
         return (void*) mraa_gpio_init(pin);
-    } else if (strncmp(type, I2C_KEY, strlen(I2C_KEY)) == 0) {
+    } else if (strncmp(type, I2C_KEY, strlen(I2C_KEY) + 1) == 0) {
         if (raw) {
             if (mraa_init_io_helper(&str, &pin, delim) == MRAA_SUCCESS) {
                 return (void*) mraa_i2c_init_raw(pin);
@@ -1490,13 +1490,13 @@ mraa_init_io(const char* desc)
             return NULL;
         }
         return (void*) mraa_i2c_init(pin);
-    } else if (strncmp(type, AIO_KEY, strlen(AIO_KEY)) == 0) {
+    } else if (strncmp(type, AIO_KEY, strlen(AIO_KEY) + 1) == 0) {
         if (raw) {
             syslog(LOG_ERR, "mraa_init_io: Aio doesn't have a RAW mode");
             return NULL;
         }
         return (void*) mraa_aio_init(pin);
-    } else if (strncmp(type, PWM_KEY, strlen(PWM_KEY)) == 0) {
+    } else if (strncmp(type, PWM_KEY, strlen(PWM_KEY) + 1) == 0) {
         if (raw) {
             if (mraa_init_io_helper(&str, &id, delim) != MRAA_SUCCESS) {
                 syslog(LOG_ERR, "mraa_init_io: Pwm, unable to convert the chip id string into a useable Int");
@@ -1509,7 +1509,7 @@ mraa_init_io(const char* desc)
             return (void*) mraa_pwm_init_raw(id, pin);
         }
         return (void*) mraa_pwm_init(pin);
-    } else if (strncmp(type, SPI_KEY, strlen(SPI_KEY)) == 0) {
+    } else if (strncmp(type, SPI_KEY, strlen(SPI_KEY) + 1) == 0) {
         if (raw) {
             if (mraa_init_io_helper(&str, &id, delim) != MRAA_SUCCESS) {
                 syslog(LOG_ERR, "mraa_init_io: Spi, unable to convert the bus string into a useable Int");
@@ -1522,7 +1522,7 @@ mraa_init_io(const char* desc)
             return (void*) mraa_spi_init_raw(id, pin);
         }
         return (void*) mraa_spi_init(pin);
-    } else if (strncmp(type, UART_KEY, strlen(UART_KEY)) == 0) {
+    } else if (strncmp(type, UART_KEY, strlen(UART_KEY) + 1) == 0) {
         if (raw) {
             return (void*) mraa_uart_init_raw(str);
         }
