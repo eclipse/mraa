@@ -51,46 +51,48 @@ mraa_x86_platform()
     FILE* fh = fopen("/sys/devices/virtual/dmi/id/board_name", "r");
     if (fh != NULL) {
         if (getline(&line, &len, fh) != -1) {
-            if (strncmp(line, "GalileoGen2", 11) == 0 || strncmp(line, "SIMATIC IOT2000", 15) == 0) {
+            if (strncmp(line, "GalileoGen2", strlen("GalileoGen2") + 1) == 0 ||
+                strncmp(line, "SIMATIC IOT2000", strlen("SIMATIC IOT2000") + 1) == 0) {
                 platform_type = MRAA_INTEL_GALILEO_GEN2;
                 plat = mraa_intel_galileo_gen2();
-            } else if (strncmp(line, "BODEGA BAY", 10) == 0) {
+            } else if (strncmp(line, "BODEGA BAY", strlen("BODEGA BAY") + 1) == 0) {
                 platform_type = MRAA_INTEL_EDISON_FAB_C;
                 plat = mraa_intel_edison_fab_c();
-            } else if (strncmp(line, "SALT BAY", 8) == 0) {
+            } else if (strncmp(line, "SALT BAY", strlen("SALT BAY") + 1) == 0) {
                 platform_type = MRAA_INTEL_EDISON_FAB_C;
                 plat = mraa_intel_edison_fab_c();
-            } else if (strncmp(line, "DE3815", 6) == 0) {
+            } else if (strncmp(line, "DE3815", strlen("DE3815") + 1) == 0) {
                 platform_type = MRAA_INTEL_DE3815;
                 plat = mraa_intel_de3815();
-            } else if (strncmp(line, "NUC5i5MYBE", 10) == 0 || strncmp(line, "NUC5i3MYBE", 10) == 0) {
+            } else if (strncmp(line, "NUC5i5MYBE", strlen("NUC5i5MYBE") + 1) == 0 ||
+                       strncmp(line, "NUC5i3MYBE", strlen("NUC5i3MYBE") + 1) == 0) {
                 platform_type = MRAA_INTEL_NUC5;
                 plat = mraa_intel_nuc5();
-            } else if (strncmp(line, "NOTEBOOK", 8) == 0) {
+            } else if (strncmp(line, "NOTEBOOK", strlen("NOTEBOOK") + 1) == 0) {
                 platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
                 plat = mraa_intel_minnowboard_byt_compatible(0);
-            } else if (strncasecmp(line, "MinnowBoard MAX", 15) == 0) {
+            } else if (strncasecmp(line, "MinnowBoard MAX", strlen("MinnowBoard MAX") + 1) == 0) {
                 platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
                 plat = mraa_intel_minnowboard_byt_compatible(0);
-            } else if (strncasecmp(line, "Galileo", 7) == 0) {
+            } else if (strncasecmp(line, "Galileo", strlen("Galileo") + 1) == 0) {
                 platform_type = MRAA_INTEL_GALILEO_GEN1;
                 plat = mraa_intel_galileo_rev_d();
-            } else if (strncasecmp(line, "MinnowBoard Compatible", 22) == 0) {
+            } else if (strncasecmp(line, "MinnowBoard Compatible", strlen("MinnowBoard Compatible") + 1) == 0) {
                 platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
                 plat = mraa_intel_minnowboard_byt_compatible(1);
-            } else if (strncasecmp(line, "MinnowBoard Turbot", 18) == 0) {
+            } else if (strncasecmp(line, "MinnowBoard Turbot", strlen("MinnowBoard Turbot") + 1) == 0) {
                 platform_type = MRAA_INTEL_MINNOWBOARD_MAX;
                 plat = mraa_intel_minnowboard_byt_compatible(1);
-            } else if (strncasecmp(line, "Braswell Cherry Hill", 20) == 0) {
+            } else if (strncasecmp(line, "Braswell Cherry Hill", strlen("Braswell Cherry Hill") + 1) == 0) {
                 platform_type = MRAA_INTEL_CHERRYHILLS;
                 plat = mraa_intel_cherryhills();
-            } else if (strncasecmp(line, "UP-CHT01", 8) == 0) {
+            } else if (strncasecmp(line, "UP-CHT01", strlen("UP-CHT01") + 1) == 0) {
                 platform_type = MRAA_UP;
                 plat = mraa_up_board();
-            } else if (strncasecmp(line, "RVP", 3) == 0) {
+            } else if (strncasecmp(line, "RVP", strlen("RVP") + 1) == 0) {
                 platform_type = MRAA_INTEL_JOULE_EXPANSION;
                 plat = mraa_joule_expansion_board();
-            } else if (strncasecmp(line, "SDS", 3) == 0) {
+            } else if (strncasecmp(line, "SDS", strlen("SDS") + 1) == 0) {
                 platform_type = MRAA_INTEL_JOULE_EXPANSION;
                 plat = mraa_joule_expansion_board();
             } else {
