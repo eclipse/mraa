@@ -29,7 +29,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
-#include <linux/i2c-dev.h>
+#include <mraa/i2c.h>
 
 // Debug
 #include <syslog.h>
@@ -39,20 +39,6 @@
 #include "x86/intel_joule_expansion.h"
 
 #define PLATFORM_NAME "INTEL JOULE EXPANSION"
-
-typedef union i2c_smbus_data_union {
-    uint8_t byte;        ///< data byte
-    unsigned short word; ///< data short word
-    uint8_t block[I2C_SMBUS_BLOCK_MAX + 2];
-    ///< block[0] is used for length and one more for PEC
-} i2c_smbus_data_t;
-
-typedef struct i2c_smbus_ioctl_data_struct {
-    uint8_t read_write;     ///< operation direction
-    uint8_t command;        ///< ioctl command
-    int size;               ///< data size
-    i2c_smbus_data_t* data; ///< data
-} i2c_smbus_ioctl_data_t;
 
 typedef enum {NO_SHIELD, DFROBOT, GROVE} shield_t;
 
@@ -99,7 +85,6 @@ mraa_joule_expansion_board()
 
     b->i2c_bus_count = 0;
 
-    //int i2c_bus_num = -1;
     int i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:16.0", "i2c_designware.0");
     int i2c_aio_bus = i2c_bus_num;
     if (i2c_bus_num != -1) {
@@ -189,7 +174,7 @@ mraa_joule_expansion_board()
     b->def_uart_dev = 0;
     b->uart_dev[0].device_path = "/dev/ttyS0";
     b->uart_dev[0].rx = 68;
-    b->uart_dev[0].tx = 7;    
+    b->uart_dev[0].tx = 7;
     b->uart_dev[1].device_path = "/dev/ttyS1";
     b->uart_dev[1].rx = 24;
     b->uart_dev[1].tx = 22;
@@ -199,102 +184,90 @@ mraa_joule_expansion_board()
     if (i2c_aio_bus != -1) {
 
         syslog(LOG_NOTICE, "Attempting shield autodetection on I2C bus %d...", i2c_aio_bus);
+        mraa_i2c_context i2c = mraa_i2c_init_raw(i2c_aio_bus);
 
-        i2c_smbus_ioctl_data_t sm;
-        i2c_smbus_data_t d;
-        int fp;
+        if (i2c == NULL)
+            syslog(LOG_ERR, "Failed to open I2C bus: %d", i2c_aio_bus);
+        else {
+            if (mraa_i2c_address(i2c, 0x49) != MRAA_SUCCESS)
+                syslog(LOG_ERR, "Failed to set I2C address: %d", 0x49);
+            if (mraa_i2c_read_word_data(i2c, 0x01) < 0) {
+                syslog(LOG_NOTICE, "No device at I2C address 0x49");
 
-        char i2c_fh[64];
-        snprintf(i2c_fh, 64, "/dev/i2c-%d", i2c_aio_bus);
+                // no DFRobot shield, try Grove
+                if (mraa_i2c_address(i2c, 0x48) != MRAA_SUCCESS)
+                    syslog(LOG_ERR, "Failed to set I2C address: %d", 0x48);
+                if (mraa_i2c_read_word_data(i2c, 0x01) < 0)
+                    syslog(LOG_NOTICE, "No device at I2C address 0x48");
+                    // no shield
 
-        sm.read_write = I2C_SMBUS_READ;
-        sm.command = 0x01;
-        sm.size = I2C_SMBUS_WORD_DATA; // LSB first
-        sm.data = &d;
+                else {
+                    // load ads1015 at 0x48
+                    syslog(LOG_NOTICE, "Loading ti-ads1015 module for Grove Shield");
+                    if (system("modprobe ti-ads1015") < 0) {
+                        syslog(LOG_NOTICE, "Failed, are you running the latest Joule kernel?");
+                    } else {
+                        char command[128];
+                        snprintf(command, 128, "echo ads1015 0x48 >/sys/bus/i2c/devices/i2c-%d/new_device", i2c_aio_bus);
+                        if (system(command) < 0) {
+                            syslog(LOG_ERR, "Failed to add ads1015 device");
+                        } else {
+                            // success, setup aio pins
+                            b->aio_count = 4;
+                            b->adc_raw = 11; // 12-bit ads1015 - sign bit
+                            b->adc_supported = 10;
+                            pincount += b->aio_count;
+                            shield = GROVE;
 
-        if ((fp = open(i2c_fh, O_RDWR)) < 1)
-            syslog(LOG_ERR, "Failed to open I2C bus: %s", strerror(errno));
-        if (ioctl(fp, I2C_SLAVE_FORCE, 0x49) < 0)
-            syslog(LOG_ERR, "Failed to set I2C address: %s", strerror(errno));
-        if (ioctl(fp, I2C_SMBUS, &sm) < 0) {
-            syslog(LOG_NOTICE, "No device at I2C address 0x49");
-
-            // no DFRobot shield, try Grove
-            if (ioctl(fp, I2C_SLAVE_FORCE, 0x48) < 0)
-                syslog(LOG_ERR, "Failed to set I2C address: %s", strerror(errno));
-            if (ioctl(fp, I2C_SMBUS, &sm) < 0)
-                syslog(LOG_NOTICE, "No device at I2C address 0x48");
-                // no shield
-            else {
-                // load ads1015 at 0x48
-                syslog(LOG_NOTICE, "Loading ti-ads1015 module for Grove Shield");
+                            // max sample rate and 6.144 V reference
+                            // additional aio functions can be added to make up for loss of precision at 3V3, 5V, etc
+                            int i;
+                            for (i = 0; i < b->aio_count; i++) {
+                                snprintf(command, 128, "echo 3300 >/sys/bus/iio/devices/iio:device0/in_voltage%d_sampling_frequency", i);
+                                system(command);
+                                snprintf(command, 128, "echo 3 >/sys/bus/iio/devices/iio:device0/in_voltage%d_scale", i);
+                                system(command);
+                            }
+                        }
+                    }
+                }
+            } else {
+                // load ads1115 at 0x48 and 0x49
+                syslog(LOG_NOTICE, "Loading ti-ads1015 module for DFRobot Shield");
                 if (system("modprobe ti-ads1015") < 0) {
                     syslog(LOG_NOTICE, "Failed, are you running the latest Joule kernel?");
                 } else {
                     char command[128];
-                    snprintf(command, 128, "echo ads1015 0x48 >/sys/bus/i2c/devices/i2c-%d/new_device", i2c_aio_bus);
-                    if (system(command) < 0) {
-                        syslog(LOG_ERR, "Failed to add ads1015 device");
-                    } else {
-                        // success, setup aio pins
-                        b->aio_count = 4;
-                        b->adc_raw = 11; // 12-bit ads1015 - sign bit
-                        b->adc_supported = 10;
-                        pincount += b->aio_count;
-                        shield = GROVE;
-
-                        // max sample rate and 6.144 V reference
-                        // additional aio functions can be added to make up for loss of precision at 3V3, 5V, etc
-                        int i;
-                        for (i = 0; i < b->aio_count; i++) {
-                            snprintf(command, 128, "echo 3300 >/sys/bus/iio/devices/iio:device0/in_voltage%d_sampling_frequency", i);
-                            system(command);
-                            snprintf(command, 128, "echo 3 >/sys/bus/iio/devices/iio:device0/in_voltage%d_scale", i);
-                            system(command);
-                        }
-                    }
-                }
-            }
-        } else {
-            // load ads1115 at 0x48 and 0x49
-            syslog(LOG_NOTICE, "Loading ti-ads1015 module for DFRobot Shield");
-            if (system("modprobe ti-ads1015") < 0) {
-                syslog(LOG_NOTICE, "Failed, are you running the latest Joule kernel?");
-            } else {
-                char command[128];
-                snprintf(command, 128, "echo ads1115 0x48 >/sys/bus/i2c/devices/i2c-%d/new_device", i2c_aio_bus);
-                if (system(command) < 0)
-                    syslog(LOG_ERR, "Failed to add ads1115 device");
-                else {
-                    snprintf(command, 128, "echo ads1115 0x49 >/sys/bus/i2c/devices/i2c-%d/new_device", i2c_aio_bus);
+                    snprintf(command, 128, "echo ads1115 0x48 >/sys/bus/i2c/devices/i2c-%d/new_device", i2c_aio_bus);
                     if (system(command) < 0)
                         syslog(LOG_ERR, "Failed to add ads1115 device");
                     else {
-                        // success, setup aio pins
-                        b->aio_count = 8;
-                        b->adc_raw = 15; // 16-bit ads1115 - sign bit
-                        b->adc_supported = 10;
-                        b->adv_func->aio_get_valid_fp = &mraa_joule_expansion_board_get_valid_fp;
-                        pincount += b->aio_count;
-                        shield = DFROBOT;
+                        snprintf(command, 128, "echo ads1115 0x49 >/sys/bus/i2c/devices/i2c-%d/new_device", i2c_aio_bus);
+                        if (system(command) < 0)
+                            syslog(LOG_ERR, "Failed to add ads1115 device");
+                        else {
+                            // success, setup aio pins
+                            b->aio_count = 8;
+                            b->adc_raw = 15; // 16-bit ads1115 - sign bit
+                            b->adc_supported = 10;
+                            b->adv_func->aio_get_valid_fp = &mraa_joule_expansion_board_get_valid_fp;
+                            pincount += b->aio_count;
+                            shield = DFROBOT;
 
-                        // max sample rate and 6.144 V reference
-                        // additional aio functions can be added to make up for loss of precision at 3V3, 5V, etc
-                        int i;
-                        for (i = 0; i < b->aio_count; i++) {
-                            snprintf(command, 128, "echo 860 >/sys/bus/iio/devices/iio:device%d/in_voltage%d_sampling_frequency", i / 4, i % 4);
-                            system(command);
-                            snprintf(command, 128, "echo 3 >/sys/bus/iio/devices/iio:device%d/in_voltage%d_scale", i / 4, i % 4);
-                            system(command);
+                            // max sample rate and 6.144 V reference
+                            // additional aio functions can be added to make up for loss of precision at 3V3, 5V, etc
+                            int i;
+                            for (i = 0; i < b->aio_count; i++) {
+                                snprintf(command, 128, "echo 860 >/sys/bus/iio/devices/iio:device%d/in_voltage%d_sampling_frequency", i / 4, i % 4);
+                                system(command);
+                                snprintf(command, 128, "echo 3 >/sys/bus/iio/devices/iio:device%d/in_voltage%d_scale", i / 4, i % 4);
+                                system(command);
+                            }
                         }
                     }
                 }
             }
         }
-    } else {
-        b->aio_count = 0;
-        b->adc_raw = 0;
-        b->adc_supported = 0;
     }
 
     // initialize pins
@@ -913,7 +886,15 @@ mraa_joule_expansion_board()
             b->pins[pos + 3].aio.pinmap = 3;
             b->pins[pos + 3].aio.mux_total = 0;
 
+            break;
+
         case NO_SHIELD:
+
+            b->aio_count = 0;
+            b->adc_raw = 0;
+            b->adc_supported = 0;
+            break;
+
         default: break;
     }
 
