@@ -85,6 +85,14 @@ typedef enum {
 } mraa_gpio_edge_t;
 
 /**
+ * Gpio input modes
+ */
+typedef enum {
+    MRAA_GPIO_ACTIVE_HIGH = 0, /**< Resistive High */
+    MRAA_GPIO_ACTIVE_LOW = 1,  /**< Resistive Low */
+} mraa_gpio_input_mode_t;
+
+/**
  * Initialise gpio_context, based on board number
  *
  *  @param pin Pin number read from the board, i.e IO3 is 3
@@ -217,6 +225,16 @@ int mraa_gpio_get_pin(mraa_gpio_context dev);
  * @return gpio number
  */
 int mraa_gpio_get_pin_raw(mraa_gpio_context dev);
+
+/**
+ * Set Gpio input mode
+ *
+ * @param dev The Gpio context
+ * @param mode Mode to set input pin state
+ * @return Result of operation
+ */
+mraa_result_t mraa_gpio_input_mode(mraa_gpio_context dev, mraa_gpio_input_mode_t);
+
 
 #ifdef __cplusplus
 }

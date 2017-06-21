@@ -839,3 +839,45 @@ mraa_gpio_get_pin_raw(mraa_gpio_context dev)
     }
     return dev->pin;
 }
+
+mraa_result_t
+mraa_gpio_input_mode(mraa_gpio_context dev, mraa_gpio_input_mode_t mode)
+{
+    if (dev == NULL) {
+        syslog(LOG_ERR, "gpio: in_mode: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    char filepath[MAX_SIZE];
+    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/active_low", dev->pin);
+
+    int active_low = open(filepath, O_WRONLY);
+    if (active_low == -1) {
+        syslog(LOG_ERR, "gpio%i: mode: Failed to open 'active_low' for writing: %s", dev->pin, strerror(errno));
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    char bu[MAX_SIZE];
+    int length;
+    switch (mode) {
+        case MRAA_GPIO_ACTIVE_HIGH:
+            length = snprintf(bu, sizeof(bu), "%d", 0);
+            break;
+        case MRAA_GPIO_ACTIVE_LOW:
+            length = snprintf(bu, sizeof(bu), "%d", 1);
+            break;
+        default:
+            close(active_low);
+            return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    }
+
+    if (write(active_low, bu, length * sizeof(char)) == -1) {
+        syslog(LOG_ERR, "gpio%i: mode: Failed to write to 'active_low': %s", dev->pin, strerror(errno));
+        close(active_low);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    close(active_low);
+
+    return MRAA_SUCCESS;
+}

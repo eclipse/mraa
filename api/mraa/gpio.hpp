@@ -70,6 +70,14 @@ typedef enum {
 } Edge;
 
 /**
+ * Gpio Input modes
+ */
+typedef enum {
+    MODE_IN_ACTIVE_HIGH = 0, /**< Resistive High */
+    MODE_IN_ACTIVE_LOW = 1,  /**< Resistive Low */
+} InputMode;
+
+/**
  * @brief API to General Purpose IO
  *
  * This file defines the gpio interface for libmraa
@@ -315,6 +323,19 @@ class Gpio
         }
         return mraa_gpio_get_pin(m_gpio);
     }
+
+    /**
+     * Change Gpio input mode
+     *
+     * @param mode The mode to change the gpio input
+     * @return Result of operation
+     */
+    Result
+    inputMode(InputMode mode)
+    {
+        return (Result )mraa_gpio_input_mode(m_gpio, (mraa_gpio_input_mode_t) mode);
+    }
+
 
   private:
     mraa_gpio_context m_gpio;
