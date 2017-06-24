@@ -51,6 +51,9 @@ mraa_x86_platform()
     FILE* fh = fopen("/sys/devices/virtual/dmi/id/board_name", "r");
     if (fh != NULL) {
         if (getline(&line, &len, fh) != -1) {
+            // Sanitize input by terminating at any of possible end of line chars
+            line[strcspn(line, "\r\n")] = 0;
+
             if (strncmp(line, "GalileoGen2", strlen("GalileoGen2") + 1) == 0 ||
                 strncmp(line, "SIMATIC IOT2000", strlen("SIMATIC IOT2000") + 1) == 0) {
                 platform_type = MRAA_INTEL_GALILEO_GEN2;
