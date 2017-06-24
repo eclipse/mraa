@@ -20,3 +20,9 @@ package.json
 binding.gyp
 READMEFIRST
 npm-debug.log
+
+# Sonar
+.scannerwork/
+
+# Visual Studio Code
+.vscode/
