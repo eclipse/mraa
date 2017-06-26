@@ -29,7 +29,7 @@ static pthread_key_t env_key;
 static pthread_once_t env_key_init = PTHREAD_ONCE_INIT;
 static jmethodID runGlobal;
 static JavaVM* globVM = NULL;
-
+static jclass jcObject;
 
 void
 mraa_java_set_jvm(JavaVM* vm)
@@ -44,8 +44,24 @@ mraa_java_make_env_key(void)
         JNIEnv* jenv;
         (*globVM)->GetEnv(globVM, (void**) &jenv, JNI_REQUIRED_VERSION);
         jclass rcls = (*jenv)->FindClass(jenv, "java/lang/Runnable");
-        jmethodID runm = (*jenv)->GetMethodID(jenv, rcls, "run", "()V");
-        runGlobal = (jmethodID)(*jenv)->NewGlobalRef(jenv, (jobject) runm);
+        if ((*jenv)->ExceptionOccurred(jenv)) {
+            (*jenv)->ExceptionClear(jenv);
+            return;
+        }
+
+        jcObject = (jclass) (*jenv)->NewGlobalRef(jenv, rcls);
+        if ((*jenv)->ExceptionOccurred(jenv)) {
+            (*jenv)->ExceptionClear(jenv);
+            return;
+        }
+        (*jenv)->DeleteLocalRef(jenv, rcls);
+
+        runGlobal = (*jenv)->GetMethodID(jenv, jcObject, "run", "()V");
+        if ((*jenv)->ExceptionOccurred(jenv)) {
+            (*jenv)->ExceptionClear(jenv);
+            return;
+        }
+
         pthread_key_create(&env_key, NULL);
     }
 }
