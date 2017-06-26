@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+#include <poll.h>
+#include <errno.h>
 
 #include "mraa_internal.h"
 #include "peripheralmanager/peripheralman.h"
@@ -716,9 +718,110 @@ mraa_pman_gpio_edge_mode_replace(mraa_gpio_context dev, mraa_gpio_edge_t mode)
 };
 
 static mraa_result_t
+mraa_pman_gpio_wait_interrupt(int fd, int control_fd)
+{
+    if (fd < 0) {
+        return MRAA_ERROR_INVALID_PARAMETER;
+    }
+
+    struct pollfd poller = {
+        .fd = fd,
+        .events = POLLIN | POLLPRI | POLLERR,
+        .revents = 0,
+    };
+
+    poll(&poller, 1, -1);
+    syslog(LOG_INFO, "peripheralman: received an event");
+    AGpio_ackInterruptEvent(fd);
+
+    return MRAA_SUCCESS;
+}
+
+static void*
+mraa_pman_gpio_interrupt_handler(void* arg)
+{
+    if (arg == NULL) {
+        syslog(LOG_ERR, "peripheralman: interrupt_handler: context is invalid");
+        return NULL;
+    }
+
+    mraa_gpio_context dev = (mraa_gpio_context) arg;
+    int fd = -1;
+
+    if (AGpio_getPollingFd(dev->bgpio, &fd)) {
+        syslog(LOG_ERR, "peripheralman: failed to get the fd");
+        return NULL;
+    }
+
+    if (pipe(dev->isr_control_pipe)) {
+        syslog(LOG_ERR, "peripheralman: interrupt_handler: failed to create isr control pipe: %s", strerror(errno));
+        close(fd);
+        return NULL;
+    }
+
+    dev->isr_value_fp = fd;
+
+    if (lang_func->java_attach_thread != NULL) {
+        if (dev->isr == lang_func->java_isr_callback) {
+            if (lang_func->java_attach_thread() != MRAA_SUCCESS) {
+                close(dev->isr_value_fp);
+                dev->isr_value_fp = -1;
+                return NULL;
+            }
+        }
+    }
+
+    for (;;) {
+        mraa_result_t ret = mraa_pman_gpio_wait_interrupt(dev->isr_value_fp, dev->isr_control_pipe[0]);
+	if (ret == MRAA_SUCCESS) {
+            dev->isr(dev->isr_args);
+        } else {
+           if (fd != -1) {
+               close(dev->isr_value_fp);
+               dev->isr_value_fp = -1;
+           }
+
+           if (lang_func->java_detach_thread != NULL && lang_func->java_delete_global_ref != NULL) {
+               if (dev->isr == lang_func->java_isr_callback) {
+                   lang_func->java_delete_global_ref(dev->isr_args);
+                   lang_func->java_detach_thread();
+               }
+           }
+
+           return NULL;
+        }
+    }
+}
+
+static mraa_result_t
 mraa_pman_gpio_isr_replace(mraa_gpio_context dev, mraa_gpio_edge_t edge, void (*fptr)(void*), void* args)
 {
-    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    if (dev->bgpio == NULL) {
+        syslog(LOG_ERR, "peripheralman: Invalid internal gpio handle");
+        return -1;
+    }
+
+    mraa_pman_gpio_edge_mode_replace(dev, edge);
+
+    // we only allow one isr per mraa_gpio_context
+    if (dev->thread_id != 0) {
+        return MRAA_ERROR_NO_RESOURCES;
+    }
+
+    dev->isr = fptr;
+
+    /* Most UPM sensors use the C API, the Java global ref must be created here. */
+    /* The reason for checking the callback function is internal callbacks. */
+    if (lang_func->java_create_global_ref != NULL) {
+        if (dev->isr == lang_func->java_isr_callback) {
+            args = lang_func->java_create_global_ref(args);
+        }
+    }
+
+    dev->isr_args = args;
+    pthread_create(&dev->thread_id, NULL, mraa_pman_gpio_interrupt_handler, (void*) dev);
+
+    return MRAA_SUCCESS;
 }
 
 static mraa_result_t
