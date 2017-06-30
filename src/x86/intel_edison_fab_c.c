@@ -31,6 +31,7 @@
 #include <linux/spi/spidev.h>
 #include <errno.h>
 #include <time.h>
+#include <sys/utsname.h>
 
 #include "common.h"
 #include "x86/intel_edison_fab_c.h"
@@ -45,7 +46,7 @@
 // Might not always be correct. First thing to check if mmap stops
 // working. Check the device for 0x1199 and Intel Vendor (0x8086)
 #define MMAP_PATH "/sys/devices/pci0000:00/0000:00:0c.0/resource0"
-#define UART_DEV_PATH "/dev/ttyMFD1"
+#define UART_DEV_PATH ((vanilla_kernel == 0)?"/dev/ttyMFD1":"/dev/ttyS1")
 
 typedef struct {
     int sysfs;
@@ -70,6 +71,7 @@ static mraa_gpio_context agpioOutputen[sizeof(outputen) / sizeof(outputen[0])];
 static unsigned int pullup_map[] = { 216, 217, 218, 219, 220, 221, 222, 223, 224, 225,
                                      226, 227, 228, 229, 208, 209, 210, 211, 212, 213 };
 static int miniboard = 0;
+static int vanilla_kernel = 0;
 
 // MMAP
 static uint8_t* mmap_reg = NULL;
@@ -115,6 +117,11 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
         return MRAA_SUCCESS;
     }
 
+    if (vanilla_kernel != 0) {
+        syslog(LOG_NOTICE, "edison: Vanilla kernel does not support setting pinmux %d", sysfs);
+        return MRAA_SUCCESS;
+    }
+
     char buffer[MAX_SIZE];
     int useDebugFS = 0;
 
@@ -140,7 +147,7 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
 
     mraa_result_t ret = MRAA_SUCCESS;
     char mode_buf[MAX_MODE_SIZE];
-    int length = snprintf(mode_buf, MAX_MODE_SIZE, "%s%u", useDebugFS ? "mode" : "", mode);
+    int length = sprintf(mode_buf, "%s%u", useDebugFS ? "mode" : "", mode);
     if (write(modef, mode_buf, length * sizeof(char)) == -1) {
         ret = MRAA_ERROR_INVALID_RESOURCE;
     }
@@ -233,6 +240,7 @@ mraa_intel_edison_i2c_init_pre(unsigned int bus)
     if (miniboard == 0) {
         if (bus != 6) {
             syslog(LOG_ERR, "edison: You can't use that bus, switching to bus 6");
+            bus = 6;
         }
         mraa_gpio_write(tristate, 0);
         mraa_gpio_context io18_gpio = mraa_gpio_init_raw(14);
@@ -659,19 +667,38 @@ mraa_intel_edison_uart_init_pre(int index)
         mraa_gpio_context io0_pullup = mraa_gpio_init_raw(216);
         mraa_gpio_context io1_output = mraa_gpio_init_raw(249);
         mraa_gpio_context io1_pullup = mraa_gpio_init_raw(217);
+        mraa_gpio_context io2_output = mraa_gpio_init_raw(250); /* CTS */
+        mraa_gpio_context io2_pullup = mraa_gpio_init_raw(218);
+        mraa_gpio_context io4_output = mraa_gpio_init_raw(252); /* RTS */
+        mraa_gpio_context io4_pullup = mraa_gpio_init_raw(220);
+
         mraa_gpio_dir(io0_output, MRAA_GPIO_OUT);
         mraa_gpio_dir(io0_pullup, MRAA_GPIO_OUT);
         mraa_gpio_dir(io1_output, MRAA_GPIO_OUT);
         mraa_gpio_dir(io1_pullup, MRAA_GPIO_IN);
+        mraa_gpio_dir(io2_output, MRAA_GPIO_OUT);
+        mraa_gpio_dir(io2_pullup, MRAA_GPIO_OUT);
+        mraa_gpio_dir(io4_output, MRAA_GPIO_OUT);
+        mraa_gpio_dir(io4_pullup, MRAA_GPIO_IN);
+
 
         mraa_gpio_write(io0_output, 0);
         mraa_gpio_write(io0_pullup, 0);
         mraa_gpio_write(io1_output, 1);
+        mraa_gpio_write(io2_output, 0);
+        mraa_gpio_write(io2_pullup, 0);
+        mraa_gpio_write(io4_output, 1);
+
 
         mraa_gpio_close(io0_output);
         mraa_gpio_close(io0_pullup);
         mraa_gpio_close(io1_output);
         mraa_gpio_close(io1_pullup);
+        mraa_gpio_close(io2_output);
+        mraa_gpio_close(io2_pullup);
+        mraa_gpio_close(io4_output);
+        mraa_gpio_close(io4_pullup);
+
     }
 
     mraa_result_t ret;
@@ -681,10 +708,8 @@ mraa_intel_edison_uart_init_pre(int index)
         return ret;
     }
     ret = mraa_intel_edison_pinmode_change(131, 1); // IO1 TX
-    if (ret != MRAA_SUCCESS) {
-        syslog(LOG_ERR, "edison: Failed to preinit UART TX pin");
-    }
-
+    ret = mraa_intel_edison_pinmode_change(128, 1); // IO2 CTS
+    ret = mraa_intel_edison_pinmode_change(129, 1); // IO4 RTS
     return ret;
 }
 
@@ -1289,12 +1314,34 @@ mraa_board_t*
 mraa_intel_edison_fab_c()
 {
     mraa_gpio_dir_t tristate_dir;
+    struct utsname name;
+    int major, minor, release;
+    int ret;
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
         return NULL;
     }
 
     b->platform_name = PLATFORM_NAME;
+
+    if (uname(&name) != 0) {
+        goto error;
+    }
+
+    ret = sscanf(name.release, "%d.%d.%d", &major, &minor, &release);
+    if (ret == 2) {
+        ret++;
+        release = 0;
+    }
+    if (ret < 2) {
+        goto error;
+    }
+
+    if (major >= 4) {
+        vanilla_kernel = 1;
+        syslog(LOG_NOTICE,
+               "edison: Linux version 4 or higher detected, assuming Vanilla kernel");
+    };
 
     if (is_arduino_board() == 0) {
         syslog(LOG_NOTICE,
