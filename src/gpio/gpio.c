@@ -881,3 +881,20 @@ mraa_gpio_input_mode(mraa_gpio_context dev, mraa_gpio_input_mode_t mode)
 
     return MRAA_SUCCESS;
 }
+
+
+mraa_result_t
+mraa_gpio_out_driver_mode(mraa_gpio_context dev, mraa_gpio_out_driver_mode_t mode)
+{
+    if (dev == NULL) {
+        syslog(LOG_ERR, "gpio: write: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
+    if (IS_FUNC_DEFINED(dev, gpio_out_driver_mode_replace)) {
+        return dev->advance_func->gpio_out_driver_mode_replace(dev, mode);
+    }
+    else {
+        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+    }
+}

@@ -78,6 +78,14 @@ typedef enum {
 } InputMode;
 
 /**
+ * Gpio output driver modes
+ */
+typedef enum {
+    MODE_OUT_OPEN_DRAIN = 0, /**< Open Drain Configuration */
+    MODE_OUT_PUSH_PULL = 1,  /**< Push Pull Configuration */
+} OutputMode;
+
+/**
  * @brief API to General Purpose IO
  *
  * This file defines the gpio interface for libmraa
@@ -336,6 +344,17 @@ class Gpio
         return (Result )mraa_gpio_input_mode(m_gpio, (mraa_gpio_input_mode_t) mode);
     }
 
+    /**
+     * Change Gpio output driver mode
+     *
+     * @param mode @param mode Set output driver mode
+     * @return Result of operation
+     */
+    Result
+    outputMode(OutputMode mode)
+    {
+        return (Result) mraa_gpio_out_driver_mode(m_gpio, (mraa_gpio_out_driver_mode_t) mode);
+    }
 
   private:
     mraa_gpio_context m_gpio;

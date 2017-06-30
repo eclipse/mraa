@@ -59,6 +59,7 @@ typedef struct {
     mraa_result_t (*gpio_wait_interrupt_replace) (mraa_gpio_context dev);
     mraa_result_t (*gpio_isr_replace) (mraa_gpio_context dev, mraa_gpio_edge_t mode, void (*fptr)(void*), void* args);
     mraa_result_t (*gpio_isr_exit_replace) (mraa_gpio_context dev);
+    mraa_result_t (*gpio_out_driver_mode_replace) (mraa_gpio_context dev, mraa_gpio_out_driver_mode_t mode);
 
     mraa_result_t (*i2c_init_pre) (unsigned int bus);
     mraa_result_t (*i2c_init_bus_replace) (mraa_i2c_context dev);

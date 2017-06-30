@@ -92,6 +92,15 @@ typedef enum {
     MRAA_GPIO_ACTIVE_LOW = 1,  /**< Resistive Low */
 } mraa_gpio_input_mode_t;
 
+
+/**
+ * Gpio output driver modes
+ */
+typedef enum {
+    MRAA_GPIO_OPEN_DRAIN = 0, /**< Open Drain Configuration */
+    MRAA_GPIO_PUSH_PULL = 1,  /**< Push Pull Configuration */
+} mraa_gpio_out_driver_mode_t;
+
 /**
  * Initialise gpio_context, based on board number
  *
@@ -235,6 +244,14 @@ int mraa_gpio_get_pin_raw(mraa_gpio_context dev);
  */
 mraa_result_t mraa_gpio_input_mode(mraa_gpio_context dev, mraa_gpio_input_mode_t);
 
+/**
+ * Set Gpio output driver mode. This is not a standard feature, it needs custom implementation for each board
+ *
+ * @param dev The Gpio context
+ * @param mode Set output driver mode
+ * @return Result of operation
+ */
+mraa_result_t mraa_gpio_out_driver_mode(mraa_gpio_context dev, mraa_gpio_out_driver_mode_t mode);
 
 #ifdef __cplusplus
 }
