@@ -709,7 +709,16 @@ mraa_init_json_platform(const char* platform_json)
     free(plat);
     // Set the new one in it's place
     plat = board;
-    platform_name = plat->platform_name;
+
+    // This one was allocated and assigned an "Unknown platform" value by now,
+    // so we need to reallocate it.
+    free(platform_name);
+    platform_name = calloc(strlen(plat->platform_name) + 1, sizeof(char));
+    if (platform_name == NULL) {
+        syslog(LOG_ERR, "init_json_platform: Could not allocate memory for platform_name");
+        goto unsuccessful;
+    }
+    strncpy(platform_name, plat->platform_name, strlen(plat->platform_name) + 1);
 
     // We made it to the end without anything going wrong, just cleanup
     ret = MRAA_SUCCESS;
