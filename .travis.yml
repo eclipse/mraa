@@ -13,6 +13,7 @@ env:
   - TARGET=java
   - TARGET=node4
   - TARGET=node5
+  - TARGET=android
   - TARGET=python2 JSONPLAT=ON
   - TARGET=python3 JSONPLAT=ON
   - TARGET=java JSONPLAT=ON
@@ -34,7 +35,7 @@ matrix:
     - compiler: clang
       env: TARGET=java BUILDARCH=MOCK
     - compiler: clang
-      env: TARGET=sonar-scan
+      env: TARGET=android
   allow_failures:
     - compiler: gcc
       env: TARGET=node4 JSONPLAT=ON
@@ -60,6 +61,7 @@ before_script:
   - if [ "$CC" == "clang" ]; then export CC=clang-3.8; fi
   - if [ "$CXX" == "clang++" ]; then export CXX=clang++-3.8; fi
   - docker-compose build base
+  - if [ "$TARGET" == "android" ]; then docker-compose build java; fi
   - docker-compose build ${TARGET}
 
 script:
