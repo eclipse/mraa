@@ -63,6 +63,10 @@ Mock
 ----
 * [Generic simulated board](../master/docs/mock.md)
 
+AFB
+---
+* [Generic AFB AGL platform](../master/docs/afb.md)
+
 JSON platform
 ----
 * [Platform loading](../master/docs/jsonplatform.md)

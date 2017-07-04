@@ -112,6 +112,11 @@ set (mraa_LIB_MOCK_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board_uart.c
 )
 
+set (mraa_LIB_AFB_SRCS_NOAUTO
+  ${PROJECT_SOURCE_DIR}/src/afb.c
+  ${PROJECT_SOURCE_DIR}/src/afb_board.c
+)
+
 set (mraa_LIB_PERIPHERALMAN_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman.c
 )
@@ -151,6 +156,11 @@ if (MOCKPLAT)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMSYS=1")
   endif ()
 endif()
+
+if (AFBPLAT)
+  add_subdirectory(afb)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DAFBPLAT=1")
+endif ()
 
 if (PERIPHERALMAN)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPERIPHERALMAN=1")

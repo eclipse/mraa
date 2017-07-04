@@ -150,6 +150,9 @@ imraa_init()
 #elif defined(MOCKPLAT)
         // Use mock platform
         platform_type = mraa_mock_platform();
+#elif defined(AFBPLAT)
+        // Use AFB platform
+        platform_type = mraa_afb_platform();
 #elif defined(PERIPHERALMAN)
         // Use peripheralmanager
         platform_type = mraa_peripheralman_platform();
