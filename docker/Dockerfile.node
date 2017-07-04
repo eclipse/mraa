@@ -1,0 +1,11 @@
+FROM mraa-base
+
+# Node.js Build Dependencies
+RUN wget -q -O - https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+ENV NVM_DIR /root/.nvm
+ARG NODE_VERSION
+RUN . $NVM_DIR/nvm.sh && nvm install $NODE_VERSION && nvm use $NODE_VERSION && \
+    npm install -g node-gyp && node-gyp install
+
+CMD bash
+
