@@ -13,37 +13,40 @@ env:
   - TARGET=java
   - TARGET=node4
   - TARGET=node5
-  - TARGET=python2 JSONPLAT=ON
-  - TARGET=python3 JSONPLAT=ON
-  - TARGET=java JSONPLAT=ON
-  - TARGET=node4 JSONPLAT=ON
-  - TARGET=node5 JSONPLAT=ON
-  - TARGET=python2 BUILDARCH=MOCK
-  - TARGET=python3 BUILDARCH=MOCK
-  - TARGET=java BUILDARCH=MOCK
-  - TARGET=node4 BUILDARCH=MOCK
-  - TARGET=node5 BUILDARCH=MOCK
+  - TARGET=android
   - TARGET=sonar-scan
+  - JSONPLAT=ON TARGET=python2
+  - JSONPLAT=ON TARGET=python3
+  - JSONPLAT=ON TARGET=java
+  - JSONPLAT=ON TARGET=node4
+  - JSONPLAT=ON TARGET=node5
+  - BUILDARCH=MOCK TARGET=python2
+  - BUILDARCH=MOCK TARGET=python3
+  - BUILDARCH=MOCK TARGET=java
+  - BUILDARCH=MOCK TARGET=node4
+  - BUILDARCH=MOCK TARGET=node5
 
 matrix:
   exclude:
     - compiler: clang
       env: TARGET=java
     - compiler: clang
-      env: TARGET=java JSONPLAT=ON
+      env: JSONPLAT=ON TARGET=java
     - compiler: clang
-      env: TARGET=java BUILDARCH=MOCK
+      env: BUILDARCH=MOCK TARGET=java
+    - compiler: gcc
+      env: TARGET=android
     - compiler: clang
       env: TARGET=sonar-scan
   allow_failures:
     - compiler: gcc
-      env: TARGET=node4 JSONPLAT=ON
+      env: JSONPLAT=ON TARGET=node4
     - compiler: clang
-      env: TARGET=node4 JSONPLAT=ON
+      env: JSONPLAT=ON TARGET=node4
     - compiler: gcc
-      env: TARGET=node5 JSONPLAT=ON
+      env: JSONPLAT=ON TARGET=node5
     - compiler: clang
-      env: TARGET=node5 JSONPLAT=ON
+      env: JSONPLAT=ON TARGET=node5
 
 services:
   - docker
@@ -59,6 +62,8 @@ before_script:
   - if [ "$CXX" == "g++" ]; then export CXX=g++-4.8; fi
   - if [ "$CC" == "clang" ]; then export CC=clang-3.8; fi
   - if [ "$CXX" == "clang++" ]; then export CXX=clang++-3.8; fi
+  - docker-compose build base
+  - if [ "$TARGET" == "android" ]; then docker-compose build java; fi
   - docker-compose build ${TARGET}
 
 script:

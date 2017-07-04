@@ -1,0 +1,43 @@
+FROM ubuntu:16.04
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# Update apt-get
+RUN apt-get -y update && \
+  # Install apt-utils
+  apt-get -y --no-install-recommends install apt-utils && \
+  # Main Build Dependencies
+  apt-get -y --no-install-recommends install git build-essential cmake clang-3.8 \
+  g++-4.8 wget ca-certificates libpcre3 libpcre3-dev python unzip \
+  # Docs Build Dependencies
+  python-sphinx doxygen graphviz \
+  # Json Platform Build Dependencies
+  pkg-config libjson0 libjson0-dev \
+  # Imraa Platform Build Dependencies
+  libudev-dev \
+  # Doc Build Dependencies
+  python-sphinx doxygen graphviz
+
+# Set library download folder to /opt
+WORKDIR /opt
+
+# Swig Build Dependencies
+ARG SWIG_VERSION=3.0.10
+RUN wget -q http://iotdk.intel.com/misc/tr/swig-$SWIG_VERSION.tar.gz && \
+    tar xf swig-$SWIG_VERSION.tar.gz && cd swig-$SWIG_VERSION && \
+    ./configure --prefix=/usr/ && make -j8 && make -j8 install && cd .. && \
+    rm -fr /opt/swig-$SWIG_VERSION.tar.gz
+
+# FTDI4222 Build Dependencies
+ARG FTDI4222_VERSION=linux-1.3.1.117
+RUN mkdir libft4222-$FTDI4222_VERSION && cd libft4222-$FTDI4222_VERSION && \
+    wget -q http://www.ftdichip.com/Support/SoftwareExamples/libft4222-$FTDI4222_VERSION.tgz && \
+    tar xf libft4222-$FTDI4222_VERSION.tgz && ./install4222.sh && \
+    rm -fr libft4222-$FTDI4222_VERSION.tgz
+
+# Set Workdir
+ARG MRAA_SRC_DIR=/usr/src/app
+ENV MRAA_SRC_DIR $MRAA_SRC_DIR
+WORKDIR $MRAA_SRC_DIR
+
+CMD bash

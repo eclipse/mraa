@@ -2,41 +2,63 @@ version: '2.1'
 
 services:
 
-  main:
+  base:
+    image: mraa-base
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile.base
       args:
         - http_proxy
         - https_proxy
         - no_proxy
-        - BUILDDOC=${BUILDDOC:-OFF}
-        - BUILDSWIG=${BUILDSWIG:-OFF}
-        - BUILDSWIGPYTHON=${BUILDSWIGPYTHON:-OFF}
-        - BUILDSWIGJAVA=${BUILDSWIGJAVA:-OFF}
-        - BUILDSWIGNODE=${BUILDSWIGNODE:-OFF}
-        - USBPLAT=${USBPLAT:-OFF}
-        - FIRMATA=${FIRMATA:-OFF}
-        - ONEWIRE=${ONEWIRE:-OFF}
-        - JSONPLAT=${JSONPLAT:-OFF}
-        - IMRAA=${IMRAA:-OFF}
-        - FTDI4222=${FTDI4222:-OFF}
-        - IPK=${IPK:-OFF}
-        - RPM=${RPM:-OFF}
-        - ENABLEEXAMPLES=${ENABLEEXAMPLES:-ON}
-        - INSTALLGPIOTOOL=${INSTALLGPIOTOOL:-OFF}
-        - INSTALLTOOLS=${INSTALLTOOLS:-OFF}
-        - BUILDTESTS=${BUILDTESTS:-ON}
-        - CC=${CC:-clang-3.8}
-        - CXX=${CXX:-clang++-3.8}
-        - NODE_VERSION=${NODE_VERSION:-v4.4.7}
-        - BUILDARCH=${BUILDARCH}
-        - MRAA_SRC_DIR=${MRAA_SRC_DIR:-/usr/src/app}
     environment:
       - http_proxy
       - https_proxy
       - no_proxy
-      - MRAA_SRC_DIR=/usr/src/app
+      - BUILDDOC=${BUILDDOC:-OFF}
+      - BUILDSWIG=${BUILDSWIG:-OFF}
+      - BUILDSWIGPYTHON=${BUILDSWIGPYTHON:-OFF}
+      - BUILDTESTS=${BUILDTESTS:-ON}
+      - USEPYTHON3TESTS=${USEPYTHON3TESTS:-OFF}
+      - BUILDSWIGJAVA=${BUILDSWIGJAVA:-OFF}
+      - BUILDSWIGNODE=${BUILDSWIGNODE:-OFF}
+      - USBPLAT=${USBPLAT:-OFF}
+      - FIRMATA=${FIRMATA:-OFF}
+      - ONEWIRE=${ONEWIRE:-ON}
+      - JSONPLAT=${JSONPLAT:-OFF}
+      - IMRAA=${IMRAA:-OFF}
+      - FTDI4222=${FTDI4222:-OFF}
+      - IPK=${IPK:-OFF}
+      - RPM=${RPM:-OFF}
+      - ENABLEEXAMPLES=${ENABLEEXAMPLES:-ON}
+      - INSTALLGPIOTOOL=${INSTALLGPIOTOOL:-OFF}
+      - INSTALLTOOLS=${INSTALLTOOLS:-ON}
+      - CC=${CC:-clang-3.8}
+      - CXX=${CXX:-clang++-3.8}
+      - BUILDARCH=${BUILDARCH}
+    volumes:
+      - .:${MRAA_SRC_DIR:-/usr/src/app}
+
+  doc:
+    extends: base
+    environment:
+      - BUILDDOC=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild doc"
+
+  sonar-scan:
+    extends: base
+    image: mraa-sonar
+    build:
+      dockerfile: docker/Dockerfile.sonar
+      args:
+        - NODE_VERSION=v5.12.0
+    environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGPYTHON=ON
+      - BUILDSWIGNODE=ON
+      - BUILDSWIGJAVA=ON
+      - ONEWIRE=ON
+      - JSONPLAT=ON
       - SONAR_TOKEN
       - SONAR_ORG
       - SONAR_PROJ_KEY
@@ -45,62 +67,58 @@ services:
       - TRAVIS_REPO_SLUG
       - TRAVIS_PULL_REQUEST_SLUG
       - GITHUB_TOKEN
-
-  doc:
-    extends: main
-    build:
-      args:
-        - BUILDDOC=ON
-    command: bash -c "make doc"
+    command: bash -c "./scripts/run-cmake.sh && cd build && ./../scripts/sonar-scan.sh"
 
   python2:
-    extends: main
+    extends: base
+    image: mraa-python
     build:
-      args:
-        - BUILDSWIG=ON
-        - BUILDSWIGPYTHON=ON
-    command: bash -c "make _python2-mraa && ctest --output-on-failure"
+      dockerfile: docker/Dockerfile.python
+    environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGPYTHON=ON
+    command: bash -c "./scripts/run-cmake.sh && cd build && make _python2-mraa && ctest --output-on-failure"
 
   python3:
     extends: python2
-    build:
-      args:
-        - USEPYTHON3TESTS=ON
-    command: bash -c "make _python3-mraa && ctest --output-on-failure"
+    environment:
+      - USEPYTHON3TESTS=ON
+    command: bash -c "./scripts/run-cmake.sh && cd build && make _python3-mraa && ctest --output-on-failure"
 
   java:
-    extends: main
+    extends: base
+    image: mraa-java
     build:
-      args:
-        - BUILDSWIG=ON
-        - BUILDSWIGJAVA=ON
-        - CC=gcc-4.8
-        - CXX=g++-4.8
-    command: bash -c "make mraajava && ctest --output-on-failure"
+      dockerfile: docker/Dockerfile.java
+    environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGJAVA=ON
+    command: bash -c "./scripts/run-cmake.sh && cd build && make mraajava && ctest --output-on-failure"
+
+  android:
+    extends: java
+    image: mraa-android
+    build:
+      dockerfile: docker/Dockerfile.android
+    environment:
+      - BUILDARCH=PERIPHERALMAN
+    command: bash -c "./scripts/build-android.sh"
 
   node4:
-    extends: main
+    extends: base
+    image: mraa-node4
     build:
+      dockerfile: docker/Dockerfile.node
       args:
-        - BUILDSWIG=ON
-        - BUILDSWIGNODE=ON
-        - NODE_VERSION=v4.4.7
-    command: bash -c "source /root/.nvm/nvm.sh && make npmpkg && cd .. && node-gyp configure && node-gyp build && npm test"
+         - NODE_VERSION=v4.4.7
+    environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGNODE=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild npmpkg && node-gyp configure && node-gyp build && npm test"
 
   node5:
     extends: node4
+    image: mraa-node5
     build:
       args:
         - NODE_VERSION=v5.12.0
-
-  sonar-scan:
-    extends: main
-    build:
-      args:
-        - BUILDSWIG=ON
-        - BUILDSWIGPYTHON=ON
-        - BUILDSWIGNODE=ON
-        - BUILDSWIGJAVA=ON
-        - ONEWIRE=ON
-        - JSONPLAT=ON
-    command: bash -c "$${MRAA_SRC_DIR}/sonar-scan.sh"
