@@ -39,7 +39,8 @@ RUN mkdir libft4222-linux-1.3.1.117 && cd libft4222-linux-1.3.1.117 && \
     rm -fr libft4222-linux-1.3.1.117.tgz
 
 # Set Workdir
-WORKDIR /usr/src/app
-VOLUME /usr/src/app
+ARG MRAA_SRC_DIR=/usr/src/app
+ENV MRAA_SRC_DIR $MRAA_SRC_DIR
+WORKDIR $MRAA_SRC_DIR
 
 CMD bash

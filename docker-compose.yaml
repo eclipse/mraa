@@ -90,8 +90,6 @@ services:
       dockerfile: docker/Dockerfile.android
     environment:
       - BUILDARCH=PERIPHERALMAN
-    depends_on:
-      - java
     command: bash -c "./scripts/build-android.sh"
 
   node4:
