@@ -45,6 +45,17 @@ services:
       - BUILDDOC=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild doc"
 
+  sonar-scan:
+    extends: base
+    environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGPYTHON=OFF
+      - BUILDSWIGNODE=OFF
+      - BUILDSWIGJAVA=OFF
+      - ONEWIRE=ON
+      - JSONPLAT=ON
+    command: bash -c "./scripts/run-cmake.sh && cd build && ./../scripts/sonar-scan.sh"
+
   python2:
     extends: base
     image: mraa-python
