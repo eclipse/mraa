@@ -24,7 +24,7 @@ services:
       - BUILDSWIGNODE=${BUILDSWIGNODE:-OFF}
       - USBPLAT=${USBPLAT:-OFF}
       - FIRMATA=${FIRMATA:-OFF}
-      - ONEWIRE=${ONEWIRE:-OFF}
+      - ONEWIRE=${ONEWIRE:-ON}
       - JSONPLAT=${JSONPLAT:-OFF}
       - IMRAA=${IMRAA:-OFF}
       - FTDI4222=${FTDI4222:-OFF}
@@ -32,7 +32,7 @@ services:
       - RPM=${RPM:-OFF}
       - ENABLEEXAMPLES=${ENABLEEXAMPLES:-ON}
       - INSTALLGPIOTOOL=${INSTALLGPIOTOOL:-OFF}
-      - INSTALLTOOLS=${INSTALLTOOLS:-OFF}
+      - INSTALLTOOLS=${INSTALLTOOLS:-ON}
       - CC=${CC:-clang-3.8}
       - CXX=${CXX:-clang++-3.8}
       - BUILDARCH=${BUILDARCH}
@@ -47,13 +47,26 @@ services:
 
   sonar-scan:
     extends: base
+    image: mraa-sonar
+    build:
+      dockerfile: docker/Dockerfile.sonar
+      args:
+        - NODE_VERSION=v5.12.0
     environment:
       - BUILDSWIG=ON
-      - BUILDSWIGPYTHON=OFF
-      - BUILDSWIGNODE=OFF
-      - BUILDSWIGJAVA=OFF
+      - BUILDSWIGPYTHON=ON
+      - BUILDSWIGNODE=ON
+      - BUILDSWIGJAVA=ON
       - ONEWIRE=ON
       - JSONPLAT=ON
+      - SONAR_TOKEN
+      - SONAR_ORG
+      - SONAR_PROJ_KEY
+      - TRAVIS_BRANCH
+      - TRAVIS_PULL_REQUEST
+      - TRAVIS_REPO_SLUG
+      - TRAVIS_PULL_REQUEST_SLUG
+      - GITHUB_TOKEN
     command: bash -c "./scripts/run-cmake.sh && cd build && ./../scripts/sonar-scan.sh"
 
   python2:
@@ -102,7 +115,7 @@ services:
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGNODE=ON
-    command: bash -c "source $$NVM_DIR/nvm.sh && ./scripts/run-cmake.sh && make -Cbuild npmpkg && node-gyp configure && node-gyp build && npm test"
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild npmpkg && node-gyp configure && node-gyp build && npm test"
 
   node5:
     extends: node4
