@@ -223,6 +223,7 @@ create a build environment. Find below a brief description of them:
 4. **mraa-android:** Provides the Android Things build tools.  Depends on `mraa-java`.
 5. **mraa-node4:** Provides the Node.js v4.4.7 build tools. Depends on `mraa-base`.
 6. **mraa-node5:** Same as `mraa-node4`, but using Node.js v5.12.0.
+7. **mraa-sonar:** Provides the tools for running [Sonar Qube](https://www.sonarqube.org/) Scans. Depends on `mraa-base`.
 
 **NOTE:** If you want to know which tools are installed for each of the mraa targets,
 just take a look at the `docker/` folder. All the related Dockerfiles are stored there!
@@ -244,6 +245,8 @@ $ docker-compose build node4
 $ docker-compose build node5
 # Build android things image
 $ docker-compose build android
+# Build sonar image
+$ docker-compose build sonar-scan
 ```
 
 **docker-compose** will take a look at the `docker-compose.yaml` file in the repository
@@ -276,13 +279,15 @@ $ docker-compose run python2
 # Build mraa python3 package and run python3 tests
 $ docker-compose run python3
 # Build mraa java package and run java tests
-$ docker-compose build java
+$ docker-compose run java
 # Build mraa node4 package
 $ docker-compose run node4
 # Build mraa node5 package
 $ docker-compose run node5
 # Build mraa for android things package
 $ docker-compose run android
+# Run Sonar Qube Scans for mraa
+$ docker-compose run sonar-scan
 ```
 
 **docker-compose** will take a look at the `docker-compose.yaml` file in the repository
