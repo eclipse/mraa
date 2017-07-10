@@ -520,6 +520,14 @@ mraa_firmata_pwm_enable_replace(mraa_pwm_context dev, int enable)
     return MRAA_SUCCESS;
 }
 
+static mraa_result_t
+mraa_firmata_pwm_period_replace(mraa_pwm_context dev, int period)
+{
+    syslog(LOG_WARNING, "You cannot set period of a PWM pin with Firmata\n");
+
+    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+}
+
 static void*
 mraa_firmata_pull_handler(void* vp)
 {
@@ -683,6 +691,7 @@ mraa_firmata_plat_init(const char* uart_dev)
     b->adv_func->pwm_write_replace = &mraa_firmata_pwm_write_replace;
     b->adv_func->pwm_read_replace = &mraa_firmata_pwm_read_replace;
     b->adv_func->pwm_enable_replace = &mraa_firmata_pwm_enable_replace;
+    b->adv_func->pwm_period_replace = &mraa_firmata_pwm_period_replace;
 
     b->adv_func->i2c_init_bus_replace = &mraa_firmata_i2c_init_bus_replace;
     b->adv_func->i2c_set_frequency_replace = &mraa_firmata_i2c_frequency;
