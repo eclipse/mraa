@@ -35,7 +35,9 @@
 #include "mraa.h"
 #include "mraa_adv_func.h"
 
+#ifdef CHARGPIO
 #include <linux/gpio.h>
+#endif
 
 // Bionic does not implement pthread cancellation API
 #ifndef __BIONIC__
@@ -133,11 +135,13 @@ struct _gpio {
     mraa_gpio_dir_t mock_dir; /**< mock direction of the pin */
     int mock_state; /**< mock state of the pin */
 #endif
+#ifdef CHARGPIO
 	struct gpiochip_info cinfo; /**< gpiochip structure> */
 	struct gpioline_info linfo; /**< gpioline structure> */
 	struct gpiohandle_request req; /**< gpiohandle request structure> */
 	struct gpiohandle_data data; /**< gpiohandle data structure> */
 	int chip_fd; /**< file descriptor for gpiochip> */
+#endif
     /*@}*/
 #ifdef PERIPHERALMAN
     AGpio *bgpio;
