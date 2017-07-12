@@ -1,10 +1,5 @@
 FROM mraa-java
 
-# Update apt-get
-RUN apt-get -y update && \
-  # Java Build Dependencies
-  apt-get -y --no-install-recommends install unzip
-
 WORKDIR /opt
 
 # Install CMake 3.6.2
@@ -28,7 +23,6 @@ RUN wget -q https://github.com/androidthings/native-libandroidthings/archive/0.4
     rm -fr /opt/0.4.1-devpreview.tar.gz
 ENV ANDROIDTHINGS_NATIVE_LIB /opt/native-libandroidthings-0.4.1-devpreview
 
-WORKDIR /usr/src/app
+WORKDIR $MRAA_SRC_DIR
 
 CMD bash
-

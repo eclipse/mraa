@@ -37,7 +37,7 @@ services:
       - CXX=${CXX:-clang++-3.8}
       - BUILDARCH=${BUILDARCH}
     volumes:
-      - .:/usr/src/app
+      - .:${MRAA_SRC_DIR:-/usr/src/app}
 
   doc:
     extends: base

@@ -7,7 +7,8 @@ RUN apt-get -y update && \
   # Install apt-utils
   apt-get -y --no-install-recommends install apt-utils && \
   # Main Build Dependencies
-  apt-get -y --no-install-recommends install git build-essential cmake clang-3.8 g++-4.8 wget ca-certificates libpcre3 libpcre3-dev python \
+  apt-get -y --no-install-recommends install git build-essential cmake clang-3.8 \
+  g++-4.8 wget ca-certificates libpcre3 libpcre3-dev python unzip \
   # Docs Build Dependencies
   python-sphinx doxygen graphviz \
   # Json Platform Build Dependencies
@@ -16,12 +17,6 @@ RUN apt-get -y update && \
   libudev-dev \
   # Doc Build Dependencies
   python-sphinx doxygen graphviz
-
-# Configure Compiler Environment
-ARG CC
-ARG CXX
-ENV CC $CC
-ENV CXX $CXX
 
 # Set library download folder to /opt
 WORKDIR /opt

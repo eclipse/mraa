@@ -10,7 +10,6 @@ RUN . $NVM_DIR/nvm.sh && nvm install $NODE_VERSION && nvm use $NODE_VERSION && \
     npm install -g node-gyp && node-gyp install
 ENV PATH $NVM_DIR/versions/node/$NODE_VERSION/bin:$PATH
 
-WORKDIR /usr/src/app
+WORKDIR $MRAA_SRC_DIR
 
 CMD bash
-
