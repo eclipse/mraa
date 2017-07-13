@@ -8,7 +8,7 @@ they are listed here. Anything pre 0.2.x is ignored.
 **1.7.0**
   * Peripheral I/O support for Android Things
   * Deprecation of node v0.10.x and 0.12.x
-  * Documetnatino improvements
+  * Documentation improvements
 
 **1.6.1**
   * mraa-deinit bug fix
