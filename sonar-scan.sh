@@ -44,7 +44,7 @@ echo "TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
 echo "TRAVIS_PULL_REQUEST_SLUG: ${TRAVIS_PULL_REQUEST_SLUG}"
 echo "TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}"
 
-if [ "${TRAVIS_BRANCH}" == "master" -a "${TRAVIS_PULL_REQUEST}" == "false" ]; then
+if [ "${TRAVIS_BRANCH}" == "master" -a "${TRAVIS_PULL_REQUEST}" == "false" -a "${TRAVIS_REPO_SLUG}" == "intel-iot-devkit/mraa" ]; then
     # Master branch push - do a full-blown scan
     echo "Performing master branch push scan"
     sonar_cmd="${sonar_cmd_base}"
