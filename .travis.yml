@@ -40,13 +40,13 @@ matrix:
       env: TARGET=sonar-scan
   allow_failures:
     - compiler: gcc
-      env: TARGET=node4 JSONPLAT=ON
+      env: JSONPLAT=ON TARGET=node4
     - compiler: clang
-      env: TARGET=node4 JSONPLAT=ON
+      env: JSONPLAT=ON TARGET=node4
     - compiler: gcc
-      env: TARGET=node5 JSONPLAT=ON
+      env: JSONPLAT=ON TARGET=node5
     - compiler: clang
-      env: TARGET=node5 JSONPLAT=ON
+      env: JSONPLAT=ON TARGET=node5
 
 services:
   - docker
