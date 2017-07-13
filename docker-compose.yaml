@@ -77,7 +77,6 @@ services:
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
-      - BUILDTESTS=ON
     command: bash -c "./scripts/run-cmake.sh && cd build && make _python2-mraa && ctest --output-on-failure"
 
   python3:

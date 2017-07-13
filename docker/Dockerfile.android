@@ -23,6 +23,7 @@ RUN wget -q https://github.com/androidthings/native-libandroidthings/archive/0.4
     rm -fr /opt/0.4.1-devpreview.tar.gz
 ENV ANDROIDTHINGS_NATIVE_LIB /opt/native-libandroidthings-0.4.1-devpreview
 
+# Set Workdir
 WORKDIR $MRAA_SRC_DIR
 
 CMD bash

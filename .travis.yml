@@ -14,17 +14,17 @@ env:
   - TARGET=node4
   - TARGET=node5
   - TARGET=android
-  - TARGET=python2 JSONPLAT=ON
-  - TARGET=python3 JSONPLAT=ON
-  - TARGET=java JSONPLAT=ON
-  - TARGET=node4 JSONPLAT=ON
-  - TARGET=node5 JSONPLAT=ON
-  - TARGET=python2 BUILDARCH=MOCK
-  - TARGET=python3 BUILDARCH=MOCK
-  - TARGET=java BUILDARCH=MOCK
-  - TARGET=node4 BUILDARCH=MOCK
-  - TARGET=node5 BUILDARCH=MOCK
   - TARGET=sonar-scan
+  - JSONPLAT=ON TARGET=python2
+  - JSONPLAT=ON TARGET=python3
+  - JSONPLAT=ON TARGET=java
+  - JSONPLAT=ON TARGET=node4
+  - JSONPLAT=ON TARGET=node5
+  - BUILDARCH=MOCK TARGET=python2
+  - BUILDARCH=MOCK TARGET=python3
+  - BUILDARCH=MOCK TARGET=java
+  - BUILDARCH=MOCK TARGET=node4
+  - BUILDARCH=MOCK TARGET=node5
 
 matrix:
   exclude:
@@ -34,8 +34,10 @@ matrix:
       env: TARGET=java JSONPLAT=ON
     - compiler: clang
       env: TARGET=java BUILDARCH=MOCK
-    - compiler: clang
+    - compiler: gcc
       env: TARGET=android
+    - compiler: clang
+      env: TARGET=sonar-scan
   allow_failures:
     - compiler: gcc
       env: TARGET=node4 JSONPLAT=ON

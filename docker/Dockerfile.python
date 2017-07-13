@@ -7,6 +7,7 @@ RUN apt-get -y update && \
   # Python 3 Build Dependencies
   python3 python3-dev
 
+# Set Workdir
 WORKDIR $MRAA_SRC_DIR
 
 CMD bash

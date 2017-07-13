@@ -8,6 +8,7 @@ RUN apt-get -y update && \
 # Set JAVA_HOME
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 
+# Set Workdir
 WORKDIR $MRAA_SRC_DIR
 
 CMD bash

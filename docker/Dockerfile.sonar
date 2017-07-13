@@ -33,6 +33,7 @@ RUN wget https://sonarsource.bintray.com/Distribution/sonar-scanner-cli/sonar-sc
     rm sonar-scanner-cli-${SONAR_VER}-linux.zip build-wrapper-linux-x86.zip
 ENV PATH $SONAR_DIR/sonar-scanner-${SONAR_VER}-linux/bin:$SONAR_DIR/build-wrapper-linux-x86:$PATH
 
+# Set Workdir
 WORKDIR $MRAA_SRC_DIR
 
 CMD bash
