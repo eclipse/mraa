@@ -31,9 +31,9 @@ matrix:
     - compiler: clang
       env: TARGET=java
     - compiler: clang
-      env: TARGET=java JSONPLAT=ON
+      env: JSONPLAT=ON TARGET=java
     - compiler: clang
-      env: TARGET=java BUILDARCH=MOCK
+      env: BUILDARCH=MOCK TARGET=java
     - compiler: gcc
       env: TARGET=android
     - compiler: clang
