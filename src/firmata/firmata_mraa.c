@@ -523,7 +523,7 @@ mraa_firmata_pwm_enable_replace(mraa_pwm_context dev, int enable)
 static mraa_result_t
 mraa_firmata_pwm_period_replace(mraa_pwm_context dev, int period)
 {
-    syslog(LOG_ERR, "You cannot set period of a PWM pin with Firmata\n");
+    syslog(LOG_WARNING, "You cannot set period of a PWM pin with Firmata\n");
 
     return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }

@@ -61,10 +61,7 @@ mraa_pwm_write_period(mraa_pwm_context dev, int period)
         mraa_result_t result = dev->advance_func->pwm_period_replace(dev, period);
         if (result == MRAA_SUCCESS) {
             dev->period = period;
-        } else if (result == MRAA_ERROR_FEATURE_NOT_IMPLEMENTED) {
-            return MRAA_SUCCESS;
         }
-
         return result;
     }
     char bu[MAX_SIZE];
