@@ -22,6 +22,12 @@
 # docker-compose ones are:
 #  - MRAA_SRC_DIR - path to mraa's git clone in the Docker container.
 
+# Check required environment variables and exit if they are not set
+MRAA_SRC_DIR=${MRAA_SRC_DIR:?value not provided}
+SONAR_PROJ_KEY=${SONAR_PROJ_KEY:?value not provided}
+SONAR_ORG=${SONAR_ORG:?value not provided}
+SONAR_TOKEN=${SONAR_TOKEN:?value not provided}
+
 bw_output_path="${MRAA_SRC_DIR}/build/bw-output"
 
 sonar_cmd_base="build-wrapper-linux-x86-64 --out-dir ${bw_output_path} make clean all && \
@@ -44,12 +50,14 @@ echo "TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
 echo "TRAVIS_PULL_REQUEST_SLUG: ${TRAVIS_PULL_REQUEST_SLUG}"
 echo "TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}"
 
-if [ "${TRAVIS_BRANCH}" == "master" -a "${TRAVIS_PULL_REQUEST}" == "false" -a "${TRAVIS_REPO_SLUG}" == "intel-iot-devkit/mraa" ]; then
+if [ "${TRAVIS_BRANCH}" == "master" -a "${TRAVIS_PULL_REQUEST}" == "false" ]; then
     # Master branch push - do a full-blown scan
     echo "Performing master branch push scan"
     sonar_cmd="${sonar_cmd_base}"
 elif [ "${TRAVIS_PULL_REQUEST}" != "false" -a "${TRAVIS_PULL_REQUEST_SLUG}" == "${TRAVIS_REPO_SLUG}" ]; then
     # Internal PR - do a preview scan with report to the PR
+    ${GITHUB_TOKEN:?value not provided}
+
     echo "Performing internal pull request scan"
     sonar_cmd="${sonar_cmd_base} \
                -Dsonar.analysis.mode=preview \

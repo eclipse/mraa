@@ -67,7 +67,7 @@ services:
       - TRAVIS_REPO_SLUG
       - TRAVIS_PULL_REQUEST_SLUG
       - GITHUB_TOKEN
-    command: bash -c "./scripts/run-cmake.sh && cd build && ./../scripts/sonar-scan.sh"
+    command: bash -c "./scripts/run-cmake.sh && cd build && ../scripts/sonar-scan.sh"
 
   python2:
     extends: base
