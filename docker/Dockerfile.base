@@ -23,7 +23,7 @@ WORKDIR /opt
 
 # Swig Build Dependencies
 ARG SWIG_VERSION=3.0.10
-RUN wget -q http://iotdk.intel.com/misc/tr/swig-$SWIG_VERSION.gz && \
+RUN wget -q http://iotdk.intel.com/misc/tr/swig-$SWIG_VERSION.tar.gz && \
     tar xf swig-$SWIG_VERSION.tar.gz && cd swig-$SWIG_VERSION && \
     ./configure --prefix=/usr/ && make -j8 && make -j8 install && cd .. && \
     rm -fr /opt/swig-$SWIG_VERSION.tar.gz
