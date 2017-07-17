@@ -22,16 +22,18 @@ RUN apt-get -y update && \
 WORKDIR /opt
 
 # Swig Build Dependencies
-RUN wget -q http://iotdk.intel.com/misc/tr/swig-3.0.10.tar.gz && \
-    tar xf swig-3.0.10.tar.gz && cd swig-3.0.10 && \
+ARG SWIG_VERSION=3.0.10
+RUN wget -q http://iotdk.intel.com/misc/tr/swig-$SWIG_VERSION.gz && \
+    tar xf swig-$SWIG_VERSION.tar.gz && cd swig-$SWIG_VERSION && \
     ./configure --prefix=/usr/ && make -j8 && make -j8 install && cd .. && \
-    rm -fr /opt/swig-3.0.10.tar.gz
+    rm -fr /opt/swig-$SWIG_VERSION.tar.gz
 
 # FTDI4222 Build Dependencies
-RUN mkdir libft4222-linux-1.3.1.117 && cd libft4222-linux-1.3.1.117 && \
-    wget -q http://www.ftdichip.com/Support/SoftwareExamples/libft4222-linux-1.3.1.117.tgz && \
-    tar xf libft4222-linux-1.3.1.117.tgz && ./install4222.sh && \
-    rm -fr libft4222-linux-1.3.1.117.tgz
+ARG FTDI4222_VERSION=linux-1.3.1.117
+RUN mkdir libft4222-$FTDI4222_VERSION && cd libft4222-$FTDI4222_VERSION && \
+    wget -q http://www.ftdichip.com/Support/SoftwareExamples/libft4222-$FTDI4222_VERSION.tgz && \
+    tar xf libft4222-$FTDI4222_VERSION.tgz && ./install4222.sh && \
+    rm -fr libft4222-$FTDI4222_VERSION.tgz
 
 # Set Workdir
 ARG MRAA_SRC_DIR=/usr/src/app
