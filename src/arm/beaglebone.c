@@ -272,9 +272,9 @@ mraa_beaglebone_i2c_init_pre(unsigned int bus)
     if (mraa_file_exist(devpath)) {
         // Bus 1 doesn't seem to be configurable
         if (bus == 0) {
-            if (set_pin_mode(plat->i2c_bus[0].scl, "i2c") == MRAA_SUCCESS &&
-                set_pin_mode(plat->i2c_bus[0].sda, "i2c") == MRAA_SUCCESS) {
-                return MRAA_SUCCESS;
+            if (set_pin_mode(plat->i2c_bus[0].scl, "i2c") != MRAA_SUCCESS ||
+                set_pin_mode(plat->i2c_bus[0].sda, "i2c") != MRAA_SUCCESS) {
+                return MRAA_ERROR_UNSPECIFIED;
             }
         }
 
