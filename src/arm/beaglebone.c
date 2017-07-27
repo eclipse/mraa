@@ -266,9 +266,6 @@ mraa_beaglebone_i2c_init_pre(unsigned int bus)
 
     snprintf(devpath, MAX_SIZE, "/dev/i2c-%u", bus);
 
-    if (!mraa_file_exist(devpath)) {
-        ret = MRAA_ERROR_INVALID_HANDLE;
-    }
     if (mraa_file_exist(devpath)) {
         // Bus 1 doesn't seem to be configurable
         if (bus == 0) {
@@ -281,6 +278,7 @@ mraa_beaglebone_i2c_init_pre(unsigned int bus)
         return MRAA_SUCCESS;
     } else {
         syslog(LOG_ERR, "i2c: Device %s not initialized", devpath);
+        ret = MRAA_ERROR_INVALID_HANDLE;
     }
     return ret;
 }
