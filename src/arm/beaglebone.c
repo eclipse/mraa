@@ -275,7 +275,7 @@ mraa_beaglebone_i2c_init_pre(unsigned int bus)
             }
         }
 
-        return MRAA_SUCCESS;
+        ret = MRAA_SUCCESS;
     } else {
         syslog(LOG_ERR, "i2c: Device %s not initialized", devpath);
         ret = MRAA_ERROR_INVALID_HANDLE;
