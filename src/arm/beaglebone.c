@@ -264,7 +264,7 @@ mraa_beaglebone_i2c_init_pre(unsigned int bus)
     mraa_result_t ret = MRAA_ERROR_NO_RESOURCES;
     char devpath[MAX_SIZE];
 
-    sprintf(devpath, "/dev/i2c-%u", bus);
+    snprintf(devpath, MAX_SIZE, "/dev/i2c-%u", bus);
 
     if (!mraa_file_exist(devpath)) {
         ret = MRAA_ERROR_INVALID_HANDLE;
