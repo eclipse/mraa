@@ -65,7 +65,7 @@ class I2c
     /**
      * I2C constructor, takes a pointer to a I2C context and initialises the I2C class
      *
-     * @param void * to an I2C context
+     * @param i2c_context void * to an I2C context
      */
     I2c(void* i2c_context)
     {

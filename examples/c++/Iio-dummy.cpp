@@ -107,6 +107,7 @@ protected:
     }
 };
 
+//! [Interesting]
 int
 main()
 {
@@ -154,4 +155,4 @@ main()
     delete iio_device;
     return EXIT_SUCCESS;
 }
-
+//! [Interesting]

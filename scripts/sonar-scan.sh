@@ -37,6 +37,7 @@ sonar_cmd_base="build-wrapper-linux-x86-64 --out-dir ${bw_output_path} make clea
         -Dsonar.projectBaseDir=${MRAA_SRC_DIR} \
         -Dsonar.sources=${MRAA_SRC_DIR} \
         -Dsonar.inclusions='api/**/*,CMakeLists.txt,examples/**/*,imraa/**/*,include/**/*,src/**/*,tests/**/*' \
+        -Dsonar.java.binaries='src' \
         -Dsonar.coverage.exclusions='**/*' \
         -Dsonar.cfamily.build-wrapper-output=${bw_output_path} \
         -Dsonar.host.url=https://sonarqube.com \

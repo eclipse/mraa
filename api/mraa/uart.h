@@ -45,6 +45,7 @@ extern "C" {
 
 #include "common.h"
 
+/** Mraa Uart Context */
 typedef struct _uart* mraa_uart_context;
 
 /**

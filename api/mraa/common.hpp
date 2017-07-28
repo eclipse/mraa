@@ -99,7 +99,7 @@ getPlatformType()
 /**
  * Print a textual representation of the mraa::Result
  *
- * @param Result the Result to print
+ * @param result the Result to print
  */
 inline void
 printError(Result result)
@@ -157,7 +157,7 @@ getPlatformName()
 /**
  * Return platform versioning info. Returns NULL if no info present.
  *
- * @param optional subplatform identifier
+ * @param platform_offset optional subplatform identifier
  * @return platform versioning info
  */
 inline std::string
@@ -315,7 +315,7 @@ getPwmLookup(std::string pwm_name)
 /**
  * Get UART index by UART name, board must be initialised.
  *
- * @param pwm_name: Name of the UART. Eg: UART2
+ * @param uart_name: Name of the UART. Eg: UART2
  * @throws std::invalid_argument if name is not found
  * @return MRAA index for the UART
  */
@@ -360,7 +360,7 @@ hasSubPlatform()
 /**
  * Check if pin or bus id includes sub platform mask.
  *
- * @param int pin or bus number
+ * @param pin_or_bus_id pin or bus number
  *
  * @return mraa_boolean_t 1 if pin or bus is for sub platform, 0 otherwise
  */
@@ -373,7 +373,7 @@ isSubPlatformId(int pin_or_bus_id)
 /**
  * Convert pin or bus index to corresponding sub platform id.
  *
- * @param int pin or bus index
+ * @param pin_or_bus_index pin or bus index
  *
  * @return int sub platform pin or bus number
  */
@@ -386,7 +386,7 @@ getSubPlatformId(int pin_or_bus_index)
 /**
  * Convert pin or bus sub platform id to index.
  *
- * @param int sub platform pin or bus id
+ * @param pin_or_bus_id sub platform pin or bus id
  *
  * @return int pin or bus index
  */
@@ -399,7 +399,7 @@ getSubPlatformIndex(int pin_or_bus_id)
 /**
  * Get default i2c bus, board must be initialised.
  *
- * @param optional subplatform identifier
+ * @param platform_offset optional subplatform identifier
  * @return default i2c bus for paltform
  */
 inline int
@@ -422,6 +422,13 @@ addSubplatform(Platform subplatformtype, std::string uart_dev)
     return (Result) mraa_add_subplatform((mraa_platform_t) subplatformtype, uart_dev.c_str());
 }
 
+/**
+ * Remove mraa subplatform
+ *
+ * @param subplatformtype the type of subplatform to remove
+ * (e.g. MRAA_GENERIC_FIRMATA)
+ * @return Result of operation
+ */
 inline Result
 removeSubplatform(Platform subplatformtype)
 {
@@ -435,7 +442,7 @@ removeSubplatform(Platform subplatformtype)
  * [io]-[raw]-[id]-[pin]
  * [io]-[raw]-[path]
  *
- * @param IO description
+ * @param desc description
  *
  * @return class T initialised using pointer to IO or NULL
  */
@@ -449,7 +456,7 @@ initIo(std::string desc)
 /**
  * Instantiate an unknown board using a json file
  *
- * @param Path to the json file, relative to the folder the program
+ * @param path Path to the json file, relative to the folder the program
  * was initially run in or a direct path
  *
  * @return Result indicating success

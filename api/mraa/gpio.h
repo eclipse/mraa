@@ -242,7 +242,7 @@ int mraa_gpio_get_pin_raw(mraa_gpio_context dev);
  * @param mode Mode to set input pin state
  * @return Result of operation
  */
-mraa_result_t mraa_gpio_input_mode(mraa_gpio_context dev, mraa_gpio_input_mode_t);
+mraa_result_t mraa_gpio_input_mode(mraa_gpio_context dev, mraa_gpio_input_mode_t mode);
 
 /**
  * Set Gpio output driver mode. This is not a standard feature, it needs custom implementation for each board

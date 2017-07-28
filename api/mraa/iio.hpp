@@ -25,28 +25,39 @@
 #pragma once
 
 #include <stdexcept>
- #include <sstream>
+#include <sstream>
 #include "iio.h"
 #include "types.hpp"
 
 namespace mraa
 {
 
+/** Iio Event Data */
 struct IioEventData
 {
+    /** Channel Type */
     int channelType;
+    /** Modifier */
     int modifier;
+    /** Type */
     int type;
+    /** Direction */
     int direction;
+    /** Channel */
     int channel;
+    /** Channel 2 */
     int channel2;
+    /** Difference */
     int diff;
 };
 
+/** Iio Handler */
 class IioHandler
 {
 public:
+  /** onIioEvent Handler */
   virtual void onIioEvent(const IioEventData& eventData) = 0;
+  /** Destructor */
   virtual ~IioHandler() {};     // add an empty destructor to get rid of warning
 };
 
@@ -56,7 +67,7 @@ public:
  *
  * This file defines the C++ iio interface for libmraa
  *
- * @snippet iio_dummy_test.cpp Interesting
+ * @snippet Iio-dummy.cpp Interesting
  */
 class Iio
 {

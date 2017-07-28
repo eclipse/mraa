@@ -56,7 +56,7 @@ Specific platform information for supported platforms is documented here:
 Sometimes it just doesn't want to work, let us try and help you, you can file
 issues in github or join us in #mraa on freenode IRC, hang around for a little
 while because we're not necessarily on 24/7, but we'll get back to you! Have a
-glance at our @debugging page too
+glance at our @ref debugging page too
 
 ## COMPILING
 

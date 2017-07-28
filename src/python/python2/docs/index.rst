@@ -6,7 +6,7 @@
 Welcome to mraa's documentation!
 ================================
 
-.. include:: ../../../docs/index.md
+.. include:: ../../../../docs/index.md
   :start-after: ==============
   :end-before: ## API
 
@@ -41,13 +41,15 @@ a C library. Generally attaching gdb to python works well, build mraa with
 debug symbols and set breakpoints either in the SWIG _wrap functions, the C++
 method/functions or the underlying C function. More info can be found on the
 C/C++ documentation:
+
    * `Debugging <../debugging.html>`_
    * `Building from source <../building.html>`_
 
 API Changelog
 =============
-.. include:: ../../../docs/index.md
-  :start-after: API Changelog
+
+`Changelog <../changelog.html>`_
+
 
 Indices and tables
 ==================

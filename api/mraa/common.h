@@ -27,13 +27,19 @@
 #include <stdint.h>
 #include "types.h"
 
+/** Max size off Mraa Platform name */
 #define MRAA_PLATFORM_NAME_MAX_SIZE 64
+/** Size off Mraa pin name */
 #define MRAA_PIN_NAME_SIZE 12
 
+/** Bit Shift for Mraa sub platform */
 #define MRAA_SUB_PLATFORM_BIT_SHIFT 9
+/** Mask for Mraa sub platform */
 #define MRAA_SUB_PLATFORM_MASK (1<<MRAA_SUB_PLATFORM_BIT_SHIFT)
 
+/** Mraa main platform offset */
 #define MRAA_MAIN_PLATFORM_OFFSET 0
+/** Mraa sub platform offset */
 #define MRAA_SUB_PLATFORM_OFFSET 1
 
 /** Executes function func and returns its result in case of error
@@ -106,7 +112,7 @@ unsigned int mraa_adc_raw_bits();
 /**
  * Check the specified board's bit size when reading the value
  *
- * @param specified platform offset; 0 for main platform, 1 foor sub platform
+ * @param platform_offset specified platform offset; 0 for main platform, 1 for sub platform
  * @return raw bits being read from kernel module. zero if no ADC
  */
 unsigned int mraa_get_platform_adc_raw_bits(uint8_t platform_offset);
@@ -121,7 +127,7 @@ unsigned int mraa_adc_supported_bits();
 /**
  * Return value that the raw value should be shifted to. Zero if no ADC
  *
- * @param specified platform offset; 0 for main platform, 1 foor sub platform
+ * @param platform_offset specified platform offset; 0 for main platform, 1 for sub platform
  * @return return actual bit size the adc value should be understood as.
  */
 unsigned int mraa_get_platform_adc_supported_bits(int platform_offset);
@@ -146,7 +152,7 @@ const char* mraa_get_platform_name();
  * platform and can be NULL. platform_offset has to be given. Do not modify
  * this pointer
  *
- * @param specified platform offset; 0 for main platform, 1 for sub platform
+ * @param platform_offset specified platform offset; 0 for main platform, 1 for sub platform
  * @return platform's versioning string
  */
 const char* mraa_get_platform_version(int platform_offset);
@@ -255,7 +261,7 @@ int mraa_get_i2c_bus_id(int i2c_bus);
 /**
  * Get specified platform pincount, board must be initialised.
  *
- * @param specified platform offset; 0 for main platform, 1 foor sub platform
+ * @param platform_offset specified platform offset; 0 for main platform, 1 for sub platform
  * @return uint of physical pin count on the in-use platform
  */
 unsigned int mraa_get_platform_pin_count(uint8_t platform_offset);
@@ -326,7 +332,7 @@ mraa_boolean_t mraa_has_sub_platform();
 /**
  * Check if pin or bus id includes sub platform mask.
  *
- * @param int pin or bus number
+ * @param pin_or_bus_id pin or bus number
  *
  * @return mraa_boolean_t 1 if pin or bus is for sub platform, 0 otherwise
  */
@@ -335,7 +341,7 @@ mraa_boolean_t mraa_is_sub_platform_id(int pin_or_bus_id);
 /**
  * Convert pin or bus index to corresponding sub platform id.
  *
- * @param int pin or bus index
+ * @param pin_or_bus_index pin or bus index
  *
  * @return int sub platform pin or bus number
  */
@@ -344,7 +350,7 @@ int mraa_get_sub_platform_id(int pin_or_bus_index);
 /**
  * Convert pin or bus sub platform id to index.
  *
- * @param int sub platform pin or bus id
+ * @param pin_or_bus_id sub platform pin or bus id
  *
  * @return int pin or bus index
  */
@@ -353,8 +359,8 @@ int mraa_get_sub_platform_index(int pin_or_bus_id);
 /**
  * Add mraa subplatform
  *
- * @param subplatform type
- * @param uart device subplatform is on
+ * @param subplatformtype subplatform type
+ * @param uart_dev uart device subplatform is on
  *
  * @return mraa_result_t indicating success
  */
@@ -363,7 +369,7 @@ mraa_result_t mraa_add_subplatform(mraa_platform_t subplatformtype, const char* 
 /**
  * Remove a mraa subplatform
  *
- * @param subplatform type
+ * @param subplatformtype subplatform type
  *
  * @return mraa_result indicating success
  */
@@ -376,7 +382,7 @@ mraa_result_t mraa_remove_subplatform(mraa_platform_t subplatformtype);
  * [io]-[raw]-[id]-[pin]
  * [io]-[raw]-[path]
  *
- * @param IO description
+ * @param desc IO description
  *
  * @return void* to IO context or NULL
  */
@@ -385,7 +391,7 @@ void* mraa_init_io(const char* desc);
 /**
  * Instantiate an unknown board using a json file
  *
- * @param Path to the json file, relative to the folder the program
+ * @param path Path to the json file, relative to the folder the program
  * was initially run in or a direct path
  *
  * @return mraa_result indicating success

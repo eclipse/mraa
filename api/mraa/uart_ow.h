@@ -64,16 +64,20 @@ extern "C" {
 #include "common.h"
 #include "uart.h"
 
-/* 8 bytes (64 bits) for a device rom code */
+/** 8 bytes (64 bits) for a device rom code */
 #define MRAA_UART_OW_ROMCODE_SIZE 8
 
-/* for now, we simply use the normal MRAA UART context */
+/** for now, we simply use the normal MRAA UART context */
 typedef struct _mraa_uart_ow {
+    /** Uart Context */
     mraa_uart_context uart;
-    /* search state */
+    /** search state */
     unsigned char ROM_NO[MRAA_UART_OW_ROMCODE_SIZE]; /* 8 byte (64b) rom code */
+    /** Context laxt discrepancy  */
     int LastDiscrepancy;
+    /** Context las family discrepancy */
     int LastFamilyDiscrepancy;
+    /** Context las device flag */
     mraa_boolean_t LastDeviceFlag;
 } *mraa_uart_ow_context;
 

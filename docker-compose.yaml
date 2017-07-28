@@ -3,14 +3,7 @@ version: '2.1'
 services:
 
   base:
-    image: mraa-base
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.base
-      args:
-        - http_proxy
-        - https_proxy
-        - no_proxy
+    image: dnoliver/mraa-base
     environment:
       - http_proxy
       - https_proxy
@@ -41,17 +34,18 @@ services:
 
   doc:
     extends: base
+    image: dnoliver/mraa-all
     environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGPYTHON=ON
+      - BUILDSWIGNODE=ON
+      - BUILDSWIGJAVA=ON
       - BUILDDOC=ON
-    command: bash -c "./scripts/run-cmake.sh && make -Cbuild doc"
+    command: bash -c "./scripts/run-cmake.sh && ./scripts/build-doc.sh"
 
   sonar-scan:
     extends: base
-    image: mraa-sonar
-    build:
-      dockerfile: docker/Dockerfile.sonar
-      args:
-        - NODE_VERSION=v5.12.0
+    image: dnoliver/mraa-all
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
@@ -69,11 +63,52 @@ services:
       - GITHUB_TOKEN
     command: bash -c "./scripts/run-cmake.sh && cd build && ../scripts/sonar-scan.sh"
 
+  usbplat:
+    extends: base
+    image: dnoliver/mraa-all
+    environment:
+      - USBPLAT=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
+
+  firmata:
+    extends: base
+    image: dnoliver/mraa-all
+    environment:
+      - FIRMATA=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
+
+  imraa:
+    extends: base
+    image: dnoliver/mraa-all
+    environment:
+      - IMRAA=ON
+      - FIRMATA=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
+
+  ftdi4442:
+    extends: base
+    image: dnoliver/mraa-all
+    environment:
+      - FTDI4222=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
+
+  ipk:
+    extends: base
+    image: dnoliver/mraa-all
+    environment:
+      - IPK=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
+
+  rpm:
+    extends: base
+    image: dnoliver/mraa-all
+    environment:
+      - RPM=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
+
   python2:
     extends: base
-    image: mraa-python
-    build:
-      dockerfile: docker/Dockerfile.python
+    image: dnoliver/mraa-python
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
@@ -87,9 +122,7 @@ services:
 
   java:
     extends: base
-    image: mraa-java
-    build:
-      dockerfile: docker/Dockerfile.java
+    image: dnoliver/mraa-java
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGJAVA=ON
@@ -97,20 +130,14 @@ services:
 
   android:
     extends: java
-    image: mraa-android
-    build:
-      dockerfile: docker/Dockerfile.android
+    image: dnoliver/mraa-android
     environment:
       - BUILDARCH=PERIPHERALMAN
     command: bash -c "./scripts/build-android.sh"
 
   node4:
     extends: base
-    image: mraa-node4
-    build:
-      dockerfile: docker/Dockerfile.node
-      args:
-         - NODE_VERSION=v4.4.7
+    image: dnoliver/mraa-node4
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGNODE=ON
@@ -118,7 +145,8 @@ services:
 
   node5:
     extends: node4
-    image: mraa-node5
-    build:
-      args:
-        - NODE_VERSION=v5.12.0
+    image: dnoliver/mraa-node5
+
+  node6:
+    extends: node4
+    image: dnoliver/mraa-node6

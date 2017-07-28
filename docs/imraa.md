@@ -6,7 +6,7 @@ MRAA_GENERIC_FIRMATA subplatform to the first process that calls imraa_init
 
 ## Build dependencies
 To build imraa, you'll need to build mraa with -DIMRAA=ON and all the normal
-dependencies for build mraa, see [Building mraa](./building.md).
+dependencies for build mraa, see @ref building page.
 You'll also need the following:
 * [dfu-utils-cross](https://github.com/arduino/dfu-utils-cross) or dfu 0.8 (0.9
   does not work well with the 101). Precompiled binaries can be found on

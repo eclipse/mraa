@@ -64,7 +64,7 @@ class Uart
      * Uart Constructor, takes a string to the path of the serial
      * interface that is needed.
      *
-     * @param uart the index of the uart set to use
+     * @param path the index of the uart set to use
      */
     Uart(std::string path)
     {
@@ -79,7 +79,7 @@ class Uart
      * Uart Constructor, takes a pointer to the UART context and initialises
      * the UART class
      *
-     * @param void * to a UART context
+     * @param uart_context void * to a UART context
      */
     Uart(void* uart_context)
     {
@@ -160,7 +160,7 @@ class Uart
     /**
      * Write bytes in String object to a device
      *
-     * @param string to write
+     * @param data string to write
      * @return the number of bytes written, or -1 if an error occurred
      */
     int
@@ -273,7 +273,6 @@ class Uart
     /**
      * Set the blocking state for write operations
      *
-     * @param dev The UART context
      * @param nonblock new nonblocking state
      * @return Result of operation
      */

@@ -60,7 +60,7 @@ class Aio
      * position. Check your board mapping for details. An arduino style layout
      * will have A0 as pin14 but AIO0.
      *
-     * @param void * to an AIO context
+     * @param aio_context void * to an AIO context
      */
     Aio(void* aio_context)
     {

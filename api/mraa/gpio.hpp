@@ -127,7 +127,7 @@ class Gpio
      * Gpio Constructor, takes a pointer to the GPIO context and initialises
      * the GPIO class
      *
-     * @param void * to GPIO context
+     * @param gpio_context void * to GPIO context
      */
     Gpio(void* gpio_context)
     {

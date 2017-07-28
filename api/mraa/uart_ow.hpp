@@ -46,8 +46,8 @@ class UartOW
      * UartOW Constructor, takes a pin number which will map directly to the
      * linux uart number, this 'enables' the uart, nothing more
      *
-     * @throws std::invalid_argument in case of error
      * @param uart the index of the uart to use
+     * @throws std::invalid_argument in case of error
      */
     UartOW(int uart)
     {
@@ -62,8 +62,8 @@ class UartOW
      * UartOW Constructor, takes a string to the path of the serial
      * interface that is needed.
      *
-     * @throws std::invalid_argument in case of error
      * @param path the file path for the UART to use
+     * @throws std::invalid_argument in case of error
      */
     UartOW(std::string path)
     {
