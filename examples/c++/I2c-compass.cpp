@@ -99,28 +99,27 @@ main()
     uint8_t rx_tx_buf[MAX_BUFFER_LENGTH];
 
     //! [Interesting]
-    mraa::I2c* i2c;
-    i2c = new mraa::I2c(0);
+    mraa::I2c i2c(0);
 
-    i2c->address(HMC5883L_I2C_ADDR);
+    i2c.address(HMC5883L_I2C_ADDR);
     rx_tx_buf[0] = HMC5883L_CONF_REG_B;
     rx_tx_buf[1] = GA_1_3_REG;
-    i2c->write(rx_tx_buf, 2);
+    i2c.write(rx_tx_buf, 2);
     //! [Interesting]
 
-    i2c->address(HMC5883L_I2C_ADDR);
+    i2c.address(HMC5883L_I2C_ADDR);
     rx_tx_buf[0] = HMC5883L_MODE_REG;
     rx_tx_buf[1] = HMC5883L_CONT_MODE;
-    i2c->write(rx_tx_buf, 2);
+    i2c.write(rx_tx_buf, 2);
 
     signal(SIGINT, sig_handler);
 
     while (running == 0) {
-        i2c->address(HMC5883L_I2C_ADDR);
-        i2c->writeByte(HMC5883L_DATA_REG);
+        i2c.address(HMC5883L_I2C_ADDR);
+        i2c.writeByte(HMC5883L_DATA_REG);
 
-        i2c->address(HMC5883L_I2C_ADDR);
-        i2c->read(rx_tx_buf, DATA_REG_SIZE);
+        i2c.address(HMC5883L_I2C_ADDR);
+        i2c.read(rx_tx_buf, DATA_REG_SIZE);
 
         x = (rx_tx_buf[HMC5883L_X_MSB_REG] << 8) | rx_tx_buf[HMC5883L_X_LSB_REG];
         z = (rx_tx_buf[HMC5883L_Z_MSB_REG] << 8) | rx_tx_buf[HMC5883L_Z_LSB_REG];
@@ -138,7 +137,6 @@ main()
         printf("Heading : %f\n", direction * 180 / M_PI);
         sleep(1);
     }
-    delete i2c;
 
     return MRAA_SUCCESS;
 }

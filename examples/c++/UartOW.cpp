@@ -30,16 +30,15 @@
 int
 main(int argc, char** argv)
 {
-    mraa::UartOW* uart = new mraa::UartOW(0);
+    mraa::UartOW uart(0);
 
     // Reset the ow bus and see if anything is present
     mraa::Result rv;
 
-    if ((rv = uart->reset()) == mraa::SUCCESS) {
+    if ((rv = uart.reset()) == mraa::SUCCESS) {
         std::cout << "Reset succeeded, device(s) detected!" << std::endl;
     } else {
         std::cout << "Reset failed, returned " << int(rv) << ". No devices on bus?" << std::endl;
-        delete uart;
         return 1;
     }
 
@@ -48,11 +47,10 @@ main(int argc, char** argv)
 
     uint8_t count = 0;
     // start the search from scratch
-    std::string id = uart->search(true);
+    std::string id = uart.search(true);
 
     if (id.empty()) {
         std::cout << "No devices detected." << std::endl;
-        delete uart;
         return 1;
     }
 
@@ -70,12 +68,10 @@ main(int argc, char** argv)
         count++;
 
         // continue the search with start argument set to false
-        id = uart->search(false);
+        id = uart.search(false);
     }
 
     std::cout << "Exiting..." << std::endl;
-
-    delete uart;
 
     return 0;
 }
