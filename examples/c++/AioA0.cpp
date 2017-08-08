@@ -44,20 +44,17 @@ main()
 {
     uint16_t adc_value;
     float adc_value_float;
-    mraa::Aio* a0;
-
-    a0 = new mraa::Aio(0);
+    mraa::Aio a0(0);
 
     signal(SIGINT, sig_handler);
 
     while (running == 0) {
-        adc_value = a0->read();
-        adc_value_float = a0->readFloat();
+        adc_value = a0.read();
+        adc_value_float = a0.readFloat();
         fprintf(stdout, "ADC A0 read %X - %d\n", adc_value, adc_value);
         fprintf(stdout, "ADC A0 read float - %.5f (Ctrl+C to exit)\n", adc_value_float);
     }
 
-    delete a0;
     return MRAA_SUCCESS;
 }
 //! [Interesting]
