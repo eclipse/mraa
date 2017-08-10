@@ -207,13 +207,14 @@ mraa_beaglebone_uart_init_pre(int index)
     if (!mraa_file_exist(devpath)) {
         ret = MRAA_ERROR_INVALID_HANDLE;
     }
-    if (mraa_file_exist(devpath))
+    if (mraa_file_exist(devpath)) {
        if (set_pin_mode(plat->uart_dev[index].rx, "uart") == MRAA_SUCCESS &&
             set_pin_mode(plat->uart_dev[index].tx, "uart") == MRAA_SUCCESS) {
             return MRAA_SUCCESS;
         }
-    else
+    } else {
         syslog(LOG_ERR, "uart: Device not initialized");
+    }
     return ret;
 }
 

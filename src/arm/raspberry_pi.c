@@ -117,7 +117,6 @@ mraa_raspberry_pi_i2c_init_pre(unsigned int bus)
 mraa_result_t
 mraa_raspberry_pi_mmap_write(mraa_gpio_context dev, int value)
 {
-    volatile uint32_t* addr;
     if (value) {
         *(volatile uint32_t*) (mmap_reg + BCM283X_GPSET0 + (dev->pin / 32) * 4) =
         (uint32_t)(1 << (dev->pin % 32));

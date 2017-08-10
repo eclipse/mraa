@@ -39,6 +39,7 @@
 #define PLATFORM_NAME_DB410C "DB410C"
 #define PLATFORM_NAME_HIKEY "HIKEY"
 #define PLATFORM_NAME_BBGUM "BBGUM"
+#define MAX_SIZE 64
 
 int db410c_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
     36, 12, 13, 69, 115, 4, 24, 25, 35, 34, 28, 33,
@@ -79,9 +80,8 @@ mraa_96boards_pininfo(mraa_board_t* board, int index, int sysfs_pin, char* fmt, 
 mraa_board_t*
 mraa_96boards()
 {
-    int i, pin;
+    int i;
     int* ls_gpio_pins = NULL;
-    char ch;
 
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
@@ -97,18 +97,18 @@ mraa_96boards()
         if (mraa_file_contains(DT_BASE "/model", "Qualcomm Technologies, Inc. APQ 8016 SBC")) {
             b->platform_name = PLATFORM_NAME_DB410C;
             ls_gpio_pins = db410c_ls_gpio_pins;
-            b->uart_dev[0].device_path = db410c_serialdev[0];
-            b->uart_dev[1].device_path = db410c_serialdev[1];
+            b->uart_dev[0].device_path = (char *)db410c_serialdev[0];
+            b->uart_dev[1].device_path = (char *)db410c_serialdev[1];
         } else if (mraa_file_contains(DT_BASE "/model", "HiKey Development Board")) {
             b->platform_name = PLATFORM_NAME_HIKEY;
             ls_gpio_pins = hikey_ls_gpio_pins;
-            b->uart_dev[0].device_path = hikey_serialdev[0];
-            b->uart_dev[1].device_path = hikey_serialdev[1];
+            b->uart_dev[0].device_path = (char *)hikey_serialdev[0];
+            b->uart_dev[1].device_path = (char *)hikey_serialdev[1];
         } else if (mraa_file_contains(DT_BASE "/model", "s900")) {
             b->platform_name = PLATFORM_NAME_BBGUM;
             ls_gpio_pins = bbgum_ls_gpio_pins;
-            b->uart_dev[0].device_path = bbgum_serialdev[0];
-            b->uart_dev[1].device_path = bbgum_serialdev[1];
+            b->uart_dev[0].device_path = (char *)bbgum_serialdev[0];
+            b->uart_dev[1].device_path = (char *)bbgum_serialdev[1];
         }
     }
 
@@ -117,7 +117,7 @@ mraa_96boards()
     b->def_uart_dev = 0;
 
     // I2C
-    if (b->platform_name == PLATFORM_NAME_BBGUM) {
+    if (strncmp(b->platform_name, PLATFORM_NAME_BBGUM, MAX_SIZE) == 0) {
         b->i2c_bus_count = MRAA_96BOARDS_LS_I2C_COUNT;
         b->def_i2c_bus = 0;
         b->i2c_bus[0].bus_id = 1;

@@ -98,7 +98,6 @@ mraa_pwm_context
 mraa_phyboard_pwm_init_replace(int pin)
 {
     char devpath[MAX_SIZE];
-    int length = strlen(SYSFS_CLASS_PWM) + 5;
 
     if (plat == NULL) {
         syslog(LOG_ERR, "pwm: Platform Not Initialised");

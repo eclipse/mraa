@@ -50,7 +50,7 @@ mraa_am335x_mmap_write(mraa_gpio_context dev, int value)
     return MRAA_SUCCESS;
 }
 
-static mraa_result_t
+mraa_result_t
 mraa_am335x_mmap_unsetup()
 {
     if (mmap_gpio[0] == NULL) {
