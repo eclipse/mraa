@@ -37,7 +37,7 @@ function check_environment {
   fi
 }
 
-check_environment "UPM_SRC_DIR" ${UPM_SRC_DIR}
+check_environment "MRAA_SRC_DIR" ${MRAA_SRC_DIR}
 check_environment "SONAR_PROJ_KEY" ${SONAR_PROJ_KEY}
 check_environment "SONAR_ORG" ${SONAR_ORG}
 check_environment "UPM_SRC_DIR" ${SONAR_TOKEN}
