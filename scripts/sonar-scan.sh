@@ -40,7 +40,7 @@ function check_environment {
 check_environment "MRAA_SRC_DIR" ${MRAA_SRC_DIR}
 check_environment "SONAR_PROJ_KEY" ${SONAR_PROJ_KEY}
 check_environment "SONAR_ORG" ${SONAR_ORG}
-check_environment "UPM_SRC_DIR" ${SONAR_TOKEN}
+check_environment "SONAR_TOKEN" ${SONAR_TOKEN}
 
 bw_output_path="${MRAA_SRC_DIR}/build/bw-output"
 
