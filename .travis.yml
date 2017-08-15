@@ -15,9 +15,7 @@ before_install:
 jobs:
   fast_finish: true
   allow_failures:
-    - env: TARGET=sonar-scan
     - env: TARGET=ipk
-    - env: TARGET=rpm
   include:
     - &run-with-clang
       stage: Clang 3.8

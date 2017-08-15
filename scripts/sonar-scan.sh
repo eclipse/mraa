@@ -23,10 +23,24 @@
 #  - MRAA_SRC_DIR - path to mraa's git clone in the Docker container.
 
 # Check required environment variables and exit if they are not set
-MRAA_SRC_DIR=${MRAA_SRC_DIR:?value not provided}
-SONAR_PROJ_KEY=${SONAR_PROJ_KEY:?value not provided}
-SONAR_ORG=${SONAR_ORG:?value not provided}
-SONAR_TOKEN=${SONAR_TOKEN:?value not provided}
+function check_environment {
+  VAR_NAME=$1
+  VAR_VALUE=$2
+  # Check required parameters
+  VAR_NAME=${VAR_NAME:?value not provided}
+  # Chek if variable is set
+  if [ -z "${VAR_VALUE}" ]; then
+    echo "Required environment variable ${VAR_NAME} is not defined. Skipping Execution..."
+    exit 0;
+  else
+    echo "Required environment variable ${VAR_NAME} is set."
+  fi
+}
+
+check_environment "MRAA_SRC_DIR" ${MRAA_SRC_DIR}
+check_environment "SONAR_PROJ_KEY" ${SONAR_PROJ_KEY}
+check_environment "SONAR_ORG" ${SONAR_ORG}
+check_environment "SONAR_TOKEN" ${SONAR_TOKEN}
 
 bw_output_path="${MRAA_SRC_DIR}/build/bw-output"
 
@@ -57,7 +71,7 @@ if [ "${TRAVIS_BRANCH}" == "master" -a "${TRAVIS_PULL_REQUEST}" == "false" ]; th
     sonar_cmd="${sonar_cmd_base}"
 elif [ "${TRAVIS_PULL_REQUEST}" != "false" -a "${TRAVIS_PULL_REQUEST_SLUG}" == "${TRAVIS_REPO_SLUG}" ]; then
     # Internal PR - do a preview scan with report to the PR
-    ${GITHUB_TOKEN:?value not provided}
+    check_environment "GITHUB_TOKEN" ${GITHUB_TOKEN}
 
     echo "Performing internal pull request scan"
     sonar_cmd="${sonar_cmd_base} \
