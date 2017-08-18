@@ -247,8 +247,26 @@ mraa_pman_uart_set_timeout_replace(mraa_uart_context dev, int read, int write, i
 static mraa_boolean_t
 mraa_pman_uart_data_available_replace(mraa_uart_context dev, unsigned int millis)
 {
-    // FIXME! We probably should say yes sometimes ;-)
-    return 0;
+    int fd = -1;
+
+    if (AUartDevice_getPollingFd(dev->buart, &fd)) {
+        syslog(LOG_ERR, "peripheralman: failed to get the fd");
+        return 0;
+    }
+
+    struct pollfd poller = {
+        .fd = fd,
+        .events = POLLIN | POLLERR,
+        .revents = 0,
+    };
+
+    if (poll(&poller, 1, millis) > 0) {
+        syslog(LOG_INFO, "peripheralman: received an event");
+        AUartDevice_ackInputEvent(fd);
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 static mraa_result_t
