@@ -39,11 +39,11 @@ interrupt(void* args)
 int
 main()
 {
-    mraa::Gpio* x = new mraa::Gpio(6);
+    mraa::Gpio x(6);
 
-    x->dir(mraa::DIR_IN);
+    x.dir(mraa::DIR_IN);
 
-    x->isr(mraa::EDGE_BOTH, &interrupt, NULL);
+    x.isr(mraa::EDGE_BOTH, &interrupt, NULL);
 
     int i = 100;
     for (; i > 0; --i) {
@@ -55,6 +55,5 @@ main()
         sleep(1);
     }
 
-    delete x;
     return MRAA_SUCCESS;
 }

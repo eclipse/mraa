@@ -43,22 +43,19 @@ main()
 {
     signal(SIGINT, sig_handler);
     //! [Interesting]
-    mraa::Pwm* pwm;
-
-    pwm = new mraa::Pwm(3);
+    mraa::Pwm pwm(3);
     fprintf(stdout, "Cycling PWM on IO3 (pwm3) \n");
-    pwm->enable(true);
+    pwm.enable(true);
 
     float value = 0.0f;
     while (running == 0) {
         value = value + 0.01f;
-        pwm->write(value);
+        pwm.write(value);
         usleep(50000);
         if (value >= 1.0f) {
             value = 0.0f;
         }
     }
-    delete pwm;
     //! [Interesting]
 
     return MRAA_SUCCESS;
