@@ -81,6 +81,8 @@ mraa_mock_i2c_address_replace(mraa_i2c_context dev, uint8_t addr)
         return MRAA_ERROR_INVALID_PARAMETER;
     }
 
+    dev->addr = addr;
+
     return MRAA_SUCCESS;
 }
 
