@@ -31,3 +31,4 @@
 #include "mraa/i2c.hpp"
 #include "mraa/spi.hpp"
 #include "mraa/uart.hpp"
+#include "mraa/led.hpp"

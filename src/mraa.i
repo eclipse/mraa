@@ -13,6 +13,7 @@
     #include "spi.hpp"
     #include "aio.hpp"
     #include "uart.hpp"
+    #include "led.hpp"
 %}
 
 %exception {
@@ -34,6 +35,7 @@
 %template (spiFromDesc) mraa::initIo<mraa::Spi>;
 %template (i2cFromDesc) mraa::initIo<mraa::I2c>;
 %template (pwmFromDesc) mraa::initIo<mraa::Pwm>;
+%template (ledFromDesc) mraa::initIo<mraa::Led>;
 
 %ignore Aio(void* aio_context);
 %ignore Pwm(void* pwm_context);
@@ -41,6 +43,7 @@
 %ignore Spi(void* spi_context);
 %ignore I2c(void* i2c_context);
 %ignore Gpio(void* gpio_context);
+%ignore Led(void* led_context);
 
 %ignore Gpio::nop(uv_work_t* req);
 %ignore Gpio::v8isr(uv_work_t* req);
@@ -59,3 +62,5 @@
 %include "aio.hpp"
 
 %include "uart.hpp"
+
+%include "led.hpp"
