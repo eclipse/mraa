@@ -242,6 +242,20 @@ struct _iio {
 #endif
 
 /**
+ * A structure representing an LED device
+ */
+struct _led {
+    /*@{*/
+    int count; /**< total LED count in a platform */
+    char *led_name; /**< LED name */
+    char led_path[64]; /**< sysfs path of the LED */
+    int trig_fd; /**< trigger file descriptor */
+    int bright_fd; /**< brightness file descriptor */
+    int max_bright_fd; /**< maximum brightness file descriptor */
+    /*@}*/
+};
+
+/**
  * A bitfield representing the capabilities of a pin.
  */
 typedef struct {
