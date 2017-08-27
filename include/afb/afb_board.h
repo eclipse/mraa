@@ -30,8 +30,8 @@ extern "C" {
 
 #include "mraa_internal.h"
 
-mraa_board_t*
-mraa_afb_board();
+mraa_platform_t
+mraa_afb_platform();
 
 #ifdef __cplusplus
 }

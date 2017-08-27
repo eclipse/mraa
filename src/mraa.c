@@ -66,6 +66,8 @@
 
 #if defined(PERIPHERALMAN)
 #include "peripheralmanager/peripheralman.h"
+#elif defined(AFBPLAT)
+#include "afb/afb_board.h"
 #else
 #define IIO_DEVICE_WILDCARD "iio:device*"
 
@@ -313,7 +315,7 @@ mraa_set_priority(const int priority)
     return sched_setscheduler(0, SCHED_RR, &sched_s);
 }
 
-#if !defined(PERIPHERALMAN)
+#if !defined(PERIPHERALMAN) && !defined(AFBPLAT)
 static int
 mraa_count_iio_devices(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
 {
@@ -995,7 +997,7 @@ mraa_get_default_i2c_bus(uint8_t platform_offset)
     }
 }
 
-#if !defined(PERIPHERALMAN)
+#if !defined(PERIPHERALMAN) && !defined(AFBPLAT)
 
 mraa_boolean_t
 mraa_file_exist(const char* filename)

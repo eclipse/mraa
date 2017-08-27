@@ -67,6 +67,7 @@ typedef enum {
     MRAA_GROVEPI = 1024,            /**< GrovePi shield i2c bridge */
     MRAA_GENERIC_FIRMATA = 1280,    /**< Firmata uart platform/bridge */
 
+    MRAA_AFB_PLATFORM = 94,         /**< AFB AGL binder service */
     MRAA_ANDROID_PERIPHERALMANAGER = 95, /**< Android Things peripheral manager platform */
     MRAA_MOCK_PLATFORM = 96,        /**< Mock platform, which requires no real hardware */
     MRAA_JSON_PLATFORM = 97,        /**< User initialised platform from json */

@@ -31,7 +31,7 @@ set (mraa_LIB_SRCS_NOAUTO
   ${mraa_LIB_SRCS_NOAUTO}
 )
 
-if (NOT PERIPHERALMAN)
+if (NOT PERIPHERALMAN AND NOT AFBPLAT)
   set (mraa_LIB_SRCS_NOAUTO
     ${mraa_LIB_SRCS_NOAUTO}
     ${PROJECT_SOURCE_DIR}/src/iio/iio.c
@@ -114,7 +114,6 @@ set (mraa_LIB_MOCK_SRCS_NOAUTO
 
 set (mraa_LIB_AFB_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/afb/afb.c
-  ${PROJECT_SOURCE_DIR}/src/afb/afb_board.c
 )
 
 set (mraa_LIB_PERIPHERALMAN_SRCS_NOAUTO
