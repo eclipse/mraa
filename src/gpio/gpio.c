@@ -24,7 +24,7 @@
  */
 #include "gpio.h"
 #include "mraa_internal.h"
-#include "chardev_interface/gpio.h"
+#include "linux/gpio.h"
 #include <dirent.h>
 
 #include <stdlib.h>
