@@ -113,8 +113,8 @@ set (mraa_LIB_MOCK_SRCS_NOAUTO
 )
 
 set (mraa_LIB_AFB_SRCS_NOAUTO
-  ${PROJECT_SOURCE_DIR}/src/afb.c
-  ${PROJECT_SOURCE_DIR}/src/afb_board.c
+  ${PROJECT_SOURCE_DIR}/src/afb/afb.c
+  ${PROJECT_SOURCE_DIR}/src/afb/afb_board.c
 )
 
 set (mraa_LIB_PERIPHERALMAN_SRCS_NOAUTO
