@@ -332,7 +332,7 @@ mraa_iio_trigger_handler(void* arg)
 #endif
             // only can process if readsize >= enabled channel's datasize
             for (i = 0; i < (read_size / dev->datasize); i++) {
-                dev->isr((void*)&data);
+                dev->isr((char*)&data, (void*)dev->isr_args);
             }
 #ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
@@ -348,7 +348,7 @@ mraa_iio_trigger_handler(void* arg)
 }
 
 mraa_result_t
-mraa_iio_trigger_buffer(mraa_iio_context dev, void (*fptr)(char* data), void* args)
+mraa_iio_trigger_buffer(mraa_iio_context dev, void (*fptr)(char*, void*), void* args)
 {
     char bu[MAX_SIZE];
     if (dev->thread_id != 0) {
@@ -362,6 +362,7 @@ mraa_iio_trigger_buffer(mraa_iio_context dev, void (*fptr)(char* data), void* ar
     }
 
     dev->isr = fptr;
+    dev->isr_args = args;
     pthread_create(&dev->thread_id, NULL, mraa_iio_trigger_handler, (void*) dev);
 
     return MRAA_SUCCESS;

@@ -46,16 +46,15 @@ printword(uint16_t input, mraa_iio_channel* chan)
     printf("  value = %05f\n", (float) res);
 }
 
-mraa_iio_context iio_device0;
-mraa_iio_context iio_device6;
-
 void
-interrupt(char* data)
+interrupt(char* data, void* args)
 {
-    mraa_iio_channel* channels = mraa_iio_get_channels(iio_device0);
+    mraa_iio_context thisdevice = (mraa_iio_context)args;
+
+    mraa_iio_channel* channels = mraa_iio_get_channels(thisdevice);
     int i = 0;
 
-    for (; i < mraa_iio_get_channel_count(iio_device0); i++) {
+    for (; i < mraa_iio_get_channel_count(thisdevice); i++) {
         if (channels[i].enabled) {
             printf("channel %d - bytes %d\n", channels[i].index, channels[i].bytes);
             switch (channels[i].bytes) {
@@ -87,7 +86,8 @@ int
 main()
 {
     //! [Interesting]
-    iio_device0 = mraa_iio_init(0);
+    mraa_iio_context iio_device0 = mraa_iio_init(0);
+
     if (iio_device0 == NULL) {
         return EXIT_FAILURE;
     }
@@ -116,7 +116,7 @@ main()
         fprintf(stdout, "IIO read %d\n", iio_int);
     }
 
-    if (mraa_iio_trigger_buffer(iio_device0, interrupt, NULL) == MRAA_SUCCESS) {
+    if (mraa_iio_trigger_buffer(iio_device0, interrupt, (void*)iio_device0) == MRAA_SUCCESS) {
         sleep(100);
         return EXIT_SUCCESS;
     }

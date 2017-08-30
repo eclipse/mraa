@@ -102,7 +102,7 @@ mraa_iio_context mraa_iio_init(int device);
  * @param args Arguments
  * @return Result of operation
  */
-mraa_result_t mraa_iio_trigger_buffer(mraa_iio_context dev, void (*fptr)(char* data), void* args);
+mraa_result_t mraa_iio_trigger_buffer(mraa_iio_context dev, void (*fptr)(char*, void*), void* args);
 
 /**
  * Get device name

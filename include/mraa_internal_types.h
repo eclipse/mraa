@@ -229,7 +229,7 @@ struct _iio {
     char* name; /**< IIO device name */
     int fp; /**< IIO device in /dev */
     int fp_event;  /**<  event file descriptor for IIO device */
-    void (* isr)(char* data); /**< the interrupt service request */
+    void (* isr)(char* data, void* args); /**< the interrupt service request */
     void *isr_args; /**< args return when interrupt service request triggered */
     void (* isr_event)(struct iio_event_data* data, void* args); /**< the event interrupt service request */
     int chan_num;
