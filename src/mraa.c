@@ -199,7 +199,7 @@ imraa_init()
     mraa_add_from_lockfile(subplatform_lockfile);
 #endif
 
-#if !defined(PERIPHERALMAN)
+#if !defined(PERIPHERALMAN) && !defined(AFBPLAT)
     // Look for IIO devices
     mraa_iio_detect();
 
@@ -289,12 +289,12 @@ mraa_deinit()
             platform_name = NULL;
         }
     }
-#if !defined(PERIPHERALMAN)
+#if !defined(PERIPHERALMAN) && !defined(AFBPLAT)
     if (plat_iio != NULL) {
         free(plat_iio);
         plat_iio = NULL;
     }
-#else
+#elif defined(PERIPHERALMAN)
     pman_mraa_deinit();
 #endif
     closelog();
@@ -1269,7 +1269,7 @@ mraa_get_sub_platform_index(int pin_or_bus)
 int
 mraa_get_iio_device_count()
 {
-#if defined(PERIPHERALMAN)
+#if defined(PERIPHERALMAN) || defined(AFBPLAT)
     return -1;
 #else
     return plat_iio->iio_device_count;
