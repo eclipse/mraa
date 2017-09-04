@@ -117,6 +117,23 @@ mraa_afb_board()
         return NULL;
     }
     b->platform_name = PLATFORM_NAME;
+    b->phy_pin_count = 2;
+    b->i2c_bus_count = 1;
+    b->def_i2c_bus = 0;
+    b->i2c_bus[0].bus_id = 0;
+
+    b->pins = (mraa_pininfo_t*) calloc(b->phy_pin_count, sizeof(mraa_pininfo_t));
+    if (b->pins == NULL) {
+        free(b);
+        return NULL;
+    }
+
+    b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+    if (b->adv_func == NULL) {
+        free(b->pins);
+        free(b);
+        return NULL;
+    }
 
     // Replace functions
     b->adv_func->i2c_init_bus_replace = &mraa_afb_i2c_init_bus_replace;
