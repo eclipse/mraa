@@ -21,7 +21,11 @@ set_property (SOURCE mraajs.i PROPERTY SWIG_FLAGS "-node"
               "-I${CMAKE_BINARY_DIR}/src" "-DV8_VERSION=${V8_VERSION_HEX}")
 set_source_files_properties (mraajs.i PROPERTIES CPLUSPLUS ON)
 
-swig_add_module (mraajs javascript mraajs.i)
+if (CMAKE_VERSION VERSION_LESS "3.8")
+  swig_add_module (mraajs javascript mraajs.i)
+else ()
+  swig_add_library (mraajs LANGUAGE javascript SOURCES mraajs.i)
+endif ()
 swig_link_libraries (mraajs mraa)
 
 set_target_properties (mraajs PROPERTIES

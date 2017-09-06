@@ -3,7 +3,11 @@ set_source_files_properties (mraa2.i PROPERTIES SWIG_FLAGS "-I${CMAKE_BINARY_DIR
 
 message ("PYTHON2 attempting to build!")
 
-swig_add_module (python2-mraa python mraa2.i ../mraapy.c)
+if (CMAKE_VERSION VERSION_LESS "3.8")
+  swig_add_module (python2-mraa python mraa2.i ../mraapy.c)
+else ()
+  swig_add_library (python2-mraa LANGUAGE python SOURCES mraa2.i ../mraapy.c)
+endif ()
 swig_link_libraries (python2-mraa ${PYTHON2_LIBRARIES} mraa)
 
 target_include_directories(${SWIG_MODULE_python2-mraa_REAL_NAME}
