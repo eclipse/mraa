@@ -32,9 +32,9 @@ else ()
 endif ()
 
 if (CMAKE_VERSION VERSION_LESS "3.8")
-  swig_add_module (mraajava java mraajava.i ../mraajni.c)
+  swig_add_module (mraajava java mraajava.i mraajni.c)
 else ()
-  swig_add_library (mraajava LANGUAGE java SOURCES mraajava.i ../mraajni.c)
+  swig_add_library (mraajava LANGUAGE java SOURCES mraajava.i mraajni.c)
 endif ()
 swig_link_libraries (mraajava ${JAVA_LIBRARIES} mraa)
 
