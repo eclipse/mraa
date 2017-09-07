@@ -223,7 +223,13 @@ mraa_up_board()
     b->adc_raw = 8;
     b->adc_supported = 8;
 
-    return b;
+    const char* pinctrl_path = "/sys/bus/platform/drivers/up-pinctrl";
+    int have_pinctrl = access(pinctrl_path, F_OK) != -1;
+    syslog(LOG_NOTICE, "up: kernel pinctrl driver %savailable", have_pinctrl ? "" : "un");
+
+    if (have_pinctrl)
+        return b;
+
 error:
     syslog(LOG_CRIT, "up: Platform failed to initialise");
     free(b);
