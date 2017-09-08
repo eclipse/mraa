@@ -82,6 +82,9 @@ mraa_up_get_pin_index(mraa_board_t* board, char* name, int* pin_index)
             return MRAA_SUCCESS;
         }
     }
+
+    syslog(LOG_CRIT, "up: Failed to find pin name %s", name);
+
     return MRAA_ERROR_INVALID_RESOURCE;
 }
 
@@ -134,17 +137,17 @@ mraa_up_board()
 
     b->adv_func->aio_get_valid_fp = &mraa_up_aio_get_valid_fp;
 
-    mraa_up_set_pininfo(b, 0, "INVALID",   (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_up_set_pininfo(b, 1, "3.3v",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_up_set_pininfo(b, 2, "5v",        (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_up_set_pininfo(b, 3, "I2C1_SDA",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 }, 2);
-    mraa_up_set_pininfo(b, 4, "5v",        (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_up_set_pininfo(b, 5, "I2C1_SCL",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 }, 3);
-    mraa_up_set_pininfo(b, 6, "GND",       (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_up_set_pininfo(b, 7, "ADC0",      (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 }, 4);
-    mraa_up_set_pininfo(b, 8, "UART1_TX",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 14);
-    mraa_up_set_pininfo(b, 9, "GND",       (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_up_set_pininfo(b, 10, "UART1_RX", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 15);
+    mraa_up_set_pininfo(b, 0,  "INVALID",  (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_up_set_pininfo(b, 1,  "3.3v",     (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_up_set_pininfo(b, 2,  "5v",       (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_up_set_pininfo(b, 3,  "I2C_SDA",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 }, 2);
+    mraa_up_set_pininfo(b, 4,  "5v",       (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_up_set_pininfo(b, 5,  "I2C_SCL",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 }, 3);
+    mraa_up_set_pininfo(b, 6,  "GND",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_up_set_pininfo(b, 7,  "ADC0",     (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 }, 4);
+    mraa_up_set_pininfo(b, 8,  "UART_TX",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 14);
+    mraa_up_set_pininfo(b, 9,  "GND",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_up_set_pininfo(b, 10, "UART_RX",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 15);
     mraa_up_set_pininfo(b, 11, "GPIO17",   (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 17);
     mraa_up_set_pininfo(b, 12, "I2S_CLK",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 18);
     mraa_up_set_pininfo(b, 13, "GPIO27",   (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 27);
@@ -187,8 +190,8 @@ mraa_up_board()
     if (i2c_bus_num != -1) {
         int i = b->i2c_bus_count;
         b->i2c_bus[i].bus_id = i2c_bus_num;
-        mraa_up_get_pin_index(b, "I2C1_SDA", (int*) &(b->i2c_bus[0].sda));
-        mraa_up_get_pin_index(b, "I2C1_SCL", (int*) &(b->i2c_bus[0].scl));
+        mraa_up_get_pin_index(b, "I2C_SDA", (int*) &(b->i2c_bus[0].sda));
+        mraa_up_get_pin_index(b, "I2C_SCL", (int*) &(b->i2c_bus[0].scl));
         b->i2c_bus_count++;
     }
 
@@ -198,8 +201,8 @@ mraa_up_board()
     if (i2c_bus_num != -1) {
         int i = b->i2c_bus_count;
         b->i2c_bus[i].bus_id = i2c_bus_num;
-        mraa_up_get_pin_index(b, "I2C0_SDA", (int*) &(b->i2c_bus[1].sda));
-        mraa_up_get_pin_index(b, "I2C0_SCL", (int*) &(b->i2c_bus[1].scl));
+        mraa_up_get_pin_index(b, "ID_SD", (int*) &(b->i2c_bus[1].sda));
+        mraa_up_get_pin_index(b, "ID_SC", (int*) &(b->i2c_bus[1].scl));
         b->i2c_bus_count++;
     }
 
@@ -227,8 +230,8 @@ mraa_up_board()
 
     // Configure UART #1 (default)
     b->uart_dev_count = 1;
-    mraa_up_get_pin_index(b, "UART1_RX", &(b->uart_dev[0].rx));
-    mraa_up_get_pin_index(b, "UART1_TX", &(b->uart_dev[0].tx));
+    mraa_up_get_pin_index(b, "UART_RX", &(b->uart_dev[0].rx));
+    mraa_up_get_pin_index(b, "UART_TX", &(b->uart_dev[0].tx));
     b->uart_dev[0].device_path = "/dev/ttyS1";
     b->def_uart_dev = 0;
 
