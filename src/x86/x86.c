@@ -37,6 +37,7 @@
 #include "x86/intel_sofia_3gr.h"
 #include "x86/intel_cherryhills.h"
 #include "x86/up.h"
+#include "x86/up2.h"
 #include "x86/intel_joule_expansion.h"
 
 mraa_platform_t
@@ -92,6 +93,9 @@ mraa_x86_platform()
             } else if (strncasecmp(line, "UP-CHT01", strlen("UP-CHT01") + 1) == 0) {
                 platform_type = MRAA_UP;
                 plat = mraa_up_board();
+            } else if (strncasecmp(line, "UP-APL01", strlen("UP-APL01") + 1) == 0) {
+                platform_type = MRAA_UP2;
+                plat = mraa_up2_board();
             } else if (strncasecmp(line, "RVP", strlen("RVP") + 1) == 0) {
                 platform_type = MRAA_INTEL_JOULE_EXPANSION;
                 plat = mraa_joule_expansion_board();
@@ -138,6 +142,8 @@ mraa_x86_platform()
     plat = mraa_intel_cherryhills();
     #elif defined(xMRAA_UP)
     plat = mraa_up_board();
+    #elif defined(xMRAA_UP2)
+    plat = mraa_up2_board();
     #elif defined(xMRAA_INTEL_JOULE_EXPANSION)
     plat = mraa_joule_expansion_board();
     #else

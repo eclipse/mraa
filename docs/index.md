@@ -48,6 +48,7 @@ Specific platform information for supported platforms is documented here:
 - @ref phyboard-wega
 - @ref nuc5
 - @ref up
+- @ref up2
 - @ref joule
 - @ref ft4222
 
