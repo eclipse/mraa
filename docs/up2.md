@@ -54,7 +54,7 @@ physical device names. See the source code in src/x86/up2.c for details.
 | 8        | UART_TX      | 14         | 477        | UART0           |
 | 9        | GND          |            |            |                 |
 | 10       | UART_RX      | 15         | 476        | UART0           |
-| 11       | UART_RTS     | 17         | 478        |                 |
+| 11       | UART_RTS     | 17         | 478        | UART0           |
 | 12       | I2S_CLK      | 18         | 326        |                 |
 | 13       | GPIO(27)     | 27         | 432        |                 |
 | 14       | GND          |            |            |                 |
@@ -79,7 +79,7 @@ physical device names. See the source code in src/x86/up2.c for details.
 | 33       | PWM1         | 13         | 469        | PWM1            |
 | 34       | GND          |            |            |                 |
 | 35       | I2S_FRM      | 19         | 327        |                 |
-| 36       | UART_CTS     | 16         | 479        |                 |
+| 36       | UART_CTS     | 16         | 479        | UART0           |
 | 37       | GPIO(26)     | 26         | 403        |                 |
 | 38       | I2S_DIN      | 20         | 328        |                 |
 | 39       | GND          |            |            |                 |

@@ -55,7 +55,7 @@ Note that there is an enum to use wiringPi style numbers.
 | 8           | P1-08        | UART TX     | 14         | UART0                |
 | 9           | P1-09        | GND         |            |                      |
 | 10          | P1-10        | UART RX     | 15         | UART0                |
-| 11          | P1-11        | GPIO(17)    | 17         |                      |
+| 11          | P1-11        | UART_RTS    | 17         | UART0                |
 | 12          | P1-12        | I2S CLK     | 18         |                      |
 | 13          | P1-13        | GPIO(27)    | 27         |                      |
 | 14          | P1-14        | GND         |            |                      |
@@ -80,7 +80,7 @@ Note that there is an enum to use wiringPi style numbers.
 | 33          | P1-33        | PWM1        | 13         | PWM1                 |
 | 34          | P1-34        | GND         |            |                      |
 | 35          | P1-35        | I2S FRM     | 19         |                      |
-| 36          | P1-36        | GPIO(16)    | 16         |                      |
+| 36          | P1-36        | UART_CTS    | 16         | UART0                |
 | 37          | P1-37        | GPIO(26)    | 26         |                      |
 | 38          | P1-38        | I2S DIN     | 20         |                      |
 | 39          | P1-39        | GND         |            |                      |
