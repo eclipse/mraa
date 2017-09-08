@@ -31,6 +31,8 @@
 #include "x86/up.h"
 
 #define PLATFORM_NAME "UP"
+#define PLATFORM_VERSION "1.0.0"
+
 
 static mraa_result_t
 mraa_up_set_pininfo(mraa_board_t* board, int mraa_index, char* name, mraa_pincapabilities_t caps, int sysfs_pin)
@@ -115,6 +117,7 @@ mraa_up_board()
     }
 
     b->platform_name = PLATFORM_NAME;
+    b->platform_version = PLATFORM_VERSION;
     b->phy_pin_count = MRAA_UP_PINCOUNT;
     b->gpio_count = MRAA_UP_GPIOCOUNT;
 
