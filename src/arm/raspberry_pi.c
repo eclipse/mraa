@@ -159,7 +159,7 @@ mmap_regs()
 {
     // Already mapped!
     if (clk_reg || gpio_reg || pwm_reg) {
-        return;
+        return 0;
     }
 
     clk_reg = mmap_reg_addr(peripheral_base + CLOCK_OFFSET);
