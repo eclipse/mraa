@@ -97,6 +97,9 @@ mraa_up2_get_pin_index(mraa_board_t* board, char* name, int* pin_index)
             return MRAA_SUCCESS;
         }
     }
+
+    syslog(LOG_CRIT, "up2: Failed to find pin name %s", name);
+
     return MRAA_ERROR_INVALID_RESOURCE;
 }
 
@@ -128,15 +131,15 @@ mraa_up2_board()
     mraa_up2_set_pininfo(b, 0, "INVALID",    (mraa_pincapabilities_t) {0, 0, 0, 0, 0, 0, 0, 0}, -1);
     mraa_up2_set_pininfo(b, 1, "3.3v",       (mraa_pincapabilities_t) {0, 0, 0, 0, 0, 0, 0, 0}, -1);
     mraa_up2_set_pininfo(b, 2, "5v",         (mraa_pincapabilities_t) {0, 0, 0, 0, 0, 0, 0, 0}, -1);
-    mraa_up2_set_pininfo(b, 3, "I2C1_SDA",   (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 1, 0, 0}, MRAA_UP2_NORTH_BASE + 28);
+    mraa_up2_set_pininfo(b, 3, "I2C_SDA",    (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 1, 0, 0}, MRAA_UP2_NORTH_BASE + 28);
     mraa_up2_set_pininfo(b, 4, "5v",         (mraa_pincapabilities_t) {0, 0, 0, 0, 0, 0, 0, 0}, -1);
-    mraa_up2_set_pininfo(b, 5, "I2C1_SCL",   (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 1, 0, 0}, MRAA_UP2_NORTH_BASE + 29);
+    mraa_up2_set_pininfo(b, 5, "I2C_SCL",    (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 1, 0, 0}, MRAA_UP2_NORTH_BASE + 29);
     mraa_up2_set_pininfo(b, 6, "GND",        (mraa_pincapabilities_t) {0, 0, 0, 0, 0, 0, 0, 0}, -1);
     mraa_up2_set_pininfo(b, 7, "GPIO4",      (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 0}, MRAA_UP2_NORTHWEST_BASE + 76);
     mraa_up2_set_pininfo(b, 8, "UART1_TX",   (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 1}, MRAA_UP2_NORTH_BASE + 43);
     mraa_up2_set_pininfo(b, 9, "GND",        (mraa_pincapabilities_t) {0, 0, 0, 0, 0, 0, 0, 0}, -1);
-    mraa_up2_set_pininfo(b, 10, "UART1_RX",  (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 1}, MRAA_UP2_NORTH_BASE + 42);
-    mraa_up2_set_pininfo(b, 11, "UART1_RTS", (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 1}, MRAA_UP2_NORTH_BASE + 44);
+    mraa_up2_set_pininfo(b, 10, "UART_RX",   (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 1}, MRAA_UP2_NORTH_BASE + 42);
+    mraa_up2_set_pininfo(b, 11, "UART_RTS",  (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 1}, MRAA_UP2_NORTH_BASE + 44);
     mraa_up2_set_pininfo(b, 12, "I2S_CLK",   (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 0}, MRAA_UP2_WEST_BASE + 16);
     mraa_up2_set_pininfo(b, 13, "GPIO27",    (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 0}, MRAA_UP2_NORTHWEST_BASE + 75);
     mraa_up2_set_pininfo(b, 14, "GND",       (mraa_pincapabilities_t) {0, 0, 0, 0, 0, 0, 0, 0}, -1);
@@ -152,8 +155,8 @@ mraa_up2_board()
     mraa_up2_set_pininfo(b, 24, "SPI0_CS0",  (mraa_pincapabilities_t) {1, 1, 0, 0, 1, 0, 0, 0}, MRAA_UP2_NORTHWEST_BASE + 62);
     mraa_up2_set_pininfo(b, 25, "GND",       (mraa_pincapabilities_t) {0, 0, 0, 0, 0, 0, 0, 0}, -1);
     mraa_up2_set_pininfo(b, 26, "SPI0_CS1",  (mraa_pincapabilities_t) {1, 1, 0, 0, 1, 0, 0, 0}, MRAA_UP2_NORTHWEST_BASE + 63);
-    mraa_up2_set_pininfo(b, 27, "I2C0_SDA",  (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 1, 0, 0}, MRAA_UP2_NORTH_BASE + 30);
-    mraa_up2_set_pininfo(b, 28, "I2C0_SCL",  (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 1, 0, 0}, MRAA_UP2_NORTH_BASE + 31);
+    mraa_up2_set_pininfo(b, 27, "ID_SD",     (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 1, 0, 0}, MRAA_UP2_NORTH_BASE + 30);
+    mraa_up2_set_pininfo(b, 28, "ID_SC",     (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 1, 0, 0}, MRAA_UP2_NORTH_BASE + 31);
     mraa_up2_set_pininfo(b, 29, "GPIO5",     (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 0}, MRAA_UP2_NORTHWEST_BASE + 73);
     mraa_up2_set_pininfo(b, 30, "GND",       (mraa_pincapabilities_t) {0, 0, 0, 0, 0, 0, 0, 0}, -1);
     mraa_up2_set_pininfo(b, 31, "GPIO6",     (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 0}, MRAA_UP2_NORTHWEST_BASE + 47);
@@ -161,7 +164,7 @@ mraa_up2_board()
     mraa_up2_set_pininfo(b, 33, "PWM1",      (mraa_pincapabilities_t) {1, 1, 1, 0, 0, 0, 0, 0}, MRAA_UP2_NORTH_BASE + 35);
     mraa_up2_set_pininfo(b, 34, "GND",       (mraa_pincapabilities_t) {0, 0, 0, 0, 0, 0, 0, 0}, -1);
     mraa_up2_set_pininfo(b, 35, "I2S_FRM",   (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 0}, MRAA_UP2_WEST_BASE + 17);
-    mraa_up2_set_pininfo(b, 36, "UART1_CTS", (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 1}, MRAA_UP2_NORTH_BASE + 45);
+    mraa_up2_set_pininfo(b, 36, "UART_CTS",  (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 1}, MRAA_UP2_NORTH_BASE + 45);
     mraa_up2_set_pininfo(b, 37, "GPIO26",    (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 0}, MRAA_UP2_NORTHWEST_BASE + 46);
     mraa_up2_set_pininfo(b, 38, "I2S_DIN",   (mraa_pincapabilities_t) {1, 1, 0, 0, 0, 0, 0, 0}, MRAA_UP2_WEST_BASE + 18);
     mraa_up2_set_pininfo(b, 39, "GND",       (mraa_pincapabilities_t) {0, 0, 0, 0, 0, 0, 0, 0}, -1);
@@ -177,8 +180,8 @@ mraa_up2_board()
     if (i2c_bus_num != -1) {
         int i = b->i2c_bus_count;
         b->i2c_bus[i].bus_id = i2c_bus_num;
-        mraa_up2_get_pin_index(b, "I2C1_SDA", &(b->i2c_bus[i].sda));
-        mraa_up2_get_pin_index(b, "I2C1_SCL", &(b->i2c_bus[i].scl));
+        mraa_up2_get_pin_index(b, "I2C_SDA", &(b->i2c_bus[i].sda));
+        mraa_up2_get_pin_index(b, "I2C_SCL", &(b->i2c_bus[i].scl));
         b->i2c_bus_count++;
     }
 
@@ -188,8 +191,8 @@ mraa_up2_board()
     if (i2c_bus_num != -1) {
         int i = b->i2c_bus_count;
         b->i2c_bus[i].bus_id = i2c_bus_num;
-        mraa_up2_get_pin_index(b, "I2C0_SDA", &(b->i2c_bus[i].sda));
-        mraa_up2_get_pin_index(b, "I2C0_SCL", &(b->i2c_bus[i].scl));
+        mraa_up2_get_pin_index(b, "ID_SD", &(b->i2c_bus[i].sda));
+        mraa_up2_get_pin_index(b, "ID_SC", &(b->i2c_bus[i].scl));
         b->i2c_bus_count++;
     }
 
@@ -233,18 +236,16 @@ mraa_up2_board()
     mraa_up2_get_pin_index(b, "SPI0_CLK",  &(b->spi_bus[1].sclk));
     b->spi_bus_count++;
 
-    // FIXME: add spi2 when we change pinout
-
     // Configure UART
     b->uart_dev_count = 0;
     b->def_uart_dev = 0;
     b->uart_dev[0].device_path = "/dev/ttyS1";
 
     // Configure UART #1 (default)
-    mraa_up2_get_pin_index(b, "UART1_RX", &(b->uart_dev[0].rx));
-    mraa_up2_get_pin_index(b, "UART1_TX", &(b->uart_dev[0].tx));
-    mraa_up2_get_pin_index(b, "UART1_CTS", &(b->uart_dev[0].cts));
-    mraa_up2_get_pin_index(b, "UART1_RTS", &(b->uart_dev[0].rts));
+    mraa_up2_get_pin_index(b, "UART_RX", &(b->uart_dev[0].rx));
+    mraa_up2_get_pin_index(b, "UART_TX", &(b->uart_dev[0].tx));
+    mraa_up2_get_pin_index(b, "UART_CTS", &(b->uart_dev[0].cts));
+    mraa_up2_get_pin_index(b, "UART_RTS", &(b->uart_dev[0].rts));
     b->uart_dev_count++;
 
     // Configure ADCs
