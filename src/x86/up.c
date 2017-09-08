@@ -177,20 +177,31 @@ mraa_up_board()
     mraa_up_set_pininfo(b, 40, "I2S_DOUT", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 21);
 
     // Set number of i2c adaptors usable from userspace
-    b->i2c_bus_count = 2;
+    b->i2c_bus_count = 0;
+    b->def_i2c_bus = 0;
+    int i2c_bus_num;
 
     // Configure i2c adaptor #0 (default)
     // (For consistency with Raspberry Pi 2, use I2C1 as our primary I2C bus)
-    b->i2c_bus[0].bus_id = 1;
-    mraa_up_get_pin_index(b, "I2C1_SDA", (int*) &(b->i2c_bus[0].sda));
-    mraa_up_get_pin_index(b, "I2C1_SCL", (int*) &(b->i2c_bus[0].scl));
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "808622C1:01", ".");
+    if (i2c_bus_num != -1) {
+        int i = b->i2c_bus_count;
+        b->i2c_bus[i].bus_id = i2c_bus_num;
+        mraa_up_get_pin_index(b, "I2C1_SDA", (int*) &(b->i2c_bus[0].sda));
+        mraa_up_get_pin_index(b, "I2C1_SCL", (int*) &(b->i2c_bus[0].scl));
+        b->i2c_bus_count++;
+    }
 
     // Configure i2c adaptor #1
     // (normally reserved for accessing HAT EEPROM)
-    b->i2c_bus[1].bus_id = 0;
-    mraa_up_get_pin_index(b, "I2C0_SDA", (int*) &(b->i2c_bus[1].sda));
-    mraa_up_get_pin_index(b, "I2C0_SCL", (int*) &(b->i2c_bus[1].scl));
-    b->def_i2c_bus = 0;
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "808622C1:00", ".");
+    if (i2c_bus_num != -1) {
+        int i = b->i2c_bus_count;
+        b->i2c_bus[i].bus_id = i2c_bus_num;
+        mraa_up_get_pin_index(b, "I2C0_SDA", (int*) &(b->i2c_bus[1].sda));
+        mraa_up_get_pin_index(b, "I2C0_SCL", (int*) &(b->i2c_bus[1].scl));
+        b->i2c_bus_count++;
+    }
 
     // Configure PWM
     b->pwm_default_period = 500;
