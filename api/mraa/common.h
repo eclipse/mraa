@@ -360,11 +360,11 @@ int mraa_get_sub_platform_index(int pin_or_bus_id);
  * Add mraa subplatform
  *
  * @param subplatformtype subplatform type
- * @param uart_dev uart device subplatform is on
+ * @param dev uart device or i2c bus subplatform is on 
  *
  * @return mraa_result_t indicating success
  */
-mraa_result_t mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev);
+mraa_result_t mraa_add_subplatform(mraa_platform_t subplatformtype, const char* dev);
 
 /**
  * Remove a mraa subplatform
