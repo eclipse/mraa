@@ -109,7 +109,7 @@ add_custom_command (TARGET npmpkg POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy
 add_dependencies (npmpkg mraajs)
 
 if (BUILDDOC)
-  find_package(Yuidoc)
+  find_package(Yuidoc 0.10.2 REQUIRED)
   if (YUIDOC_FOUND)
     add_custom_target(jsdoc ALL
       COMMAND ${CMAKE_SOURCE_DIR}/doxygen2jsdoc/docgen.js -m mraa -i xml/ -o jsdoc -c ${CMAKE_CURRENT_SOURCE_DIR}/doxygen2jsdoc_custom.json --strict

@@ -1,5 +1,5 @@
 if (DOXYGEN_FOUND)
-  find_package (Sphinx)
+  find_package (Sphinx 1.3.6 REQUIRED)
   if (SPHINX_FOUND)
     if (NOT DEFINED SPHINX_THEME)
       set (SPHINX_THEME default)
