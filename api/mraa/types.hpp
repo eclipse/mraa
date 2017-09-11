@@ -58,12 +58,12 @@ typedef enum {
 
     FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 
+    GROVEPI = 1024,            /**< GrovePi shield i2c bridge */
     GENERIC_FIRMATA = 1280,    /**< Firmata uart platform/bridge */
 
     ANDROID_PERIPHERALMANAGER = 95, /**< Android Things peripheral manager platform */
     NULL_PLATFORM = 98,
-    UNKNOWN_PLATFORM =
-    99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
+    UNKNOWN_PLATFORM = 99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
 } Platform;
 
 /**
