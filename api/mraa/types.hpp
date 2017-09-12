@@ -59,6 +59,8 @@ typedef enum {
     FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 
     GENERIC_FIRMATA = 1280,    /**< Firmata uart platform/bridge */
+    BLE_FIRMATA_BY_NAME = 1281,    /**< Firmata ble platform by name */
+    BLE_FIRMATA_BY_ADDRESS = 1282, /**< Firmata ble platform by address */
 
     ANDROID_PERIPHERALMANAGER = 95, /**< Android Things peripheral manager platform */
     NULL_PLATFORM = 98,

@@ -1268,7 +1268,7 @@ mraa_get_iio_device_count()
 }
 
 mraa_result_t
-mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
+mraa_add_subplatform(mraa_platform_t subplatformtype, const char* dev)
 {
 #if defined(FIRMATA)
     if (subplatformtype == MRAA_GENERIC_FIRMATA) {
@@ -1280,10 +1280,29 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
             syslog(LOG_NOTICE, "mraa: We don't support multiple firmata subplatforms!");
             return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
         }
-        if (mraa_firmata_platform(plat, uart_dev) == MRAA_GENERIC_FIRMATA) {
+        if (mraa_firmata_platform(plat, dev, MRAA_GENERIC_FIRMATA) == MRAA_GENERIC_FIRMATA) {
             syslog(LOG_NOTICE, "mraa: Added firmata subplatform");
             return MRAA_SUCCESS;
         }
+
+    } else if (subplatformtype == MRAA_BLE_FIRMATA_BY_NAME) {
+        if (plat->sub_platform != NULL) {
+            return MRAA_ERROR_INVALID_PARAMETER;
+        }
+        if (mraa_firmata_platform(plat, dev, MRAA_BLE_FIRMATA_BY_NAME) == MRAA_BLE_FIRMATA_BY_NAME) {
+            syslog(LOG_NOTICE, "mraa: Added firmata ble subplatform by name");
+            return MRAA_SUCCESS;
+        }
+        syslog(LOG_NOTICE, "mraa: Failed to add firmata ble subplatform by name");
+    } else if (subplatformtype == MRAA_BLE_FIRMATA_BY_ADDRESS) {
+        if (plat->sub_platform != NULL) {
+            return MRAA_ERROR_INVALID_PARAMETER;
+        }
+        if (mraa_firmata_platform(plat, dev, MRAA_BLE_FIRMATA_BY_ADDRESS) == MRAA_BLE_FIRMATA_BY_ADDRESS) {
+            syslog(LOG_NOTICE, "mraa: Added firmata ble subplatform by address");
+            return MRAA_SUCCESS;
+        }
+        syslog(LOG_NOTICE, "mraa: Failed to add firmata ble subplatform by address");
     }
 #else
     if (subplatformtype == MRAA_GENERIC_FIRMATA) {

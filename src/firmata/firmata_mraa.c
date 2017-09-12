@@ -51,7 +51,7 @@ mraa_firmata_init(int feature)
 mraa_result_t
 mraa_firmata_write_sysex(mraa_firmata_context dev, char* msg, int length)
 {
-    return mraa_uart_write(firmata_dev->uart, msg, length);
+    return firmata_write_internal(firmata_dev, msg, length);
 }
 
 mraa_result_t
@@ -59,7 +59,7 @@ mraa_firmata_response(mraa_firmata_context dev, void (*fptr)(uint8_t*, int))
 {
     if (dev->added == 0) {
         struct _firmata** ptr;
-        ptr = realloc(firmata_dev->devs, (firmata_dev->dev_count+1) * sizeof(struct _firmata*));
+        ptr = realloc(firmata_dev->devs, (firmata_dev->dev_count + 1) * sizeof(struct _firmata*));
         if (ptr == NULL) {
             return MRAA_ERROR_NO_RESOURCES;
         }
@@ -98,7 +98,7 @@ mraa_firmata_i2c_init_bus_replace(mraa_i2c_context dev)
     buff[1] = FIRMATA_I2C_CONFIG;
     buff[2] = delay & 0xFF, (delay >> 8) & 0xFF;
     buff[3] = FIRMATA_END_SYSEX;
-    mraa_uart_write(firmata_dev->uart, buff, 4);
+    firmata_write_internal(firmata_dev, buff, 4);
 
     return MRAA_SUCCESS;
 }
@@ -135,7 +135,7 @@ mraa_firmata_send_i2c_read_req(mraa_i2c_context dev, int length)
     buffer[5] = (length >> 7) & 0x7f;
     buffer[6] = FIRMATA_END_SYSEX;
 
-    if (mraa_uart_write(firmata_dev->uart, buffer, 7) != 7) {
+    if (firmata_write_internal(firmata_dev, buffer, 7) != 7) {
         free(buffer);
         return MRAA_ERROR_UNSPECIFIED;
     }
@@ -167,7 +167,7 @@ mraa_firmata_send_i2c_read_reg_req(mraa_i2c_context dev, uint8_t command, int le
     buffer[7] = (length >> 7) & 0x7f;
     buffer[8] = FIRMATA_END_SYSEX;
 
-    if (mraa_uart_write(firmata_dev->uart, buffer, 9) != 9) {
+    if (firmata_write_internal(firmata_dev, buffer, 9) != 9) {
         free(buffer);
         return MRAA_ERROR_UNSPECIFIED;
     }
@@ -297,7 +297,7 @@ mraa_firmata_i2c_write(mraa_i2c_context dev, const uint8_t* data, int bytesToWri
         ii = ii+2;
     }
     buffer[buffer_size-1] = FIRMATA_END_SYSEX;
-    mraa_uart_write(firmata_dev->uart, buffer, buffer_size);
+    firmata_write_internal(firmata_dev, buffer, buffer_size);
     free(buffer);
     return MRAA_SUCCESS;
 }
@@ -316,7 +316,7 @@ mraa_firmata_i2c_write_byte(mraa_i2c_context dev, uint8_t data)
     buffer[4] = data & 0x7F;
     buffer[5] = (data >> 7) & 0x7F;
     buffer[6] = FIRMATA_END_SYSEX;
-    mraa_uart_write(firmata_dev->uart, buffer, 7);
+    firmata_write_internal(firmata_dev, buffer, 7);
     free(buffer);
     return MRAA_SUCCESS;
 }
@@ -337,7 +337,7 @@ mraa_firmata_i2c_write_byte_data(mraa_i2c_context dev, const uint8_t data, const
     buffer[6] = data & 0x7F;
     buffer[7] = (data >> 7) & 0x7F;
     buffer[8] = FIRMATA_END_SYSEX;
-    mraa_uart_write(firmata_dev->uart, buffer, 9);
+    firmata_write_internal(firmata_dev, buffer, 9);
     free(buffer);
     return MRAA_SUCCESS;
 }
@@ -550,20 +550,21 @@ mraa_firmata_pull_handler(void* vp)
 }
 
 mraa_board_t*
-mraa_firmata_plat_init(const char* uart_dev)
+mraa_firmata_plat_init(const char* uart_dev, mraa_platform_t type)
 {
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
         return NULL;
     }
 
-    firmata_dev = firmata_new(uart_dev);
-    if (firmata_dev == NULL) {
-        syslog(LOG_WARNING, "firmata: Failed to open uart to Firmata dev on %s", uart_dev);
-        fprintf(stderr, "Mraa expected to find a Firmata device on %s, is the port in use?\n", uart_dev);
-        free(b);
-        return NULL;
-    }
+    if (type == MRAA_GENERIC_FIRMATA) {
+        firmata_dev = firmata_new(uart_dev);
+        if (firmata_dev == NULL) {
+            syslog(LOG_WARNING, "firmata: Failed to open uart to Firmata dev on %s", uart_dev);
+            fprintf(stderr, "Mraa expected to find a Firmata device on %s, is the port in use?\n", uart_dev);
+            free(b);
+            return NULL;
+        }
 
     // if this isn't working then we have an issue with our uart
     int retry = 20;
@@ -571,14 +572,23 @@ mraa_firmata_plat_init(const char* uart_dev)
        firmata_pull(firmata_dev);
     }
 
-    if (!retry) {
-        syslog(LOG_ERR, "firmata: Failed to find a valid Firmata board on %s", uart_dev);
-        firmata_close(firmata_dev);
-        free(b);
-	return NULL;
+        pthread_create(&thread_id, NULL, mraa_firmata_pull_handler, NULL);
     }
 
-    pthread_create(&thread_id, NULL, mraa_firmata_pull_handler, NULL);
+    else if (type == MRAA_BLE_FIRMATA_BY_NAME || type == MRAA_BLE_FIRMATA_BY_ADDRESS) {
+#ifndef FIRMATABLE
+        return NULL;
+#endif
+        firmata_dev = firmata_ble_new(uart_dev, type);
+        if (firmata_dev == NULL) {
+            syslog(LOG_WARNING, "firmata: Failed to open ble to Firmata dev on %s", uart_dev);
+            fprintf(stderr, "Mraa expected to find a Firmata ble device named %s, is the device "
+                            "available?\n",
+                    uart_dev);
+            free(b);
+            return NULL;
+        }
+    }
 
     b->platform_name = "firmata";
     // do we support 2.5? Or are we more 2.3?
@@ -711,7 +721,7 @@ mraa_firmata_plat_init(const char* uart_dev)
 }
 
 mraa_platform_t
-mraa_firmata_platform(mraa_board_t* board, const char* uart_dev)
+mraa_firmata_platform(mraa_board_t* board, const char* uart_dev, mraa_platform_t type)
 {
     /**
      * Firmata boards are not something we can detect so we just trust the user
@@ -720,9 +730,9 @@ mraa_firmata_platform(mraa_board_t* board, const char* uart_dev)
      */
     mraa_board_t* sub_plat = NULL;
 
-    sub_plat = mraa_firmata_plat_init(uart_dev);
+    sub_plat = mraa_firmata_plat_init(uart_dev, type);
     if (sub_plat != NULL) {
-        sub_plat->platform_type = MRAA_GENERIC_FIRMATA;
+        sub_plat->platform_type = type;
         board->sub_platform = sub_plat;
         return sub_plat->platform_type;
     }
