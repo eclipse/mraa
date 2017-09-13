@@ -1,6 +1,6 @@
 UP Squared  Board   {#up2}
 ================================
-UP Squared is based on the Intel&reg; Celeron&trade; N3350 or the Intel&reg; Pentium&trade; N4200, formerly Skylake&trade;.
+UP Squared is based on the Intel&reg; Celeron&trade; N3350 or the Intel&reg; Pentium&trade; N4200, formerly ApolloLake&trade;.
 
 For the full specification please refer to the main specification page here:
 
@@ -12,21 +12,23 @@ The Up Squared present one Raspberry Pi compatible HAT connector and a  60 pin e
 
 **I2C**
  - 2 channels
- - support: standard-mode (100kHz), fast-mode (400kHz) , Fast-mode plus (1MHz), High-speed mode (3.4MHz)
- - bus frequency can be selected in BIOS settings.
- - the default i2c channel is the one connected to the pin 3,5 of the hat
+ - Support: standard-mode (100kHz), fast-mode (400kHz), Fast-mode plus (1MHz), High-speed mode (3.4MHz)
+ - Bus frequency can be selected in BIOS settings
+ - The default i2c channel is the one connected to the pin 3,5 of the hat
+ - On some OSes the i2c-dev kernel module may need to be loaded manually to export the i2c device nodes
 
 **SPI**
-- Bus frequencies up to 10MHz are supported.
-- 3 chip-selects.
+ - Bus frequencies up to 10MHz are supported
+ - 3 chip-selects
+ - To enable SPI device nodes the ACPI tables need to be overwritten as explained [here](https://up-community.org/wiki/Pinout_UP2#SPI_Ports)
 
 **PWM**
- - up to 3 channel of PWM
+ - Up to 3 channel of PWM
 
 **UART**
-- 1 high-speed UART is available
-- supporting baud rates up to 3686400 baud.
-- Hardware flow-control signals are available on pins 11/36 (RTS/CTS).
+ - 1 high-speed UART is available
+ - Supporting baud rates up to 3686400 baud
+ - Hardware flow-control signals are available on pins 11/36 (RTS/CTS)
 
 Please note that a kernel with UP board support is required to enable the I/O
 interfaces above.
