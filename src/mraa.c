@@ -55,6 +55,7 @@
 
 #include "mraa_internal.h"
 #include "firmata/firmata_mraa.h"
+#include "grovepi/grovepi.h"
 #include "gpio.h"
 #include "version.h"
 #include "i2c.h"
@@ -1268,7 +1269,7 @@ mraa_get_iio_device_count()
 }
 
 mraa_result_t
-mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
+mraa_add_subplatform(mraa_platform_t subplatformtype, const char* dev)
 {
 #if defined(FIRMATA)
     if (subplatformtype == MRAA_GENERIC_FIRMATA) {
@@ -1280,7 +1281,7 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
             syslog(LOG_NOTICE, "mraa: We don't support multiple firmata subplatforms!");
             return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
         }
-        if (mraa_firmata_platform(plat, uart_dev) == MRAA_GENERIC_FIRMATA) {
+        if (mraa_firmata_platform(plat, dev) == MRAA_GENERIC_FIRMATA) {
             syslog(LOG_NOTICE, "mraa: Added firmata subplatform");
             return MRAA_SUCCESS;
         }
@@ -1291,14 +1292,33 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* uart_dev)
     }
 #endif
 
+    if (subplatformtype == MRAA_GROVEPI) {
+        if (plat == NULL || plat->platform_type == MRAA_UNKNOWN_PLATFORM || plat->i2c_bus_count == 0) {
+            syslog(LOG_NOTICE, "mraa: The GrovePi shield is not supported on this platform!");
+            return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+        }
+        if (plat->sub_platform != NULL) {
+            syslog(LOG_NOTICE, "mraa: A subplatform was already added!");
+            return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+        }
+        int i2c_bus;
+        if(mraa_atoi(strdup(dev), &i2c_bus) != MRAA_SUCCESS && i2c_bus < plat->i2c_bus_count) {
+            syslog(LOG_NOTICE, "mraa: Cannot add GrovePi subplatform, invalid i2c bus specified");
+            return MRAA_ERROR_INVALID_PARAMETER;
+        }
+        if (mraa_grovepi_platform(plat, i2c_bus) == MRAA_GROVEPI) {
+            syslog(LOG_NOTICE, "mraa: Added GrovePi subplatform");
+            return MRAA_SUCCESS;
+        }
+    }
+
     return MRAA_ERROR_INVALID_PARAMETER;
 }
 
 mraa_result_t
 mraa_remove_subplatform(mraa_platform_t subplatformtype)
 {
-#if defined(FIRMATA)
-    if (subplatformtype == MRAA_GENERIC_FIRMATA) {
+    if (subplatformtype != MRAA_FTDI_FT4222) {
         if (plat == NULL || plat->sub_platform == NULL) {
             return MRAA_ERROR_INVALID_PARAMETER;
         }
@@ -1307,7 +1327,6 @@ mraa_remove_subplatform(mraa_platform_t subplatformtype)
         free(plat->sub_platform);
         return MRAA_SUCCESS;
     }
-#endif
     return MRAA_ERROR_INVALID_PARAMETER;
 }
 

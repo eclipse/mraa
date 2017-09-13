@@ -4,6 +4,8 @@ set (mraa_LIB_INCLUDE_DIRS
   ${PROJECT_SOURCE_DIR}/include
 )
 
+add_subdirectory (grovepi)
+
 if (FIRMATA)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFIRMATA=1")
   add_subdirectory (firmata)

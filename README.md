@@ -50,6 +50,10 @@ USB
 * [FT4222](../master/docs/ftdi_ft4222.md)
 * [Firmata](../master/docs/firmata.md)
 
+I2C
+---
+* [GrovePi](../master/docs/grovepi.md)
+
 Mock
 ----
 * [Generic simulated board](../master/docs/mock.md)
