@@ -31,6 +31,57 @@
 static mraa_i2c_context grovepi_bus;
 static int pwm_cache[10];
 
+static int
+mraa_grovepi_read_internal(int function, int pin)
+{
+    uint8_t data[5];
+    uint8_t result[3];
+    data[0] = GROVEPI_REGISTER;
+    data[1] = function;
+    data[2] = pin;
+    data[3] = 0;
+    data[4] = 0;
+    if (mraa_i2c_write(grovepi_bus, data, 5) != MRAA_SUCCESS) {
+        syslog(LOG_WARNING, "grovepi: failed to write command to i2c bus /dev/i2c-%d", grovepi_bus->busnum);
+        return -1;
+    }
+    if (mraa_i2c_write_byte(grovepi_bus, 1) != MRAA_SUCCESS) {
+        syslog(LOG_WARNING, "grovepi: failed to write to i2c bus /dev/i2c-%d", grovepi_bus->busnum);
+        return -1;
+    }
+    if (function == GROVEPI_GPIO_READ) {
+        if (mraa_i2c_read(grovepi_bus, result, 1) != 1) {
+            syslog(LOG_WARNING, "grovepi: failed to read result from i2c bus /dev/i2c-%d", grovepi_bus->busnum);
+            return -1;
+        }
+        return result[0];
+    }
+    if (function == GROVEPI_AIO_READ) {
+        if (mraa_i2c_read(grovepi_bus, result, 3) != 3) {
+            syslog(LOG_WARNING, "grovepi: failed to read result from i2c bus /dev/i2c-%d", grovepi_bus->busnum);
+            return -1;
+        }
+        return (result[1] << 8) | result [2];
+    }
+    return -1;
+}
+
+static mraa_result_t
+mraa_grovepi_write_internal(int function, int pin, int value)
+{
+    uint8_t data[5];
+    data[0] = GROVEPI_REGISTER;
+    data[1] = function;
+    data[2] = pin;
+    data[3] = value;
+    data[4] = 0;
+    if (mraa_i2c_write(grovepi_bus, data, 5) != MRAA_SUCCESS) {
+        syslog(LOG_WARNING, "grovepi: failed to write command to i2c bus /dev/i2c-%d", grovepi_bus->busnum);
+        return MRAA_ERROR_UNSPECIFIED;
+    }
+    return MRAA_SUCCESS;
+}
+
 static mraa_result_t
 mraa_grovepi_aio_init_internal_replace(mraa_aio_context dev, int aio)
 {
@@ -41,16 +92,7 @@ mraa_grovepi_aio_init_internal_replace(mraa_aio_context dev, int aio)
 static int
 mraa_grovepi_aio_read_replace(mraa_aio_context dev)
 {
-    uint8_t data[5], result[3];
-    data[0] = GROVEPI_REGISTER;
-    data[1] = GROVEPI_AIO_READ;
-    data[2] = dev->channel;
-    data[3] = 0;
-    data[4] = 0;
-    mraa_i2c_write(grovepi_bus, data, 5);
-    mraa_i2c_write_byte(grovepi_bus, 1);
-    mraa_i2c_read(grovepi_bus, result, 3);
-    return (result[1] << 8) | result [2];
+    return mraa_grovepi_read_internal(GROVEPI_AIO_READ, dev->channel);
 }
 
 static mraa_result_t
@@ -65,28 +107,13 @@ mraa_grovepi_gpio_init_internal_replace(mraa_gpio_context dev, int pin)
 static int
 mraa_grovepi_gpio_read_replace(mraa_gpio_context dev)
 {
-    uint8_t data[5];
-    data[0] = GROVEPI_REGISTER;
-    data[1] = GROVEPI_GPIO_READ;
-    data[2] = dev->pin;
-    data[3] = 0;
-    data[4] = 0;
-    mraa_i2c_write(grovepi_bus, data, 5);
-    mraa_i2c_write_byte(grovepi_bus, 1);
-    return mraa_i2c_read_byte(grovepi_bus);
+    return mraa_grovepi_read_internal(GROVEPI_GPIO_READ, dev->pin);
 }
 
 static mraa_result_t
 mraa_grovepi_gpio_write_replace(mraa_gpio_context dev, int write_value)
 {
-    uint8_t data[5];
-    data[0] = GROVEPI_REGISTER;
-    data[1] = GROVEPI_GPIO_WRITE;
-    data[2] = dev->pin;
-    data[3] = write_value;
-    data[4] = 0;
-    mraa_i2c_write(grovepi_bus, data, 5);
-    return MRAA_SUCCESS;
+    return mraa_grovepi_write_internal(GROVEPI_GPIO_WRITE, dev->pin, write_value);
 }
 
 static mraa_result_t
@@ -127,15 +154,8 @@ static mraa_result_t
 mraa_grovepi_pwm_write_replace(mraa_pwm_context dev, float percentage)
 {
     int value = (int)((percentage - 1) / 8000);
-    uint8_t data[5];
-    data[0] = GROVEPI_REGISTER;
-    data[1] = GROVEPI_PWM;
-    data[2] = dev->pin;
-    data[3] = value;
-    data[4] = 0;
-    mraa_i2c_write(grovepi_bus, data, 5);
     pwm_cache[dev->pin] = value;
-    return MRAA_SUCCESS;
+    return mraa_grovepi_write_internal(GROVEPI_PWM, dev->pin, value);
 }
 
 static float
@@ -150,23 +170,11 @@ mraa_grovepi_pwm_read_replace(mraa_pwm_context dev)
 static mraa_result_t
 mraa_grovepi_pwm_enable_replace(mraa_pwm_context dev, int enable)
 {
-    uint8_t data[5];
     if(!enable) {
-        data[0] = GROVEPI_REGISTER;
-        data[1] = GROVEPI_GPIO_WRITE;
-        data[2] = dev->pin;
-        data[3] = 0;
-        data[4] = 0;
-        mraa_i2c_write(grovepi_bus, data, 5);
+        return mraa_grovepi_write_internal(GROVEPI_GPIO_WRITE, dev->pin, 0);
     } else {
-        data[0] = GROVEPI_REGISTER;
-        data[1] = GROVEPI_PWM;
-        data[2] = dev->pin;
-        data[3] = pwm_cache[dev->pin];
-        data[4] = 0;
-        mraa_i2c_write(grovepi_bus, data, 5);
+        return mraa_grovepi_write_internal(GROVEPI_PWM, dev->pin, pwm_cache[dev->pin]);
     }
-    return MRAA_SUCCESS;
 }
 
 static mraa_result_t
@@ -265,6 +273,7 @@ mraa_grovepi_platform(mraa_board_t* board, const int i2c_bus)
     b->adv_func->gpio_init_internal_replace = &mraa_grovepi_gpio_init_internal_replace;
     b->adv_func->gpio_mode_replace = &mraa_grovepi_gpio_mode_replace;
     b->adv_func->gpio_dir_replace = &mraa_grovepi_gpio_dir_replace;
+    //TODO: add interrupt support
     //b->adv_func->gpio_edge_mode_replace = &mraa_grovepi_gpio_edge_mode_replace;
     //b->adv_func->gpio_interrupt_handler_init_replace = &mraa_grovepi_gpio_interrupt_handler_init_replace;
     //b->adv_func->gpio_wait_interrupt_replace = &mraa_grovepi_gpio_wait_interrupt_replace;
