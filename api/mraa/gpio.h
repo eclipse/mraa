@@ -194,8 +194,6 @@ mraa_result_t mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir);
  */
 mraa_result_t mraa_gpio_close(mraa_gpio_context dev);
 
-mraa_result_t mraa_gpio_close_multiple(mraa_gpio_context dev);
-
 /**
  * Read the Gpio value. This can be 0 or 1. A resonse of -1 means that there
  * was a fatal error.
@@ -231,13 +229,15 @@ mraa_result_t mraa_gpio_write_multiple(mraa_gpio_context dev, int input_values[]
 mraa_result_t mraa_gpio_owner(mraa_gpio_context dev, mraa_boolean_t owner);
 
 /**
- * Enable using memory mapped io instead of sysfs
+ * Enable using memory mapped io instead of sysfs, chardev based I/O can be
+ * considered memorymapped
  *
+ * @deprecated
  * @param dev The Gpio context
  * @param mmap Use mmap instead of sysfs
  * @return Result of operation
  */
-mraa_result_t mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap);
+DEPRECATED mraa_result_t mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap);
 
 /**
  * Get a pin number of the gpio, invalid will return -1
