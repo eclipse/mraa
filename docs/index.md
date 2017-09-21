@@ -51,6 +51,11 @@ Specific platform information for supported platforms is documented here:
 - @ref up2
 - @ref joule
 - @ref ft4222
+- @ref _96boards
+- @ref de10-nano
+- @ref firmata
+- @ref grovepi
+- @ref mock
 
 ## DEBUGGING
 

@@ -99,7 +99,7 @@ sudo zypper in mraa
 Installing for Node.js only
 ---------------------------
 
-> Note: Node.js 7.0.0+ is not supported. You'll have to downgrade to 6.x.x.
+> Note: Node.js 7.0.0+ is not currntly supported. You'll have to downgrade to 6.x.x.
 
 You can also install just the node.js mraa module by using npm. You will need a
 C++ compiler and the node development headers, however it's not required to

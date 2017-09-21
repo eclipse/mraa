@@ -8,8 +8,11 @@ this list as it's the first thing we'll ask you to do.
 
 Getting the exact version of libmraa you're running is really important to us.
 The best way to get this is to call mraa_get_version() or mraa.getVersion(). If
-mraa returns x.x.x-dirty then your version was not built from a git tree or you
-built out of tree (see our building doc) - or you don't have git installed.
+you built from git then please tell us which commit hash you used. Mraa no
+longer tags itself as 'dirty' if built as a non tagged version but simply uses
+the latest version number listed in the top level CMakeLists.txt file. Note
+that you may have to wipe the build/ dir for git sha version to be absolutely
+correct.
 
 ### Finding error logs
 
@@ -22,10 +25,12 @@ systemd likely your log is in /var/log/messages or a similar location.
 
 ### Common errors to check for
 
-* Not running as root
+* Not running as a user with permissions to the physical char devices/files
+  that require access. Check quickly if it works as root and you likely have
+  such an issue. The log file will reflect this
 * Incorrect IO pin numbers, mraa uses physical connector pin numbering see your
   platform documentation for details
-* Your platform is unsupported
+* Your platform is unsupported or has been detected wrongly (logfile will show this)
 * Using the wrong pin, check pin capabilities either using the API or your
   platform documentation
 
