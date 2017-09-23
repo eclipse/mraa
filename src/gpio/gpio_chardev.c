@@ -81,7 +81,7 @@ _mraa_free_gpio_groups(mraa_gpio_context dev)
 }
 
 int
-_mraa__mraa_gpiod_ioctl(int fd, unsigned long gpio_request, void* data)
+_mraa_gpiod_ioctl(int fd, unsigned long gpio_request, void* data)
 {
     int status;
 
