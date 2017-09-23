@@ -155,18 +155,12 @@ struct _gpio {
     AGpio *bgpio;
 #endif
 
-    /* TODO: The below members should be integrated in gpio_group struct. */
-    int dev_fd;
-    int gpiod_handle;
-    unsigned int gpio_chip;
-    unsigned int gpio_line;
-
-    /* Multiple gpio support. These members are treated separately for now until multiple gpio support is accepted. */
-    unsigned int num_chips;
     struct _gpio_group *gpio_group;
-    /* Pin index passed by the user to gpio_group structures. */
+    unsigned int num_chips;
     int *pin_to_gpio_table;
     unsigned int num_pins;
+    mraa_gpio_events_t events;
+    int *provided_pins;
 
     struct _gpio *next;
 };
