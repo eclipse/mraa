@@ -131,7 +131,9 @@ mraa_x86_platform()
     #elif defined(xMRAA_INTEL_DE3815)
     plat = mraa_intel_de3815();
     #elif defined(xMRAA_INTEL_MINNOWBOARD_MAX)
-    plat = mraa_intel_minnowboard_byt_compatible();
+    plat = mraa_intel_minnowboard_byt_compatible(0);
+    #elif defined(xMRAA_INTEL_MINNOWBOARD_TURBOT)
+    plat = mraa_intel_minnowboard_byt_compatible(1);
     #elif defined(xMRAA_INTEL_GALILEO_GEN1)
     plat = mraa_intel_galileo_rev_d();
     #elif defined(xMRAA_INTEL_NUC5)
