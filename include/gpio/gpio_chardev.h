@@ -38,6 +38,8 @@ typedef struct {
 typedef struct gpioline_info mraa_gpiod_line_info;
 
 void _mraa_free_gpio_groups(mraa_gpio_context dev);
+void _mraa_close_gpio_event_handles(mraa_gpio_context dev);
+void _mraa_close_gpio_desc(mraa_gpio_context dev);
 int _mraa_gpiod_ioctl(int fd, unsigned long gpio_request, void* data);
 
 mraa_gpiod_chip_info* mraa_get_chip_info_by_path(const char* path);

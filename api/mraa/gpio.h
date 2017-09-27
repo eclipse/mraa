@@ -104,6 +104,13 @@ typedef enum {
     MRAA_GPIO_PUSH_PULL = 1,  /**< Push Pull Configuration */
 } mraa_gpio_out_driver_mode_t;
 
+typedef struct {
+    int id;
+    long long unsigned int timestamp;
+} mraa_gpio_event;
+
+typedef mraa_gpio_event* mraa_gpio_events_t;
+
 /**
  * Initialise gpio_context, based on board number
  *
@@ -112,7 +119,7 @@ typedef enum {
  */
 mraa_gpio_context mraa_gpio_init(int pin);
 
-mraa_gpio_context mraa_gpio_init_multiple(int pins[], int num_pins);
+mraa_gpio_context mraa_gpio_init_multi(int pins[], int num_pins);
 
 /**
  * Initialise gpio context without any mapping to a pin
@@ -131,7 +138,7 @@ mraa_gpio_context mraa_gpio_init_raw(int gpiopin);
  */
 mraa_result_t mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode);
 
-mraa_result_t mraa_gpio_edge_mode_multiple(mraa_gpio_context dev, mraa_gpio_edge_t mode);
+mraa_result_t mraa_gpio_edge_mode_multi(mraa_gpio_context dev, mraa_gpio_edge_t mode);
 
 /**
  * Set an interrupt on pin
@@ -145,7 +152,15 @@ mraa_result_t mraa_gpio_edge_mode_multiple(mraa_gpio_context dev, mraa_gpio_edge
  */
 mraa_result_t mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t edge, void (*fptr)(void*), void* args);
 
-mraa_result_t mraa_gpio_isr_multiple(mraa_gpio_context dev, mraa_gpio_edge_t edge, void (*fptr)(void*), void* args);
+/**
+ * Get an array of structures describing triggered events.
+ *
+ * @param dev The Gpio context
+ * @return Array of structures containing pairs of pin id's and the associated timestamp.
+ * An event with negative id value indicates that no event was triggered for the respective pin.
+ * The array length is that of the number of pins provided in mraa_gpio_init_multi().
+ */
+mraa_gpio_events_t mraa_gpio_get_events(mraa_gpio_context dev);
 
 /**
  * Stop the current interrupt watcher on this Gpio, and set the Gpio edge mode
@@ -173,8 +188,6 @@ mraa_result_t mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode);
  * @return Result of operation
  */
 mraa_result_t mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir);
-
-mraa_result_t mraa_gpio_dir_multiple(mraa_gpio_context dev, mraa_gpio_dir_t dir);
 
 /**
  * Read Gpio direction
@@ -206,7 +219,7 @@ int mraa_gpio_read(mraa_gpio_context dev);
 /* Values array is provided by user. Must be the same size as the array passed in init.
  * It will be overwritten with the read results.
  */
-mraa_result_t mraa_gpio_read_multiple(mraa_gpio_context dev, int output_values[]);
+mraa_result_t mraa_gpio_read_multi(mraa_gpio_context dev, int output_values[]);
 
 /**
  * Write to the Gpio Value.
@@ -217,7 +230,7 @@ mraa_result_t mraa_gpio_read_multiple(mraa_gpio_context dev, int output_values[]
  */
 mraa_result_t mraa_gpio_write(mraa_gpio_context dev, int value);
 
-mraa_result_t mraa_gpio_write_multiple(mraa_gpio_context dev, int input_values[]);
+mraa_result_t mraa_gpio_write_multi(mraa_gpio_context dev, int input_values[]);
 
 /**
  * Change ownership of the context.

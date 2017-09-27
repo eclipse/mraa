@@ -50,34 +50,70 @@
 void
 _mraa_free_gpio_groups(mraa_gpio_context dev)
 {
-    mraa_gpiod_group_t gpio_group = dev->gpio_group;
+    mraa_gpiod_group_t gpio_iter;
 
-    for (int i = 0; i < dev->num_chips; ++i) {
-        if (gpio_group[i].is_required) {
-            free(gpio_group[i].gpio_lines);
-            free(gpio_group[i].rw_values);
-            free(gpio_group[i].gpio_group_to_pins_table);
+    for_each_gpio_group(gpio_iter, dev) {
+        free(gpio_iter->gpio_lines);
+        free(gpio_iter->rw_values);
+        free(gpio_iter->gpio_group_to_pins_table);
 
-            if (gpio_group[i].gpiod_handle != -1) {
-                close(gpio_group[i].gpiod_handle);
-            }
-
-            if (gpio_group[i].event_handles != NULL) {
-                for (int j = 0; j < gpio_group[i].num_gpio_lines; ++j) {
-                    close(gpio_group[i].event_handles[j]);
-                }
-
-                free(gpio_group[i].event_handles);
-            }
-
-            close(gpio_group[i].dev_fd);
+        if (gpio_iter->gpiod_handle != -1) {
+            close(gpio_iter->gpiod_handle);
         }
+
+        if (gpio_iter->event_handles != NULL) {
+            for (int j = 0; j < gpio_iter->num_gpio_lines; ++j) {
+                close(gpio_iter->event_handles[j]);
+            }
+
+            free(gpio_iter->event_handles);
+        }
+
+        close(gpio_iter->dev_fd);
     }
 
-    free(gpio_group);
+    free(dev->gpio_group);
 
     /* Also delete the pin to gpio chip mapping. */
     free(dev->pin_to_gpio_table);
+
+    /* User provided array saved internally. */
+    free(dev->provided_pins);
+
+    /* Finally, delete event array. */
+    free(dev->events);
+}
+
+void
+_mraa_close_gpio_event_handles(mraa_gpio_context dev)
+{
+    mraa_gpiod_group_t gpio_iter;
+
+    for_each_gpio_group(gpio_iter, dev) {
+        if (gpio_iter->event_handles != NULL) {
+            for (int j = 0; j < gpio_iter->num_gpio_lines; ++j) {
+                close(gpio_iter->event_handles[j]);
+            }
+
+            free(gpio_iter->event_handles);
+
+            /* In the end, _mraa_free_gpio_groups will be called. */
+            gpio_iter->event_handles = NULL;
+        }
+    }
+}
+
+void
+_mraa_close_gpio_desc(mraa_gpio_context dev)
+{
+    mraa_gpiod_group_t gpio_iter;
+
+    for_each_gpio_group(gpio_iter, dev) {
+        if (gpio_iter->gpiod_handle != -1) {
+            close(gpio_iter->gpiod_handle);
+            gpio_iter->gpiod_handle = -1;
+        }
+    }
 }
 
 int
@@ -343,4 +379,3 @@ mraa_get_number_of_gpio_chips()
     /* Assume opendir() error. */
     return num_chips;
 }
-
