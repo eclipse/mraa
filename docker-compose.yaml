@@ -3,7 +3,7 @@ version: '2.1'
 services:
 
   base:
-    image: dnoliver/mraa-base
+    image: dnoliver/mraa-base:build-mraa-for-upm
     environment:
       - http_proxy
       - https_proxy
@@ -34,7 +34,7 @@ services:
 
   doc:
     extends: base
-    image: dnoliver/mraa-all
+    image: dnoliver/mraa-all:build-mraa-for-upm
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
@@ -45,7 +45,7 @@ services:
 
   sonar-scan:
     extends: base
-    image: dnoliver/mraa-all
+    image: dnoliver/mraa-all:build-mraa-for-upm
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
@@ -65,21 +65,21 @@ services:
 
   usbplat:
     extends: base
-    image: dnoliver/mraa-all
+    image: dnoliver/mraa-all:build-mraa-for-upm
     environment:
       - USBPLAT=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
 
   firmata:
     extends: base
-    image: dnoliver/mraa-all
+    image: dnoliver/mraa-all:build-mraa-for-upm
     environment:
       - FIRMATA=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
 
   imraa:
     extends: base
-    image: dnoliver/mraa-all
+    image: dnoliver/mraa-all:build-mraa-for-upm
     environment:
       - IMRAA=ON
       - FIRMATA=ON
@@ -87,31 +87,33 @@ services:
 
   ftdi4442:
     extends: base
-    image: dnoliver/mraa-all
+    image: dnoliver/mraa-all:build-mraa-for-upm
     environment:
       - FTDI4222=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
 
   ipk:
     extends: base
-    image: dnoliver/mraa-all
+    image: dnoliver/mraa-all:build-mraa-for-upm
     environment:
       - IPK=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
 
   rpm:
     extends: base
-    image: dnoliver/mraa-all
+    image: dnoliver/mraa-all:build-mraa-for-upm
     environment:
       - RPM=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
 
   python2:
     extends: base
-    image: dnoliver/mraa-python
+    image: dnoliver/mraa-python:build-mraa-for-upm
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
+      - BUILDSWIGJAVA=OFF
+      - BUILDSWIGNODE=ON
     command: bash -c "./scripts/run-cmake.sh && cd build && make _python2-mraa && ctest --output-on-failure"
 
   python3:
@@ -122,31 +124,35 @@ services:
 
   java:
     extends: base
-    image: dnoliver/mraa-java
+    image: dnoliver/mraa-java:build-mraa-for-upm
     environment:
       - BUILDSWIG=ON
+      - BUILDSWIGPYTHON=OFF
       - BUILDSWIGJAVA=ON
+      - BUILDSWIGNODE=OFF
     command: bash -c "./scripts/run-cmake.sh && cd build && make mraajava && ctest --output-on-failure"
 
   android:
     extends: java
-    image: dnoliver/mraa-android
+    image: dnoliver/mraa-android:build-mraa-for-upm
     environment:
       - BUILDARCH=PERIPHERALMAN
     command: bash -c "./scripts/build-android.sh"
 
   node4:
     extends: base
-    image: dnoliver/mraa-node4
+    image: dnoliver/mraa-node4:build-mraa-for-upm
     environment:
       - BUILDSWIG=ON
+      - BUILDSWIGPYTHON=OFF
+      - BUILDSWIGJAVA=OFF
       - BUILDSWIGNODE=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild npmpkg && node-gyp configure && node-gyp build && npm test"
 
   node5:
     extends: node4
-    image: dnoliver/mraa-node5
+    image: dnoliver/mraa-node5:build-mraa-for-upm
 
   node6:
     extends: node4
-    image: dnoliver/mraa-node6
+    image: dnoliver/mraa-node6:build-mraa-for-upm
