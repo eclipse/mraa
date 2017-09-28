@@ -113,7 +113,7 @@ services:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
       - BUILDSWIGJAVA=OFF
-      - BUILDSWIGNODE=ON
+      - BUILDSWIGNODE=OFF
     command: bash -c "./scripts/run-cmake.sh && cd build && make _python2-mraa && ctest --output-on-failure"
 
   python3:
