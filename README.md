@@ -41,6 +41,10 @@ ARM
 * [phyBOARD-Wega](../master/docs/phyboard-wega.md)
 * [96Boards](../master/docs/96boards.md)
 
+MIPS
+---
+* [Linkit Smart 7688](../master/docs/linkit_7688.md)
+
 FPGA
 ----
 * [DE10-Nano](../master/docs/de_nano_soc.md)
