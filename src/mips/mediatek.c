@@ -52,14 +52,12 @@ static int mmap_fd = 0;
 static int mmap_size;
 static uint8_t* gpio_mmap_reg = NULL;
 static int gpio_mmap_fd = 0;
-static int gpio_mmap_size;
 static unsigned int mmap_count = 0;
 static int platform_detected = 0;
 
-mraa_result_t
-mraa_mtk_linkit_mmap_write(mraa_gpio_context dev, int value)
+static mraa_result_t
+mtk_mmap_write(mraa_gpio_context dev, int value)
 {
-    volatile uint32_t* addr;
     if (value) {
         *(volatile uint32_t*) (mmap_reg + MT7628_GPIO_SET + (dev->pin / 32) * 4) =
         (uint32_t)(1 << (dev->pin % 32));
@@ -71,7 +69,7 @@ mraa_mtk_linkit_mmap_write(mraa_gpio_context dev, int value)
 }
 
 static mraa_result_t
-mraa_mtk_linkit_mmap_unsetup()
+mtk_mmap_unsetup()
 {
     if (mmap_reg == NULL) {
         syslog(LOG_ERR, "linkit mmap: null register cant unsetup");
@@ -85,8 +83,8 @@ mraa_mtk_linkit_mmap_unsetup()
     return MRAA_SUCCESS;
 }
 
-int
-mraa_mtk_linkit_mmap_read(mraa_gpio_context dev)
+static int
+mtk_mmap_read(mraa_gpio_context dev)
 {
     uint32_t value = *(volatile uint32_t*) (mmap_reg + MT7628_GPIO_DATA + (dev->pin / 32) * 4);
     if (value & (uint32_t)(1 << (dev->pin % 32))) {
@@ -95,8 +93,8 @@ mraa_mtk_linkit_mmap_read(mraa_gpio_context dev)
     return 0;
 }
 
-mraa_result_t
-mraa_mtk_linkit_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
+static mraa_result_t
+mtk_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
 {
     if (dev == NULL) {
         syslog(LOG_ERR, "linkit mmap: context not valid");
@@ -112,7 +110,7 @@ mraa_mtk_linkit_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
         dev->mmap_read = NULL;
         mmap_count--;
         if (mmap_count == 0) {
-            return mraa_mtk_linkit_mmap_unsetup();
+            return mtk_mmap_unsetup();
         }
         return MRAA_SUCCESS;
     }
@@ -141,14 +139,15 @@ mraa_mtk_linkit_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
             return MRAA_ERROR_NO_RESOURCES;
         }
     }
-    dev->mmap_write = &mraa_mtk_linkit_mmap_write;
-    dev->mmap_read = &mraa_mtk_linkit_mmap_read;
+    dev->mmap_write = &mtk_mmap_write;
+    dev->mmap_read = &mtk_mmap_read;
     mmap_count++;
 
     return MRAA_SUCCESS;
 }
 
-static int mmap_gpiomode(void)
+static int
+mmap_gpiomode(void)
 {
     if ((gpio_mmap_fd = open(MMAP_PATH, O_RDWR)) < 0) {
         syslog(LOG_ERR, "linkit map: unable to open resource0 file");
@@ -166,7 +165,8 @@ static int mmap_gpiomode(void)
     return 0;
 }
 
-static void set_gpiomode(unsigned int mask, unsigned int shift, unsigned int val)
+static void
+set_gpiomode(unsigned int mask, unsigned int shift, unsigned int val)
 {
     unsigned int reg;
     unsigned int offset = 0x60;
@@ -269,7 +269,8 @@ static struct pinmux {
 	},
 };
 
-mraa_result_t gpio_init_pre(int pin)
+static mraa_result_t
+gpio_init_pre(int pin)
 {
 	struct pinmux *m = &mt7688_mux[gpio_mux_groups[pin]];
 
@@ -278,7 +279,8 @@ mraa_result_t gpio_init_pre(int pin)
 	return 0;
 }
 
-static void gpiomode_set(unsigned int id, char *name)
+static void
+gpiomode_set(unsigned int id, char *name)
 {
 	int i;
 
@@ -294,13 +296,14 @@ static void gpiomode_set(unsigned int id, char *name)
 	}
 }
 
-mraa_result_t i2c_init_pre(unsigned int bus)
+static mraa_result_t
+i2c_init_pre(unsigned int bus)
 {
 	gpiomode_set(MUX_I2C, "i2c");
 	return 0;
 }
 
-mraa_result_t
+static mraa_result_t
 pwm_init_post(mraa_pwm_context pwm)
 {
 	switch(pwm->pin) {
@@ -318,13 +321,15 @@ pwm_init_post(mraa_pwm_context pwm)
 	return 0;
 }
 
-mraa_result_t spi_init_pre(int bus)
+static mraa_result_t
+spi_init_pre(int bus)
 {
 	gpiomode_set(MUX_SPI_CS1, "spi_cs1");
 	return 0;
 }
 
-mraa_result_t uart_init_pre(int index)
+static mraa_result_t
+uart_init_pre(int index)
 {
 	switch(index) {
 	case 0:
@@ -340,7 +345,7 @@ mraa_result_t uart_init_pre(int index)
 	return 0;
 }
 
-mraa_result_t
+static mraa_result_t
 i2c_freq(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 {
     switch (mode) {
@@ -397,20 +402,20 @@ mraa_mtk_linkit()
     memset(b->pins, 0, sizeof(mraa_pininfo_t) * b->phy_pin_count);
     memset(gpio_mux_groups, -1, sizeof(gpio_mux_groups));
 
-    b->adv_func->gpio_mmap_setup = &mraa_mtk_linkit_mmap_setup;
+    b->adv_func->gpio_mmap_setup = &mtk_mmap_setup;
 
     for (i = 0; i < b->phy_pin_count; i++) {
         snprintf(b->pins[i].name, MRAA_PIN_NAME_SIZE, "GPIO%d", i);
-        b->pins[i].capabilites = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
+        b->pins[i].capabilities = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
     }
 
     strncpy(b->pins[43].name, "GPIO43", MRAA_PIN_NAME_SIZE);
-    b->pins[43].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[43].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[43].gpio.pinmap = 43;
     gpio_mux_groups[43] = MUX_EPHY;
 
     strncpy(b->pins[20].name, "GPIO20", MRAA_PIN_NAME_SIZE);
-    b->pins[20].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 1 };
+    b->pins[20].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 1 };
     b->pins[20].gpio.pinmap = 20;
     b->pins[20].uart.parent_id = 2;
     b->pins[20].uart.mux_total = 0;
@@ -419,7 +424,7 @@ mraa_mtk_linkit()
     gpio_mux_groups[20] = MUX_UART2;
 
     strncpy(b->pins[21].name, "GPIO21", MRAA_PIN_NAME_SIZE);
-    b->pins[21].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 1 };
+    b->pins[21].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 1 };
     b->pins[21].gpio.pinmap = 21;
     b->pins[21].uart.parent_id = 2;
     b->pins[21].uart.mux_total = 0;
@@ -428,130 +433,130 @@ mraa_mtk_linkit()
     gpio_mux_groups[21] = MUX_UART2;
 
     strncpy(b->pins[2].name, "GPIO2", MRAA_PIN_NAME_SIZE);
-    b->pins[2].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[2].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[2].gpio.pinmap = 2;
     gpio_mux_groups[2] = MUX_I2S;
 
     strncpy(b->pins[3].name, "GPIO3", MRAA_PIN_NAME_SIZE);
-    b->pins[3].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[3].gpio.pinmap = 3;
     gpio_mux_groups[3] = MUX_I2S;
 
     strncpy(b->pins[0].name, "GPIO0", MRAA_PIN_NAME_SIZE);
-    b->pins[0].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[0].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[0].gpio.pinmap = 0;
     gpio_mux_groups[0] = MUX_I2S;
 
     strncpy(b->pins[1].name, "GPIO1", MRAA_PIN_NAME_SIZE);
-    b->pins[1].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[1].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[1].gpio.pinmap = 1;
     gpio_mux_groups[1] = MUX_I2S;
 
     strncpy(b->pins[37].name, "GPIO37", MRAA_PIN_NAME_SIZE);
-    b->pins[37].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[37].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[37].gpio.pinmap = 37;
     gpio_mux_groups[37] = MUX_GPIO;
 
     strncpy(b->pins[44].name, "GPIO44", MRAA_PIN_NAME_SIZE);
-    b->pins[44].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[44].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[44].gpio.pinmap = 44;
     gpio_mux_groups[44] = MUX_WLED;
 
     strncpy(b->pins[46].name, "GPIO46", MRAA_PIN_NAME_SIZE);
-    b->pins[46].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[46].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[46].gpio.pinmap = 46;
     b->pins[46].uart.parent_id = 1;
     b->pins[46].uart.mux_total = 0;
     gpio_mux_groups[46] = MUX_UART1;
 
     strncpy(b->pins[45].name, "GPIO45", MRAA_PIN_NAME_SIZE);
-    b->pins[45].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[45].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[45].gpio.pinmap = 45;
     b->pins[45].uart.parent_id = 1;
     b->pins[45].uart.mux_total = 0;
     gpio_mux_groups[45] = MUX_UART1;
 
     strncpy(b->pins[13].name, "GPIO13", MRAA_PIN_NAME_SIZE);
-    b->pins[13].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[13].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[13].gpio.pinmap = 13;
     b->pins[13].uart.parent_id = 1;
     b->pins[13].uart.mux_total = 0;
     gpio_mux_groups[13] = MUX_UART0;
 
     strncpy(b->pins[12].name, "GPIO12", MRAA_PIN_NAME_SIZE);
-    b->pins[12].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[12].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
     b->pins[12].gpio.pinmap = 12;
     b->pins[12].uart.parent_id = 0;
     b->pins[12].uart.mux_total = 0;
     gpio_mux_groups[12] = MUX_UART0;
 
     strncpy(b->pins[5].name, "GPIO5", MRAA_PIN_NAME_SIZE);
-    b->pins[5].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
+    b->pins[5].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
     b->pins[5].gpio.pinmap = 5;
     b->pins[5].i2c.pinmap = 0;
     b->pins[5].i2c.mux_total = 0;
     gpio_mux_groups[5] = MUX_I2C;
 
     strncpy(b->pins[4].name, "GPIO4", MRAA_PIN_NAME_SIZE);
-    b->pins[4].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
+    b->pins[4].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
     b->pins[4].gpio.pinmap = 4;
     b->pins[4].i2c.pinmap = 0;
     b->pins[4].i2c.mux_total = 0;
     gpio_mux_groups[4] = MUX_I2C;
 
     strncpy(b->pins[6].name, "GPIO6", MRAA_PIN_NAME_SIZE);
-    b->pins[6].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+    b->pins[6].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
     b->pins[6].gpio.pinmap = 6;
     b->pins[6].spi.pinmap = 0;
     b->pins[6].spi.mux_total = 0;
     gpio_mux_groups[6] = MUX_SPI_CS1;
 
     strncpy(b->pins[7].name, "GPIO7", MRAA_PIN_NAME_SIZE);
-    b->pins[7].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+    b->pins[7].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     b->pins[7].spi.pinmap = 0;
     b->pins[7].spi.mux_total = 0;
 
     strncpy(b->pins[8].name, "GPIO8", MRAA_PIN_NAME_SIZE);
-    b->pins[8].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+    b->pins[8].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     b->pins[8].spi.pinmap = 0;
     b->pins[8].spi.mux_total = 0;
 
     strncpy(b->pins[9].name, "GPIO9", MRAA_PIN_NAME_SIZE);
-    b->pins[9].capabilites = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+    b->pins[9].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     b->pins[9].spi.pinmap = 0;
     b->pins[9].spi.mux_total = 0;
 
     strncpy(b->pins[18].name, "GPIO18", MRAA_PIN_NAME_SIZE);
-    b->pins[18].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    b->pins[18].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[18].gpio.pinmap = 18;
     b->pins[18].pwm.parent_id = 0;
     b->pins[18].pwm.pinmap = 0;
     gpio_mux_groups[18] = MUX_PWM0;
 
     strncpy(b->pins[19].name, "GPIO19", MRAA_PIN_NAME_SIZE);
-    b->pins[19].capabilites = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
+    b->pins[19].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
     b->pins[19].gpio.pinmap = 19;
     b->pins[19].pwm.parent_id = 0;
     b->pins[19].pwm.pinmap = 1;
     gpio_mux_groups[19] = MUX_PWM1;
 
     strncpy(b->pins[16].name, "GPIO16", MRAA_PIN_NAME_SIZE);
-    b->pins[16].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[16].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[16].gpio.pinmap = 16;
     gpio_mux_groups[16] = MUX_SPI_S;
 
     strncpy(b->pins[17].name, "GPIO17", MRAA_PIN_NAME_SIZE);
-    b->pins[17].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[17].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[17].gpio.pinmap = 17;
     gpio_mux_groups[17] = MUX_SPI_S;
 
     strncpy(b->pins[14].name, "GPIO14", MRAA_PIN_NAME_SIZE);
-    b->pins[14].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[14].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[14].gpio.pinmap = 14;
     gpio_mux_groups[14] = MUX_SPI_S;
 
     strncpy(b->pins[15].name, "GPIO15", MRAA_PIN_NAME_SIZE);
-    b->pins[15].capabilites = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[15].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[15].gpio.pinmap = 15;
     gpio_mux_groups[15] = MUX_SPI_S;
 
@@ -585,7 +590,7 @@ mraa_mtk_linkit()
 
     b->gpio_count = 0;
     for (i = 0; i < b->phy_pin_count; i++) {
-        if (b->pins[i].capabilites.gpio) {
+        if (b->pins[i].capabilities.gpio) {
             b->gpio_count++;
         }
     }
