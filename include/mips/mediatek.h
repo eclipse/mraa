@@ -33,6 +33,8 @@ extern "C" {
 
 mraa_board_t *
         mraa_mtk_linkit();
+mraa_board_t *
+        mraa_mtk_omega2();
 
 #ifdef __cplusplus
 }

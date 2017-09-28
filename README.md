@@ -44,6 +44,7 @@ ARM
 MIPS
 ---
 * [Linkit Smart 7688](../master/docs/linkit_7688.md)
+* [Onion Omega2](../master/docs/omega2.md)
 
 FPGA
 ----

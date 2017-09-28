@@ -42,6 +42,9 @@ mraa_mips_platform()
                 if (strstr(line, "MediaTek LinkIt Smart 7688")) {
                     platform_type = MRAA_MTK_LINKIT;
                 }
+                if (strstr(line, "Onion Omega2")) {
+                    platform_type = MRAA_MTK_OMEGA2;
+                }
             }
         }
         fclose(fh);
@@ -51,6 +54,9 @@ mraa_mips_platform()
     switch (platform_type) {
         case MRAA_MTK_LINKIT:
             plat = mraa_mtk_linkit();
+            break;
+        case MRAA_MTK_OMEGA2:
+            plat = mraa_mtk_omega2();
             break;
         default:
             plat = NULL;
