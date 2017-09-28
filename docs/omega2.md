@@ -32,7 +32,7 @@ Pin Mapping
 | 2           | GPIO2, (I2S WS)        | (USB D-)               | ---         |
 | 17          | GPIO17                 | GPIO13, UART RX0       | 13          |
 | 16          | GPIO16                 | GPIO12, UART TX0       | 12          |
-| 15          | GPIO15                 | FW_RST                 | 38          |
+| 15          | GPIO15                 | FW RST                 | 38          |
 | 46          | GPIO46, UART RX1       | VOUT 3V3               | ---         |
 | 45          | GPIO45, UART TX1       | (Eth TX-)              | ---         |
 | 9           | SPI MISO               | (Eth TX+)              | ---         |
