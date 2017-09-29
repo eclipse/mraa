@@ -23,7 +23,6 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -35,15 +34,15 @@
 
 #include "common.h"
 
-#define MMAP_PATH			"/dev/mem"
-#define MT7628_GPIOMODE_BASE		0x10000000
-#define MT7628_BLOCK_SIZE		0x1000
-#define MT7628_GPIO_CTRL		0x600
-#define MT7628_GPIO_DATA		0x620
-#define MT7628_GPIO_SET			0x630
-#define MT7628_GPIO_CLEAR		0x640
+#define MMAP_PATH               "/dev/mem"
+#define MT7628_GPIOMODE_BASE    0x10000000
+#define MT7628_BLOCK_SIZE       0x1000
+#define MT7628_GPIO_CTRL        0x600
+#define MT7628_GPIO_DATA        0x620
+#define MT7628_GPIO_SET         0x630
+#define MT7628_GPIO_CLEAR       0x640
 
-#define MAX_SIZE 64
+#define MAX_SIZE                64
 
 // MMAP
 static uint8_t *mmap_reg = NULL;
@@ -58,10 +57,10 @@ mtk_mmap_write(mraa_gpio_context dev, int value)
 {
     if (value) {
         *(volatile uint32_t*) (mmap_reg + MT7628_GPIO_SET + (dev->pin / 32) * 4) =
-        (uint32_t)(1 << (dev->pin % 32));
+            (uint32_t)(1 << (dev->pin % 32));
     } else {
         *(volatile uint32_t*) (mmap_reg + MT7628_GPIO_CLEAR + (dev->pin / 32) * 4) =
-        (uint32_t)(1 << (dev->pin % 32));
+            (uint32_t)(1 << (dev->pin % 32));
     }
     return MRAA_SUCCESS;
 }
@@ -131,7 +130,7 @@ mtk_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
                                        MAP_FILE | MAP_SHARED, mmap_fd, 0x10000000);
         if (mmap_reg == MAP_FAILED) {
             perror("foo");
-	    syslog(LOG_ERR, "linkit mmap: failed to mmap");
+            syslog(LOG_ERR, "linkit mmap: failed to mmap");
             mmap_reg = NULL;
             close(mmap_fd);
             return MRAA_ERROR_NO_RESOURCES;
@@ -170,8 +169,8 @@ set_gpiomode(unsigned int mask, unsigned int shift, unsigned int val)
     unsigned int offset = 0x60;
 
     if (shift >= 32) {
-		shift -= 32;
-		offset += 4;
+        shift -= 32;
+        offset += 4;
     }
 
     reg = *(volatile uint32_t*) (gpio_mmap_reg + offset);
@@ -182,177 +181,177 @@ set_gpiomode(unsigned int mask, unsigned int shift, unsigned int val)
 }
 
 enum {
-	MUX_GPIO = 0,
-	MUX_SPI_S,
-	MUX_SPI_CS1,
-	MUX_I2S,
-	MUX_UART0,
-	MUX_I2C,
-	MUX_UART1,
-	MUX_UART2,
-	MUX_PWM0,
-	MUX_PWM1,
-	MUX_EPHY,
-	MUX_WLED,
-	__MUX_MAX,
+    MUX_GPIO = 0,
+    MUX_SPI_S,
+    MUX_SPI_CS1,
+    MUX_I2S,
+    MUX_UART0,
+    MUX_I2C,
+    MUX_UART1,
+    MUX_UART2,
+    MUX_PWM0,
+    MUX_PWM1,
+    MUX_EPHY,
+    MUX_WLED,
+    __MUX_MAX,
 };
 
 static unsigned char gpio_mux_groups[MAX_SIZE];
 
 static struct pinmux {
-	char *name;
-	char *func[4];
-	unsigned int shift;
-	unsigned int mask;
+    char *name;
+    char *func[4];
+    unsigned int shift;
+    unsigned int mask;
 } mt7688_mux[] = {
-	{
-		.name = "refclk",
-		.func = { "refclk", "gpio", NULL, NULL },
-		.shift = 18,
-		.mask = 0x1,
-	}, {
-		.name = "spi_s",
-		.func = { "spi_s", "gpio", "utif", "pwm" },
-		.shift = 2,
-		.mask = 0x3,
-	}, {
-		.name = "spi_cs1",
-		.func = { "spi_cs1", "gpio", NULL, "refclk" },
-		.shift = 4,
-		.mask = 0x3,
-	}, {
-		.name = "i2s",
-		.func = { "i2s", "gpio", "pcm", NULL },
-		.shift = 6,
-		.mask = 0x3,
-	}, {
-		.name = "uart0",
-		.func = { "uart", "gpio", NULL, NULL },
-		.shift = 8,
-		.mask = 0x3,
-	}, {
-		.name = "i2c",
-		.func = { "i2c", "gpio", NULL, NULL },
-		.shift = 20,
-		.mask = 0x3,
-	}, {
-		.name = "uart1",
-		.func = { "uart", "gpio", NULL, NULL },
-		.shift = 24,
-		.mask = 0x3,
-	}, {
-		.name = "uart2",
-		.func = { "uart", "gpio", "pwm", NULL },
-		.shift = 26,
-		.mask = 0x3,
-	}, {
-		.name = "pwm0",
-		.func = { "pwm", "gpio", NULL, NULL },
-		.shift = 28,
-		.mask = 0x3,
-	}, {
-		.name = "pwm1",
-		.func = { "pwm", "gpio", NULL, NULL },
-		.shift = 30,
-		.mask = 0x3,
-	}, {
-		.name = "ephy",
-		.func = { "ephy", "gpio", NULL, NULL },
-		.shift = 34,
-		.mask = 0x3,
-	}, {
-		.name = "wled",
-		.func = { "wled", "gpio", NULL, NULL },
-		.shift = 32,
-		.mask = 0x3,
-	},
+    {
+        .name = "refclk",
+        .func = { "refclk", "gpio", NULL, NULL },
+        .shift = 18,
+        .mask = 0x1,
+    }, {
+        .name = "spi_s",
+        .func = { "spi_s", "gpio", "utif", "pwm" },
+        .shift = 2,
+        .mask = 0x3,
+    }, {
+        .name = "spi_cs1",
+        .func = { "spi_cs1", "gpio", NULL, "refclk" },
+        .shift = 4,
+        .mask = 0x3,
+    }, {
+        .name = "i2s",
+        .func = { "i2s", "gpio", "pcm", NULL },
+        .shift = 6,
+        .mask = 0x3,
+    }, {
+        .name = "uart0",
+        .func = { "uart", "gpio", NULL, NULL },
+        .shift = 8,
+        .mask = 0x3,
+    }, {
+        .name = "i2c",
+        .func = { "i2c", "gpio", NULL, NULL },
+        .shift = 20,
+        .mask = 0x3,
+    }, {
+        .name = "uart1",
+        .func = { "uart", "gpio", NULL, NULL },
+        .shift = 24,
+        .mask = 0x3,
+    }, {
+        .name = "uart2",
+        .func = { "uart", "gpio", "pwm", NULL },
+        .shift = 26,
+        .mask = 0x3,
+    }, {
+        .name = "pwm0",
+        .func = { "pwm", "gpio", NULL, NULL },
+        .shift = 28,
+        .mask = 0x3,
+    }, {
+        .name = "pwm1",
+        .func = { "pwm", "gpio", NULL, NULL },
+        .shift = 30,
+        .mask = 0x3,
+    }, {
+        .name = "ephy",
+        .func = { "ephy", "gpio", NULL, NULL },
+        .shift = 34,
+        .mask = 0x3,
+    }, {
+        .name = "wled",
+        .func = { "wled", "gpio", NULL, NULL },
+        .shift = 32,
+        .mask = 0x3,
+    },
 };
 
 static mraa_result_t
 gpio_init_pre(int pin)
 {
-	struct pinmux *m = &mt7688_mux[gpio_mux_groups[pin]];
+    struct pinmux *m = &mt7688_mux[gpio_mux_groups[pin]];
 
-	set_gpiomode(m->mask, m->shift, 1);
+    set_gpiomode(m->mask, m->shift, 1);
 
-	return 0;
+    return 0;
 }
 
 static void
 gpiomode_set(unsigned int id, char *name)
 {
-	int i;
+    int i;
 
-	if (id >= __MUX_MAX)
-		return;
+    if (id >= __MUX_MAX)
+        return;
 
-	for (i = 0; i < 4; i++) {
-		if (!mt7688_mux[id].func[i] || strcmp(mt7688_mux[id].func[i], name))
-			continue;
-		set_gpiomode(mt7688_mux[id].mask, mt7688_mux[id].shift, i);
-		syslog(0, "mraa: set pinmux %s -> %s\n", mt7688_mux[id].name, name);
-		return;
-	}
+    for (i = 0; i < 4; i++) {
+        if (!mt7688_mux[id].func[i] || strcmp(mt7688_mux[id].func[i], name))
+            continue;
+        set_gpiomode(mt7688_mux[id].mask, mt7688_mux[id].shift, i);
+        syslog(0, "mraa: set pinmux %s -> %s\n", mt7688_mux[id].name, name);
+        return;
+    }
 }
 
 static mraa_result_t
 i2c_init_pre(unsigned int bus)
 {
-	gpiomode_set(MUX_I2C, "i2c");
-	return 0;
+    gpiomode_set(MUX_I2C, "i2c");
+    return 0;
 }
 
 static mraa_result_t
 pwm_init_post(mraa_pwm_context pwm)
 {
-	switch(pwm->pin) {
-	case 0:
-		gpiomode_set(MUX_PWM0, "pwm");
-		break;
-	case 1:
-		gpiomode_set(MUX_PWM1, "pwm");
-		break;
-	case 2:
-	case 3:
-		gpiomode_set(MUX_UART2, "pwm");
-		break;
-	}
-	return 0;
+    switch(pwm->pin) {
+    case 0:
+        gpiomode_set(MUX_PWM0, "pwm");
+        break;
+    case 1:
+        gpiomode_set(MUX_PWM1, "pwm");
+        break;
+    case 2:
+    case 3:
+        gpiomode_set(MUX_UART2, "pwm");
+        break;
+    }
+    return 0;
 }
 
 static mraa_result_t
 spi_init_pre(int bus)
 {
-	gpiomode_set(MUX_SPI_CS1, "spi_cs1");
-	return 0;
+    gpiomode_set(MUX_SPI_CS1, "spi_cs1");
+    return 0;
 }
 
 static mraa_result_t
 uart_init_pre(int index)
 {
-	switch(index) {
-	case 0:
-		gpiomode_set(MUX_UART0, "uart");
-		break;
-	case 1:
-		gpiomode_set(MUX_UART1, "uart");
-		break;
-	case 2:
-		gpiomode_set(MUX_UART2, "uart");
-		break;
-	}
-	return 0;
+    switch(index) {
+    case 0:
+        gpiomode_set(MUX_UART0, "uart");
+        break;
+    case 1:
+        gpiomode_set(MUX_UART1, "uart");
+        break;
+    case 2:
+        gpiomode_set(MUX_UART2, "uart");
+        break;
+    }
+    return 0;
 }
 
 static mraa_result_t
 i2c_freq(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 {
     switch (mode) {
-        case MRAA_I2C_STD:
-            break;
-        default:
-            syslog(LOG_ERR, "Invalid i2c frequency");
-            break;
+    case MRAA_I2C_STD:
+        break;
+    default:
+        syslog(LOG_ERR, "Invalid i2c frequency");
+        break;
     }
     return MRAA_SUCCESS;
 }
@@ -377,6 +376,21 @@ add_gpio_pin(mraa_board_t *b, int index, const char *name, int mux,
     b->pins[index].capabilities.i2c = i2c;
     b->pins[index].capabilities.aio = aio;
     b->pins[index].capabilities.uart = uart;
+    if (gpio) {
+        b->gpio_count++;
+    }
+}
+
+/*
+ * Add UART device.
+ */
+static void
+add_uart_dev(mraa_board_t *b, char *path, int tx_pin, int rx_pin)
+{
+    b->uart_dev[b->uart_dev_count].device_path = path;
+    b->uart_dev[b->uart_dev_count].tx = tx_pin;
+    b->uart_dev[b->uart_dev_count].rx = rx_pin;
+    ++b->uart_dev_count;
 }
 
 /*
@@ -388,7 +402,7 @@ mtk_common(char *name)
     int i;
 
     if (mmap_gpiomode())
-	    return NULL;
+        return NULL;
 
     mraa_board_t *b = (mraa_board_t*) malloc(sizeof(mraa_board_t));
     if (b == NULL) {
@@ -456,22 +470,6 @@ mtk_common(char *name)
 }
 
 /*
- * Count available GPIO ports.
- */
-static void
-mtk_finalize(mraa_board_t *b)
-{
-    int i;
-
-    b->gpio_count = 0;
-    for (i = 0; i < b->phy_pin_count; i++) {
-        if (b->pins[i].capabilities.gpio) {
-            b->gpio_count++;
-        }
-    }
-}
-
-/*
  * Mediatek Linkit Smart 7688 board (and Duo)
  */
 mraa_board_t *
@@ -484,75 +482,57 @@ mraa_mtk_linkit()
 
     //
     // GPIO pins
-    //
-    add_gpio_pin(b, 43, "GPIO43", MUX_EPHY,     1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 20, "GPIO20", MUX_UART2,    1, 1, 1, 0, 0, 0, 0, 1);
+    //                                                gpio     spi i2c  uart
+    add_gpio_pin(b, 43, "GPIO43",   MUX_EPHY,       1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 20, "GPIO20",   MUX_UART2,      1, 1, 1, 0, 0, 0, 0, 1);
     b->pins[20].uart.parent_id = 2;
-    b->pins[20].uart.mux_total = 0;
     b->pins[20].pwm.parent_id = 0;
     b->pins[20].pwm.pinmap = 2;
-    add_gpio_pin(b, 21, "GPIO21", MUX_UART2,    1, 1, 1, 0, 0, 0, 0, 1);
+    add_gpio_pin(b, 21, "GPIO21",   MUX_UART2,      1, 1, 1, 0, 0, 0, 0, 1);
     b->pins[21].uart.parent_id = 2;
-    b->pins[21].uart.mux_total = 0;
     b->pins[21].pwm.parent_id = 0;
     b->pins[21].pwm.pinmap = 3;
-    add_gpio_pin(b, 2,  "GPIO2",  MUX_I2S,      1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 3,  "GPIO3",  MUX_I2S,      1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 0,  "GPIO0",  MUX_I2S,      1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 1,  "GPIO1",  MUX_I2S,      1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 37, "GPIO37", MUX_GPIO,     1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 44, "GPIO44", MUX_WLED,     1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 46, "GPIO46", MUX_UART1,    1, 1, 0, 0, 0, 0, 0, 1);
+    add_gpio_pin(b, 2,  "GPIO2",    MUX_I2S,        1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 3,  "GPIO3",    MUX_I2S,        1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 0,  "GPIO0",    MUX_I2S,        1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 1,  "GPIO1",    MUX_I2S,        1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 37, "GPIO37",   MUX_GPIO,       1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 44, "GPIO44",   MUX_WLED,       1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 46, "GPIO46",   MUX_UART1,      1, 1, 0, 0, 0, 0, 0, 1);
     b->pins[46].uart.parent_id = 1;
-    b->pins[46].uart.mux_total = 0;
-    add_gpio_pin(b, 45, "GPIO45", MUX_UART1,    1, 1, 0, 0, 0, 0, 0, 1);
+    add_gpio_pin(b, 45, "GPIO45",   MUX_UART1,      1, 1, 0, 0, 0, 0, 0, 1);
     b->pins[45].uart.parent_id = 1;
-    b->pins[45].uart.mux_total = 0;
-    add_gpio_pin(b, 13, "GPIO13", MUX_UART0,    1, 1, 0, 0, 0, 0, 0, 1);
-    b->pins[13].uart.parent_id = 1;
-    b->pins[13].uart.mux_total = 0;
-    add_gpio_pin(b, 12, "GPIO12", MUX_UART0,    1, 1, 0, 0, 0, 0, 0, 1);
+    add_gpio_pin(b, 13, "GPIO13",   MUX_UART0,      1, 1, 0, 0, 0, 0, 0, 1);
+    b->pins[13].uart.parent_id = 0;
+    add_gpio_pin(b, 12, "GPIO12",   MUX_UART0,      1, 1, 0, 0, 0, 0, 0, 1);
     b->pins[12].uart.parent_id = 0;
-    b->pins[12].uart.mux_total = 0;
-    add_gpio_pin(b, 5,  "GPIO5",  MUX_I2C,      1, 1, 0, 0, 0, 1, 0, 0);
+    add_gpio_pin(b, 5,  "GPIO5",    MUX_I2C,        1, 1, 0, 0, 0, 1, 0, 0);
     b->pins[5].i2c.pinmap = 0;
-    b->pins[5].i2c.mux_total = 0;
-    add_gpio_pin(b, 4,  "GPIO4",  MUX_I2C,      1, 1, 0, 0, 0, 1, 0, 0);
+    add_gpio_pin(b, 4,  "GPIO4",    MUX_I2C,        1, 1, 0, 0, 0, 1, 0, 0);
     b->pins[4].i2c.pinmap = 0;
-    b->pins[4].i2c.mux_total = 0;
-    add_gpio_pin(b, 6,  "GPIO6",  MUX_SPI_CS1,  1, 1, 0, 0, 1, 0, 0, 0);
+    add_gpio_pin(b, 6,  "GPIO6",    MUX_SPI_CS1,    1, 1, 0, 0, 1, 0, 0, 0);
     b->pins[6].spi.pinmap = 0;
-    b->pins[6].spi.mux_total = 0;
-    add_gpio_pin(b, 7,  "SPI_CLK", 0,           1, 0, 0, 0, 1, 0, 0, 0);
-    add_gpio_pin(b, 8,  "SPI_MOSI", 0,          1, 0, 0, 0, 1, 0, 0, 0);
-    add_gpio_pin(b, 9,  "SPI_MISO", 0,          1, 0, 0, 0, 1, 0, 0, 0);
-    add_gpio_pin(b, 18, "GPIO18", MUX_PWM0,     1, 1, 1, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 7,  "SPI_CLK",  MUX_GPIO,       1, 0, 0, 0, 1, 0, 0, 0);
+    add_gpio_pin(b, 8,  "SPI_MOSI", MUX_GPIO,       1, 0, 0, 0, 1, 0, 0, 0);
+    add_gpio_pin(b, 9,  "SPI_MISO", MUX_GPIO,       1, 0, 0, 0, 1, 0, 0, 0);
+    add_gpio_pin(b, 18, "GPIO18",   MUX_PWM0,       1, 1, 1, 0, 0, 0, 0, 0);
     b->pins[18].pwm.parent_id = 0;
     b->pins[18].pwm.pinmap = 0;
-    add_gpio_pin(b, 19, "GPIO19", MUX_PWM1,     1, 1, 1, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 19, "GPIO19",   MUX_PWM1,       1, 1, 1, 0, 0, 0, 0, 0);
     b->pins[19].pwm.parent_id = 0;
     b->pins[19].pwm.pinmap = 1;
-    add_gpio_pin(b, 16, "GPIO16", MUX_SPI_S,    1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 17, "GPIO17", MUX_SPI_S,    1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 14, "GPIO14", MUX_SPI_S,    1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 15, "GPIO15", MUX_SPI_S,    1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 16, "GPIO16",   MUX_SPI_S,      1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 17, "GPIO17",   MUX_SPI_S,      1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 14, "GPIO14",   MUX_SPI_S,      1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 15, "GPIO15",   MUX_SPI_S,      1, 1, 0, 0, 0, 0, 0, 0);
 
     //
     // UARTs
     //
-    b->uart_dev_count = 3;
+    add_uart_dev(b, "/dev/ttyS0", 12, 13);
+    add_uart_dev(b, "/dev/ttyS1", 45, 46);
+    add_uart_dev(b, "/dev/ttyS2", 20, 21);
     b->def_uart_dev = 0;
-    b->uart_dev[0].rx = 13;
-    b->uart_dev[0].tx = 12;
-    b->uart_dev[0].device_path = "/dev/ttyS0";
-    b->uart_dev[1].rx = 46;
-    b->uart_dev[1].tx = 45;
-    b->uart_dev[1].device_path = "/dev/ttyS1";
-    b->uart_dev[2].rx = 21;
-    b->uart_dev[2].tx = 20;
-    b->uart_dev[2].device_path = "/dev/ttyS2";
-
-    mtk_finalize(b);
     return b;
 }
 
@@ -569,63 +549,50 @@ mraa_mtk_omega2()
 
     //
     // GPIO pins, left side
-    //
-    add_gpio_pin(b, 11, "GPIO11", 0,            1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 3,  "GPIO3",  MUX_I2S,      1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 2,  "GPIO2",  MUX_I2S,      1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 17, "GPIO17", 0,            1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 16, "GPIO16", 0,            1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 15, "GPIO15", 0,            1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 46, "GPIO46", MUX_UART1,    1, 1, 0, 0, 0, 0, 0, 1);
+    //                                                gpio     spi i2c  uart
+    add_gpio_pin(b, 11, "GPIO11",   MUX_GPIO,       1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 3,  "GPIO3",    MUX_I2S,        1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 2,  "GPIO2",    MUX_I2S,        1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 17, "GPIO17",   MUX_GPIO,       1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 16, "GPIO16",   MUX_GPIO,       1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 15, "GPIO15",   MUX_GPIO,       1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 46, "GPIO46",   MUX_UART1,      1, 1, 0, 0, 0, 0, 0, 1);
     b->pins[46].uart.parent_id = 1;
-    b->pins[46].uart.mux_total = 0;
-    add_gpio_pin(b, 45, "GPIO45", MUX_UART1,    1, 1, 0, 0, 0, 0, 0, 1);
+    add_gpio_pin(b, 45, "GPIO45",   MUX_UART1,      1, 1, 0, 0, 0, 0, 0, 1);
     b->pins[45].uart.parent_id = 1;
-    b->pins[45].uart.mux_total = 0;
-    add_gpio_pin(b, 9,  "SPI_MISO", 0,          1, 0, 0, 0, 1, 0, 0, 0);
-    add_gpio_pin(b, 8,  "SPI_MOSI", 0,          1, 0, 0, 0, 1, 0, 0, 0);
-    add_gpio_pin(b, 7,  "SPI_CLK", 0,           1, 0, 0, 0, 1, 0, 0, 0);
-    add_gpio_pin(b, 6,  "GPIO6", MUX_SPI_CS1,   1, 1, 0, 0, 1, 0, 0, 0);
+    add_gpio_pin(b, 9,  "SPI_MISO", MUX_GPIO,       1, 0, 0, 0, 1, 0, 0, 0);
+    add_gpio_pin(b, 8,  "SPI_MOSI", MUX_GPIO,       1, 0, 0, 0, 1, 0, 0, 0);
+    add_gpio_pin(b, 7,  "SPI_CLK",  MUX_GPIO,       1, 0, 0, 0, 1, 0, 0, 0);
+    add_gpio_pin(b, 6,  "GPIO6",    MUX_SPI_CS1,    1, 1, 0, 0, 1, 0, 0, 0);
     b->pins[6].spi.pinmap = 0;
-    b->pins[6].spi.mux_total = 0;
-    add_gpio_pin(b, 1,  "GPIO1", MUX_I2S,       1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 0,  "GPIO0", MUX_I2S,       1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 1,  "GPIO1",    MUX_I2S,        1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 0,  "GPIO0",    MUX_I2S,        1, 1, 0, 0, 0, 0, 0, 0);
 
     //
     // GPIO pins, right side
-    //
-    add_gpio_pin(b, 13, "GPIO13", MUX_UART0,    1, 1, 0, 0, 0, 0, 0, 1);
-    b->pins[13].uart.parent_id = 1;
-    b->pins[13].uart.mux_total = 0;
-    add_gpio_pin(b, 12, "GPIO12", MUX_UART0,    1, 1, 0, 0, 0, 0, 0, 1);
+    //                                                gpio     spi i2c  uart
+    add_gpio_pin(b, 13, "GPIO13",   MUX_UART0,      1, 1, 0, 0, 0, 0, 0, 1);
+    b->pins[13].uart.parent_id = 0;
+    add_gpio_pin(b, 12, "GPIO12",   MUX_UART0,      1, 1, 0, 0, 0, 0, 0, 1);
     b->pins[12].uart.parent_id = 0;
-    b->pins[12].uart.mux_total = 0;
-    add_gpio_pin(b, 38, "FW_RST", 0,            1, 1, 0, 0, 0, 0, 0, 0);
-    add_gpio_pin(b, 18, "GPIO18", MUX_PWM0,     1, 1, 1, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 38, "FW_RST", 0,                1, 1, 0, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 18, "GPIO18",   MUX_PWM0,       1, 1, 1, 0, 0, 0, 0, 0);
     b->pins[18].pwm.parent_id = 0;
     b->pins[18].pwm.pinmap = 0;
-    add_gpio_pin(b, 19, "GPIO19", MUX_PWM1,     1, 1, 1, 0, 0, 0, 0, 0);
+    add_gpio_pin(b, 19, "GPIO19",   MUX_PWM1,       1, 1, 1, 0, 0, 0, 0, 0);
     b->pins[19].pwm.parent_id = 0;
     b->pins[19].pwm.pinmap = 1;
-    add_gpio_pin(b, 5,  "GPIO5",  MUX_I2C,      1, 1, 0, 0, 0, 1, 0, 0);
+    add_gpio_pin(b, 5,  "GPIO5",    MUX_I2C,        1, 1, 0, 0, 0, 1, 0, 0);
     b->pins[5].i2c.pinmap = 0;
-    b->pins[5].i2c.mux_total = 0;
-    add_gpio_pin(b, 4,  "GPIO4",  MUX_I2C,      1, 1, 0, 0, 0, 1, 0, 0);
+    add_gpio_pin(b, 4,  "GPIO4",    MUX_I2C,        1, 1, 0, 0, 0, 1, 0, 0);
     b->pins[4].i2c.pinmap = 0;
-    b->pins[4].i2c.mux_total = 0;
 
     //
     // UARTs
     //
-    b->uart_dev_count = 2;
+    add_uart_dev(b, "/dev/ttyS0", 12, 13);
+    add_uart_dev(b, "/dev/ttyS1", 45, 46);
     b->def_uart_dev = 0;
-    b->uart_dev[0].rx = 13;
-    b->uart_dev[0].tx = 12;
-    b->uart_dev[0].device_path = "/dev/ttyS0";
-    b->uart_dev[1].rx = 46;
-    b->uart_dev[1].tx = 45;
-    b->uart_dev[1].device_path = "/dev/ttyS1";
 
-    mtk_finalize(b);
     return b;
 }

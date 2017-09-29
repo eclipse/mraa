@@ -5,7 +5,7 @@ The Linkit Smart 7688 is based on the MediaTek MT7688 system on a chip, which
 includes a MIPS 24KEc 580 MHz processor and 128 megabytes of RAM.
 
 Features:
- * 22 GPIO pins
+ * 20 GPIO pins
  * 4 PWM pins
  * 3 UART ports
  * 1 SPI master port
