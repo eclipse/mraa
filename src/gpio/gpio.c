@@ -39,7 +39,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <stdio.h>
+#include <time.h>
 
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
 #define MAX_SIZE 64
@@ -196,6 +196,8 @@ mraa_gpio_init(int pin)
 
     /* We only have one pin. No need for multiple pin legacy support. */
     r->next = NULL;
+
+    r->event_timestamp = 0;
 
     return r;
 }
@@ -456,6 +458,11 @@ mraa_gpio_chardev_wait_interrupt(int fds[], int num_fds, mraa_gpio_events_t even
 mraa_gpio_events_t
 mraa_gpio_get_events(mraa_gpio_context dev)
 {
+    if (!plat->chardev_capable) {
+        syslog(LOG_ERR, "mraa_gpio_get_events() available only for chardev interface!");
+        return NULL;
+    }
+
     mraa_gpiod_group_t gpio_iter;
     unsigned int event_idx = 0;
     unsigned int pin_idx;
@@ -471,6 +478,20 @@ mraa_gpio_get_events(mraa_gpio_context dev)
     }
 
     return dev->events;
+}
+
+mraa_timestamp_t
+_mraa_gpio_get_timestamp_sysfs()
+{
+    struct timespec tspec;
+    int result;
+
+    if ((result = clock_gettime(CLOCK_REALTIME, &tspec)) != 0) {
+        syslog(LOG_ERR, "clock_gettime() error");
+        return 0;
+    }
+
+    return tspec.tv_nsec;
 }
 
 static void*
@@ -539,6 +560,7 @@ mraa_gpio_interrupt_handler(void* arg)
             if (lang_func->python_isr != NULL) {
                 lang_func->python_isr(dev->isr, dev->isr_args);
             } else {
+                dev->event_timestamp = _mraa_gpio_get_timestamp_sysfs();
                 dev->isr(dev->isr_args);
             }
 #ifdef HAVE_PTHREAD_CANCEL
@@ -564,6 +586,17 @@ mraa_gpio_interrupt_handler(void* arg)
             return NULL;
         }
     }
+}
+
+mraa_timestamp_t
+mraa_gpio_get_last_event_timestamp(mraa_gpio_context dev)
+{
+    if (plat->chardev_capable) {
+        syslog(LOG_ERR, "mraa_gpio_get_last_event_timestamp() available for sysfs interface only!");
+        return 0;
+    }
+
+    return dev->event_timestamp;
 }
 
 /* In it's simplest form, for now. */
@@ -1337,38 +1370,32 @@ mraa_gpio_write_multi(mraa_gpio_context dev, int input_values[])
     }
 
     if (plat->chardev_capable) {
-        mraa_gpiod_group_t gpio_group;
+        mraa_gpiod_group_t gpio_iter;
 
         int* counters = calloc(dev->num_chips, sizeof(int));
         for (int i = 0; i < dev->num_pins; ++i) {
             int chip_id = dev->pin_to_gpio_table[i];
-            gpio_group = &dev->gpio_group[chip_id];
-
-            gpio_group->rw_values[counters[chip_id]] = input_values[i];
+            gpio_iter = &dev->gpio_group[chip_id];
+            gpio_iter->rw_values[counters[chip_id]] = input_values[i];
             counters[chip_id]++;
         }
         free(counters);
 
-        for (int i = 0; i < dev->num_chips; ++i) {
-            gpio_group = &dev->gpio_group[i];
-            if (!gpio_group->is_required) {
-                continue;
-            }
-
+        for_each_gpio_group(gpio_iter, dev) {
             int status;
             unsigned flags = GPIOHANDLE_REQUEST_OUTPUT;
 
-            if (gpio_group->gpiod_handle <= 0) {
-                gpio_group->gpiod_handle = mraa_get_lines_handle(gpio_group->dev_fd, gpio_group->gpio_lines,
-                                                                 gpio_group->num_gpio_lines, flags, 0);
-                if (gpio_group->gpiod_handle <= 0) {
+            if (gpio_iter->gpiod_handle <= 0) {
+                gpio_iter->gpiod_handle = mraa_get_lines_handle(gpio_iter->dev_fd, gpio_iter->gpio_lines,
+                                                                gpio_iter->num_gpio_lines, flags, 0);
+                if (gpio_iter->gpiod_handle <= 0) {
                     syslog(LOG_ERR, "[GPIOD_INTERFACE]: error getting gpio line handle");
                     return MRAA_ERROR_INVALID_HANDLE;
                 }
             }
 
-            status = mraa_set_line_values(gpio_group->gpiod_handle, gpio_group->num_gpio_lines,
-                                          gpio_group->rw_values);
+            status = mraa_set_line_values(gpio_iter->gpiod_handle, gpio_iter->num_gpio_lines,
+                                          gpio_iter->rw_values);
             if (status < 0) {
                 syslog(LOG_ERR, "[GPIOD_INTERFACE]: error writing gpio");
                 return MRAA_ERROR_INVALID_RESOURCE;

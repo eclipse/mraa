@@ -104,9 +104,11 @@ typedef enum {
     MRAA_GPIO_PUSH_PULL = 1,  /**< Push Pull Configuration */
 } mraa_gpio_out_driver_mode_t;
 
+typedef long long unsigned int mraa_timestamp_t;
+
 typedef struct {
     int id;
-    long long unsigned int timestamp;
+    mraa_timestamp_t timestamp;
 } mraa_gpio_event;
 
 typedef mraa_gpio_event* mraa_gpio_events_t;
@@ -119,6 +121,14 @@ typedef mraa_gpio_event* mraa_gpio_events_t;
  */
 mraa_gpio_context mraa_gpio_init(int pin);
 
+/**
+ * Initialise gpio_context, based on board number, for multiple pins (can be one).
+ *
+ *  @param pins Pin array read from the board
+ *  @param num_pins Number of pins - must be the same as the pins array length provided
+ *  as the first argument.
+ *  @returns gpio context or NULL
+ */
 mraa_gpio_context mraa_gpio_init_multi(int pins[], int num_pins);
 
 /**
@@ -138,13 +148,21 @@ mraa_gpio_context mraa_gpio_init_raw(int gpiopin);
  */
 mraa_result_t mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode);
 
+/**
+ * Set the edge mode on the gpio for multiple pins.
+ * NOTE: Only works for the new chardev interface.
+ *
+ * @param dev The Gpio context
+ * @param mode The edge mode to set the gpio into
+ * @return Result of operation
+ */
 mraa_result_t mraa_gpio_edge_mode_multi(mraa_gpio_context dev, mraa_gpio_edge_t mode);
 
 /**
- * Set an interrupt on pin
+ * Set an interrupt on pin(s).
  *
  * @param dev The Gpio context
- * @param edge The edge mode to set the gpio into
+ * @param edge The edge mode to set the gpio(s) into
  * @param fptr Function pointer to function to be called when interrupt is
  * triggered
  * @param args Arguments passed to the interrupt handler (fptr)
@@ -154,6 +172,7 @@ mraa_result_t mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t edge, void (
 
 /**
  * Get an array of structures describing triggered events.
+ * NOTE: Only for chardev interface.
  *
  * @param dev The Gpio context
  * @return Array of structures containing pairs of pin id's and the associated timestamp.
@@ -162,9 +181,19 @@ mraa_result_t mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t edge, void (
  */
 mraa_gpio_events_t mraa_gpio_get_events(mraa_gpio_context dev);
 
+
+/**
+ * Get the timestamp for the last triggered event for a single pin.
+ * NOTE: Only for sysfs interface.
+ *
+ * @param dev The Gpio context
+ * @return Timestamp of the last produced event for the requested gpio.
+ */
+mraa_timestamp_t mraa_gpio_get_last_event_timestamp(mraa_gpio_context dev);
+
 /**
  * Stop the current interrupt watcher on this Gpio, and set the Gpio edge mode
- * to MRAA_GPIO_EDGE_NONE
+ * to MRAA_GPIO_EDGE_NONE(only for sysfs interface).
  *
  * @param dev The Gpio context
  * @return Result of operation
@@ -172,35 +201,36 @@ mraa_gpio_events_t mraa_gpio_get_events(mraa_gpio_context dev);
 mraa_result_t mraa_gpio_isr_exit(mraa_gpio_context dev);
 
 /**
- * Set Gpio Output Mode,
+ * Set Gpio(s) Output Mode,
  *
  * @param dev The Gpio context
- * @param mode The Gpio Output Mode
+ * @param mode The Gpio(s) Output Mode
  * @return Result of operation
  */
 mraa_result_t mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode);
 
 /**
- * Set Gpio direction
+ * Set Gpio(s) direction
  *
  * @param dev The Gpio context
- * @param dir The direction of the Gpio
+ * @param dir The direction of the Gpio(s)
  * @return Result of operation
  */
 mraa_result_t mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir);
 
 /**
- * Read Gpio direction
+ * Read Gpio(s) direction
  *
  * @param dev The Gpio context
- * @param dir The address where to store the Gpio direction
+ * @param dir The address where to store the Gpio(s) direction
  * @return Result of operation
  */
 mraa_result_t mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir);
 
 /**
  * Close the Gpio context
- * - Will free the memory for the context and unexport the Gpio
+ * - Will free the memory for the context and unexport the Gpio - sysfs interface.
+ * - Will free up the memory used by context and close related file descriptors - chardev interface.
  *
  * @param dev The Gpio context
  * @return Result of operation
@@ -216,8 +246,13 @@ mraa_result_t mraa_gpio_close(mraa_gpio_context dev);
  */
 int mraa_gpio_read(mraa_gpio_context dev);
 
-/* Values array is provided by user. Must be the same size as the array passed in init.
- * It will be overwritten with the read results.
+/**
+ * Read the Gpio(s) value. The user must provide an integer array with a length equal to the
+ * number of pins provided to mraa_gpio_init_multi() function.
+ *
+ * @param dev The Gpio context
+ * @param output_values The array provided by the user. Existing values will be overwritten with the newly read ones.
+ * @return Result of operation
  */
 mraa_result_t mraa_gpio_read_multi(mraa_gpio_context dev, int output_values[]);
 
@@ -230,6 +265,15 @@ mraa_result_t mraa_gpio_read_multi(mraa_gpio_context dev, int output_values[]);
  */
 mraa_result_t mraa_gpio_write(mraa_gpio_context dev, int value);
 
+/**
+ * Write to the Gpio(s) Value. The user must provide an integer array with a length equal to the
+ * number of pins provided to mraa_gpio_init_multi() function.
+ *
+ * @param dev The Gpio context
+ * @param output_values The array provided by the user. It must contain the values intended to be written
+ * to the gpio pins, in the same order as the init function.
+ * @return Result of operation
+ */
 mraa_result_t mraa_gpio_write_multi(mraa_gpio_context dev, int input_values[]);
 
 /**
