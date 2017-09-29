@@ -39,7 +39,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <time.h>
+#include <sys/time.h>
 
 #define SYSFS_CLASS_GPIO "/sys/class/gpio"
 #define MAX_SIZE 64
@@ -483,15 +483,10 @@ mraa_gpio_get_events(mraa_gpio_context dev)
 mraa_timestamp_t
 _mraa_gpio_get_timestamp_sysfs()
 {
-    struct timespec tspec;
-    int result;
+    struct timeval time;
+    gettimeofday(&time, NULL);
 
-    if ((result = clock_gettime(CLOCK_REALTIME, &tspec)) != 0) {
-        syslog(LOG_ERR, "clock_gettime() error");
-        return 0;
-    }
-
-    return tspec.tv_nsec;
+    return (time.tv_sec * 1e6 + time.tv_usec);
 }
 
 static void*
