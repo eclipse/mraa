@@ -180,8 +180,8 @@ endif ()
 
 if (BUILDDOC)
   # add a target to generate API documentation with Doxygen
-  find_package (Doxygen 1.8.11 REQUIRED)
-  if (DOXYGEN_FOUND)
+  find_package (Doxygen 1.8 REQUIRED)
+  if (DOXYGEN_FOUND AND DOXYGEN_VERSION VERSION_GREATER "1.8")
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
     if (BUILDSWIGJAVA)
       configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.java.in ${CMAKE_CURRENT_BINARY_DIR}/src/java/Doxyfile @ONLY)
@@ -191,7 +191,9 @@ if (BUILDDOC)
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       COMMENT "Generating API documentation with Doxygen" VERBATIM
     )
-  endif (DOXYGEN_FOUND)
+  else ()
+    message (SEND_ERROR "ERROR - Failed to find a compatible version of Doxygen. API doc will not be generated")
+  endif (DOXYGEN_FOUND AND DOXYGEN_VERSION VERSION_GREATER "1.8")
 endif ()
 
 if (IPK)
