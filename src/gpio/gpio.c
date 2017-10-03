@@ -195,6 +195,7 @@ mraa_gpio_init(int pin)
     }
 
     /* We only have one pin. No need for multiple pin legacy support. */
+    r->num_pins = 1;
     r->next = NULL;
 
     r->event_timestamp = 0;
@@ -1137,7 +1138,9 @@ mraa_result_t
 mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
 {
     mraa_result_t result = MRAA_SUCCESS;
-    unsigned flags;
+
+    /* Initialize with 'unusable'. */
+    unsigned flags = GPIOLINE_FLAG_KERNEL;
 
     if (plat->chardev_capable) {
         mraa_gpiod_group_t gpio_iter;
@@ -1153,6 +1156,11 @@ mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
 
             /* We don't need to iterate further. */
             break;
+        }
+
+        if (flags & GPIOLINE_FLAG_KERNEL) {
+            syslog(LOG_ERR, "[GPIOD_INTERFACE]: cannot read gpio direction. Line used by kernel.");
+            return MRAA_ERROR_UNSPECIFIED;
         }
 
         *dir = flags & GPIOLINE_FLAG_IS_OUT ? MRAA_GPIO_OUT : MRAA_GPIO_IN;
