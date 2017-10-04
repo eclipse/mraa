@@ -114,6 +114,7 @@ set (mraa_LIB_MOCK_SRCS_NOAUTO
 
 set (mraa_LIB_AFB_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/afb/afb.c
+  ${PROJECT_SOURCE_DIR}/src/afb/wrapjson/wrap-json.c
 )
 
 set (mraa_LIB_PERIPHERALMAN_SRCS_NOAUTO
@@ -220,6 +221,13 @@ if (JSONPLAT OR IMRAA)
     include_directories (${JSON-C_INCLUDE_DIR})
     set (mraa_LIBS ${mraa_LIBS} ${JSON-C_LIBRARIES})
   endif ()
+endif ()
+
+if (AFBPLAT)
+  # AFBPLAT will find json this way even if above is disabled
+  pkg_check_modules (AFBWSC REQUIRED libafbwsc)
+  include_directories (${AFBWSC_INCLUDE_DIR})
+  set (mraa_LIBS ${mraa_LIBS} ${AFBWSC_LIBRARIES})
 endif ()
 
 set (mraa_LIB_SRCS

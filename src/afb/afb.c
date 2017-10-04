@@ -24,15 +24,58 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+
+#include <afb/afb-wsj1.h>
+#include <afb/afb-ws-client.h>
+#include <systemd/sd-event.h>
+#include <json-c/json.h>
 
 #include "common.h"
 #include "afb/afb_board.h"
 
 #define PLATFORM_NAME "MRAA AFB platform"
 
+static void on_call(void *closure, const char *api, const char *verb, struct afb_wsj1_msg *msg)
+{
+	int rc;
+	printf("ON-CALL %s/%s:\n%s\n", api, verb,
+			json_object_to_json_string_ext(afb_wsj1_msg_object_j(msg),
+						JSON_C_TO_STRING_PRETTY));
+	fflush(stdout);
+	rc = afb_wsj1_reply_error_s(msg, "\"unimplemented\"", NULL);
+	if (rc < 0)
+		fprintf(stderr, "replying failed: %m\n");
+}
+
+/* the callback interface for wsj1 */
+static struct afb_wsj1_itf itf = {
+    .on_hangup = 0,
+    .on_call = on_call,
+    .on_event = 0
+};
+
+/* global variables */
+static struct afb_wsj1 *wsj1;
+
+/* makes a call to AFB binding */
+static void
+afb_call(const char *api, const char *verb, const char *object)
+{
+    char *key;
+    int rc;
+
+    /* send the request */
+    rc = afb_wsj1_call_s(wsj1, api, verb, object, NULL, key);
+    if (rc < 0) {
+        fprintf(stderr, "calling %s/%s(%s) failed: %m\n", api, verb, object);
+    }
+}
+
 mraa_result_t
 mraa_afb_i2c_init_bus_replace(mraa_i2c_context dev)
 {
+    afb_call("mraa", "dev-init", "['mraa_i2c_init', 0]");
     return MRAA_SUCCESS;
 }
 
@@ -52,6 +95,13 @@ mraa_afb_i2c_set_frequency_replace(mraa_i2c_context dev, mraa_i2c_mode_t mode)
 mraa_result_t
 mraa_afb_i2c_address_replace(mraa_i2c_context dev, uint8_t addr)
 {
+    dev->addr = addr;
+
+    char* command;
+    command = calloc(sizeof(char), 255);
+    snprintf(command, 255, "['mraa_i2c_address', 0, %d]", addr);
+    afb_call("mraa", "command", command);
+
     return MRAA_SUCCESS;
 }
 
@@ -88,7 +138,11 @@ mraa_afb_i2c_read_word_data_replace(mraa_i2c_context dev, uint8_t command)
 mraa_result_t
 mraa_afb_i2c_write_replace(mraa_i2c_context dev, const uint8_t* data, int length)
 {
-    return MRAA_ERROR_UNSPECIFIED;
+    char* command;
+    command = calloc(sizeof(char), 255);
+    snprintf(command, 255, "['mraa_i2c_write', 0, %s, %d]", data, length);
+    afb_call("mraa", "command", command);
+    return MRAA_SUCCESS;
 }
 
 mraa_result_t
@@ -150,12 +204,31 @@ mraa_afb_board()
     b->adv_func->i2c_write_byte_data_replace = &mraa_afb_i2c_write_byte_data_replace;
     b->adv_func->i2c_write_word_data_replace = &mraa_afb_i2c_write_word_data_replace;
 
-    return b;
+    int rc;
+    char uri[500];
+    sd_event *loop;
 
-error:
-    syslog(LOG_CRIT, "MRAA afb: Platform failed to initialise");
-    free(b);
-    return NULL;
+    /*get port and token from the command arg*/
+    char *port = "12345";
+    char *token = "";
+
+    /*Generate uri*/
+    sprintf (uri, "127.0.0.1:%s/api?token=%s", port, token);
+
+    rc = sd_event_default(&loop);
+    if (rc < 0) {
+        fprintf(stderr, "connection to default event loop failed: %s\n", strerror(-rc));
+        return NULL;
+    }
+
+    /* connect the websocket wsj1 to the uri given by the first argument */
+    wsj1 = afb_ws_client_connect_wsj1(loop, uri, &itf, NULL);
+    if (wsj1 == NULL) {
+        fprintf(stderr, "connection to %s failed: %m\n", uri);
+        return NULL;
+    }
+
+    return b;
 }
 
 mraa_platform_t
