@@ -45,6 +45,8 @@ set(archdetect_c_code "
     #error cmake_ARCH x86_64
 #elif defined(__ia64) || defined(__ia64__) || defined(_M_IA64)
     #error cmake_ARCH ia64
+#elif defined(__mips) || defined(__mips__) || defined(_M_MRX000)
+    #error cmake_ARCH mips
 #elif defined(__ppc__) || defined(__ppc) || defined(__powerpc__) \\
       || defined(_ARCH_COM) || defined(_ARCH_PWR) || defined(_ARCH_PPC)  \\
       || defined(_M_MPPC) || defined(_M_PPC)
