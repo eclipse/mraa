@@ -97,6 +97,11 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/arm/de_nano_soc.c
 )
 
+set (mraa_LIB_MIPS_SRCS_NOAUTO
+  ${PROJECT_SOURCE_DIR}/src/mips/mips.c
+  ${PROJECT_SOURCE_DIR}/src/mips/mediatek.c
+)
+
 set (mraa_LIB_MOCK_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/mock/mock.c
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board.c
@@ -132,6 +137,11 @@ endif()
 if (ARMPLAT)
   add_subdirectory(arm)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DARMPLAT=1")
+endif()
+
+if (MIPSPLAT)
+  add_subdirectory(mips)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMIPSPLAT=1")
 endif()
 
 if (MOCKPLAT)
