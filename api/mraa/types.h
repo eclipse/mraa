@@ -57,6 +57,7 @@ typedef enum {
     MRAA_PHYBOARD_WEGA = 14,        /**< The phyBOARD-Wega */
     MRAA_DE_NANO_SOC = 15,          /**< Terasic DE-Nano-SoC Board */
     MRAA_UP2 = 16,                  /**< The UP^2 Board */
+    MRAA_INTEL_MINNOWBOARD_TURBOT = 17, /**< The Intel Minnow Board Max */
 
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
