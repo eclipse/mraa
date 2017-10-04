@@ -56,6 +56,8 @@ Specific platform information for supported platforms is documented here:
 - @ref firmata
 - @ref grovepi
 - @ref mock
+- @ref linkit_7688
+- @ref omega2
 
 ## DEBUGGING
 
