@@ -148,17 +148,25 @@ mraa_afb_i2c_write_replace(mraa_i2c_context dev, const uint8_t* data, int length
 mraa_result_t
 mraa_afb_i2c_write_byte_replace(mraa_i2c_context dev, const uint8_t data)
 {
-    return MRAA_ERROR_UNSPECIFIED;
+    char* command;
+    command = calloc(sizeof(char), 255);
+    snprintf(command, 255, "['mraa_i2c_write_byte', 0, %d]", data);
+    afb_call("mraa", "command", command);
+    return MRAA_SUCCESS;
 }
 
 mraa_result_t
-mraa_afb_i2c_write_byte_data_replace(mraa_i2c_context dev, const uint8_t data, const uint8_t command)
+mraa_afb_i2c_write_byte_data_replace(mraa_i2c_context dev, const uint8_t data, const uint8_t reg)
 {
-    return MRAA_ERROR_UNSPECIFIED;
+    char* command;
+    command = calloc(sizeof(char), 255);
+    snprintf(command, 255, "['mraa_i2c_write_byte_data', 0, %d, %d]", data, reg);
+    afb_call("mraa", "command", command);
+    return MRAA_SUCCESS;
 }
 
 mraa_result_t
-mraa_afb_i2c_write_word_data_replace(mraa_i2c_context dev, const uint16_t data, const uint8_t command)
+mraa_afb_i2c_write_word_data_replace(mraa_i2c_context dev, const uint16_t data, const uint8_t reg)
 {
     return MRAA_ERROR_UNSPECIFIED;
 }
@@ -209,8 +217,8 @@ mraa_afb_board()
     sd_event *loop;
 
     /*get port and token from the command arg*/
-    char *port = "12345";
-    char *token = "";
+    char *port = "1521";
+    char *token = "x";
 
     /*Generate uri*/
     sprintf (uri, "127.0.0.1:%s/api?token=%s", port, token);

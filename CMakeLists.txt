@@ -161,6 +161,7 @@ else ()
   message (STATUS "INFO - Override arch is ${DETECTED_ARCH}")
 endif()
 
+# Virtual platforms are capitalised, hardware platforms are not
 if (DETECTED_ARCH STREQUAL "i586" OR DETECTED_ARCH STREQUAL "x86_64"
     OR DETECTED_ARCH STREQUAL "i386")
   set (X86PLAT ON)
@@ -175,7 +176,7 @@ elseif (DETECTED_ARCH STREQUAL "AFB")
 elseif (DETECTED_ARCH STREQUAL "PERIPHERALMAN")
   set (PERIPHERALMAN ON)
 else ()
-  message (FATAL_ERROR "Only x86, arm, mips, PERIPHERALMAN and mock platforms currently supported")
+        message (FATAL_ERROR "Only x86, arm, mips, PERIPHERALMAN, AFB and MOCK platforms currently supported")
 endif()
 
 if (BUILDSWIGPYTHON OR BUILDTESTS)
