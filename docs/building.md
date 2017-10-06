@@ -152,6 +152,7 @@ tar caf mraa.tar.bz2 cov-int
 ~~~~~~~~~~~~~
 
 ## Building Java bindings
+
 Have JAVA_HOME set to JDK install directory. Most distributions set this from `/etc/profile.d/`
  and have a way of switching between alternatives. We support both OpenJDK and Oracle's JDK.
  On Arch Linux with OpenJDK 8 you'll have to set this yourself like this:
@@ -191,17 +192,37 @@ cmake -DRPM=ON -DCMAKE_INSTALL_PREFIX=/usr ..
 ## Building for the Android Things Peripheralmanager Client
 
 Requirements:
-* Android [Things Native Library](https://github.com/androidthings/native-libandroidthings)
-* Android NDK >= 14b
+* [Android Things Native Library](https://github.com/androidthings/native-libandroidthings) >= 0.5.1
+* [Android NDK](https://developer.android.com/ndk/downloads/index.html) >= 14b
 
-The [Things Native Library](https://github.com/androidthings/native-libandroidthings) contains a CMake find_package module
-[FindAndroidThings.cmake](https://github.com/androidthings/native-libandroidthings/blob/master/FindAndroidThings.cmake). Make sure the directory containing this module is
-added to the CMAKE_MODULE_PATH.
+The [Android NDK](https://developer.android.com/ndk/downloads/index.html) contains a CMake find_package module
+`FindAndroidThings.cmake`. Make sure the directory containing this module is
+added to the `CMAKE_MODULE_PATH`.
 
-### NDK r14b
+### Android NDK r14b
 
 ~~~~~~~~~~~~~{.sh}
-cmake -DBUILDSWIG=OFF -DBUILDARCH=PERIPHERALMAN -DANDROID_TOOLCHAIN_NAME=x86-i686 -DCMAKE_TOOLCHAIN_FILE=/path/to/android-ndk-r14b/build/cmake/android.toolchain.cmake -DCMAKE_MODULE_PATH=/path/to/native-libandroidthings ..
+NDK_HOME="/path/to/android-ndk-r14b"
+ANDROIDTHINGS_NATIVE_LIB="/path/to/native-libandroidthings-0.5.1-devpreview"
+
+cmake -DBUILDSWIG=ON \
+      -DBUILDSWIGPYTHON=OFF \
+      -DBUILDSWIGNODE=OFF \
+      -DBUILDSWIGJAVA=ON \
+      -DANDROID_COMPILER_FLAGS_CXX='-std=c++11' \
+      -DANDROID_PIE=1 \
+      -DANDROID_PLATFORM=android-24 \
+      -DANDROID_STL_FORCE_FEATURES=ON \
+      -DANDROID_STL=c++_shared \
+      -DANDROID_TOOLCHAIN_NAME=x86-i686 \
+      -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+      -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+      -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=BOTH \
+      -DCMAKE_FIND_ROOT_PATH=$NDK_HOME/platforms/android-24/arch-x86/ \
+      -DCMAKE_MODULE_PATH=$ANDROIDTHINGS_NATIVE_LIB \
+      -DCMAKE_TOOLCHAIN_FILE=$NDK_HOME/build/cmake/android.toolchain.cmake \
+      -DBUILDARCH=PERIPHERALMAN \
+      ..
 ~~~~~~~~~~~~~
 
 ## Building with Docker
