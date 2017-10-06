@@ -1,7 +1,44 @@
 #!/usr/bin/env bash
+#
+# The script is used to build .aar packages for Mraa modules.
+#
+# Author: Nicolas Oliver <dario.n.oliver@intel.com>
+#
+# All environment variables used are passed from docker-compose.
+# Those environment variables can also be declared in the host,
+# and this script can be used to build .aar packages without using
+# docker-compose.
+#
+# Environment variables:
+#    - NDK_HOME - Path to Android NDK install folder. i.e. /opt/android-ndk-r14b/
+#    - ANDROIDTHINGS_NATIVE_LIB - Path to Android Things library install folder. i.e /opt/native-libandroidthings-0.5.1-devpreview/
+#    - JAVA_HOME - Path to Java install folder. i.e. /usr/lib/jvm/java-8-openjdk-amd64/
+#
+set -e
 
-PKG_CONFIG_LIBDIR=$NDK_HOME/platforms/android-24/arch-x86/usr/lib
+# Check required environment variables and exit if they are not set
+function check_environment {
+  VAR_NAME=$1
+  VAR_VALUE=$2
+  # Check required parameters
+  VAR_NAME=${VAR_NAME:?value not provided}
+  # Chek if variable is set
+  if [ -z "${VAR_VALUE}" ]; then
+    echo "Required environment variable ${VAR_NAME} is not defined. Exiting..."
+    exit 1;
+  else
+    echo "Required environment variable ${VAR_NAME} is set."
+  fi
+}
+
+# Check for required environment variables
+check_environment "NDK_HOME" ${NDK_HOME}
+check_environment "ANDROIDTHINGS_NATIVE_LIB" ${ANDROIDTHINGS_NATIVE_LIB}
+check_environment "JAVA_HOME" ${JAVA_HOME}
+
+PKG_CONFIG_LIBDIR="$NDK_HOME/platforms/android-24/arch-x86/usr/lib"
 PKG_CONFIG_SYSROOT_DIR=""
+export PKG_CONFIG_LIBDIR
 
 # Run cmake
 cmake \
@@ -11,6 +48,7 @@ cmake \
   -DANDROID_STL_FORCE_FEATURES=on \
   -DANDROID_STL=c++_shared \
   -DANDROID_TOOLCHAIN_NAME=x86-i686 \
+  -DCMAKE_INSTALL_PREFIX=install \
   -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
   -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
   -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=BOTH \
@@ -50,7 +88,7 @@ make -Cbuild install
 # Anotate the .java src from doxygen
 echo src/mraa.i > build/swig.i.list
 # TODO: install doxy port tool
-#doxyport \
+#../doxy/doxyport \
 #  build/swig.i.list \
 #  -s api,api/mraa \
 #  -d build/src/java \
@@ -60,7 +98,6 @@ echo src/mraa.i > build/swig.i.list
 
 # Copy the STL implementation into the build/src directory
 cp $NDK_HOME/sources/cxx-stl/llvm-libc++/libs/x86/libc++_shared.so build/src/
-
 
 # Template for res/values/values.xml in aar
 values_xml='<?xml version="1.0" encoding="utf-8"?><resources><string name="app_name">XXX_LIBRARY</string></resources>'
@@ -122,10 +159,10 @@ jar cf $PKG_BUNDLE_DIR/$LIB_NAME-$VERSION-javadoc.jar $LIB_NAME-javadoc/*
 jar cf $PKG_BUNDLE_DIR/$LIB_NAME-$VERSION-sources.jar src/java/*.java
 
 # HACK - mraa pom file groupId is io.mraa (AT is io.mraa.at)
-perl -p -i -e 's/(groupId>)(.*?)(<\/groupId)/\1io.mraa.at\3/' src/java/$LIB_NAME-$VERSION.pom
+perl -p -i.bak -e 's/(groupId>)(.*?)(<\/groupId)/\1io.mraa.at\3/' src/java/$LIB_NAME-$VERSION.pom
 
 # HACK - mraa pom file packaging is 'jar' (convert this to 'aar')
-perl -p -i -e 's/(packaging>)(.*?)(<\/packaging)/\1aar\3/' src/java/$LIB_NAME-$VERSION.pom
+perl -p -i.bak -e 's/(packaging>)(.*?)(<\/packaging)/\1aar\3/' src/java/$LIB_NAME-$VERSION.pom
 
 # Copy pom file
 cp src/java/$LIB_NAME-$VERSION.pom $PKG_BUNDLE_DIR
