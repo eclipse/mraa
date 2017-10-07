@@ -1,4 +1,4 @@
-Linkit Smart 7688    {#linkit}
+Linkit Smart 7688    {#linkit_7688}
 =================
 
 The Linkit Smart 7688 is based on the MediaTek MT7688 system on a chip, which
