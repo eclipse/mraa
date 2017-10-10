@@ -3,7 +3,7 @@ version: '2.1'
 services:
 
   base:
-    image: dnoliver/mraa-base
+    image: inteliotdevkit/mraa-base
     environment:
       - http_proxy
       - https_proxy
@@ -32,9 +32,12 @@ services:
     volumes:
       - .:${MRAA_SRC_DIR:-/usr/src/app}
 
-  doc:
+  all:
     extends: base
-    image: dnoliver/mraa-all
+    image: inteliotdevkit/mraa-all
+
+  doc:
+    extends: all
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
@@ -44,8 +47,7 @@ services:
     command: bash -c "./scripts/run-cmake.sh && ./scripts/build-doc.sh"
 
   sonar-scan:
-    extends: base
-    image: dnoliver/mraa-all
+    extends: all
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
@@ -64,51 +66,45 @@ services:
     command: bash -c "./scripts/run-cmake.sh && cd build && ../scripts/sonar-scan.sh"
 
   usbplat:
-    extends: base
-    image: dnoliver/mraa-all
+    extends: all
     environment:
       - USBPLAT=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
 
   firmata:
-    extends: base
-    image: dnoliver/mraa-all
+    extends: all
     environment:
       - FIRMATA=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
 
   imraa:
-    extends: base
-    image: dnoliver/mraa-all
+    extends: all
     environment:
       - IMRAA=ON
       - FIRMATA=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
 
   ftdi4442:
-    extends: base
-    image: dnoliver/mraa-all
+    extends: all
     environment:
       - FTDI4222=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
 
   ipk:
-    extends: base
-    image: dnoliver/mraa-all
+    extends: all
     environment:
       - IPK=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
 
   rpm:
-    extends: base
-    image: dnoliver/mraa-all
+    extends: all
     environment:
       - RPM=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
 
   python2:
     extends: base
-    image: dnoliver/mraa-python
+    image: inteliotdevkit/mraa-python
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
@@ -122,7 +118,7 @@ services:
 
   java:
     extends: base
-    image: dnoliver/mraa-java
+    image: inteliotdevkit/mraa-java
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGJAVA=ON
@@ -130,14 +126,14 @@ services:
 
   android:
     extends: java
-    image: dnoliver/mraa-android
+    image: inteliotdevkit/mraa-android
     environment:
       - BUILDARCH=PERIPHERALMAN
     command: bash -c "./scripts/build-android.sh"
 
   node4:
     extends: base
-    image: dnoliver/mraa-node4
+    image: inteliotdevkit/mraa-node4
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGNODE=ON
@@ -145,8 +141,8 @@ services:
 
   node5:
     extends: node4
-    image: dnoliver/mraa-node5
+    image: inteliotdevkit/mraa-node5
 
   node6:
     extends: node4
-    image: dnoliver/mraa-node6
+    image: inteliotdevkit/mraa-node6
