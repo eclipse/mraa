@@ -154,8 +154,6 @@ struct _gpio {
 #ifdef PERIPHERALMAN
     AGpio *bgpio;
 #endif
-    /* Support for sysfs last event timestamp. */
-    mraa_timestamp_t event_timestamp;
 
     struct _gpio_group *gpio_group;
     unsigned int num_chips;

@@ -59,6 +59,16 @@ _mraa_gpio_get_valfp(mraa_gpio_context dev)
     return MRAA_SUCCESS;
 }
 
+void
+mraa_gpio_close_event_handles_sysfs(int fds[], int num_fds)
+{
+    for (int i = 0; i < num_fds; ++i) {
+        close(fds[i]);
+    }
+
+    free(fds);
+}
+
 static mraa_gpio_context
 mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
 {
@@ -112,13 +122,15 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
         } else {
             int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
             if (export == -1) {
-                syslog(LOG_ERR, "gpio%i: init: Failed to open 'export' for writing: %s", pin, strerror(errno));
+                syslog(LOG_ERR, "gpio%i: init: Failed to open 'export' for writing: %s",
+                       pin, strerror(errno));
                 status = MRAA_ERROR_INVALID_RESOURCE;
                 goto init_internal_cleanup;
             }
             length = snprintf(bu, sizeof(bu), "%d", dev->pin);
             if (write(export, bu, length * sizeof(char)) == -1) {
-                syslog(LOG_ERR, "gpio%i: init: Failed to write to 'export': %s", pin, strerror(errno));
+                syslog(LOG_ERR, "gpio%i: init: Failed to write to 'export': %s",
+                       pin, strerror(errno));
                 close(export);
                 status = MRAA_ERROR_INVALID_RESOURCE;
                 goto init_internal_cleanup;
@@ -128,12 +140,20 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
         }
     }
 
+    /* We only have one pin. No need for multiple pin legacy support. */
+    dev->num_pins = 1;
+    dev->next = NULL;
+
+    /* Initialize events array. */
+    dev->events = NULL;
+
 init_internal_cleanup:
     if (status != MRAA_SUCCESS) {
         if (dev != NULL)
             free(dev);
         return NULL;
     }
+
     return dev;
 }
 
@@ -163,7 +183,8 @@ mraa_gpio_init(int pin)
     }
 
     if (pin < 0 || pin >= board->phy_pin_count) {
-        syslog(LOG_ERR, "gpio: init: pin %i beyond platform pin count (%i)", pin, board->phy_pin_count);
+        syslog(LOG_ERR, "gpio: init: pin %i beyond platform pin count (%i)",
+               pin, board->phy_pin_count);
         return NULL;
     }
     if (board->pins[pin].capabilities.gpio != 1) {
@@ -194,12 +215,6 @@ mraa_gpio_init(int pin)
         }
     }
 
-    /* We only have one pin. No need for multiple pin legacy support. */
-    r->num_pins = 1;
-    r->next = NULL;
-
-    r->event_timestamp = 0;
-
     return r;
 }
 
@@ -219,6 +234,10 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
     }
 
     dev->pin_to_gpio_table = malloc(num_pins * sizeof(int));
+    if (dev->pin_to_gpio_table == NULL) {
+        syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+        return NULL;
+    }
 
     dev->num_chips = mraa_get_number_of_gpio_chips();
     if (dev->num_chips <= 0) {
@@ -229,6 +248,11 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
     dev->num_pins = num_pins;
 
     gpio_group = calloc(dev->num_chips, sizeof(struct _gpio_group));
+    if (gpio_group == NULL) {
+        syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+        return NULL;
+    }
+
     for (int i = 0; i < dev->num_chips; ++i) {
         gpio_group[i].gpio_chip = i;
         /* Just to be sure realloc has the desired behaviour. */
@@ -240,8 +264,7 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
             syslog(LOG_NOTICE, "[GPIOD_INTERFACE]: init: Using sub platform for %d", pins[i]);
             board = board->sub_platform;
             if (board == NULL) {
-                syslog(LOG_ERR, "[GPIOD_INTERFACE]: init: Sub platform not initialised for pin %d",
-                       pins[i]);
+                syslog(LOG_ERR, "[GPIOD_INTERFACE]: init: Sub platform not initialised for pin %d", pins[i]);
                 return NULL;
             }
             pins[i] = mraa_get_sub_platform_index(pins[i]);
@@ -275,8 +298,6 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
             mraa_gpiod_chip_info* cinfo = mraa_get_chip_info_by_number(chip_id);
             if (!cinfo) {
                 syslog(LOG_ERR, "[GPIOD_INTERFACE]: error getting gpio_chip_info for chip %d", chip_id);
-                _mraa_free_gpio_groups(dev);
-                free(dev);
                 return NULL;
             }
 
@@ -289,8 +310,12 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
 
         int line_in_group;
         line_in_group = gpio_group[chip_id].num_gpio_lines;
-        gpio_group[chip_id].gpio_lines =
-        realloc(gpio_group[chip_id].gpio_lines, (line_in_group + 1) * sizeof(unsigned int));
+        gpio_group[chip_id].gpio_lines = realloc(gpio_group[chip_id].gpio_lines,
+                                                 (line_in_group + 1) * sizeof(unsigned int));
+        if (gpio_group[chip_id].gpio_lines == NULL) {
+            syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+            return NULL;
+        }
 
         gpio_group[chip_id].gpio_lines[line_in_group] = line_offset;
         gpio_group[chip_id].num_gpio_lines++;
@@ -300,7 +325,16 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
      * Also, allocate memory for inverse map: */
     for (int i = 0; i < dev->num_chips; ++i) {
         gpio_group[i].rw_values = calloc(gpio_group[i].num_gpio_lines, sizeof(unsigned char));
+        if (gpio_group[i].rw_values == NULL) {
+            syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+            return NULL;
+        }
+
         gpio_group[i].gpio_group_to_pins_table = calloc(gpio_group[i].num_gpio_lines, sizeof(int));
+        if (gpio_group[i].gpio_group_to_pins_table == NULL) {
+            syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+            return NULL;
+        }
 
         /* Set event handle arrays for all lines contained on a chip to NULL. */
         gpio_group[i].event_handles = NULL;
@@ -309,6 +343,11 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
     /* Finally map the inverse relation between a gpio group and its original pin numbers
      * provided by user. */
     int* counters = calloc(dev->num_chips, sizeof(int));
+    if (counters == NULL) {
+        syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for local variable");
+        return NULL;
+    }
+
     for (int i = 0; i < num_pins; ++i) {
         int chip = dev->pin_to_gpio_table[i];
         gpio_group[chip].gpio_group_to_pins_table[counters[chip]] = i;
@@ -316,17 +355,19 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
     }
     free(counters);
 
-    /* Initialize events array. */
-    dev->events = malloc(dev->num_pins * sizeof (mraa_gpio_event));
-    for (int i = 0; i < dev->num_pins; ++i) {
-        dev->events[i].id = -1;
-    }
-
     dev->gpio_group = gpio_group;
 
     /* Save the provided array from the user to our internal structure. */
     dev->provided_pins = malloc(dev->num_pins * sizeof(int));
+    if (dev->provided_pins == NULL) {
+        syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+        return NULL;
+    }
+
     memcpy(dev->provided_pins, pins, dev->num_pins * sizeof(int));
+
+    /* Initialize events array. */
+    dev->events = NULL;
 
     return dev;
 }
@@ -365,6 +406,8 @@ mraa_gpio_init_multi(int pins[], int num_pins)
         current->next = NULL;
     }
 
+    head->num_pins = num_pins;
+
     return head;
 }
 
@@ -374,53 +417,72 @@ mraa_gpio_init_raw(int pin)
     return mraa_gpio_init_internal(plat == NULL ? NULL : plat->adv_func, pin);
 }
 
+mraa_timestamp_t
+_mraa_gpio_get_timestamp_sysfs()
+{
+    struct timeval time;
+    gettimeofday(&time, NULL);
+
+    return (time.tv_sec * 1e6 + time.tv_usec);
+}
 
 static mraa_result_t
-mraa_gpio_wait_interrupt(int fd
+mraa_gpio_wait_interrupt(int fds[],
+                         int num_fds
 #ifndef HAVE_PTHREAD_CANCEL
                          ,
                          int control_fd
 #endif
+                        ,
+                         mraa_gpio_events_t events
 )
 {
     unsigned char c;
 #ifdef HAVE_PTHREAD_CANCEL
-    struct pollfd pfd[1];
+    struct pollfd pfd[num_fds];
 #else
-    struct pollfd pfd[2];
+    struct pollfd pfd[num_fds + 1];
 
     if (control_fd < 0) {
         return MRAA_ERROR_INVALID_PARAMETER;
     }
 #endif
 
-    if (fd < 0) {
+    if (!fds) {
         return MRAA_ERROR_INVALID_PARAMETER;
     }
 
-    // setup poll on POLLPRI
-    pfd[0].fd = fd;
-    pfd[0].events = POLLPRI;
+    for (int i = 0; i < num_fds; ++i) {
+        pfd[i].fd = fds[i];
+        // setup poll on POLLPRI
+        pfd[i].events = POLLPRI;
 
-    // do an initial read to clear interrupt
-    lseek(fd, 0, SEEK_SET);
-    read(fd, &c, 1);
+        // do an initial read to clear interrupt
+        lseek(fds[i], 0, SEEK_SET);
+        read(fds[i], &c, 1);
+    }
 
 #ifdef HAVE_PTHREAD_CANCEL
     // Wait for it forever or until pthread_cancel
     // poll is a cancelable point like sleep()
-    poll(pfd, 1, -1);
+    poll(pfd, num_fds, -1);
 #else
     // setup poll on the controling fd
-    pfd[1].fd = control_fd;
-    pfd[1].events = 0; //  POLLHUP, POLLERR, and POLLNVAL
+    pfd[num_fds].fd = control_fd;
+    pfd[num_fds].events = 0; //  POLLHUP, POLLERR, and POLLNVAL
 
     // Wait for it forever or until control fd is closed
-    poll(pfd, 2, -1);
+    poll(pfd, num_fds + 1, -1);
 #endif
 
-    // do a final read to clear interrupt
-    read(fd, &c, 1);
+    for (int i = 0; i < num_fds; ++i) {
+        if (pfd[i].revents & POLLPRI) {
+            read(fds[i], &c, 1);
+            events[i].id = i;
+            events[i].timestamp = _mraa_gpio_get_timestamp_sysfs();
+        } else
+            events[i].id = -1;
+    }
 
     return MRAA_SUCCESS;
 }
@@ -459,35 +521,40 @@ mraa_gpio_chardev_wait_interrupt(int fds[], int num_fds, mraa_gpio_events_t even
 mraa_gpio_events_t
 mraa_gpio_get_events(mraa_gpio_context dev)
 {
-    if (!plat->chardev_capable) {
-        syslog(LOG_ERR, "mraa_gpio_get_events() available only for chardev interface!");
-        return NULL;
+    if (dev == NULL) {
+        syslog(LOG_ERR, "gpio: mraa_gpio_get_events(): context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    mraa_gpiod_group_t gpio_iter;
     unsigned int event_idx = 0;
-    unsigned int pin_idx;
 
-    for_each_gpio_group(gpio_iter, dev) {
-        for (int i = 0; i < gpio_iter->num_gpio_lines; ++i) {
-            if (dev->events[event_idx].id != -1) {
-                pin_idx = gpio_iter->gpio_group_to_pins_table[i];
-                dev->events[event_idx].id = dev->provided_pins[pin_idx];
+    if (plat->chardev_capable) {
+        unsigned int pin_idx;
+        mraa_gpiod_group_t gpio_iter;
+
+        for_each_gpio_group(gpio_iter, dev) {
+            for (int i = 0; i < gpio_iter->num_gpio_lines; ++i) {
+                if (dev->events[event_idx].id != -1) {
+                    pin_idx = gpio_iter->gpio_group_to_pins_table[i];
+                    dev->events[event_idx].id = dev->provided_pins[pin_idx];
+                }
+                event_idx++;
             }
+        }
+    } else {
+        mraa_gpio_context it = dev;
+
+        while (it) {
+            if (dev->events[event_idx].id != -1) {
+                dev->events[event_idx].id = it->phy_pin;
+            }
+
             event_idx++;
+            it = it->next;
         }
     }
 
     return dev->events;
-}
-
-mraa_timestamp_t
-_mraa_gpio_get_timestamp_sysfs()
-{
-    struct timeval time;
-    gettimeofday(&time, NULL);
-
-    return (time.tv_sec * 1e6 + time.tv_usec);
 }
 
 static void*
@@ -498,22 +565,45 @@ mraa_gpio_interrupt_handler(void* arg)
         return NULL;
     }
 
-    mraa_gpio_context dev = (mraa_gpio_context) arg;
-    int fp;
     mraa_result_t ret;
+    mraa_gpio_context dev = (mraa_gpio_context) arg;
+    int idx = 0;
 
     if (IS_FUNC_DEFINED(dev, gpio_interrupt_handler_init_replace)) {
         if (dev->advance_func->gpio_interrupt_handler_init_replace(dev) != MRAA_SUCCESS)
             return NULL;
+    }
+
+    int *fps = malloc(dev->num_pins * sizeof(int));
+    if (!fps) {
+        syslog(LOG_ERR, "mraa_gpio_interrupt_handler_multiple() malloc error");
+        return NULL;
+    }
+
+    if (plat->chardev_capable) {
+        mraa_gpiod_group_t gpio_group;
+
+        for_each_gpio_group(gpio_group, dev) {
+            for (int i = 0; i < gpio_group->num_gpio_lines; ++i) {
+                fps[idx++] = gpio_group->event_handles[i];
+            }
+        }
     } else {
-        // open gpio value with open(3)
-        char bu[MAX_SIZE];
-        snprintf(bu, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/value", dev->pin);
-        fp = open(bu, O_RDONLY);
-        if (fp < 0) {
-            syslog(LOG_ERR, "gpio%i: interrupt_handler: failed to open 'value' : %s", dev->pin,
-                    strerror(errno));
-            return NULL;
+        mraa_gpio_context it = dev;
+
+        while (it) {
+            // open gpio value with open(3)
+            char bu[MAX_SIZE];
+            snprintf(bu, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/value", it->pin);
+            fps[idx] = open(bu, O_RDONLY);
+            if (fps[idx] < 0) {
+                syslog(LOG_ERR, "gpio%i: interrupt_handler: failed to open 'value' : %s", it->pin,
+                       strerror(errno));
+                return NULL;
+            }
+
+            idx++;
+            it = it->next;
         }
     }
 
@@ -521,18 +611,15 @@ mraa_gpio_interrupt_handler(void* arg)
     if (pipe(dev->isr_control_pipe)) {
         syslog(LOG_ERR, "gpio%i: interrupt_handler: failed to create isr control pipe: %s",
                dev->pin, strerror(errno));
-        close(fp);
+        mraa_gpio_close_event_handles_sysfs(fps, dev->num_pins);
         return NULL;
     }
 #endif
 
-    dev->isr_value_fp = fp;
-
     if (lang_func->java_attach_thread != NULL) {
         if (dev->isr == lang_func->java_isr_callback) {
             if (lang_func->java_attach_thread() != MRAA_SUCCESS) {
-                close(dev->isr_value_fp);
-                dev->isr_value_fp = -1;
+                mraa_gpio_close_event_handles_sysfs(fps, dev->num_pins);
                 return NULL;
             }
         }
@@ -542,13 +629,20 @@ mraa_gpio_interrupt_handler(void* arg)
         if (IS_FUNC_DEFINED(dev, gpio_wait_interrupt_replace)) {
             ret = dev->advance_func->gpio_wait_interrupt_replace(dev);
         } else {
-            ret = mraa_gpio_wait_interrupt(dev->isr_value_fp
+            if (plat->chardev_capable) {
+                ret = mraa_gpio_chardev_wait_interrupt(fps, idx, dev->events);
+            } else {
+                ret = mraa_gpio_wait_interrupt(fps, idx
 #ifndef HAVE_PTHREAD_CANCEL
-                                           ,
-                                           dev->isr_control_pipe[0]
+                                                ,
+                                                dev->isr_control_pipe[0]
 #endif
-            );
+                                                ,
+                                                dev->events
+                );
+            }
         }
+
         if (ret == MRAA_SUCCESS && !dev->isr_thread_terminating) {
 #ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
@@ -556,7 +650,6 @@ mraa_gpio_interrupt_handler(void* arg)
             if (lang_func->python_isr != NULL) {
                 lang_func->python_isr(dev->isr, dev->isr_args);
             } else {
-                dev->event_timestamp = _mraa_gpio_get_timestamp_sysfs();
                 dev->isr(dev->isr_args);
             }
 #ifdef HAVE_PTHREAD_CANCEL
@@ -567,9 +660,11 @@ mraa_gpio_interrupt_handler(void* arg)
 #ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 #endif
-            if (fp != -1) {
-                close(dev->isr_value_fp);
-                dev->isr_value_fp = -1;
+            if (fps) {
+                for (int i = 0; i < idx; ++i) {
+                    close(fps[i]);
+                }
+                free(fps);
             }
 
             if (lang_func->java_detach_thread != NULL && lang_func->java_delete_global_ref != NULL) {
@@ -577,71 +672,6 @@ mraa_gpio_interrupt_handler(void* arg)
                     lang_func->java_delete_global_ref(dev->isr_args);
                     lang_func->java_detach_thread();
                 }
-            }
-
-            return NULL;
-        }
-    }
-}
-
-mraa_timestamp_t
-mraa_gpio_get_last_event_timestamp(mraa_gpio_context dev)
-{
-    if (plat->chardev_capable) {
-        syslog(LOG_ERR, "mraa_gpio_get_last_event_timestamp() available for sysfs interface only!");
-        return 0;
-    }
-
-    return dev->event_timestamp;
-}
-
-/* In it's simplest form, for now. */
-static void*
-mraa_gpio_chardev_interrupt_handler(void* arg)
-{
-    if (arg == NULL) {
-        syslog(LOG_ERR, "gpio: interrupt_handler: context is invalid");
-        return NULL;
-    }
-
-    mraa_gpio_context dev = (mraa_gpio_context) arg;
-    mraa_gpiod_group_t gpio_group;
-    mraa_result_t ret;
-    int idx = 0;
-
-    int *fps = malloc(dev->num_pins * sizeof(int));
-    if (!fps) {
-        syslog(LOG_ERR, "mraa_gpio_interrupt_handler_multiple() malloc error");
-        return NULL;
-    }
-
-    for_each_gpio_group(gpio_group, dev)
-    {
-        for (int i = 0; i < gpio_group->num_gpio_lines; ++i) {
-            fps[idx++] = gpio_group->event_handles[i];
-        }
-    }
-
-    for (;;) {
-        ret = mraa_gpio_chardev_wait_interrupt(fps, idx, dev->events);
-
-        if (ret == MRAA_SUCCESS && !dev->isr_thread_terminating) {
-#ifdef HAVE_PTHREAD_CANCEL
-            pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
-#endif
-            dev->isr(dev->isr_args);
-#ifdef HAVE_PTHREAD_CANCEL
-            pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-#endif
-        } else {
-#ifdef HAVE_PTHREAD_CANCEL
-            pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
-#endif
-            if (fps) {
-                for (int i = 0; i < idx; ++i) {
-                    close(fps[i]);
-                }
-                free(fps);
             }
 
             return NULL;
@@ -724,58 +754,72 @@ mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode)
     if (IS_FUNC_DEFINED(dev, gpio_edge_mode_replace))
         return dev->advance_func->gpio_edge_mode_replace(dev, mode);
 
+    /* Initialize events array. */
+    if (dev->events == NULL && mode != MRAA_GPIO_EDGE_NONE) {
+        dev->events = malloc(dev->num_pins * sizeof (mraa_gpio_event));
+        if (dev->events == NULL) {
+            syslog(LOG_ERR, "mraa_gpio_edge_mode() malloc error");
+            return MRAA_ERROR_NO_RESOURCES;
+        }
+
+        for (int i = 0; i < dev->num_pins; ++i) {
+            dev->events[i].id = -1;
+        }
+    }
+
     if (plat->chardev_capable)
         return mraa_gpio_chardev_edge_mode(dev, mode);
 
-    if (dev->value_fp != -1) {
-        close(dev->value_fp);
-        dev->value_fp = -1;
-    }
+    mraa_gpio_context it = dev;
 
-    char filepath[MAX_SIZE];
-    snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/edge", dev->pin);
+    while (it) {
 
-    int edge = open(filepath, O_RDWR);
-    if (edge == -1) {
-        syslog(LOG_ERR, "gpio%i: edge_mode: Failed to open 'edge' for writing: %s", dev->pin,
-                strerror(errno));
-        return MRAA_ERROR_INVALID_RESOURCE;
-    }
+        if (it->value_fp != -1) {
+            close(it->value_fp);
+            it->value_fp = -1;
+        }
 
-    char bu[MAX_SIZE];
-    int length;
-    switch (mode) {
-        case MRAA_GPIO_EDGE_NONE:
-            length = snprintf(bu, sizeof(bu), "none");
-            break;
-        case MRAA_GPIO_EDGE_BOTH:
-            length = snprintf(bu, sizeof(bu), "both");
-            break;
-        case MRAA_GPIO_EDGE_RISING:
-            length = snprintf(bu, sizeof(bu), "rising");
-            break;
-        case MRAA_GPIO_EDGE_FALLING:
-            length = snprintf(bu, sizeof(bu), "falling");
-            break;
-        default:
+        char filepath[MAX_SIZE];
+        snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/edge", it->pin);
+
+        int edge = open(filepath, O_RDWR);
+        if (edge == -1) {
+            syslog(LOG_ERR, "gpio%i: edge_mode: Failed to open 'edge' for writing: %s", it->pin,
+                    strerror(errno));
+            return MRAA_ERROR_INVALID_RESOURCE;
+        }
+
+        char bu[MAX_SIZE];
+        int length;
+        switch (mode) {
+            case MRAA_GPIO_EDGE_NONE:
+                length = snprintf(bu, sizeof(bu), "none");
+                break;
+            case MRAA_GPIO_EDGE_BOTH:
+                length = snprintf(bu, sizeof(bu), "both");
+                break;
+            case MRAA_GPIO_EDGE_RISING:
+                length = snprintf(bu, sizeof(bu), "rising");
+                break;
+            case MRAA_GPIO_EDGE_FALLING:
+                length = snprintf(bu, sizeof(bu), "falling");
+                break;
+            default:
+                close(edge);
+                return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+        }
+        if (write(edge, bu, length * sizeof(char)) == -1) {
+            syslog(LOG_ERR, "gpio%i: edge_mode: Failed to write to 'edge': %s", it->pin, strerror(errno));
             close(edge);
-            return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
-    }
-    if (write(edge, bu, length * sizeof(char)) == -1) {
-        syslog(LOG_ERR, "gpio%i: edge_mode: Failed to write to 'edge': %s", dev->pin, strerror(errno));
-        close(edge);
-        return MRAA_ERROR_UNSPECIFIED;
-    }
+            return MRAA_ERROR_UNSPECIFIED;
+        }
 
-    close(edge);
+        close(edge);
+
+        it = it->next;
+    }
 
     return MRAA_SUCCESS;
-}
-
-mraa_result_t
-mraa_gpio_edge_mode_multi(mraa_gpio_context dev, mraa_gpio_edge_t mode)
-{
-    return mraa_gpio_chardev_edge_mode(dev, mode);
 }
 
 mraa_result_t
@@ -797,11 +841,8 @@ mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t mode, void (*fptr)(void*),
 
     mraa_result_t ret;
 
-    if (plat->chardev_capable) {
-        ret = mraa_gpio_chardev_edge_mode(dev, mode);
-    } else {
-        ret = mraa_gpio_edge_mode(dev, mode);
-    }
+
+    ret = mraa_gpio_edge_mode(dev, mode);
 
     if (ret != MRAA_SUCCESS) {
         return ret;
@@ -819,11 +860,7 @@ mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t mode, void (*fptr)(void*),
 
     dev->isr_args = args;
 
-    if (plat->chardev_capable) {
-        pthread_create(&dev->thread_id, NULL, mraa_gpio_chardev_interrupt_handler, (void*) dev);
-    } else {
-        pthread_create(&dev->thread_id, NULL, mraa_gpio_interrupt_handler, (void*) dev);
-    }
+    pthread_create(&dev->thread_id, NULL, mraa_gpio_interrupt_handler, (void*) dev);
 
     return MRAA_SUCCESS;
 }
@@ -842,7 +879,7 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
     }
 
     // wasting our time, there is no isr to exit from
-    if (dev->thread_id == 0 && dev->isr_value_fp == -1) {
+    if (dev->thread_id == 0) {
         return ret;
     }
     // mark the beginning of the thread termination process for interested parties
@@ -869,17 +906,15 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
 #endif
     }
 
-    // close the filehandle in case it's still open
-    if (dev->isr_value_fp != -1) {
-        if (close(dev->isr_value_fp) != 0) {
-            ret = MRAA_ERROR_INVALID_RESOURCE;
-        }
-    }
-
     // assume our thread will exit either way we just lost it's handle
     dev->thread_id = 0;
     dev->isr_value_fp = -1;
     dev->isr_thread_terminating = 0;
+
+    if (dev->events) {
+      free(dev->events);
+      dev->events = NULL;
+    }
 
     return ret;
 }
@@ -1058,9 +1093,8 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
         return mraa_gpio_chardev_dir(dev, dir);
 
     mraa_gpio_context it = dev;
-    int pins = dev->num_pins;
 
-    while (it && pins) {
+    while (it) {
 
         if (IS_FUNC_DEFINED(it, gpio_dir_replace)) {
                 return it->advance_func->gpio_dir_replace(it, dir);
@@ -1128,7 +1162,6 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
             return it->advance_func->gpio_dir_post(it, dir);
 
         it = it->next;
-        pins--;
     }
 
     return MRAA_SUCCESS;
@@ -1229,11 +1262,13 @@ mraa_gpio_read(mraa_gpio_context dev)
         return output_values[0];
     }
 
-    if (IS_FUNC_DEFINED(dev, gpio_read_replace))
+    if (IS_FUNC_DEFINED(dev, gpio_read_replace)) {
         return dev->advance_func->gpio_read_replace(dev);
+    }
 
-    if (dev->mmap_read != NULL)
+    if (dev->mmap_read != NULL) {
         return dev->mmap_read(dev);
+    }
 
     if (dev->value_fp == -1) {
         if (_mraa_gpio_get_valfp(dev) != MRAA_SUCCESS) {
@@ -1304,6 +1339,7 @@ mraa_gpio_read_multi(mraa_gpio_context dev, int output_values[])
                 syslog(LOG_ERR, "gpio: read_multiple: failed to read multiple gpio pins");
                 return MRAA_ERROR_INVALID_RESOURCE;
             }
+
             i++;
             it = it->next;
         }
@@ -1326,8 +1362,9 @@ mraa_gpio_write(mraa_gpio_context dev, int value)
         return mraa_gpio_write_multi(dev, input_values);
     }
 
-    if (dev->mmap_write != NULL)
+    if (dev->mmap_write != NULL) {
         return dev->mmap_write(dev, value);
+    }
 
     if (IS_FUNC_DEFINED(dev, gpio_write_pre)) {
         mraa_result_t pre_ret = (dev->advance_func->gpio_write_pre(dev, value));
@@ -1376,6 +1413,11 @@ mraa_gpio_write_multi(mraa_gpio_context dev, int input_values[])
         mraa_gpiod_group_t gpio_iter;
 
         int* counters = calloc(dev->num_chips, sizeof(int));
+        if (counters == NULL) {
+            syslog(LOG_ERR, "mraa_gpio_write_multi() malloc error");
+            return MRAA_ERROR_NO_RESOURCES;
+        }
+
         for (int i = 0; i < dev->num_pins; ++i) {
             int chip_id = dev->pin_to_gpio_table[i];
             gpio_iter = &dev->gpio_group[chip_id];
@@ -1455,6 +1497,7 @@ mraa_gpio_unexport(mraa_gpio_context dev)
     if (dev->owner) {
         return mraa_gpio_unexport_force(dev);
     }
+
     return MRAA_ERROR_INVALID_PARAMETER;
 }
 
@@ -1498,6 +1541,10 @@ mraa_gpio_close(mraa_gpio_context dev)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
+    if (dev->events) {
+        free(dev->events);
+    }
+
     if (plat->chardev_capable) {
         _mraa_free_gpio_groups(dev);
 
@@ -1524,8 +1571,10 @@ mraa_gpio_owner(mraa_gpio_context dev, mraa_boolean_t own)
         syslog(LOG_ERR, "gpio: owner: context is invalid");
         return MRAA_ERROR_INVALID_HANDLE;
     }
+
     syslog(LOG_DEBUG, "gpio%i: owner: Set owner to %d", dev->pin, (int) own);
     dev->owner = own;
+
     return MRAA_SUCCESS;
 }
 
@@ -1542,6 +1591,7 @@ mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap_en)
     }
 
     syslog(LOG_ERR, "gpio%i: use_mmaped: mmap not implemented on this platform", dev->pin);
+
     return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
 }
 
@@ -1552,6 +1602,7 @@ mraa_gpio_get_pin(mraa_gpio_context dev)
         syslog(LOG_ERR, "gpio: get_pin: context is invalid");
         return -1;
     }
+
     return dev->phy_pin;
 }
 
@@ -1562,6 +1613,7 @@ mraa_gpio_get_pin_raw(mraa_gpio_context dev)
         syslog(LOG_ERR, "gpio: get_pin: context is invalid");
         return -1;
     }
+
     return dev->pin;
 }
 

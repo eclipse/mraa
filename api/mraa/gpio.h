@@ -149,16 +149,6 @@ mraa_gpio_context mraa_gpio_init_raw(int gpiopin);
 mraa_result_t mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode);
 
 /**
- * Set the edge mode on the gpio for multiple pins.
- * NOTE: Only works for the new chardev interface.
- *
- * @param dev The Gpio context
- * @param mode The edge mode to set the gpio into
- * @return Result of operation
- */
-mraa_result_t mraa_gpio_edge_mode_multi(mraa_gpio_context dev, mraa_gpio_edge_t mode);
-
-/**
  * Set an interrupt on pin(s).
  *
  * @param dev The Gpio context
@@ -172,7 +162,6 @@ mraa_result_t mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t edge, void (
 
 /**
  * Get an array of structures describing triggered events.
- * NOTE: Only for chardev interface.
  *
  * @param dev The Gpio context
  * @return Array of structures containing pairs of pin id's and the associated timestamp.
@@ -180,16 +169,6 @@ mraa_result_t mraa_gpio_isr(mraa_gpio_context dev, mraa_gpio_edge_t edge, void (
  * The array length is that of the number of pins provided in mraa_gpio_init_multi().
  */
 mraa_gpio_events_t mraa_gpio_get_events(mraa_gpio_context dev);
-
-
-/**
- * Get the timestamp for the last triggered event for a single pin.
- * NOTE: Only for sysfs interface.
- *
- * @param dev The Gpio context
- * @return Timestamp of the last produced event for the requested gpio.
- */
-mraa_timestamp_t mraa_gpio_get_last_event_timestamp(mraa_gpio_context dev);
 
 /**
  * Stop the current interrupt watcher on this Gpio, and set the Gpio edge mode

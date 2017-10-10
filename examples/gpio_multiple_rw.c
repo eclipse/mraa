@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     int *gpio_pins;
     int num_pins;
     int *input_values, *output_values;
-    
+
     printf("Provide int arg(s) if you want to toggle gpio pins other than Joule's onboard LED's\n");
 
     if (argc < 2) {
@@ -67,6 +67,9 @@ int main(int argc, char** argv)
 
     while (running == 0) {
         r = mraa_gpio_write_multi(gpio, input_values);
+
+        sleep(1);
+
         if (r != MRAA_SUCCESS) {
             mraa_result_print(r);
         } else {
@@ -76,14 +79,12 @@ int main(int argc, char** argv)
             }
         }
 
-        sleep(1);
-
         for (int i = 0; i < num_pins; ++i) {
             input_values[i] = (input_values[i] + 1) % 2;
         }
     }
 
-    memset(input_values, 0, 4 * sizeof(int));
+    memset(input_values, 0, num_pins * sizeof(int));
     mraa_gpio_write_multi(gpio, input_values);
 
     r = mraa_gpio_close(gpio);
