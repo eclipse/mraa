@@ -5,7 +5,9 @@ build out of tree so the recommended way is to clone from git and make a `build/
 directory inside the clone directory.
 
 For building imraa check @ref buildingimraa page.
+
 ## Build dependencies
+
 Not all these are required but if you're unsure of what you're doing this is
 what you'll need:
 * [SWIG](http://swig.org) 3.0.5+
@@ -25,7 +27,6 @@ To build the documentation you'll also need:
 * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) 1.8.9.1+
 * [Graphviz](http://graphviz.org/) 2+ (For Doxygen graph generation)
 * [Sphinx](http://sphinx-doc.org/) 1.1.3+ (For Python docs)
-
 
 ## Basic build steps
 
@@ -77,7 +78,7 @@ A few recommended options:
 Changing install path from `/usr/local` to `/usr`:
  `-DCMAKE_INSTALL_PREFIX:PATH=/usr`
 
-Building debug build - adds `-g` and disables optimisations - this will force a
+Building debug build - adds `-g` and disables optimizations - this will force a
 full rebuild:
  `-DCMAKE_BUILD_TYPE=DEBUG`
 
@@ -108,7 +109,7 @@ You can also enable -Wall for gcc before running cmake by exporting your wanted
 CC flags to the CC env var
   `export CC="gcc -Wall"`
 
-Sometimes it's nice to build a static libary, on Linux systems just set
+Sometimes it's nice to build a static library, on Linux systems just set
    `-DBUILD_SHARED_LIBS=OFF`
 
 ## Dependencies continued
@@ -121,7 +122,7 @@ failure when building the JavaScript module. The Python module builds with SWIG
 
 During the build, we'll assume you're building from git, note that if you
 compile with `git` installed your version of mraa will be versioned with `git
-desribe --tag` to make it easy for intentification. You can easily modify
+describe --tag` to make it easy for identification. You can easily modify
 version.c in build/src. If you don't build from a git tree then you will simply
 have a version which matches the latest released version of mraa.
 
@@ -165,7 +166,7 @@ javac -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example.java
 ~~~~~~~~~~~~~
 To run, make sure `libmraajava.so` is in `LD_LIBRARY_PATH`
  ~~~~~~~~~~~~~{.sh}
-jave -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example
+java -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example
 ~~~~~~~~~~~~~
 
 If you want to add or improve Java bindings for mraa, please follow the <a href="https://github.com/intel-iot-devkit/upm/blob/master/docs/creating_java_bindings.md">Creating Java Bindings Guide</a>.
@@ -285,11 +286,11 @@ to proxy settings:
 
 **docker run fails to access the internet**
 
-docker-compose will automatically take `http_proxy`, `https_proxy`, and `no_proxy`
+Docker-compose will automatically take `http_proxy`, `https_proxy`, and `no_proxy`
 environment variables and use it as build arguments. Be sure to properly configure
 this variables before building.
 
-docker, unlinke docker-compose, do not take the proxy settings from the environment
+Docker, unlike docker-compose, does not take the proxy settings from the environment
 automatically. You need to send them as environment arguments:
 
 ```sh
