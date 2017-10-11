@@ -270,7 +270,7 @@ $ docker run \
       --env BUILDSWIGPYTHON=ON \
       --env BUILDSWIGJAVA=OFF \
       --env BUILDSWIGNODE=OFF \
-      dnoliver/mraa-python \
+      inteliotdevkit/mraa-python \
       bash -c "./scripts/run-cmake.sh && make -Cbuild _python2-mraa"
 ```
 
@@ -304,6 +304,6 @@ $ docker run \
     --env http_proxy=$http_proxy \
     --env https_proxy=$https_proxy \
     --env no_proxy=$no_proxy \
-    dnoliver/mraa-python \
+    inteliotdevkit/mraa-python \
     bash -c "./scripts/run-cmake.sh && make -Cbuild _python2-mraa"
 ```
