@@ -28,6 +28,7 @@ set (mraa_LIB_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/spi/spi.c
   ${PROJECT_SOURCE_DIR}/src/aio/aio.c
   ${PROJECT_SOURCE_DIR}/src/uart/uart.c
+  ${PROJECT_SOURCE_DIR}/src/led/led.c
   ${mraa_LIB_SRCS_NOAUTO}
 )
 
@@ -236,7 +237,7 @@ mraa_create_install_pkgconfig (mraa.pc ${LIB_INSTALL_DIR}/pkgconfig)
 
 if (DOXYGEN_FOUND)
   set (CMAKE_SWIG_FLAGS -DDOXYGEN=${DOXYGEN_FOUND})
-  set (DOCCLASSES aio gpio i2c pwm spi uart)
+  set (DOCCLASSES aio gpio i2c pwm spi uart led)
   # CPP class headers
   foreach (_file ${DOCCLASSES})
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_file}_class_doc.i
