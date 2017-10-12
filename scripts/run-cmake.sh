@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -x
+set -e
+
 # Run cmake
 cmake \
   -DBUILDARCH=$BUILDARCH \
@@ -24,4 +27,3 @@ cmake \
   -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
   -H. \
   -Bbuild
-

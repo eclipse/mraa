@@ -23,7 +23,7 @@ services:
       - FTDI4222=${FTDI4222:-OFF}
       - IPK=${IPK:-OFF}
       - RPM=${RPM:-OFF}
-      - ENABLEEXAMPLES=${ENABLEEXAMPLES:-ON}
+      - ENABLEEXAMPLES=${ENABLEEXAMPLES:-OFF}
       - INSTALLGPIOTOOL=${INSTALLGPIOTOOL:-OFF}
       - INSTALLTOOLS=${INSTALLTOOLS:-ON}
       - CC=${CC:-clang-3.8}
@@ -46,6 +46,21 @@ services:
       - BUILDDOC=ON
     command: bash -c "./scripts/run-cmake.sh && ./scripts/build-doc.sh"
 
+  examples:
+    extends: all
+    environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGPYTHON=ON
+      - BUILDSWIGNODE=ON
+      - BUILDSWIGJAVA=ON
+      - ENABLEEXAMPLES=ON
+      - USBPLAT=ON
+      - FIRMATA=ON
+      - ONEWIRE=ON
+      - IMRAA=ON
+      - FTDI4222=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
+
   sonar-scan:
     extends: all
     environment:
@@ -53,6 +68,7 @@ services:
       - BUILDSWIGPYTHON=ON
       - BUILDSWIGNODE=ON
       - BUILDSWIGJAVA=ON
+      - ENABLEEXAMPLES=ON
       - ONEWIRE=ON
       - JSONPLAT=ON
       - SONAR_TOKEN
@@ -94,12 +110,14 @@ services:
     extends: all
     environment:
       - IPK=ON
+      - ENABLEEXAMPLES=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
 
   rpm:
     extends: all
     environment:
       - RPM=ON
+      - ENABLEEXAMPLES=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
 
   python2:
