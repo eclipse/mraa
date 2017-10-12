@@ -84,6 +84,8 @@ jobs:
     - <<: *run-additional-jobs
       env: TARGET=android
     - <<: *run-additional-jobs
+      env: TARGET=examples
+    - <<: *run-additional-jobs
       env: TARGET=usbplat
     - <<: *run-additional-jobs
       env: TARGET=firmata
