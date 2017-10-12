@@ -523,7 +523,7 @@ mraa_gpio_get_events(mraa_gpio_context dev)
 {
     if (dev == NULL) {
         syslog(LOG_ERR, "gpio: mraa_gpio_get_events(): context is invalid");
-        return MRAA_ERROR_INVALID_HANDLE;
+        return NULL;
     }
 
     unsigned int event_idx = 0;
