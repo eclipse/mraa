@@ -303,3 +303,7 @@ if (MSYS)
 else ()
   install(TARGETS mraa DESTINATION ${LIB_INSTALL_DIR})
 endif ()
+
+if (BUILDSYSFS2CHARDEVTOOL)
+    add_executable (sysfs2chardev ${PROJECT_SOURCE_DIR}/src/gpio/gpio_chardev.c ${PROJECT_SOURCE_DIR}/src/sysfs2chardev/sysfs2chardev.c)
+endif ()
