@@ -47,6 +47,11 @@
 #define CHIP_DEV_PREFIX "gpiochip"
 #define STR_SIZE 64
 
+int mraa_get_tool_value()
+{
+    return 3;
+}
+
 void
 _mraa_free_gpio_groups(mraa_gpio_context dev)
 {
@@ -353,6 +358,37 @@ mraa_get_line_values(int line_handle, unsigned int num_lines, unsigned char outp
     memcpy(output_values, __hdata.values, num_lines * sizeof(unsigned char));
 
     return status;
+}
+
+
+mraa_boolean_t
+mraa_is_gpio_line_kernel_owned(mraa_gpiod_line_info *linfo)
+{
+    return (linfo->flags & GPIOLINE_FLAG_IS_OUT);
+}
+
+mraa_boolean_t
+mraa_is_gpio_line_dir_out(mraa_gpiod_line_info *linfo)
+{
+    return (linfo->flags & GPIOLINE_FLAG_IS_OUT);
+}
+
+mraa_boolean_t
+mraa_is_gpio_line_active_low(mraa_gpiod_line_info *linfo)
+{
+    return (linfo->flags & GPIOLINE_FLAG_ACTIVE_LOW);
+}
+
+mraa_boolean_t
+mraa_is_gpio_line_open_drain(mraa_gpiod_line_info *linfo)
+{
+    return (linfo->flags & GPIOLINE_FLAG_OPEN_DRAIN);
+}
+
+mraa_boolean_t
+mraa_is_gpio_line_open_source(mraa_gpiod_line_info *linfo)
+{
+    return (linfo->flags & GPIOHANDLE_REQUEST_OPEN_SOURCE);
 }
 
 int

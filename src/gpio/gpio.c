@@ -785,7 +785,7 @@ mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode)
         int edge = open(filepath, O_RDWR);
         if (edge == -1) {
             syslog(LOG_ERR, "gpio%i: edge_mode: Failed to open 'edge' for writing: %s", it->pin,
-                    strerror(errno));
+                   strerror(errno));
             return MRAA_ERROR_INVALID_RESOURCE;
         }
 

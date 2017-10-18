@@ -141,6 +141,7 @@ option (INSTALLGPIOTOOL "Install gpio tool" OFF)
 option (INSTALLTOOLS "Install all tools" ON)
 option (BUILDTESTS "Override the addition of tests" ON)
 option (USEPYTHON3TESTS "Force tests to run with python3" OFF)
+option (BUILDSYSFS2CHARDEVTOOL "Transform gpio sysfs id the corresponding chardev chip and line number" OFF)
 
 set (BUILDARCH "" CACHE STRING "Override architecture to build for")
 
