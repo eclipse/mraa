@@ -30,6 +30,7 @@ extern "C" {
 #include "mraa/pwm.h"
 #include "mraa/aio.h"
 #include "mraa/gpio.h"
+#include "mraa/gpio_chardev.h"
 #include "mraa/spi.h"
 #include "mraa/i2c.h"
 #include "mraa/uart.h"

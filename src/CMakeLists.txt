@@ -32,6 +32,13 @@ set (mraa_LIB_SRCS_NOAUTO
   ${mraa_LIB_SRCS_NOAUTO}
 )
 
+if (HAVE_GPIO_H)
+  set (mraa_LIB_SRCS_NOAUTO
+    ${mraa_LIB_SRCS_NOAUTO}
+	${PROJECT_SOURCE_DIR}/src/gpio/gpio_chardev.c
+  )
+endif ()
+
 if (NOT PERIPHERALMAN)
   set (mraa_LIB_SRCS_NOAUTO
     ${mraa_LIB_SRCS_NOAUTO}
