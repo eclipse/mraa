@@ -24,7 +24,6 @@ services:
       - IPK=${IPK:-OFF}
       - RPM=${RPM:-OFF}
       - ENABLEEXAMPLES=${ENABLEEXAMPLES:-OFF}
-      - INSTALLGPIOTOOL=${INSTALLGPIOTOOL:-OFF}
       - INSTALLTOOLS=${INSTALLTOOLS:-ON}
       - CC=${CC:-clang-3.8}
       - CXX=${CXX:-clang++-3.8}
