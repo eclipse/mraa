@@ -271,3 +271,7 @@ if (BUILDTESTS AND PYTHON_DEFAULT_EXECUTABLE)
   enable_testing ()
   add_subdirectory (tests)
 endif ()
+
+if (INSTALLTOOLS)
+  add_subdirectory (tools)
+endif()
