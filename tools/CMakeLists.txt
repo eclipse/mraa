@@ -11,10 +11,6 @@ target_link_libraries (mraa-gpio mraa)
 target_link_libraries (mraa-i2c mraa)
 target_link_libraries (mraa-uart mraa)
 
-if (INSTALLGPIOTOOL AND NOT INSTALLTOOLS)
-   install (TARGETS mraa-gpio DESTINATION bin)
-endif()
-
 if (INSTALLTOOLS)
    install (TARGETS mraa-gpio DESTINATION bin)
    install (TARGETS mraa-i2c DESTINATION bin)
