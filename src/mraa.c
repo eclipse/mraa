@@ -57,6 +57,7 @@
 #include "firmata/firmata_mraa.h"
 #include "grovepi/grovepi.h"
 #include "gpio.h"
+#include "gpio/gpio_chardev.h"
 #include "version.h"
 #include "i2c.h"
 #include "pwm.h"
@@ -100,43 +101,7 @@ mraa_set_log_level(int level)
 
 mraa_boolean_t mraa_is_kernel_chardev_interface_compatible()
 {
-    struct utsname buf;
-    int status;
-
-    status = uname(&buf);
-
-    if (status) {
-        syslog(LOG_ERR, "uname() error");
-        return 0;
-    }
-
-    int major, minor;
-    char *token;
-
-    token = strtok(buf.release, ".");
-    if (token == NULL) {
-        syslog(LOG_ERR, "Could not find kernel version major number");
-        return 0;
-    }
-    status = mraa_atoi(token, &major);
-    if (status) {
-        syslog(LOG_ERR, "mraa_atoi() error");
-        return 0;
-    }
-
-    token = strtok(NULL, ".");
-    if (token == NULL) {
-        syslog(LOG_ERR, "Could not find kernel version minor number");
-        return 0;
-    }
-    status = mraa_atoi(token, &minor);
-    if (status) {
-        syslog(LOG_ERR, "mraa_atoi() error");
-        return 0;
-    }
-
-    if (major < 4 || minor < 8) {
-        syslog(LOG_ERR, "Kernel version %i.%i not supported for chardev interface. Need version 4.8 or newer!", major, minor);
+    if (mraa_get_number_of_gpio_chips() <= 0) {
         return 0;
     }
 
