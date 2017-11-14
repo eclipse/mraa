@@ -469,35 +469,43 @@ mraa_raspberry_pi()
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_B_REV_1_PINCOUNT;
+                    b->uart_dev[0].device_path = "/dev/ttyS0";
                 } else if (strstr(line, "0004") || strstr(line, "0005") || strstr(line, "0006") ||
                            strstr(line, "000d") || strstr(line, "000e") || strstr(line, "000f")) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_2;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_2;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_REV_2_PINCOUNT;
+                    b->uart_dev[0].device_path = "/dev/ttyS0";
                 } else if (strstr(line, "900092") || strstr(line, "900093") || strstr(line, "920093")) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_ZERO;
                     platform_detected = PLATFORM_RASPBERRY_PI_ZERO;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_ZERO_PINCOUNT;
+                    b->uart_dev[0].device_path = "/dev/ttyS0";
                 } else if (strstr(line, "0007") || strstr(line, "0008") || strstr(line, "0009")) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_A_REV_2;
                     platform_detected = PLATFORM_RASPBERRY_PI_A_REV_2;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_REV_2_PINCOUNT;
+                    b->uart_dev[0].device_path = "/dev/ttyS0";
                 } else if (strstr(line, "0010")) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_PLUS_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_PLUS_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_PLUS_PINCOUNT;
+                    b->uart_dev[0].device_path = "/dev/ttyS0";
                 } else if (strstr(line, "0011")) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_COMPUTE_MODULE_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_COMPUTE_MODULE_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_COMPUTE_MODULE_PINCOUNT;
+                    b->uart_dev[0].device_path = "/dev/ttyS0";
                 } else if (strstr(line, "0012")) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_A_PLUS_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_A_PLUS_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_AB_PLUS_PINCOUNT;
+                    b->uart_dev[0].device_path = "/dev/ttyS0";
                 } else if (strstr(line, "a01041") || strstr(line, "a21041")) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI2_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI2_B_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI2_B_REV_1_PINCOUNT;
+                    b->uart_dev[0].device_path = "/dev/ttyS0";
                     peripheral_base = BCM2836_PERI_BASE;
                     block_size = BCM2836_BLOCK_SIZE;
                 } else if (strstr(line, "a02082") || strstr(line, "a020a0") ||
@@ -505,16 +513,19 @@ mraa_raspberry_pi()
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_B;
                     platform_detected = PLATFORM_RASPBERRY_PI3_B;
                     b->phy_pin_count = MRAA_RASPBERRY_PI3_B_PINCOUNT;
+                    b->uart_dev[0].device_path = "/dev/serial0";
                     peripheral_base = BCM2837_PERI_BASE;
                     block_size = BCM2837_BLOCK_SIZE;
                 } else if (strstr(line, "9000c1")) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_ZERO_W;
                     platform_detected = PLATFORM_RASPBERRY_PI_ZERO_W;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_ZERO_W_PINCOUNT;
+                    b->uart_dev[0].device_path = "/dev/ttyS0";
                 } else {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
                     b->phy_pin_count = MRAA_RASPBERRY_PI_B_REV_1_PINCOUNT;
+                    b->uart_dev[0].device_path = "/dev/ttyS0";
                 }
             }
         }
@@ -533,46 +544,57 @@ mraa_raspberry_pi()
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
             platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
             b->phy_pin_count = MRAA_RASPBERRY_PI_B_REV_1_PINCOUNT;
+            b->uart_dev[0].device_path = "/dev/ttyS0";
         } else if (mraa_file_contains(compatible_path, "raspberrypi,model-b-rev2")) {
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_2;
             platform_detected = PLATFORM_RASPBERRY_PI_B_REV_2;
             b->phy_pin_count = MRAA_RASPBERRY_PI_AB_REV_2_PINCOUNT;
+            b->uart_dev[0].device_path = "/dev/ttyS0";
         } else if (mraa_file_contains(compatible_path, "raspberrypi,model-zero")) {
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI_ZERO;
             platform_detected = PLATFORM_RASPBERRY_PI_ZERO;
             b->phy_pin_count = MRAA_RASPBERRY_PI_ZERO_PINCOUNT;
+            b->uart_dev[0].device_path = "/dev/ttyS0";
         } else if (mraa_file_contains(compatible_path, "raspberrypi,model-a")) {
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI_A_REV_2;
             platform_detected = PLATFORM_RASPBERRY_PI_A_REV_2;
             b->phy_pin_count = MRAA_RASPBERRY_PI_AB_REV_2_PINCOUNT;
+            b->uart_dev[0].device_path = "/dev/ttyS0";
         } else if (mraa_file_contains(compatible_path, "raspberrypi,model-b-plus")) {
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_PLUS_REV_1;
             platform_detected = PLATFORM_RASPBERRY_PI_B_PLUS_REV_1;
             b->phy_pin_count = MRAA_RASPBERRY_PI_AB_PLUS_PINCOUNT;
+            b->uart_dev[0].device_path = "/dev/ttyS0";
         } else if (mraa_file_contains(compatible_path, "raspberrypi,compute-module")) {
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI_COMPUTE_MODULE_REV_1;
             platform_detected = PLATFORM_RASPBERRY_PI_COMPUTE_MODULE_REV_1;
             b->phy_pin_count = MRAA_RASPBERRY_PI_COMPUTE_MODULE_PINCOUNT;
+            b->uart_dev[0].device_path = "/dev/ttyS0";
         } else if (mraa_file_contains(compatible_path, "raspberrypi,model-a-plus")) {
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI_A_PLUS_REV_1;
             platform_detected = PLATFORM_RASPBERRY_PI_A_PLUS_REV_1;
             b->phy_pin_count = MRAA_RASPBERRY_PI_AB_PLUS_PINCOUNT;
+            b->uart_dev[0].device_path = "/dev/ttyS0";
         } else if (mraa_file_contains(compatible_path, "raspberrypi,2-model-b")) {
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI2_B_REV_1;
             platform_detected = PLATFORM_RASPBERRY_PI2_B_REV_1;
             b->phy_pin_count = MRAA_RASPBERRY_PI2_B_REV_1_PINCOUNT;
+            b->uart_dev[0].device_path = "/dev/ttyS0";
         } else if (mraa_file_contains(compatible_path, "raspberrypi,model-b")) {
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
             platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
             b->phy_pin_count = MRAA_RASPBERRY_PI_B_REV_1_PINCOUNT;
+            b->uart_dev[0].device_path = "/dev/ttyS0";
         } else if (mraa_file_contains(compatible_path, "raspberrypi,3-model-b")) {
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_B;
             platform_detected = PLATFORM_RASPBERRY_PI3_B;
             b->phy_pin_count = MRAA_RASPBERRY_PI3_B_PINCOUNT;
+            b->uart_dev[0].device_path = "/dev/serial0";
         } else if (mraa_file_contains(compatible_path, "raspberrypi,model-zero-w")) {
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI_ZERO_W;
             platform_detected = PLATFORM_RASPBERRY_PI_ZERO_W;
             b->phy_pin_count = MRAA_RASPBERRY_PI_ZERO_W_PINCOUNT;
+            b->uart_dev[0].device_path = "/dev/ttyS0";
         }
     }
 
