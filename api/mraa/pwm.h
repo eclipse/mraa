@@ -33,7 +33,7 @@
  * of resolution so make sure you check the board & pin you are using before
  * hand.
  *
- * @snippet cycle-pwm3.c Interesting
+ * @snippet pwm.c Interesting
  */
 
 #ifdef __cplusplus

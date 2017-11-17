@@ -32,7 +32,7 @@
  * communicate to multiple i2c slaves by configuring the address.
  * @htmlinclude i2c.txt
  *
- * @snippet i2c_HMC5883L.c Interesting
+ * @snippet i2c_hmc5883l.c Interesting
  */
 
 #ifdef __cplusplus

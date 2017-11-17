@@ -28,12 +28,13 @@
 
 #include "mraa.hpp"
 
-int main()
+int
+main()
 {
     // GPIO-PIN
     mraa::Gpio* gpio = mraa::initIo<mraa::Gpio>("gpio-1");
     // GPIO-RAW-RAWPIN
-    mmraa::Gpio* gpioraw = mraa::initIo<mraa::Gpio>initIo("gpio-raw-131");
+    mmraa::Gpio* gpioraw = mraa::initIo<mraa::Gpio> initIo("gpio-raw-131");
     // AIO-PIN
     mraa::Aio aio = mraa::initIo<mraa::Aio>("aio-0");
     // PWM-PIN

@@ -22,9 +22,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <unistd.h>
 #include <signal.h>
 #include <stdint.h>
+#include <unistd.h>
 
 #include "mraa.hpp"
 

@@ -20,15 +20,21 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Example usage: Demonstrates how to initialize and close different
+ *                peripherals
  */
 
+/* standard headers */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+/* mraa header */
 #include "mraa.h"
 
-int main()
+int
+main()
 {
     // GPIO-PIN
     mraa_gpio_context gpio = (mraa_gpio_context) init_io("gpio-1");
@@ -39,7 +45,7 @@ int main()
     // PWM-PIN
     mraa_pwm_context pwm = (mraa_pwm_context) init_io("pwm-6");
     // PWM-RAW-CHIPID-PIN
-    mraa_pwm_context pwmraw= (mraa_pwm_context) init_io("pwm-raw-0,1");
+    mraa_pwm_context pwmraw = (mraa_pwm_context) init_io("pwm-raw-0,1");
     // UART-INDEX: the index is the one represented internally in the uart_dev array
     mraa_uart_context uart = (mraa_uart_context) init_io("uart-1");
     // UART-RAW-PATH

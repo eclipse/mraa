@@ -33,7 +33,7 @@
  * through sysfs), or memory mapped IO via a /dev/uio device or /dev/mem
  * depending again on the board configuration.
  *
- * @snippet gpio_read6.c Interesting
+ * @snippet gpio.c Interesting
  */
 
 #ifdef __cplusplus

@@ -67,7 +67,7 @@ typedef struct {
  *
  * An iio context represents an IIO device
  *
- * @snippet iio_driver.c Interesting
+ * @snippet iio.c Interesting
  */
 
 #ifdef __cplusplus

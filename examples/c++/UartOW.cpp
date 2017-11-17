@@ -22,8 +22,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "stdio.h"
 #include "iostream"
+#include "stdio.h"
 //! [Interesting]
 #include "uart_ow.hpp"
 

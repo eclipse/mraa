@@ -22,63 +22,65 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <unistd.h>
+#include "mraa/iio.hpp"
+#include <float.h>
 #include <iostream>
 #include <math.h>
-#include <float.h>
-#include "mraa/iio.hpp"
+#include <unistd.h>
 
 #define EXPECT_FAILURE 0
 #define EXPECT_SUCCESS 1
 
-#define IIO_TRY(func) \
-{ \
-    bool success = true;    \
-    try { \
-        iio_device->func;  \
-    } catch (std::exception& e) { \
-        success = false; \
-    } \
-    log_result(#func, "", true, success); \
-}
+#define IIO_TRY(func)                         \
+    {                                         \
+        bool success = true;                  \
+        try {                                 \
+            iio_device->func;                 \
+        } catch (std::exception & e) {        \
+            success = false;                  \
+        }                                     \
+        log_result(#func, "", true, success); \
+    }
 
 // Macro to run IIO method on attribute and log output
-#define IIO_RUN(func, attr, value, expect) \
-{ \
-    std::string attr_name = attr; \
-    bool success = true;    \
-    try { \
-        iio_device->func(attr_name, value);  \
-    } catch (std::exception& e) { \
-        success = false; \
-    } \
-    log_result(#func, attr_name, expect, success); \
-}
+#define IIO_RUN(func, attr, value, expect)             \
+    {                                                  \
+        std::string attr_name = attr;                  \
+        bool success = true;                           \
+        try {                                          \
+            iio_device->func(attr_name, value);        \
+        } catch (std::exception & e) {                 \
+            success = false;                           \
+        }                                              \
+        log_result(#func, attr_name, expect, success); \
+    }
 
 // Macro to run IIO method on attribute and check for expected result and log output
-#define IIO_TEST(func, attr, value, expect) \
-{ \
-    std::string attr_name = attr; \
-    bool success = false;    \
-    try { \
-        success = fabs(iio_device->func(attr_name) - value) < FLT_EPSILON; \
-    } catch (std::exception& e) { \
-        success = false; \
-    } \
-    log_result(#func, attr_name, expect, success); \
-}
+#define IIO_TEST(func, attr, value, expect)                                    \
+    {                                                                          \
+        std::string attr_name = attr;                                          \
+        bool success = false;                                                  \
+        try {                                                                  \
+            success = fabs(iio_device->func(attr_name) - value) < FLT_EPSILON; \
+        } catch (std::exception & e) {                                         \
+            success = false;                                                   \
+        }                                                                      \
+        log_result(#func, attr_name, expect, success);                         \
+    }
 
 mraa::Iio* iio_device;
 int eventCount = 0;
 
-// Log result of test. Note a "fail" (i.e. success is false) will be displayed as a pass if a fail was expected
-void log_result(std::string test_name, std::string attr_name, bool expect_success, bool success)
+// Log result of test. Note a "fail" (i.e. success is false) will be displayed as a pass if a fail
+// was expected
+void
+log_result(std::string test_name, std::string attr_name, bool expect_success, bool success)
 {
     std::string result;
     if (expect_success)
-       result = success ? "PASS" : "FAIL";
+        result = success ? "PASS" : "FAIL";
     else
-       result = success ? "FAIL" : "PASS";
+        result = success ? "FAIL" : "PASS";
     if (attr_name.empty())
         fprintf(stdout, "%s: %s\n", test_name.c_str(), result.c_str());
     else
@@ -86,9 +88,10 @@ void log_result(std::string test_name, std::string attr_name, bool expect_succes
 }
 
 // Generate iio_dummy driver event by writing a string to a specific sysfs node
-bool generate_event()
+bool
+generate_event()
 {
-    FILE *fp = fopen("/sys/bus/iio/devices/iio_evgen/poke_ev0", "w");
+    FILE* fp = fopen("/sys/bus/iio/devices/iio_evgen/poke_ev0", "w");
     if (fp == NULL)
         return false;
     fprintf(fp, "1\n");
@@ -100,9 +103,12 @@ bool generate_event()
 // IIO event handler that checks for event from dummy_iio_evgen driver
 class IioTestHandler : public mraa::IioHandler
 {
-protected:
-    void onIioEvent(const mraa::IioEventData& eventData) {
-        if (eventData.channelType == IIO_VOLTAGE && eventData.direction == IIO_EV_DIR_RISING && eventData.type == IIO_EV_TYPE_THRESH)
+  protected:
+    void
+    onIioEvent(const mraa::IioEventData& eventData)
+    {
+        if (eventData.channelType == IIO_VOLTAGE && eventData.direction == IIO_EV_DIR_RISING &&
+            eventData.type == IIO_EV_TYPE_THRESH)
             eventCount++;
     }
 };
