@@ -31,6 +31,7 @@
  * LED is the Light Emitting Diode interface to libmraa. It is used to
  * access the on board LED's via sysfs.
  *
+ * @snippet led.c Interesting
  */
 
 #ifdef __cplusplus

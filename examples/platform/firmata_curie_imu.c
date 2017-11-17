@@ -44,9 +44,9 @@ main()
     mraa_init();
     //! [Interesting]
 
-   /**
-    * This example reads from the FirmataCurieIMU plugin
-    */
+    /**
+     * This example reads from the FirmataCurieIMU plugin
+     */
 
     mraa_add_subplatform(MRAA_GENERIC_FIRMATA, "/dev/ttyACM0");
     mraa_firmata_context firm = mraa_firmata_init(FIRMATA_CURIE_IMU);

@@ -30,7 +30,7 @@
  * AIO is the anlog input & output interface to libmraa. It is used to read or
  * set the voltage applied to an AIO pin.
  *
- * @snippet analogin_a0.c Interesting
+ * @snippet aio.c Interesting
  */
 
 #ifdef __cplusplus

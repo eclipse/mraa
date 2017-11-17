@@ -20,73 +20,86 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Example usage: Search and print the found OW device ID recursively.
+ *
  */
 
+/* standard headers */
 #include "stdio.h"
-//! [Interesting]
+
+/* mraa header */
 #include "mraa.h"
 
 int
-main(int argc, char** argv)
+main(void)
 {
-    mraa_uart_ow_context uart;
-    uart = mraa_uart_ow_init(0);
+    mraa_uart_ow_context uart_ow;
+    mraa_result_t status;
+    uint8_t id[MRAA_UART_OW_ROMCODE_SIZE];
+    uint8_t count = 0;
 
-    if (!uart) {
-        printf("mraa_uart_ow_init() failed\n");
-        return 1;
+    //! [Interesting]
+    uart_ow = mraa_uart_ow_init(0);
+    if (uart_ow == NULL) {
+        fprintf(stderr, "Failed to initialize UART OW\n");
+        mraa_deinit();
+        return EXIT_FAILURE;
     }
 
     // Reset the ow bus and see if anything is present
-    mraa_result_t rv;
-
-    if ((rv = mraa_uart_ow_reset(uart)) == MRAA_SUCCESS) {
-        printf("Reset succeeded, device(s) detected!\n");
+    status = mraa_uart_ow_reset(uart_ow);
+    if (status == MRAA_SUCCESS) {
+        fprintf(stdout, "Reset succeeded, device(s) detected!\n");
     } else {
-        printf("Reset failed, returned %d. No devices on bus?\n", rv);
-        return 1;
+        goto err_exit;
     }
 
-    printf("Looking for devices...\n");
-    uint8_t id[MRAA_UART_OW_ROMCODE_SIZE];
+    fprintf(stdout, "Looking for devices...\n");
 
-    /* we are essentially doing a binary tree search through the 64
+    /*
+     * we are essentially doing a binary tree search through the 64
      * bit address space.  id is modified during this search, and will
      * be set to the valid rom code for each device found.
+     *
+     * start the search from scratch
      */
-
-    uint8_t count = 0;
-
-    // start the search from scratch
-    mraa_result_t result = mraa_uart_ow_rom_search(uart, 1, id);
-    if (result == MRAA_ERROR_UART_OW_NO_DEVICES) {
-        printf("No devices detected.\n");
-        return 1;
+    status = mraa_uart_ow_rom_search(uart_ow, 1, id);
+    if (status != MRAA_SUCCESS) {
+        goto err_exit;
     }
 
-    if (result == MRAA_ERROR_UART_OW_DATA_ERROR) {
-        printf("Bus/Data error.\n");
-        return 1;
-    }
-
-    while (result == MRAA_SUCCESS) {
+    while (status == MRAA_SUCCESS) {
         /* The first byte (id[0]]) is the device type (family) code.
          * The last byte (id[7]) is the rom code CRC value.  The
          * intervening bytes (id[1]-id[6]) are the unique 48 bit
          * device ID.
          */
-        printf("Device %02d Type 0x%02x ID %02x%02x%02x%02x%02x%02x CRC 0x%02x\n", count, id[0],
-               id[6], id[5], id[4], id[3], id[2], id[1], id[7]);
+        fprintf(stdout, "Device %02d Type 0x%02x ID %02x%02x%02x%02x%02x%02x CRC 0x%02x\n", count,
+                id[0], id[6], id[5], id[4], id[3], id[2], id[1], id[7]);
         count++;
 
         // continue the search with start argument set to 0
-        result = mraa_uart_ow_rom_search(uart, 0, id);
+        status = mraa_uart_ow_rom_search(uart_ow, 0, id);
     }
 
-    printf("Exiting...\n");
+    /* stop uart_ow */
+    mraa_uart_ow_stop(uart_ow);
 
-    mraa_uart_ow_stop(uart);
+    //! [Interesting]
+    /* deinitialize mraa for the platform (not needed most of the time) */
+    mraa_deinit();
 
-    return 0;
+    return EXIT_SUCCESS;
+
+err_exit:
+    mraa_result_print(status);
+
+    /* stop uart_ow */
+    mraa_uart_ow_stop(uart_ow);
+
+    /* deinitialize mraa for the platform (not needed most of the times) */
+    mraa_deinit();
+
+    return EXIT_FAILURE;
 }
-//! [Interesting]

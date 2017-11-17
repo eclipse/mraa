@@ -1,7 +1,6 @@
 /*
- * Author: Nandkishor Sonar
- * Contributors: Alex Tereschenko <alext.mkrs@gmail.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Copyright (c) 2016 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -23,51 +22,42 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <unistd.h>
-#include <signal.h>
+#include "mraa.h"
 
-#include "mraa/aio.h"
-
-int running = 0;
-
-void
-sig_handler(int signo)
-{
-    if (signo == SIGINT) {
-        printf("closing down nicely\n");
-        running = -1;
-    }
-}
-
-//! [Interesting]
 int
-main()
+main(int argc, char** argv)
 {
-    mraa_aio_context adc_a0;
-    uint16_t adc_value = 0;
-    float adc_value_float = 0.0;
-    mraa_result_t r = MRAA_SUCCESS;
+    mraa_init();
+    mraa_add_subplatform(MRAA_GENERIC_FIRMATA, "/dev/ttyACM0");
 
-    adc_a0 = mraa_aio_init(0);
-    if (adc_a0 == NULL) {
-        return 1;
-    }
+    mraa_i2c_context i2c;
+    i2c = mraa_i2c_init(0 + 512);
+#if 0
+    mraa_i2c_address(i2c, 0x62);
 
-    signal(SIGINT, sig_handler);
+#if 1
+    uint8_t rx_tx_buf[2];
+    rx_tx_buf[0] = 0x0;
+    rx_tx_buf[1] = 0x0;
+    mraa_i2c_write(i2c, rx_tx_buf, 2);
+#endif
+    //mraa_i2c_write_byte_data(i2c, 0x0, 0x0);
+    mraa_i2c_write_byte_data(i2c, 0x0, 0x1);
 
-    while (running == 0) {
-        adc_value = mraa_aio_read(adc_a0);
-        adc_value_float = mraa_aio_read_float(adc_a0);
-        fprintf(stdout, "ADC A0 read %X - %d\n", adc_value, adc_value);
-        fprintf(stdout, "ADC A0 read float - %.5f (Ctrl+C to exit)\n", adc_value_float);
-        sleep(1);
-    }
+    mraa_i2c_write_byte_data(i2c, 0xFF, 0x08);
+    mraa_i2c_write_byte_data(i2c, 0x00, 0x04);
+    mraa_i2c_write_byte_data(i2c, 0xA0, 0x02);
+#else
+    mraa_i2c_address(i2c, 0x77);
+    int res = mraa_i2c_read_byte_data(i2c, 0xd0);
+    printf("res is 0x%x\n", res);
 
-    r = mraa_aio_close(adc_a0);
-    if (r != MRAA_SUCCESS) {
-        mraa_result_print(r);
-    }
+    uint8_t data[2];
+    mraa_i2c_write_byte(i2c, 0x77);
+    mraa_i2c_read(i2c, data, 1);
 
-    return r;
+    res = mraa_i2c_read_word_data(i2c, 0xAA); // BMP085_CAL_AC1
+    printf("res is %d\n", res);
+#endif
+    sleep(10);
 }
-//! [Interesting]
