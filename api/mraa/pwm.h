@@ -45,6 +45,7 @@ extern "C" {
 
 #include "common.h"
 
+/** Mraa Pwm Context */
 typedef struct _pwm* mraa_pwm_context;
 
 /**

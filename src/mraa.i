@@ -4,19 +4,6 @@
 %include std_string.i
 %include exception.i
 
-#ifdef DOXYGEN
-  //and doesn't seem to work correctly in SWIG's preprocessor
-  #ifdef SWIGPYTHON2
-        %include common_hpp_doc.i
-        %include gpio_class_doc.i
-        %include i2c_class_doc.i
-        %include pwm_class_doc.i
-        %include aio_class_doc.i
-        %include spi_class_doc.i
-        %include uart_class_doc.i
-    #endif
-#endif
-
 %{
     #include "common.hpp"
     #include "types.hpp"
@@ -26,6 +13,7 @@
     #include "spi.hpp"
     #include "aio.hpp"
     #include "uart.hpp"
+    #include "led.hpp"
 %}
 
 %exception {
@@ -47,6 +35,7 @@
 %template (spiFromDesc) mraa::initIo<mraa::Spi>;
 %template (i2cFromDesc) mraa::initIo<mraa::I2c>;
 %template (pwmFromDesc) mraa::initIo<mraa::Pwm>;
+%template (ledFromDesc) mraa::initIo<mraa::Led>;
 
 %ignore Aio(void* aio_context);
 %ignore Pwm(void* pwm_context);
@@ -54,6 +43,7 @@
 %ignore Spi(void* spi_context);
 %ignore I2c(void* i2c_context);
 %ignore Gpio(void* gpio_context);
+%ignore Led(void* led_context);
 
 %ignore Gpio::nop(uv_work_t* req);
 %ignore Gpio::v8isr(uv_work_t* req);
@@ -72,3 +62,5 @@
 %include "aio.hpp"
 
 %include "uart.hpp"
+
+%include "led.hpp"

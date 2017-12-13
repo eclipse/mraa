@@ -1,5 +1,6 @@
 /*
  * Author: Brendan Le Foll
+ * Contributors: Alex Tereschenko <alext.mkrs@gmail.com>
  * Copyright (c) 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -38,13 +39,14 @@ interrupt(void* args)
 int
 main()
 {
-    mraa::Gpio* x = new mraa::Gpio(6);
+    mraa::Gpio x(6);
 
-    x->dir(mraa::DIR_IN);
+    x.dir(mraa::DIR_IN);
 
-    x->isr(mraa::EDGE_BOTH, &interrupt, NULL);
+    x.isr(mraa::EDGE_BOTH, &interrupt, NULL);
 
-    for (;;) {
+    int i = 100;
+    for (; i > 0; --i) {
         if (counter != oldcounter) {
             fprintf(stdout, "timeout counter == %d\n", counter);
             oldcounter = counter;
@@ -53,5 +55,5 @@ main()
         sleep(1);
     }
 
-    return EXIT_SUCCESS;
+    return MRAA_SUCCESS;
 }

@@ -107,7 +107,6 @@ mraa_banana_mmap_write(mraa_gpio_context dev, int value)
 {
     uint32_t readvalue =
     *(volatile uint32_t*) (mmap_reg + SUNXI_GPIO_DAT + (dev->pin / 32) * SUNXI_GPIO_PORT_OFFSET);
-    volatile uint32_t* addr;
     if (value) {
         *(volatile uint32_t*) (mmap_reg + SUNXI_GPIO_DAT + (dev->pin / 32) * SUNXI_GPIO_PORT_OFFSET) =
         (uint32_t)((1 << (dev->pin % 32)) | readvalue);
@@ -559,20 +558,20 @@ mraa_banana()
     b->def_uart_dev = 0;
     if ((uart3 >= 0) && (platform_detected == PLATFORM_BANANA_PI)) {
         b->def_uart_dev = b->uart_dev_count;
-        b->uart_dev[b->uart_dev_count].device_path = serialdev[uart3];
+        b->uart_dev[b->uart_dev_count].device_path = (char *)serialdev[uart3];
         b->uart_dev[b->uart_dev_count].rx = 11;
         b->uart_dev[b->uart_dev_count].tx = 13;
         b->uart_dev_count++;
     }
     if ((uart4 >= 0) && (platform_detected == PLATFORM_BANANA_PRO)) {
         b->def_uart_dev = b->uart_dev_count;
-        b->uart_dev[b->uart_dev_count].device_path = serialdev[uart4];
+        b->uart_dev[b->uart_dev_count].device_path = (char *)serialdev[uart4];
         b->uart_dev[b->uart_dev_count].rx = 10;
         b->uart_dev[b->uart_dev_count].tx = 8;
         b->uart_dev_count++;
     }
     if (uart7 >= 0) {
-        b->uart_dev[b->uart_dev_count].device_path = serialdev[uart7];
+        b->uart_dev[b->uart_dev_count].device_path = (char *)serialdev[uart7];
         if (platform_detected == PLATFORM_BANANA_PRO) {
             b->uart_dev[b->uart_dev_count].rx = 31;
             b->uart_dev[b->uart_dev_count].tx = 32;
@@ -583,7 +582,7 @@ mraa_banana()
         b->uart_dev_count++;
     }
     if (uart2 >= 0) {
-        b->uart_dev[b->uart_dev_count].device_path = serialdev[uart2];
+        b->uart_dev[b->uart_dev_count].device_path = (char *)serialdev[uart2];
         b->uart_dev[b->uart_dev_count].rx = 11;
         b->uart_dev[b->uart_dev_count].tx = 13;
         b->uart_dev_count++;

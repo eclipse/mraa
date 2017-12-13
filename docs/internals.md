@@ -166,6 +166,10 @@ conversions and memory allocations are performed so the performance of using
 these functions compared to the C/C++ equivalent will likely be a little lower,
 however it is much more natural than using carrays.i typemap library.
 
+Note that node v7.x.x is not yet supported in SWIG, however this is a patchset
+in SWIG that enables this and does enable mraa to compile and work against a
+newer nodejs version.
+
 ### NPM ###
 
 mraa is published on NPM, there is a target to prebuild a mraa src tarball that

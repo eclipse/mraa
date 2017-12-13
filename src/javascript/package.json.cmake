@@ -12,5 +12,8 @@
   },
   "license": "MIT",
   "version": "@VERSION@",
-  "authors": "See github.com/intel-iot-devkit/mraa/graphs/contributors"
+  "authors": "See github.com/intel-iot-devkit/mraa/graphs/contributors",
+  "scripts": {
+    "test": "node -p -e 'require(\".\").getVersion()'"
+  }
 }

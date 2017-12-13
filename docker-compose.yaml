@@ -1,0 +1,165 @@
+version: '2.1'
+
+services:
+
+  base:
+    image: inteliotdevkit/mraa-base
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy
+      - BUILDDOC=${BUILDDOC:-OFF}
+      - BUILDSWIG=${BUILDSWIG:-OFF}
+      - BUILDSWIGPYTHON=${BUILDSWIGPYTHON:-OFF}
+      - BUILDTESTS=${BUILDTESTS:-ON}
+      - USEPYTHON3TESTS=${USEPYTHON3TESTS:-OFF}
+      - BUILDSWIGJAVA=${BUILDSWIGJAVA:-OFF}
+      - BUILDSWIGNODE=${BUILDSWIGNODE:-OFF}
+      - USBPLAT=${USBPLAT:-OFF}
+      - FIRMATA=${FIRMATA:-OFF}
+      - ONEWIRE=${ONEWIRE:-ON}
+      - JSONPLAT=${JSONPLAT:-OFF}
+      - IMRAA=${IMRAA:-OFF}
+      - FTDI4222=${FTDI4222:-OFF}
+      - IPK=${IPK:-OFF}
+      - RPM=${RPM:-OFF}
+      - ENABLEEXAMPLES=${ENABLEEXAMPLES:-OFF}
+      - INSTALLTOOLS=${INSTALLTOOLS:-ON}
+      - CC=${CC:-clang-3.8}
+      - CXX=${CXX:-clang++-3.8}
+      - BUILDARCH=${BUILDARCH}
+    volumes:
+      - .:${MRAA_SRC_DIR:-/usr/src/app}
+
+  all:
+    extends: base
+    image: inteliotdevkit/mraa-all
+
+  doc:
+    extends: all
+    environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGPYTHON=ON
+      - BUILDSWIGNODE=ON
+      - BUILDSWIGJAVA=ON
+      - BUILDDOC=ON
+    command: bash -c "./scripts/run-cmake.sh && ./scripts/build-doc.sh"
+
+  examples:
+    extends: all
+    environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGPYTHON=ON
+      - BUILDSWIGNODE=ON
+      - BUILDSWIGJAVA=ON
+      - ENABLEEXAMPLES=ON
+      - USBPLAT=ON
+      - FIRMATA=ON
+      - ONEWIRE=ON
+      - IMRAA=ON
+      - FTDI4222=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
+
+  sonar-scan:
+    extends: all
+    environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGPYTHON=ON
+      - BUILDSWIGNODE=ON
+      - BUILDSWIGJAVA=ON
+      - ENABLEEXAMPLES=ON
+      - ONEWIRE=ON
+      - JSONPLAT=ON
+      - SONAR_TOKEN
+      - SONAR_ORG
+      - SONAR_PROJ_KEY
+      - TRAVIS_BRANCH
+      - TRAVIS_PULL_REQUEST
+      - TRAVIS_REPO_SLUG
+      - TRAVIS_PULL_REQUEST_SLUG
+      - GITHUB_TOKEN
+    command: bash -c "./scripts/run-cmake.sh && cd build && ../scripts/sonar-scan.sh"
+
+  usbplat:
+    extends: all
+    environment:
+      - USBPLAT=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
+
+  firmata:
+    extends: all
+    environment:
+      - FIRMATA=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
+
+  imraa:
+    extends: all
+    environment:
+      - IMRAA=ON
+      - FIRMATA=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
+
+  ftdi4442:
+    extends: all
+    environment:
+      - FTDI4222=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
+
+  ipk:
+    extends: all
+    environment:
+      - IPK=ON
+      - ENABLEEXAMPLES=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
+
+  rpm:
+    extends: all
+    environment:
+      - RPM=ON
+      - ENABLEEXAMPLES=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
+
+  python2:
+    extends: base
+    image: inteliotdevkit/mraa-python
+    environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGPYTHON=ON
+    command: bash -c "./scripts/run-cmake.sh && cd build && make _python2-mraa && ctest --output-on-failure"
+
+  python3:
+    extends: python2
+    environment:
+      - USEPYTHON3TESTS=ON
+    command: bash -c "./scripts/run-cmake.sh && cd build && make _python3-mraa && ctest --output-on-failure"
+
+  java:
+    extends: base
+    image: inteliotdevkit/mraa-java
+    environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGJAVA=ON
+    command: bash -c "./scripts/run-cmake.sh && cd build && make mraajava && ctest --output-on-failure"
+
+  android:
+    extends: java
+    image: inteliotdevkit/mraa-android
+    environment:
+      - BUILDARCH=PERIPHERALMAN
+    command: bash -c "./scripts/build-android.sh"
+
+  node4:
+    extends: base
+    image: inteliotdevkit/mraa-node4
+    environment:
+      - BUILDSWIG=ON
+      - BUILDSWIGNODE=ON
+    command: bash -c "./scripts/run-cmake.sh && make -Cbuild npmpkg && node-gyp configure && node-gyp build && npm test"
+
+  node5:
+    extends: node4
+    image: inteliotdevkit/mraa-node5
+
+  node6:
+    extends: node4
+    image: inteliotdevkit/mraa-node6

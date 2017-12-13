@@ -45,9 +45,7 @@ main()
     signal(SIGINT, sig_handler);
 
     //! [Interesting]
-    mraa::Spi* spi;
-
-    spi = new mraa::Spi(0);
+    mraa::Spi spi(0);
 
     uint8_t data[] = { 0x00, 100 };
     uint8_t rxBuf[2];
@@ -56,7 +54,7 @@ main()
         int i;
         for (i = 90; i < 130; i++) {
             data[1] = i;
-            recv = spi->write(data, 2);
+            recv = spi.write(data, 2);
             printf("Writing -%i", i);
             if (recv) {
                 printf("RECIVED-%i-%i\n", recv[0], recv[1]);
@@ -66,14 +64,13 @@ main()
         }
         for (i = 130; i > 90; i--) {
             data[1] = i;
-            if (spi->transfer(data, rxBuf, 2) == mraa::SUCCESS) {
+            if (spi.transfer(data, rxBuf, 2) == mraa::SUCCESS) {
                 printf("Writing -%i", i);
                 printf("RECIVED-%i-%i\n", rxBuf[0], rxBuf[1]);
             }
             usleep(100000);
         }
     }
-    delete spi;
     //! [Interesting]
 
     return mraa::SUCCESS;

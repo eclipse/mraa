@@ -63,9 +63,9 @@ mraa_result_t mraa_am335x_mmap_write(mraa_gpio_context dev, int value);
 /**
  * Unsetup register of mmap_gpio[]
  *
- * @return static mraa_result_t indicating success of actions.
+ * @return mraa_result_t indicating success of actions.
  */
-static mraa_result_t mraa_am335x_mmap_unsetup();
+mraa_result_t mraa_am335x_mmap_unsetup();
 
 /**
  * Read from gpio_context 'dev'

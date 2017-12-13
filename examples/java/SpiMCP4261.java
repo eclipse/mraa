@@ -43,7 +43,7 @@ public class SpiMCP4261 {
 
         System.out.println("Hello, SPI initialised");
         byte data[] = {0x00, 100};
-        while (true) {
+        for (int cnt = 100; cnt > 0; --cnt) {
             for (int i = 90; i < 130; i++) {
                 data[1] = (byte) i;
                 byte[] recv = spi.write(data);

@@ -166,16 +166,16 @@ int
 process_command(int argc, char** argv)
 {
     int status = 0;
-    if (strcmp(argv[1], "help") == 0) {
+    if (strncmp(argv[1], "help", strlen("help") + 1) == 0) {
         print_help();
         return 0;
-    } else if (strcmp(argv[1], "version") == 0) {
+    } else if (strncmp(argv[1], "version", strlen("version") + 1) == 0) {
         print_version();
         return 0;
-    } else if (strcmp(argv[1], "list") == 0) {
+    } else if (strncmp(argv[1], "list", strlen("list") + 1) == 0) {
         print_busses();
         return 0;
-    } else if (strcmp(argv[1], "detect") == 0) {
+    } else if (strncmp(argv[1], "detect", strlen("detect") + 1) == 0) {
         if (argc == 3) {
             int bus = strtol(argv[2], NULL, 0);
             i2c_detect_devices(bus);
@@ -184,10 +184,11 @@ process_command(int argc, char** argv)
             print_command_error();
             return 1;
         }
-    } else if ((strcmp(argv[1], "get") == 0) || (strcmp(argv[1], "getrpt") == 0)) {
+    } else if ((strncmp(argv[1], "get", strlen("get") + 1) == 0) ||
+               (strncmp(argv[1], "getrpt", strlen("getrpt") + 1) == 0)) {
         if (argc == 5) {
             int interation = 0;
-            mraa_boolean_t should_repeat = strcmp(argv[1], "getrpt") == 0;
+            mraa_boolean_t should_repeat = strncmp(argv[1], "getrpt", strlen("getrpt") + 1) == 0;
             int bus = strtol(argv[2], NULL, 0);
             uint8_t device_address = strtol(argv[3], NULL, 0);
             uint8_t register_address = strtol(argv[4], NULL, 0);
@@ -211,7 +212,7 @@ process_command(int argc, char** argv)
             status = 1;
         }
         return status;
-    } else if ((strcmp(argv[1], "set") == 0)) {
+    } else if ((strncmp(argv[1], "set", strlen("set") + 1) == 0)) {
         if (argc == 6) {
             int bus = strtol(argv[2], NULL, 0);
             uint8_t device_address = strtol(argv[3], NULL, 0);
@@ -246,12 +247,14 @@ run_interactive_mode()
         fprintf(stdout, "Command: ");
         fgets(command, 80, stdin);
         command[strlen(command) - 1] = 0;
-        if (strcmp(command, "q") == 0)
+        if (strncmp(command, "q", strlen("q") + 1) == 0)
             return;
         char* str = strtok(command, " ");
+        int len = 0;
         while (str != NULL) {
-            arg = malloc(strlen(str) + 1);
-            argv[argc++] = strcpy(arg, str);
+            len = strlen(str) + 1;
+            arg = malloc(len);
+            argv[argc++] = strncpy(arg, str, len);
             str = strtok(NULL, " ");
         }
         process_command(argc, argv);

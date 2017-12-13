@@ -46,7 +46,7 @@ public class GpioRead6 {
 
         gpio.dir(Dir.DIR_IN);
 
-        while (true) {
+        for (int i = 100; i > 0; --i) {
             System.out.format("Gpio is %d\n", gpio.read());
             Thread.sleep(1000);
         }

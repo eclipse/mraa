@@ -1,4 +1,11 @@
 FIND_PACKAGE (JNI REQUIRED)
+
+if (PERIPHERALMAN)
+  # Override the JNI include directory for Android Things since these
+  # will require an Android-friendly jni.h
+  set(JAVA_INCLUDE_PATH "${ANDROID_SYSROOT}/usr/include")
+endif()
+
 include_directories (
   ${JAVA_INCLUDE_PATH}
   ${JAVA_INCLUDE_PATH2}
@@ -24,7 +31,11 @@ else ()
   set (JAR $ENV{JAVA_HOME_NATIVE}/bin/jar)
 endif ()
 
-swig_add_module (mraajava java mraajava.i mraajni.c)
+if (CMAKE_VERSION VERSION_LESS "3.8")
+  swig_add_module (mraajava java mraajava.i mraajni.c)
+else ()
+  swig_add_library (mraajava LANGUAGE java SOURCES mraajava.i mraajni.c)
+endif ()
 swig_link_libraries (mraajava ${JAVA_LIBRARIES} mraa)
 
 add_custom_command (TARGET mraajava

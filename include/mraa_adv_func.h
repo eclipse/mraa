@@ -59,6 +59,7 @@ typedef struct {
     mraa_result_t (*gpio_wait_interrupt_replace) (mraa_gpio_context dev);
     mraa_result_t (*gpio_isr_replace) (mraa_gpio_context dev, mraa_gpio_edge_t mode, void (*fptr)(void*), void* args);
     mraa_result_t (*gpio_isr_exit_replace) (mraa_gpio_context dev);
+    mraa_result_t (*gpio_out_driver_mode_replace) (mraa_gpio_context dev, mraa_gpio_out_driver_mode_t mode);
 
     mraa_result_t (*i2c_init_pre) (unsigned int bus);
     mraa_result_t (*i2c_init_bus_replace) (mraa_i2c_context dev);
@@ -86,6 +87,7 @@ typedef struct {
 
     mraa_pwm_context (*pwm_init_replace) (int pin);
     mraa_pwm_context (*pwm_init_internal_replace) (void* func_table, int pin);
+    mraa_result_t (*pwm_init_raw_replace) (mraa_pwm_context dev, int pin);
     mraa_result_t (*pwm_init_pre) (int pin);
     mraa_result_t (*pwm_init_post) (mraa_pwm_context pwm);
     mraa_result_t (*pwm_period_replace) (mraa_pwm_context dev, int period);
@@ -112,6 +114,7 @@ typedef struct {
     mraa_result_t (*uart_init_post) (mraa_uart_context uart);
     mraa_result_t (*uart_init_raw_replace) (mraa_uart_context dev, const char* path);
     mraa_result_t (*uart_flush_replace) (mraa_uart_context dev);
+    mraa_result_t (*uart_sendbreak_replace) (mraa_uart_context dev, int duration);
     mraa_result_t (*uart_set_baudrate_replace) (mraa_uart_context dev, unsigned int baud);
     mraa_result_t (*uart_set_mode_replace) (mraa_uart_context dev, int bytesize, mraa_uart_parity_t parity, int stopbits);
     mraa_result_t (*uart_set_flowcontrol_replace) (mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_boolean_t rtscts);

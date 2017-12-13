@@ -39,6 +39,9 @@
 #define PLATFORM_NAME_DB410C "DB410C"
 #define PLATFORM_NAME_HIKEY "HIKEY"
 #define PLATFORM_NAME_BBGUM "BBGUM"
+#define MAX_SIZE 64
+#define MMAP_PATH "/dev/mem"
+#define DB410C_MMAP_REG 0x01000000
 
 int db410c_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
     36, 12, 13, 69, 115, 4, 24, 25, 35, 34, 28, 33,
@@ -56,6 +59,12 @@ const char* hikey_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyAMA2", "/d
 int bbgum_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 155, 154 };
 
 const char* bbgum_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyS3", "/dev/ttyS5" };
+
+// MMAP
+static uint8_t* mmap_reg = NULL;
+static int mmap_fd = 0;
+static int mmap_size = 0x00120004;
+static unsigned int mmap_count = 0;
 
 void
 mraa_96boards_pininfo(mraa_board_t* board, int index, int sysfs_pin, char* fmt, ...)
@@ -76,17 +85,113 @@ mraa_96boards_pininfo(mraa_board_t* board, int index, int sysfs_pin, char* fmt, 
     pininfo->gpio.mux_total = 0;
 }
 
+static mraa_result_t
+mraa_db410c_mmap_unsetup()
+{
+	if (mmap_reg == NULL) {
+		syslog(LOG_WARNING, "db410c mmap: null register nothing to unsetup");
+		return MRAA_ERROR_INVALID_RESOURCE;
+	}
+	munmap(mmap_reg, mmap_size);
+	mmap_reg = NULL;
+	close(mmap_fd);
+
+	return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_db410c_mmap_write(mraa_gpio_context dev, int value)
+{
+	uint32_t offset = (0x1000 * dev->pin);
+
+	if (value) {
+		*(volatile uint32_t*) (mmap_reg + offset + 0x04) |= (uint32_t) (1 << 1);
+	} else {
+		*(volatile uint32_t*) (mmap_reg + offset + 0x04) &= ~(uint32_t) (1 << 1);
+	}
+
+	return MRAA_SUCCESS;
+}
+
+int
+mraa_db410c_mmap_read(mraa_gpio_context dev)
+{
+	uint32_t value;
+	uint32_t offset = (0x1000 * dev->pin);
+
+	value = *(volatile uint32_t*) (mmap_reg + offset + 0x04);
+	if (value & (uint32_t) (1 << 0)) {
+		return 1;
+	}
+
+	return 0;
+}
+
+mraa_result_t
+mraa_db410c_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
+{
+	if (dev == NULL) {
+		syslog(LOG_ERR, "db410c mmap: context not valid");
+		return MRAA_ERROR_INVALID_HANDLE;
+	}
+
+	/* disable mmap if already enabled */
+	if (en == 0) {
+		if (dev->mmap_write == NULL && dev->mmap_read == NULL) {
+			syslog(LOG_ERR, "db410c mmap: can't disable disabled mmap gpio");
+			return MRAA_ERROR_INVALID_PARAMETER;
+		}
+		dev->mmap_write = NULL;
+		dev->mmap_read = NULL;
+		mmap_count--;
+		if (mmap_count == 0) {
+			return mraa_db410c_mmap_unsetup();
+		}
+		return MRAA_SUCCESS;
+	}
+
+	if (dev->mmap_write != NULL && dev->mmap_read != NULL) {
+		syslog(LOG_ERR, "db410c mmap: can't enable enabled mmap gpio");
+		return MRAA_ERROR_INVALID_PARAMETER;
+	}
+
+	if (mmap_reg == NULL) {
+		if ((mmap_fd = open(MMAP_PATH, O_RDWR)) < 0) {
+			syslog(LOG_ERR, "db410c mmap: unable to open /dev/mem");
+			return MRAA_ERROR_INVALID_HANDLE;
+		}
+		mmap_reg = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, mmap_fd, DB410C_MMAP_REG);
+
+		if (mmap_reg == MAP_FAILED) {
+			syslog(LOG_ERR, "db410c mmap: failed to mmap");
+			mmap_reg = NULL;
+			close(mmap_fd);
+			return MRAA_ERROR_NO_RESOURCES;
+		}
+	}
+	dev->mmap_write = &mraa_db410c_mmap_write;
+	dev->mmap_read = &mraa_db410c_mmap_read;
+	mmap_count++;
+
+	return MRAA_SUCCESS;
+}
+
 mraa_board_t*
 mraa_96boards()
 {
-    int i, pin;
+    int i;
     int* ls_gpio_pins = NULL;
-    char ch;
 
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
         return NULL;
     }
+
+	b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+	if (b->adv_func == NULL) {
+		free(b);
+		return NULL;
+	}
 
     // pin mux for buses are setup by default by kernel so tell mraa to ignore them
     b->no_bus_mux = 1;
@@ -97,18 +202,19 @@ mraa_96boards()
         if (mraa_file_contains(DT_BASE "/model", "Qualcomm Technologies, Inc. APQ 8016 SBC")) {
             b->platform_name = PLATFORM_NAME_DB410C;
             ls_gpio_pins = db410c_ls_gpio_pins;
-            b->uart_dev[0].device_path = db410c_serialdev[0];
-            b->uart_dev[1].device_path = db410c_serialdev[1];
+            b->uart_dev[0].device_path = (char *)db410c_serialdev[0];
+            b->uart_dev[1].device_path = (char *)db410c_serialdev[1];
+            b->adv_func->gpio_mmap_setup = &mraa_db410c_mmap_setup;
         } else if (mraa_file_contains(DT_BASE "/model", "HiKey Development Board")) {
             b->platform_name = PLATFORM_NAME_HIKEY;
             ls_gpio_pins = hikey_ls_gpio_pins;
-            b->uart_dev[0].device_path = hikey_serialdev[0];
-            b->uart_dev[1].device_path = hikey_serialdev[1];
+            b->uart_dev[0].device_path = (char *)hikey_serialdev[0];
+            b->uart_dev[1].device_path = (char *)hikey_serialdev[1];
         } else if (mraa_file_contains(DT_BASE "/model", "s900")) {
             b->platform_name = PLATFORM_NAME_BBGUM;
             ls_gpio_pins = bbgum_ls_gpio_pins;
-            b->uart_dev[0].device_path = bbgum_serialdev[0];
-            b->uart_dev[1].device_path = bbgum_serialdev[1];
+            b->uart_dev[0].device_path = (char *)bbgum_serialdev[0];
+            b->uart_dev[1].device_path = (char *)bbgum_serialdev[1];
         }
     }
 
@@ -117,7 +223,7 @@ mraa_96boards()
     b->def_uart_dev = 0;
 
     // I2C
-    if (b->platform_name == PLATFORM_NAME_BBGUM) {
+    if (strncmp(b->platform_name, PLATFORM_NAME_BBGUM, MAX_SIZE) == 0) {
         b->i2c_bus_count = MRAA_96BOARDS_LS_I2C_COUNT;
         b->def_i2c_bus = 0;
         b->i2c_bus[0].bus_id = 1;
@@ -133,12 +239,6 @@ mraa_96boards()
     b->spi_bus_count = MRAA_96BOARDS_LS_SPI_COUNT;
     b->spi_bus[0].bus_id = 0;
     b->def_spi_bus = 0;
-
-    b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
-    if (b->adv_func == NULL) {
-        free(b);
-        return NULL;
-    }
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * b->phy_pin_count);
     if (b->pins == NULL) {

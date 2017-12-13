@@ -22,33 +22,35 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var m = require('mraa'); //require mraa
-console.log('MRAA Version: ' + m.getVersion());
-u = new m.Uart(0)
+"use strict";
+
+const mraa = require('mraa'); //require mraa
+console.log('MRAA Version: ' + mraa.getVersion());
+let uart = new mraa.Uart(0);
 
 console.log("Note: connect Rx and Tx of UART with a wire before use");
 
 function sleep(delay) {
-  delay += new Date().getTime();
-  while (new Date() < delay) { }
+    delay += new Date().getTime();
+    while (new Date() < delay) {}
 }
 
 console.log("Set UART parameters");
 
-u.setBaudRate(115200);
-u.setMode(8, 0, 1);
-u.setFlowcontrol(false, false);
+uart.setBaudRate(115200);
+uart.setMode(8, 0, 1);
+uart.setFlowcontrol(false, false);
 sleep(200);
 
 console.log("First write-read circle:");
 
-u.writeStr("test\n");
+uart.writeStr("test\n");
 sleep(200);
-console.log(u.readStr(6));
+console.log(uart.readStr(6));
 sleep(200);
 
 console.log("Second write-read circle:");
 
-u.writeStr("2nd test\n");
+uart.writeStr("2nd test\n");
 sleep(200);
-console.log(u.readStr(10));
+console.log(uart.readStr(10));

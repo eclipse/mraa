@@ -1,8 +1,9 @@
 <p align="center">
   <img src="http://iotdk.intel.com/misc/logos/mraa.png" height="150px" width="auto" algt="Mraa Logo"/>
 </p>
+
 libmraa - Low Level Skeleton Library for Communication on GNU/Linux platforms
-==============
+=============================================================================
 
 Libmraa is a C/C++ library with bindings to Java, Python and JavaScript to
 interface with the IO on Galileo, Edison & other platforms, with a structured
@@ -26,9 +27,10 @@ X86
 * [Galileo Gen 2 - Rev H](../master/docs/galileorevh.md)
 * [Edison](../master/docs/edison.md)
 * [Intel DE3815](../master/docs/intel_de3815.md)
-* [Minnowboard Max](../master/docs/minnow_max.md)
+* [Minnowboard](../master/docs/minnow_max.md)
 * [NUC 5th generation](../master/docs/intel_nuc5.md)
 * [UP](../master/docs/up.md)
+* [UP Squared](../master/docs/up2.md)
 * [Intel Joule](../master/docs/joule.md)
 
 ARM
@@ -37,6 +39,12 @@ ARM
 * [Banana Pi](../master/docs/banana_pi.md)
 * [Beaglebone Black](../master/docs/beaglebone.md)
 * [phyBOARD-Wega](../master/docs/phyboard-wega.md)
+* [96Boards](../master/docs/96boards.md)
+
+MIPS
+---
+* [Linkit Smart 7688](../master/docs/linkit_7688.md)
+* [Onion Omega2](../master/docs/omega2.md)
 
 FPGA
 ----
@@ -45,6 +53,11 @@ FPGA
 USB
 ---
 * [FT4222](../master/docs/ftdi_ft4222.md)
+* [Firmata](../master/docs/firmata.md)
+
+I2C
+---
+* [GrovePi](../master/docs/grovepi.md)
 
 Mock
 ----
@@ -66,10 +79,11 @@ https://launchpad.net/~mraa/+archive/ubuntu/mraa
 ```bash
 sudo add-apt-repository ppa:mraa/mraa
 sudo apt-get update
-sudo apt-get install libmraa1 libmraa-dev mraa-tools python-mraa python3-mraa
+sudo apt-get install libmraa1 libmraa-dev libmraa-java python-mraa python3-mraa node-mraa mraa-tools
 ```
 
-Node.js package is available seperately.
+Running MRAA tools or applications on Ubuntu systems requires elevated permissions
+(e.g. run with `sudo`).
 
 Install on Arch Linux
 ---------------------
@@ -91,7 +105,7 @@ sudo zypper in mraa
 Installing for Node.js only
 ---------------------------
 
-> Note: Node.js 7.0.0+ is not supported. You'll have to downgrade to 6.x.x.
+> Note: Node.js 7.0.0+ is not currently supported. You'll have to downgrade to 6.x.x.
 
 You can also install just the node.js mraa module by using npm. You will need a
 C++ compiler and the node development headers, however it's not required to
@@ -105,6 +119,9 @@ Note that installing mraa in this way builds mraa without json-c so you cannot
 use mraa_init_json_platform(). Also building this way means the mraa.node
 includes a static version of libmraa rather than relying on a dynamic library
 in /usr/lib.
+
+Subplatforms (i.e. Firmata) have to be added manually with this kind of install
+from your application, as shown in [this example](examples/javascript/firmata.js).
 
 Installing on Intel 32bit Yocto based opkg image
 ------------------------------------------------

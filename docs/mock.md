@@ -26,7 +26,8 @@ See [SPI mock header](../include/mock/mock_board_spi.h#L38-L39) for constant val
 * Single UART port. All functions are supported, but many are simple stubs. Write
 always succeeds, read returns 'Z' symbol as many times as `read()` requested.
 
-We plan to develop it further and all [contributions](../CONTRIBUTING.md) are more than welcome.
+We plan to develop it further and all contributions are more than welcome. See our
+@ref contributing page for more information.
 
 See the table below for pin layout and features
 
@@ -47,7 +48,7 @@ Building
 --------
 
 Generally all the building steps are the same as listed
-in the [main building guide](./building.md), you just need to set some specific
+in the main @ref building guide, you just need to set some specific
 CMake options.
 
 ### Linux

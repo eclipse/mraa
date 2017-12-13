@@ -31,14 +31,15 @@
 #include "x86/up.h"
 
 #define PLATFORM_NAME "UP"
-#define MAX_LENGTH 8
+#define PLATFORM_VERSION "1.0.0"
+
 
 static mraa_result_t
 mraa_up_set_pininfo(mraa_board_t* board, int mraa_index, char* name, mraa_pincapabilities_t caps, int sysfs_pin)
 {
     if (mraa_index < board->phy_pin_count) {
         mraa_pininfo_t* pin_info = &board->pins[mraa_index];
-        strncpy(pin_info->name, name, MAX_LENGTH);
+        strncpy(pin_info->name, name, MRAA_PIN_NAME_SIZE);
         pin_info->capabilities = caps;
         if (caps.gpio) {
             pin_info->gpio.pinmap = sysfs_pin;
@@ -76,11 +77,14 @@ mraa_up_get_pin_index(mraa_board_t* board, char* name, int* pin_index)
 {
     int i;
     for (i = 0; i < board->phy_pin_count; ++i) {
-        if (strncmp(name, board->pins[i].name, MAX_LENGTH) == 0) {
+        if (strncmp(name, board->pins[i].name, MRAA_PIN_NAME_SIZE) == 0) {
             *pin_index = i;
             return MRAA_SUCCESS;
         }
     }
+
+    syslog(LOG_CRIT, "up: Failed to find pin name %s", name);
+
     return MRAA_ERROR_INVALID_RESOURCE;
 }
 
@@ -116,6 +120,7 @@ mraa_up_board()
     }
 
     b->platform_name = PLATFORM_NAME;
+    b->platform_version = PLATFORM_VERSION;
     b->phy_pin_count = MRAA_UP_PINCOUNT;
     b->gpio_count = MRAA_UP_GPIOCOUNT;
 
@@ -132,18 +137,18 @@ mraa_up_board()
 
     b->adv_func->aio_get_valid_fp = &mraa_up_aio_get_valid_fp;
 
-    mraa_up_set_pininfo(b, 0, "INVALID",   (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_up_set_pininfo(b, 1, "3.3v",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_up_set_pininfo(b, 2, "5v",        (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_up_set_pininfo(b, 3, "I2C1_SDA",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 }, 2);
-    mraa_up_set_pininfo(b, 4, "5v",        (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_up_set_pininfo(b, 5, "I2C1_SCL",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 }, 3);
-    mraa_up_set_pininfo(b, 6, "GND",       (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_up_set_pininfo(b, 7, "ADC0",      (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 }, 4);
-    mraa_up_set_pininfo(b, 8, "UART1_TX",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 14);
-    mraa_up_set_pininfo(b, 9, "GND",       (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_up_set_pininfo(b, 10, "UART1_RX", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 15);
-    mraa_up_set_pininfo(b, 11, "GPIO17",   (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 17);
+    mraa_up_set_pininfo(b, 0,  "INVALID",  (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_up_set_pininfo(b, 1,  "3.3v",     (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_up_set_pininfo(b, 2,  "5v",       (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_up_set_pininfo(b, 3,  "I2C_SDA",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 }, 2);
+    mraa_up_set_pininfo(b, 4,  "5v",       (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_up_set_pininfo(b, 5,  "I2C_SCL",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 }, 3);
+    mraa_up_set_pininfo(b, 6,  "GND",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_up_set_pininfo(b, 7,  "ADC0",     (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 1, 0 }, 4);
+    mraa_up_set_pininfo(b, 8,  "UART_TX",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 14);
+    mraa_up_set_pininfo(b, 9,  "GND",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
+    mraa_up_set_pininfo(b, 10, "UART_RX",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 15);
+    mraa_up_set_pininfo(b, 11, "UART_RTS", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 17);
     mraa_up_set_pininfo(b, 12, "I2S_CLK",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 18);
     mraa_up_set_pininfo(b, 13, "GPIO27",   (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 27);
     mraa_up_set_pininfo(b, 14, "GND",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
@@ -168,27 +173,38 @@ mraa_up_board()
     mraa_up_set_pininfo(b, 33, "PWM1",     (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 }, 13);
     mraa_up_set_pininfo(b, 34, "GND",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_up_set_pininfo(b, 35, "I2S_FRM",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 19);
-    mraa_up_set_pininfo(b, 36, "GPIO16",   (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 16);
+    mraa_up_set_pininfo(b, 36, "UART_CTS", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 }, 16);
     mraa_up_set_pininfo(b, 37, "GPIO26",   (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 26);
     mraa_up_set_pininfo(b, 38, "I2S_DIN",  (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 20);
     mraa_up_set_pininfo(b, 39, "GND",      (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
     mraa_up_set_pininfo(b, 40, "I2S_DOUT", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 21);
 
     // Set number of i2c adaptors usable from userspace
-    b->i2c_bus_count = 2;
+    b->i2c_bus_count = 0;
+    b->def_i2c_bus = 0;
+    int i2c_bus_num;
 
     // Configure i2c adaptor #0 (default)
     // (For consistency with Raspberry Pi 2, use I2C1 as our primary I2C bus)
-    b->i2c_bus[0].bus_id = 1;
-    mraa_up_get_pin_index(b, "I2C1_SDA", (int*) &(b->i2c_bus[0].sda));
-    mraa_up_get_pin_index(b, "I2C1_SCL", (int*) &(b->i2c_bus[0].scl));
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "808622C1:01", ".");
+    if (i2c_bus_num != -1) {
+        int i = b->i2c_bus_count;
+        b->i2c_bus[i].bus_id = i2c_bus_num;
+        mraa_up_get_pin_index(b, "I2C_SDA", (int*) &(b->i2c_bus[0].sda));
+        mraa_up_get_pin_index(b, "I2C_SCL", (int*) &(b->i2c_bus[0].scl));
+        b->i2c_bus_count++;
+    }
 
     // Configure i2c adaptor #1
     // (normally reserved for accessing HAT EEPROM)
-    b->i2c_bus[1].bus_id = 0;
-    mraa_up_get_pin_index(b, "I2C0_SDA", (int*) &(b->i2c_bus[1].sda));
-    mraa_up_get_pin_index(b, "I2C0_SCL", (int*) &(b->i2c_bus[1].scl));
-    b->def_i2c_bus = 0;
+    i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "808622C1:00", ".");
+    if (i2c_bus_num != -1) {
+        int i = b->i2c_bus_count;
+        b->i2c_bus[i].bus_id = i2c_bus_num;
+        mraa_up_get_pin_index(b, "ID_SD", (int*) &(b->i2c_bus[1].sda));
+        mraa_up_get_pin_index(b, "ID_SC", (int*) &(b->i2c_bus[1].scl));
+        b->i2c_bus_count++;
+    }
 
     // Configure PWM
     b->pwm_default_period = 500;
@@ -214,8 +230,10 @@ mraa_up_board()
 
     // Configure UART #1 (default)
     b->uart_dev_count = 1;
-    mraa_up_get_pin_index(b, "UART1_RX", &(b->uart_dev[0].rx));
-    mraa_up_get_pin_index(b, "UART1_TX", &(b->uart_dev[0].tx));
+    mraa_up_get_pin_index(b, "UART_RX",  &(b->uart_dev[0].rx));
+    mraa_up_get_pin_index(b, "UART_TX",  &(b->uart_dev[0].tx));
+    mraa_up_get_pin_index(b, "UART_CTS", &(b->uart_dev[0].cts));
+    mraa_up_get_pin_index(b, "UART_RTS", &(b->uart_dev[0].rts));
     b->uart_dev[0].device_path = "/dev/ttyS1";
     b->def_uart_dev = 0;
 
@@ -224,7 +242,13 @@ mraa_up_board()
     b->adc_raw = 8;
     b->adc_supported = 8;
 
-    return b;
+    const char* pinctrl_path = "/sys/bus/platform/drivers/up-pinctrl";
+    int have_pinctrl = access(pinctrl_path, F_OK) != -1;
+    syslog(LOG_NOTICE, "up: kernel pinctrl driver %savailable", have_pinctrl ? "" : "un");
+
+    if (have_pinctrl)
+        return b;
+
 error:
     syslog(LOG_CRIT, "up: Platform failed to initialise");
     free(b);

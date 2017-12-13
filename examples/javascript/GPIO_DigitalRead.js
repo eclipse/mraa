@@ -22,17 +22,17 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var m = require('mraa'); //require mraa
-console.log('MRAA Version: ' + m.getVersion()); //write the mraa version to the console
+"use strict";
 
-var myDigitalPin = new m.Gpio(6); //setup digital read on pin 6
-myDigitalPin.dir(m.DIR_IN); //set the gpio direction to input
+const mraa = require('mraa'); //require mraa
+console.log('MRAA Version: ' + mraa.getVersion()); //write the mraa version to the console
 
-periodicActivity(); //call the periodicActivity function
+let myDigitalPin = new mraa.Gpio(6); //setup digital read on pin 6
+myDigitalPin.dir(mraa.DIR_IN); //set the gpio direction to input
 
-function periodicActivity() //
-{
-  var myDigitalValue =  myDigitalPin.read(); //read the digital value of the pin
-  console.log('Gpio is ' + myDigitalValue); //write the read value out to the console
-  setTimeout(periodicActivity,1000); //call the indicated function after 1 second (1000 milliseconds)
+function periodicActivity() {
+    let myDigitalValue = myDigitalPin.read(); //read the digital value of the pin
+    console.log('Gpio value is ' + myDigitalValue); //write the read value out to the console
 }
+
+setInterval(periodicActivity, 1000); //call the indicated function every 1 second (1000 milliseconds)

@@ -1,60 +1,101 @@
-language: cpp
-sudo: required
 dist: trusty
-env:
-  - NODE010=true
-  - NODE012=true
-  - NODE4=true
-  - NODE5=true
-  - JSONPLAT=true NODE010=true
-  - JSONPLAT=true NODE012=true
-  - JSONPLAT=true NODE4=true
-  - JSONPLAT=true NODE5=true
-  - MOCK=true NODE010=true
-  - MOCK=true NODE012=true
-  - MOCK=true NODE4=true
-  - MOCK=true NODE5=true
-  # node010 npm builds don't work in clang and anyone using npm should want to
-  # use something newer
-  - NPM=true NODE4=true
-  - NPM=true NODE5=true
-compiler:
-  - clang
-  - gcc
+sudo: required
+
+language: cpp
+
+services:
+  - docker
+
 before_install:
-  # Via https://github.com/travis-ci/travis-ci/issues/5326
-  - export PATH="$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")"
-install:
-  - if [ "${NODE4}" ]; then export CC=gcc-4.8 CXX=g++-4.8; fi
-before_script:
-  # Turn off JAVA SWIG for clang++, use 4.8 for all g++ builds
-  - if [ "$CC" == "gcc" ]; then export BUILDJAVA=ON; export CC=gcc-4.8; export CXX=g++-4.8; else export BUILDJAVA=OFF; fi
-  - if [ "${JSONPLAT}" ]; then export JSONPLAT=ON; else export JSONPLAT=OFF; fi
-  - if [ "${MOCK}" ]; then export BUILDARCH="MOCK"; else export BUILDARCH=""; fi
-  - if [ "${NODE010}" ]; then nvm install 0.10; fi
-  - if [ "${NODE012}" ]; then nvm install 0.12; fi
-  - if [ "${NODE4}" ]; then nvm install 4.1; fi
-  - if [ "${NODE5}" ]; then nvm install 5; fi
-  - npm install node-gyp && export NODE_GYP="/home/travis/build/intel-iot-devkit/mraa/node_modules/node-gyp/bin/node-gyp.js"
-  # Handle 0.10 NODE_ROOT_DIR differently than other versions
-  - wget http://iotdk.intel.com/misc/tr/swig-3.0.10.tar.gz && tar xf swig-3.0.10.tar.gz && cd swig-3.0.10 && ./configure --prefix=/home/travis/ && make && make install && cd ..
-script:
-  - echo "CC=$CC BUILDJAVA=$BUILDJAVA BUILDARCH=$BUILDARCH JSONPLAT=$JSONPLAT NODE010=$NODE010 NODE012=$NODE012 NODE4=$NODE4 NODE5=$NODE5 NODE_ROOT_DIR=$NODE_ROOT_DIR"
-  - if [ -z ${NPM} ]; then mkdir build && cd build && cmake -DBUILDSWIGJAVA="$BUILDJAVA" -DBUILDARCH="$BUILDARCH" -DJSONPLAT=$JSONPLAT -DNODE_ROOT_DIR:PATH="${NVM_BIN}/.." -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make install && make test; else mkdir build && cd build && cmake -DBUILDSWIGJAVA="$BUILDJAVA" -DJSONPLAT=$JSONPLAT -DNODE_ROOT_DIR:PATH="${NVM_BIN}/.." -DCMAKE_INSTALL_PREFIX:PATH=../install -DSWIG_EXECUTABLE=/home/travis/bin/swig -DSWIG_DIR:PATH=/home/travis/share/swig/3.0.10/ .. && make npmpkg && cd .. && ${NODE_GYP} configure && ${NODE_GYP} build; fi
-  # simple test to see if we can load our node module
-  - if [ ${NPM} ]; then cd build/Release/obj.target/ && node -e  "var m = require('./mraa.node'); m.getVersion()";fi
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - kalakris-cmake
-    packages:
-      - g++-4.8
-      - cmake
-      - python
-      - python-dev
-      - python3
-      - python3-dev
-      - git
-      - libjson0
-      - libjson0-dev
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/1.9.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+jobs:
+  fast_finish: true
+  allow_failures:
+    - env: TARGET=ipk
+  include:
+    - &run-with-clang
+      stage: Clang 3.8
+      env: TARGET=python2
+      before_script: docker-compose pull ${TARGET}
+      script:
+        - export CC=clang-3.8 CXX=clang++-3.8
+        - docker-compose run ${TARGET}
+        - BUILDARCH=MOCK docker-compose run ${TARGET}
+        - if [[ ${TARGET} != *"node"* ]]; then JSONPLAT=ON docker-compose run ${TARGET}; fi
+    - <<: *run-with-clang
+      env: TARGET=python3
+    - <<: *run-with-clang
+      env: TARGET=node4
+    - <<: *run-with-clang
+      env: TARGET=node5
+    - <<: *run-with-clang
+      env: TARGET=node6
+    - <<: *run-with-clang
+      env: TARGET=java
+    - &run-with-gcc-5
+      stage: Gcc 5
+      env: TARGET=python2
+      before_script: docker-compose pull ${TARGET}
+      script:
+        - export CC=gcc-5 CXX=g++-5
+        - docker-compose run ${TARGET}
+        - BUILDARCH=MOCK docker-compose run ${TARGET}
+        - if [[ ${TARGET} != *"node"* ]]; then JSONPLAT=ON docker-compose run ${TARGET}; fi
+    - <<: *run-with-gcc-5
+      env: TARGET=python3
+    - <<: *run-with-gcc-5
+      env: TARGET=node4
+    - <<: *run-with-gcc-5
+      env: TARGET=node5
+    - <<: *run-with-gcc-5
+      env: TARGET=node6
+    - <<: *run-with-gcc-5
+      env: TARGET=java
+    - &run-with-gcc-6
+      stage: Gcc 6
+      env: TARGET=python2
+      before_script: docker-compose pull ${TARGET}
+      script:
+        - export CC=gcc-6 CXX=g++-6
+        - docker-compose run ${TARGET}
+        - BUILDARCH=MOCK docker-compose run ${TARGET}
+        - if [[ ${TARGET} != *"node"* ]]; then JSONPLAT=ON docker-compose run ${TARGET}; fi
+    - <<: *run-with-gcc-6
+      env: TARGET=python3
+    - <<: *run-with-gcc-6
+      env: TARGET=node4
+    - <<: *run-with-gcc-6
+      env: TARGET=node5
+    - <<: *run-with-gcc-6
+      env: TARGET=node6
+    - <<: *run-with-gcc-6
+      env: TARGET=java
+    - &run-additional-jobs
+      stage: Additional Jobs
+      env: TARGET=doc
+      before_script: docker-compose pull ${TARGET}
+      script:
+        - export CC=clang-3.8 CXX=clang++-3.8
+        - docker-compose run ${TARGET}
+    - <<: *run-additional-jobs
+      env: TARGET=android
+    - <<: *run-additional-jobs
+      env: TARGET=examples
+    - <<: *run-additional-jobs
+      env: TARGET=usbplat
+    - <<: *run-additional-jobs
+      env: TARGET=firmata
+    - <<: *run-additional-jobs
+      env: TARGET=imraa
+    - <<: *run-additional-jobs
+      env: TARGET=ftdi4442
+    - <<: *run-additional-jobs
+      env: TARGET=ipk
+    - <<: *run-additional-jobs
+      env: TARGET=rpm
+    - <<: *run-additional-jobs
+      env: TARGET=sonar-scan

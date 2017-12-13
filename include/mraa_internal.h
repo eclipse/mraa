@@ -38,7 +38,9 @@ extern "C" {
 
 extern mraa_board_t* plat;
 extern char* platform_name;
+#if !defined(PERIPHERALMAN)
 extern mraa_iio_info_t* plat_iio;
+#endif
 extern mraa_lang_func_t* lang_func;
 
 /**
@@ -62,6 +64,13 @@ mraa_platform_t mraa_x86_platform();
  * @return mraa_platform_t of the init'ed platform
  */
 mraa_platform_t mraa_arm_platform();
+
+/**
+ * runtime detect running mips platforms
+ *
+ * @return mraa_platform_t of the init'ed platform
+ */
+mraa_platform_t mraa_mips_platform();
 
 /**
  * setup a mock platform

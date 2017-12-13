@@ -98,7 +98,6 @@ mraa_pwm_context
 mraa_phyboard_pwm_init_replace(int pin)
 {
     char devpath[MAX_SIZE];
-    int length = strlen(SYSFS_CLASS_PWM) + 5;
 
     if (plat == NULL) {
         syslog(LOG_ERR, "pwm: Platform Not Initialised");
@@ -330,7 +329,7 @@ mraa_phyboard()
     b->pins[33].gpio.parent_id = 0;
     b->pins[33].gpio.mux_total = 0;
     b->pins[33].uart.mux_total = 0;
-    
+
     strncpy(b->pins[34].name, "GND", MRAA_PIN_NAME_SIZE);
     b->pins[34].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 

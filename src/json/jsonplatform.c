@@ -95,8 +95,8 @@ mraa_init_json_platform_platform(json_object* jobj_platform, mraa_board_t* board
             syslog(LOG_ERR, "init_json_platform: Empty string provided for \"%s\" key in platform", NAME_KEY);
             return MRAA_ERROR_NO_DATA_AVAILABLE;
         }
-        board->platform_name = (char*) calloc(length, sizeof(char));
-        strncpy(board->platform_name, temp_string, length);
+        board->platform_name = (char*) calloc(length + 1, sizeof(char));
+        strncpy(board->platform_name, temp_string, length + 1);
     } else {
         syslog(LOG_ERR, "init_json_platform: No \"%s\" key in platform", NAME_KEY);
         return MRAA_ERROR_NO_DATA_AVAILABLE;
@@ -214,7 +214,8 @@ mraa_init_json_platform_io(json_object* jobj_io, mraa_board_t* board, int index)
         }
         temp_string = json_object_get_string(jobj_temp);
         // set the gpio label
-        strncpy(board->pins[pos].name, temp_string, 8);
+        memset(board->pins[pos].name, 0, MRAA_PIN_NAME_SIZE);
+        strncpy(board->pins[pos].name, temp_string, MRAA_PIN_NAME_SIZE - 1);
     } else {
         syslog(LOG_ERR, "init_json_platform: No IO Label");
         return MRAA_ERROR_INVALID_RESOURCE;
@@ -299,7 +300,7 @@ mraa_init_json_platform_i2c(json_object* jobj_i2c, mraa_board_t* board, int inde
     }
     // Get the bus number (e.g. 2 for /dev/i2c-2). If it doesn't exist, default to bus = pos
     bus = pos;
-    ret = mraa_init_json_platform_get_pin(jobj_i2c, I2C_KEY, BUS_KEY, index, &bus);
+    mraa_init_json_platform_get_pin(jobj_i2c, I2C_KEY, BUS_KEY, index, &bus);
     // Setup the sda pin
     ret = mraa_init_json_platform_get_index(jobj_i2c, I2C_KEY, SDAPIN_KEY, index, &pin,
                                             board->phy_pin_count - 1);
@@ -521,8 +522,8 @@ mraa_init_json_platform_uart(json_object* jobj_uart, mraa_board_t* board, int in
             syslog(LOG_ERR, "init_json_platform: UART Path at index: %d was empty", index);
             return MRAA_ERROR_NO_DATA_AVAILABLE;
         }
-        board->uart_dev[pos].device_path = (char*) calloc(length, sizeof(char));
-        strncpy(board->uart_dev[pos].device_path, temp_string, length);
+        board->uart_dev[pos].device_path = (char*) calloc(length + 1, sizeof(char));
+        strncpy(board->uart_dev[pos].device_path, temp_string, length + 1);
     } else {
         syslog(LOG_ERR, "init_json_platform: UART config at index: %d needs a path", index);
         return MRAA_ERROR_NO_DATA_AVAILABLE;
@@ -708,7 +709,16 @@ mraa_init_json_platform(const char* platform_json)
     free(plat);
     // Set the new one in it's place
     plat = board;
-    platform_name = plat->platform_name;
+
+    // This one was allocated and assigned an "Unknown platform" value by now,
+    // so we need to reallocate it.
+    free(platform_name);
+    platform_name = calloc(strlen(plat->platform_name) + 1, sizeof(char));
+    if (platform_name == NULL) {
+        syslog(LOG_ERR, "init_json_platform: Could not allocate memory for platform_name");
+        goto unsuccessful;
+    }
+    strncpy(platform_name, plat->platform_name, strlen(plat->platform_name) + 1);
 
     // We made it to the end without anything going wrong, just cleanup
     ret = MRAA_SUCCESS;

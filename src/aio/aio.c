@@ -37,6 +37,11 @@ static int raw_bits;
 static mraa_result_t
 aio_get_valid_fp(mraa_aio_context dev)
 {
+    if (dev == NULL) {
+        syslog(LOG_ERR, "aio: get_valid_fp: context is invalid");
+        return MRAA_ERROR_INVALID_HANDLE;
+    }
+
     if (IS_FUNC_DEFINED(dev, aio_get_valid_fp)) {
         return dev->advance_func->aio_get_valid_fp(dev);
     }
@@ -102,8 +107,14 @@ mraa_aio_init(unsigned int aio)
         aio = mraa_get_sub_platform_index(aio);
     }
 
-    // aio are always past the gpio_count in the pin array
-    pin = aio + board->gpio_count;
+    // Some boards, like the BBB, don't have sequential AIO pins
+    // They will have their own specific mapping to map aio -> pin
+    if((board->aio_non_seq) && (aio < board->aio_count)){
+        pin = board->aio_dev[aio].pin;
+    } else {
+        // aio are always past the gpio_count in the pin array
+        pin = aio + board->gpio_count;
+    }
 
     if (pin < 0 || pin >= board->phy_pin_count) {
         syslog(LOG_ERR, "aio: pin %i beyond platform definition", pin);

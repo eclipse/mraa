@@ -27,6 +27,8 @@
 #include "common.h"
 #include "types.hpp"
 #include <string>
+#include <sstream>
+#include <stdexcept>
 
 /**
  * @namespace mraa namespace
@@ -97,7 +99,7 @@ getPlatformType()
 /**
  * Print a textual representation of the mraa::Result
  *
- * @param Result the Result to print
+ * @param result the Result to print
  */
 inline void
 printError(Result result)
@@ -155,7 +157,7 @@ getPlatformName()
 /**
  * Return platform versioning info. Returns NULL if no info present.
  *
- * @param optional subplatform identifier
+ * @param platform_offset optional subplatform identifier
  * @return platform versioning info
  */
 inline std::string
@@ -174,6 +176,18 @@ inline unsigned int
 getPinCount()
 {
     return mraa_get_pin_count();
+}
+
+/**
+ * Get platform usable UART count, board must be initialised.
+ *
+ * @return number of usable UARTs on the current platform. Function will
+ * return -1 on failure
+ */
+inline int
+getUartCount()
+{
+    return mraa_get_uart_count();
 }
 
 /**
@@ -215,6 +229,111 @@ getPinName(int pin)
 }
 
 /**
+* Get GPIO index by pin name, board must be initialised.
+*
+* @param pin_name: GPIO pin name. Eg: IO0
+* @throws std::invalid_argument if name is not found
+* @return int of MRAA index for GPIO
+*/
+inline int
+getGpioLookup(std::string pin_name)
+{
+    int index = mraa_gpio_lookup(pin_name.c_str());
+
+    if (index < 0){
+        std::ostringstream oss;
+        oss << "Gpio name " << pin_name << " is not valid";
+        throw std::invalid_argument(oss.str());
+    }
+
+    return index;
+}
+
+/**
+* Get I2C bus index by bus name, board must be initialised.
+*
+* @param i2c_name: I2C bus name. Eg: I2C6
+* @throws std::invalid_argument if name is not found
+* @return int of MRAA index for I2C bus
+*/
+inline int
+getI2cLookup(std::string i2c_name)
+{
+    int index = mraa_i2c_lookup(i2c_name.c_str());
+
+    if (index < 0){
+        std::ostringstream oss;
+        oss << "i2c name " << i2c_name << " is not valid";
+        throw std::invalid_argument(oss.str());
+    }
+
+    return index;
+}
+
+/**
+* Get SPI bus index by bus name, board must be initialised.
+*
+* @param spi_name: Name of SPI bus. Eg: SPI2
+* @throws std::invalid_argument if name is not found
+* @return int of MRAA index for SPI bus
+*/
+inline int
+getSpiLookup(std::string spi_name)
+{
+    int index = mraa_spi_lookup(spi_name.c_str());
+
+    if (index < 0){
+        std::ostringstream oss;
+        oss << "Spi name " << spi_name << " is not valid";
+        throw std::invalid_argument(oss.str());
+    }
+
+    return index;
+}
+
+/**
+ * Get PWM index by PWM name, board must be initialised.
+ *
+ * @param pwm_name: Name of PWM. Eg:PWM0
+ * @throws std::invalid_argument if name is not found
+ * @return int of MRAA index for PWM
+ */
+inline int
+getPwmLookup(std::string pwm_name)
+{
+    int index = mraa_pwm_lookup(pwm_name.c_str());
+
+    if (index < 0){
+        std::ostringstream oss;
+        oss << "PWM name " << pwm_name << " is not valid";
+        throw std::invalid_argument(oss.str());
+    }
+
+    return index;
+}
+
+/**
+ * Get UART index by UART name, board must be initialised.
+ *
+ * @param uart_name: Name of the UART. Eg: UART2
+ * @throws std::invalid_argument if name is not found
+ * @return MRAA index for the UART
+ */
+inline int
+getUartLookup(std::string uart_name)
+{
+    int index = mraa_uart_lookup(uart_name.c_str());
+
+    if (index < 0) {
+        std::ostringstream oss;
+        oss << "UART name " << uart_name << " is not valid";
+        throw std::invalid_argument(oss.str());
+    }
+
+    return index;
+}
+
+/**
  * Sets the log level to use from 0-7 where 7 is very verbose. These are the
  * syslog log levels, see syslog(3) for more information on the levels.
  *
@@ -241,7 +360,7 @@ hasSubPlatform()
 /**
  * Check if pin or bus id includes sub platform mask.
  *
- * @param int pin or bus number
+ * @param pin_or_bus_id pin or bus number
  *
  * @return mraa_boolean_t 1 if pin or bus is for sub platform, 0 otherwise
  */
@@ -254,7 +373,7 @@ isSubPlatformId(int pin_or_bus_id)
 /**
  * Convert pin or bus index to corresponding sub platform id.
  *
- * @param int pin or bus index
+ * @param pin_or_bus_index pin or bus index
  *
  * @return int sub platform pin or bus number
  */
@@ -267,7 +386,7 @@ getSubPlatformId(int pin_or_bus_index)
 /**
  * Convert pin or bus sub platform id to index.
  *
- * @param int sub platform pin or bus id
+ * @param pin_or_bus_id sub platform pin or bus id
  *
  * @return int pin or bus index
  */
@@ -280,7 +399,7 @@ getSubPlatformIndex(int pin_or_bus_id)
 /**
  * Get default i2c bus, board must be initialised.
  *
- * @param optional subplatform identifier
+ * @param platform_offset optional subplatform identifier
  * @return default i2c bus for paltform
  */
 inline int
@@ -293,16 +412,23 @@ getDefaultI2cBus(int platform_offset=MRAA_MAIN_PLATFORM_OFFSET)
  * Add mraa subplatform
  *
  * @param subplatformtype the type of subplatform to add
- * (e.g. MRAA_GENERIC_FIRMATA)
- * @param uart_dev subplatform device string (e.g. "/dev/ttyACM0")
+ * (e.g. MRAA_GENERIC_FIRMATA or MRAA_GROVEPI)
+ * @param dev subplatform uart device string or i2c bus number (e.g. "/dev/ttyACM0" or "0")
  * @return Result of operation
  */
 inline Result
-addSubplatform(Platform subplatformtype, std::string uart_dev)
+addSubplatform(Platform subplatformtype, std::string dev)
 {
-    return (Result) mraa_add_subplatform((mraa_platform_t) subplatformtype, uart_dev.c_str());
+    return (Result) mraa_add_subplatform((mraa_platform_t) subplatformtype, dev.c_str());
 }
 
+/**
+ * Remove mraa subplatform
+ *
+ * @param subplatformtype the type of subplatform to remove
+ * (e.g. MRAA_GENERIC_FIRMATA)
+ * @return Result of operation
+ */
 inline Result
 removeSubplatform(Platform subplatformtype)
 {
@@ -316,7 +442,7 @@ removeSubplatform(Platform subplatformtype)
  * [io]-[raw]-[id]-[pin]
  * [io]-[raw]-[path]
  *
- * @param IO description
+ * @param desc description
  *
  * @return class T initialised using pointer to IO or NULL
  */
@@ -330,7 +456,7 @@ initIo(std::string desc)
 /**
  * Instantiate an unknown board using a json file
  *
- * @param Path to the json file, relative to the folder the program
+ * @param path Path to the json file, relative to the folder the program
  * was initially run in or a direct path
  *
  * @return Result indicating success

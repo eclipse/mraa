@@ -44,12 +44,13 @@ public class GpioMmapped {
     String version = mraa.getVersion();
     System.out.println("hello mraa");
     System.out.println(String.format("Version: %s", version));
+    System.out.println(String.format("Platform: %s", board));
     
     Gpio gpio = new Gpio(1);
     
     gpio.useMmap(true);
     
-    while (true) {
+    for (int i = 1000; i > 0; --i) {
         gpio.write(1);
         Thread.sleep(50);
         gpio.write(0);

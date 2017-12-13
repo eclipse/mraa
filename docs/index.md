@@ -48,15 +48,23 @@ Specific platform information for supported platforms is documented here:
 - @ref phyboard-wega
 - @ref nuc5
 - @ref up
+- @ref up2
 - @ref joule
 - @ref ft4222
+- @ref _96boards
+- @ref de10-nano
+- @ref firmata
+- @ref grovepi
+- @ref mock
+- @ref linkit_7688
+- @ref omega2
 
 ## DEBUGGING
 
 Sometimes it just doesn't want to work, let us try and help you, you can file
 issues in github or join us in #mraa on freenode IRC, hang around for a little
 while because we're not necessarily on 24/7, but we'll get back to you! Have a
-glance at our @debugging page too
+glance at our @ref debugging page too
 
 ## COMPILING
 

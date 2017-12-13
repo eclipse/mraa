@@ -1,5 +1,6 @@
 /*
  * Author: Brendan Le Foll
+ * Contributors: Alex Tereschenko <alext.mkrs@gmail.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -52,7 +53,8 @@ main()
 
     mraa_gpio_isr(x, edge, &interrupt, NULL);
 
-    for (;;) {
+    int i = 100;
+    for (; i > 0; --i) {
         if (counter != oldcounter) {
             fprintf(stdout, "timeout counter == %d\n", counter);
             oldcounter = counter;

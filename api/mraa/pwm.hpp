@@ -71,7 +71,7 @@ class Pwm
      * Pwm constructor, takes a pointer to the PWM context and
      * initialises the class
      *
-     * @param void * to a PWM context
+     * @param pwm_context void * to a PWM context
      */
     Pwm(void* pwm_context)
     {

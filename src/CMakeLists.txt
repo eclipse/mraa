@@ -4,6 +4,8 @@ set (mraa_LIB_INCLUDE_DIRS
   ${PROJECT_SOURCE_DIR}/include
 )
 
+add_subdirectory (grovepi)
+
 if (FIRMATA)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFIRMATA=1")
   add_subdirectory (firmata)
@@ -26,9 +28,16 @@ set (mraa_LIB_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/spi/spi.c
   ${PROJECT_SOURCE_DIR}/src/aio/aio.c
   ${PROJECT_SOURCE_DIR}/src/uart/uart.c
-  ${PROJECT_SOURCE_DIR}/src/iio/iio.c
+  ${PROJECT_SOURCE_DIR}/src/led/led.c
   ${mraa_LIB_SRCS_NOAUTO}
 )
+
+if (NOT PERIPHERALMAN)
+  set (mraa_LIB_SRCS_NOAUTO
+    ${mraa_LIB_SRCS_NOAUTO}
+    ${PROJECT_SOURCE_DIR}/src/iio/iio.c
+  )
+endif ()
 
 set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/x86.c
@@ -41,6 +50,7 @@ set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/intel_sofia_3gr.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_cherryhills.c
   ${PROJECT_SOURCE_DIR}/src/x86/up.c
+  ${PROJECT_SOURCE_DIR}/src/x86/up2.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_joule_expansion.c
 )
 
@@ -67,6 +77,8 @@ if (NOT ${MRAAPLATFORMFORCE} STREQUAL "ALL")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_cherryhills.c)
   elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_UP")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/up.c)
+  elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_UP2")
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/up2.c)
   elseif( ${MRAAPLATFORMFORCE} STREQUAL "MRAA_INTEL_JOULE_EXPANSION")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_joule_expansion.c)
   else ()
@@ -86,6 +98,11 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/arm/de_nano_soc.c
 )
 
+set (mraa_LIB_MIPS_SRCS_NOAUTO
+  ${PROJECT_SOURCE_DIR}/src/mips/mips.c
+  ${PROJECT_SOURCE_DIR}/src/mips/mediatek.c
+)
+
 set (mraa_LIB_MOCK_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/mock/mock.c
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board.c
@@ -94,6 +111,10 @@ set (mraa_LIB_MOCK_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board_i2c.c
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board_spi.c
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board_uart.c
+)
+
+set (mraa_LIB_PERIPHERALMAN_SRCS_NOAUTO
+  ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman.c
 )
 
 if (JSONPLAT)
@@ -108,15 +129,20 @@ endif ()
 
 set (mraa_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
-
 if (X86PLAT)
   add_subdirectory(x86)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DX86PLAT=1")
+  set (mraa_LIBS ${mraa_LIBS} rt)
 endif()
 
 if (ARMPLAT)
   add_subdirectory(arm)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DARMPLAT=1")
+endif()
+
+if (MIPSPLAT)
+  add_subdirectory(mips)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMIPSPLAT=1")
 endif()
 
 if (MOCKPLAT)
@@ -125,6 +151,23 @@ if (MOCKPLAT)
   if (MSYS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMSYS=1")
   endif ()
+endif()
+
+if (PERIPHERALMAN)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPERIPHERALMAN=1")
+
+  # Use the find_package provided by Android Things.  Make sure this is
+  # available in CMAKE_MODULE_PATH.
+  find_package(AndroidThings REQUIRED)
+
+  # Add Android Things libraries
+  set (mraa_LIBS ${mraa_LIBS} ${ANDROIDTHINGS_LIBRARIES})
+
+  # Add Android Things include directories
+  include_directories(${ANDROIDTHINGS_INCLUDE_DIRS})
+
+  # Add the peripheral manager source to the build
+  add_subdirectory(peripheralman)
 endif()
 
 if (USBPLAT)
@@ -194,7 +237,7 @@ mraa_create_install_pkgconfig (mraa.pc ${LIB_INSTALL_DIR}/pkgconfig)
 
 if (DOXYGEN_FOUND)
   set (CMAKE_SWIG_FLAGS -DDOXYGEN=${DOXYGEN_FOUND})
-  set (DOCCLASSES aio gpio i2c pwm spi uart)
+  set (DOCCLASSES aio gpio i2c pwm spi uart led)
   # CPP class headers
   foreach (_file ${DOCCLASSES})
     add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_file}_class_doc.i

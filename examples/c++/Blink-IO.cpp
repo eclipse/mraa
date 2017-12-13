@@ -55,23 +55,19 @@ main(int argc, char** argv)
     signal(SIGINT, sig_handler);
 
     //! [Interesting]
-    mraa::Gpio* gpio = new mraa::Gpio(iopin);
-    if (gpio == NULL) {
-        return mraa::ERROR_UNSPECIFIED;
-    }
-    mraa::Result response = gpio->dir(mraa::DIR_OUT);
+    mraa::Gpio gpio(iopin);
+    mraa::Result response = gpio.dir(mraa::DIR_OUT);
     if (response != mraa::SUCCESS) {
         mraa::printError(response);
         return 1;
     }
 
     while (running == 0) {
-        response = gpio->write(1);
+        response = gpio.write(1);
         sleep(1);
-        response = gpio->write(0);
+        response = gpio.write(0);
         sleep(1);
     }
-    delete gpio;
     return response;
     //! [Interesting]
 }

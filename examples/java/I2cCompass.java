@@ -110,16 +110,16 @@ public class I2cCompass {
         conf_buf[1] = HMC5883L_CONT_MODE;
         i2c.write(conf_buf);
 
-        while (true) {
+        for (int i = 100; i > 0; --i) {
             i2c.address(HMC5883L_I2C_ADDR);
             i2c.writeByte(HMC5883L_DATA_REG);
 
             i2c.address(HMC5883L_I2C_ADDR);
             i2c.read(rx_tx_buf);
 
-            x = (rx_tx_buf[HMC5883L_X_MSB_REG] << 8) | rx_tx_buf[HMC5883L_X_LSB_REG];
-            z = (rx_tx_buf[HMC5883L_Z_MSB_REG] << 8) | rx_tx_buf[HMC5883L_Z_LSB_REG];
-            y = (rx_tx_buf[HMC5883L_Y_MSB_REG] << 8) | rx_tx_buf[HMC5883L_Y_LSB_REG];
+            x = (rx_tx_buf[HMC5883L_X_MSB_REG] << 8) | (rx_tx_buf[HMC5883L_X_LSB_REG] & 0xFF);
+            z = (rx_tx_buf[HMC5883L_Z_MSB_REG] << 8) | (rx_tx_buf[HMC5883L_Z_LSB_REG] & 0xFF);
+            y = (rx_tx_buf[HMC5883L_Y_MSB_REG] << 8) | (rx_tx_buf[HMC5883L_Y_LSB_REG] & 0xFF);
 
             direction = (float) Math.atan2(y * SCALE_0_92_MG, x * SCALE_0_92_MG);
 

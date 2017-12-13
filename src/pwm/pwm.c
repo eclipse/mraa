@@ -102,8 +102,8 @@ mraa_pwm_write_duty(mraa_pwm_context dev, int duty)
             return MRAA_ERROR_INVALID_RESOURCE;
         }
     }
-    char bu[64];
-    int length = sprintf(bu, "%d", duty);
+    char bu[MAX_SIZE];
+    int length = snprintf(bu, MAX_SIZE, "%d", duty);
     if (write(dev->duty_fp, bu, length * sizeof(char)) == -1)
     {
         syslog(LOG_ERR, "pwm%i write_duty: Failed to write to duty_cycle: %s", dev->pin, strerror(errno));
@@ -229,10 +229,11 @@ mraa_pwm_init(int pin)
         }
         pin = mraa_get_sub_platform_index(pin);
     }
-    if (pin < 0 || pin > board->phy_pin_count) {
+    if (pin < 0 || pin >= board->phy_pin_count) {
         syslog(LOG_ERR, "pwm_init: pin %i beyond platform definition", pin);
         return NULL;
     }
+
     if (board->pins[pin].capabilities.pwm != 1) {
         syslog(LOG_ERR, "pwm_init: pin %i not capable of pwm", pin);
         return NULL;
@@ -268,15 +269,31 @@ mraa_pwm_init(int pin)
         }
         return pret;
     }
+
+#if defined(PERIPHERALMAN)
+    return mraa_pwm_init_raw(chip, pin);
+#else
     return mraa_pwm_init_raw(chip, pinn);
+#endif
 }
 
 mraa_pwm_context
 mraa_pwm_init_raw(int chipin, int pin)
 {
     mraa_pwm_context dev = mraa_pwm_init_internal(plat == NULL ? NULL : plat->adv_func , chipin, pin);
-    if (dev == NULL)
+    if (dev == NULL) {
+        syslog(LOG_CRIT, "pwm: Failed to allocate memory for context");
         return NULL;
+    }
+
+    if (IS_FUNC_DEFINED(dev, pwm_init_raw_replace)) {
+        if (dev->advance_func->pwm_init_raw_replace(dev, pin) == MRAA_SUCCESS) {
+            return dev;
+        } else {
+            free(dev);
+            return NULL;
+        }
+    }
 
     char directory[MAX_SIZE];
     snprintf(directory, MAX_SIZE, SYSFS_PWM "/pwmchip%d/pwm%d", dev->chipid, dev->pin);
@@ -306,7 +323,9 @@ mraa_pwm_init_raw(int chipin, int pin)
         mraa_pwm_period_us(dev, plat->pwm_default_period);
         close(export_f);
     }
+
     mraa_pwm_setup_duty_fp(dev);
+
     return dev;
 }
 

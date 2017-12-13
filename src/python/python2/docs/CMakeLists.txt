@@ -1,6 +1,6 @@
 if (DOXYGEN_FOUND)
-  find_package (Sphinx)
-  if (SPHINX_FOUND)
+  find_package (Sphinx 1.3 REQUIRED)
+  if (SPHINX_FOUND AND SPHINX_VERSION VERSION_GREATER "1.3")
     if (NOT DEFINED SPHINX_THEME)
       set (SPHINX_THEME default)
     endif ()
@@ -19,7 +19,7 @@ if (DOXYGEN_FOUND)
     set (SPHINX_HTML_DIR "${CMAKE_CURRENT_BINARY_DIR}/html")
 
     # doc .rst locations
-    set (SPHINX_DOC_LOATION "${CMAKE_CURRENT_SOURCE_DIR}")
+    set (SPHINX_DOC_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}")
 
     configure_file(
       "${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in"
@@ -31,11 +31,13 @@ if (DOXYGEN_FOUND)
       ${SPHINX_EXECUTABLE} -b html
       -c "${BINARY_BUILD_DIR}"
       -d "${SPHINX_CACHE_DIR}"
-      "${SPHINX_DOC_LOATION}"
+      "${SPHINX_DOC_LOCATION}"
       "${SPHINX_HTML_DIR}"
       COMMENT "Building HTML documentation with Sphinx"
     )
 
     add_dependencies (sphinx ${SWIG_MODULE_python2-mraa_REAL_NAME})
-  endif ()
+  else ()
+    message (SEND_ERROR "ERROR - Failed to find a compatible version of Sphinx. Python API doc will not be generated")
+  endif (SPHINX_FOUND AND SPHINX_VERSION VERSION_GREATER "1.3")
 endif ()

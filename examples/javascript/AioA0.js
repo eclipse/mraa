@@ -22,11 +22,13 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var m = require('mraa'); //require mraa
-console.log('MRAA Version: ' + m.getVersion()); //write the mraa version to the console
+"use strict";
 
-var analogPin0 = new m.Aio(0); //setup access analog inpuput pin 0
-var analogValue = analogPin0.read(); //read the value of the analog pin
-var analogValueFloat = analogPin0.readFloat(); //read the pin value as a float
+const mraa = require('mraa'); //require mraa
+console.log('MRAA Version: ' + mraa.getVersion()); //write the mraa version to the console
+
+let analogPin0 = new mraa.Aio(0); //setup access analog inpuput pin 0
+let analogValue = analogPin0.read(); //read the value of the analog pin
+let analogValueFloat = analogPin0.readFloat(); //read the pin value as a float
 console.log(analogValue); //write the value of the analog pin to the console
 console.log(analogValueFloat.toFixed(5)); //write the value in the float format

@@ -1,4 +1,8 @@
 [submodule "doxygen2jsdoc"]
 	path = doxygen2jsdoc
-	url = https://github.com/arfoll/doxygen2jsdoc.git
+	url = https://github.com/intel-iot-devkit/doxygen2jsdoc.git
+	branch = master
+[submodule "doxyport"]
+	path = doxyport
+	url = https://github.com/intel-iot-devkit/doxyport.git
 	branch = master

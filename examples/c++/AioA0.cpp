@@ -1,5 +1,6 @@
 /*
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Contributors: Alex Tereschenko <alex.mkrs@gmail.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -22,26 +23,36 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//! [Interesting]
+#include <signal.h>
+
 #include "mraa.hpp"
 
+int running = 0;
+
+void
+sig_handler(int signo)
+{
+    if (signo == SIGINT) {
+        printf("closing down nicely\n");
+        running = -1;
+    }
+}
+
+//! [Interesting]
 int
 main()
 {
     uint16_t adc_value;
     float adc_value_float;
-    mraa::Aio* a0;
+    mraa::Aio a0(0);
 
-    a0 = new mraa::Aio(0);
-    if (a0 == NULL) {
-        return MRAA_ERROR_UNSPECIFIED;
-    }
+    signal(SIGINT, sig_handler);
 
-    for (;;) {
-        adc_value = a0->read();
-        adc_value_float = a0->readFloat();
+    while (running == 0) {
+        adc_value = a0.read();
+        adc_value_float = a0.readFloat();
         fprintf(stdout, "ADC A0 read %X - %d\n", adc_value, adc_value);
-        fprintf(stdout, "ADC A0 read float - %.5f\n", adc_value_float);
+        fprintf(stdout, "ADC A0 read float - %.5f (Ctrl+C to exit)\n", adc_value_float);
     }
 
     return MRAA_SUCCESS;

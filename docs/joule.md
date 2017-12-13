@@ -14,26 +14,22 @@ Interface notes
 
 **SPI**
 
-Two SPI buses are available, with one chipselect each. Pins listed are MRAA
-numbered pins. Other chip selects are available if enabled in BIOS/EEPROM but
-cannot be enabled as BIOS options. You will need the spidev kernel module
-loaded, Ostro-XT does this by default.
+Two SPI buses are available, one with three and another one with two chipselects.
+In MRAA terms an SPI "bus" (denoted by a number) is a combination
+of an actual bus + specific chipselect on this bus. In view of that + taking
+into account that SPI1CS1 is not available on the board, in MRAA the above
+translates into five available bus numbers - from 0 to 4, covering SPI0CS0 to SPI1CS2.
 
-Bus 0 (32765)
-MOSI = 2
-MISO = 4
-CS = 6
-CLK = 10
+Pins listed are MRAA numbered pins. You will need the `spidev` kernel module loaded
+with appropriate board configuration for binding, Ref-OS-IoT does not enable this by default.
 
-Bus 1 (32766)
-MOSI = 67
-MISO = 69
-CS0 = 59
-CS1 = 61
-CLK = 65
-
-(remove 40 from numbers to get pin header number for pins on low speed header
-2)
+MRAA bus # | Ref-OS-IoT bus # | Joule docs bus # | MOSI | MISO | CLK | CS
+-----------|------------------|------------------|------|------|-----|----
+0 | 32766 | SPI0 | 67 (J13-27)| 69 (J13-29) | 65 (J13-25) | 59 (J13-19)
+1 | 32766 | SPI0 | 67 (J13-27)| 69 (J13-29) | 65 (J13-25) | 61 (J13-21)
+2 | 32766 | SPI0 | 67 (J13-27)| 69 (J13-29) | 65 (J13-25) | 63 (J13-23)
+3 | 32765 | SPI1 | 4 (J12-4)| 2 (J12-2) | 10 (J12-10) | 6 (J12-6)
+4 | 32765 | SPI1 | 4 (J12-4)| 2 (J12-2) | 10 (J12-10) | 8 (J12-8)
 
 **UART** Some pins are labelled as UARTs but are not configured in BIOS as UART
 so only available UART is on the FTDI header. Disable the getty on ttyS2 and
