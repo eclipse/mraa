@@ -33,6 +33,7 @@
 #define DEFAULT_BITS 10
 
 static int raw_bits;
+static unsigned int shifter_value;
 
 static mraa_result_t
 aio_get_valid_fp(mraa_aio_context dev)
@@ -161,6 +162,12 @@ mraa_aio_init(unsigned int aio)
 
     raw_bits = mraa_adc_raw_bits();
 
+    if (raw_bits < dev->value_bit) {
+        shifter_value = dev->value_bit - raw_bits;
+    } else {
+        shifter_value = raw_bits - dev->value_bit;
+    }
+
     return dev;
 }
 
@@ -177,7 +184,6 @@ mraa_aio_read(mraa_aio_context dev)
     }
 
     char buffer[17];
-    unsigned int shifter_value = 0;
 
     if (dev->adc_in_fp == -1) {
         if (aio_get_valid_fp(dev) != MRAA_SUCCESS) {
@@ -205,15 +211,11 @@ mraa_aio_read(mraa_aio_context dev)
         return -1;
     }
 
-    if (dev->value_bit != raw_bits) {
-        /* Adjust the raw analog input reading to supported resolution value*/
-        if (raw_bits > dev->value_bit) {
-            shifter_value = raw_bits - dev->value_bit;
-            analog_value = analog_value >> shifter_value;
-        } else {
-            shifter_value = dev->value_bit - raw_bits;
-            analog_value = analog_value << shifter_value;
-        }
+    /* Adjust the raw analog input reading to supported resolution value*/
+    if (raw_bits > dev->value_bit) {
+        analog_value = analog_value >> shifter_value;
+    } else {
+       analog_value = analog_value << shifter_value;
     }
 
     return analog_value;
@@ -222,12 +224,13 @@ mraa_aio_read(mraa_aio_context dev)
 float
 mraa_aio_read_float(mraa_aio_context dev)
 {
+    const float max_analog_value = ((1 << raw_bits) - 1) << (shifter_value);
+
     if (dev == NULL) {
         syslog(LOG_ERR, "aio: Device not valid");
         return -1.0;
     }
 
-    float max_analog_value = (1 << dev->value_bit) - 1;
     unsigned int analog_value_int = mraa_aio_read(dev);
 
     return analog_value_int / max_analog_value;
