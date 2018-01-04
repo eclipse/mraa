@@ -241,6 +241,8 @@ mraa_up_board()
     b->aio_count = 1;
     b->adc_raw = 8;
     b->adc_supported = 8;
+    b->aio_non_seq = 1;
+    mraa_up_get_pin_index(b, "ADC0", (int*) &(b->aio_dev[0].pin));
 
     const char* pinctrl_path = "/sys/bus/platform/drivers/up-pinctrl";
     int have_pinctrl = access(pinctrl_path, F_OK) != -1;
