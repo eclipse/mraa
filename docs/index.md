@@ -22,6 +22,7 @@ functionality.
 | C API Modules          | C++ API Classes              |
 |:----------------------:|:----------------------------:|
 | @ref gpio.h "gpio"     | @ref mraa::Gpio "Gpio class" |
+| @ref led.h "led"       | @ref mraa::Led "Led class"   |
 | @ref i2c.h "i2c"       | @ref mraa::I2c "I2c class"   |
 | @ref aio.h "aio"       | @ref mraa::Aio "Aio class"   |
 | @ref pwm.h "pwm"       | @ref mraa::Pwm "Pwm class"   |
