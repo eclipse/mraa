@@ -60,6 +60,7 @@ main()
         adc_value_float = mraa_aio_read_float(adc_a0);
         fprintf(stdout, "ADC A0 read %X - %d\n", adc_value, adc_value);
         fprintf(stdout, "ADC A0 read float - %.5f (Ctrl+C to exit)\n", adc_value_float);
+        sleep(1);
     }
 
     r = mraa_aio_close(adc_a0);
