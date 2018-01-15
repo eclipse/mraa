@@ -106,9 +106,12 @@ typedef enum {
 
 typedef long long unsigned int mraa_timestamp_t;
 
+/**
+ * Gpio event object
+ */
 typedef struct {
-    int id;
-    mraa_timestamp_t timestamp;
+    int id; /**< id of event */
+    mraa_timestamp_t timestamp; /**< timestamp */
 } mraa_gpio_event;
 
 typedef mraa_gpio_event* mraa_gpio_events_t;
