@@ -10,6 +10,7 @@ add_executable (Isr-pin6 Isr-pin6.cpp)
 add_executable (Iio-dummy Iio-dummy.cpp)
 
 include_directories(${PROJECT_SOURCE_DIR}/api)
+include_directories(${PROJECT_SOURCE_DIR}/api/mraa)
 
 target_link_libraries (AioA0 mraa stdc++)
 target_link_libraries (blink-io-cpp mraa stdc++)

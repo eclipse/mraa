@@ -1,5 +1,5 @@
 /*
- * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -22,26 +22,20 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "stdio.h"
-#include <unistd.h>
-
+#include <stdio.h>
+#include <string.h>
+#include <syslog.h>
+//! [Interesting]
 #include "mraa.h"
 
 int
 main(int argc, char** argv)
 {
-    //! [Interesting]
-    fprintf(stdout, "hello mraa\n Version: %s\n", mraa_get_version());
-    mraa_gpio_context gpio;
-    gpio = mraa_gpio_init(2);
+    const char* board_name = mraa_get_platform_name();
+    fprintf(stdout, "hello mraa\n Version: %s\n Running on %s\n", mraa_get_version(), board_name);
 
-    mraa_gpio_use_mmaped(gpio, 1);
+    mraa_deinit();
 
-    for (;;) {
-        mraa_gpio_write(gpio, 1);
-        usleep(50000);
-        mraa_gpio_write(gpio, 0);
-        usleep(50000);
-    }
-    //! [Interesting]
+    return MRAA_SUCCESS;
 }
+//! [Interesting]

@@ -22,9 +22,9 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <unistd.h>
-#include <iostream>
 #include <exception>
+#include <iostream>
+#include <unistd.h>
 
 #include "mraa.hpp"
 

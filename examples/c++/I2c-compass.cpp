@@ -23,11 +23,11 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <unistd.h>
 #include <signal.h>
+#include <unistd.h>
 
-#include "mraa.hpp"
 #include "math.h"
+#include "mraa.hpp"
 
 #define MAX_BUFFER_LENGTH 6
 #define HMC5883L_I2C_ADDR 0x1E
