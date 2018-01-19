@@ -436,14 +436,6 @@ mraa_raspberry_pi_mmap_setup(mraa_gpio_context dev, mraa_boolean_t en)
     return MRAA_SUCCESS;
 }
 
-mraa_result_t
-mraa_raspberry_pi_spi_frequency_replace(mraa_spi_context dev, int hz)
-{
-    // RPI driver doesn't like being queried for it's max speed
-    dev->clock = hz;
-    return MRAA_SUCCESS;
-}
-
 mraa_board_t*
 mraa_raspberry_pi()
 {
@@ -630,7 +622,6 @@ mraa_raspberry_pi()
     b->adv_func->spi_init_pre = &mraa_raspberry_pi_spi_init_pre;
     b->adv_func->i2c_init_pre = &mraa_raspberry_pi_i2c_init_pre;
     b->adv_func->gpio_mmap_setup = &mraa_raspberry_pi_mmap_setup;
-    b->adv_func->spi_frequency_replace = &mraa_raspberry_pi_spi_frequency_replace;
     b->adv_func->pwm_init_raw_replace = &mraa_raspberry_pi_pwm_initraw_replace;
     b->adv_func->pwm_write_replace = &mraa_raspberry_pi_pwm_write_duty_replace;
     b->adv_func->pwm_period_replace = &mraa_raspberry_pi_pwm_period_us_replace;
