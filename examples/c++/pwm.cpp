@@ -1,7 +1,6 @@
 /*
- * Author: Brendan Le Foll
- * Contributors: Alex Tereschenko <alext.mkrs@gmail.com>
- * Copyright (c) 2015 Intel Corporation.
+ * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+ * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -21,39 +20,55 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Example usage: Generates PWM at a step rate of 0.01 continuously.
+ *                Press Ctrl+C to exit
  */
 
+/* standard headers */
+#include <iostream>
+#include <signal.h>
+#include <stdlib.h>
 #include <unistd.h>
 
-#include "mraa.hpp"
+/* mraa headers */
+#include "mraa/common.hpp"
+#include "mraa/pwm.hpp"
 
-static volatile int counter = 0;
-static volatile int oldcounter = 0;
+#define PWM_PORT 3
+
+volatile sig_atomic_t flag = 1;
 
 void
-interrupt(void* args)
+sig_handler(int signum)
 {
-    ++counter;
+    if (signum == SIGINT) {
+        std::cout << "Exiting..." << std::endl;
+        flag = 0;
+    }
 }
 
 int
-main()
+main(void)
 {
-    mraa::Gpio x(6);
+    float value = 0.0f;
 
-    x.dir(mraa::DIR_IN);
+    signal(SIGINT, sig_handler);
 
-    x.isr(mraa::EDGE_BOTH, &interrupt, NULL);
+    //! [Interesting]
+    mraa::Pwm pwm(PWM_PORT);
+    std::cout << "Cycling PWM on IO3 (pwm3)" << std::endl;
+    pwm.enable(true);
 
-    int i = 100;
-    for (; i > 0; --i) {
-        if (counter != oldcounter) {
-            fprintf(stdout, "timeout counter == %d\n", counter);
-            oldcounter = counter;
+    while (flag) {
+        value = value + 0.01f;
+        pwm.write(value);
+        usleep(50000);
+        if (value >= 1.0f) {
+            value = 0.0f;
         }
-        // got to relieve our poor CPU!
-        sleep(1);
     }
+    //! [Interesting]
 
-    return MRAA_SUCCESS;
+    return EXIT_SUCCESS;
 }

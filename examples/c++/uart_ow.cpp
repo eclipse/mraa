@@ -20,51 +20,59 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Example usage: Search and print the found OW device ID recursively.
+ *
  */
 
-#include "iostream"
-#include "stdio.h"
-//! [Interesting]
-#include "uart_ow.hpp"
+/* standard headers */
+#include <iostream>
+#include <stdlib.h>
+
+/* mraa headers */
+#include "mraa/common.hpp"
+#include "mraa/uart_ow.hpp"
 
 int
-main(int argc, char** argv)
+main(void)
 {
+    mraa::Result status;
+    std::string id;
+    uint8_t count = 0;
+    uint8_t* ptr;
+
+    //! [Interesting]
     mraa::UartOW uart(0);
 
     // Reset the ow bus and see if anything is present
-    mraa::Result rv;
-
-    if ((rv = uart.reset()) == mraa::SUCCESS) {
+    if ((status = uart.reset()) == mraa::SUCCESS) {
         std::cout << "Reset succeeded, device(s) detected!" << std::endl;
     } else {
-        std::cout << "Reset failed, returned " << int(rv) << ". No devices on bus?" << std::endl;
-        return 1;
+        std::cout << "Reset failed, returned " << int(status) << ". No devices on bus?" << std::endl;
+        return EXIT_FAILURE;
     }
 
     std::cout << "Looking for devices..." << std::endl;
-    ;
 
-    uint8_t count = 0;
     // start the search from scratch
-    std::string id = uart.search(true);
+    id = uart.search(true);
 
     if (id.empty()) {
         std::cout << "No devices detected." << std::endl;
-        return 1;
+        return EXIT_FAILURE;
     }
 
     while (!id.empty()) {
         // hack so we don't need to cast each element of the romcode
         // for printf purposes
-        uint8_t* ptr = (uint8_t*) id.data();
+        ptr = (uint8_t*) id.data();
 
         // The first byte (0) is the device type (family) code.
         // The last byte (7) is the rom code CRC value.  The
         // intervening bytes are the unique 48 bit device ID.
 
-        printf("Device %02d Type 0x%02x ID %02x%02x%02x%02x%02x%02x CRC 0x%02x\n", count, ptr[0],
-               ptr[6], ptr[5], ptr[4], ptr[3], ptr[2], ptr[1], ptr[7]);
+        std::cout << "Device %02d Type 0x%02x ID %02x%02x%02x%02x%02x%02x CRC 0x%02x" << count << ptr[0]
+                  << ptr[6] << ptr[5] << ptr[4] << ptr[3] << ptr[2] << ptr[1] << ptr[7] << std::endl;
         count++;
 
         // continue the search with start argument set to false
@@ -72,7 +80,7 @@ main(int argc, char** argv)
     }
 
     std::cout << "Exiting..." << std::endl;
+    //! [Interesting]
 
-    return 0;
+    return EXIT_SUCCESS;
 }
-//! [Interesting]
