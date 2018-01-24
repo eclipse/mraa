@@ -1,6 +1,6 @@
-AioA0.cpp	java/AioA0.java
-Blink-IO.cpp	java/BlinkIO.java
-I2c-compass.cpp	java/I2cCompass.java
-Pwm3-cycle.cpp	java/CyclePwm3.java
-Spi-pot.cpp	java/SpiMCP4261.java
-Uart-example.cpp	java/UartExample.java
+aio.cpp		java/AioA0.java
+gpio.cpp	java/BlinkIO.java
+i2c.cpp		java/I2cCompass.java
+pwm.cpp		java/CyclePwm3.java
+spi.cpp		java/SpiMCP4261.java
+uart.cpp	java/UartExample.java
