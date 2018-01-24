@@ -37,7 +37,7 @@ namespace mraa
  *
  * This file defines the UartOW (UART to Dallas 1-wire) interface for libmraa
  *
- * @snippet UartOW.cpp Interesting
+ * @snippet uart_ow.cpp Interesting
  */
 class UartOW
 {
