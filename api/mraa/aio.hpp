@@ -36,7 +36,7 @@ namespace mraa
  *
  * This file defines the aio interface for libmraa
  *
- * @snippet AioA0.cpp Interesting
+ * @snippet aio.cpp Interesting
  */
 class Aio
 {

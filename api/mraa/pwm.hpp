@@ -36,7 +36,7 @@ namespace mraa
  *
  * This file defines the PWM interface for libmraa
  *
- * @snippet Pwm3-cycle.cpp Interesting
+ * @snippet pwm.cpp Interesting
  */
 class Pwm
 {

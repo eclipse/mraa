@@ -51,7 +51,7 @@ typedef enum {
 *
 * This file defines the SPI interface for libmraa
 *
-* @snippet Spi-pot.cpp Interesting
+* @snippet spi.cpp Interesting
 */
 class Spi
 {

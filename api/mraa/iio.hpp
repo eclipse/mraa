@@ -67,7 +67,7 @@ public:
  *
  * This file defines the C++ iio interface for libmraa
  *
- * @snippet Iio-dummy.cpp Interesting
+ * @snippet iio.cpp Interesting
  */
 class Iio
 {
