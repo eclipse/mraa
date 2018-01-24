@@ -1,5 +1,7 @@
 /*
- * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+ * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+ * Contributors: Alex Tereschenko <alex.mkrs@gmail.com>
+ * Contributors: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
  * Copyright (c) 2014 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -20,43 +22,52 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Example usage: Reads ADC A0 value continuously. Press Ctrl+C to exit.
  */
 
+/* standard headers */
+#include <iostream>
 #include <signal.h>
-#include <unistd.h>
+#include <stdlib.h>
 
-#include "mraa.hpp"
+/* mraa headers */
+#include "mraa/aio.hpp"
+#include "mraa/common.hpp"
 
-int running = 0;
+/* AIO port */
+#define AIO_PORT 0
+
+volatile sig_atomic_t flag = 1;
 
 void
-sig_handler(int signo)
+sig_handler(int signum)
 {
-    if (signo == SIGINT) {
-        printf("closing PWM nicely\n");
-        running = -1;
+    if (signum == SIGINT) {
+        std::cout << "Exiting..." << std::endl;
+        flag = 0;
     }
 }
 
 int
-main()
+main(void)
 {
-    signal(SIGINT, sig_handler);
-    //! [Interesting]
-    mraa::Pwm pwm(3);
-    fprintf(stdout, "Cycling PWM on IO3 (pwm3) \n");
-    pwm.enable(true);
+    uint16_t value;
+    float float_value;
 
-    float value = 0.0f;
-    while (running == 0) {
-        value = value + 0.01f;
-        pwm.write(value);
-        usleep(50000);
-        if (value >= 1.0f) {
-            value = 0.0f;
-        }
+    signal(SIGINT, sig_handler);
+
+    //! [Interesting]
+    /* initialize AIO */
+    mraa::Aio aio(AIO_PORT);
+
+    while (flag) {
+        value = aio.read();
+        float_value = aio.readFloat();
+        std::cout << "ADC A0 read %X - %d" << value << value << std::endl;
+        std::cout << "ADC A0 read float - %.5f" << float_value << std::endl;
     }
     //! [Interesting]
 
-    return MRAA_SUCCESS;
+    return EXIT_SUCCESS;
 }

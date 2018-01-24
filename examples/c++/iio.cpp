@@ -20,13 +20,22 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Example usage: Sets accelerometer scale and registers for the threshold event
+ *
  */
 
-#include "mraa/iio.hpp"
+/* standard headers */
 #include <float.h>
 #include <iostream>
 #include <math.h>
+#include <signal.h>
+#include <stdlib.h>
 #include <unistd.h>
+
+/* mraa headers */
+#include "mraa/common.hpp"
+#include "mraa/iio.hpp"
 
 #define EXPECT_FAILURE 0
 #define EXPECT_SUCCESS 1
@@ -82,9 +91,9 @@ log_result(std::string test_name, std::string attr_name, bool expect_success, bo
     else
         result = success ? "FAIL" : "PASS";
     if (attr_name.empty())
-        fprintf(stdout, "%s: %s\n", test_name.c_str(), result.c_str());
+        std::cout << "%s: %s" << test_name.c_str() << result.c_str() << std::endl;
     else
-        fprintf(stdout, "%s(%s): %s\n", test_name.c_str(), attr_name.c_str(), result.c_str());
+        std::cout << "%s(%s): %s" << test_name.c_str() << attr_name.c_str() << result.c_str() << std::endl;
 }
 
 // Generate iio_dummy driver event by writing a string to a specific sysfs node
@@ -113,10 +122,10 @@ class IioTestHandler : public mraa::IioHandler
     }
 };
 
-//! [Interesting]
 int
-main()
+main(void)
 {
+    //! [Interesting]
     IioTestHandler testHandler;
     std::string deviceName;
     try {
@@ -144,7 +153,6 @@ main()
         return EXIT_FAILURE;
     }
 
-
     std::cout << "Using IIO device0. Name is " << iio_device->getDeviceName() << std::endl;
     IIO_RUN(writeFloat, "in_accel_x_raw", 100, EXPECT_FAILURE);
     IIO_RUN(writeFloat, "in_voltage0_scale", 100, EXPECT_FAILURE);
@@ -157,8 +165,9 @@ main()
     generate_event();
     usleep(500000);
     log_result("eventReceived", "", (eventCount == 1), true);
+    //! [Interesting]
 
     delete iio_device;
+
     return EXIT_SUCCESS;
 }
-//! [Interesting]

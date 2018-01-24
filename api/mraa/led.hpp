@@ -36,6 +36,7 @@ namespace mraa
  *
  * This file defines the LED interface for libmraa
  *
+ * @snippet led.cpp Interesting
  */
 class Led
 {

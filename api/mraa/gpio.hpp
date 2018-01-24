@@ -90,7 +90,7 @@ typedef enum {
  *
  * This file defines the gpio interface for libmraa
  *
- * @snippet Blink-IO.cpp Interesting
+ * @snippet gpio.cpp Interesting
  */
 class Gpio
 {
@@ -347,7 +347,7 @@ class Gpio
     /**
      * Change Gpio output driver mode
      *
-     * @param mode @param mode Set output driver mode
+     * @param mode Set output driver mode
      * @return Result of operation
      */
     Result

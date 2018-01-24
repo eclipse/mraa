@@ -21,13 +21,22 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Example usage: Outputs X,Y,Z co-ordinates and direction recursively using
+ *                HMC5883L. Press Ctrl+C to exit.
+ *
  */
 
+/* standard headers */
+#include <iostream>
+#include <math.h>
 #include <signal.h>
+#include <stdlib.h>
 #include <unistd.h>
 
-#include "math.h"
-#include "mraa.hpp"
+/* mraa headers */
+#include "mraa/common.hpp"
+#include "mraa/i2c.hpp"
 
 #define MAX_BUFFER_LENGTH 6
 #define HMC5883L_I2C_ADDR 0x1E
@@ -79,42 +88,41 @@
 #define SCALE_3_03_MG 3.03
 #define SCALE_4_35_MG 4.35
 
+#define I2C_BUS 0
 
-int running = 0;
+volatile sig_atomic_t flag = 1;
 
 void
-sig_handler(int signo)
+sig_handler(int signum)
 {
-    if (signo == SIGINT) {
-        printf("closing nicely\n");
-        running = -1;
+    if (signum == SIGINT) {
+        std::cout << "Exiting..." << std::endl;
+        flag = 0;
     }
 }
 
 int
-main()
+main(void)
 {
-    float direction = 0;
-    int16_t x = 0, y = 0, z = 0;
+    float direction;
+    int16_t x, y, z;
     uint8_t rx_tx_buf[MAX_BUFFER_LENGTH];
 
+    signal(SIGINT, sig_handler);
+
     //! [Interesting]
-    mraa::I2c i2c(0);
+    mraa::I2c i2c(I2C_BUS);
 
     i2c.address(HMC5883L_I2C_ADDR);
     rx_tx_buf[0] = HMC5883L_CONF_REG_B;
     rx_tx_buf[1] = GA_1_3_REG;
     i2c.write(rx_tx_buf, 2);
-    //! [Interesting]
 
     i2c.address(HMC5883L_I2C_ADDR);
     rx_tx_buf[0] = HMC5883L_MODE_REG;
     rx_tx_buf[1] = HMC5883L_CONT_MODE;
-    i2c.write(rx_tx_buf, 2);
 
-    signal(SIGINT, sig_handler);
-
-    while (running == 0) {
+    while (flag) {
         i2c.address(HMC5883L_I2C_ADDR);
         i2c.writeByte(HMC5883L_DATA_REG);
 
@@ -132,11 +140,13 @@ main()
         if (direction < 0)
             direction += 2 * M_PI;
 
-        printf("Compass scaled data x : %f, y : %f, z : %f\n", x * SCALE_0_92_MG, y * SCALE_0_92_MG,
-               z * SCALE_0_92_MG);
-        printf("Heading : %f\n", direction * 180 / M_PI);
+        std::cout << "Compass scaled data x : %f, y : %f, z : %f" << x * SCALE_0_92_MG
+                  << y * SCALE_0_92_MG << z * SCALE_0_92_MG << std::endl;
+        std::cout << "Heading : %f" << direction * 180 / M_PI << std::endl;
+
         sleep(1);
     }
+    //! [Interesting]
 
-    return MRAA_SUCCESS;
+    return EXIT_SUCCESS;
 }
