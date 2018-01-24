@@ -1,7 +1,6 @@
 /*
- * Author: Brendan Le Foll <brendan.le.foll@intel.com>
- * Contributors: Alex Tereschenko <alex.mkrs@gmail.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+ * Copyright (c) 2018 Linaro Ltd.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -21,40 +20,54 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Example usage: Configures GPIO pin for interrupt and waits 30 seconds for the isr to trigger
+ *
  */
 
-#include <signal.h>
+/* standard headers */
+#include <iostream>
+#include <stdlib.h>
+#include <unistd.h>
 
-#include "mraa.hpp"
+/* mraa headers */
+#include "mraa/common.hpp"
+#include "mraa/gpio.hpp"
 
-int running = 0;
+#define GPIO_PIN 6
 
 void
-sig_handler(int signo)
+int_handler(void* args)
 {
-    if (signo == SIGINT) {
-        printf("closing down nicely\n");
-        running = -1;
-    }
+    std::cout << "ISR triggered" << std::endl;
 }
 
-//! [Interesting]
 int
-main()
+main(void)
 {
-    uint16_t adc_value;
-    float adc_value_float;
-    mraa::Aio a0(0);
+    mraa::Result status;
 
-    signal(SIGINT, sig_handler);
+    //! [Interesting]
+    /* initialize GPIO */
+    mraa::Gpio gpio(GPIO_PIN);
 
-    while (running == 0) {
-        adc_value = a0.read();
-        adc_value_float = a0.readFloat();
-        fprintf(stdout, "ADC A0 read %X - %d\n", adc_value, adc_value);
-        fprintf(stdout, "ADC A0 read float - %.5f (Ctrl+C to exit)\n", adc_value_float);
+    /* set GPIO to input */
+    status = gpio.dir(mraa::DIR_IN);
+    if (status != mraa::SUCCESS) {
+        printError(status);
+        return EXIT_FAILURE;
     }
 
-    return MRAA_SUCCESS;
+    /* configure ISR for GPIO */
+    status = gpio.isr(mraa::EDGE_BOTH, &int_handler, NULL);
+    if (status != mraa::SUCCESS) {
+        printError(status);
+        return EXIT_FAILURE;
+    }
+
+    /* wait 30 seconds isr trigger */
+    sleep(30);
+    //! [Interesting]
+
+    return EXIT_SUCCESS;
 }
-//! [Interesting]
