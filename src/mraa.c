@@ -883,7 +883,7 @@ mraa_gpio_lookup(const char* pin_name)
     for (i = 0; i < plat->gpio_count; i++) {
          if (plat->pins[i].name != NULL &&
              strncmp(pin_name, plat->pins[i].name, strlen(plat->pins[i].name) + 1) == 0) {
-             return plat->pins[i].gpio.pinmap;
+             return i;
          }
     }
     return -1;
