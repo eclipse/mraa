@@ -35,6 +35,6 @@ txbuf[2] = 0x00
 while True:
     rxbuf = dev.write(txbuf)
     value = ((rxbuf[1] & 0x03) << 8) | rxbuf[2]
-    print value
+    print(value)
     time.sleep(0.5)
 

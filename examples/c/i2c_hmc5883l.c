@@ -123,7 +123,7 @@ main(void)
     }
 
     /* set slave address */
-    mraa_i2c_address(i2c, HMC5883L_I2C_ADDR);
+    status = mraa_i2c_address(i2c, HMC5883L_I2C_ADDR);
     if (status != MRAA_SUCCESS) {
         goto err_exit;
     }
