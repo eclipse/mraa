@@ -139,18 +139,6 @@ cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/oe-sdk_cross.cmake ..
 make
 ~~~~~~~~~~~~~
 
-## Using Coverity
-
-This is the procedure to submit a build to Coverity. You'll need to install
-`coverity-submit` for your OS.
-
-~~~~~~~~~~~~~{.sh}
-mkdir covbuild/ && cd covbuild
-cmake -DBUILDDOC=OFF -DBUILDSWIG=OFF ..
-cov-build --dir cov-int make
-tar caf mraa.tar.bz2 cov-int
-~~~~~~~~~~~~~
-
 ## Building Java bindings
 
 Have JAVA_HOME set to JDK install directory. Most distributions set this from `/etc/profile.d/`

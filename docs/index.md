@@ -71,6 +71,10 @@ glance at our @ref debugging page too
 
 More information on compiling is @ref building page.
 
+## STATIC CODE ANALYSIS
+
+See @ref static_code_analysis page.
+
 ## CONTRIBUTING
 
 Please see the @ref contributing page, the @ref internals page may also be of
