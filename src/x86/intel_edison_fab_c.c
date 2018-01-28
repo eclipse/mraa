@@ -147,7 +147,7 @@ mraa_intel_edison_pinmode_change(int sysfs, int mode)
 
     mraa_result_t ret = MRAA_SUCCESS;
     char mode_buf[MAX_MODE_SIZE];
-    int length = sprintf(mode_buf, "%s%u", useDebugFS ? "mode" : "", mode);
+    int length = snprintf(mode_buf, MAX_MODE_SIZE, "%s%u", useDebugFS ? "mode" : "", mode);
     if (write(modef, mode_buf, length * sizeof(char)) == -1) {
         ret = MRAA_ERROR_INVALID_RESOURCE;
     }
