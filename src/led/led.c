@@ -113,12 +113,16 @@ mraa_led_init_internal(const char* led)
     dev->count = cnt;
     if (dev->led_name == NULL) {
         syslog(LOG_CRIT, "led: init: unknown device specified");
-        closedir(dir);
+        if (dir != NULL) {
+            closedir(dir);
+        }
         free(dev);
         return NULL;
     }
 
-    closedir(dir);
+    if (dir != NULL) {
+        closedir(dir);
+    }
     return dev;
 }
 
