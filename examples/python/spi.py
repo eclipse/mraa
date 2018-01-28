@@ -38,6 +38,5 @@ for x in range(0,100):
   rxbuf = dev.write(txbuf)
   if rxbuf != txbuf:
     print("We have an error captain!")
-    break
     exit(1)
 
