@@ -21,34 +21,20 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
+#
+# Example Usage: Changes the Grove-LCD RGB backlight to a nice shade of purple
 
 import mraa
-import time
-import sys
 
-class Counter:
-  count = 0
+# initialise I2C
+x = mraa.I2c(0)
+x.address(0x62)
 
-c = Counter()
+# initialise device
+x.writeReg(0, 0)
+x.writeReg(1, 0)
 
-# inside a python interrupt you cannot use 'basic' types so you'll need to use
-# objects
-def test(gpio):
-  print("pin " + repr(gpio.getPin(True)) + " = " + repr(gpio.read()))
-  c.count+=1
-
-pin = 6;
-if (len(sys.argv) == 2):
-  try:
-    pin = int(sys.argv[1], 10)
-  except ValueError:
-    printf("Invalid pin " + sys.argv[1])
-try:
-	x = mraa.Gpio(pin)
-	print("Starting ISR for pin " + repr(pin))
-	x.dir(mraa.DIR_IN)
-	x.isr(mraa.EDGE_BOTH, test, x)
-	var = raw_input("Press ENTER to stop")
-	x.isrExit()
-except ValueError as e:
-    print(e)
+# write RGB color data
+x.writeReg(0x08, 0xAA)
+x.writeReg(0x04, 255)
+x.writeReg(0x02, 255)

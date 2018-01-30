@@ -21,14 +21,21 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# Example Usage: Reads integer and float value from ADC
 
 import mraa
 
-print (mraa.getVersion())
+print(mraa.getVersion())
 
 try:
+    # initialise AIO
     x = mraa.Aio(0)
-    print (x.read())
-    print ("%.5f" % x.readFloat())
+
+    # read integer value
+    print(x.read())
+
+    # read float value
+    print("%.5f" % x.readFloat())
 except:
-    print ("Are you sure you have an ADC?")
+    print("Are you sure you have an ADC?")

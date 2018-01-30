@@ -21,19 +21,39 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
+#
+# Example Usage: Triggers ISR upon GPIO state change
 
 import mraa
+import time
+import sys
 
-# This example will change the LCD backlight on the Grove-LCD RGB backlight
-# to a nice shade of purple
-x = mraa.I2c(0)
-x.address(0x62)
+class Counter:
+    count = 0
 
-# initialise device
-x.writeReg(0, 0)
-x.writeReg(1, 0)
+c = Counter()
 
-# sent RGB color data
-x.writeReg(0x08, 0xAA)
-x.writeReg(0x04, 255)
-x.writeReg(0x02, 255)
+# inside a python interrupt you cannot use 'basic' types so you'll need to use
+# objects
+def isr_routine(gpio):
+    print("pin " + repr(gpio.getPin(True)) + " = " + repr(gpio.read()))
+    c.count += 1
+
+# GPIO
+pin = 6;
+
+try:
+    # initialise GPIO
+    x = mraa.Gpio(pin)
+
+    print("Starting ISR for pin " + repr(pin))
+
+    # set direction and edge types for interrupt
+    x.dir(mraa.DIR_IN)
+    x.isr(mraa.EDGE_BOTH, isr_routine, x)
+
+    # wait until ENTER is pressed
+    var = raw_input("Press ENTER to stop")
+    x.isrExit()
+except ValueError as e:
+    print(e)

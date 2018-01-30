@@ -21,12 +21,17 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
+#
+# Example Usage: Sends some info messages in the form of bytearray and strings
+#                along with `X` flag and prints the response from other end.
+#                This example requires uart_receiver.py to be running on the
+#                other end.
 
 import mraa
 import sys
 
 sys.stdout.write("Initializing UART...")
-u=mraa.Uart(0)
+u = mraa.Uart(0)
 print("...done")
 
 print("Setting UART parameters: baudrate 115200, 8N1, no flow control")
@@ -52,6 +57,6 @@ u.writeStr("X")
 print("...sent, awaiting response...")
 # Checking for data in the RX buffer, giving it a 100ms timeout
 if u.dataAvailable(100):
-  print("We've got a response: '{0}', says the other side".format(u.readStr(20)))
+    print("We've got a response: '{0}', says the other side".format(u.readStr(20)))
 else:
-  print("No data received, do you have anything at the other end?")
+    print("No data received, do you have anything at the other end?")

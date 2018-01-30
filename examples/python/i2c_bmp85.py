@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+# Author: Brendan Le Foll <brendan.le.foll@intel.com>
 # Copyright (c) 2014 Intel Corporation.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -20,16 +20,35 @@
 # NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
+#
+# Example Usage: Shows the 'advanced' i2c functionality from python i2c
+#                read/write
 
-import mraa
-import time
+import mraa as m
 
-x = mraa.Gpio(8)
-x.dir(mraa.DIR_OUT)
+# initialise I2C
+x = m.I2c(0)
+x.address(0x77)
 
-while True:
-    x.write(1)
-    time.sleep(0.2)
-    x.write(0)
-    time.sleep(0.2)
+# initialise device
+if x.readReg(0xd0) != 0x55:
+    print("error")
+
+# we want to read temperature so write 0x2e into control reg
+x.writeReg(0xf4, 0x2e)
+
+# read a 16bit reg, obviously it's uncalibrated so mostly a useless value :)
+print(str(x.readWordReg(0xf6)))
+
+# and we can do the same thing with the read()/write() calls if we wished
+# thought I'd really not recommend it!
+
+x.write(bytearray(b'0xf40x2e'))
+
+x.writeByte(0xf6)
+d = x.read(2)
+
+# WARNING: python 3.2+ call
+print(str(d))
+print(int.from_bytes(d, byteorder='little'))

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-# Author: Henry Bruce <henry.bruce@intel.com>
-# Copyright (c) 2016 Intel Corporation.
+# Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+# Copyright (c) 2018 Linaro Ltd.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -20,21 +20,33 @@
 # NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# Example Usage: Toggles GPIO 23 and 24 continuously in an alternative pattern
 
-# Read from MCP3004 ADC pin 0 in single ended mode
 import mraa
 import time
 
-dev = mraa.Spi(0)
-txbuf = bytearray(3)
-txbuf[0] = 0x01
-txbuf[1] = 0x80
-txbuf[2] = 0x00
+# initialise gpio 23
+gpio_1 = mraa.Gpio(23)
 
+# initialise gpio 24
+gpio_2 = mraa.Gpio(24)
+
+# set gpio 23 to output
+gpio_1.dir(mraa.DIR_OUT)
+
+# set gpio 24 to output
+gpio_2.dir(mraa.DIR_OUT)
+
+# toggle both gpio's
 while True:
-    rxbuf = dev.write(txbuf)
-    value = ((rxbuf[1] & 0x03) << 8) | rxbuf[2]
-    print(value)
-    time.sleep(0.5)
+    gpio_1.write(1)
+    gpio_2.write(0)
 
+    time.sleep(1)
+
+    gpio_1.write(0)
+    gpio_2.write(1)
+
+    time.sleep(1)
