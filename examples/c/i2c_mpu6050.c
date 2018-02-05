@@ -27,6 +27,7 @@
  */
 
 /* standard headers */
+#include <endian.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
