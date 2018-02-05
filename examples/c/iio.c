@@ -28,6 +28,7 @@
 /* standard headers */
 #include <stdlib.h>
 #include <unistd.h>
+#include <endian.h>
 
 /* mraa header */
 #include "mraa/iio.h"
