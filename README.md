@@ -16,7 +16,7 @@ The intent is to make it easier for developers and sensor manufacturers to map
 their sensors & actuators on top of supported hardware and to allow control of
 low level communication protocol by high level languages & constructs.
 
-[![Build Status](https://travis-ci.org/intel-iot-devkit/mraa.svg?branch=master)](https://travis-ci.org/intel-iot-devkit/mraa)
+[![Build Status](https://travis-ci.org/intel-iot-devkit/mraa.svg?branch=master)](https://travis-ci.org/intel-iot-devkit/mraa) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=mraa-master&metric=alert_status)](https://sonarcloud.io/dashboard?id=mraa-master)
 
 Supported Boards
 ================
