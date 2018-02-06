@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-# Author: Alex Tereschenko <alext.mkrs@gmail.com>
-# Copyright (c) 2015 Alex Tereschenko
+# Author: Brendan Le Foll <brendan.le.foll@intel.com>
+# Copyright (c) 2015 Intel Corporation.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -22,27 +22,21 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 #
-# Example Usage: Expects 'X' flag from the sender. This example requires
-#                `uart_sender.py` to be running on the other end.
+# Example Usage: Loopbacks data between MISO and MOSI 100 times
 
-import mraa
+import mraa as m
+import random as rand
 
-# Initialise UART
-u = mraa.Uart(0)
+# intialise SPI
+dev = m.Spi(0)
 
-# Set UART parameters
-u.setBaudRate(115200)
-u.setMode(8, mraa.UART_PARITY_NONE, 1)
-u.setFlowcontrol(False, False)
+for x in range(0,100):
+    txbuf = bytearray(4)
+    for y in range(0,4):
+        txbuf[y] = rand.randrange(0, 256)
 
-# Start a neverending loop waiting for data to arrive.
-# Press Ctrl+C to get out of it.
-while True:
-    if u.dataAvailable():
-        # We are doing 1-byte reads here
-        data_byte = u.readStr(1)
-        print(data_byte)
-
-        # Just a two-way half-duplex communication example, "X" is a flag
-        if data_byte == "X":
-            u.writeStr("Yes, master!")
+    # send and receive data through SPI
+    rxbuf = dev.write(txbuf)
+    if rxbuf != txbuf:
+        print("Data mismatch!")
+        exit(1)

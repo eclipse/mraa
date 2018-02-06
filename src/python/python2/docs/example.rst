@@ -12,7 +12,7 @@ Hello GPIO
 
 Here is the simplest Gpio program in mraa.
 
-.. literalinclude:: ../../../../examples/python/hello_gpio.py
+.. literalinclude:: ../../../../examples/python/gpio.py
   :prepend: import mraa
   :start-after: import mraa
 
@@ -27,7 +27,7 @@ values.
 
 **Note:** Galileo Gen1 only supports EDGE_BOTH
 
-.. literalinclude:: ../../../../examples/python/hello_isr.py
+.. literalinclude:: ../../../../examples/python/gpio_advanced.py
   :prepend: import mraa
   :start-after: import mraa
 
@@ -44,7 +44,7 @@ The I2c module module has a number of different ways of interacting with the
 i2c bus, including a number of overloaded read() calls and the writeReg()
 helper function.
 
-.. literalinclude:: ../../../../examples/python/bmp85.py
+.. literalinclude:: ../../../../examples/python/i2c_bmp85.py
   :prepend: x = m.I2c(0)
   :start-after: x = m.I2c(0)
 
@@ -56,7 +56,7 @@ Pwm
 The PWM module is rather simple, note that different hardware support PWM
 generation is various different ways so results may vary.
 
-.. literalinclude:: ../../../../examples/python/cycle-pwm3.py
+.. literalinclude:: ../../../../examples/python/pwm.py
   :prepend: import mraa
   :start-after: import mraa
 
@@ -89,5 +89,15 @@ Sender:
 Receiver:
 
 .. literalinclude:: ../../../../examples/python/uart_receiver.py
+  :prepend: import mraa
+  :start-after: import mraa
+
+LED
+===
+
+LED module is used for controlling the on-board LEDs. With the
+help of this module, we can control the brightness, trigger etc...
+
+.. literalinclude:: ../../../../examples/python/led.py
   :prepend: import mraa
   :start-after: import mraa
