@@ -111,6 +111,10 @@ CC flags to the CC env var
 
 Sometimes it's nice to build a static library, on Linux systems just set
    `-DBUILD_SHARED_LIBS=OFF`
+Note that for static builds the python bindings will not build as they would
+require a static python etc... You can try to link mraa statically to the
+python binding module by adding -fPIC with `-DCMAKE_C_FLAGS=-fPIC`. You can
+also use the node.js gyp build system to get node.js static bindings.
 
 ## Dependencies continued
 
