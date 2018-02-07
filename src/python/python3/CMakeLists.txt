@@ -1,7 +1,7 @@
 set_source_files_properties (mraa3.i PROPERTIES CPLUSPLUS ON)
 set_source_files_properties (mraa3.i PROPERTIES SWIG_FLAGS "-I${CMAKE_BINARY_DIR}/src")
 
-message ("PYTHON3 attempting to build!")
+message (STATUS "PYTHON3 attempting to build!")
 
 if (CMAKE_VERSION VERSION_LESS "3.8")
   swig_add_module (python3-mraa python mraa3.i ../mraapy.c)
