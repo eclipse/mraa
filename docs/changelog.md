@@ -5,6 +5,15 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**1.9.0**
+  * Added support for RPi Zero W
+  * Added support for MIPS based Omega2 and Linkit Smart 7688
+  * New APIs for sysfs onboard LED control using the gpio-leds driver
+  * Restructured and cleaned-up examples
+  * Improved documentation generation and CI integration
+  * Static analysis fixes, added SonarQube badge
+  * Enhanced Node.js detection on some Linux distros (OpenSUSE)
+
 **1.8.0**
   * Added Up2 support & grovePi subplatform support
   * Various improvements on 96board, rpi, beaglebone & Up boards
