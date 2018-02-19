@@ -45,7 +45,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <limits.h>
-
+#include <sys/utsname.h>
 
 #if defined(IMRAA)
 #include <json-c/json.h>
@@ -96,6 +96,57 @@ mraa_set_log_level(int level)
     }
     syslog(LOG_NOTICE, "Invalid loglevel %d requested", level);
     return MRAA_ERROR_INVALID_PARAMETER;
+}
+
+mraa_boolean_t mraa_is_kernel_chardev_interface_compatible()
+{
+    struct utsname buf;
+    int status;
+
+    status = uname(&buf);
+
+    if (status) {
+        syslog(LOG_ERR, "uname() error");
+        return 0;
+    }
+
+    int major, minor;
+    char *token;
+
+    token = strtok(buf.release, ".");
+    if (token == NULL) {
+        syslog(LOG_ERR, "Could not find kernel version major number");
+        return 0;
+    }
+    status = mraa_atoi(token, &major);
+    if (status) {
+        syslog(LOG_ERR, "mraa_atoi() error");
+        return 0;
+    }
+
+    token = strtok(NULL, ".");
+    if (token == NULL) {
+        syslog(LOG_ERR, "Could not find kernel version minor number");
+        return 0;
+    }
+    status = mraa_atoi(token, &minor);
+    if (status) {
+        syslog(LOG_ERR, "mraa_atoi() error");
+        return 0;
+    }
+
+    if (major < 4 || minor < 8) {
+        syslog(LOG_ERR, "Kernel version %i.%i not supported for chardev interface. Need version 4.8 or newer!", major, minor);
+        return 0;
+    }
+
+    return 1;
+}
+
+/* TODO: Add all relevant checks here and return the overall result. */
+mraa_boolean_t mraa_is_platform_chardev_interface_capable()
+{
+    return mraa_is_kernel_chardev_interface_compatible();
 }
 
 /**
@@ -216,6 +267,11 @@ imraa_init()
     lang_func = (mraa_lang_func_t*) calloc(1, sizeof(mraa_lang_func_t));
     if (lang_func == NULL) {
         return MRAA_ERROR_NO_RESOURCES;
+    }
+
+    plat->chardev_capable = mraa_is_platform_chardev_interface_capable();
+    if (plat->chardev_capable) {
+        syslog(LOG_NOTICE, "libmraa: support for chardev interface is activated");
     }
 
     syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
