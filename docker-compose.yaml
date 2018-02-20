@@ -21,8 +21,6 @@ services:
       - JSONPLAT=${JSONPLAT:-OFF}
       - IMRAA=${IMRAA:-OFF}
       - FTDI4222=${FTDI4222:-OFF}
-      - IPK=${IPK:-OFF}
-      - RPM=${RPM:-OFF}
       - ENABLEEXAMPLES=${ENABLEEXAMPLES:-OFF}
       - INSTALLTOOLS=${INSTALLTOOLS:-ON}
       - CC=${CC:-clang-3.8}
@@ -104,20 +102,6 @@ services:
     environment:
       - FTDI4222=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
-
-  ipk:
-    extends: all
-    environment:
-      - IPK=ON
-      - ENABLEEXAMPLES=ON
-    command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
-
-  rpm:
-    extends: all
-    environment:
-      - RPM=ON
-      - ENABLEEXAMPLES=ON
-    command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
 
   python2:
     extends: base

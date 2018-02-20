@@ -134,8 +134,6 @@ option (ONEWIRE "Add Onewire support to mraa." ON)
 option (JSONPLAT "Add Platform loading via a json file." ON)
 option (IMRAA "Add Imraa support to mraa." OFF)
 option (FTDI4222 "Build with FTDI FT4222 subplatform support." OFF)
-option (IPK "Generate IPK using CPack" OFF)
-option (RPM "Generate RPM using CPack" OFF)
 option (ENABLEEXAMPLES "Disable building of examples" ON)
 option (INSTALLTOOLS "Install all tools" ON)
 option (BUILDTESTS "Override the addition of tests" ON)
@@ -196,66 +194,6 @@ if (BUILDDOC)
     message (SEND_ERROR "ERROR - Failed to find a compatible version of Doxygen. API doc will not be generated")
   endif (DOXYGEN_FOUND AND DOXYGEN_VERSION VERSION_GREATER "1.8")
 endif ()
-
-if (IPK)
-  # Get target package arch from Yocto ADT sysroot if set or host OS, mapping to Ubuntu name if necessary
-  if (DEFINED ENV{OECORE_TARGET_SYSROOT})
-    GET_FILENAME_COMPONENT (DETECTED_SYSROOT $ENV{OECORE_TARGET_SYSROOT} NAME)
-    string (REGEX REPLACE "-poky-linux" "" TARGET_ARCH "${DETECTED_SYSROOT}")
-  else ()
-    # debian uses amd64 to denote x86_64
-    if (DETECTED_ARCH STREQUAL "x86_64")
-      set (TARGET_ARCH "amd64")
-    else ()
-      set (TARGET_ARCH ${DETECTED_ARCH})
-    endif ()
-  endif ()
-  message (STATUS "INFO - Package arch is ${TARGET_ARCH}")
-
-  set(CPACK_GENERATOR "DEB")
-  set(OPKG_ARCH ${TARGET_ARCH})
-  set(CPACK_BINARY_DIR ${CMAKE_BINARY_DIR})
-  set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Intel IoT-Devkit") #required
-  set(mraa_PACKAGE_ON_TAG ".")
-  if ("${VERSION_COMMIT}" STREQUAL "")
-    set(mraa_PACKAGE_ON_TAG "")
-  endif()
-  set(CPACK_PACKAGE_VERSION
-      "${mraa_VERSION_MAJOR}.${mraa_VERSION_MINOR}.${mraa_VERSION_PATCH}${mraa_PACKAGE_ON_TAG}${VERSION_COMMIT}")
-  set(CPACK_PACKAGE_NAME "mraa")
-  set(CPACK_DEBIAN_PACKAGE_SECTION "libs")
-  set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${TARGET_ARCH})
-  set(CPACK_SYSTEM_NAME ${TARGET_ARCH})
-  set(CPACK_DEBIAN_PACKAGE_PROVIDES "mraa-dev, mraa-dbg, mraa-doc")
-  set(CPACK_DEBIAN_PACKAGE_REPLACES "${CPACK_DEBIAN_PACKAGE_PROVIDES}, libmraa, libmraa-dev, libmraa-doc")
-  set(CPACK_DEBIAN_PACKAGE_CONFLICTS ${CPACK_DEBIAN_PACKAGE_PROVIDES})
-  set(WDIR "${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}")
-  include (CPack)
-endif()
-
-if (RPM)
-  message (STATUS "INFO - Enabled RPM packaging for ${DETECTED_ARCH}")
-  set(CMAKE_INSTALL_PREFIX "/usr")
-  set(CPACK_PACKAGE_VERSION ${VERSION})
-  set(CPACK_GENERATOR "RPM")
-  set(CPACK_PACKAGE_NAME "libmraa${mraa_VERSION_MAJOR}")
-  set(CPACK_PACKAGE_RELEASE 1)
-  set(CPACK_PACKAGE_VERSION
-      "${mraa_VERSION_MAJOR}.${mraa_VERSION_MINOR}.${mraa_VERSION_PATCH}${mraa_PACKAGE_ON_TAG}${VERSION_COMMIT}")
-  set(CPACK_PACKAGE_CONTACT "Intel IoT-Devkit")
-  set(CPACK_PACKAGE_VENDOR "Intel IoT-Devkit")
-  set(CPACK_RPM_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME}-devel")
-  # Get distro tag (e.g. 'fc20') by parsing output of rpm --showrc
-  EXECUTE_PROCESS(
-    COMMAND rpm --showrc
-    COMMAND grep -w dist
-    COMMAND sed -e "s/\\t./ /"
-    COMMAND awk "{printf \"%s\", \$NF}"
-    OUTPUT_VARIABLE DIST_TAG
-  )
-  set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${DIST_TAG}.${DETECTED_ARCH}")
-  include(CPack)
-endif()
 
 add_subdirectory (src)
 if (ENABLEEXAMPLES)

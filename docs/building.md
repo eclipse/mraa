@@ -164,23 +164,6 @@ java -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example
 
 If you want to add or improve Java bindings for mraa, please follow the <a href="https://github.com/intel-iot-devkit/upm/blob/master/docs/creating_java_bindings.md">Creating Java Bindings Guide</a>.
 
-## Building an IPK/RPM package using `cpack`
-
-You can get `cpack` to generate an IPK or RPM package fairly easily if you have
-the correct packaging tools
-
-~~~~~~~~~~~~~{.sh}
-cmake -DIPK=ON -DCMAKE_INSTALL_PREFIX=/usr ..
-make package
-~~~~~~~~~~~~~
-
-To use RPM simply enable the RPM option. You'll need `rpmbuild` installed on your
-build machine.
-
-~~~~~~~~~~~~~{.sh}
-cmake -DRPM=ON -DCMAKE_INSTALL_PREFIX=/usr ..
-~~~~~~~~~~~~~
-
 ## Building for the Android Things Peripheralmanager Client
 
 Requirements:

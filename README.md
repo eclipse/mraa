@@ -123,28 +123,6 @@ in /usr/lib.
 Subplatforms (i.e. Firmata) have to be added manually with this kind of install
 from your application, as shown in [this example](examples/javascript/firmata.js).
 
-Installing on Intel 32bit Yocto based opkg image
-------------------------------------------------
-
-See the section below on compiling or use our repository to install on a glibc
-based yocto poky image that supports opkg. Adding this repository is as simple
-as and you'll have the latest stable tagged build of mraa installed!
-
-``` bash
-echo "src mraa-upm http://iotdk.intel.com/repos/3.5/intelgalactic/opkg/i586" > /etc/opkg/mraa-upm.conf
-opkg update
-opkg install mraa
-```
-
-If you would like to get the latest & greatest builds from master HEAD you can
-use our -dev repository
-
-```bash
-echo "src mraa-upm http://iotdk.intel.com/repos/3.5/intelgalactic-dev/opkg/i586" > /etc/opkg/mraa-upm.conf
-opkg update
-opkg install mraa
-```
-
 Compiling
 =========
 
