@@ -67,7 +67,7 @@ $> sonar-scanner \
     -Dsonar.sources=/PATH/TO/YOUR/MRAA/REPO/CLONE \
     -Dsonar.inclusions='api/**/*,CMakeLists.txt,examples/**/*,imraa/**/*,include/**/*,src/*,src/**/*,tests/**/*' \
     -Dsonar.cfamily.build-wrapper-output=/PATH/TO/YOUR/MRAA/REPO/CLONE/YOUR_BUILD_DIR/bw-output \
-    -Dsonar.host.url=https://sonarqube.com \
+    -Dsonar.host.url=https://sonarcloud.io \
     -Dsonar.organization=mraa-github \
     -Dsonar.login=YOUR_SONAR_LOGIN_TOKEN_HERE
 ```
