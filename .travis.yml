@@ -14,8 +14,6 @@ before_install:
 
 jobs:
   fast_finish: true
-  allow_failures:
-    - env: TARGET=ipk
   include:
     - &run-with-clang
       stage: Clang 3.8
@@ -93,9 +91,5 @@ jobs:
       env: TARGET=imraa
     - <<: *run-additional-jobs
       env: TARGET=ftdi4442
-    - <<: *run-additional-jobs
-      env: TARGET=ipk
-    - <<: *run-additional-jobs
-      env: TARGET=rpm
     - <<: *run-additional-jobs
       env: TARGET=sonar-scan
