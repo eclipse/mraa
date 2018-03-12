@@ -261,7 +261,7 @@ mraa_spi_frequency(mraa_spi_context dev, int hz)
             // seems a bunch of drivers don't have this set to the actual max
             // so we only complain about it
             // dev->clock = speed;
-            syslog(LOG_NOTICE, "spi: Selected speed (%dhz) is higher than the kernel max allowed speed (%shz)", hz, SPI_IOC_RD_MAX_SPEED_HZ);
+            syslog(LOG_NOTICE, "spi: Selected speed (%d Hz) is higher than the kernel max allowed speed (%lu Hz)", hz, SPI_IOC_RD_MAX_SPEED_HZ);
         }
     }
     return MRAA_SUCCESS;
