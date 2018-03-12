@@ -39,7 +39,7 @@ services:
       - BUILDSWIG=OFF
       - INSTALLTOOLS=OFF
       - JSONPLAT=OFF
-    command: bash -c "./scripts/run-cmake.sh && cd build && make"
+    command: bash -c "./scripts/run-cmake.sh && cd build && make && ctest -R unit --output-on-failure"
 
   doc:
     extends: all
@@ -117,13 +117,13 @@ services:
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
-    command: bash -c "./scripts/run-cmake.sh && cd build && make _python2-mraa && ctest --output-on-failure"
+    command: bash -c "./scripts/run-cmake.sh && cd build && make _python2-mraa tests-unit && ctest --output-on-failure"
 
   python3:
     extends: python2
     environment:
       - USEPYTHON3TESTS=ON
-    command: bash -c "./scripts/run-cmake.sh && cd build && make _python3-mraa && ctest --output-on-failure"
+    command: bash -c "./scripts/run-cmake.sh && cd build && make _python3-mraa tests-unit && ctest --output-on-failure"
 
   java:
     extends: base
@@ -131,7 +131,7 @@ services:
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGJAVA=ON
-    command: bash -c "./scripts/run-cmake.sh && cd build && make mraajava && ctest --output-on-failure"
+    command: bash -c "./scripts/run-cmake.sh && cd build && make mraajava tests-unit && ctest --output-on-failure"
 
   android:
     extends: java
