@@ -163,7 +163,10 @@ getPlatformName()
 inline std::string
 getPlatformVersion(int platform_offset=MRAA_MAIN_PLATFORM_OFFSET)
 {
-    std::string ret_val(mraa_get_platform_version(platform_offset));
+    std::string ret_val;
+    const char* pv = mraa_get_platform_version(platform_offset);
+    if (pv != NULL)
+        ret_val = pv;
     return ret_val;
 }
 

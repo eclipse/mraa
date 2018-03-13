@@ -775,7 +775,7 @@ mraa_get_platform_version(int platform_offset)
 }
 
 int
-mraa_get_uart_count(void)
+mraa_get_uart_count()
 {
     if (plat == NULL) {
         return -1;
@@ -784,7 +784,7 @@ mraa_get_uart_count(void)
 }
 
 int
-mraa_get_spi_count(void)
+mraa_get_spi_bus_count()
 {
     if (plat == NULL) {
         return -1;
@@ -793,7 +793,7 @@ mraa_get_spi_count(void)
 }
 
 int
-mraa_get_pwm_count(void)
+mraa_get_pwm_count()
 {
     if (plat == NULL) {
         return -1;
@@ -802,7 +802,7 @@ mraa_get_pwm_count(void)
 }
 
 int
-mraa_get_gpio_count(void)
+mraa_get_gpio_count()
 {
     if (plat == NULL) {
         return -1;
@@ -811,7 +811,7 @@ mraa_get_gpio_count(void)
 }
 
 int
-mraa_get_aio_count(void)
+mraa_get_aio_count()
 {
     if (plat == NULL) {
         return -1;
