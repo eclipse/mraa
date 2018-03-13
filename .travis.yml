@@ -15,6 +15,13 @@ before_install:
 jobs:
   fast_finish: true
   include:
+    - &run-with-clang-minimal
+      stage: Clang 3.8 - minimal mock platform
+      env: TARGET=minimal
+      before_script: docker-compose pull ${TARGET}
+      script:
+        - export CC=clang-3.8 CXX=clang++-3.8
+        - BUILDARCH=MOCK docker-compose run ${TARGET}
     - &run-with-clang
       stage: Clang 3.8
       env: TARGET=python2

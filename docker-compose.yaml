@@ -33,6 +33,14 @@ services:
     extends: base
     image: inteliotdevkit/mraa-all
 
+  minimal:
+    extends: base
+    environment:
+      - BUILDSWIG=OFF
+      - INSTALLTOOLS=OFF
+      - JSONPLAT=OFF
+    command: bash -c "./scripts/run-cmake.sh && cd build && make"
+
   doc:
     extends: all
     environment:
