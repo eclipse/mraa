@@ -168,6 +168,16 @@ mraa_result_t mraa_atoi(char* intStr, int* value);
  */
 int mraa_find_i2c_bus_pci(const char* pci_device, const char *pci_id, const char* adapter_name);
 
+/**
+ * helper function to find the uart device based on pci data
+ *
+ * @param pci_dev_path points to the location of tty device which corresponds
+ * to the uart device available on the platform
+ * @param dev_name as retrieved from pci_dev_path
+ * @return Result of the operation
+ */
+mraa_result_t mraa_find_uart_bus_pci(const char* pci_dev_path, char** dev_name);
+
 #if defined(IMRAA)
 /**
  * read Imraa subplatform lock file, caller is responsible to free return

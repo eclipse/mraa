@@ -282,21 +282,22 @@ mraa_deinit()
             }
             free(sub_plat);
         }
-#if defined(JSONPLAT)
         if (plat->platform_type == MRAA_JSON_PLATFORM) {
             // Free the platform name
             free(plat->platform_name);
             plat->platform_name = NULL;
+        }
 
-            int i = 0;
-            // Free the UART device path
+        int i = 0;
+        // Free the UART device path
+        if ((plat->platform_type == MRAA_JSON_PLATFORM) || (plat->platform_type == MRAA_UP2)) {
             for (i = 0; i < plat->uart_dev_count; i++) {
                 if (plat->uart_dev[i].device_path != NULL) {
                     free(plat->uart_dev[i].device_path);
                 }
             }
         }
-#endif
+
         free(plat);
         plat = NULL;
 
@@ -1133,6 +1134,34 @@ mraa_link_targets(const char* filename, const char* targetname)
         free(buffer);
         return 0;
     }
+}
+
+mraa_result_t
+mraa_find_uart_bus_pci(const char* pci_dev_path, char** dev_name)
+{
+    char path[PATH_MAX];
+    const int max_allowable_len = 16;
+    snprintf(path, PATH_MAX - 1, "%s", pci_dev_path);
+    if (!mraa_file_exist(path)) {
+        return MRAA_ERROR_INVALID_PARAMETER;
+    }
+
+    struct dirent** namelist;
+    int n = scandir(path, &namelist, NULL, alphasort);
+    if (n <= 0) {
+        syslog(LOG_ERR, "Failed to find expected UART bus: %s", strerror(errno));
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    *dev_name = (char*) malloc(sizeof(char) * max_allowable_len);
+
+    snprintf(*dev_name, max_allowable_len, "/dev/%s", namelist[n - 1]->d_name);
+    while (n--) {
+        free(namelist[n]);
+    }
+    free(namelist);
+    syslog(LOG_INFO, "UART device: %s selected for initialization", *dev_name);
+    return MRAA_SUCCESS;
 }
 
 static int

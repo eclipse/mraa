@@ -242,7 +242,11 @@ mraa_up2_board()
     // Configure UART
     b->uart_dev_count = 0;
     b->def_uart_dev = 0;
-    b->uart_dev[0].device_path = "/dev/ttyS1";
+    // setting up a default path
+    if (mraa_find_uart_bus_pci("/sys/bus/pci/devices/0000:00:18.1/dw-apb-uart.9/tty/",
+                               &(b->uart_dev[0].device_path)) != MRAA_SUCCESS) {
+        goto error;
+    }
 
     // Configure UART #1 (default)
     mraa_up2_get_pin_index(b, "UART_RX", &(b->uart_dev[0].rx));
