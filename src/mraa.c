@@ -102,16 +102,21 @@ mraa_set_log_level(int level)
 mraa_boolean_t mraa_is_kernel_chardev_interface_compatible()
 {
     if (mraa_get_number_of_gpio_chips() <= 0) {
+        syslog(LOG_NOTICE, "gpio: platform supports chardev but kernel doesn't, falling back to sysfs");
         return 0;
     }
 
     return 1;
 }
 
-/* TODO: Add all relevant checks here and return the overall result. */
 mraa_boolean_t mraa_is_platform_chardev_interface_capable()
 {
-    return mraa_is_kernel_chardev_interface_compatible();
+    if (plat->chardev_capable) {
+        return mraa_is_kernel_chardev_interface_compatible();
+    }
+
+    syslog(LOG_NOTICE, "gpio: platform doesn't support chardev, falling back to sysfs");
+    return 0;
 }
 
 /**
@@ -236,7 +241,7 @@ imraa_init()
 
     plat->chardev_capable = mraa_is_platform_chardev_interface_capable();
     if (plat->chardev_capable) {
-        syslog(LOG_NOTICE, "libmraa: support for chardev interface is activated");
+        syslog(LOG_NOTICE, "gpio: support for chardev interface is activated");
     }
 
     syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());

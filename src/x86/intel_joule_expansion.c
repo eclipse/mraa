@@ -43,6 +43,7 @@ mraa_joule_expansion_board()
 
     b->platform_name = PLATFORM_NAME;
     b->phy_pin_count = MRAA_INTEL_JOULE_EXPANSION_PINCOUNT;
+    b->chardev_capable = 1;
     b->aio_count = 0;
     b->adc_raw = 0;
     b->adc_supported = 0;
