@@ -143,30 +143,31 @@ adcSupportedBits()
 }
 
 /**
- * Return Platform Name. Returns NULL if no platform inited.
+ * Return platform name.
  *
- * @return platform name
+ * @return platform name or empty string if not initialised
  */
 inline std::string
 getPlatformName()
 {
-    std::string ret_val(mraa_get_platform_name());
+    std::string ret_val;
+    const char * pn = mraa_get_platform_name();
+    if (pn) ret_val = pn;
     return ret_val;
 }
 
 /**
- * Return platform versioning info. Returns NULL if no info present.
+ * Return platform versioning info.
  *
  * @param platform_offset optional subplatform identifier
- * @return platform versioning info
+ * @return platform versioning info or empty string if no info is present
  */
 inline std::string
 getPlatformVersion(int platform_offset=MRAA_MAIN_PLATFORM_OFFSET)
 {
     std::string ret_val;
     const char* pv = mraa_get_platform_version(platform_offset);
-    if (pv != NULL)
-        ret_val = pv;
+    if (pv) ret_val = pv;
     return ret_val;
 }
 
@@ -222,12 +223,14 @@ getI2cBusId(int i2c_bus)
 *
 * @param pin number
 *
-* @return char* of pin name
+* @return Pin name or empty string on failure
 */
 inline std::string
 getPinName(int pin)
 {
-    std::string ret_val(mraa_get_pin_name(pin));
+    std::string ret_val;
+    const char* pn = mraa_get_pin_name(pin);
+    if (pn) ret_val = pn;
     return ret_val;
 }
 
