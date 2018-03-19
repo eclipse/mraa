@@ -62,6 +62,11 @@ _mraa_gpio_get_valfp(mraa_gpio_context dev)
 void
 mraa_gpio_close_event_handles_sysfs(int fds[], int num_fds)
 {
+    if ((fds == NULL) || (num_fds <= 0)) {
+        syslog(LOG_CRIT, "failed to close and free sysfs event handles");
+        return;
+    }
+
     for (int i = 0; i < num_fds; ++i) {
         close(fds[i]);
     }
@@ -236,12 +241,13 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
     dev->pin_to_gpio_table = malloc(num_pins * sizeof(int));
     if (dev->pin_to_gpio_table == NULL) {
         syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+        mraa_gpio_close(dev);
         return NULL;
     }
 
     dev->num_chips = mraa_get_number_of_gpio_chips();
     if (dev->num_chips <= 0) {
-        free(dev);
+        mraa_gpio_close(dev);
         return NULL;
     }
 
@@ -250,6 +256,7 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
     gpio_group = calloc(dev->num_chips, sizeof(struct _gpio_group));
     if (gpio_group == NULL) {
         syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+        mraa_gpio_close(dev);
         return NULL;
     }
 
@@ -265,6 +272,7 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
             board = board->sub_platform;
             if (board == NULL) {
                 syslog(LOG_ERR, "[GPIOD_INTERFACE]: init: Sub platform not initialised for pin %d", pins[i]);
+                mraa_gpio_close(dev);
                 return NULL;
             }
             pins[i] = mraa_get_sub_platform_index(pins[i]);
@@ -273,17 +281,20 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
         if (pins[i] < 0 || pins[i] >= board->phy_pin_count) {
             syslog(LOG_ERR, "[GPIOD_INTERFACE]: init: pin %d beyond platform pin count (%d)",
                    pins[i], board->phy_pin_count);
+            mraa_gpio_close(dev);
             return NULL;
         }
 
         if (board->pins[pins[i]].capabilities.gpio != 1) {
             syslog(LOG_ERR, "[GPIOD_INTERFACE]: init: pin %d not capable of gpio", pins[i]);
+            mraa_gpio_close(dev);
             return NULL;
         }
 
         if (board->pins[pins[i]].gpio.mux_total > 0) {
             if (mraa_setup_mux_mapped(board->pins[pins[i]].gpio) != MRAA_SUCCESS) {
                 syslog(LOG_ERR, "[GPIOD_INTERFACE]: init: unable to setup muxes for pin %d", pins[i]);
+                mraa_gpio_close(dev);
                 return NULL;
             }
         }
@@ -298,6 +309,7 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
             mraa_gpiod_chip_info* cinfo = mraa_get_chip_info_by_number(chip_id);
             if (!cinfo) {
                 syslog(LOG_ERR, "[GPIOD_INTERFACE]: error getting gpio_chip_info for chip %d", chip_id);
+                mraa_gpio_close(dev);
                 return NULL;
             }
 
@@ -314,6 +326,7 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
                                                  (line_in_group + 1) * sizeof(unsigned int));
         if (gpio_group[chip_id].gpio_lines == NULL) {
             syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+            mraa_gpio_close(dev);
             return NULL;
         }
 
@@ -327,12 +340,14 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
         gpio_group[i].rw_values = calloc(gpio_group[i].num_gpio_lines, sizeof(unsigned char));
         if (gpio_group[i].rw_values == NULL) {
             syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+            mraa_gpio_close(dev);
             return NULL;
         }
 
         gpio_group[i].gpio_group_to_pins_table = calloc(gpio_group[i].num_gpio_lines, sizeof(int));
         if (gpio_group[i].gpio_group_to_pins_table == NULL) {
             syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+            mraa_gpio_close(dev);
             return NULL;
         }
 
@@ -345,6 +360,7 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
     int* counters = calloc(dev->num_chips, sizeof(int));
     if (counters == NULL) {
         syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for local variable");
+        mraa_gpio_close(dev);
         return NULL;
     }
 
@@ -361,6 +377,7 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
     dev->provided_pins = malloc(dev->num_pins * sizeof(int));
     if (dev->provided_pins == NULL) {
         syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+        mraa_gpio_close(dev);
         return NULL;
     }
 
@@ -406,7 +423,9 @@ mraa_gpio_init_multi(int pins[], int num_pins)
         current->next = NULL;
     }
 
-    head->num_pins = num_pins;
+    if (head != NULL) {
+        head->num_pins = num_pins;
+    }
 
     return head;
 }
@@ -599,6 +618,7 @@ mraa_gpio_interrupt_handler(void* arg)
             if (fps[idx] < 0) {
                 syslog(LOG_ERR, "gpio%i: interrupt_handler: failed to open 'value' : %s", it->pin,
                        strerror(errno));
+                free(fps);
                 return NULL;
             }
 
@@ -660,12 +680,7 @@ mraa_gpio_interrupt_handler(void* arg)
 #ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 #endif
-            if (fps) {
-                for (int i = 0; i < idx; ++i) {
-                    close(fps[i]);
-                }
-                free(fps);
-            }
+            mraa_gpio_close_event_handles_sysfs(fps, idx);
 
             if (lang_func->java_detach_thread != NULL && lang_func->java_delete_global_ref != NULL) {
                 if (dev->isr == lang_func->java_isr_callback) {
