@@ -95,9 +95,5 @@ TEST_F(api_common_hpp_unit, test_libmraa_common_methods)
 
         /* MOCK does NOT have a subplatform */
         ASSERT_FALSE(mraa::hasSubPlatform());
-
-        /* Test the string init methods (via the internal struct type) */
-        mraa::Gpio* sg0 = mraa::initIo<mraa::Gpio>("GPIO-0");
-        ASSERT_EQ(0, sg0->getPin());
     }
 }

@@ -30,10 +30,17 @@ if (FTDI4222)
     gtest_add_tests(platform_extender "" AUTO)
 endif ()
 
+# Unit tests - C initio header methods
+add_executable(mraa_initio_h_unit api/mraa_initio_h_unit.cxx)
+target_link_libraries(mraa_initio_h_unit GTest::GTest GTest::Main mraa)
+target_include_directories(mraa_initio_h_unit PRIVATE "${CMAKE_SOURCE_DIR}/api")
+gtest_add_tests(mraa_initio_h_unit "" AUTO)
+
 # Add a custom target for unit tests
 add_custom_target(tests-unit ALL
     DEPENDS
         api_common_h_unit
         api_common_hpp_unit
         platform_extender
+        mraa_initio_h_unit
         COMMENT "mraa unit test collection")
