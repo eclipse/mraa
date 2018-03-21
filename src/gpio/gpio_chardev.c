@@ -53,9 +53,17 @@ _mraa_free_gpio_groups(mraa_gpio_context dev)
     mraa_gpiod_group_t gpio_iter;
 
     for_each_gpio_group(gpio_iter, dev) {
-        free(gpio_iter->gpio_lines);
-        free(gpio_iter->rw_values);
-        free(gpio_iter->gpio_group_to_pins_table);
+        if (gpio_iter->gpio_lines) {
+            free(gpio_iter->gpio_lines);
+        }
+
+        if (gpio_iter->rw_values) {
+            free(gpio_iter->rw_values);
+        }
+
+        if (gpio_iter->gpio_group_to_pins_table) {
+            free(gpio_iter->gpio_group_to_pins_table);
+        }
 
         if (gpio_iter->gpiod_handle != -1) {
             close(gpio_iter->gpiod_handle);
@@ -72,16 +80,24 @@ _mraa_free_gpio_groups(mraa_gpio_context dev)
         close(gpio_iter->dev_fd);
     }
 
-    free(dev->gpio_group);
+    if (dev->gpio_group) {
+        free(dev->gpio_group);
+    }
 
     /* Also delete the pin to gpio chip mapping. */
-    free(dev->pin_to_gpio_table);
+    if (dev->pin_to_gpio_table) {
+        free(dev->pin_to_gpio_table);
+    }
 
     /* User provided array saved internally. */
-    free(dev->provided_pins);
+    if (dev->provided_pins) {
+        free(dev->provided_pins);
+    }
 
     /* Finally, delete event array. */
-    free(dev->events);
+    if (dev->events) {
+        free(dev->events);
+    }
 }
 
 void
