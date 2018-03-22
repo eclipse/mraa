@@ -1,6 +1,9 @@
 add_executable (gpio_edison gpio_edison.c)
 target_link_libraries (gpio_edison mraa)
 
+add_executable (up2-leds up2-leds.cpp)
+target_link_libraries (up2-leds mraa)
+
 include_directories(${PROJECT_SOURCE_DIR}/api)
 include_directories(${PROJECT_SOURCE_DIR}/api/mraa)
 
