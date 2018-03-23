@@ -618,7 +618,7 @@ mraa_gpio_interrupt_handler(void* arg)
             if (fps[idx] < 0) {
                 syslog(LOG_ERR, "gpio%i: interrupt_handler: failed to open 'value' : %s", it->pin,
                        strerror(errno));
-                free(fps);
+                mraa_gpio_close_event_handles_sysfs(fps, idx);
                 return NULL;
             }
 
@@ -680,7 +680,7 @@ mraa_gpio_interrupt_handler(void* arg)
 #ifdef HAVE_PTHREAD_CANCEL
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 #endif
-            mraa_gpio_close_event_handles_sysfs(fps, idx);
+            mraa_gpio_close_event_handles_sysfs(fps, dev->num_pins);
 
             if (lang_func->java_detach_thread != NULL && lang_func->java_delete_global_ref != NULL) {
                 if (dev->isr == lang_func->java_isr_callback) {
