@@ -9,6 +9,7 @@ Board Support
 -------------
 
 - [DragonBoard 410c](http://www.96boards.org/product/dragonboard410c/)
+- [DragonBoard 820c](http://www.96boards.org/product/dragonboard820c/)
 - [HiKey](http://www.96boards.org/product/hikey/)
 - [Bubblegum-96](http://www.96boards.org/product/bubblegum-96/)
 

@@ -60,17 +60,14 @@ int db820c_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
 };
 
 int db820c_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
-    { 0, 80 }, { 0, 29 }, { 0, 124 }, { 0, 62 }, { 0, 507 }, { 2, 3 },
+    { 0, 80 }, { 0, 29 }, { 0, 124 }, { 0, 24 }, { 0, 62 }, { 2, 3 },
     { 0, 10 }, { 0, 8 }, { 0, 25 }, { 0, 26 }, { 0, 23 },  { 0, 133 },
 };
 
+const char* db820c_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyMSM0", "/dev/ttyMSM1" };
+
 int hikey_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
     488, 489, 490, 491, 492, 415, 463, 495, 426, 433, 427, 434,
-};
-
-int hikey_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
-    { 2, 0 }, { 2, 1 }, { 2, 2 },  { 2, 3 }, { 2, 4 },  { 12, 7 },
-    { 6, 7 }, { 2, 7 }, { 10, 2 }, { 9, 1 }, { 10, 3 }, { 9, 2 },
 };
 
 int hikey_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
@@ -228,7 +225,7 @@ mraa_96boards()
     b->no_bus_mux = 1;
     b->phy_pin_count = MRAA_96BOARDS_LS_PIN_COUNT + 1;
 
-	if (mraa_file_exist(DT_BASE "/model")) {
+    if (mraa_file_exist(DT_BASE "/model")) {
         // We are on a modern kernel, great!!!!
         if (mraa_file_contains(DT_BASE "/model", "Qualcomm Technologies, Inc. APQ 8016 SBC")) {
             b->platform_name = PLATFORM_NAME_DB410C;
@@ -256,7 +253,6 @@ mraa_96boards()
             b->uart_dev[1].device_path = (char*) bbgum_serialdev[1];
         }
     }
-
 
     // UART
     b->uart_dev_count = MRAA_96BOARDS_LS_UART_COUNT;
