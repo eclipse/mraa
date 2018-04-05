@@ -47,12 +47,21 @@ int db410c_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
     36, 12, 13, 69, 115, 4, 24, 25, 35, 34, 28, 33,
 };
 
+int db410c_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
+    { 0, 36 }, { 0, 12 }, { 0, 13 }, { 0, 69 }, { 0, 115 }, { 2, 3 },
+    { 0, 24 }, { 0, 25 }, { 0, 35 }, { 0, 34 }, { 0, 28 },  { 0, 33 },
+};
+
 const char* db410c_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyMSM0", "/dev/ttyMSM1" };
 
 int hikey_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
     488, 489, 490, 491, 492, 415, 463, 495, 426, 433, 427, 434,
 };
 
+int hikey_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
+    { 2, 0 }, { 2, 1 }, { 2, 2 },  { 2, 3 }, { 2, 4 },  { 12, 7 },
+    { 6, 7 }, { 2, 7 }, { 10, 2 }, { 9, 1 }, { 10, 3 }, { 9, 2 },
+};
 
 const char* hikey_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyAMA2", "/dev/ttyAMA3" };
 
@@ -67,7 +76,7 @@ static int mmap_size = 0x00120004;
 static unsigned int mmap_count = 0;
 
 void
-mraa_96boards_pininfo(mraa_board_t* board, int index, int sysfs_pin, char* fmt, ...)
+mraa_96boards_pininfo(mraa_board_t* board, int index, int sysfs_pin, int is_gpio, char* fmt, ...)
 {
     va_list arg_ptr;
     if (index > board->phy_pin_count)
@@ -76,6 +85,12 @@ mraa_96boards_pininfo(mraa_board_t* board, int index, int sysfs_pin, char* fmt, 
     mraa_pininfo_t* pininfo = &board->pins[index];
     va_start(arg_ptr, fmt);
     vsnprintf(pininfo->name, MRAA_PIN_NAME_SIZE, fmt, arg_ptr);
+    if (is_gpio) {
+        // skip the read argument
+        va_arg(arg_ptr, int);
+        pininfo->gpio.gpio_chip = va_arg(arg_ptr, int);
+        pininfo->gpio.gpio_line = va_arg(arg_ptr, int);
+    }
     va_end(arg_ptr);
     if (sysfs_pin >= 0)
         pininfo->capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
@@ -181,6 +196,7 @@ mraa_96boards()
 {
     int i;
     int* ls_gpio_pins = NULL;
+    int(*chardev_map)[MRAA_96BOARDS_LS_GPIO_COUNT][2] = NULL;
 
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
@@ -202,12 +218,14 @@ mraa_96boards()
         if (mraa_file_contains(DT_BASE "/model", "Qualcomm Technologies, Inc. APQ 8016 SBC")) {
             b->platform_name = PLATFORM_NAME_DB410C;
             ls_gpio_pins = db410c_ls_gpio_pins;
+            chardev_map = &db410c_chardev_map;
             b->uart_dev[0].device_path = (char *)db410c_serialdev[0];
             b->uart_dev[1].device_path = (char *)db410c_serialdev[1];
             b->adv_func->gpio_mmap_setup = &mraa_db410c_mmap_setup;
         } else if (mraa_file_contains(DT_BASE "/model", "HiKey Development Board")) {
             b->platform_name = PLATFORM_NAME_HIKEY;
             ls_gpio_pins = hikey_ls_gpio_pins;
+            chardev_map = &hikey_chardev_map;
             b->uart_dev[0].device_path = (char *)hikey_serialdev[0];
             b->uart_dev[1].device_path = (char *)hikey_serialdev[1];
         } else if (mraa_file_contains(DT_BASE "/model", "s900")) {
@@ -247,41 +265,44 @@ mraa_96boards()
         return NULL;
     }
 
-    mraa_96boards_pininfo(b, 0, -1, "INVALID");
-    mraa_96boards_pininfo(b, 1, -1, "GND");
-    mraa_96boards_pininfo(b, 2, -1, "GND");
-    mraa_96boards_pininfo(b, 3, -1, "UART0_CTS");
-    mraa_96boards_pininfo(b, 4, -1, "PWR_BTN_N");
-    mraa_96boards_pininfo(b, 5, -1, "UART0_TXD");
-    mraa_96boards_pininfo(b, 6, -1, "RST_BTN_N");
-    mraa_96boards_pininfo(b, 7, -1, "UART0_RXD");
-    mraa_96boards_pininfo(b, 8, -1, "SPI0_SCLK");
-    mraa_96boards_pininfo(b, 9, -1, "UART0_RTS");
-    mraa_96boards_pininfo(b, 10, -1, "SPI0_DIN");
-    mraa_96boards_pininfo(b, 11, -1, "UART1_TXD");
-    mraa_96boards_pininfo(b, 12, -1, "SPI0_CS");
-    mraa_96boards_pininfo(b, 13, -1, "UART1_RXD");
-    mraa_96boards_pininfo(b, 14, -1, "SPI0_DOUT");
-    mraa_96boards_pininfo(b, 15, -1, "I2C0_SCL");
-    mraa_96boards_pininfo(b, 16, -1, "PCM_FS");
-    mraa_96boards_pininfo(b, 17, -1, "I2C0_SDA");
-    mraa_96boards_pininfo(b, 18, -1, "PCM_CLK");
-    mraa_96boards_pininfo(b, 19, -1, "I2C1_SCL");
-    mraa_96boards_pininfo(b, 20, -1, "PCM_DO");
-    mraa_96boards_pininfo(b, 21, -1, "I2C1_SDA");
-    mraa_96boards_pininfo(b, 22, -1, "PCM_DI");
+    mraa_96boards_pininfo(b, 0, -1, 0, "INVALID");
+    mraa_96boards_pininfo(b, 1, -1, 0, "GND");
+    mraa_96boards_pininfo(b, 2, -1, 0, "GND");
+    mraa_96boards_pininfo(b, 3, -1, 0, "UART0_CTS");
+    mraa_96boards_pininfo(b, 4, -1, 0, "PWR_BTN_N");
+    mraa_96boards_pininfo(b, 5, -1, 0, "UART0_TXD");
+    mraa_96boards_pininfo(b, 6, -1, 0, "RST_BTN_N");
+    mraa_96boards_pininfo(b, 7, -1, 0, "UART0_RXD");
+    mraa_96boards_pininfo(b, 8, -1, 0, "SPI0_SCLK");
+    mraa_96boards_pininfo(b, 9, -1, 0, "UART0_RTS");
+    mraa_96boards_pininfo(b, 10, -1, 0, "SPI0_DIN");
+    mraa_96boards_pininfo(b, 11, -1, 0, "UART1_TXD");
+    mraa_96boards_pininfo(b, 12, -1, 0, "SPI0_CS");
+    mraa_96boards_pininfo(b, 13, -1, 0, "UART1_RXD");
+    mraa_96boards_pininfo(b, 14, -1, 0, "SPI0_DOUT");
+    mraa_96boards_pininfo(b, 15, -1, 0, "I2C0_SCL");
+    mraa_96boards_pininfo(b, 16, -1, 0, "PCM_FS");
+    mraa_96boards_pininfo(b, 17, -1, 0, "I2C0_SDA");
+    mraa_96boards_pininfo(b, 18, -1, 0, "PCM_CLK");
+    mraa_96boards_pininfo(b, 19, -1, 0, "I2C1_SCL");
+    mraa_96boards_pininfo(b, 20, -1, 0, "PCM_DO");
+    mraa_96boards_pininfo(b, 21, -1, 0, "I2C1_SDA");
+    mraa_96boards_pininfo(b, 22, -1, 0, "PCM_DI");
     // GPIOs are labelled "GPIO-A" through "GPIO-L"
     for (i = 0; i < MRAA_96BOARDS_LS_GPIO_COUNT; i++) {
-        mraa_96boards_pininfo(b, 23 + i, ls_gpio_pins ? ls_gpio_pins[i] : -1, "GPIO-%c", 'A' + i);
+        mraa_96boards_pininfo(b, 23 + i, ls_gpio_pins ? ls_gpio_pins[i] : -1, 1, "GPIO-%c", 'A' + i,
+                              chardev_map ? (*chardev_map)[i][0] : -1,
+                              chardev_map ? (*chardev_map)[i][1] : -1);
     }
-    mraa_96boards_pininfo(b, 35, -1, "1.8v");
-    mraa_96boards_pininfo(b, 36, -1, "SYS_DCIN");
-    mraa_96boards_pininfo(b, 37, -1, "5v");
-    mraa_96boards_pininfo(b, 38, -1, "SYS_DCIN");
-    mraa_96boards_pininfo(b, 39, -1, "GND");
-    mraa_96boards_pininfo(b, 40, -1, "GND");
+    mraa_96boards_pininfo(b, 35, -1, 0, "1.8v");
+    mraa_96boards_pininfo(b, 36, -1, 0, "SYS_DCIN");
+    mraa_96boards_pininfo(b, 37, -1, 0, "5v");
+    mraa_96boards_pininfo(b, 38, -1, 0, "SYS_DCIN");
+    mraa_96boards_pininfo(b, 39, -1, 0, "GND");
+    mraa_96boards_pininfo(b, 40, -1, 0, "GND");
 
     b->gpio_count = MRAA_96BOARDS_LS_GPIO_COUNT;
+    b->chardev_capable = 1;
 
     b->aio_count = 0;
     b->adc_raw = 0;
