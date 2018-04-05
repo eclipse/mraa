@@ -39,6 +39,7 @@
 #define PLATFORM_NAME_DB410C "DB410C"
 #define PLATFORM_NAME_DB820C "DB820C"
 #define PLATFORM_NAME_HIKEY "HIKEY"
+#define PLATFORM_NAME_HIKEY960 "HIKEY960"
 #define PLATFORM_NAME_BBGUM "BBGUM"
 #define MAX_SIZE 64
 #define MMAP_PATH "/dev/mem"
@@ -76,6 +77,14 @@ int hikey_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
 };
 
 const char* hikey_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyAMA2", "/dev/ttyAMA3" };
+
+// HIKEY960
+int hikey960_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
+    { 26, 0 }, { 26, 1 }, { 26, 2 },  { 26, 3 }, { 26, 4 },  { 22, 6 },
+    { 2, 7 }, { 5, 0 }, { 6, 4 }, { 2, 3 }, { 9, 3 }, { 2, 5 },
+};
+
+const char* hikey960_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyAMA3", "/dev/ttyAMA6" };
 
 int bbgum_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 155, 154 };
 
@@ -248,6 +257,12 @@ mraa_96boards()
             chardev_map = &hikey_chardev_map;
             b->uart_dev[0].device_path = (char*) hikey_serialdev[0];
             b->uart_dev[1].device_path = (char*) hikey_serialdev[1];
+            b->chardev_capable = 1;
+        } else if (mraa_file_contains(DT_BASE "/model", "HiKey960")) {
+            b->platform_name = PLATFORM_NAME_HIKEY960;
+            chardev_map = &hikey960_chardev_map;
+            b->uart_dev[0].device_path = (char*) hikey960_serialdev[0];
+            b->uart_dev[1].device_path = (char*) hikey960_serialdev[1];
             b->chardev_capable = 1;
         } else if (mraa_file_contains(DT_BASE "/model", "s900")) {
             b->platform_name = PLATFORM_NAME_BBGUM;
