@@ -111,12 +111,11 @@ mraa_96boards_pininfo(mraa_board_t* board, int index, int sysfs_pin, int is_gpio
         va_arg(arg_ptr, int);
         pininfo->gpio.gpio_chip = va_arg(arg_ptr, int);
         pininfo->gpio.gpio_line = va_arg(arg_ptr, int);
+        pininfo->capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    } else {
+        pininfo->capabilities = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
     }
     va_end(arg_ptr);
-    if (sysfs_pin >= 0)
-        pininfo->capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    else
-        pininfo->capabilities = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
     pininfo->gpio.pinmap = sysfs_pin;
     pininfo->gpio.mux_total = 0;
 }
