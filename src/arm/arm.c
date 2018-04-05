@@ -92,6 +92,8 @@ mraa_arm_platform()
         else if (mraa_file_contains("/proc/device-tree/model",
                                     "HiKey Development Board"))
             platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/model", "HiKey960"))
+            platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/model", "s900"))
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
