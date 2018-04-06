@@ -399,7 +399,7 @@ mraa_is_gpio_line_open_drain(mraa_gpiod_line_info *linfo)
 mraa_boolean_t
 mraa_is_gpio_line_open_source(mraa_gpiod_line_info *linfo)
 {
-    return (linfo->flags & GPIOHANDLE_REQUEST_OPEN_SOURCE);
+    return (linfo->flags & GPIOLINE_FLAG_OPEN_SOURCE);
 }
 
 int
