@@ -37,6 +37,7 @@
 #define DT_BASE "/proc/device-tree"
 
 #define PLATFORM_NAME_DB410C "DB410C"
+#define PLATFORM_NAME_DB820C "DB820C"
 #define PLATFORM_NAME_HIKEY "HIKEY"
 #define PLATFORM_NAME_BBGUM "BBGUM"
 #define MAX_SIZE 64
@@ -54,8 +55,22 @@ int db410c_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
 
 const char* db410c_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyMSM0", "/dev/ttyMSM1" };
 
+int db820c_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
+    80, 29, 124, 24, 62, 507, 10, 8, 25, 26, 23, 133,
+};
+
+int db820c_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
+    { 0, 80 }, { 0, 29 }, { 0, 124 }, { 0, 62 }, { 0, 507 }, { 2, 3 },
+    { 0, 10 }, { 0, 8 }, { 0, 25 }, { 0, 26 }, { 0, 23 },  { 0, 133 },
+};
+
 int hikey_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
     488, 489, 490, 491, 492, 415, 463, 495, 426, 433, 427, 434,
+};
+
+int hikey_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
+    { 2, 0 }, { 2, 1 }, { 2, 2 },  { 2, 3 }, { 2, 4 },  { 12, 7 },
+    { 6, 7 }, { 2, 7 }, { 10, 2 }, { 9, 1 }, { 10, 3 }, { 9, 2 },
 };
 
 int hikey_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
@@ -213,7 +228,7 @@ mraa_96boards()
     b->no_bus_mux = 1;
     b->phy_pin_count = MRAA_96BOARDS_LS_PIN_COUNT + 1;
 
-    if (mraa_file_exist(DT_BASE "/model")) {
+	if (mraa_file_exist(DT_BASE "/model")) {
         // We are on a modern kernel, great!!!!
         if (mraa_file_contains(DT_BASE "/model", "Qualcomm Technologies, Inc. APQ 8016 SBC")) {
             b->platform_name = PLATFORM_NAME_DB410C;
@@ -222,6 +237,12 @@ mraa_96boards()
             b->uart_dev[0].device_path = (char*) db410c_serialdev[0];
             b->uart_dev[1].device_path = (char*) db410c_serialdev[1];
             b->adv_func->gpio_mmap_setup = &mraa_db410c_mmap_setup;
+        } else if (mraa_file_contains(DT_BASE "/model", "Qualcomm Technologies, Inc. DB820c")) {
+            b->platform_name = PLATFORM_NAME_DB820C;
+            ls_gpio_pins = db820c_ls_gpio_pins;
+            chardev_map = &db820c_chardev_map;
+            b->uart_dev[0].device_path = (char*) db820c_serialdev[0];
+            b->uart_dev[1].device_path = (char *)db820c_serialdev[1];
         } else if (mraa_file_contains(DT_BASE "/model", "HiKey Development Board")) {
             b->platform_name = PLATFORM_NAME_HIKEY;
             ls_gpio_pins = hikey_ls_gpio_pins;
@@ -235,6 +256,7 @@ mraa_96boards()
             b->uart_dev[1].device_path = (char*) bbgum_serialdev[1];
         }
     }
+
 
     // UART
     b->uart_dev_count = MRAA_96BOARDS_LS_UART_COUNT;
