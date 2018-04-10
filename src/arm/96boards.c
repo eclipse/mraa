@@ -234,18 +234,21 @@ mraa_96boards()
             b->uart_dev[0].device_path = (char*) db410c_serialdev[0];
             b->uart_dev[1].device_path = (char*) db410c_serialdev[1];
             b->adv_func->gpio_mmap_setup = &mraa_db410c_mmap_setup;
+            b->chardev_capable = 1;
         } else if (mraa_file_contains(DT_BASE "/model", "Qualcomm Technologies, Inc. DB820c")) {
             b->platform_name = PLATFORM_NAME_DB820C;
             ls_gpio_pins = db820c_ls_gpio_pins;
             chardev_map = &db820c_chardev_map;
             b->uart_dev[0].device_path = (char*) db820c_serialdev[0];
             b->uart_dev[1].device_path = (char *)db820c_serialdev[1];
+            b->chardev_capable = 1;
         } else if (mraa_file_contains(DT_BASE "/model", "HiKey Development Board")) {
             b->platform_name = PLATFORM_NAME_HIKEY;
             ls_gpio_pins = hikey_ls_gpio_pins;
             chardev_map = &hikey_chardev_map;
             b->uart_dev[0].device_path = (char*) hikey_serialdev[0];
             b->uart_dev[1].device_path = (char*) hikey_serialdev[1];
+            b->chardev_capable = 1;
         } else if (mraa_file_contains(DT_BASE "/model", "s900")) {
             b->platform_name = PLATFORM_NAME_BBGUM;
             ls_gpio_pins = bbgum_ls_gpio_pins;
@@ -320,7 +323,6 @@ mraa_96boards()
     mraa_96boards_pininfo(b, 40, -1, 0, "GND");
 
     b->gpio_count = MRAA_96BOARDS_LS_GPIO_COUNT;
-    b->chardev_capable = 1;
 
     b->aio_count = 0;
     b->adc_raw = 0;
