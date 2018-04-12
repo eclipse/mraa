@@ -38,7 +38,7 @@
 int arch_nr_gpios_adjust = 0x100;
 
 mraa_result_t
-mraa_intel_minnowboard_set_pininfo(mraa_board_t* board, int mraa_index, char* name, mraa_pincapabilities_t caps, int sysfs_pin)
+mraa_intel_minnowboard_set_pininfo(mraa_board_t* board, int mraa_index, char* name, mraa_pincapabilities_t caps, int sysfs_pin, int chip, int line)
 {
     if (mraa_index < board->phy_pin_count) {
         // adjust mraa_index for ARCH_NR_GPIOS value
@@ -48,6 +48,8 @@ mraa_intel_minnowboard_set_pininfo(mraa_board_t* board, int mraa_index, char* na
         if (caps.gpio) {
             pin_info->gpio.pinmap = sysfs_pin | arch_nr_gpios_adjust;
             pin_info->gpio.mux_total = 0;
+            pin_info->gpio.gpio_chip = chip;
+            pin_info->gpio.gpio_line = line;
         }
         if (caps.i2c) {
             pin_info->i2c.pinmap = 1;
@@ -102,6 +104,7 @@ mraa_intel_minnowboard_byt_compatible(mraa_boolean_t turbot)
         b->platform_version = "Ax";
         b->gpio_count = b->phy_pin_count = MRAA_INTEL_MINNOW_MAX_PINCOUNT;
     }
+    b->chardev_capable = 1;
 
     b->pins = (mraa_pininfo_t*) calloc((size_t) b->phy_pin_count, sizeof(mraa_pininfo_t));
     if (b->pins == NULL) {
@@ -131,39 +134,39 @@ mraa_intel_minnowboard_byt_compatible(mraa_boolean_t turbot)
         arch_nr_gpios_adjust = 0;
     }
 
-    mraa_intel_minnowboard_set_pininfo(b, 0, "INVALID", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_intel_minnowboard_set_pininfo(b, 1, "GND", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_intel_minnowboard_set_pininfo(b, 2, "GND", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_intel_minnowboard_set_pininfo(b, 3, "5v", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_intel_minnowboard_set_pininfo(b, 4, "3.3v", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 }, -1);
-    mraa_intel_minnowboard_set_pininfo(b, 5, "SPI_CS", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 220);
-    mraa_intel_minnowboard_set_pininfo(b, 6, "UART1TX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 225);
-    mraa_intel_minnowboard_set_pininfo(b, 7, "SPIMISO", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 221);
-    mraa_intel_minnowboard_set_pininfo(b, 8, "UART1RX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 224);
-    mraa_intel_minnowboard_set_pininfo(b, 9, "SPIMOSI", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 222);
-    mraa_intel_minnowboard_set_pininfo(b, 10, "UART1CT", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 227);
-    mraa_intel_minnowboard_set_pininfo(b, 11, "SPI_CLK", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 223);
-    mraa_intel_minnowboard_set_pininfo(b, 12, "UART1RT", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 226);
-    mraa_intel_minnowboard_set_pininfo(b, 13, "I2C_SCL", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, 243);
-    mraa_intel_minnowboard_set_pininfo(b, 14, "I2S_CLK", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 216);
-    mraa_intel_minnowboard_set_pininfo(b, 15, "I2C_SDA", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, 242);
-    mraa_intel_minnowboard_set_pininfo(b, 16, "I2S_FRM", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 217);
-    mraa_intel_minnowboard_set_pininfo(b, 17, "UART2TX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 229);
-    mraa_intel_minnowboard_set_pininfo(b, 18, "I2S_DO", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 219);
-    mraa_intel_minnowboard_set_pininfo(b, 19, "UART2RX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 228);
-    mraa_intel_minnowboard_set_pininfo(b, 20, "I2S_DI", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 218);
-    mraa_intel_minnowboard_set_pininfo(b, 21, "S5_0", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 82);
+    mraa_intel_minnowboard_set_pininfo(b, 0, "INVALID", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1, -1, -1);
+    mraa_intel_minnowboard_set_pininfo(b, 1, "GND", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1, -1, -1);
+    mraa_intel_minnowboard_set_pininfo(b, 2, "GND", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1, -1, -1);
+    mraa_intel_minnowboard_set_pininfo(b, 3, "5v", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1, -1, -1);
+    mraa_intel_minnowboard_set_pininfo(b, 4, "3.3v", (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 }, -1, -1, -1);
+    mraa_intel_minnowboard_set_pininfo(b, 5, "SPI_CS", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 220, 0, 66);
+    mraa_intel_minnowboard_set_pininfo(b, 6, "UART1TX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 225, 0, 71);
+    mraa_intel_minnowboard_set_pininfo(b, 7, "SPIMISO", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 221, 0, 67);
+    mraa_intel_minnowboard_set_pininfo(b, 8, "UART1RX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 224, 0, 70);
+    mraa_intel_minnowboard_set_pininfo(b, 9, "SPIMOSI", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 222, 0, 68);
+    mraa_intel_minnowboard_set_pininfo(b, 10, "UART1CT", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 227, 0, 73);
+    mraa_intel_minnowboard_set_pininfo(b, 11, "SPI_CLK", (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 }, 223, 0, 69);
+    mraa_intel_minnowboard_set_pininfo(b, 12, "UART1RT", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 226, 0, 72);
+    mraa_intel_minnowboard_set_pininfo(b, 13, "I2C_SCL", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, 243, 0, 89);
+    mraa_intel_minnowboard_set_pininfo(b, 14, "I2S_CLK", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 216, 0, 62);
+    mraa_intel_minnowboard_set_pininfo(b, 15, "I2C_SDA", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 }, 242, 0, 88);
+    mraa_intel_minnowboard_set_pininfo(b, 16, "I2S_FRM", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 217, 0, 63);
+    mraa_intel_minnowboard_set_pininfo(b, 17, "UART2TX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 229, 0, 75);
+    mraa_intel_minnowboard_set_pininfo(b, 18, "I2S_DO", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 219, 0, 65);
+    mraa_intel_minnowboard_set_pininfo(b, 19, "UART2RX", (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 }, 228, 0, 74);
+    mraa_intel_minnowboard_set_pininfo(b, 20, "I2S_DI", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 218, 0, 64);
+    mraa_intel_minnowboard_set_pininfo(b, 21, "S5_0", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 82, 2, 0);
     mraa_intel_minnowboard_set_pininfo(b, 22, "PWM0", (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 },
-                     248); // Assume BIOS configured for PWM
-    mraa_intel_minnowboard_set_pininfo(b, 23, "S5_1", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 83);
+                     248, 0, 94); // Assume BIOS configured for PWM
+    mraa_intel_minnowboard_set_pininfo(b, 23, "S5_1", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 83, 2, 1);
     mraa_intel_minnowboard_set_pininfo(b, 24, "PWM1", (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 },
-                     249); // Assume BIOS configured for PWM
-    mraa_intel_minnowboard_set_pininfo(b, 25, "S5_4", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 84);
+                     249, 0, 95); // Assume BIOS configured for PWM
+    mraa_intel_minnowboard_set_pininfo(b, 25, "S5_4", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 84, 2, 2);
     if (turbot) {
-        mraa_intel_minnowboard_set_pininfo(b, 26, "I2S_MCLK", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 253);
-        mraa_intel_minnowboard_set_pininfo(b, 27, "S5_22", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 104);
+        mraa_intel_minnowboard_set_pininfo(b, 26, "I2S_MCLK", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 253, 0, 99);
+        mraa_intel_minnowboard_set_pininfo(b, 27, "D2_LED", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 104, 2, 22);
     } else {
-        mraa_intel_minnowboard_set_pininfo(b, 26, "IBL8254", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 208);
+        mraa_intel_minnowboard_set_pininfo(b, 26, "IBL8254", (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 }, 208, 0, 54);
     }
 
     // Set number of i2c adaptors usable from userspace
