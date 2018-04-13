@@ -10,7 +10,7 @@ For building imraa check @ref buildingimraa page.
 
 Not all these are required but if you're unsure of what you're doing this is
 what you'll need:
-* [SWIG](http://swig.org) 3.0.5+
+* [SWIG](http://swig.org) 3.0.5+ (3.0.12 recommended, on Xenial this can be installed via 3rd party PPAs)
 * [git](http://git-scm.com)
 * [python](http://python.org) 2.7 or 3.4+ (you'll need not just the interpreter but python-dev)
 * [node.js](http://nodejs.org) 4.x recommended (you'll need not just the interpreter but nodejs-dev)
@@ -22,6 +22,13 @@ For Debian-like distros the below command installs the basic set:
 ```bash
 sudo apt-get install git build-essential swig3.0 python-dev nodejs-dev cmake libjson-c-dev
 ```
+
+Adjust as needed, for instance Python 3 builds will require `python3-dev`.
+On Ubuntu Bionic you'll need to downgrade node.js (see [nodesource](https://github.com/nodesource/distributions)
+for some handy install scripts) or patch SWIG. This is explained more in the
+advanced dependencies list below.
+
+### Documentation dependencies
 
 To build the documentation you'll also need:
 * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) 1.8.9.1+
@@ -118,11 +125,36 @@ also use the node.js gyp build system to get node.js static bindings.
 
 ## Dependencies continued
 
-You'll need at least SWIG version 3.0.2 and we recommend 3.0.5 to build the
+You'll need at least SWIG version 3.0.2 and we recommend 3.0.12 to build the
 JavaScript & Python modules. If your version of SWIG is older than this then
 please see above for disabling `SWIGNODE`. Otherwise you will get a weird build
 failure when building the JavaScript module. The Python module builds with SWIG
 2.x but we don't test it.
+
+### JavaScript bindings for node.js 7.0.0+
+
+Building the JavaScript bindings using the latest versions of node.js does
+involve additional steps due to our dependency on SWIG. In short, a patch is
+needed to compile correctly with node.js 7.0.0 or newer. We found the install
+scripts from nodesource to be very handy for switching versions and they
+support all versions of Ubuntu.
+
+The patch applies cleanly on SWIG 3.0.12, available by default on Ubuntu Bionic
+and through 3rd party PPAs for older distributions. For example, with Xenial or
+Zesty you could use [this](https://launchpad.net/~timsc/+archive/ubuntu/swig-3.0.12).
+
+To patch SWIG on Ubuntu (assumes you start in the home folder):
+
+```
+wget https://git.yoctoproject.org/cgit.cgi/poky/plain/meta/recipes-devtools/swig/swig/0001-Add-Node-7.x-aka-V8-5.2-support.patch
+cd /usr/share/swig3.0
+sudo patch -p2 <~/0001-Add-Node-7.x-aka-V8-5.2-support.patch
+```
+
+Keep in mind that Ubuntu Bionic ships with node.js version 8. You'll need to
+either use the patch or downgrade node.js.
+
+### Build version
 
 During the build, we'll assume you're building from git, note that if you
 compile with `git` installed your version of mraa will be versioned with `git
