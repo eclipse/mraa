@@ -73,7 +73,7 @@ Installing on your board
 Installing on Ubuntu
 --------------------
 
-Here is a PPA for installing on ubuntu:
+Here is a PPA for installing on Ubuntu Xenial or Bionic:
 https://launchpad.net/~mraa/+archive/ubuntu/mraa
 
 ```bash
@@ -105,11 +105,12 @@ sudo zypper in mraa
 Installing for Node.js only
 ---------------------------
 
-> Note: Node.js 7.0.0+ is not currently supported. You'll have to downgrade to 6.x.x.
+> Note: Node.js 7.0.0+ is not currently supported unless compiling with a patched
+vesion of SWIG. See the corresponding section and document below.
 
 You can also install just the node.js mraa module by using npm. You will need a
 C++ compiler and the node development headers, however it's not required to
-have SWIG installed.
+have SWIG installed. This works for node versions 6.x.x and prior.
 
 ```bash
 npm install mraa
