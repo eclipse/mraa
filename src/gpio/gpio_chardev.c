@@ -295,6 +295,7 @@ mraa_get_line_info_by_chip_number(unsigned chip_number, unsigned line_number)
 
     linfo = mraa_get_line_info_from_descriptor(cinfo->chip_fd, line_number);
 
+    close(cinfo->chip_fd);
     free(cinfo);
 
     return linfo;
@@ -314,6 +315,7 @@ mraa_get_line_info_by_chip_name(const char* chip_name, unsigned line_number)
 
     linfo = mraa_get_line_info_from_descriptor(cinfo->chip_fd, line_number);
 
+    close(cinfo->chip_fd);
     free(cinfo);
 
     return linfo;
@@ -333,6 +335,7 @@ mraa_get_line_info_by_chip_label(const char* chip_label, unsigned line_number)
 
     linfo = mraa_get_line_info_from_descriptor(cinfo->chip_fd, line_number);
 
+    close(cinfo->chip_fd);
     free(cinfo);
 
     return linfo;
