@@ -297,15 +297,16 @@ mraa_ftdi_ft4222_i2c_read_internal(FT_HANDLE handle, uint8_t addr, uint8_t* data
 {
     uint16 bytesRead = 0;
     uint8 controllerStatus;
-    FT4222_STATUS ft4222Status = dl_FT4222_I2CMaster_Read(handle, addr, data, length, &bytesRead);
-    // mraa_ftdi_ft4222_i2c_log("FT4222_I2CMaster_Read", addr, data, length);
-    ft4222Status = dl_FT4222_I2CMaster_GetStatus(ftHandleI2c, &controllerStatus);
-    if (FT4222_OK != ft4222Status || I2CM_ERROR(controllerStatus)) {
+
+    /* If a read fails, check the I2C controller status, reset the controller, return 0? */
+    if(dl_FT4222_I2CMaster_Read(handle, addr, data, length, &bytesRead) != FT4222_OK) {
+        dl_FT4222_I2CMaster_GetStatus(ftHandleI2c, &controllerStatus);
+
         syslog(LOG_ERR, "FT4222_I2CMaster_Read failed for address %#02x. Code %d", addr, controllerStatus);
         dl_FT4222_I2CMaster_Reset(handle);
-        return 0;
+        bytesRead = 0;
     }
-    // syslog(LOG_NOTICE, "FT4222_I2CMaster_Read completed");
+
     return bytesRead;
 }
 
@@ -314,18 +315,20 @@ mraa_ftdi_ft4222_i2c_write_internal(FT_HANDLE handle, uint8_t addr, const uint8_
 {
     uint16 bytesWritten = 0;
     uint8 controllerStatus;
-    // mraa_ftdi_ft4222_i2c_log("FT4222_I2CMaster_Write", addr, data, bytesToWrite);
-    FT4222_STATUS ft4222Status = dl_FT4222_I2CMaster_Write(handle, addr, (uint8_t*) data, bytesToWrite, &bytesWritten);
-    ft4222Status = dl_FT4222_I2CMaster_GetStatus(ftHandleI2c, &controllerStatus);
-    if (FT4222_OK != ft4222Status || I2CM_ERROR(controllerStatus)) {
-        syslog(LOG_ERR, "FT4222_I2CMaster_Write failed address %#02x\n", addr);
+
+    /* If a write fails, check the I2C controller status, reset the controller, return 0? */
+    if(dl_FT4222_I2CMaster_Write(handle, addr, (uint8_t*) data, bytesToWrite, &bytesWritten)
+            != FT4222_OK) {
+        dl_FT4222_I2CMaster_GetStatus(ftHandleI2c, &controllerStatus);
+
+        syslog(LOG_ERR, "FT4222_I2CMaster_Write failed address %#02x. Code %d\n", addr, controllerStatus);
         dl_FT4222_I2CMaster_Reset(handle);
-        return 0;
+        bytesWritten = 0;
     }
+
     if (bytesWritten != bytesToWrite)
         syslog(LOG_ERR, "FT4222_I2CMaster_Write wrote %u of %u bytes.\n", bytesWritten, bytesToWrite);
 
-    // syslog(LOG_NOTICE, "FT4222_I2CMaster_Write completed");
     return bytesWritten;
 }
 
@@ -911,7 +914,7 @@ mraa_ftdi_ft4222_gpio_monitor(void *arg)
                 pthread_mutex_lock(&gpio_monitor.mutex);
                 for (i = 0; i < MAX_IO_EXPANDER_PINS; ++i) {
                     uint16_t mask = 1 << i;
-                    gpio_monitor.is_interrupt_detected[i] = change_value & mask ? 1 : 0;
+                    gpio_monitor.is_interrupt_detected[i] = (change_value & mask) ? 1 : 0;
                 }
                 pthread_mutex_unlock(&gpio_monitor.mutex);
                 prev_value = value;
@@ -1045,9 +1048,13 @@ mraa_ftdi_ft4222_populate_gpio_func_table(mraa_adv_func_t* func_table)
 mraa_board_t*
 mraa_ftdi_ft4222()
 {
+    mraa_pininfo_t* pins = NULL;
+    mraa_adv_func_t* func_table = NULL;
     mraa_board_t* sub_plat = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
+
     if (sub_plat == NULL)
-        return NULL;
+        goto mraa_ftdi_ft4222_fail;
+
     numI2cGpioExpanderPins = mraa_ftdi_ft4222_detect_io_expander();
     int pinIndex = 0;
     int numUsbGpio = numFt4222GpioPins + numI2cGpioExpanderPins;
@@ -1060,10 +1067,11 @@ mraa_ftdi_ft4222()
     sub_plat->platform_name = PLATFORM_NAME;
     sub_plat->phy_pin_count = numUsbPins;
     sub_plat->gpio_count = numUsbGpio;
-    mraa_pininfo_t* pins = (mraa_pininfo_t*) calloc(numUsbPins,sizeof(mraa_pininfo_t));
-    if (pins == NULL) {
-        return NULL;
-    }
+    pins = (mraa_pininfo_t*) calloc(numUsbPins,sizeof(mraa_pininfo_t));
+
+    if (pins == NULL)
+        goto mraa_ftdi_ft4222_fail;
+
     sub_plat->pins = pins;
 
     int bus = 0;
@@ -1110,7 +1118,7 @@ mraa_ftdi_ft4222()
         pinIndex++;
     }
 
-    // Now add any extra i2c busses behind i2c switch
+    // Now add any extra i2c buses behind i2c switch
     for (bus = 1; bus < numI2cBusses; ++bus) {
         sub_plat->i2c_bus[bus].bus_id = bus;
         sub_plat->pins[pinIndex].i2c.mux_total = 0;
@@ -1126,10 +1134,10 @@ mraa_ftdi_ft4222()
     }
 
     // Set override functions
-    mraa_adv_func_t* func_table = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
-    if (func_table == NULL) {
-        return NULL;
-    }
+    func_table = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+    if (func_table == NULL)
+        goto mraa_ftdi_ft4222_fail;
+
     mraa_ftdi_ft4222_populate_i2c_func_table(func_table);
     mraa_ftdi_ft4222_populate_gpio_func_table(func_table);
 
@@ -1137,9 +1145,17 @@ mraa_ftdi_ft4222()
 
     if (pthread_mutex_init(&ft4222_lock, NULL) != 0) {
         syslog(LOG_ERR, "Could not create mutex for FT4222 access");
-        return NULL;
+        goto mraa_ftdi_ft4222_fail;
     }
 
+    /* Success, return the sub platform */
     return sub_plat;
+
+mraa_ftdi_ft4222_fail:
+    if (!func_table) free(func_table);
+    if (!pins) free(pins);
+    if (!sub_plat) free(sub_plat);
+
+    return NULL;
 }
 
