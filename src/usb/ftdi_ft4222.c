@@ -63,7 +63,6 @@ static uint16_t pca9555DirectionValue = 0;
 static int bus_speed = 400;
 static int numFt4222GpioPins = 4;
 static int numI2cGpioExpanderPins = 8;
-static int numI2cSwitchBusses = 4;
 static int currentI2cBus = 0;
 static ft4222_io_exp_type gpio_expander_chip;
 static mraa_boolean_t libft4222_load_success = TRUE;
@@ -101,20 +100,6 @@ mraa_ftdi_ft4222_sleep_ms(unsigned long mseconds)
         ;
 }
 
-static unsigned int
-mraa_ftdi_ft4222_get_tick_count_ms()
-{
-    static unsigned int startTick = 0;
-    unsigned int ticks;
-    struct timeval now;
-    gettimeofday(&now, NULL);
-    ticks = now.tv_sec * 1000;
-    ticks += now.tv_usec / 1000;
-    if (startTick == 0)
-        startTick = ticks;
-    return ticks - startTick;
-}
-
 void *
 mraa_ftdi_ft4222_dlsym(const char *symbol)
 {
@@ -134,8 +119,6 @@ mraa_ftdi_ft4222_init()
     FT_DEVICE_LIST_INFO_NODE* devInfo = NULL;
     FT_STATUS ftStatus;
     DWORD numDevs = 0;
-    int i;
-    int retCode = 0;
 
     dl_FT_GetDeviceInfoList = mraa_ftdi_ft4222_dlsym("FT_GetDeviceInfoList");
     dl_FT_CreateDeviceInfoList = mraa_ftdi_ft4222_dlsym("FT_CreateDeviceInfoList");
@@ -308,20 +291,6 @@ mraa_ftdi_ft4222_get_version(unsigned int* versionChip, unsigned int* versionLib
 
 
 /******************* Private I2C functions *******************/
-
-static void
-mraa_ftdi_ft4222_i2c_log(char* msg, uint8_t addr, const uint8_t* data, int length)
-{
-    char buf[256];
-    int pos = sprintf(buf, "%s: %#02x ", msg, addr);
-    int i = 0;
-    pos += sprintf(&buf[pos], "{");
-    for (i = 0; i < length; ++i)
-       pos += sprintf(&buf[pos], "%#02x ", data[i]);
-    pos += sprintf(&buf[pos], "}");
-    syslog(LOG_NOTICE, "%s", buf);
-}
-
 
 static int
 mraa_ftdi_ft4222_i2c_read_internal(FT_HANDLE handle, uint8_t addr, uint8_t* data, int length)
@@ -559,10 +528,10 @@ mraa_ftdi_ft4222_i2c_frequency(mraa_i2c_context dev, mraa_i2c_mode_t mode)
         case MRAA_I2C_STD: /**< up to 100Khz */
             bus_speed = 100;
             break;
-        MRAA_I2C_FAST: /**< up to 400Khz */
+        case MRAA_I2C_FAST: /**< up to 400Khz */
             bus_speed = 400;
             break;
-        MRAA_I2C_HIGH: /**< up to 3.4Mhz */
+        case MRAA_I2C_HIGH: /**< up to 3.4Mhz */
             bus_speed = 3400;
             break;
     }
@@ -616,17 +585,22 @@ mraa_ftdi_ft4222_i2c_read_byte_data(mraa_i2c_context dev, uint8_t command)
 static int
 mraa_ftdi_ft4222_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
 {
-    uint8_t buf[2];
-    uint16_t data;
+    union i2c_read_buf {
+        uint8_t bytes[2];
+        uint16_t word;
+    } buf;
     int bytes_read = 0;
+
     pthread_mutex_lock(&ft4222_lock);
     int bytes_written = mraa_ftdi_ft4222_i2c_context_write(dev, &command, 1);
     if (bytes_written == 1)
-       bytes_read = mraa_ftdi_ft4222_i2c_context_read(dev, buf, 2);
+       bytes_read = mraa_ftdi_ft4222_i2c_context_read(dev, buf.bytes, 2);
     pthread_mutex_unlock(&ft4222_lock);
+
     if (bytes_read == 2) {
-        return (int) data;
+        return (int) buf.word;
     }
+
     return -1;
 }
 
@@ -900,7 +874,7 @@ static mraa_boolean_t
 mraa_ftdi_ft4222_has_internal_gpio_triggered(int pin)
 {
     uint16 num_events = 0;
-    FT4222_STATUS ft4222Status = dl_FT4222_GPIO_GetTriggerStatus(ftHandleGpio, pin, &num_events);
+    dl_FT4222_GPIO_GetTriggerStatus(ftHandleGpio, pin, &num_events);
     if (num_events > 0) {
         int i;
         uint16 num_events_read;
@@ -945,6 +919,7 @@ mraa_ftdi_ft4222_gpio_monitor(void *arg)
         }
         mraa_ftdi_ft4222_sleep_ms(20);
     }
+    return NULL;
 }
 
 
@@ -1003,6 +978,8 @@ mraa_ftdi_ft4222_gpio_interrupt_handler_init_replace(mraa_gpio_context dev)
             mraa_ftdi_ft4222_has_internal_gpio_triggered(GPIO_PORT_IO_INT);
             mraa_ftdi_ft4222_gpio_monitor_add_pin(dev->phy_pin);
             break;
+        default:
+            return MRAA_ERROR_INVALID_RESOURCE;
     }
     return MRAA_SUCCESS;
 }
@@ -1010,7 +987,7 @@ mraa_ftdi_ft4222_gpio_interrupt_handler_init_replace(mraa_gpio_context dev)
 static mraa_result_t
 mraa_ftdi_ft4222_gpio_wait_interrupt_replace(mraa_gpio_context dev)
 {
-    int prev_level = mraa_ftdi_ft4222_gpio_read_replace(dev);
+    mraa_ftdi_ft4222_gpio_read_replace(dev);
     ft4222_gpio_type gpio_type = mraa_ftdi_ft4222_get_gpio_type(dev->pin);
     mraa_boolean_t interrupt_detected = FALSE;
 
