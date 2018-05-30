@@ -179,51 +179,53 @@ mraa_ftdi_ft4222_init()
         syslog(LOG_ERR, "FT_GetDeviceInfoList failed (error code %d)\n", (int) ftStatus);
         goto init_exit;
     }
-    if (numDevs < 2) {
-        syslog(LOG_ERR, "No FT4222 devices connected.\n");
-        goto init_exit;
+
+    int first_4222_ndx = -1;
+    int ftdi_mode = -1;
+    /* Look for FT_DEVICE_4222H_0 devices. Print out all devices found. */
+    for (int i = 0; i < numDevs; i++)
+    {
+        /* Log info for debugging */
+        syslog(LOG_NOTICE, "  FTDI ndx: %02d id: 0x%08x %s description: '%s'\n",
+                i,
+                devInfo[i].ID,
+                (devInfo[i].Flags & 0x2) ? "High-speed USB" : "Full-speed USB",
+                devInfo[i].Description);
+
+        /* FTDI_4222 mode 3 provides 2 devices */
+        if ((first_4222_ndx == -1) && (devInfo[i].Type == FT_DEVICE_4222H_0) &&
+            ((i + 1 < numDevs) && (devInfo[i].ID == devInfo[i + 1].ID))) {
+            first_4222_ndx = i;
+            ftdi_mode = 3;
+        }
+        /* FTDI_4222 mode 0 provides 1 device */
+        else if ((first_4222_ndx == -1) && (devInfo[i].Type == FT_DEVICE_4222H_0)) {
+            first_4222_ndx = i;
+            ftdi_mode = 0;
+        }
     }
-    if(numDevs > 2) {
-        syslog(LOG_ERR, "CNFMODE not supported. Valid modes are 0 or 3.\n");
+
+    /* Was a usable 4222 found? */
+    if (first_4222_ndx == -1) {
+        syslog(LOG_ERR, "No FT4222 (mode 0 or 3) devices found.\n");
         goto init_exit;
     }
 
-    // FIXME: Assumes just one physical FTDI device present
-    DWORD locationIdI2c = 0;
-    DWORD locationIdGpio = 0;
-    if (devInfo[0].Type == FT_DEVICE_4222H_0)
-            locationIdI2c = devInfo[0].LocId;
-    if (devInfo[1].Type == FT_DEVICE_4222H_0)
-            locationIdGpio = devInfo[1].LocId;
+    syslog(LOG_NOTICE, "FTDI 4222 device found at ndx: %02d, mode %d\n", first_4222_ndx, ftdi_mode);
 
+    /* Both modes provide a SPI/I2C at the first ndx */
+    syslog(LOG_NOTICE, "FTDI ndx: %02d initializing as SPI/I2C\n", first_4222_ndx);
+
+    /* Setup I2c */
+    DWORD locationIdI2c = devInfo[first_4222_ndx].LocId;
     if (locationIdI2c == 0) {
-        syslog(LOG_ERR, "FT_GetDeviceInfoList contains no I2C controllers\n");
-        goto init_exit;
-    }
-
-    if (locationIdGpio == 0) {
-        syslog(LOG_ERR, "FT_GetDeviceInfoList contains no GPIO controllers\n");
+        syslog(LOG_ERR, "No I2C controller for FTDI_4222 device\n");
         goto init_exit;
     }
 
     ftStatus = dl_FT_OpenEx((PVOID)(uintptr_t) locationIdI2c, FT_OPEN_BY_LOCATION, &ftHandleI2c);
     if (ftStatus != FT_OK) {
         syslog(LOG_ERR, "FT_OpenEx failed (error %d)\n", (int) ftStatus);
-        goto init_exit;
-    }
-
-    ftStatus = dl_FT_OpenEx((PVOID)(uintptr_t) locationIdGpio, FT_OPEN_BY_LOCATION, &ftHandleGpio);
-    if (ftStatus != FT_OK) {
-        syslog(LOG_ERR, "FT_OpenEx failed (error %d)\n", (int) ftStatus);
-        goto init_exit;
-    }
-
-    dl_FT4222_SetSuspendOut(ftHandleGpio, 0);
-    dl_FT4222_SetWakeUpInterrupt(ftHandleGpio, 0);
-    ftStatus =  dl_FT4222_GPIO_Init(ftHandleGpio, pinDirection);
-    if (ftStatus != FT_OK) {
-        syslog(LOG_ERR, "FT4222_GPIO_Init failed (error %d)\n", (int) ftStatus);
-        mraaStatus = MRAA_ERROR_NO_RESOURCES;
         goto init_exit;
     }
 
@@ -238,6 +240,38 @@ mraa_ftdi_ft4222_init()
     if (FT4222_OK != ft4222Status) {
         syslog(LOG_ERR, "FT4222_I2CMaster_Reset failed (error %d)!\n", ft4222Status);
         goto init_exit;
+    }
+
+    /* Mode 3 adds 1 GPIO device */
+    if (ftdi_mode == 3) {
+        syslog(LOG_NOTICE, "FTDI ndx: %02d initializing as GPIO device\n", first_4222_ndx + 1);
+
+        /* Setup I2c */
+
+        // FIXME: Assumes just one physical FTDI device present
+        DWORD locationIdGpio = devInfo[first_4222_ndx + 1].LocId;
+
+
+        if (locationIdGpio == 0) {
+            syslog(LOG_ERR, "No GPIO controller for FTDI_4222 device\n");
+            goto init_exit;
+        }
+
+
+        ftStatus = dl_FT_OpenEx((PVOID)(uintptr_t) locationIdGpio, FT_OPEN_BY_LOCATION, &ftHandleGpio);
+        if (ftStatus != FT_OK) {
+            syslog(LOG_ERR, "FT_OpenEx failed (error %d)\n", (int) ftStatus);
+            goto init_exit;
+        }
+
+        dl_FT4222_SetSuspendOut(ftHandleGpio, 0);
+        dl_FT4222_SetWakeUpInterrupt(ftHandleGpio, 0);
+        ftStatus =  dl_FT4222_GPIO_Init(ftHandleGpio, pinDirection);
+        if (ftStatus != FT_OK) {
+            syslog(LOG_ERR, "FT4222_GPIO_Init failed (error %d)\n", (int) ftStatus);
+            mraaStatus = MRAA_ERROR_NO_RESOURCES;
+            goto init_exit;
+        }
     }
 
     mraaStatus = MRAA_SUCCESS;
