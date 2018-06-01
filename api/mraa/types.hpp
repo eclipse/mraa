@@ -55,6 +55,7 @@ typedef enum {
     PHYBOARD_WEGA = 14,        /**< The phyBOARD-Wega */
     DE_NANO_SOC = 15,          /**< Terasic DE-Nano-SoC Board */
     INTEL_UP2 = 16,            /**< The UP^2 Board */
+    IEI_TANK = 19,             /**< IEI Tank System*/
 
     FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 

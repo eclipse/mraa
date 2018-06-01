@@ -39,6 +39,7 @@
 #include "x86/up.h"
 #include "x86/up2.h"
 #include "x86/intel_joule_expansion.h"
+#include "x86/iei_tank.h"
 
 mraa_platform_t
 mraa_x86_platform()
@@ -102,6 +103,9 @@ mraa_x86_platform()
             } else if (strncasecmp(line, "SDS", strlen("SDS") + 1) == 0) {
                 platform_type = MRAA_INTEL_JOULE_EXPANSION;
                 plat = mraa_joule_expansion_board();
+            } else if ((strncasecmp(line, "SAF3", strlen("SAF3") + 1) == 0) ) {
+                platform_type = MRAA_IEI_TANK;
+                plat = mraa_iei_tank();
             } else {
                 syslog(LOG_ERR, "Platform not supported, not initialising");
                 platform_type = MRAA_UNKNOWN_PLATFORM;
