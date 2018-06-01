@@ -80,13 +80,6 @@ mraa_platform_t mraa_mips_platform();
 mraa_platform_t mraa_mock_platform();
 
 /**
- * runtime detect running usb platform extender
- *
- * @return mraa_platform_t of the detected platform extender
- */
-mraa_platform_t mraa_usb_platform_extender(mraa_board_t* board);
-
-/**
  * runtime detect iio subsystem
  *
  * @return mraa_result_t indicating success of iio detection

@@ -29,6 +29,7 @@
 #endif
 
 #include <stddef.h>
+#include <dlfcn.h>
 #include <stdlib.h>
 #include <sched.h>
 #include <string.h>
@@ -195,18 +196,21 @@ imraa_init()
     }
 
 #if defined(USBPLAT)
-    // Now detect sub platform, note this is not an else since we could be in
-    // an error case and fall through to MRAA_ERROR_PLATFORM_NOT_INITIALISED
-    if (plat != NULL) {
-        mraa_platform_t usb_platform_type = mraa_usb_platform_extender(plat);
-        // if we have no known platform just replace usb platform with platform
-        if (plat->platform_type == MRAA_UNKNOWN_PLATFORM && usb_platform_type != MRAA_UNKNOWN_PLATFORM) {
-            plat->platform_type = usb_platform_type;
-        }
-    }
-    if (plat == NULL) {
-        printf("mraa: FATAL error, failed to initialise platform\n");
-        return MRAA_ERROR_PLATFORM_NOT_INITIALISED;
+    syslog(LOG_NOTICE, "Searching for USB plaform extender libraries...");
+    /* If a usb platform lib is present, attempt to load and look for
+     * necessary symbols for adding extended I/O */
+    void* usblib = dlopen("libmraa-platform-ft4222.so", RTLD_LAZY);
+    if (usblib)
+    {
+        syslog(LOG_NOTICE, "Found USB platform extender library: libmraa-platform-ft4222.so");
+        syslog(LOG_NOTICE, "Detecting FT4222 subplatforms...");
+        fptr_add_platform_extender add_ft4222_platform =
+            (fptr_add_platform_extender)dlsym(usblib, "mraa_usb_platform_extender");
+
+        /* If this method exists, call it to add a subplatform */
+        syslog(LOG_NOTICE, "Detecting FT4222 subplatforms complete, found %i subplatform/s",
+                ((add_ft4222_platform != NULL) && (add_ft4222_platform(plat) == MRAA_SUCCESS))
+                ? 1 : 0);
     }
 #endif
 
@@ -273,7 +277,8 @@ mraa_deinit()
             free(plat->adv_func);
         }
         mraa_board_t* sub_plat = plat->sub_platform;
-        if (sub_plat != NULL) {
+        /* No alloc's in an FTDI_FT4222 platform structure */
+        if ((sub_plat != NULL) && (sub_plat->platform_type != MRAA_FTDI_FT4222)) {
             if (sub_plat->pins != NULL) {
                 free(sub_plat->pins);
             }

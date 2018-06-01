@@ -176,22 +176,26 @@ endif()
 
 if (USBPLAT)
   message (STATUS "INFO - Adding USB platforms")
+  # USBPLAT is used in mraa.c to decide whether to attempt to load sub-platforms
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUSBPLAT=1")
+  # Loading an FTDI platform extender library using dlopen requires
+  # mraa to link against libdl.  Mraa does NOT link directly to the
+  # FT4222 shim library.
+  set (mraa_LIBS ${mraa_LIBS} dl)
   if (FTDID2xx)
     find_package (Ftd2xx)
     if (${LIBFTD2XX_FOUND})
-      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFTDID2XX=1")
       set (mraa_LIBS ${mraa_LIBS} ${LIBFTD2XX_LIBRARIES})
     else ()
       message (SEND_ERROR "Enabled FTDID2xx support but library not found")
     endif ()
   endif ()
+  # The FTDI4222 shim includes libft4222.h (which includes ftd2xx.h), make sure
+  # both exist if building the FTDI4222 shim library
   if (FTDI4222)
+    find_package (Ftd2xx REQUIRED)
     find_package (Ftd4222)
-    if (${LIBFT4222_FOUND})
-      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DFTDI4222=1")
-      set (mraa_LIBS ${mraa_LIBS} dl)
-    else ()
+    if (NOT ${LIBFT4222_FOUND})
       message (SEND_ERROR "Enabled FTDI4222 support but library not found")
     endif ()
   endif ()

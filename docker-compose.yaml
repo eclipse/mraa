@@ -108,6 +108,7 @@ services:
   ftdi4442:
     extends: all
     environment:
+      - USBPLAT=ON
       - FTDI4222=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
 

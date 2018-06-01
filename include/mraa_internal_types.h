@@ -497,3 +497,15 @@ typedef struct {
     uint8_t iio_device_count; /**< IIO device count */
 } mraa_iio_info_t;
 #endif
+
+/**
+ * Function pointer typedef for use with platform extender libraries.
+ * Currently only the FT42222.
+ *
+ * @param board Pointer to valid board structure.  If a mraa_board_t
+ * is initialized, it will be added to board->sub_platform
+ *
+ * @return MRAA_SUCCESS if a valid subplaform has been initialized,
+ * otherwise return MRAA_ERROR_PLATFORM_NOT_INITIALISED
+ */
+typedef mraa_result_t (*fptr_add_platform_extender)(mraa_board_t* board);
