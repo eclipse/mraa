@@ -32,6 +32,7 @@ X86
 * [UP](../master/docs/up.md)
 * [UP Squared](../master/docs/up2.md)
 * [Intel Joule](../master/docs/joule.md)
+* [IEI Tank](../master/docs/iei-tank.md)
 
 ARM
 ---

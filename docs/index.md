@@ -59,6 +59,7 @@ Specific platform information for supported platforms is documented here:
 - @ref mock
 - @ref linkit_7688
 - @ref omega2
+- @ref iei-tank
 
 ## DEBUGGING
 
