@@ -1142,7 +1142,7 @@ mraa_link_targets(const char* filename, const char* targetname)
 }
 
 mraa_result_t
-mraa_find_uart_bus_pci(const char* pci_dev_path, char* dev_name)
+mraa_find_uart_bus_pci(const char* pci_dev_path, char** dev_name)
 {
     char path[PATH_MAX];
     const int max_allowable_len = 16;
@@ -1158,14 +1158,14 @@ mraa_find_uart_bus_pci(const char* pci_dev_path, char* dev_name)
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
-    dev_name = (char*) malloc(sizeof(char) * max_allowable_len);
+    *dev_name = (char*) malloc(sizeof(char) * max_allowable_len);
 
-    snprintf(dev_name, max_allowable_len, "/dev/%s", namelist[n - 1]->d_name);
+    snprintf(*dev_name, max_allowable_len, "/dev/%s", namelist[n - 1]->d_name);
     while (n--) {
         free(namelist[n]);
     }
     free(namelist);
-    syslog(LOG_INFO, "UART device: %s selected for initialization", dev_name);
+    syslog(LOG_INFO, "UART device: %s selected for initialization", *dev_name);
     return MRAA_SUCCESS;
 }
 

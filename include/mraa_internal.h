@@ -176,7 +176,7 @@ int mraa_find_i2c_bus_pci(const char* pci_device, const char *pci_id, const char
  * @param dev_name as retrieved from pci_dev_path
  * @return Result of the operation
  */
-mraa_result_t mraa_find_uart_bus_pci(const char* pci_dev_path, char* dev_name);
+mraa_result_t mraa_find_uart_bus_pci(const char* pci_dev_path, char** dev_name);
 
 #if defined(IMRAA)
 /**
