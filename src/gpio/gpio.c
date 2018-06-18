@@ -172,8 +172,18 @@ mraa_gpio_init(int pin)
         return NULL;
     }
 
-    if (mraa_is_sub_platform_id(pin)) {
-        syslog(LOG_NOTICE, "gpio%i: init: Using sub platform", pin);
+    /* If this pin belongs to a subplatform, then the pin member will contain
+     * the mraa pin index and the phy_pin will contain the subplatform's
+     * pin index.
+     *      example:  pin 515, dev->pin = 515, dev->phy_pin = 3
+     */
+    if (mraa_is_sub_platform_id(pin) && (board->sub_platform != NULL)) {
+        syslog(LOG_NOTICE, "gpio%i: initialised on sub platform '%s' physical pin: %i",
+                pin,
+                board->sub_platform->platform_name != NULL ?
+                board->sub_platform->platform_name : "",
+                mraa_get_sub_platform_index(pin));
+
         board = board->sub_platform;
         if (board == NULL) {
             syslog(LOG_ERR, "gpio%i: init: Sub platform not initialised", pin);
@@ -599,7 +609,10 @@ mraa_gpio_interrupt_handler(void* arg)
         return NULL;
     }
 
-    if (plat->chardev_capable) {
+    /* Is this pin on a subplatform? Do nothing... */
+    if (mraa_is_sub_platform_id(dev->pin)) {}
+    /* Is the platform chardev_capable? */
+    else if (plat->chardev_capable) {
         mraa_gpiod_group_t gpio_group;
 
         for_each_gpio_group(gpio_group, dev) {
@@ -607,7 +620,9 @@ mraa_gpio_interrupt_handler(void* arg)
                 fps[idx++] = gpio_group->event_handles[i];
             }
         }
-    } else {
+    }
+    /* Else, attempt fs access */
+    else {
         mraa_gpio_context it = dev;
 
         while (it) {
@@ -901,7 +916,7 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
     dev->isr_thread_terminating = 1;
 
     // stop isr being useful
-    if (plat->chardev_capable)
+    if (plat && (plat->chardev_capable))
         _mraa_close_gpio_event_handles(dev);
     else
         ret = mraa_gpio_edge_mode(dev, MRAA_GPIO_EDGE_NONE);
@@ -1561,7 +1576,10 @@ mraa_gpio_close(mraa_gpio_context dev)
         free(dev->events);
     }
 
-    if (plat->chardev_capable) {
+    /* Free any ISRs */
+    mraa_gpio_isr_exit(dev);
+
+    if (plat && plat->chardev_capable) {
         _mraa_free_gpio_groups(dev);
 
         free(dev);
