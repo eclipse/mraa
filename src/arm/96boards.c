@@ -41,6 +41,7 @@
 #define PLATFORM_NAME_HIKEY "HIKEY"
 #define PLATFORM_NAME_HIKEY960 "HIKEY960"
 #define PLATFORM_NAME_BBGUM "BBGUM"
+#define PLATFORM_NAME_ROCK960 "ROCK960"
 #define MAX_SIZE 64
 #define MMAP_PATH "/dev/mem"
 #define DB410C_MMAP_REG 0x01000000
@@ -89,6 +90,13 @@ const char* hikey960_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyAMA3", 
 int bbgum_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 155, 154 };
 
 const char* bbgum_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyS3", "/dev/ttyS5" };
+
+// Rock960
+int rock960_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = { 
+    1006, 1002, 1041, 1042, 1121, 1128, 1124, 1131, 1125, 1132, 1050, 1055 
+};
+
+const char* rock960_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyS3", "/dev/ttyS4" };
 
 // MMAP
 static uint8_t* mmap_reg = NULL;
@@ -263,6 +271,11 @@ mraa_96boards()
             b->uart_dev[0].device_path = (char*) hikey960_serialdev[0];
             b->uart_dev[1].device_path = (char*) hikey960_serialdev[1];
             b->chardev_capable = 1;
+        } else if (mraa_file_contains(DT_BASE "/model", "ROCK960")) {
+            b->platform_name = PLATFORM_NAME_ROCK960;
+            ls_gpio_pins = rock960_ls_gpio_pins;
+            b->uart_dev[0].device_path = (char*) rock960_serialdev[0];
+            b->uart_dev[1].device_path = (char*) rock960_serialdev[1];
         } else if (mraa_file_contains(DT_BASE "/model", "s900")) {
             b->platform_name = PLATFORM_NAME_BBGUM;
             ls_gpio_pins = bbgum_ls_gpio_pins;
@@ -281,6 +294,11 @@ mraa_96boards()
         b->def_i2c_bus = 0;
         b->i2c_bus[0].bus_id = 1;
         b->i2c_bus[1].bus_id = 2;
+    } else if (strncmp(b->platform_name, PLATFORM_NAME_ROCK960, MAX_SIZE) == 0) {
+        b->i2c_bus_count = MRAA_96BOARDS_LS_I2C_COUNT;
+        b->def_i2c_bus = 0;
+        b->i2c_bus[0].bus_id = 6;
+        b->i2c_bus[1].bus_id = 1;
     } else {
         b->i2c_bus_count = MRAA_96BOARDS_LS_I2C_COUNT;
         b->def_i2c_bus = 0;

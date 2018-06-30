@@ -13,6 +13,7 @@ Board Support
 - [HiKey](http://www.96boards.org/product/hikey/)
 - [HiKey960](http://www.96boards.org/product/hikey960/)
 - [Bubblegum-96](http://www.96boards.org/product/bubblegum-96/)
+- [Rock960](http://www.96boards.org/product/rock960/)
 
 Interface notes
 ---------------
