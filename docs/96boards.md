@@ -8,11 +8,11 @@ Standardized expansion buses for peripheral I/O have led to a wide range of comp
 Board Support
 -------------
 
+- [Bubblegum-96](http://www.96boards.org/product/bubblegum-96/)
 - [DragonBoard 410c](http://www.96boards.org/product/dragonboard410c/)
 - [DragonBoard 820c](http://www.96boards.org/product/dragonboard820c/)
 - [HiKey](http://www.96boards.org/product/hikey/)
 - [HiKey960](http://www.96boards.org/product/hikey960/)
-- [Bubblegum-96](http://www.96boards.org/product/bubblegum-96/)
 - [Rock960](http://www.96boards.org/product/rock960/)
 
 Interface notes
