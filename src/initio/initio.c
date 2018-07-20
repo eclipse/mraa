@@ -291,6 +291,7 @@ parse_pwm(char** proto, size_t n)
     return dev;
 }
 
+#if !defined(PERIPHERALMAN)
 static mraa_iio_context
 parse_iio(char** proto, size_t n)
 {
@@ -313,6 +314,7 @@ parse_iio(char** proto, size_t n)
 
     return dev;
 }
+#endif
 
 static mraa_i2c_context
 parse_i2c(char** proto, size_t n)
@@ -633,7 +635,9 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
                     new_desc->gpios[new_desc->n_gpio++] = dev;
                 }
             }
-        } else if (strncmp(str_tokens[0], IIO_KEY, strlen(IIO_KEY)) == 0 &&
+        }
+#if !defined(PERIPHERALMAN)
+        else if (strncmp(str_tokens[0], IIO_KEY, strlen(IIO_KEY)) == 0 &&
                    strlen(str_tokens[0]) == strlen(IIO_KEY)) {
             mraa_iio_context dev = parse_iio(str_tokens, num_desc_tokens);
             if (!dev) {
@@ -650,7 +654,9 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
                     new_desc->iios[new_desc->n_iio++] = dev;
                 }
             }
-        } else if (strncmp(str_tokens[0], I2C_KEY, strlen(I2C_KEY)) == 0 &&
+        }
+#endif
+        else if (strncmp(str_tokens[0], I2C_KEY, strlen(I2C_KEY)) == 0 &&
                    strlen(str_tokens[0]) == strlen(I2C_KEY)) {
             mraa_i2c_context dev = parse_i2c(str_tokens, num_desc_tokens);
             if (!dev) {
@@ -807,12 +813,14 @@ mraa_io_close(mraa_io_descriptor* desc)
         free(desc->i2cs);
     }
 
+#if !defined(PERIPHERALMAN)
     for (int i = 0; i < desc->n_iio; ++i) {
         mraa_iio_close(desc->iios[i]);
     }
     if (desc->n_iio) {
         free(desc->iios);
     }
+#endif
 
     for (int i = 0; i < desc->n_pwm; ++i) {
         mraa_pwm_close(desc->pwms[i]);

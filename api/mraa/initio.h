@@ -40,7 +40,11 @@ extern "C" {
 #include "aio.h"
 #include "gpio.h"
 #include "i2c.h"
+
+#if !defined(PERIPHERALMAN)
 #include "iio.h"
+#endif
+
 #include "pwm.h"
 #include "spi.h"
 #include "uart.h"
@@ -53,8 +57,10 @@ typedef struct _mraa_io_descriptor {
     mraa_gpio_context* gpios;
     int n_i2c;
     mraa_i2c_context* i2cs;
+#if !defined(PERIPHERALMAN)
     int n_iio;
     mraa_iio_context* iios;
+#endif
     int n_pwm;
     mraa_pwm_context* pwms;
     int n_spi;

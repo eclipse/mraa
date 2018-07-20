@@ -32,7 +32,11 @@
 #include "aio.hpp"
 #include "gpio.hpp"
 #include "i2c.hpp"
+
+#if !defined(PERIPHERALMAN)
 #include "iio.hpp"
+#endif
+
 #include "pwm.hpp"
 #include "spi.hpp"
 #include "uart.hpp"
@@ -67,10 +71,12 @@ class MraaIo
             i2cs.emplace_back(descs->i2cs[i]);
         }
 
+#if !defined(PERIPHERALMAN)
         iios.reserve(descs->n_iio);
         for (int i = 0; i < descs->n_iio; ++i) {
             iios.emplace_back(descs->iios[i]);
         }
+#endif
 
         pwms.reserve(descs->n_pwm);
         for (int i = 0; i < descs->n_pwm; ++i) {
@@ -116,9 +122,11 @@ class MraaIo
         if (descs->n_i2c) {
             free(descs->i2cs);
         }
+#if !defined(PERIPHERALMAN)
         if (descs->n_iio) {
             free(descs->iios);
         }
+#endif
         if (descs->n_pwm) {
             free(descs->pwms);
         }
@@ -140,7 +148,9 @@ class MraaIo
     std::vector<Aio> aios;
     std::vector<Gpio> gpios;
     std::vector<I2c> i2cs;
+#if !defined(PERIPHERALMAN)
     std::vector<Iio> iios;
+#endif
     std::vector<Pwm> pwms;
     std::vector<Spi> spis;
     std::vector<Uart> uarts;
