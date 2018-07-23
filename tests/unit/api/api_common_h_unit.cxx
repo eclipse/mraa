@@ -111,10 +111,6 @@ TEST_F(api_common_h_unit, test_libmraa_common_methods)
 
         /* MOCK does NOT have a subplatform */
         ASSERT_FALSE(mraa_has_sub_platform());
-
-        /* Test the string init methods (via the internal struct type) */
-        struct _gpio* sg0 = (struct _gpio*)mraa_init_io("GPIO-0");
-        ASSERT_EQ(0, sg0->pin);
     }
 
     /* Set the priority of this process */
