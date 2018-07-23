@@ -38,11 +38,24 @@
 static mraa_result_t
 mraa_atoi_x(const char* intStr, char** str_end, int* value, int base)
 {
-    long val = strtol(intStr, str_end, base);
+    char *lendptr;
+    long val = strtol(intStr, &lendptr, base);
+
+    /* Test for no-conversion */
+    if (intStr == lendptr) {
+        return MRAA_ERROR_UNSPECIFIED;
+    }
+
+    /* Test for overflow/underflow for a long int */
     if (errno == ERANGE || val > INT_MAX || val < INT_MIN) {
         *value = 0;
         return MRAA_ERROR_UNSPECIFIED;
     }
+
+    if (str_end) {
+        *str_end = lendptr;
+    }
+
     *value = (int) val;
     return MRAA_SUCCESS;
 }
@@ -88,9 +101,9 @@ mraa_delete_tokenized_string(char** str, int num_tokens)
 }
 
 static mraa_uart_ow_context
-parse_uart_ow(char** proto, size_t n)
+parse_uart_ow(char** proto, size_t n, const char* proto_full)
 {
-    if (proto == NULL || n <= 1) {
+    if (!proto || (n <= 1) || (!proto_full)) {
         syslog(LOG_ERR, "parse_uart_ow: invalid parameters");
         return NULL;
     }
@@ -101,19 +114,21 @@ parse_uart_ow(char** proto, size_t n)
     if (proto[1] && (mraa_atoi_x(proto[1], NULL, &bus, 0) == MRAA_SUCCESS)) {
         dev = mraa_uart_ow_init(bus);
         if (dev == NULL) {
-            syslog(LOG_ERR, "parse_uart_ow: could not init uart_ow bus %d", bus);
+            syslog(LOG_ERR, "parse_uart_ow: could not init uart_ow bus '%d' from '%s'",
+                    bus, proto_full);
         }
     } else {
-        syslog(LOG_ERR, "parse_uart_ow: invalid uart_ow bus number");
+        syslog(LOG_ERR, "parse_uart_ow: invalid uart_ow bus number '%s' from '%s'",
+                proto[1], proto_full);
     }
 
     return dev;
 }
 
 static mraa_uart_context
-parse_uart(char** proto, size_t n)
+parse_uart(char** proto, size_t n, const char* proto_full)
 {
-    if (proto == NULL || n <= 1) {
+    if (!proto || (n <= 1) || (!proto_full)) {
         syslog(LOG_ERR, "parse_uart: invalid parameters");
         return NULL;
     }
@@ -125,7 +140,8 @@ parse_uart(char** proto, size_t n)
     if (proto[idx] && (mraa_atoi_x(proto[idx], NULL, &uart, 0) == MRAA_SUCCESS)) {
         dev = mraa_uart_init(uart);
         if (dev == NULL) {
-            syslog(LOG_ERR, "parse_uart: could not init uart index %d", uart);
+            syslog(LOG_ERR, "parse_uart: could not init uart index '%d' from '%s'",
+                    uart, proto_full);
             return NULL;
         } else {
             if (++idx == n) {
@@ -133,15 +149,17 @@ parse_uart(char** proto, size_t n)
             }
         }
     } else {
-        syslog(LOG_ERR, "parse_uart: invalid uart index");
+        syslog(LOG_ERR, "parse_uart: invalid uart index '%s' from '%s'",
+                proto[idx], proto_full);
         return NULL;
     }
 
     /* Check for baudrate. */
     unsigned int baudrate = -1;
-    if (proto[idx] && (mraa_atoi_x(proto[idx], NULL, &baudrate, 0) == MRAA_SUCCESS)) {
+    if (proto[idx] && (mraa_atoi_x(proto[idx], NULL, (int*)&baudrate, 0) == MRAA_SUCCESS)) {
         if (mraa_uart_set_baudrate(dev, baudrate) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_uart: could not set uart baudrate %d", baudrate);
+            syslog(LOG_ERR, "parse_uart: could not set uart baudrate '%d' from '%s'",
+                    baudrate, proto_full);
             mraa_uart_stop(dev);
             return NULL;
         } else {
@@ -150,15 +168,18 @@ parse_uart(char** proto, size_t n)
             }
         }
     } else {
-        syslog(LOG_ERR, "parse_uart: invalid uart baudrate");
+        syslog(LOG_ERR, "parse_uart: invalid uart baudrate '%s' from '%s'",
+                proto[idx], proto_full);
     }
 
     /* Check for mode - [int] bytesize, [mraa_uart_parity_t] parity, [int] stopbits. */
-    char* end = proto[idx];
+    char* end = NULL;
+
     /* Check for bytesize. */
     int bytesize = -1;
     if (mraa_atoi_x(proto[idx], &end, &bytesize, 0) != MRAA_SUCCESS) {
-        syslog(LOG_ERR, "parse_uart: error reading uart bytesize %d", bytesize);
+        syslog(LOG_ERR, "parse_uart: error reading uart bytesize '%d' from '%s'",
+                bytesize, proto_full);
         mraa_uart_stop(dev);
         return NULL;
     }
@@ -182,20 +203,23 @@ parse_uart(char** proto, size_t n)
     }
 
     if (parity == -1) {
-        syslog(LOG_ERR, "parse_uart: error reading uart parity");
+        syslog(LOG_ERR, "parse_uart: error reading uart parity '%s' from '%s'",
+                end, proto_full);
         mraa_uart_stop(dev);
         return NULL;
     }
 
     int stopbits = -1;
     if (mraa_atoi_x(end, NULL, &stopbits, 0) != MRAA_SUCCESS) {
-        syslog(LOG_ERR, "parse_uart: error reading uart bytesize %d", bytesize);
+        syslog(LOG_ERR, "parse_uart: error reading uart bytesize '%d' from '%s'",
+                bytesize, proto_full);
         mraa_uart_stop(dev);
         return NULL;
     }
 
     if (mraa_uart_set_mode(dev, bytesize, (mraa_uart_parity_t) parity, stopbits) != MRAA_SUCCESS) {
-        syslog(LOG_ERR, "parse_uart: error setting up uart mode");
+        syslog(LOG_ERR, "parse_uart: error setting up uart mode '%s' from '%s'",
+                proto[idx], proto_full);
         mraa_uart_stop(dev);
         return NULL;
     }
@@ -204,9 +228,9 @@ parse_uart(char** proto, size_t n)
 }
 
 static mraa_spi_context
-parse_spi(char** proto, size_t n)
+parse_spi(char** proto, size_t n, const char* proto_full)
 {
-    if (proto == NULL || n <= 1) {
+    if (!proto || (n <= 1) || (!proto_full)) {
         syslog(LOG_ERR, "parse_spi: invalid parameters");
         return NULL;
     }
@@ -218,7 +242,8 @@ parse_spi(char** proto, size_t n)
     if (proto[idx] && (mraa_atoi_x(proto[idx], NULL, &bus, 0) == MRAA_SUCCESS)) {
         dev = mraa_spi_init(bus);
         if (dev == NULL) {
-            syslog(LOG_ERR, "parse_spi: could not init spi bus %d", bus);
+            syslog(LOG_ERR, "parse_spi: could not init spi bus '%d' from '%s'",
+                    bus, proto_full);
             return NULL;
         } else {
             if (++idx == n) {
@@ -226,7 +251,8 @@ parse_spi(char** proto, size_t n)
             }
         }
     } else {
-        syslog(LOG_ERR, "parse_spi: invalid spi bus number");
+        syslog(LOG_ERR, "parse_spi: invalid spi bus number '%s' from '%s'",
+                proto[idx], proto_full);
         return NULL;
     }
 
@@ -244,7 +270,8 @@ parse_spi(char** proto, size_t n)
 
     if (mode != -1) {
         if (mraa_spi_mode(dev, (mraa_spi_mode_t) mode) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_spi: error setting up spi mode %s", proto[idx]);
+            syslog(LOG_ERR, "parse_spi: error setting up spi mode '%s' from '%s'",
+                    proto[idx], proto_full);
             mraa_spi_stop(dev);
             return NULL;
         } else {
@@ -257,21 +284,23 @@ parse_spi(char** proto, size_t n)
     int frequency;
     if (proto[idx] && (mraa_atoi_x(proto[idx], NULL, &frequency, 0) == MRAA_SUCCESS)) {
         if (mraa_spi_frequency(dev, frequency) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_spi: error setting up spi frequency %d", frequency);
+            syslog(LOG_ERR, "parse_spi: error setting up spi frequency '%d' from '%s'",
+                    frequency, proto_full);
             mraa_spi_stop(dev);
             return NULL;
         }
     } else {
-        syslog(LOG_ERR, "parse_spi: invalid spi frequency");
+        syslog(LOG_ERR, "parse_spi: invalid spi frequency '%s' from '%s'",
+                proto[idx], proto_full);
     }
 
     return dev;
 }
 
 static mraa_pwm_context
-parse_pwm(char** proto, size_t n)
+parse_pwm(char** proto, size_t n, const char* proto_full)
 {
-    if (proto == NULL || n <= 1) {
+    if (!proto || (n <= 1) || (!proto_full)) {
         syslog(LOG_ERR, "parse_pwm: invalid parameters");
         return NULL;
     }
@@ -293,9 +322,9 @@ parse_pwm(char** proto, size_t n)
 
 #if !defined(PERIPHERALMAN)
 static mraa_iio_context
-parse_iio(char** proto, size_t n)
+parse_iio(char** proto, size_t n, const char* proto_full)
 {
-    if (proto == NULL || n <= 1) {
+    if (!proto || (n <= 1) || (!proto_full)) {
         syslog(LOG_ERR, "parse_iio: invalid parameters");
         return NULL;
     }
@@ -306,10 +335,12 @@ parse_iio(char** proto, size_t n)
     if (proto[1] && (mraa_atoi_x(proto[1], NULL, &device, 0) == MRAA_SUCCESS)) {
         dev = mraa_iio_init(device);
         if (dev == NULL) {
-            syslog(LOG_ERR, "parse_iio: could not init iio device %d", device);
+            syslog(LOG_ERR, "parse_iio: could not init iio device '%d' from '%s'",
+                    device, proto_full);
         }
     } else {
-        syslog(LOG_ERR, "parse_iio: invalid iio device number");
+        syslog(LOG_ERR, "parse_iio: invalid iio device number '%s' from '%s'",
+                proto[1], proto_full);
     }
 
     return dev;
@@ -317,9 +348,9 @@ parse_iio(char** proto, size_t n)
 #endif
 
 static mraa_i2c_context
-parse_i2c(char** proto, size_t n)
+parse_i2c(char** proto, size_t n, const char* proto_full)
 {
-    if (proto == NULL || n <= 1) {
+    if (!proto || (n <= 1) || (!proto_full)) {
         syslog(LOG_ERR, "parse_i2c: invalid parameters");
         return NULL;
     }
@@ -331,21 +362,24 @@ parse_i2c(char** proto, size_t n)
     if (proto[idx] && (mraa_atoi_x(proto[idx], NULL, &bus, 0) == MRAA_SUCCESS)) {
         dev = mraa_i2c_init(bus);
         if (dev == NULL) {
-            syslog(LOG_ERR, "parse_i2c: could not init i2c bus %d", bus);
+            syslog(LOG_ERR, "parse_i2c: could not init i2c bus '%d' from '%s'",
+                    bus, proto_full);
             return NULL;
         } else {
             if (++idx == n)
                 return dev;
         }
     } else {
-        syslog(LOG_ERR, "parse_i2c: invalid i2c bus number");
+        syslog(LOG_ERR, "parse_i2c: invalid i2c bus number '%s' from '%s'",
+                proto[idx], proto_full);
         return NULL;
     }
 
     int address = -1;
     if (proto[idx] && (mraa_atoi_x(proto[idx], NULL, &address, 0) == MRAA_SUCCESS)) {
         if (mraa_i2c_address(dev, (uint8_t) address) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_i2c: error setting up i2c address");
+            syslog(LOG_ERR, "parse_i2c: error setting up i2c address '0x%02x' from '%s'",
+                    address, proto_full);
             mraa_i2c_stop(dev);
             return NULL;
         } else {
@@ -366,7 +400,8 @@ parse_i2c(char** proto, size_t n)
 
     if (mode != -1) {
         if (mraa_i2c_frequency(dev, (mraa_i2c_mode_t) mode) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_i2c: error setting up gpio driver mode %s", proto[idx]);
+            syslog(LOG_ERR, "parse_i2c: error setting up gpio driver mode '%s' from '%s'",
+                    proto[idx], proto_full);
             mraa_i2c_stop(dev);
             return NULL;
         }
@@ -376,9 +411,9 @@ parse_i2c(char** proto, size_t n)
 }
 
 static mraa_aio_context
-parse_aio(char** proto, size_t n)
+parse_aio(char** proto, size_t n, const char* proto_full)
 {
-    if (proto == NULL || n <= 1) {
+    if (!proto || (n <= 1) || (!proto_full)) {
         syslog(LOG_ERR, "parse_aio: invalid parameters");
         return NULL;
     }
@@ -390,7 +425,8 @@ parse_aio(char** proto, size_t n)
     if (proto[idx] && (mraa_atoi_x(proto[idx], NULL, &aio_num, 0) == MRAA_SUCCESS)) {
         dev = mraa_aio_init(aio_num);
         if (dev == NULL) {
-            syslog(LOG_ERR, "parse_aio: could not init aio number %d", aio_num);
+            syslog(LOG_ERR, "parse_aio: could not init aio number '%d' from '%s'",
+                    aio_num, proto_full);
             return NULL;
         } else {
             if (++idx == n) {
@@ -398,19 +434,22 @@ parse_aio(char** proto, size_t n)
             }
         }
     } else {
-        syslog(LOG_ERR, "parse_aio: invalid aio number");
+        syslog(LOG_ERR, "parse_aio: failed to parse '%s' as integer from '%s'",
+                proto[idx], proto_full);
         return NULL;
     }
 
     int num_bits = -1;
     if (proto[idx] && (mraa_atoi_x(proto[idx], NULL, &num_bits, 0) == MRAA_SUCCESS)) {
         if (mraa_aio_set_bit(dev, num_bits) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_aio: error setting up aio bit");
+            syslog(LOG_ERR, "parse_aio: error setting up aio bits '%d' from '%s'",
+                    num_bits, proto_full);
             mraa_aio_close(dev);
             return NULL;
         }
     } else {
-        syslog(LOG_ERR, "parse_aio: invalid aio bit number");
+        syslog(LOG_ERR, "parse_aio: invalid aio bit number '%s' from '%s'",
+                proto[idx], proto_full);
         mraa_aio_close(dev);
         return NULL;
     }
@@ -419,9 +458,9 @@ parse_aio(char** proto, size_t n)
 }
 
 static mraa_gpio_context
-parse_gpio(char** proto, size_t n)
+parse_gpio(char** proto, size_t n, const char* proto_full)
 {
-    if (proto == NULL || n <= 1) {
+    if (!proto || (n <= 1) || (!proto_full)) {
         syslog(LOG_ERR, "parse_gpio: invalid parameters");
         return NULL;
     }
@@ -433,11 +472,13 @@ parse_gpio(char** proto, size_t n)
     if (proto[idx] && (mraa_atoi_x(proto[idx], NULL, &gpio_num, 0) == MRAA_SUCCESS)) {
         dev = mraa_gpio_init(gpio_num);
         if (dev == NULL) {
-            syslog(LOG_ERR, "parse_gpio: could not init gpio number %d", gpio_num);
+            syslog(LOG_ERR, "parse_gpio: could not init gpio number '%d' from '%s'",
+                    gpio_num, proto_full);
             return NULL;
         }
     } else {
-        syslog(LOG_ERR, "parse_gpio: invalid gpio number");
+        syslog(LOG_ERR, "parse_gpio: invalid gpio number '%s' from '%s'",
+                proto[idx], proto_full);
         return NULL;
     }
     if (++idx == n) {
@@ -458,7 +499,8 @@ parse_gpio(char** proto, size_t n)
 
     if (dir != -1) {
         if (mraa_gpio_dir(dev, (mraa_gpio_dir_t) dir) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_gpio: error setting up gpio direction %s", proto[idx]);
+            syslog(LOG_ERR, "parse_gpio: error setting up gpio direction '%s' from '%s'",
+                    proto[idx], proto_full);
             mraa_gpio_close(dev);
             return NULL;
         } else {
@@ -469,7 +511,8 @@ parse_gpio(char** proto, size_t n)
     } else {
         /* Set direction to default - output. */
         if (mraa_gpio_dir(dev, MRAA_GPIO_OUT) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_gpio: error setting up gpio direction %s", G_DIR_OUT);
+            syslog(LOG_ERR, "parse_gpio: error setting up gpio direction '%s' from '%s'",
+                    G_DIR_OUT, proto_full);
             mraa_gpio_close(dev);
             return NULL;
         }
@@ -479,7 +522,8 @@ parse_gpio(char** proto, size_t n)
     int value = -1;
     if (mraa_atoi_x(proto[idx], NULL, &value, 0) == MRAA_SUCCESS) {
         if (mraa_gpio_write(dev, value) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_gpio: could not init gpio number %d with value %d", gpio_num, value);
+            syslog(LOG_ERR, "parse_gpio: could not init gpio number '%d' with value '%d' from '%s'",
+                    gpio_num, value, proto_full);
             mraa_gpio_close(dev);
             return NULL;
         } else {
@@ -509,7 +553,8 @@ parse_gpio(char** proto, size_t n)
 
     if (mode != -1) {
         if (mraa_gpio_mode(dev, (mraa_gpio_mode_t) mode) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_gpio: error setting up gpio mode %s", proto[idx]);
+            syslog(LOG_ERR, "parse_gpio: error setting up gpio mode '%s' from '%s'",
+                    proto[idx], proto_full);
             mraa_gpio_close(dev);
             return NULL;
         } else {
@@ -533,7 +578,8 @@ parse_gpio(char** proto, size_t n)
 
     if (edge != -1) {
         if (mraa_gpio_edge_mode(dev, (mraa_gpio_edge_t) edge) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_gpio: error setting up gpio edge %s", proto[idx]);
+            syslog(LOG_ERR, "parse_gpio: error setting up gpio edge '%s' from '%s'",
+                    proto[idx], proto_full);
             mraa_gpio_close(dev);
             return NULL;
         } else {
@@ -553,7 +599,8 @@ parse_gpio(char** proto, size_t n)
 
     if (input_mode != -1) {
         if (mraa_gpio_input_mode(dev, (mraa_gpio_input_mode_t) input_mode) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_gpio: error setting up gpio input mode %s", proto[idx]);
+            syslog(LOG_ERR, "parse_gpio: error setting up gpio input mode '%s' from '%s'",
+                    proto[idx], proto_full);
             mraa_gpio_close(dev);
             return NULL;
         } else {
@@ -573,7 +620,8 @@ parse_gpio(char** proto, size_t n)
 
     if (driver_mode != -1) {
         if (mraa_gpio_out_driver_mode(dev, (mraa_gpio_out_driver_mode_t) driver_mode) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "parse_gpio: error setting up gpio driver mode %s", proto[idx]);
+            syslog(LOG_ERR, "parse_gpio: error setting up gpio driver mode '%s' from '%s'",
+                    proto[idx], proto_full);
             mraa_gpio_close(dev);
             return NULL;
         }
@@ -602,9 +650,10 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
 
         if (strncmp(str_tokens[0], AIO_KEY, strlen(AIO_KEY)) == 0 &&
             strlen(str_tokens[0]) == strlen(AIO_KEY)) {
-            mraa_aio_context dev = parse_aio(str_tokens, num_desc_tokens);
+            mraa_aio_context dev = parse_aio(str_tokens, num_desc_tokens, str_descs[i]);
             if (!dev) {
-                syslog(LOG_ERR, "mraa_io_init: error parsing aio");
+                syslog(LOG_ERR, "mraa_io_init: error parsing aio init string '%s'",
+                        str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
             }
 
@@ -619,9 +668,10 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             }
         } else if (strncmp(str_tokens[0], GPIO_KEY, strlen(GPIO_KEY)) == 0 &&
                    strlen(str_tokens[0]) == strlen(GPIO_KEY)) {
-            mraa_gpio_context dev = parse_gpio(str_tokens, num_desc_tokens);
+            mraa_gpio_context dev = parse_gpio(str_tokens, num_desc_tokens, str_descs[i]);
             if (!dev) {
-                syslog(LOG_ERR, "mraa_io_init: error parsing gpio");
+                syslog(LOG_ERR, "mraa_io_init: error parsing gpio init string '%s'",
+                        str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
             }
 
@@ -639,9 +689,10 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
 #if !defined(PERIPHERALMAN)
         else if (strncmp(str_tokens[0], IIO_KEY, strlen(IIO_KEY)) == 0 &&
                    strlen(str_tokens[0]) == strlen(IIO_KEY)) {
-            mraa_iio_context dev = parse_iio(str_tokens, num_desc_tokens);
+            mraa_iio_context dev = parse_iio(str_tokens, num_desc_tokens, str_descs[i]);
             if (!dev) {
-                syslog(LOG_ERR, "mraa_io_init: error parsing iio");
+                syslog(LOG_ERR, "mraa_io_init: error parsing iio init string '%s'",
+                        str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
             }
 
@@ -658,9 +709,10 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
 #endif
         else if (strncmp(str_tokens[0], I2C_KEY, strlen(I2C_KEY)) == 0 &&
                    strlen(str_tokens[0]) == strlen(I2C_KEY)) {
-            mraa_i2c_context dev = parse_i2c(str_tokens, num_desc_tokens);
+            mraa_i2c_context dev = parse_i2c(str_tokens, num_desc_tokens, str_descs[i]);
             if (!dev) {
-                syslog(LOG_ERR, "mraa_io_init: error parsing i2c");
+                syslog(LOG_ERR, "mraa_io_init: error parsing i2c init string '%s'",
+                        str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
             }
 
@@ -675,9 +727,10 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             }
         } else if (strncmp(str_tokens[0], PWM_KEY, strlen(PWM_KEY)) == 0 &&
                    strlen(str_tokens[0]) == strlen(PWM_KEY)) {
-            mraa_pwm_context dev = parse_pwm(str_tokens, num_desc_tokens);
+            mraa_pwm_context dev = parse_pwm(str_tokens, num_desc_tokens, str_descs[i]);
             if (!dev) {
-                syslog(LOG_ERR, "mraa_io_init: error parsing pwm");
+                syslog(LOG_ERR, "mraa_io_init: error parsing pwm init string '%s'",
+                        str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
             }
 
@@ -692,9 +745,10 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             }
         } else if (strncmp(str_tokens[0], SPI_KEY, strlen(SPI_KEY)) == 0 &&
                    strlen(str_tokens[0]) == strlen(SPI_KEY)) {
-            mraa_spi_context dev = parse_spi(str_tokens, num_desc_tokens);
+            mraa_spi_context dev = parse_spi(str_tokens, num_desc_tokens, str_descs[i]);
             if (!dev) {
-                syslog(LOG_ERR, "mraa_io_init: error parsing spi");
+                syslog(LOG_ERR, "mraa_io_init: error parsing spi init string '%s'",
+                        str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
             }
 
@@ -709,9 +763,10 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             }
         } else if (strncmp(str_tokens[0], UART_KEY, strlen(UART_KEY)) == 0 &&
                    strlen(str_tokens[0]) == strlen(UART_KEY)) {
-            mraa_uart_context dev = parse_uart(str_tokens, num_desc_tokens);
+            mraa_uart_context dev = parse_uart(str_tokens, num_desc_tokens, str_descs[i]);
             if (!dev) {
-                syslog(LOG_ERR, "mraa_io_init: error parsing uart");
+                syslog(LOG_ERR, "mraa_io_init: error parsing uart init string '%s'",
+                        str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
             }
 
@@ -727,9 +782,10 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             }
         } else if (strncmp(str_tokens[0], UART_OW_KEY, strlen(UART_OW_KEY)) == 0 &&
                    strlen(str_tokens[0]) == strlen(UART_OW_KEY)) {
-            mraa_uart_ow_context dev = parse_uart_ow(str_tokens, num_desc_tokens);
+            mraa_uart_ow_context dev = parse_uart_ow(str_tokens, num_desc_tokens, str_descs[i]);
             if (!dev) {
-                syslog(LOG_ERR, "mraa_io_init: error parsing uart_ow");
+                syslog(LOG_ERR, "mraa_io_init: error parsing uart_ow init string '%s'",
+                        str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
             }
 

@@ -43,30 +43,34 @@ class mraa_initio_h_unit : public ::testing::Test
     virtual void TearDown() {}
 };
 
-/* Test for a successful AIO init. */
-TEST_F(mraa_initio_h_unit, test_aio_init)
+/* Test for an invalid AIO init. */
+TEST_F(mraa_initio_h_unit, test_aio_init_invalid)
 {
     mraa_io_descriptor* desc;
-    mraa_result_t status;
-
-    status = mraa_io_init("a:0:10", &desc);
-    ASSERT_EQ(status, MRAA_SUCCESS);
-
-    status = mraa_io_close(desc);
-    ASSERT_EQ(status, MRAA_SUCCESS);
+    ASSERT_EQ(MRAA_ERROR_INVALID_HANDLE, mraa_io_init("a:bogus:10", &desc));
 }
 
-/* Test for a successful GPIO init. */
-TEST_F(mraa_initio_h_unit, test_gpio_init)
+/* Test for a valid AIO init. */
+TEST_F(mraa_initio_h_unit, test_aio_init_valid)
 {
     mraa_io_descriptor* desc;
-    mraa_result_t status;
+    ASSERT_EQ(MRAA_SUCCESS, mraa_io_init("a:0:10", &desc));
+    ASSERT_EQ(MRAA_SUCCESS, mraa_io_close(desc));
+}
 
-    status = mraa_io_init("g:0:1", &desc);
-    ASSERT_EQ(status, MRAA_SUCCESS);
+/* Test for an invalid GPIO init. */
+TEST_F(mraa_initio_h_unit, test_gpio_init_invalid)
+{
+    mraa_io_descriptor* desc;
+    ASSERT_EQ(MRAA_ERROR_INVALID_HANDLE, mraa_io_init("g:0:34", &desc));
+}
 
-    status = mraa_io_close(desc);
-    ASSERT_EQ(status, MRAA_SUCCESS);
+/* Test for a valid GPIO init. */
+TEST_F(mraa_initio_h_unit, test_gpio_init_valid)
+{
+    mraa_io_descriptor* desc;
+    ASSERT_EQ(MRAA_SUCCESS, mraa_io_init("g:0:1", &desc));
+    ASSERT_EQ(MRAA_SUCCESS, mraa_io_close(desc));
 }
 
 /* Test for a successful I2C init. */
