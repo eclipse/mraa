@@ -620,6 +620,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             if (!dev) {
                 syslog(LOG_ERR, "mraa_io_init: error parsing aio init string '%s'", str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
+                free(new_desc);
             }
 
             if (status == MRAA_SUCCESS) {
@@ -627,6 +628,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
                 if (!new_desc->aios) {
                     syslog(LOG_ERR, "mraa_io_init: error allocating memory for aio");
                     status = MRAA_ERROR_NO_RESOURCES;
+                    free(new_desc);
                 } else {
                     new_desc->aios[new_desc->n_aio++] = dev;
                 }
@@ -637,6 +639,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             if (!dev) {
                 syslog(LOG_ERR, "mraa_io_init: error parsing gpio init string '%s'", str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
+                free(new_desc);
             }
 
             if (status == MRAA_SUCCESS) {
@@ -645,6 +648,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
                 if (!new_desc->gpios) {
                     syslog(LOG_ERR, "mraa_io_init: error allocating memory for gpio");
                     status = MRAA_ERROR_NO_RESOURCES;
+                    free(new_desc);
                 } else {
                     new_desc->gpios[new_desc->n_gpio++] = dev;
                 }
@@ -657,6 +661,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             if (!dev) {
                 syslog(LOG_ERR, "mraa_io_init: error parsing iio init string '%s'", str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
+                free(new_desc);
             }
 
             if (status == MRAA_SUCCESS) {
@@ -664,6 +669,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
                 if (!new_desc->iios) {
                     syslog(LOG_ERR, "mraa_io_init: error allocating memory for iio");
                     status = MRAA_ERROR_NO_RESOURCES;
+                    free(new_desc);
                 } else {
                     new_desc->iios[new_desc->n_iio++] = dev;
                 }
@@ -676,6 +682,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             if (!dev) {
                 syslog(LOG_ERR, "mraa_io_init: error parsing i2c init string '%s'", str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
+                free(new_desc);
             }
 
             if (status == MRAA_SUCCESS) {
@@ -683,6 +690,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
                 if (!new_desc->i2cs) {
                     syslog(LOG_ERR, "mraa_io_init: error allocating memory for i2c");
                     status = MRAA_ERROR_NO_RESOURCES;
+                    free(new_desc);
                 } else {
                     new_desc->i2cs[new_desc->n_i2c++] = dev;
                 }
@@ -700,6 +708,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
                 if (!new_desc->pwms) {
                     syslog(LOG_ERR, "mraa_io_init: error allocating memory for pwm");
                     status = MRAA_ERROR_NO_RESOURCES;
+                    free(new_desc);
                 } else {
                     new_desc->pwms[new_desc->n_pwm++] = dev;
                 }
@@ -710,6 +719,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             if (!dev) {
                 syslog(LOG_ERR, "mraa_io_init: error parsing spi init string '%s'", str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
+                free(new_desc);
             }
 
             if (status == MRAA_SUCCESS) {
@@ -717,6 +727,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
                 if (!new_desc->spis) {
                     syslog(LOG_ERR, "mraa_io_init: error allocating memory for spi");
                     status = MRAA_ERROR_NO_RESOURCES;
+                    free(new_desc);
                 } else {
                     new_desc->spis[new_desc->n_spi++] = dev;
                 }
@@ -727,6 +738,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             if (!dev) {
                 syslog(LOG_ERR, "mraa_io_init: error parsing uart init string '%s'", str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
+                free(new_desc);
             }
 
             if (status == MRAA_SUCCESS) {
@@ -735,6 +747,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
                 if (!new_desc->uarts) {
                     syslog(LOG_ERR, "mraa_io_init: error allocating memory for uart");
                     status = MRAA_ERROR_NO_RESOURCES;
+                    free(new_desc);
                 } else {
                     new_desc->uarts[new_desc->n_uart++] = dev;
                 }
@@ -745,6 +758,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             if (!dev) {
                 syslog(LOG_ERR, "mraa_io_init: error parsing uart_ow init string '%s'", str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
+                free(new_desc);
             }
 
             if (status == MRAA_SUCCESS) {
@@ -753,6 +767,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
                 if (!new_desc->uart_ows) {
                     syslog(LOG_ERR, "mraa_io_init: error allocating memory for uart_ow");
                     status = MRAA_ERROR_NO_RESOURCES;
+                    free(new_desc);
                 } else {
                     new_desc->uart_ows[new_desc->n_uart_ow++] = dev;
                 }
@@ -764,6 +779,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             if (!new_desc->leftover_str) {
                 syslog(LOG_ERR, "mraa_io_init: error allocating memory for leftover string");
                 status = MRAA_ERROR_NO_RESOURCES;
+                free(new_desc);
             } else {
                 if (leftover_str_len == 0) {
                     strncpy(new_desc->leftover_str, str_descs[i], strlen(str_descs[i]));
@@ -786,7 +802,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
     }
     mraa_delete_tokenized_string(str_descs, num_descs);
 
-    if (new_desc->leftover_str) {
+    if ((status == MRAA_SUCCESS) && (new_desc->leftover_str)) {
         /* We don't need the last comma. */
         new_desc->leftover_str[leftover_str_len - 1] = '\0';
     }
