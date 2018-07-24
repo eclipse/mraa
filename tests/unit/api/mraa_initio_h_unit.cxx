@@ -29,18 +29,6 @@
 /* MRAA API common test fixture */
 class mraa_initio_h_unit : public ::testing::Test
 {
-  protected:
-    /* One-time setup logic if needed */
-    mraa_initio_h_unit() {}
-
-    /* One-time tear-down logic if needed */
-    virtual ~mraa_initio_h_unit() {}
-
-    /* Per-test setup logic if needed */
-    virtual void SetUp() {}
-
-    /* Per-test tear-down logic if needed */
-    virtual void TearDown() {}
 };
 
 /* Test for an invalid AIO init. */
