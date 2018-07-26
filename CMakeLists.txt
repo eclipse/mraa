@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 2.8.11)
 project (mraa C CXX)
 
 FIND_PACKAGE (Threads REQUIRED)
@@ -73,6 +73,17 @@ foreach (flag ${MRAA_BOTH_WARNING_FLAGS} ${MRAA_CXX_WARNING_FLAGS})
     message (WARNING "C++ compiler does not support flag \"${flag}\"")
   endif ()
 endforeach ()
+
+# This function adds the c++11 flag to a c++ target (if supported)
+function(use_cxx_11 targetname)
+  include(CheckCXXCompilerFlag)
+  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  if (COMPILER_SUPPORTS_CXX11)
+    set_target_properties(${targetname} PROPERTIES COMPILE_FLAGS "-std=c++11")
+  else()
+    message(FATAL_ERROR "Target '${targetname}' requires c++11 which is not supported by this compiler")
+  endif()
+endfunction()
 
 # Set CMAKE_INSTALL_LIBDIR if not defined
 include(GNUInstallDirs)
