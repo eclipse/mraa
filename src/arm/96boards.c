@@ -42,6 +42,8 @@
 #define PLATFORM_NAME_HIKEY "HIKEY"
 #define PLATFORM_NAME_HIKEY960 "HIKEY960"
 #define PLATFORM_NAME_ROCK960 "ROCK960"
+#define PLATFORM_NAME_ULTRA96 "ULTRA96"
+
 #define MAX_SIZE 64
 #define MMAP_PATH "/dev/mem"
 #define DB410C_MMAP_REG 0x01000000
@@ -101,6 +103,14 @@ int rock960_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
 };
 
 const char* rock960_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyS3", "/dev/ttyS4" };
+
+// Ultra96
+int ultra96_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
+    { 0, 36 }, { 0, 37 }, { 0, 39 }, { 0, 40 }, { 0, 44 }, { 0, 45 },
+    { 0, 78 }, { 0, 79 }, { 0, 80 }, { 0, 81 }, { 0, 82 }, { 0, 83 },
+};
+
+const char* ultra96_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyPS0", "/dev/ttyS0" };
 
 // MMAP
 static uint8_t* mmap_reg = NULL;
@@ -286,6 +296,12 @@ mraa_96boards()
             ls_gpio_pins = rock960_ls_gpio_pins;
             b->uart_dev[0].device_path = (char*) rock960_serialdev[0];
             b->uart_dev[1].device_path = (char*) rock960_serialdev[1];
+        } else if (mraa_file_contains(DT_BASE "/model", "ZynqMP ZCU100 RevC")) {
+            b->platform_name = PLATFORM_NAME_ULTRA96;
+            chardev_map = &ultra96_chardev_map;
+            b->uart_dev[0].device_path = (char*) ultra96_serialdev[0];
+            b->uart_dev[1].device_path = (char*) ultra96_serialdev[1];
+            b->chardev_capable = 1;
         }
     }
 
@@ -304,6 +320,11 @@ mraa_96boards()
         b->def_i2c_bus = 0;
         b->i2c_bus[0].bus_id = 6;
         b->i2c_bus[1].bus_id = 1;
+    } else if (strncmp(b->platform_name, PLATFORM_NAME_ULTRA96, MAX_SIZE) == 0) {
+        b->i2c_bus_count = MRAA_96BOARDS_LS_I2C_COUNT;
+        b->def_i2c_bus = 0;
+        b->i2c_bus[0].bus_id = 2;
+        b->i2c_bus[1].bus_id = 3;
     } else {
         b->i2c_bus_count = MRAA_96BOARDS_LS_I2C_COUNT;
         b->def_i2c_bus = 0;

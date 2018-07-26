@@ -14,6 +14,7 @@ Board Support
 - [HiKey](http://www.96boards.org/product/hikey/)
 - [HiKey960](http://www.96boards.org/product/hikey960/)
 - [Rock960](http://www.96boards.org/product/rock960/)
+- [Ultra96](https://www.96boards.org/product/ultra96/)
 
 Interface notes
 ---------------
