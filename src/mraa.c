@@ -917,7 +917,11 @@ mraa_gpio_lookup(const char* pin_name)
         return -1;
     }
 
-    for (i = 0; i < plat->gpio_count; i++) {
+    for (i = 0; i < plat->phy_pin_count; i++) {
+         // Skip non GPIO pins
+         if (!(plat->pins[i].capabilities.gpio))
+             continue;
+
          if (plat->pins[i].name != NULL &&
              strncmp(pin_name, plat->pins[i].name, strlen(plat->pins[i].name) + 1) == 0) {
              return i;
