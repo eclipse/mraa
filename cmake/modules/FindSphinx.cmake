@@ -17,10 +17,13 @@ if (SPHINX_EXECUTABLE)
                     OUTPUT_VARIABLE SPHINX_VERSION_STRING
                     OUTPUT_STRIP_TRAILING_WHITESPACE
                     ERROR_STRIP_TRAILING_WHITESPACE)
-    if (SPHINX_VERSION_STRING)
+    if (SPHINX_VERSION_STRING MATCHES "^Sphinx")
         string(REPLACE "Sphinx (sphinx-build) " "" SPHINX_VERSION ${SPHINX_VERSION_STRING})
-        message (STATUS "Sphinx version is ${SPHINX_VERSION}")
+    else ()
+        # newer sphinx builds just say sphinx-build
+        string(REPLACE "sphinx-build " "" SPHINX_VERSION ${SPHINX_VERSION_STRING})
     endif ()
+    message (STATUS "Sphinx version is ${SPHINX_VERSION}")
 endif ()
 
 mark_as_advanced (SPHINX_EXECUTABLE)
