@@ -356,7 +356,14 @@ mraa_96boards()
     mraa_96boards_pininfo(b, 9, -1, 0, "UART0_RTS");
     mraa_96boards_pininfo(b, 10, -1, 0, "SPI0_DIN");
     mraa_96boards_pininfo(b, 11, -1, 0, "UART1_TXD");
-    mraa_96boards_pininfo(b, 12, -1, 0, "SPI0_CS");
+    // On DB410c, configure the SPI0_CS pin as GPIO for enabling the
+    // user to control it manually without adding chip select property
+    // in Devicetree.
+    if (strncmp(b->platform_name, PLATFORM_NAME_DB410C, MAX_SIZE) == 0) {
+        mraa_96boards_pininfo(b, 12, 18, 1, "SPI0_CS", -1, 0, 18);
+    } else {
+        mraa_96boards_pininfo(b, 12, -1, 0, "SPI0_CS");
+    }
     mraa_96boards_pininfo(b, 13, -1, 0, "UART1_RXD");
     mraa_96boards_pininfo(b, 14, -1, 0, "SPI0_DOUT");
     mraa_96boards_pininfo(b, 15, -1, 0, "I2C0_SCL");
@@ -380,7 +387,12 @@ mraa_96boards()
     mraa_96boards_pininfo(b, 39, -1, 0, "GND");
     mraa_96boards_pininfo(b, 40, -1, 0, "GND");
 
-    b->gpio_count = MRAA_96BOARDS_LS_GPIO_COUNT;
+    // On DB410c, SPI0_CS pin is used as GPIO
+    if (strncmp(b->platform_name, PLATFORM_NAME_DB410C, MAX_SIZE) == 0) {
+        b->gpio_count = MRAA_96BOARDS_LS_GPIO_COUNT + 1;
+    } else {
+        b->gpio_count = MRAA_96BOARDS_LS_GPIO_COUNT;
+    }
 
     b->aio_count = 0;
     b->adc_raw = 0;
