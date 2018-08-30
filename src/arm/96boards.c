@@ -64,6 +64,7 @@ int db410c_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
 };
 
 const char* db410c_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyMSM0", "/dev/ttyMSM1" };
+const char* db410c_led[MRAA_96BOARDS_LED_COUNT] = { "user1", "user2", "user3", "user4", "bt", "wlan" };
 
 // Dragonboard820c
 int db820c_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
@@ -269,6 +270,13 @@ mraa_96boards()
             chardev_map = &db410c_chardev_map;
             b->uart_dev[0].device_path = (char*) db410c_serialdev[0];
             b->uart_dev[1].device_path = (char*) db410c_serialdev[1];
+            b->led_dev[0].name = (char*) db410c_led[0];
+            b->led_dev[1].name = (char*) db410c_led[1];
+            b->led_dev[2].name = (char*) db410c_led[2];
+            b->led_dev[3].name = (char*) db410c_led[3];
+            b->led_dev[4].name = (char*) db410c_led[4];
+            b->led_dev[5].name = (char*) db410c_led[5];
+            b->led_dev_count = MRAA_96BOARDS_LED_COUNT;
             b->adv_func->gpio_mmap_setup = &mraa_db410c_mmap_setup;
             b->chardev_capable = 1;
         } else if (mraa_file_contains(DT_BASE "/model", "Qualcomm Technologies, Inc. DB820c")) {
