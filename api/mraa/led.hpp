@@ -44,11 +44,25 @@ class Led
     /**
      * Instantiates an LED object
      *
-     * @param led LED fuction name to use
+     * @param led LED index to use
      */
-    Led(const char* led)
+    Led(int led)
     {
         m_led = mraa_led_init(led);
+
+        if (m_led == NULL) {
+            throw std::invalid_argument("Invalid LED name specified");
+        }
+    }
+
+    /**
+     * Instantiates an LED object
+     *
+     * @param led_dev LED function name to use
+     */
+    Led(std::string led_dev)
+    {
+        m_led = mraa_led_init_raw(led_dev.c_str());
 
         if (m_led == NULL) {
             throw std::invalid_argument("Invalid LED name specified");
