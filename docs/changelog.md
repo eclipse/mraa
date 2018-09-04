@@ -5,6 +5,15 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**2.0.0**
+  * New platforms IEI Tank, Ultra-96, Rock960, Hikey960, Dragonboard 820c
+  * Added support for chardev GPIO devices with implementation on several boards
+  * Added string based I/O initialization for simpler integration with other frameworks
+  * Added GTest support for unit testing
+  * Extended named LED device APIs allowing them to be listed during board definition
+  * Removed packaging and CI for obsolete devkits
+  * Multiple bug fixes and cmake improvements
+
 **1.9.0**
   * Added support for RPi Zero W
   * Added support for MIPS based Omega2 and Linkit Smart 7688
