@@ -103,6 +103,17 @@ sudo zypper ar http://download.opensuse.org/repositories/hardware/$REPO/hardware
 sudo zypper in mraa
 ```
 
+Install on Fedora Linux
+-----------------------
+
+There is an mraa package in the main Fedora repository so it can be dnf installed
+in all recent Fedora releases. The Node.js and Python 3 bindings are packaged as
+separate packages.
+
+```bash
+sudo dnf install mraa nodejs-mraa python3-mraa
+```
+
 Installing for Node.js only
 ---------------------------
 
