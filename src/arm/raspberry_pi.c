@@ -843,8 +843,8 @@ mraa_raspberry_pi()
         (platform_detected == PLATFORM_RASPBERRY_PI2_B_REV_1) ||
         (platform_detected == PLATFORM_RASPBERRY_PI3_B) ||
         (platform_detected == PLATFORM_RASPBERRY_PI_ZERO) ||
-        (platform_detected == PLATFORM_RASPBERRY_PI3_B_PLUS) ||
-        (platform_detected == PLATFORM_RASPBERRY_PI_ZERO_W)) {
+        (platform_detected == PLATFORM_RASPBERRY_PI_ZERO_W) ||
+        (platform_detected == PLATFORM_RASPBERRY_PI3_B_PLUS)) {
 
         strncpy(b->pins[27].name, "ID_SD", MRAA_PIN_NAME_SIZE);
         b->pins[27].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
