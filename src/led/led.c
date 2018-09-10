@@ -127,7 +127,48 @@ mraa_led_init_internal(const char* led)
 }
 
 mraa_led_context
-mraa_led_init(const char* led)
+mraa_led_init(int index)
+{
+    mraa_led_context dev = NULL;
+    char directory[MAX_SIZE];
+    struct stat dir;
+
+    if (plat == NULL) {
+        syslog(LOG_ERR, "led: init: platform not initialised");
+        return NULL;
+    }
+
+    if (plat->led_dev_count == 0) {
+        syslog(LOG_ERR, "led: init: no led device defined in platform");
+        return NULL;
+    }
+
+    if (index < 0) {
+        syslog(LOG_ERR, "led: init: led index cannot be negative");
+        return NULL;
+    }
+
+    if (index >= plat->led_dev_count) {
+        syslog(LOG_ERR, "led: init: requested led above led device count");
+        return NULL;
+    }
+
+    dev = mraa_led_init_internal((char*) plat->led_dev[index].name);
+    if (dev == NULL) {
+        return NULL;
+    }
+
+    snprintf(directory, MAX_SIZE, "%s/%s", SYSFS_CLASS_LED, dev->led_name);
+    if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
+        syslog(LOG_NOTICE, "led: init: current user doesn't have access rights for using LED %s", dev->led_name);
+    }
+    strncpy(dev->led_path, (const char*) directory, sizeof(directory));
+
+    return dev;
+}
+
+mraa_led_context
+mraa_led_init_raw(const char* led)
 {
     mraa_led_context dev = NULL;
     char directory[MAX_SIZE];

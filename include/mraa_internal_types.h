@@ -46,7 +46,7 @@
 #define MAX_AIO_COUNT 7
 #define MAX_UART_COUNT 6
 #define MAX_PWM_COUNT 6
-
+#define MAX_LED_COUNT 12
 
 // general status failures for internal functions
 #define MRAA_PLATFORM_NO_INIT -3
@@ -455,6 +455,16 @@ typedef struct {
 } mraa_aio_dev_t;
 
 /**
+ * Structure representing an LED device.
+ */
+typedef struct {
+    /*@{*/
+    char *name; /**< LED device function name */
+    unsigned int index; /**< Index as exposed in the platform */
+    /*@}*/
+} mraa_led_dev_t;
+
+/**
  * A Structure representing a platform/board.
  */
 typedef struct _board_t {
@@ -490,6 +500,8 @@ typedef struct _board_t {
     mraa_adv_func_t* adv_func;    /**< Pointer to advanced function disptach table */
     struct _board_t* sub_platform;     /**< Pointer to sub platform */
     mraa_boolean_t chardev_capable;  /**< Decide what interface is being used: old sysfs or new char device*/
+    mraa_led_dev_t led_dev[MAX_LED_COUNT]; /**< Array of LED devices */
+    unsigned int led_dev_count; /**< Total onboard LED device count */
     /*@}*/
 } mraa_board_t;
 
