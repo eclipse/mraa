@@ -80,7 +80,7 @@ https://launchpad.net/~mraa/+archive/ubuntu/mraa
 ```bash
 sudo add-apt-repository ppa:mraa/mraa
 sudo apt-get update
-sudo apt-get install libmraa1 libmraa-dev libmraa-java python-mraa python3-mraa node-mraa mraa-tools
+sudo apt-get install libmraa2 libmraa-dev libmraa-java python-mraa python3-mraa node-mraa mraa-tools
 ```
 
 Running MRAA tools or applications on Ubuntu systems requires elevated permissions
