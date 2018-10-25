@@ -787,7 +787,6 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
                     strncat(new_desc->leftover_str, str_descs[i], strlen(str_descs[i]));
                 }
 
-                strncat(new_desc->leftover_str, str_descs[i], strlen(str_descs[i]));
                 leftover_str_len += strlen(str_descs[i]) + 1;
                 new_desc->leftover_str[leftover_str_len - 1] = ',';
                 new_desc->leftover_str[leftover_str_len] = '\0';
