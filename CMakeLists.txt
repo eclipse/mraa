@@ -214,6 +214,30 @@ if (BUILDDOC)
   endif (DOXYGEN_FOUND AND DOXYGEN_VERSION VERSION_GREATER "1.8")
 endif ()
 
+if (RPM)
+  message (STATUS "INFO - Enabled RPM packaging for ${DETECTED_ARCH}")
+  set(CMAKE_INSTALL_PREFIX "/usr")
+  set(CPACK_PACKAGE_VERSION ${VERSION})
+  set(CPACK_GENERATOR "RPM")
+  set(CPACK_PACKAGE_NAME "libmraa${mraa_VERSION_MAJOR}")
+  set(CPACK_PACKAGE_RELEASE 1)
+  set(CPACK_PACKAGE_VERSION
+      "${mraa_VERSION_MAJOR}.${mraa_VERSION_MINOR}.${mraa_VERSION_PATCH}${mraa_PACKAGE_ON_TAG}${VERSION_COMMIT}")
+  set(CPACK_PACKAGE_CONTACT "Intel IoT-Devkit")
+  set(CPACK_PACKAGE_VENDOR "Intel IoT-Devkit")
+  set(CPACK_RPM_PACKAGE_PROVIDES "libmraa, libmraa-devel, ${CPACK_PACKAGE_NAME}-devel")
+  # Get distro tag (e.g. 'fc20') by parsing output of rpm --showrc
+  EXECUTE_PROCESS(
+    COMMAND rpm --showrc
+    COMMAND grep -w dist
+    COMMAND sed -e "s/\\t./ /"
+    COMMAND awk "{printf \"%s\", \$NF}"
+    OUTPUT_VARIABLE DIST_TAG
+  )
+  set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${DIST_TAG}.${DETECTED_ARCH}")
+  include(CPack)
+endif()
+
 add_subdirectory (src)
 if (ENABLEEXAMPLES)
   add_subdirectory (examples)
