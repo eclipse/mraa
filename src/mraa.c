@@ -1374,10 +1374,13 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* dev)
             return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
         }
         int i2c_bus;
-        if(mraa_atoi(strdup(dev), &i2c_bus) != MRAA_SUCCESS && i2c_bus < plat->i2c_bus_count) {
+        char *dev_dup = strdup(dev);
+        if(mraa_atoi(dev_dup, &i2c_bus) != MRAA_SUCCESS && i2c_bus < plat->i2c_bus_count) {
             syslog(LOG_NOTICE, "mraa: Cannot add GrovePi subplatform, invalid i2c bus specified");
+            free(dev_dup);
             return MRAA_ERROR_INVALID_PARAMETER;
         }
+        free(dev_dup);
         if (mraa_grovepi_platform(plat, i2c_bus) == MRAA_GROVEPI) {
             syslog(LOG_NOTICE, "mraa: Added GrovePi subplatform");
             return MRAA_SUCCESS;
