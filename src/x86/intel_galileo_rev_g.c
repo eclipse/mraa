@@ -158,7 +158,6 @@ mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_
         case MRAA_GPIO_HIZ:
             close(drive);
             return MRAA_SUCCESS;
-            break;
         default:
             close(drive);
             return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
