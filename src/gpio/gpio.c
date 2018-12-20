@@ -114,7 +114,7 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
     dev->isr_thread_terminating = 0;
     dev->phy_pin = -1;
 
-    if (!plat->chardev_capable) {
+    if ((plat != NULL) && (!plat->chardev_capable)) {
         char bu[MAX_SIZE];
         int length;
 
