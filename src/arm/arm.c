@@ -73,7 +73,7 @@ mraa_arm_platform()
                     else if (mraa_file_exist("/sys/class/leds/green:ph24:led1")) {
                         platform_type = MRAA_BANANA;
                     }
-                } else if (strstr(line, "DE0/DE10-Nano-SoC")) {
+                } else if (strstr(line, "DE0/DE10-Nano-SoC") || strstr(line, "Altera SOCFPGA")) {
                         platform_type = MRAA_DE_NANO_SOC;
                 }
             }
