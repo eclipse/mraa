@@ -701,6 +701,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             if (!dev) {
                 syslog(LOG_ERR, "mraa_io_init: error parsing pwm init string '%s'", str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
+                free(new_desc);
             }
 
             if (status == MRAA_SUCCESS) {
