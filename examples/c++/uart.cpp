@@ -61,9 +61,10 @@ main(void)
     // If you have a valid platform configuration use numbers to represent uart
     // device. If not use raw mode where std::string is taken as a constructor
     // parameter
-    mraa::Uart* uart;
+    mraa::Uart* uart, *temp;
     try {
         uart = new mraa::Uart(UART_PORT);
+        temp = uart;
     } catch (std::exception& e) {
         std::cerr << e.what() << ", likely invalid platform config" << std::endl;
     }
@@ -96,6 +97,7 @@ main(void)
     //! [Interesting]
 
     delete uart;
+    delete temp;
 
     return EXIT_SUCCESS;
 }
