@@ -270,6 +270,8 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
         return NULL;
     }
 
+    dev->gpio_group = gpio_group;
+
     for (int i = 0; i < dev->num_chips; ++i) {
         gpio_group[i].gpio_chip = i;
         /* Just to be sure realloc has the desired behaviour. */
@@ -380,8 +382,6 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
         counters[chip]++;
     }
     free(counters);
-
-    dev->gpio_group = gpio_group;
 
     /* Save the provided array from the user to our internal structure. */
     dev->provided_pins = malloc(dev->num_pins * sizeof(int));
