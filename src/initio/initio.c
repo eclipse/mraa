@@ -171,7 +171,7 @@ parse_uart(char** proto, size_t n, const char* proto_full)
 
     /* Check for bytesize. */
     int bytesize = -1;
-    if (mraa_atoi_x(proto[idx], &end, &bytesize, 0) != MRAA_SUCCESS) {
+    if (proto[idx] != NULL && mraa_atoi_x(proto[idx], &end, &bytesize, 0) != MRAA_SUCCESS) {
         syslog(LOG_ERR, "parse_uart: error reading uart bytesize '%d' from '%s'", bytesize, proto_full);
         mraa_uart_stop(dev);
         return NULL;
