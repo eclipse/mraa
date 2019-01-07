@@ -1126,9 +1126,12 @@ mraa_link_targets(const char* filename, const char* targetname)
     int nchars = 0;
     char* buffer = NULL;
     while (nchars == 0) {
+        char* old_buffer = buffer;
         buffer = (char*) realloc(buffer, size);
-        if (buffer == NULL)
+        if (buffer == NULL) {
+            free(old_buffer);
             return 0;
+        }
         nchars = readlink(filename, buffer, size);
         if (nchars < 0) {
             free(buffer);
