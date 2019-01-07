@@ -370,11 +370,11 @@ parse_i2c(char** proto, size_t n, const char* proto_full)
     }
 
     int mode = -1;
-    if (strncmp(proto[idx], I_MODE_STD, strlen(I_MODE_STD)) == 0) {
+    if (proto[idx] && strncmp(proto[idx], I_MODE_STD, strlen(I_MODE_STD)) == 0) {
         mode = MRAA_I2C_STD;
-    } else if (strncmp(proto[idx], I_MODE_FAST, strlen(I_MODE_FAST)) == 0) {
+    } else if (proto[idx] && strncmp(proto[idx], I_MODE_FAST, strlen(I_MODE_FAST)) == 0) {
         mode = MRAA_I2C_FAST;
-    } else if (strncmp(proto[idx], I_MODE_HIGH, strlen(I_MODE_HIGH)) == 0) {
+    } else if (proto[idx] && strncmp(proto[idx], I_MODE_HIGH, strlen(I_MODE_HIGH)) == 0) {
         mode = MRAA_GPIO_PULLDOWN;
     }
 
