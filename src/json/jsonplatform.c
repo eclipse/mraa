@@ -291,7 +291,11 @@ mraa_init_json_platform_i2c(json_object* jobj_i2c, mraa_board_t* board, int inde
     json_object* jobj_temp = NULL;
 
     // Default to no mux pins defined
-    board->pins[pin].i2c.mux_total = 0;
+    if(board->pins != NULL) {
+        board->pins[pin].i2c.mux_total = 0;
+    } else {
+        return MRAA_ERROR_NO_DATA_AVAILABLE;
+    }
 
     // Get the I2C bus array index
     ret = mraa_init_json_platform_get_index(jobj_i2c, I2C_KEY, INDEX_KEY, index, &pos, board->i2c_bus_count - 1);
