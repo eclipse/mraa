@@ -717,7 +717,13 @@ mraa_init_json_platform(const char* platform_json)
     // This one was allocated and assigned an "Unknown platform" value by now,
     // so we need to reallocate it.
     free(platform_name);
-    platform_name = calloc(strlen(plat->platform_name) + 1, sizeof(char));
+
+    if (!plat->platform_name) {
+        goto unsuccessful;
+    } else {
+        platform_name = calloc(strlen(plat->platform_name) + 1, sizeof(char));
+    }
+
     if (platform_name == NULL) {
         syslog(LOG_ERR, "init_json_platform: Could not allocate memory for platform_name");
         goto unsuccessful;
