@@ -68,7 +68,10 @@ mraa_gpio_close_event_handles_sysfs(int fds[], int num_fds)
     }
 
     for (int i = 0; i < num_fds; ++i) {
-        close(fds[i]);
+        // Check required to avoid closing stdin and of an uninitialized fd
+        if(fds[i] != 0) {
+            close(fds[i]);
+        }
     }
 
     free(fds);
@@ -603,7 +606,7 @@ mraa_gpio_interrupt_handler(void* arg)
             return NULL;
     }
 
-    int *fps = malloc(dev->num_pins * sizeof(int));
+    int *fps = calloc(dev->num_pins, sizeof(int));
     if (!fps) {
         syslog(LOG_ERR, "mraa_gpio_interrupt_handler_multiple() malloc error");
         return NULL;
