@@ -131,7 +131,6 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
                     read(fd, readbuf, 31 * sizeof(char));
                     ret = sscanf(readbuf, "%ce:%c%u/%u>>%u", &shortbuf, &signchar, &chan->bits_used,
                                  &padint, &chan->shift);
-                    chan->bytes = padint / 8;
                     // probably should be 5?
                     if (ret < 0) {
                         // cleanup
@@ -139,6 +138,7 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
                         close(fd);
                         return MRAA_IO_SETUP_FAILURE;
                     }
+                    chan->bytes = padint / 8;
                     chan->signedd = (signchar == 's');
                     chan->lendian = (shortbuf == 'l');
                     if (chan->bits_used == 64) {
