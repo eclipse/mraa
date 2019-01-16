@@ -172,7 +172,7 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
     }
     closedir(dir);
 
-    // channel location has to be done in channel index order so do it afetr we
+    // channel location has to be done in channel index order so do it after we
     // have grabbed all the correct info
     for (i = 0; i < dev->chan_num; i++) {
         chan = &dev->channels[i];
