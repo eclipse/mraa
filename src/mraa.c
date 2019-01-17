@@ -192,6 +192,8 @@ imraa_init()
         if (plat != NULL) {
             plat->platform_type = MRAA_NULL_PLATFORM;
             plat->platform_name = "Unknown platform";
+        } else {
+            return MRAA_ERROR_NO_RESOURCES;
         }
     }
 
