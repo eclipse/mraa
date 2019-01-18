@@ -177,6 +177,10 @@ parse_uart(char** proto, size_t n, const char* proto_full)
         return NULL;
     }
 
+    if (end == NULL) {
+        return NULL;
+    }
+
     int parity = -1;
     if (strncmp(end, U_PARITY_NONE, strlen(U_PARITY_NONE)) == 0) {
         parity = MRAA_UART_PARITY_NONE;
