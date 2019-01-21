@@ -74,8 +74,8 @@ TEST_F(api_common_hpp_unit, test_libmraa_common_methods)
         /* No versioning for the mock platform */
         ASSERT_EQ("", mraa::getPlatformVersion(0));
 
-        /* Currently 10 pins in the mock platform */
-        ASSERT_EQ(10, mraa::getPinCount());
+        /* Currently 11 pins in the mock platform */
+        ASSERT_EQ(11, mraa::getPinCount());
 
         /* Test the other pin/bus counts for the mock platform */
         /* Missing equivalent C++ methods */
