@@ -33,7 +33,7 @@ extern "C" {
 // Mock I2C device address
 #define MOCK_I2C_DEV_ADDR 0x33
 // Mock I2C device data registers block length in bytes. Our code assumes it's >= 1.
-#define MOCK_I2C_DEV_DATA_LEN 10
+#define MOCK_I2C_DEV_DATA_LEN 255
 // Initial value for each byte in the mock I2C device data registers
 #define MOCK_I2C_DEV_DATA_INIT_BYTE 0xAB
 
