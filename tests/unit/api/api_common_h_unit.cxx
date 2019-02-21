@@ -91,15 +91,15 @@ TEST_F(api_common_h_unit, test_libmraa_common_methods)
         /* No versioning for the mock platform */
         ASSERT_STREQ(NULL, mraa_get_platform_version(0));
 
-        /* Currently 10 pins in the mock platform */
-        ASSERT_EQ(10, mraa_get_pin_count());
+        /* Currently 11 pins in the mock platform */
+        ASSERT_EQ(11, mraa_get_pin_count());
 
         /* Test the other pin/bus counts for the mock platform */
         EXPECT_EQ(1, mraa_get_aio_count());
         EXPECT_EQ(1, mraa_get_gpio_count());
         EXPECT_EQ(1, mraa_get_i2c_bus_count());
         EXPECT_EQ(0, mraa_get_i2c_bus_id(0));
-        EXPECT_EQ(0, mraa_get_pwm_count());
+        EXPECT_EQ(1, mraa_get_pwm_count());
         EXPECT_EQ(1, mraa_get_spi_bus_count());
         EXPECT_EQ(1, mraa_get_uart_count());
 

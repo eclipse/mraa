@@ -1,6 +1,6 @@
 /*
- * Author: Alex Tereschenko <alext.mkrs@gmail.com>
- * Copyright (c) 2016 Alex Tereschenko.
+ * Author: Adelin Dobre <adelin.dobre@rinftech.com>
+ * Copyright (c) 2019 Adelin Dobre.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -30,21 +30,20 @@ extern "C" {
 
 #include "mraa_internal.h"
 
-#define MRAA_MOCK_GPIO_COUNT      1
-#define MRAA_MOCK_AIO_COUNT       1
-#define MRAA_MOCK_I2C_BUS_COUNT   1
-#define MRAA_MOCK_SPI_BUS_COUNT   1
-#define MRAA_MOCK_PWM_DEV_COUNT   1
-#define MRAA_MOCK_UART_DEV_COUNT  1
-#define MRAA_MOCK_PINCOUNT (MRAA_MOCK_GPIO_COUNT + MRAA_MOCK_AIO_COUNT + \
-                           2 * MRAA_MOCK_I2C_BUS_COUNT +  4 * MRAA_MOCK_SPI_BUS_COUNT + \
-                           MRAA_MOCK_PWM_DEV_COUNT + 2 * MRAA_MOCK_UART_DEV_COUNT)
+mraa_result_t
+mraa_mock_pwm_init_raw_replace(mraa_pwm_context dev, int pin);
 
-#define MRAA_PWM_OFFSET (MRAA_MOCK_GPIO_COUNT + MRAA_MOCK_AIO_COUNT + \
-                        2 * MRAA_MOCK_I2C_BUS_COUNT + 4 * MRAA_MOCK_SPI_BUS_COUNT)
+mraa_result_t
+mraa_mock_pwm_write_period_replace(mraa_pwm_context dev, int period);
 
-mraa_board_t*
-mraa_mock_board();
+mraa_result_t
+mraa_mock_pwm_write_duty_replace(mraa_pwm_context dev, int duty);
+
+int
+mraa_mock_pwm_read_duty_replace(mraa_pwm_context dev);
+
+mraa_result_t
+mraa_mock_pwm_enable_replace(mraa_pwm_context dev, int enable);
 
 #ifdef __cplusplus
 }

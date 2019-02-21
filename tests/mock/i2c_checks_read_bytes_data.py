@@ -37,7 +37,7 @@ class I2cChecksReadBytesData(u.TestCase):
   def test_i2c_read_bytes_data(self):
     self.i2c.address(MRAA_MOCK_I2C_ADDR)
     # Generate unique data bytes
-    data_to_write = bytearray([0xEE+i for i in range(MRAA_MOCK_I2C_DATA_LEN)])
+    data_to_write = bytearray([0x00+i for i in range(MRAA_MOCK_I2C_DATA_LEN)])
     self.i2c.write(data_to_write)
     # We expect to read the last two bytes
     expected_res = bytearray(data_to_write[-2:])
@@ -50,7 +50,7 @@ class I2cChecksReadBytesData(u.TestCase):
   def test_i2c_read_bytes_data_length_bigger_than_max(self):
     self.i2c.address(MRAA_MOCK_I2C_ADDR)
     # Generate unique data bytes
-    data_to_write = bytearray([0xEE+i for i in range(MRAA_MOCK_I2C_DATA_LEN)])
+    data_to_write = bytearray([0x00+i for i in range(MRAA_MOCK_I2C_DATA_LEN)])
     self.i2c.write(data_to_write)
     # We expect to read the last two bytes
     expected_res = bytearray(data_to_write[-2:])

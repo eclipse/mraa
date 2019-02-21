@@ -32,6 +32,7 @@
 
 #include "pwm.h"
 #include "mraa_internal.h"
+#include "mock/mock_board.h"
 
 #define MAX_SIZE 64
 #define SYSFS_PWM "/sys/class/pwm"
@@ -220,6 +221,11 @@ mraa_pwm_init(int pin)
         syslog(LOG_ERR, "pwm_init: Platform Not Initialised");
         return NULL;
     }
+
+#if defined(MOCKPLAT)
+    pin += MRAA_PWM_OFFSET;
+#endif
+
     if (mraa_is_sub_platform_id(pin)) {
         syslog(LOG_NOTICE, "pwm_init: Using sub platform");
         board = board->sub_platform;

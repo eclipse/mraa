@@ -1,6 +1,6 @@
 /*
- * Author: Alex Tereschenko <alext.mkrs@gmail.com>
- * Copyright (c) 2016 Alex Tereschenko.
+ * Author: Adelin Dobre <adelin.dobre@rinftech.com>
+ * Copyright (c) 2019 Adelin Dobre.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -22,30 +22,55 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#pragma once
+#include <stdlib.h>
+#include <string.h>
+#include <limits.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "common.h"
+#include "mock/mock_board_pwm.h"
 
-#include "mraa_internal.h"
+mraa_result_t
+mraa_mock_pwm_init_raw_replace(mraa_pwm_context dev, int pin)
+{
+    if(dev->pin != pin) {
+        syslog(LOG_ERR, "pwm_init: Failed to initialize the pin");
+        return MRAA_ERROR_INVALID_PARAMETER;
+    }
+    dev->owner = 1;
 
-#define MRAA_MOCK_GPIO_COUNT      1
-#define MRAA_MOCK_AIO_COUNT       1
-#define MRAA_MOCK_I2C_BUS_COUNT   1
-#define MRAA_MOCK_SPI_BUS_COUNT   1
-#define MRAA_MOCK_PWM_DEV_COUNT   1
-#define MRAA_MOCK_UART_DEV_COUNT  1
-#define MRAA_MOCK_PINCOUNT (MRAA_MOCK_GPIO_COUNT + MRAA_MOCK_AIO_COUNT + \
-                           2 * MRAA_MOCK_I2C_BUS_COUNT +  4 * MRAA_MOCK_SPI_BUS_COUNT + \
-                           MRAA_MOCK_PWM_DEV_COUNT + 2 * MRAA_MOCK_UART_DEV_COUNT)
-
-#define MRAA_PWM_OFFSET (MRAA_MOCK_GPIO_COUNT + MRAA_MOCK_AIO_COUNT + \
-                        2 * MRAA_MOCK_I2C_BUS_COUNT + 4 * MRAA_MOCK_SPI_BUS_COUNT)
-
-mraa_board_t*
-mraa_mock_board();
-
-#ifdef __cplusplus
+    return MRAA_SUCCESS;
 }
-#endif
+
+mraa_result_t
+mraa_mock_pwm_write_period_replace(mraa_pwm_context dev, int period)
+{
+    dev->period = period;
+
+    return MRAA_SUCCESS;
+}
+
+mraa_result_t
+mraa_mock_pwm_write_duty_replace(mraa_pwm_context dev, int duty)
+{
+    dev->duty_fp = duty;
+
+    return MRAA_SUCCESS;
+}
+
+int
+mraa_mock_pwm_read_duty_replace(mraa_pwm_context dev)
+{
+    if(dev->duty_fp > INT_MAX || dev->duty_fp < INT_MIN) {
+        syslog(LOG_ERR, "pwm%i read_duty: Number is invalid", dev->pin);
+        return -1;
+    }
+
+    return dev->duty_fp;
+}
+
+mraa_result_t
+mraa_mock_pwm_enable_replace(mraa_pwm_context dev, int enable)
+{
+    return MRAA_SUCCESS;
+}
+

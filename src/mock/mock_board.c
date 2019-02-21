@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "common.h"
 #include "mock/mock_board.h"
@@ -31,10 +32,12 @@
 #include "mock/mock_board_aio.h"
 #include "mock/mock_board_i2c.h"
 #include "mock/mock_board_spi.h"
+#include "mock/mock_board_pwm.h"
 #include "mock/mock_board_uart.h"
 
 #define PLATFORM_NAME "MRAA mock platform"
 #define UART_DEV_PATH "dummy"
+#define PWM_DEV_PATH  "dummy"
 
 mraa_board_t*
 mraa_mock_board()
@@ -47,35 +50,54 @@ mraa_mock_board()
     // General board definitions
     b->platform_name = PLATFORM_NAME;
     b->phy_pin_count = MRAA_MOCK_PINCOUNT;
-    b->gpio_count = 1;
-    b->aio_count = 1;
+    b->gpio_count = MRAA_MOCK_GPIO_COUNT;
+    b->aio_count = MRAA_MOCK_AIO_COUNT;
     b->adc_raw = 12;
     b->adc_supported = 10;
 
-    b->i2c_bus_count = 1;
-    b->i2c_bus[0].bus_id = 0;
-    b->i2c_bus[0].sda = 2;
-    b->i2c_bus[0].scl = 3;
+    int i2c_offset = MRAA_MOCK_GPIO_COUNT + MRAA_MOCK_AIO_COUNT;
+    b->i2c_bus_count = MRAA_MOCK_I2C_BUS_COUNT;
+
+    for(int index = 0; index < MRAA_MOCK_I2C_BUS_COUNT; index++) {
+        b->i2c_bus[index].bus_id = index;
+        b->i2c_bus[index].sda = i2c_offset + 2 * index;
+        b->i2c_bus[index].scl = i2c_offset + 2 * index + 1;
+    }
     b->def_i2c_bus = b->i2c_bus[0].bus_id;
 
-    b->spi_bus_count = 1;
+    int spi_offset = i2c_offset + 2 * MRAA_MOCK_I2C_BUS_COUNT;
+    b->spi_bus_count = MRAA_MOCK_SPI_BUS_COUNT;
     b->def_spi_bus = 0;
-    b->spi_bus[0].bus_id = 0;
-    b->spi_bus[0].slave_s = 0;
-    b->spi_bus[0].cs = 4;
-    b->spi_bus[0].mosi = 5;
-    b->spi_bus[0].miso = 6;
-    b->spi_bus[0].sclk = 7;
 
-    b->pwm_default_period = 0;
-    b->pwm_max_period = 0;
-    b->pwm_min_period = 0;
+    for(int index = 0; index < MRAA_MOCK_SPI_BUS_COUNT; index++) {
+        b->spi_bus[index].bus_id = index;
+        b->spi_bus[index].slave_s = 0;
+        b->spi_bus[index].cs = spi_offset + 4 * index;
+        b->spi_bus[index].mosi = spi_offset + 4 * index + 1;
+        b->spi_bus[index].miso = spi_offset + 4 * index + 2;
+        b->spi_bus[index].sclk = spi_offset + 4 * index + 3;
+    }
 
-    b->uart_dev_count = 1;
+    int pwm_offset = spi_offset +  4 * MRAA_MOCK_SPI_BUS_COUNT;
+    b->pwm_dev_count = MRAA_MOCK_PWM_DEV_COUNT;
+    b->pwm_default_period = 500;
+    b->pwm_max_period = 2147483;
+    b->pwm_min_period = 1;
+
+    for(int index = 0; index < MRAA_MOCK_PWM_DEV_COUNT; index++) {
+        b->pwm_dev[index].index = pwm_offset + index;
+        b->pwm_dev[index].device_path = PWM_DEV_PATH;
+    }
+
+    int uart_offset = pwm_offset + MRAA_MOCK_PWM_DEV_COUNT;
+    b->uart_dev_count = MRAA_MOCK_UART_DEV_COUNT;
     b->def_uart_dev = 0;
-    b->uart_dev[0].rx = 8;
-    b->uart_dev[0].tx = 9;
-    b->uart_dev[0].device_path = UART_DEV_PATH;
+
+    for(int index = 0; index < MRAA_MOCK_UART_DEV_COUNT; index++) {
+        b->uart_dev[index].rx = uart_offset + 2 * index;
+        b->uart_dev[index].tx = uart_offset + 2 * index + 1;
+        b->uart_dev[index].device_path = UART_DEV_PATH;
+    }
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_MOCK_PINCOUNT);
     if (b->pins == NULL) {
@@ -125,6 +147,11 @@ mraa_mock_board()
     b->adv_func->spi_write_word_replace = &mraa_mock_spi_write_word_replace;
     b->adv_func->spi_transfer_buf_replace = &mraa_mock_spi_transfer_buf_replace;
     b->adv_func->spi_transfer_buf_word_replace = &mraa_mock_spi_transfer_buf_word_replace;
+    b->adv_func->pwm_init_raw_replace = &mraa_mock_pwm_init_raw_replace;
+    b->adv_func->pwm_period_replace = &mraa_mock_pwm_write_period_replace;
+    b->adv_func->pwm_write_replace = &mraa_mock_pwm_write_duty_replace;
+    b->adv_func->pwm_read_replace = &mraa_mock_pwm_read_duty_replace;
+    b->adv_func->pwm_enable_replace = &mraa_mock_pwm_enable_replace;
     b->adv_func->uart_init_raw_replace = &mraa_mock_uart_init_raw_replace;
     b->adv_func->uart_set_baudrate_replace = &mraa_mock_uart_set_baudrate_replace;
     b->adv_func->uart_flush_replace = &mraa_mock_uart_flush_replace;
@@ -140,67 +167,86 @@ mraa_mock_board()
     // Pin definitions
     int pos = 0;
 
-    strncpy(b->pins[pos].name, "GPIO0", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[pos].gpio.pinmap = 0;
-    b->pins[pos].gpio.mux_total = 0;
-    pos++;
+    for(int index = 0; index < MRAA_MOCK_GPIO_COUNT; index++) {
+        snprintf(b->pins[pos].name, 8, "GPIO%d", index);
+        b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[pos].gpio.pinmap = index;
+        b->pins[pos].gpio.mux_total = 0;
+        pos++;
+    }
 
-    strncpy(b->pins[pos].name, "ADC0", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
-    b->pins[pos].aio.pinmap = 0;
-    b->pins[pos].aio.mux_total = 0;
-    pos++;
+    for(int index = 0; index < MRAA_MOCK_AIO_COUNT; index++) {
+        snprintf(b->pins[pos].name, 8, "ADC%d", index);
+        b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
+        b->pins[pos].aio.pinmap = 0;
+        b->pins[pos].aio.mux_total = 0;
+        pos++;
+    }
 
-    strncpy(b->pins[pos].name, "I2C0SDA", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
-    b->pins[pos].i2c.mux_total = 0;
-    b->pins[pos].i2c.pinmap = 0;
-    pos++;
+    for(int index = 0; index < MRAA_MOCK_I2C_BUS_COUNT; index++) {
+        snprintf(b->pins[pos].name, 8, "I2C%dSDA", index);
+        b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
+        b->pins[pos].i2c.mux_total = 0;
+        b->pins[pos].i2c.pinmap = 0;
+        pos++;
 
-    strncpy(b->pins[pos].name, "I2C0SCL", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
-    b->pins[pos].i2c.mux_total = 0;
-    b->pins[pos].i2c.pinmap = 0;
-    pos++;
+        snprintf(b->pins[pos].name, 8, "I2C%dSCL", index);
+        b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
+        b->pins[pos].i2c.mux_total = 0;
+        b->pins[pos].i2c.pinmap = 0;
+        pos++;
+    }
 
-    strncpy(b->pins[pos].name, "SPI0CS", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
-    b->pins[pos].spi.mux_total = 0;
-    b->pins[pos].spi.pinmap = 0;
-    pos++;
+    for(int index = 0; index < MRAA_MOCK_SPI_BUS_COUNT; index++) {
+        snprintf(b->pins[pos].name, 8, "SPI%dCS", index);
+        b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+        b->pins[pos].spi.mux_total = 0;
+        b->pins[pos].spi.pinmap = 0;
+        pos++;
 
-    strncpy(b->pins[pos].name, "SPI0MOSI", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
-    b->pins[pos].spi.mux_total = 0;
-    b->pins[pos].spi.pinmap = 0;
-    pos++;
+        snprintf(b->pins[pos].name, 9, "SPI%dMOSI", index);
+        b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+        b->pins[pos].spi.mux_total = 0;
+        b->pins[pos].spi.pinmap = 0;
+        pos++;
 
-    strncpy(b->pins[pos].name, "SPI0MISO", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
-    b->pins[pos].spi.mux_total = 0;
-    b->pins[pos].spi.pinmap = 0;
-    pos++;
+        snprintf(b->pins[pos].name, 9, "SPI%dMISO", index);
+        b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+        b->pins[pos].spi.mux_total = 0;
+        b->pins[pos].spi.pinmap = 0;
+        pos++;
 
-    strncpy(b->pins[pos].name, "SPI0SCLK", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
-    b->pins[pos].spi.mux_total = 0;
-    b->pins[pos].spi.pinmap = 0;
-    pos++;
+        snprintf(b->pins[pos].name, 9, "SPI%dSCLK", index);
+        b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
+        b->pins[pos].spi.mux_total = 0;
+        b->pins[pos].spi.pinmap = 0;
+        pos++;
+    }
 
-    strncpy(b->pins[pos].name, "UART0RX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
-    b->pins[pos].uart.pinmap = 0;
-    b->pins[pos].uart.parent_id = 0;
-    b->pins[pos].uart.mux_total = 0;
-    pos++;
+    for(int index = 0; index < MRAA_MOCK_PWM_DEV_COUNT; index++) {
+        snprintf(b->pins[pos].name, 8, "PWM%d", index);
+        b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
+        b->pins[pos].pwm.pinmap = index;
+        b->pins[pos].pwm.parent_id = 0;
+        b->pins[pos].pwm.mux_total = 0;
+        pos++;
+    }
 
-    strncpy(b->pins[pos].name, "UART0TX", 8);
-    b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
-    b->pins[pos].uart.pinmap = 0;
-    b->pins[pos].uart.parent_id = 0;
-    b->pins[pos].uart.mux_total = 0;
-    pos++;
+    for(int index = 0; index < MRAA_MOCK_UART_DEV_COUNT; index++) {
+        snprintf(b->pins[pos].name, 8, "UART%dRX", index);
+        b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
+        b->pins[pos].uart.pinmap = 0;
+        b->pins[pos].uart.parent_id = 0;
+        b->pins[pos].uart.mux_total = 0;
+        pos++;
+
+        snprintf(b->pins[pos].name, 8, "UART%dTX", index);
+        b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
+        b->pins[pos].uart.pinmap = 0;
+        b->pins[pos].uart.parent_id = 0;
+        b->pins[pos].uart.mux_total = 0;
+        pos++;
+    }
 
     return b;
 
