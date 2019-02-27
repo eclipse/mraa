@@ -33,7 +33,7 @@ Pin mapping table shows signals pertaining to 40-pin low speed expansion header 
 |     UART0_CTS     |   3   |   4   |    PWR_BTN_N       |
 |     UART0_TxD     |   5   |   6   |    RST_BTN_N       |
 |     UART0_RxD     |   7   |   8   |    SPI0_SCLK       |
-|     UART1_RTS     |   9   |   10  |    SPI0_DIN        |
+|     UART0_RTS     |   9   |   10  |    SPI0_DIN        |
 |     UART1_TxD     |   11  |   12  |    SPI0_CS         |
 |     UART1_RxD     |   13  |   14  |    SPI0_DOUT       |
 |     I2C0_SCL      |   15  |   16  |    PCM_FS          |
