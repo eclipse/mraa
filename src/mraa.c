@@ -28,43 +28,43 @@
 #define _XOPEN_SOURCE 600 /* Get nftw() and S_IFSOCK declarations */
 #endif
 
-#include <stddef.h>
 #include <dlfcn.h>
-#include <stdlib.h>
-#include <sched.h>
-#include <string.h>
 #include <pwd.h>
+#include <sched.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 #if !defined(PERIPHERALMAN)
-#include <glob.h>
 #include <ftw.h>
+#include <glob.h>
 #endif
-#include <dirent.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <errno.h>
-#include <unistd.h>
 #include <ctype.h>
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <limits.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <sys/utsname.h>
+#include <unistd.h>
 
 #if defined(IMRAA)
 #include <json-c/json.h>
-#include <sys/stat.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #endif
 
-#include "mraa_internal.h"
+#include "aio.h"
 #include "firmata/firmata_mraa.h"
-#include "grovepi/grovepi.h"
 #include "gpio.h"
 #include "gpio/gpio_chardev.h"
-#include "version.h"
+#include "grovepi/grovepi.h"
 #include "i2c.h"
+#include "mraa_internal.h"
 #include "pwm.h"
-#include "aio.h"
 #include "spi.h"
 #include "uart.h"
+#include "version.h"
 
 #if defined(PERIPHERALMAN)
 #include "peripheralmanager/peripheralman.h"
@@ -100,17 +100,20 @@ mraa_set_log_level(int level)
     return MRAA_ERROR_INVALID_PARAMETER;
 }
 
-mraa_boolean_t mraa_is_kernel_chardev_interface_compatible()
+mraa_boolean_t
+mraa_is_kernel_chardev_interface_compatible()
 {
     if (mraa_get_number_of_gpio_chips() <= 0) {
-        syslog(LOG_NOTICE, "gpio: platform supports chardev but kernel doesn't, falling back to sysfs");
+        syslog(LOG_NOTICE,
+               "gpio: platform supports chardev but kernel doesn't, falling back to sysfs");
         return 0;
     }
 
     return 1;
 }
 
-mraa_boolean_t mraa_is_platform_chardev_interface_capable()
+mraa_boolean_t
+mraa_is_platform_chardev_interface_capable()
 {
     if ((plat != NULL) && (plat->chardev_capable)) {
         return mraa_is_kernel_chardev_interface_compatible();
@@ -202,17 +205,15 @@ imraa_init()
     /* If a usb platform lib is present, attempt to load and look for
      * necessary symbols for adding extended I/O */
     void* usblib = dlopen("libmraa-platform-ft4222.so", RTLD_LAZY);
-    if (usblib)
-    {
+    if (usblib) {
         syslog(LOG_NOTICE, "Found USB platform extender library: libmraa-platform-ft4222.so");
         syslog(LOG_NOTICE, "Detecting FT4222 subplatforms...");
         fptr_add_platform_extender add_ft4222_platform =
-            (fptr_add_platform_extender)dlsym(usblib, "mraa_usb_platform_extender");
+        (fptr_add_platform_extender) dlsym(usblib, "mraa_usb_platform_extender");
 
         /* If this method exists, call it to add a subplatform */
         syslog(LOG_NOTICE, "Detecting FT4222 subplatforms complete, found %i subplatform/s",
-                ((add_ft4222_platform != NULL) && (add_ft4222_platform(plat) == MRAA_SUCCESS))
-                ? 1 : 0);
+               ((add_ft4222_platform != NULL) && (add_ft4222_platform(plat) == MRAA_SUCCESS)) ? 1 : 0);
     }
 #endif
 
@@ -250,7 +251,8 @@ imraa_init()
         syslog(LOG_NOTICE, "gpio: support for chardev interface is activated");
     }
 
-    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
+    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(),
+           mraa_get_platform_type());
     return MRAA_SUCCESS;
 }
 
@@ -300,9 +302,8 @@ mraa_deinit()
          * allocate space for device_path, others use #defines or consts,
          * which means this has to be handled differently per platform
          */
-        if ((plat->platform_type == MRAA_JSON_PLATFORM) ||
-                (plat->platform_type == MRAA_UP2) ||
-                (plat->platform_type == MRAA_IEI_TANK)) {
+        if ((plat->platform_type == MRAA_JSON_PLATFORM) || (plat->platform_type == MRAA_UP2) ||
+            (plat->platform_type == MRAA_IEI_TANK)) {
             for (i = 0; i < plat->uart_dev_count; i++) {
                 if (plat->uart_dev[i].device_path != NULL) {
                     free(plat->uart_dev[i].device_path);
@@ -377,7 +378,7 @@ mraa_iio_detect()
     plat_iio->iio_device_count = num_iio_devices;
     plat_iio->iio_devices = calloc(num_iio_devices, sizeof(struct _iio));
     struct _iio* device;
-    for (i=0; i < num_iio_devices; i++) {
+    for (i = 0; i < num_iio_devices; i++) {
         device = &plat_iio->iio_devices[i];
         device->num = i;
         snprintf(filepath, 64, "/sys/bus/iio/devices/iio:device%d/name", i);
@@ -390,7 +391,7 @@ mraa_iio_detect()
                 len = strlen(name);
                 // use strndup
                 device->name = malloc((sizeof(char) * len) + sizeof(char));
-                strncpy(device->name, name, len+1);
+                strncpy(device->name, name, len + 1);
             }
             close(fd);
         }
@@ -409,22 +410,23 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
 
     for (mi = 0; mi < meta.mux_total; mi++) {
 
-        switch(meta.mux[mi].pincmd) {
-            case PINCMD_UNDEFINED:              // used for backward compatibility
-                if(meta.mux[mi].pin != last_pin) {
+        switch (meta.mux[mi].pincmd) {
+            case PINCMD_UNDEFINED: // used for backward compatibility
+                if (meta.mux[mi].pin != last_pin) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
                     }
                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    if (mux_i == NULL)
+                        return MRAA_ERROR_INVALID_HANDLE;
                     last_pin = meta.mux[mi].pin;
                 }
                 // this function will sometimes fail, however this is not critical as
                 // long as the write succeeds - Test case galileo gen2 pin2
                 mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
                 ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
-                if(ret != MRAA_SUCCESS) {
+                if (ret != MRAA_SUCCESS) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
@@ -434,19 +436,20 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
                 break;
 
             case PINCMD_SET_VALUE:
-                if(meta.mux[mi].pin != last_pin) {
+                if (meta.mux[mi].pin != last_pin) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
                     }
                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    if (mux_i == NULL)
+                        return MRAA_ERROR_INVALID_HANDLE;
                     last_pin = meta.mux[mi].pin;
                 }
 
                 ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
 
-                if(ret != MRAA_SUCCESS) {
+                if (ret != MRAA_SUCCESS) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
@@ -456,19 +459,20 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
                 break;
 
             case PINCMD_SET_DIRECTION:
-                if(meta.mux[mi].pin != last_pin) {
+                if (meta.mux[mi].pin != last_pin) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
                     }
                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    if (mux_i == NULL)
+                        return MRAA_ERROR_INVALID_HANDLE;
                     last_pin = meta.mux[mi].pin;
                 }
 
                 ret = mraa_gpio_dir(mux_i, meta.mux[mi].value);
 
-                if(ret != MRAA_SUCCESS) {
+                if (ret != MRAA_SUCCESS) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
@@ -478,22 +482,23 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
                 break;
 
             case PINCMD_SET_IN_VALUE:
-                if(meta.mux[mi].pin != last_pin) {
+                if (meta.mux[mi].pin != last_pin) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
                     }
                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    if (mux_i == NULL)
+                        return MRAA_ERROR_INVALID_HANDLE;
                     last_pin = meta.mux[mi].pin;
                 }
 
                 ret = mraa_gpio_dir(mux_i, MRAA_GPIO_IN);
 
-                if(ret == MRAA_SUCCESS)
+                if (ret == MRAA_SUCCESS)
                     ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
 
-                if(ret != MRAA_SUCCESS) {
+                if (ret != MRAA_SUCCESS) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
@@ -503,22 +508,23 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
                 break;
 
             case PINCMD_SET_OUT_VALUE:
-                if(meta.mux[mi].pin != last_pin) {
+                if (meta.mux[mi].pin != last_pin) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
                     }
                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    if (mux_i == NULL)
+                        return MRAA_ERROR_INVALID_HANDLE;
                     last_pin = meta.mux[mi].pin;
                 }
 
                 ret = mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
 
-                if(ret == MRAA_SUCCESS)
+                if (ret == MRAA_SUCCESS)
                     ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
 
-                if(ret != MRAA_SUCCESS) {
+                if (ret != MRAA_SUCCESS) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
@@ -528,19 +534,20 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
                 break;
 
             case PINCMD_SET_MODE:
-                if(meta.mux[mi].pin != last_pin) {
+                if (meta.mux[mi].pin != last_pin) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
                     }
                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
-                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                    if (mux_i == NULL)
+                        return MRAA_ERROR_INVALID_HANDLE;
                     last_pin = meta.mux[mi].pin;
                 }
 
                 ret = mraa_gpio_mode(mux_i, meta.mux[mi].value);
 
-                if(ret != MRAA_SUCCESS) {
+                if (ret != MRAA_SUCCESS) {
                     if (mux_i != NULL) {
                         mraa_gpio_owner(mux_i, 0);
                         mraa_gpio_close(mux_i);
@@ -553,7 +560,8 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
                 break;
 
             default:
-                syslog(LOG_NOTICE, "mraa_setup_mux_mapped: wrong command %d on pin %d with value %d", meta.mux[mi].pincmd, meta.mux[mi].pin, meta.mux[mi].value);
+                syslog(LOG_NOTICE, "mraa_setup_mux_mapped: wrong command %d on pin %d with value %d",
+                       meta.mux[mi].pincmd, meta.mux[mi].pin, meta.mux[mi].value);
                 break;
         }
     }
@@ -654,7 +662,8 @@ mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
         pin = mraa_get_sub_platform_index(pin);
     }
 
-    if (current_plat == NULL || current_plat->platform_type == MRAA_UNKNOWN_PLATFORM || current_plat->platform_type == MRAA_NULL_PLATFORM) {
+    if (current_plat == NULL || current_plat->platform_type == MRAA_UNKNOWN_PLATFORM ||
+        current_plat->platform_type == MRAA_NULL_PLATFORM) {
         return 0;
     }
     if (pin > (current_plat->phy_pin_count - 1) || pin < 0)
@@ -876,9 +885,9 @@ mraa_get_platform_pin_count(uint8_t platform_offset)
         return mraa_get_pin_count();
     else {
         if (mraa_has_sub_platform())
-           return plat->sub_platform->phy_pin_count;
+            return plat->sub_platform->phy_pin_count;
         else
-           return 0;
+            return 0;
     }
 }
 
@@ -920,14 +929,14 @@ mraa_gpio_lookup(const char* pin_name)
     }
 
     for (i = 0; i < plat->phy_pin_count; i++) {
-         // Skip non GPIO pins
-         if (!(plat->pins[i].capabilities.gpio))
-             continue;
+        // Skip non GPIO pins
+        if (!(plat->pins[i].capabilities.gpio))
+            continue;
 
-         if (plat->pins[i].name != NULL &&
-             strncmp(pin_name, plat->pins[i].name, strlen(plat->pins[i].name) + 1) == 0) {
-             return i;
-         }
+        if (plat->pins[i].name != NULL &&
+            strncmp(pin_name, plat->pins[i].name, strlen(plat->pins[i].name) + 1) == 0) {
+            return i;
+        }
     }
     return -1;
 }
@@ -946,10 +955,10 @@ mraa_i2c_lookup(const char* i2c_name)
     }
 
     for (i = 0; i < plat->i2c_bus_count; i++) {
-         if (plat->i2c_bus[i].name != NULL &&
-             strncmp(i2c_name, plat->i2c_bus[i].name, strlen(plat->i2c_bus[i].name) + 1) == 0) {
-             return plat->i2c_bus[i].bus_id;
-         }
+        if (plat->i2c_bus[i].name != NULL &&
+            strncmp(i2c_name, plat->i2c_bus[i].name, strlen(plat->i2c_bus[i].name) + 1) == 0) {
+            return plat->i2c_bus[i].bus_id;
+        }
     }
     return -1;
 }
@@ -968,10 +977,10 @@ mraa_spi_lookup(const char* spi_name)
     }
 
     for (i = 0; i < plat->spi_bus_count; i++) {
-         if (plat->spi_bus[i].name != NULL &&
-             strncmp(spi_name, plat->spi_bus[i].name, strlen(plat->spi_bus[i].name) + 1) == 0) {
-             return plat->spi_bus[i].bus_id;
-         }
+        if (plat->spi_bus[i].name != NULL &&
+            strncmp(spi_name, plat->spi_bus[i].name, strlen(plat->spi_bus[i].name) + 1) == 0) {
+            return plat->spi_bus[i].bus_id;
+        }
     }
     return -1;
 }
@@ -990,10 +999,10 @@ mraa_pwm_lookup(const char* pwm_name)
     }
 
     for (i = 0; i < plat->pwm_dev_count; i++) {
-         if (plat->pwm_dev[i].name != NULL &&
-             strncmp(pwm_name, plat->pwm_dev[i].name, strlen(plat->pwm_dev[i].name) + 1) == 0) {
-             return plat->pwm_dev[i].index;
-         }
+        if (plat->pwm_dev[i].name != NULL &&
+            strncmp(pwm_name, plat->pwm_dev[i].name, strlen(plat->pwm_dev[i].name) + 1) == 0) {
+            return plat->pwm_dev[i].index;
+        }
     }
     return -1;
 }
@@ -1012,10 +1021,10 @@ mraa_uart_lookup(const char* uart_name)
     }
 
     for (i = 0; i < plat->uart_dev_count; i++) {
-         if (plat->uart_dev[i].name != NULL &&
-             strncmp(uart_name, plat->uart_dev[i].name, strlen(plat->uart_dev[i].name) + 1) == 0) {
-             return plat->uart_dev[i].index;
-         }
+        if (plat->uart_dev[i].name != NULL &&
+            strncmp(uart_name, plat->uart_dev[i].name, strlen(plat->uart_dev[i].name) + 1) == 0) {
+            return plat->uart_dev[i].index;
+        }
     }
     return -1;
 }
@@ -1029,9 +1038,9 @@ mraa_get_default_i2c_bus(uint8_t platform_offset)
         return plat->def_i2c_bus;
     } else {
         if (mraa_has_sub_platform())
-           return plat->sub_platform->def_i2c_bus;
+            return plat->sub_platform->def_i2c_bus;
         else
-           return -1;
+            return -1;
     }
 }
 
@@ -1195,23 +1204,22 @@ mraa_count_i2c_files(const char* path, const struct stat* sb, int flag, struct F
 }
 
 int
-mraa_find_i2c_bus_pci(const char* pci_device, const char *pci_id, const char* adapter_name)
+mraa_find_i2c_bus_pci(const char* pci_device, const char* pci_id, const char* adapter_name)
 {
     /**
      * For example we'd get something like:
      * pci0000:00/0000:00:16.3/i2c_desiignware.3
      */
     char path[1024];
-    snprintf(path, 1024-1, "/sys/devices/pci%s/%s/%s/", pci_device, pci_id, adapter_name);
+    snprintf(path, 1024 - 1, "/sys/devices/pci%s/%s/%s/", pci_device, pci_id, adapter_name);
     if (mraa_file_exist(path)) {
-        struct dirent **namelist;
+        struct dirent** namelist;
         int n;
         n = scandir(path, &namelist, NULL, alphasort);
         if (n < 0) {
             syslog(LOG_ERR, "Failed to get information on i2c");
             return -1;
-        }
-        else {
+        } else {
             while (n--) {
                 char* dup = strdup(namelist[n]->d_name);
                 char* orig_dup = dup;
@@ -1270,7 +1278,7 @@ mraa_find_i2c_bus(const char* devname, int startfrom)
     // i2c devices are numbered numerically so 0 must exist otherwise there is
     // no i2c-dev loaded
     if (mraa_file_exist("/sys/class/i2c-dev/i2c-0")) {
-        for (;i < num_i2c_devices; i++) {
+        for (; i < num_i2c_devices; i++) {
             off_t size, err;
             snprintf(path, 64, "/sys/class/i2c-dev/i2c-%u/name", i);
             fd = open(path, O_RDONLY);
@@ -1379,8 +1387,8 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* dev)
             return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
         }
         int i2c_bus;
-        char *dev_dup = strdup(dev);
-        if(mraa_atoi(dev_dup, &i2c_bus) != MRAA_SUCCESS && i2c_bus < plat->i2c_bus_count) {
+        char* dev_dup = strdup(dev);
+        if (mraa_atoi(dev_dup, &i2c_bus) != MRAA_SUCCESS && i2c_bus < plat->i2c_bus_count) {
             syslog(LOG_NOTICE, "mraa: Cannot add GrovePi subplatform, invalid i2c bus specified");
             free(dev_dup);
             return MRAA_ERROR_INVALID_PARAMETER;
@@ -1443,8 +1451,9 @@ mraa_add_from_lockfile(const char* imraa_lock_file)
         int id = -1;
         const char* uartdev = NULL;
         for (i = 0; i < subplat_num; i++) {
-            struct json_object *ioobj = json_object_array_get_idx(ioarray, i);
-            json_object_object_foreach(ioobj, key, val) {
+            struct json_object* ioobj = json_object_array_get_idx(ioarray, i);
+            json_object_object_foreach(ioobj, key, val)
+            {
                 if (strncmp(key, "id", strlen("id") + 1) == 0) {
                     if (mraa_atoi(json_object_get_string(val), &id) != MRAA_SUCCESS) {
                         id = -1;
@@ -1465,13 +1474,12 @@ mraa_add_from_lockfile(const char* imraa_lock_file)
         }
         if (json_object_object_get_ex(jobj_lock, "IO", &ioarray) == true &&
             json_object_is_type(ioarray, json_type_array)) {
-	    /* assume we have declared IO so we are preinitialised and wipe the
-	     * advance func array
+            /* assume we have declared IO so we are preinitialised and wipe the
+             * advance func array
              */
             memset(plat->adv_func, 0, sizeof(mraa_adv_func_t));
         }
-    }
-    else {
+    } else {
         ret = MRAA_ERROR_INVALID_RESOURCE;
     }
     json_object_put(jobj_lock);
@@ -1598,11 +1606,13 @@ mraa_init_io(const char* desc)
     } else if (strncmp(type, PWM_KEY, strlen(PWM_KEY) + 1) == 0) {
         if (raw) {
             if (mraa_init_io_helper(&str, &id, delim) != MRAA_SUCCESS) {
-                syslog(LOG_ERR, "mraa_init_io: Pwm, unable to convert the chip id string into a useable Int");
+                syslog(LOG_ERR, "mraa_init_io: Pwm, unable to convert the chip id string into a "
+                                "useable Int");
                 return NULL;
             }
             if (mraa_init_io_helper(&str, &pin, delim) != MRAA_SUCCESS) {
-                syslog(LOG_ERR, "mraa_init_io: Pwm, unable to convert the pin string into a useable Int");
+                syslog(LOG_ERR,
+                       "mraa_init_io: Pwm, unable to convert the pin string into a useable Int");
                 return NULL;
             }
             return (void*) mraa_pwm_init_raw(id, pin);
@@ -1611,11 +1621,13 @@ mraa_init_io(const char* desc)
     } else if (strncmp(type, SPI_KEY, strlen(SPI_KEY) + 1) == 0) {
         if (raw) {
             if (mraa_init_io_helper(&str, &id, delim) != MRAA_SUCCESS) {
-                syslog(LOG_ERR, "mraa_init_io: Spi, unable to convert the bus string into a useable Int");
+                syslog(LOG_ERR,
+                       "mraa_init_io: Spi, unable to convert the bus string into a useable Int");
                 return NULL;
             }
             if (mraa_init_io_helper(&str, &pin, delim) != MRAA_SUCCESS) {
-                syslog(LOG_ERR, "mraa_init_io: Spi, unable to convert the cs string into a useable Int");
+                syslog(LOG_ERR,
+                       "mraa_init_io: Spi, unable to convert the cs string into a useable Int");
                 return NULL;
             }
             return (void*) mraa_spi_init_raw(id, pin);
