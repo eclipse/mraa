@@ -150,6 +150,8 @@ mraa_x86_platform()
     plat = mraa_up2_board();
     #elif defined(xMRAA_INTEL_JOULE_EXPANSION)
     plat = mraa_joule_expansion_board();
+    #elif defined(xMRAA_IEI_TANK)
+    plat = mraa_iei_tank();
     #else
         #error "Not using a valid platform value from mraa_platform_t - cannot compile"
     #endif
