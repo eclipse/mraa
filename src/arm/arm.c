@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "arm/96boards.h"
+#include "arm/rockpi4.h"
 #include "arm/de_nano_soc.h"
 #include "arm/banana.h"
 #include "arm/beaglebone.h"
@@ -105,6 +106,8 @@ mraa_arm_platform()
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/model", "Avnet Ultra96 Rev1"))
             platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/model", "ROCK PI 4"))
+            platform_type = MRAA_ROCKPI4;
         else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
             platform_type = MRAA_RASPBERRY_PI;
     }
@@ -124,6 +127,9 @@ mraa_arm_platform()
             break;
         case MRAA_96BOARDS:
             plat = mraa_96boards();
+	    break;
+        case MRAA_ROCKPI4:
+	    plat = mraa_rockpi4();
             break;
         case MRAA_DE_NANO_SOC:
             plat = mraa_de_nano_soc();
