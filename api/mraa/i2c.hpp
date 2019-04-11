@@ -38,7 +38,7 @@ namespace mraa
  * selecting the correct address
  * @htmlinclude i2c.txt
  *
- * @snippet I2c-compass.cpp Interesting
+ * @snippet i2c.cpp Interesting
  */
 class I2c
 {

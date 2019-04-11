@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "arm/96boards.h"
+#include "arm/rockpi4.h"
 #include "arm/de_nano_soc.h"
 #include "arm/banana.h"
 #include "arm/beaglebone.h"
@@ -75,6 +76,9 @@ mraa_arm_platform()
                     }
                 } else if (strstr(line, "DE0/DE10-Nano-SoC")) {
                         platform_type = MRAA_DE_NANO_SOC;
+                // For different kernel version(s) of DE10-Nano
+                } else if (strstr(line, "Altera SOCFPGA")) {
+                        platform_type = MRAA_DE_NANO_SOC;
                 }
             }
         }
@@ -85,13 +89,25 @@ mraa_arm_platform()
     /* Get compatible string from Device tree for boards that dont have enough info in /proc/cpuinfo
      */
     if (platform_type == MRAA_UNKNOWN_PLATFORM) {
-        if (mraa_file_contains("/proc/device-tree/compatible", "qcom,apq8016-sbc"))
+        if (mraa_file_contains("/proc/device-tree/model", "s900"))
+            platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/compatible", "qcom,apq8016-sbc"))
+            platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/compatible", "arrow,apq8096-db820c"))
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/model",
                                     "HiKey Development Board"))
             platform_type = MRAA_96BOARDS;
-        else if (mraa_file_contains("/proc/device-tree/model", "s900"))
+        else if (mraa_file_contains("/proc/device-tree/model", "HiKey960"))
             platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/model", "ROCK960"))
+            platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/model", "ZynqMP ZCU100 RevC"))
+            platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/model", "Avnet Ultra96 Rev1"))
+            platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/model", "ROCK PI 4"))
+            platform_type = MRAA_ROCKPI4;
         else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
             platform_type = MRAA_RASPBERRY_PI;
     }
@@ -111,6 +127,9 @@ mraa_arm_platform()
             break;
         case MRAA_96BOARDS:
             plat = mraa_96boards();
+	    break;
+        case MRAA_ROCKPI4:
+	    plat = mraa_rockpi4();
             break;
         case MRAA_DE_NANO_SOC:
             plat = mraa_de_nano_soc();

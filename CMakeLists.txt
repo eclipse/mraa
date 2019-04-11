@@ -1,7 +1,15 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 2.8.11)
 project (mraa C CXX)
 
 FIND_PACKAGE (Threads REQUIRED)
+
+if (CMAKE_VERSION VERSION_LESS "3.1")
+  if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    set (CMAKE_C_FLAGS "-std=gnu99 ${CMAKE_C_FLAGS}")
+  endif ()
+else ()
+  set (CMAKE_C_STANDARD 99)
+endif ()
 
 ###############################################################################
 # Detect supported warning flags
@@ -66,6 +74,17 @@ foreach (flag ${MRAA_BOTH_WARNING_FLAGS} ${MRAA_CXX_WARNING_FLAGS})
   endif ()
 endforeach ()
 
+# This function adds the c++11 flag to a c++ target (if supported)
+function(use_cxx_11 targetname)
+  include(CheckCXXCompilerFlag)
+  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  if (COMPILER_SUPPORTS_CXX11)
+    set_target_properties(${targetname} PROPERTIES COMPILE_FLAGS "-std=c++11")
+  else()
+    message(FATAL_ERROR "Target '${targetname}' requires c++11 which is not supported by this compiler")
+  endif()
+endfunction()
+
 # Set CMAKE_INSTALL_LIBDIR if not defined
 include(GNUInstallDirs)
 
@@ -91,7 +110,7 @@ include (GetGitRevisionDescription)
 git_describe (VERSION "--tags")
 if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND" OR "x_${VERSION}" STREQUAL "x_HEAD-HASH-NOTFOUND" OR "x_${VERSION}" STREQUAL "x_-128-NOTFOUND")
   message (WARNING " - Install git to compile a production libmraa!")
-  set (VERSION "v1.8.0")
+  set (VERSION "v2.0.0")
 endif ()
 
 message (STATUS "INFO - libmraa Version ${VERSION}")
@@ -134,8 +153,6 @@ option (ONEWIRE "Add Onewire support to mraa." ON)
 option (JSONPLAT "Add Platform loading via a json file." ON)
 option (IMRAA "Add Imraa support to mraa." OFF)
 option (FTDI4222 "Build with FTDI FT4222 subplatform support." OFF)
-option (IPK "Generate IPK using CPack" OFF)
-option (RPM "Generate RPM using CPack" OFF)
 option (ENABLEEXAMPLES "Disable building of examples" ON)
 option (INSTALLTOOLS "Install all tools" ON)
 option (BUILDTESTS "Override the addition of tests" ON)
@@ -196,66 +213,6 @@ if (BUILDDOC)
     message (SEND_ERROR "ERROR - Failed to find a compatible version of Doxygen. API doc will not be generated")
   endif (DOXYGEN_FOUND AND DOXYGEN_VERSION VERSION_GREATER "1.8")
 endif ()
-
-if (IPK)
-  # Get target package arch from Yocto ADT sysroot if set or host OS, mapping to Ubuntu name if necessary
-  if (DEFINED ENV{OECORE_TARGET_SYSROOT})
-    GET_FILENAME_COMPONENT (DETECTED_SYSROOT $ENV{OECORE_TARGET_SYSROOT} NAME)
-    string (REGEX REPLACE "-poky-linux" "" TARGET_ARCH "${DETECTED_SYSROOT}")
-  else ()
-    # debian uses amd64 to denote x86_64
-    if (DETECTED_ARCH STREQUAL "x86_64")
-      set (TARGET_ARCH "amd64")
-    else ()
-      set (TARGET_ARCH ${DETECTED_ARCH})
-    endif ()
-  endif ()
-  message (STATUS "INFO - Package arch is ${TARGET_ARCH}")
-
-  set(CPACK_GENERATOR "DEB")
-  set(OPKG_ARCH ${TARGET_ARCH})
-  set(CPACK_BINARY_DIR ${CMAKE_BINARY_DIR})
-  set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Intel IoT-Devkit") #required
-  set(mraa_PACKAGE_ON_TAG ".")
-  if ("${VERSION_COMMIT}" STREQUAL "")
-    set(mraa_PACKAGE_ON_TAG "")
-  endif()
-  set(CPACK_PACKAGE_VERSION
-      "${mraa_VERSION_MAJOR}.${mraa_VERSION_MINOR}.${mraa_VERSION_PATCH}${mraa_PACKAGE_ON_TAG}${VERSION_COMMIT}")
-  set(CPACK_PACKAGE_NAME "mraa")
-  set(CPACK_DEBIAN_PACKAGE_SECTION "libs")
-  set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${TARGET_ARCH})
-  set(CPACK_SYSTEM_NAME ${TARGET_ARCH})
-  set(CPACK_DEBIAN_PACKAGE_PROVIDES "mraa-dev, mraa-dbg, mraa-doc")
-  set(CPACK_DEBIAN_PACKAGE_REPLACES "${CPACK_DEBIAN_PACKAGE_PROVIDES}, libmraa, libmraa-dev, libmraa-doc")
-  set(CPACK_DEBIAN_PACKAGE_CONFLICTS ${CPACK_DEBIAN_PACKAGE_PROVIDES})
-  set(WDIR "${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}")
-  include (CPack)
-endif()
-
-if (RPM)
-  message (STATUS "INFO - Enabled RPM packaging for ${DETECTED_ARCH}")
-  set(CMAKE_INSTALL_PREFIX "/usr")
-  set(CPACK_PACKAGE_VERSION ${VERSION})
-  set(CPACK_GENERATOR "RPM")
-  set(CPACK_PACKAGE_NAME "libmraa${mraa_VERSION_MAJOR}")
-  set(CPACK_PACKAGE_RELEASE 1)
-  set(CPACK_PACKAGE_VERSION
-      "${mraa_VERSION_MAJOR}.${mraa_VERSION_MINOR}.${mraa_VERSION_PATCH}${mraa_PACKAGE_ON_TAG}${VERSION_COMMIT}")
-  set(CPACK_PACKAGE_CONTACT "Intel IoT-Devkit")
-  set(CPACK_PACKAGE_VENDOR "Intel IoT-Devkit")
-  set(CPACK_RPM_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME}-devel")
-  # Get distro tag (e.g. 'fc20') by parsing output of rpm --showrc
-  EXECUTE_PROCESS(
-    COMMAND rpm --showrc
-    COMMAND grep -w dist
-    COMMAND sed -e "s/\\t./ /"
-    COMMAND awk "{printf \"%s\", \$NF}"
-    OUTPUT_VARIABLE DIST_TAG
-  )
-  set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${DIST_TAG}.${DETECTED_ARCH}")
-  include(CPack)
-endif()
 
 add_subdirectory (src)
 if (ENABLEEXAMPLES)

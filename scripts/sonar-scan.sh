@@ -54,7 +54,7 @@ sonar_cmd_base="build-wrapper-linux-x86-64 --out-dir ${bw_output_path} make clea
         -Dsonar.java.binaries='src' \
         -Dsonar.coverage.exclusions='**/*' \
         -Dsonar.cfamily.build-wrapper-output=${bw_output_path} \
-        -Dsonar.host.url=https://sonarqube.com \
+        -Dsonar.host.url=https://sonarcloud.io \
         -Dsonar.organization=${SONAR_ORG} \
         -Dsonar.login=${SONAR_TOKEN} \
 "

@@ -256,9 +256,12 @@ mraa_spi_frequency(mraa_spi_context dev, int hz)
     int speed = 0;
     dev->clock = hz;
     if (ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) != -1) {
-        if (speed < hz) {
-            dev->clock = speed;
-            syslog(LOG_WARNING, "spi: Selected speed reduced to max allowed speed");
+	if (speed < hz) {
+            // We wanted to never go higher than SPI_IOC_RD_MAX_SPEED_HZ but it
+            // seems a bunch of drivers don't have this set to the actual max
+            // so we only complain about it
+            // dev->clock = speed;
+            syslog(LOG_NOTICE, "spi: Selected speed (%d Hz) is higher than the kernel max allowed speed (%lu Hz)", hz, SPI_IOC_RD_MAX_SPEED_HZ);
         }
     }
     return MRAA_SUCCESS;

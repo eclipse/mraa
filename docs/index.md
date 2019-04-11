@@ -59,6 +59,7 @@ Specific platform information for supported platforms is documented here:
 - @ref mock
 - @ref linkit_7688
 - @ref omega2
+- @ref iei-tank
 
 ## DEBUGGING
 
@@ -70,6 +71,10 @@ glance at our @ref debugging page too
 ## COMPILING
 
 More information on compiling is @ref building page.
+
+## STATIC CODE ANALYSIS
+
+See @ref static_code_analysis page.
 
 ## CONTRIBUTING
 

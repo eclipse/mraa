@@ -55,6 +55,9 @@ typedef enum {
     PHYBOARD_WEGA = 14,        /**< The phyBOARD-Wega */
     DE_NANO_SOC = 15,          /**< Terasic DE-Nano-SoC Board */
     INTEL_UP2 = 16,            /**< The UP^2 Board */
+    MTK_LINKIT = 17,           /**< Mediatek MT7688 based Linkit boards */
+    MTK_OMEGA2 = 18,           /**< MT7688 based Onion Omega2 board */
+    IEI_TANK = 19,             /**< IEI Tank System*/
 
     FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 
@@ -62,6 +65,7 @@ typedef enum {
     GENERIC_FIRMATA = 1280,    /**< Firmata uart platform/bridge */
 
     ANDROID_PERIPHERALMANAGER = 95, /**< Android Things peripheral manager platform */
+    MOCK_PLATFORM = 96,        /**< Mock platform, which requires no real hardware */
     NULL_PLATFORM = 98,
     UNKNOWN_PLATFORM = 99 /**< An unknown platform type, typically will load INTEL_GALILEO_GEN1 */
 } Platform;

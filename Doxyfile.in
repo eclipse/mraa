@@ -866,7 +866,9 @@ EXCLUDE_SYMBOLS        =
 # command).
 
 EXAMPLE_PATH           = @CMAKE_CURRENT_SOURCE_DIR@/examples/ \
+                         @CMAKE_CURRENT_SOURCE_DIR@/examples/c \
                          @CMAKE_CURRENT_SOURCE_DIR@/examples/c++/ \
+                         @CMAKE_CURRENT_SOURCE_DIR@/examples/platform/ \
                          @CMAKE_CURRENT_SOURCE_DIR@/docs/
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the

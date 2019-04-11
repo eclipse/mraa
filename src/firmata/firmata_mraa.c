@@ -96,7 +96,7 @@ mraa_firmata_i2c_init_bus_replace(mraa_i2c_context dev)
     char buff[4];
     buff[0] = FIRMATA_START_SYSEX;
     buff[1] = FIRMATA_I2C_CONFIG;
-    buff[2] = delay & 0xFF, (delay >> 8) & 0xFF;
+    buff[2] = delay & 0xFF;
     buff[3] = FIRMATA_END_SYSEX;
     mraa_uart_write(firmata_dev->uart, buff, 4);
 
@@ -217,7 +217,7 @@ mraa_firmata_i2c_read_word_data(mraa_i2c_context dev, uint8_t command)
             uint8_t rawdata[2];
             rawdata[0] = firmata_dev->i2cmsg[dev->addr][command];
             rawdata[1] = firmata_dev->i2cmsg[dev->addr][command+1];
-            uint16_t data = (uint16_t) rawdata;
+            uint16_t data = (uint16_t) *rawdata;
             uint8_t high = (data & 0xFF00) >> 8;
             data = (data << 8) & 0xFF00;
             data |= high;

@@ -27,11 +27,11 @@ else (LIBFTD2XX_LIBRARIES AND LIBFTD2XX_INCLUDE_DIRS)
     /usr/local/include
     /opt/local/include
     /sw/include
-	)
+    )
 
   SET(FTD2XX_LIBNAME ftd2xx)
   IF(WIN32)
-	SET(FTD2XX_LIBNAME ftd2xx.lib)
+    SET(FTD2XX_LIBNAME ftd2xx.lib)
   ENDIF(WIN32)
 
   find_library(LIBFTD2XX_LIBRARY
@@ -42,16 +42,16 @@ else (LIBFTD2XX_LIBRARIES AND LIBFTD2XX_INCLUDE_DIRS)
     /usr/local/lib
     /opt/local/lib
     /sw/lib
-	)
+    )
 
   if(LIBFTD2XX_INCLUDE_DIR)
-	set(LIBFTD2XX_INCLUDE_DIRS
+    set(LIBFTD2XX_INCLUDE_DIRS
       ${LIBFTD2XX_INCLUDE_DIR}
-	  )
+      )
   endif(LIBFTD2XX_INCLUDE_DIR)
   set(LIBFTD2XX_LIBRARIES
     ${LIBFTD2XX_LIBRARY}
-	)
+    )
 
   if (LIBFTD2XX_INCLUDE_DIRS AND LIBFTD2XX_LIBRARIES)
     set(LIBFTD2XX_FOUND TRUE)
@@ -59,13 +59,16 @@ else (LIBFTD2XX_LIBRARIES AND LIBFTD2XX_INCLUDE_DIRS)
 
   if (LIBFTD2XX_FOUND)
     if (NOT libftd2xx_FIND_QUIETLY)
-	  message(STATUS "Found libftd2xx: ${LIBFTD2XX_LIBRARIES}")
+      message(STATUS "Found libftd2xx: ${LIBFTD2XX_LIBRARIES}")
     endif (NOT libftd2xx_FIND_QUIETLY)
   else (LIBFTD2XX_FOUND)
     if (libftd2xx_FIND_REQUIRED)
-	  message(FATAL_ERROR "Could not find libftd2xx")
+      message(FATAL_ERROR "Could not find libftd2xx")
     endif (libftd2xx_FIND_REQUIRED)
   endif (LIBFTD2XX_FOUND)
+
+  find_package_handle_standard_args(Ftd2xx
+      REQUIRED_VARS LIBFTD2XX_INCLUDE_DIRS)
 
   # show the LIBFTD2XX_INCLUDE_DIRS and LIBFTD2XX_LIBRARIES variables only in the advanced view
   mark_as_advanced(LIBFTD2XX_INCLUDE_DIRS LIBFTD2XX_LIBRARIES)

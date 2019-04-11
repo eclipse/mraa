@@ -21,11 +21,14 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
+#
+# Example Usage: Expects 'X' flag from the sender. This example requires
+#                `uart_sender.py` to be running on the other end.
 
 import mraa
 
-# Initialize UART
-u=mraa.Uart(0)
+# Initialise UART
+u = mraa.Uart(0)
 
 # Set UART parameters
 u.setBaudRate(115200)
@@ -35,10 +38,11 @@ u.setFlowcontrol(False, False)
 # Start a neverending loop waiting for data to arrive.
 # Press Ctrl+C to get out of it.
 while True:
-  if u.dataAvailable():
-    # We are doing 1-byte reads here
-    data_byte = u.readStr(1)
-    print(data_byte)
-    # Just a two-way half-duplex communication example, "X" is a flag
-    if data_byte == "X":
-      u.writeStr("Yes, master!")
+    if u.dataAvailable():
+        # We are doing 1-byte reads here
+        data_byte = u.readStr(1)
+        print(data_byte)
+
+        # Just a two-way half-duplex communication example, "X" is a flag
+        if data_byte == "X":
+            u.writeStr("Yes, master!")

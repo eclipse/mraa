@@ -80,13 +80,6 @@ mraa_platform_t mraa_mips_platform();
 mraa_platform_t mraa_mock_platform();
 
 /**
- * runtime detect running usb platform extender
- *
- * @return mraa_platform_t of the detected platform extender
- */
-mraa_platform_t mraa_usb_platform_extender(mraa_board_t* board);
-
-/**
  * runtime detect iio subsystem
  *
  * @return mraa_result_t indicating success of iio detection
@@ -167,6 +160,16 @@ mraa_result_t mraa_atoi(char* intStr, int* value);
  * @return the matching i2c-dev bus id or -1
  */
 int mraa_find_i2c_bus_pci(const char* pci_device, const char *pci_id, const char* adapter_name);
+
+/**
+ * helper function to find the uart device based on pci data
+ *
+ * @param pci_dev_path points to the location of tty device which corresponds
+ * to the uart device available on the platform
+ * @param dev_name as retrieved from pci_dev_path
+ * @return Result of the operation
+ */
+mraa_result_t mraa_find_uart_bus_pci(const char* pci_dev_path, char** dev_name);
 
 #if defined(IMRAA)
 /**

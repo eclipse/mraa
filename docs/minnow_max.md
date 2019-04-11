@@ -12,20 +12,22 @@ legacy board https://www.minnowboard.org/minnowboard-max
 
 Supported Firmware
 ------------------
-mraa has only been tested with 64 bit firmware version 0.73 or later.
+MRAA has only been tested with 64 bit firmware version 0.73 or later.
 
 SPI
 ---
 For SPI support you need to load the low_speed_spidev kernel module and that
-will create the /dev/spidev0.0 device node. Mraa only knows about this one SPI
+will create the /dev/spidev0.0 device node. MRAA only knows about this one SPI
 bus and no other.
 
 Interface notes
 ---------------
 The low speed I/O connector supported as per table below.  This assumes default
 BIOS settings, as they are not dynamcially detected If any changes are mode
-(Device Manager -> System Setup -> South Cluster -> LPSS & CSS) them mraa calls
+(Device Manager -> System Setup -> South Cluster -> LPSS & CSS) them MRAA calls
 will not behave as expected.
+
+The platform is chardev capable on newer kernels.
 
 Documentation shows i2c on bus #5, ACPI shows it on bus #6, but driver uses
 bus #7.
@@ -60,3 +62,14 @@ bus #7.
 | 26          | 26            | IBL_8254   | 208        | GPIO / I2S MCLK (tb) |
 
 *(tb) New assignment on the MinnowBoard Turbot
+** On 3.18+ kernels, sysfs GPIO numbers are computed using:
+`new_value = old_value | 0x100`
+
+User LED
+---------------
+The MinnowBoard Turbot has one user programmable built-in LED. This is exposed
+as a GPIO from MRAA.
+
+| MRAA Number | Physical Pin  | Function   | Sysfs GPIO | Notes                |
+|-------------|---------------|------------|------------|----------------------|
+| 27          | N/A           | D2_LED     | 104        | Active low           |

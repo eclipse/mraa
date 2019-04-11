@@ -23,14 +23,14 @@
  */
 
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 
 #include <json-c/json.h>
-#include <sys/stat.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 
 #include "mraa_internal.h"
 
@@ -64,9 +64,8 @@ mraa_init_json_platform_get_index(json_object* jobj, const char* io, const char*
 
         *pos = (int) json_object_get_int(jobj_temp);
         if (*pos < 0 || *pos > upper) {
-            syslog(LOG_ERR,
-                   "init_json_platform: %s %s at position: %d, gave: %d which was out of range", io,
-                   key, index, *pos);
+            syslog(LOG_ERR, "init_json_platform: %s %s at position: %d, gave: %d which was out of range",
+                   io, key, index, *pos);
             return MRAA_ERROR_INVALID_RESOURCE;
         }
         return MRAA_SUCCESS;
@@ -291,7 +290,11 @@ mraa_init_json_platform_i2c(json_object* jobj_i2c, mraa_board_t* board, int inde
     json_object* jobj_temp = NULL;
 
     // Default to no mux pins defined
-    board->pins[pin].i2c.mux_total = 0;
+    if (board->pins != NULL) {
+        board->pins[pin].i2c.mux_total = 0;
+    } else {
+        return MRAA_ERROR_NO_DATA_AVAILABLE;
+    }
 
     // Get the I2C bus array index
     ret = mraa_init_json_platform_get_index(jobj_i2c, I2C_KEY, INDEX_KEY, index, &pos, board->i2c_bus_count - 1);
@@ -555,8 +558,9 @@ mraa_init_json_platform_loop(json_object* jobj_platform, const char* obj_key, mr
             jobj_io = json_object_array_get_idx(jobj_temp, i);
             // Check to see it's the right type
             if (!json_object_is_type(jobj_io, json_type_object)) {
-                syslog(LOG_ERR, "init_json_platform: One of more of the elements in the \"%s\" "
-                                "array where not JSON objects",
+                syslog(LOG_ERR,
+                       "init_json_platform: One of more of the elements in the \"%s\" "
+                       "array where not JSON objects",
                        obj_key);
                 return MRAA_ERROR_INVALID_RESOURCE;
             }
@@ -591,8 +595,7 @@ mraa_init_json_platform_size_check(json_object* jobj_platform,
         // make sure we don't have more than our range
         array_length = json_object_array_length(jobj_temp);
         if (array_length > range) {
-            syslog(LOG_ERR,
-                   "init_json_platform: The size of the %s array given was %d, max was: %d",
+            syslog(LOG_ERR, "init_json_platform: The size of the %s array given was %d, max was: %d",
                    obj_key, array_length, range);
             return MRAA_ERROR_INVALID_RESOURCE;
         }
@@ -613,7 +616,7 @@ mraa_init_json_platform(const char* platform_json)
     char* buffer = NULL;
     struct stat st;
     int file_lock = 0, i = 0;
-    json_object *jobj_platform = NULL;
+    json_object* jobj_platform = NULL;
     mraa_board_t* board = NULL;
 
     // Try to lock the file for use
@@ -713,7 +716,13 @@ mraa_init_json_platform(const char* platform_json)
     // This one was allocated and assigned an "Unknown platform" value by now,
     // so we need to reallocate it.
     free(platform_name);
-    platform_name = calloc(strlen(plat->platform_name) + 1, sizeof(char));
+
+    if (!plat->platform_name) {
+        goto unsuccessful;
+    } else {
+        platform_name = calloc(strlen(plat->platform_name) + 1, sizeof(char));
+    }
+
     if (platform_name == NULL) {
         syslog(LOG_ERR, "init_json_platform: Could not allocate memory for platform_name");
         goto unsuccessful;

@@ -131,7 +131,6 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
                     read(fd, readbuf, 31 * sizeof(char));
                     ret = sscanf(readbuf, "%ce:%c%u/%u>>%u", &shortbuf, &signchar, &chan->bits_used,
                                  &padint, &chan->shift);
-                    chan->bytes = padint / 8;
                     // probably should be 5?
                     if (ret < 0) {
                         // cleanup
@@ -139,6 +138,7 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
                         close(fd);
                         return MRAA_IO_SETUP_FAILURE;
                     }
+                    chan->bytes = padint / 8;
                     chan->signedd = (signchar == 's');
                     chan->lendian = (shortbuf == 'l');
                     if (chan->bits_used == 64) {
@@ -172,10 +172,17 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
     }
     closedir(dir);
 
-    // channel location has to be done in channel index order so do it afetr we
+    // channel location has to be done in channel index order so do it after we
     // have grabbed all the correct info
     for (i = 0; i < dev->chan_num; i++) {
-	chan = &dev->channels[i];
+        chan = &dev->channels[i];
+
+        if(chan->bytes <= 0)
+        {
+            syslog(LOG_ERR, "iio: Channel %d with channel bytes value <= 0");
+            return MRAA_IO_SETUP_FAILURE;
+        }
+
         if (curr_bytes % chan->bytes == 0) {
             chan->location = curr_bytes;
         } else {

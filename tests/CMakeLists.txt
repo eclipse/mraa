@@ -36,3 +36,6 @@ if (BUILDSWIGPYTHON)
         message (STATUS "Could not run tests since python interpreter or python bindings not built")
     endif ()
 endif ()
+
+# Add mraa unit tests
+add_subdirectory(unit)

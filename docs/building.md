@@ -10,7 +10,7 @@ For building imraa check @ref buildingimraa page.
 
 Not all these are required but if you're unsure of what you're doing this is
 what you'll need:
-* [SWIG](http://swig.org) 3.0.5+
+* [SWIG](http://swig.org) 3.0.5+ (3.0.12 recommended, on Xenial this can be installed via 3rd party PPAs)
 * [git](http://git-scm.com)
 * [python](http://python.org) 2.7 or 3.4+ (you'll need not just the interpreter but python-dev)
 * [node.js](http://nodejs.org) 4.x recommended (you'll need not just the interpreter but nodejs-dev)
@@ -22,6 +22,13 @@ For Debian-like distros the below command installs the basic set:
 ```bash
 sudo apt-get install git build-essential swig3.0 python-dev nodejs-dev cmake libjson-c-dev
 ```
+
+Adjust as needed, for instance Python 3 builds will require `python3-dev`.
+On Ubuntu Bionic you'll need to downgrade node.js (see [nodesource](https://github.com/nodesource/distributions)
+for some handy install scripts) or patch SWIG. This is explained more in the
+advanced dependencies list below.
+
+### Documentation dependencies
 
 To build the documentation you'll also need:
 * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) 1.8.9.1+
@@ -111,14 +118,43 @@ CC flags to the CC env var
 
 Sometimes it's nice to build a static library, on Linux systems just set
    `-DBUILD_SHARED_LIBS=OFF`
+Note that for static builds the python bindings will not build as they would
+require a static python etc... You can try to link mraa statically to the
+python binding module by adding -fPIC with `-DCMAKE_C_FLAGS=-fPIC`. You can
+also use the node.js gyp build system to get node.js static bindings.
 
 ## Dependencies continued
 
-You'll need at least SWIG version 3.0.2 and we recommend 3.0.5 to build the
+You'll need at least SWIG version 3.0.2 and we recommend 3.0.12 to build the
 JavaScript & Python modules. If your version of SWIG is older than this then
 please see above for disabling `SWIGNODE`. Otherwise you will get a weird build
 failure when building the JavaScript module. The Python module builds with SWIG
 2.x but we don't test it.
+
+### JavaScript bindings for node.js 7.0.0+
+
+Building the JavaScript bindings using the latest versions of node.js does
+involve additional steps due to our dependency on SWIG. In short, a patch is
+needed to compile correctly with node.js 7.0.0 or newer. We found the install
+scripts from nodesource to be very handy for switching versions and they
+support all versions of Ubuntu.
+
+The patch applies cleanly on SWIG 3.0.12, available by default on Ubuntu Bionic
+and through 3rd party PPAs for older distributions. For example, with Xenial or
+Zesty you could use [this](https://launchpad.net/~timsc/+archive/ubuntu/swig-3.0.12).
+
+To patch SWIG on Ubuntu (assumes you start in the home folder):
+
+```
+wget https://git.yoctoproject.org/cgit.cgi/poky/plain/meta/recipes-devtools/swig/swig/0001-Add-Node-7.x-aka-V8-5.2-support.patch
+cd /usr/share/swig3.0
+sudo patch -p2 <~/0001-Add-Node-7.x-aka-V8-5.2-support.patch
+```
+
+Keep in mind that Ubuntu Bionic ships with node.js version 8. You'll need to
+either use the patch or downgrade node.js.
+
+### Build version
 
 During the build, we'll assume you're building from git, note that if you
 compile with `git` installed your version of mraa will be versioned with `git
@@ -137,18 +173,6 @@ source /opt/poky-edison/1.7.2/environment-setup-core2-32-poky-linux
 mkdir build
 cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/oe-sdk_cross.cmake ..
 make
-~~~~~~~~~~~~~
-
-## Using Coverity
-
-This is the procedure to submit a build to Coverity. You'll need to install
-`coverity-submit` for your OS.
-
-~~~~~~~~~~~~~{.sh}
-mkdir covbuild/ && cd covbuild
-cmake -DBUILDDOC=OFF -DBUILDSWIG=OFF ..
-cov-build --dir cov-int make
-tar caf mraa.tar.bz2 cov-int
 ~~~~~~~~~~~~~
 
 ## Building Java bindings
@@ -171,23 +195,6 @@ java -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example
 ~~~~~~~~~~~~~
 
 If you want to add or improve Java bindings for mraa, please follow the <a href="https://github.com/intel-iot-devkit/upm/blob/master/docs/creating_java_bindings.md">Creating Java Bindings Guide</a>.
-
-## Building an IPK/RPM package using `cpack`
-
-You can get `cpack` to generate an IPK or RPM package fairly easily if you have
-the correct packaging tools
-
-~~~~~~~~~~~~~{.sh}
-cmake -DIPK=ON -DCMAKE_INSTALL_PREFIX=/usr ..
-make package
-~~~~~~~~~~~~~
-
-To use RPM simply enable the RPM option. You'll need `rpmbuild` installed on your
-build machine.
-
-~~~~~~~~~~~~~{.sh}
-cmake -DRPM=ON -DCMAKE_INSTALL_PREFIX=/usr ..
-~~~~~~~~~~~~~
 
 ## Building for the Android Things Peripheralmanager Client
 

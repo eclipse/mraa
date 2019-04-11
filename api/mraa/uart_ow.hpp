@@ -24,10 +24,10 @@
 
 #pragma once
 
-#include "uart_ow.h"
 #include "types.hpp"
-#include <stdexcept>
+#include "uart_ow.h"
 #include <cstring>
+#include <stdexcept>
 
 namespace mraa
 {
@@ -37,7 +37,7 @@ namespace mraa
  *
  * This file defines the UartOW (UART to Dallas 1-wire) interface for libmraa
  *
- * @snippet UartOW.cpp Interesting
+ * @snippet uart_ow.cpp Interesting
  */
 class UartOW
 {
@@ -71,6 +71,21 @@ class UartOW
 
         if (m_uart == NULL) {
             throw std::invalid_argument("Error initialising UART");
+        }
+    }
+
+    /**
+     * UartOW Constructor, takes a pointer to the UartOW context and initialises
+     * the UartOW class
+     *
+     * @param uart_ow_context void * to a UartOW context
+     */
+    UartOW(void* uart_ow_context)
+    {
+        m_uart = (mraa_uart_ow_context) uart_ow_context;
+
+        if (m_uart == NULL) {
+            throw std::invalid_argument("Invalid UART_OW context");
         }
     }
 

@@ -40,7 +40,7 @@ namespace mraa
  *
  * This file defines the UART interface for libmraa
  *
- * @snippet Uart-example.cpp Interesting
+ * @snippet uart.cpp Interesting
  */
 class Uart
 {

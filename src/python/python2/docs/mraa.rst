@@ -23,6 +23,13 @@ Gpio
     :undoc-members:
     :show-inheritance:
 
+Led
+===
+.. autoclass:: mraa.Led
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Pwm
 ===
 .. autoclass:: mraa.Pwm
@@ -49,4 +56,4 @@ Common
 
 .. automodule:: mraa
    :members:
-   :exclude-members: Gpio, Aio, Uart, Spi, I2c, Pwm, uint8Array, uint8Array_frompointer
+   :exclude-members: Gpio, Led, Aio, Uart, Spi, I2c, Pwm, uint8Array, uint8Array_frompointer

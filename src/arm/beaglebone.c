@@ -370,6 +370,7 @@ mraa_beaglebone()
 {
     unsigned int emmc_enabled = 1;
     unsigned int hdmi_enabled = 1;
+    unsigned int pcm0_enabled = 1;
     unsigned int i2c0_enabled = 1;
     unsigned int i2c1_enabled = 1;
     unsigned int spi0_enabled = 0;
@@ -408,6 +409,11 @@ mraa_beaglebone()
         hdmi_enabled = 1;
     else
         hdmi_enabled = 0;
+
+    if (mraa_file_exist("/sys/class/sound/pcmC0D0p"))
+        pcm0_enabled = 1;
+    else
+        pcm0_enabled = 0;
 
     if (mraa_file_exist("/sys/class/i2c-dev/i2c-0"))
         i2c0_enabled = 1;
@@ -1256,7 +1262,7 @@ mraa_beaglebone()
     b->pins[BUILD_PIN(P9, 27)].gpio.parent_id = 0;
     b->pins[BUILD_PIN(P9, 27)].gpio.mux_total = 0;
 
-    if (emmc_enabled != 1) {
+    if (pcm0_enabled != 1) {
         if (spi1_enabled == 1) {
             strncpy(b->pins[BUILD_PIN(P9, 28)].name, "SPI1CS0", MRAA_PIN_NAME_SIZE);
             b->pins[BUILD_PIN(P9, 28)].capabilities =
@@ -1275,7 +1281,7 @@ mraa_beaglebone()
     b->pins[BUILD_PIN(P9, 28)].gpio.mux_total = 0;
     b->pins[BUILD_PIN(P9, 28)].spi.mux_total = 0;
 
-    if (emmc_enabled != 1) {
+    if (pcm0_enabled != 1) {
         if (spi1_enabled == 1) {
             strncpy(b->pins[BUILD_PIN(P9, 29)].name, "SPI1D0", MRAA_PIN_NAME_SIZE);
             b->pins[BUILD_PIN(P9, 29)].capabilities =
@@ -1294,7 +1300,7 @@ mraa_beaglebone()
     b->pins[BUILD_PIN(P9, 29)].gpio.mux_total = 0;
     b->pins[BUILD_PIN(P9, 29)].spi.mux_total = 0;
 
-    if (emmc_enabled != 1) {
+    if (pcm0_enabled != 1) {
         if (spi1_enabled == 1) {
             strncpy(b->pins[BUILD_PIN(P9, 30)].name, "SPI1D1", MRAA_PIN_NAME_SIZE);
             b->pins[BUILD_PIN(P9, 30)].capabilities =
@@ -1313,7 +1319,7 @@ mraa_beaglebone()
     b->pins[BUILD_PIN(P9, 30)].gpio.mux_total = 0;
     b->pins[BUILD_PIN(P9, 30)].spi.mux_total = 0;
 
-    if (emmc_enabled != 1) {
+    if (pcm0_enabled != 1) {
         if (spi1_enabled == 1) {
             strncpy(b->pins[BUILD_PIN(P9, 31)].name, "SPI1CLK", MRAA_PIN_NAME_SIZE);
             b->pins[BUILD_PIN(P9, 31)].capabilities =

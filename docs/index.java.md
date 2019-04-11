@@ -51,6 +51,7 @@ Specific platform information for supported platforms is documented here:
 - @ref up
 - @ref joule
 - @ref ft4222
+- @ref iei-tank
 
 ## DEBUGGING
 

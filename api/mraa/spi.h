@@ -34,7 +34,7 @@
  * more information on spidev devices is available
  * [here](https://www.kernel.org/doc/Documentation/spi/spidev).
  *
- * @snippet spi_mcp4261.c Interesting
+ * @snippet spi.c Interesting
  */
 
 #ifdef __cplusplus

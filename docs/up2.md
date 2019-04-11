@@ -20,7 +20,7 @@ The Up Squared present one Raspberry Pi compatible HAT connector and a  60 pin e
 **SPI**
  - Bus frequencies up to 10MHz are supported
  - 3 chip-selects
- - To enable SPI device nodes the ACPI tables need to be overwritten as explained [here](https://up-community.org/wiki/Pinout_UP2#SPI_Ports)
+ - To enable SPI device nodes the ACPI tables need to be overwritten as explained [here](https://wiki.up-community.org/Pinout_UP2#SPI_Ports)
 
 **PWM**
  - Up to 3 channel of PWM

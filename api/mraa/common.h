@@ -50,6 +50,17 @@
                                       if (res != MRAA_SUCCESS) \
                                       return res;} while(0)
 
+/**
+ * Simple deprecated macro
+ */
+#ifdef __GNUC__
+#define DEPRECATED __attribute__((deprecated))
+#elif defined(_MSC_VER)
+#define DEPRECATED __declspec(deprecated)
+#else
+#pragma message("WARNING: You need to implement DEPRECATED for this compiler")
+#define DEPRECATED
+#endif
 
 /** @file
  *
@@ -212,35 +223,35 @@ unsigned int mraa_get_pin_count();
  *
  * @return number of usable UARTs on the platform, returns -1 on failure.
  */
-int mraa_get_uart_count(void);
+int mraa_get_uart_count();
 
 /**
  * Get the number of usable SPI buses, board must be initialised.
  *
  * @return number of usable SPI buses on the platform, returns -1 on failure.
  */
-int mraa_get_spi_bus_count(void);
+int mraa_get_spi_bus_count();
 
 /**
  * Get the number of usable PWM pins, board must be initialised.
  *
  * @return number of PWMs on the current platform, -1 on failure.
  */
-int mraa_get_pwm_count(void);
+int mraa_get_pwm_count();
 
 /**
  * Get the number of usable GPIOs, board must be initialised.
  *
  * @return number of usable external GPIO pins on the board, -1 on failure.
  */
-int mraa_get_gpio_count(void);
+int mraa_get_gpio_count();
 
 /**
  * Get the number of usable analog pins, board must be initialised.
  *
  * @return number of usable ADC inputs on the platform and -1 on failure.
  */
-int mraa_get_aio_bus_count(void);
+int mraa_get_aio_count();
 
 /**
  * Get platform usable I2C bus count, board must be initialised.

@@ -38,6 +38,7 @@ extern "C" {
 #define MRAA_96BOARDS_LS_SPI_COUNT  1
 #define MRAA_96BOARDS_LS_UART_COUNT 2
 #define MRAA_96BOARDS_LS_PIN_COUNT  40
+#define MRAA_96BOARDS_LED_COUNT 6
 
 mraa_board_t* mraa_96boards();
 

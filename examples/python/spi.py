@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-# Author: Brendan Le Foll <brendan.le.foll@intel.com>
-# Copyright (c) 2015 Intel Corporation.
+# Author: Henry Bruce <henry.bruce@intel.com>
+# Copyright (c) 2016 Intel Corporation.
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -22,22 +22,24 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 
-import mraa as m
-import random as rand
+# Example Usage: Read from MCP3004 ADC pin 0 in single ended mode
 
-# Excuse the super boring example, I was out of fun devices to play with, this
-# will write and read the same data back to itself, a few 100 times, just short
-# MISO & MOSI on your board
+import mraa
+import time
 
-dev = m.Spi(0)
+# initialise SPI
+dev = mraa.Spi(0)
 
-for x in range(0,100):
-  txbuf = bytearray(4)
-  for y in range(0,4):
-    txbuf[y] = rand.randrange(0, 256)
-  rxbuf = dev.write(txbuf)
-  if rxbuf != txbuf:
-    print("We have an error captain!")
-    break
-    exit(1)
+# prepare data to send
+txbuf = bytearray(3)
+txbuf[0] = 0x01
+txbuf[1] = 0x80
+txbuf[2] = 0x00
 
+while True:
+    # send data through SPI
+    rxbuf = dev.write(txbuf)
+    value = ((rxbuf[1] & 0x03) << 8) | rxbuf[2]
+    print(value)
+
+    time.sleep(0.5)
