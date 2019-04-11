@@ -11,6 +11,10 @@ else ()
   set (CMAKE_C_STANDARD 99)
 endif ()
 
+if (CMAKE_VERSION VERSION_GREATER "3.13")
+  cmake_policy(SET CMP0078 OLD)
+endif ()
+
 ###############################################################################
 # Detect supported warning flags
 # Modified from work By Dan Liew (fpbench - MIT)
