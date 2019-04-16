@@ -343,7 +343,12 @@ mraa_96boards()
 
     // SPI
     b->spi_bus_count = MRAA_96BOARDS_LS_SPI_COUNT;
-    b->spi_bus[0].bus_id = 0;
+    if(strncmp(b->platform_name, PLATFORM_NAME_ROCK960, MAX_SIZE) == 0) {
+        b->spi_bus[0].bus_id = 32766;
+    }
+    else {
+        b->spi_bus[0].bus_id = 0;
+    }
     b->def_spi_bus = 0;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * b->phy_pin_count);
