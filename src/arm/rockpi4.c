@@ -115,7 +115,11 @@ mraa_rockpi4()
     }
 
     b->pins[11].pwm.parent_id = 0;
+    b->pins[11].pwm.mux_total = 0;
+    b->pins[11].pwm.pinmap = 0;
     b->pins[13].pwm.parent_id = 1;
+    b->pins[13].pwm.mux_total = 0;
+    b->pins[13].pwm.pinmap = 0;
 
     b->aio_count = MRAA_ROCKPI4_AIO_COUNT;
     b->adc_raw = 10;
