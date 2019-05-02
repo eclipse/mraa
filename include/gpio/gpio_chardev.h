@@ -64,6 +64,7 @@ mraa_boolean_t mraa_is_gpio_line_open_drain(mraa_gpiod_line_info *linfo);
 mraa_boolean_t mraa_is_gpio_line_open_source(mraa_gpiod_line_info *linfo);
 
 int mraa_get_number_of_gpio_chips();
+int mraa_get_chip_infos(mraa_gpiod_chip_info*** cinfos);
 
 /* Multiple gpio support. */
 typedef struct _gpio_group* mraa_gpiod_group_t;

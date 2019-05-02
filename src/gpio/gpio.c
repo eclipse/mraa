@@ -164,6 +164,122 @@ init_internal_cleanup:
 }
 
 mraa_gpio_context
+mraa_gpio_init_by_name(char* name)
+{
+    mraa_board_t* board = plat;
+    mraa_gpio_context dev;
+    mraa_gpiod_group_t gpio_group;
+    mraa_gpiod_line_info* linfo = NULL;
+    mraa_gpiod_chip_info* cinfo;
+    mraa_gpiod_chip_info** cinfos;
+    int i, line_found, line_offset;
+
+    if (name == NULL) {
+        syslog(LOG_ERR, "[GPIOD_INTERFACE]: Gpio name not valid");
+        return NULL;
+    }
+
+    if (!board->chardev_capable) {
+        syslog(LOG_ERR, "[GPIOD_INTERFACE]: gpio_init_by_name not available for this platform!");
+        return NULL;
+    }
+
+    dev = (mraa_gpio_context) calloc(1, sizeof(struct _gpio));
+    if (dev == NULL) {
+        syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for context");
+        return NULL;
+    }
+
+    dev->pin_to_gpio_table = malloc(sizeof(int));
+    if (dev->pin_to_gpio_table == NULL) {
+        syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+        mraa_gpio_close(dev);
+        return NULL;
+    }
+
+    dev->num_chips = mraa_get_chip_infos(&cinfos);
+    if (dev->num_chips <= 0) {
+        mraa_gpio_close(dev);
+        return NULL;
+    }
+
+    /* We are dealing with a single GPIO */
+    dev->num_pins = 1;
+
+    gpio_group = calloc(dev->num_chips, sizeof(struct _gpio_group));
+    if (gpio_group == NULL) {
+        syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+        mraa_gpio_close(dev);
+        return NULL;
+    }
+
+    dev->gpio_group = gpio_group;
+    for (i = 0; i < dev->num_chips; ++i) {
+        gpio_group[i].gpio_chip = i;
+        gpio_group[i].gpio_lines = NULL;
+    }
+
+    /* Iterate over all gpiochips in the platform to find the requested line */
+    for_each_gpio_chip(cinfo, cinfos, dev->num_chips)
+    {
+        for (i = 0; i < cinfo->chip_info.lines; i++) {
+            linfo = mraa_get_line_info_by_chip_name(cinfo->chip_info.name, i);
+            if (!strncmp(linfo->name, name, 32)) {
+                /* idx is coming from `for_each_gpio_chip` definition */
+                syslog(LOG_DEBUG, "[GPIOD_INTERFACE]: Chip: %d Line: %d", idx, i);
+                if (!gpio_group[idx].is_required) {
+                    gpio_group[idx].dev_fd = cinfo->chip_fd;
+                    gpio_group[idx].is_required = 1;
+                    gpio_group[idx].gpiod_handle = -1;
+                }
+
+                /* Map pin to _gpio_group structure. */
+                dev->pin_to_gpio_table[0] = idx;
+                gpio_group[idx].gpio_lines = realloc(gpio_group[idx].gpio_lines, sizeof(unsigned int));
+                gpio_group[idx].gpio_lines[0] = i;
+                gpio_group[idx].num_gpio_lines++;
+
+                line_found = 1;
+                line_offset = i;
+
+                break;
+            }
+        }
+    }
+
+    if (!line_found) {
+        syslog(LOG_ERR, "[GPIOD_INTERFACE]: Gpio not found!");
+        return NULL;
+    }
+
+    /* Initialize rw_values for read / write multiple functions */
+    for (i = 0; i < dev->num_chips; ++i) {
+        gpio_group[i].rw_values = calloc(gpio_group[i].num_gpio_lines, sizeof(unsigned char));
+        if (gpio_group[i].rw_values == NULL) {
+            syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+            mraa_gpio_close(dev);
+            return NULL;
+        }
+
+        gpio_group[i].event_handles = NULL;
+    }
+
+    /* Save the provided array from the user to our internal structure. */
+    dev->provided_pins = malloc(dev->num_pins * sizeof(int));
+    if (dev->provided_pins == NULL) {
+        syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+        mraa_gpio_close(dev);
+        return NULL;
+    }
+
+    memcpy(dev->provided_pins, &line_offset, dev->num_pins * sizeof(int));
+
+    dev->events = NULL;
+
+    return dev;
+}
+
+mraa_gpio_context
 mraa_gpio_init(int pin)
 {
     mraa_board_t* board = plat;

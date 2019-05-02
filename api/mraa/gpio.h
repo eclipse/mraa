@@ -125,6 +125,14 @@ typedef mraa_gpio_event* mraa_gpio_events_t;
 mraa_gpio_context mraa_gpio_init(int pin);
 
 /**
+ * Initialise gpio_context, based on gpio line name
+ *
+ *  @param name GPIO line name, i.e GPIO-A
+ *  @returns gpio context or NULL
+ */
+mraa_gpio_context mraa_gpio_init_by_name(char* name);
+
+/**
  * Initialise gpio_context, based on board number, for multiple pins (can be one).
  *
  *  @param pins Pin array read from the board

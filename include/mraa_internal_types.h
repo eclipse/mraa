@@ -174,6 +174,11 @@ struct _gpio {
         ++k) \
             if (dev->gpio_group[k].is_required)
 
+#define for_each_gpio_chip(cinfo, cinfos, num_chips) \
+    for (int idx = 0; \
+        idx < num_chips && (cinfo = cinfos[idx]); \
+        (idx++))
+
 /**
  * A structure representing a I2C bus
  */
