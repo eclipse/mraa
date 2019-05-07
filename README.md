@@ -16,6 +16,9 @@ The intent is to make it easier for developers and sensor manufacturers to map
 their sensors & actuators on top of supported hardware and to allow control of
 low level communication protocol by high level languages & constructs.
 
+The MRAA project is joining the Eclipse Foundation as an Eclipse IoT project.
+You can read more about this [here](https://projects.eclipse.org/proposals/eclipse-mraa).
+
 [![Build Status](https://travis-ci.org/intel-iot-devkit/mraa.svg?branch=master)](https://travis-ci.org/intel-iot-devkit/mraa) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=mraa-master&metric=alert_status)](https://sonarcloud.io/dashboard?id=mraa-master)
 
 Supported Boards
