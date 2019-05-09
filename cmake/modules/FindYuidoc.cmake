@@ -1,3 +1,6 @@
+# Copyright (c) 2015 Intel Corporation
+# SPDX-License-Identifier: MIT
+
 find_program (YUIDOC_EXECUTABLE NAMES yuidoc
   HINTS $ENV{YUIDOC_DIR}
     PATHS usr usr/local
