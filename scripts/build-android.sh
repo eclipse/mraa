@@ -3,6 +3,8 @@
 # The script is used to build .aar packages for Mraa modules.
 #
 # Author: Nicolas Oliver <dario.n.oliver@intel.com>
+# Copyright (c) 2017 Intel Corporation.
+# SPDX-License-Identifier: MIT
 #
 # All environment variables used are passed from docker-compose.
 # Those environment variables can also be declared in the host,

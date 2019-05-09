@@ -20,7 +20,9 @@ output will be written (the file will be clobbered).
 #   http://www.faqs.org/docs/diveintopython/kgp_divein.html
 #
 # Author: Prabhu Ramachandran
-# License: BSD style
+# License: BSD style (https://alioth-lists.debian.net/pipermail/pkg-a11y-devel/Week-of-Mon-20171030/000247.html)
+# SPDX-License-Identifier: BSD-3-Clause
+# 
 #
 # Thanks:
 #   Johan Hake:  the include_function_definition feature

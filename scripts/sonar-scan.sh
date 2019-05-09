@@ -4,6 +4,8 @@
 # analysis scan via SonarCloud.
 #
 # Author: Alex Tereschenko <alext.mkrs@gmail.com>
+# Copyright (c) 2017 Alex Tereschenko.
+# SPDX-License-Identifier: MIT
 #
 # All environment variables used are passed from either Travis or docker-compose.
 # See details at https://docs.sonarqube.org/display/SONAR/Analysis+Parameters.

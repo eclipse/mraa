@@ -1,4 +1,9 @@
-/* This currently works only on Intel Joule Platform. */
+/*
+ * Copyright (c) 2017 Mihai Stefanescu
+ * SPDX-License-Identifier: MIT
+ *
+ * This currently works only on Intel Joule Platform.
+ */
 
 #include <stdio.h>
 #include <signal.h>
