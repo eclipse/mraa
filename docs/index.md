@@ -60,6 +60,7 @@ Specific platform information for supported platforms is documented here:
 - @ref linkit_7688
 - @ref omega2
 - @ref iei-tank
+- @ref upXtreme
 
 ## DEBUGGING
 

@@ -66,6 +66,7 @@ typedef enum {
     MRAA_ADLINK_IPI = 21,           /**< Adlink Industrial PI */
     MRAA_ADLINK_LEC_AL = 22,        /**< Adlink LEC-AL*/
     MRAA_ADLINK_LEC_AL_AI = 23,        /**< Adlink LEC-AL*/
+    MRAA_UPXTREME = 24,             /**< The UPXTREME Board */
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 

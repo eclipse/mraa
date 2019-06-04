@@ -24,6 +24,7 @@
 #include "x86/intel_joule_expansion.h"
 #include "x86/iei_tank.h"
 #include "x86/intel_adlink_lec_al.h"
+#include "x86/up_xtreme.h"
 
 mraa_platform_t
 mraa_x86_platform()
@@ -98,6 +99,9 @@ mraa_x86_platform()
 	    } else if ((strncasecmp(line, "LEC-AL", strlen("LEC-AL") + 1) == 0) ) {
                 platform_type = MRAA_ADLINK_LEC_AL;
                 plat = mraa_lec_al_board();
+            } else if (strncasecmp(line, "UP-WHL01", strlen("UP-WHL01") + 1) == 0) {
+                platform_type = MRAA_UPXTREME;
+                plat = mraa_upxtreme_board();
             } else {
                 syslog(LOG_ERR, "Platform not supported, not initialising");
                 platform_type = MRAA_UNKNOWN_PLATFORM;
@@ -162,6 +166,8 @@ mraa_x86_platform()
     plat = mraa_joule_expansion_board();
     #elif defined(xMRAA_IEI_TANK)
     plat = mraa_iei_tank();
+    #elif defined(xMRAA_UPXTREME)
+    plat = mraa_upxtreme_board();
     #else
         #error "Not using a valid platform value from mraa_platform_t - cannot compile"
     #endif
