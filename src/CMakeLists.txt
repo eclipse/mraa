@@ -56,6 +56,7 @@ set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/intel_joule_expansion.c
   ${PROJECT_SOURCE_DIR}/src/x86/iei_tank.c
   ${PROJECT_SOURCE_DIR}/src/x86/adlink-ipi.c
+  ${PROJECT_SOURCE_DIR}/src/x86/up_xtreme.c
 )
 
 message (STATUS "INFO - Adding support for platform ${MRAAPLATFORMFORCE}")
@@ -87,6 +88,8 @@ if (NOT ${MRAAPLATFORMFORCE} STREQUAL "ALL")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_joule_expansion.c)
   elseif( ${MRAAPLATFORMFORCE} STREQUAL "MRAA_IEI_TANK")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/iei_tank.c)
+  elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_UPXTREME")
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/up_xtreme.c)
   else ()
     message (FATAL_ERROR "Unknown x86 platform enabled!")
   endif ()

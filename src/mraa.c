@@ -286,7 +286,7 @@ mraa_deinit()
          * which means this has to be handled differently per platform
          */
         if ((plat->platform_type == MRAA_JSON_PLATFORM) || (plat->platform_type == MRAA_UP2) ||
-            (plat->platform_type == MRAA_IEI_TANK)) {
+            (plat->platform_type == MRAA_IEI_TANK) || (plat->platform_type == MRAA_UPXTREME)) {
             for (i = 0; i < plat->uart_dev_count; i++) {
                 if (plat->uart_dev[i].device_path != NULL) {
                     free(plat->uart_dev[i].device_path);
