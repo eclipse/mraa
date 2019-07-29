@@ -112,7 +112,7 @@ AndroidManifest_xml='<?xml version="1.0" encoding="utf-8"?>
 </manifest>'
 
 # Package prefix
-JAVA_PKG_PREFIX_DOT="io.mraa.at"
+JAVA_PKG_PREFIX_DOT="org.eclipse.mraa.at"
 
 # Package prefix slash to dot
 JAVA_PKG_PREFIX_SLASH="${JAVA_PKG_PREFIX_DOT//\./\/}/upm"
@@ -158,7 +158,7 @@ jar cf $PKG_BUNDLE_DIR/$LIB_NAME-$VERSION-javadoc.jar $LIB_NAME-javadoc/*
 jar cf $PKG_BUNDLE_DIR/$LIB_NAME-$VERSION-sources.jar src/java/*.java
 
 # HACK - mraa pom file groupId is io.mraa (AT is io.mraa.at)
-perl -p -i.bak -e 's/(groupId>)(.*?)(<\/groupId)/\1io.mraa.at\3/' src/java/$LIB_NAME-$VERSION.pom
+perl -p -i.bak -e 's/(groupId>)(.*?)(<\/groupId)/\1org.eclipse.mraa.at\3/' src/java/$LIB_NAME-$VERSION.pom
 
 # HACK - mraa pom file packaging is 'jar' (convert this to 'aar')
 perl -p -i.bak -e 's/(packaging>)(.*?)(<\/packaging)/\1aar\3/' src/java/$LIB_NAME-$VERSION.pom
