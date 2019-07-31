@@ -436,7 +436,7 @@ mraa_uart_settings(int index, const char **devpath, const char **name, int* baud
        }
 
        if (xonxoff != NULL) {
-           *xonxoff = term.c_cflag & (IXON|IXOFF);
+           *xonxoff = term.c_iflag & (IXON|IXOFF);
        }
 
        close(fd);
