@@ -1068,13 +1068,23 @@ mraa_file_contains(const char* filename, const char* content)
     char* file = mraa_file_unglob(filename);
     if (file != NULL) {
         size_t len = 0;
+        size_t read = 0;
         char* line = NULL;
         FILE* fh = fopen(file, "r");
         if (fh == NULL) {
             free(file);
             return 0;
         }
-        while ((getline(&line, &len, fh) != -1) && (found == 0)) {
+        while (((read = getline(&line, &len, fh)) != -1) && (found == 0)) {
+            if (strlen(line) < read) {
+                char* ptr = line;
+                while (ptr < line + read) {
+                    if (*ptr == '\0') {
+                        *ptr = ' ';
+                    }
+                    ++ptr;
+                }
+            }
             if (strstr(line, content)) {
                 found = 1;
                 break;
@@ -1098,13 +1108,23 @@ mraa_file_contains_both(const char* filename, const char* content, const char* c
     char* file = mraa_file_unglob(filename);
     if (file != NULL) {
         size_t len = 0;
+        size_t read = 0;
         char* line = NULL;
         FILE* fh = fopen(file, "r");
         if (fh == NULL) {
             free(file);
             return 0;
         }
-        while ((getline(&line, &len, fh) != -1) && (found == 0)) {
+        while (((read = getline(&line, &len, fh)) != -1) && (found == 0)) {
+            if (strlen(line) < read) {
+                char* ptr = line;
+                while (ptr < line + read) {
+                    if (*ptr == '\0') {
+                        *ptr = ' ';
+                    }
+                    ++ptr;
+                }
+            }
             if (strstr(line, content) && strstr(line, content2)) {
                 found = 1;
                 break;
