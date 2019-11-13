@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 /* mraa header */
 #include "mraa/uart.h"
@@ -58,8 +59,10 @@ main(int argc, char** argv)
 {
     mraa_result_t status = MRAA_SUCCESS;
     mraa_uart_context uart;
-    char buffer[] = "Hello Mraa!";
-
+//    char buffer[] = "Hello Mraa!";
+char buf[20];   
+char buffer1[20];	
+	int rec=0,i=0;
     int baudrate = 9600, stopbits = 1, databits = 8;
     mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
     unsigned int ctsrts = FALSE, xonxoff = FALSE;
@@ -80,22 +83,29 @@ main(int argc, char** argv)
     }
 
     /* set serial port parameters */
-    status =
-    mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
+    status = mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
     if (status != MRAA_SUCCESS) {
         goto err_exit;
     }
 
-    while (flag) {
-        /* send data through uart */
-        mraa_uart_write(uart, buffer, sizeof(buffer));
+    while (flag) 
+    {
+	//printf("while start\n");
+	rec=mraa_uart_read(uart,buffer1,sizeof(buffer1));
+	//sleep(1);
+	for(i=0;i<20;i++)
+        buf[i] = buffer1[i];
+//	printf("Recv:%d:",rec);
+//	printf("Message Received:" );	
+	printf("%s\n",buf);
+	memset(buffer1,0,sizeof(buffer1));
+	memset(buf,0,sizeof(buf));	
+//	printf("while end\n");   
+ }	
 
-        sleep(1);
-    }
-
+	
     /* stop uart */
     mraa_uart_stop(uart);
-
     //! [Interesting]
     /* deinitialize mraa for the platform (not needed most of the time) */
     mraa_deinit();

@@ -33,7 +33,7 @@
 #include "arm/phyboard.h"
 #include "arm/raspberry_pi.h"
 #include "mraa_internal.h"
-
+#include "arm/phyboard_pico.h"
 
 mraa_platform_t
 mraa_arm_platform()
@@ -57,6 +57,12 @@ mraa_arm_platform()
                         platform_type = MRAA_PHYBOARD_WEGA;
                     } else {
                         platform_type = MRAA_BEAGLEBONE;
+                    }
+                } else if (strstr(line, "Freescale i.MX6 Ultralite")) {
+                    if(mraa_file_contains("/proc/device-tree/model", "phyBOARD-Segin")) {
+                        platform_type = MRAA_PHYBOARD_RUGGED_IMX6UL;
+                    } else {
+                        platform_type = MRAA_PHYBOARD_WEGA;
                     }
                 } else if (strstr(line, "HiKey Development Board")) {
                     platform_type = MRAA_96BOARDS;
@@ -113,6 +119,9 @@ mraa_arm_platform()
             break;
         case MRAA_PHYBOARD_WEGA:
             plat = mraa_phyboard();
+            break;
+        case MRAA_PHYBOARD_RUGGED_IMX6UL:
+            plat = mraa_phyboard_pico();
             break;
         case MRAA_BANANA:
             plat = mraa_banana();

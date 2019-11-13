@@ -37,8 +37,7 @@
 #include "mraa/gpio.h"
 
 /* gpio declaration */
-#define GPIO_PIN_1 23
-#define GPIO_PIN_2 24
+#define GPIO_PIN_1 49
 
 volatile sig_atomic_t flag = 1;
 
@@ -55,7 +54,7 @@ int
 main(void)
 {
     mraa_result_t status = MRAA_SUCCESS;
-    mraa_gpio_context gpio_1, gpio_2;
+    mraa_gpio_context gpio_1;
 
     /* install signal handler */
     signal(SIGINT, sig_handler);
@@ -72,46 +71,23 @@ main(void)
         return EXIT_FAILURE;
     }
 
-    /* initialize GPIO pin */
-    gpio_2 = mraa_gpio_init(GPIO_PIN_2);
-    if (gpio_2 == NULL) {
-        fprintf(stderr, "Failed to initialize GPIO %d\n", GPIO_PIN_2);
-        mraa_deinit();
-        return EXIT_FAILURE;
-    }
-
     /* set GPIO to output */
     status = mraa_gpio_dir(gpio_1, MRAA_GPIO_OUT);
     if (status != MRAA_SUCCESS) {
         goto err_exit;
     }
 
-    /* set GPIO to output */
-    status = mraa_gpio_dir(gpio_2, MRAA_GPIO_OUT);
-    if (status != MRAA_SUCCESS) {
-        goto err_exit;
-    }
-
     /* toggle both GPIO's */
     while (flag) {
-        status = mraa_gpio_write(gpio_1, 1);
-        if (status != MRAA_SUCCESS) {
-            goto err_exit;
-        }
-
-        status = mraa_gpio_write(gpio_2, 0);
-        if (status != MRAA_SUCCESS) {
-            goto err_exit;
-        }
-
-        sleep(1);
-
         status = mraa_gpio_write(gpio_1, 0);
         if (status != MRAA_SUCCESS) {
             goto err_exit;
         }
 
-        status = mraa_gpio_write(gpio_2, 1);
+
+        sleep(1);
+
+        status = mraa_gpio_write(gpio_1, 1);
         if (status != MRAA_SUCCESS) {
             goto err_exit;
         }
@@ -121,12 +97,6 @@ main(void)
 
     /* release gpio's */
     status = mraa_gpio_close(gpio_1);
-    if (status != MRAA_SUCCESS) {
-        goto err_exit;
-    }
-
-    /* close GPIO */
-    status = mraa_gpio_close(gpio_2);
     if (status != MRAA_SUCCESS) {
         goto err_exit;
     }

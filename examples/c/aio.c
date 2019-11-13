@@ -35,7 +35,7 @@
 #include "mraa/aio.h"
 
 /* AIO port */
-#define AIO_PORT 0
+#define AIO_PORT 27
 
 volatile sig_atomic_t flag = 1;
 

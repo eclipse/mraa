@@ -1,0 +1,4088 @@
+From a2b30a5be8b8b1f5b01d9d81448bc96d399cd9fd Mon Sep 17 00:00:00 2001
+From: mahitha-n <mahitha.n@ruggedboard.com>
+Date: Wed, 13 Nov 2019 11:09:36 +0530
+Subject: [PATCH] v1.0
+
+Signed-off-by: mahitha-n <mahitha.n@ruggedboard.com>
+---
+ examples/c++/uart.cpp         |   4 +-
+ examples/c/aio.c              |   2 +-
+ examples/c/button.c           |  30 +++
+ examples/c/button_LED.c       |  70 +++++++
+ examples/c/button_gpio.c      |  41 ++++
+ examples/c/gpio.c             |  38 +---
+ examples/c/gpio_RB.c          |   6 +
+ examples/c/gpio_advanced.c    |  26 ++-
+ examples/c/gpio_led_toggle.c  |  68 +++++++
+ examples/c/hello_RB.c         |   9 +
+ examples/c/initio.c           |   2 +-
+ examples/c/pwm.c              |   3 +-
+ examples/c/uart.c             |  44 +++--
+ examples/c/uart_RB.c          |  66 +++++++
+ examples/c/uart_a.c           | 115 ++++++++++++
+ examples/c/uart_r.c           | 119 ++++++++++++
+ examples/c/uart_r_dy.c        | 125 +++++++++++++
+ examples/c/uart_rdy_relay.c   | 167 +++++++++++++++++
+ examples/c/uart_w.c           | 119 ++++++++++++
+ examples/c/uart_w_dy.c        | 123 ++++++++++++
+ examples/c/uart_wdy_relay.c   | 140 ++++++++++++++
+ examples/python/gpio.py       |   8 +-
+ src/CMakeLists.txt            |   2 +-
+ src/aio/aio.c                 |  15 +-
+ src/arm/96boards.c            |  16 +-
+ src/arm/arm.c                 |  22 +--
+ src/arm/beaglebone.c          |  14 +-
+ src/arm/phyboard_pico.c       | 426 ++++++++++++++++++++++++++++++++++++++++++
+ src/arm/raspberry_pi.c        |  28 +--
+ src/arm/rockpi4.c             | 184 ------------------
+ src/doxy2swig.py              |   0
+ src/gpio/gpio.c               | 240 ++++++------------------
+ src/gpio/gpio_chardev.c       |  82 +++-----
+ src/iio/iio.c                 |  13 +-
+ src/initio/initio.c           |  14 +-
+ src/json/jsonplatform.c       |  33 ++--
+ src/mraa.c                    | 216 ++++++++++-----------
+ src/pwm/pwm.c                 |   4 +-
+ src/x86/intel_galileo_rev_g.c |   1 +
+ src/x86/x86.c                 |   2 -
+ 40 files changed, 1925 insertions(+), 712 deletions(-)
+ create mode 100644 examples/c/button.c
+ create mode 100644 examples/c/button_LED.c
+ create mode 100644 examples/c/button_gpio.c
+ create mode 100644 examples/c/gpio_RB.c
+ create mode 100644 examples/c/gpio_led_toggle.c
+ create mode 100644 examples/c/hello_RB.c
+ create mode 100644 examples/c/uart_RB.c
+ create mode 100644 examples/c/uart_a.c
+ create mode 100644 examples/c/uart_r.c
+ create mode 100644 examples/c/uart_r_dy.c
+ create mode 100644 examples/c/uart_rdy_relay.c
+ create mode 100644 examples/c/uart_w.c
+ create mode 100644 examples/c/uart_w_dy.c
+ create mode 100644 examples/c/uart_wdy_relay.c
+ create mode 100644 src/arm/phyboard_pico.c
+ delete mode 100644 src/arm/rockpi4.c
+ mode change 100755 => 100644 src/doxy2swig.py
+
+diff --git a/examples/c++/uart.cpp b/examples/c++/uart.cpp
+index 6ac6fa1..81949ff 100644
+--- a/examples/c++/uart.cpp
++++ b/examples/c++/uart.cpp
+@@ -61,10 +61,9 @@ main(void)
+     // If you have a valid platform configuration use numbers to represent uart
+     // device. If not use raw mode where std::string is taken as a constructor
+     // parameter
+-    mraa::Uart* uart, *temp;
++    mraa::Uart* uart;
+     try {
+         uart = new mraa::Uart(UART_PORT);
+-        temp = uart;
+     } catch (std::exception& e) {
+         std::cerr << e.what() << ", likely invalid platform config" << std::endl;
+     }
+@@ -97,7 +96,6 @@ main(void)
+     //! [Interesting]
+ 
+     delete uart;
+-    delete temp;
+ 
+     return EXIT_SUCCESS;
+ }
+diff --git a/examples/c/aio.c b/examples/c/aio.c
+index ea9e023..d659281 100644
+--- a/examples/c/aio.c
++++ b/examples/c/aio.c
+@@ -35,7 +35,7 @@
+ #include "mraa/aio.h"
+ 
+ /* AIO port */
+-#define AIO_PORT 0
++#define AIO_PORT 27
+ 
+ volatile sig_atomic_t flag = 1;
+ 
+diff --git a/examples/c/button.c b/examples/c/button.c
+new file mode 100644
+index 0000000..1fcccf4
+--- /dev/null
++++ b/examples/c/button.c
+@@ -0,0 +1,30 @@
++#include <mraa.h>
++#include <inttypes.h>
++
++#define BTN_PIN      52       /**< Button is connected to this pin */
++
++
++int main(void)
++{
++	mraa_gpio_context      btnPin;  /* Will be used to represnt the button pin */
++
++	uint32_t               status;   /* Used to toggle the LED */
++	uint32_t               btnState; /* Used to capture the state of the button */
++	
++	mraa_init();
++
++	btnPin = mraa_gpio_init(BTN_PIN);
++
++	mraa_gpio_dir(btnPin, MRAA_GPIO_IN);
++
++	while(1)
++	{
++		status = mraa_gpio_read(btnPin);
++		printf("STATUS = %d..\n\n",status);
++		if(status == 0)
++			printf("button pressed \n");
++	sleep(10);
++	}
++
++	return 0;
++}
+diff --git a/examples/c/button_LED.c b/examples/c/button_LED.c
+new file mode 100644
+index 0000000..aeffba8
+--- /dev/null
++++ b/examples/c/button_LED.c
+@@ -0,0 +1,70 @@
++
++#include <mraa.h>
++#include <inttypes.h>
++
++#define LED_PIN      49        /**< The pin where the LED is connected */
++#define BTN_PIN      52        /**< Button is connected to this pin */
++
++
++int main(void)
++{
++    mraa_gpio_context      ledPin;  /* Will be used to represnt the LED pin */
++    mraa_gpio_context      btnPin;  /* Will be used to represnt the button pin */
++    
++    uint32_t               toggle;   /* Used to toggle the LED */
++    uint32_t               btnState; /* Used to capture the state of the button */
++    
++    
++    
++    /* Step1: Init the mraa subsystem */
++    mraa_init();
++    
++    /* Step2: Set the ledPin is 49 and btnPin is 52 */
++    ledPin = mraa_gpio_init(LED_PIN);
++    btnPin = mraa_gpio_init(BTN_PIN);
++     
++    /* Step3: Set the 'ledPin(49)' pin as output */
++    mraa_gpio_dir(ledPin, MRAA_GPIO_OUT);
++    
++    /* LED is turned off to start with */
++    toggle = 0;                     
++    mraa_gpio_write(ledPin, toggle);
++    
++    /* 
++     * Step4: Set the 'btnPin(52)' pin as input, will be used to read
++     * the button state
++     */
++    mraa_gpio_dir(btnPin, MRAA_GPIO_IN);
++    
++    while(1)
++    {
++      /* Step5: Wait until there is some activty on the button pin */
++      while (mraa_gpio_read(btnPin) != 0)
++      { }
++      /* 
++       * Step6: Button state has changed, wait for signal to settle, and 
++       * then read the pin again to get the 'stable' signal, this is 
++       * simplest form of debouncing.
++       */
++       usleep(10);  /* man usleep */
++       if (mraa_gpio_read(btnPin) == 1)
++       {
++           /* Step7: Control the LED state based on the button toggle */
++           if (toggle == 0)
++           {
++               toggle = 0;  /* If the LED is off, trun it on */
++               
++           }
++           else
++           {
++               toggle = 1;  /* Turn off the LED */
++           }
++           mraa_gpio_write(ledPin, toggle);
++       }
++       // else: false click, ignore it
++    }
++    
++    return 0;
++}
++
++
+diff --git a/examples/c/button_gpio.c b/examples/c/button_gpio.c
+new file mode 100644
+index 0000000..b782b5e
+--- /dev/null
++++ b/examples/c/button_gpio.c
+@@ -0,0 +1,41 @@
++#include <mraa.h>
++#include <inttypes.h>
++
++#define LED_PIN      49       /**< The pin where the LED is connected */
++#define BTN_PIN      52       /**< Button is connected to this pin */
++
++
++int main(void)
++{
++  mraa_gpio_context      ledPin;  /* Will be used to represnt the LED pin */
++  mraa_gpio_context      btnPin;  /* Will be used to represnt the button pin */
++
++  uint32_t               status;   /* Used to toggle the LED */
++  uint32_t               btnState; /* Used to capture the state of the button */
++
++  mraa_init();
++
++  ledPin = mraa_gpio_init(LED_PIN);
++  btnPin = mraa_gpio_init(BTN_PIN);
++
++  mraa_gpio_dir(ledPin, MRAA_GPIO_OUT);
++  mraa_gpio_dir(btnPin, MRAA_GPIO_IN);
++
++while(1)
++{
++  status = mraa_gpio_read(btnPin);
++  printf("STATUS = %d..\n\n",status);
++    if(status == 0)
++    {
++        mraa_gpio_write(ledPin, 0);    
++        printf("LED ON \n");
++    }
++    else
++    {
++        printf("LED OFF \n");
++        mraa_gpio_write(ledPin, 1); // active low 0 is on the led
++    }
++}
++
++return 0;
++}
+diff --git a/examples/c/gpio.c b/examples/c/gpio.c
+index 793a4aa..d90d20e 100644
+--- a/examples/c/gpio.c
++++ b/examples/c/gpio.c
+@@ -37,8 +37,7 @@
+ #include "mraa/gpio.h"
+ 
+ /* gpio declaration */
+-#define GPIO_PIN_1 23
+-#define GPIO_PIN_2 24
++#define GPIO_PIN_1 49
+ 
+ volatile sig_atomic_t flag = 1;
+ 
+@@ -55,7 +54,7 @@ int
+ main(void)
+ {
+     mraa_result_t status = MRAA_SUCCESS;
+-    mraa_gpio_context gpio_1, gpio_2;
++    mraa_gpio_context gpio_1;
+ 
+     /* install signal handler */
+     signal(SIGINT, sig_handler);
+@@ -72,46 +71,23 @@ main(void)
+         return EXIT_FAILURE;
+     }
+ 
+-    /* initialize GPIO pin */
+-    gpio_2 = mraa_gpio_init(GPIO_PIN_2);
+-    if (gpio_2 == NULL) {
+-        fprintf(stderr, "Failed to initialize GPIO %d\n", GPIO_PIN_2);
+-        mraa_deinit();
+-        return EXIT_FAILURE;
+-    }
+-
+     /* set GPIO to output */
+     status = mraa_gpio_dir(gpio_1, MRAA_GPIO_OUT);
+     if (status != MRAA_SUCCESS) {
+         goto err_exit;
+     }
+ 
+-    /* set GPIO to output */
+-    status = mraa_gpio_dir(gpio_2, MRAA_GPIO_OUT);
+-    if (status != MRAA_SUCCESS) {
+-        goto err_exit;
+-    }
+-
+     /* toggle both GPIO's */
+     while (flag) {
+-        status = mraa_gpio_write(gpio_1, 1);
++        status = mraa_gpio_write(gpio_1, 0);
+         if (status != MRAA_SUCCESS) {
+             goto err_exit;
+         }
+ 
+-        status = mraa_gpio_write(gpio_2, 0);
+-        if (status != MRAA_SUCCESS) {
+-            goto err_exit;
+-        }
+ 
+         sleep(1);
+ 
+-        status = mraa_gpio_write(gpio_1, 0);
+-        if (status != MRAA_SUCCESS) {
+-            goto err_exit;
+-        }
+-
+-        status = mraa_gpio_write(gpio_2, 1);
++        status = mraa_gpio_write(gpio_1, 1);
+         if (status != MRAA_SUCCESS) {
+             goto err_exit;
+         }
+@@ -125,12 +101,6 @@ main(void)
+         goto err_exit;
+     }
+ 
+-    /* close GPIO */
+-    status = mraa_gpio_close(gpio_2);
+-    if (status != MRAA_SUCCESS) {
+-        goto err_exit;
+-    }
+-
+     //! [Interesting]
+     /* deinitialize mraa for the platform (not needed most of the times) */
+     mraa_deinit();
+diff --git a/examples/c/gpio_RB.c b/examples/c/gpio_RB.c
+new file mode 100644
+index 0000000..d9f756f
+--- /dev/null
++++ b/examples/c/gpio_RB.c
+@@ -0,0 +1,6 @@
++#include<stdio.h>
++
++#include"mraa/gpio.h"
++
++int main(int argc,char **argv)
++{}
+diff --git a/examples/c/gpio_advanced.c b/examples/c/gpio_advanced.c
+index 3e07a03..09bf179 100644
+--- a/examples/c/gpio_advanced.c
++++ b/examples/c/gpio_advanced.c
+@@ -34,20 +34,20 @@
+ /* mraa header */
+ #include "mraa/gpio.h"
+ 
+-#define GPIO_PIN 6
+ 
+-void
++/*void
+ int_handler(void* args)
+ {
+     fprintf(stdout, "ISR triggered\n");
+-}
++}*/
+ 
+ int
+-main()
++main(int argc,char **argv)
+ {
++    int running = 0;
+     mraa_result_t status = MRAA_SUCCESS;
+-    mraa_gpio_context gpio;
+-
++    mraa_gpio_context gpio; 
++    int GPIO_PIN = atoi(argv[1]);
+     /* initialize mraa for the platform (not needed most of the times) */
+     mraa_init();
+ 
+@@ -61,11 +61,11 @@ main()
+     }
+ 
+     /* set GPIO to input */
+-    status = mraa_gpio_dir(gpio, MRAA_GPIO_IN);
++    status = mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
+     if (status != MRAA_SUCCESS) {
+         goto err_exit;
+     }
+-
++#if 0
+     /* configure ISR for GPIO */
+     status = mraa_gpio_isr(gpio, MRAA_GPIO_EDGE_BOTH, &int_handler, NULL);
+     if (status != MRAA_SUCCESS) {
+@@ -77,6 +77,16 @@ main()
+ 
+     /* close GPIO */
+     mraa_gpio_close(gpio);
++#endif
++
++    while (running == 0) {
++	    mraa_gpio_write(gpio,1);
++
++	    sleep(5);
++	     mraa_gpio_write(gpio,0);
++	    sleep(5);
++
++    }
+ 
+     //! [Interesting]
+     /* deinitialize mraa for the platform (not needed most of the times) */
+diff --git a/examples/c/gpio_led_toggle.c b/examples/c/gpio_led_toggle.c
+new file mode 100644
+index 0000000..f90873c
+--- /dev/null
++++ b/examples/c/gpio_led_toggle.c
+@@ -0,0 +1,68 @@
++/* standard headers */
++#include <stdlib.h>
++#include <unistd.h>
++
++/* mraa header */
++#include "mraa/gpio.h"
++
++
++int
++main(int argc,char **argv)
++{
++    int running = 0;
++    mraa_result_t status = MRAA_SUCCESS;
++    mraa_gpio_context gpio; 
++    int GPIO_PIN = atoi(argv[1]);
++    /* initialize mraa for the platform (not needed most of the times) */
++    mraa_init();
++
++    //! [Interesting]
++    /* initialize GPIO pin */
++    gpio = mraa_gpio_init(GPIO_PIN);
++    if (gpio == NULL) {
++        fprintf(stderr, "Failed to initialize GPIO %d\n", GPIO_PIN);
++        mraa_deinit();
++        return EXIT_FAILURE;
++    }
++
++    /* set GPIO to input */
++    status = mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
++    if (status != MRAA_SUCCESS) {
++        goto err_exit;
++    }
++#if 0
++    /* configure ISR for GPIO */
++    status = mraa_gpio_isr(gpio, MRAA_GPIO_EDGE_BOTH, &int_handler, NULL);
++    if (status != MRAA_SUCCESS) {
++        goto err_exit;
++    }
++
++    /* wait 30 seconds isr trigger */
++    sleep(30);
++
++    /* close GPIO */
++    mraa_gpio_close(gpio);
++#endif
++
++    while (running == 0) {
++	    mraa_gpio_write(gpio,1);
++	    sleep(5);
++	     mraa_gpio_write(gpio,0);
++	    sleep(5);
++
++    }
++
++    //! [Interesting]
++    /* deinitialize mraa for the platform (not needed most of the times) */
++    mraa_deinit();
++
++    return EXIT_SUCCESS;
++
++err_exit:
++    mraa_result_print(status);
++
++    /* deinitialize mraa for the platform (not needed most of the times) */
++    mraa_deinit();
++
++    return EXIT_FAILURE;
++}
+diff --git a/examples/c/hello_RB.c b/examples/c/hello_RB.c
+new file mode 100644
+index 0000000..6d09000
+--- /dev/null
++++ b/examples/c/hello_RB.c
+@@ -0,0 +1,9 @@
++#include<stdio.h>
++#include"mraa.h"
++
++int main()
++{
++fprintf(stdout,"Hello Rugged Board User!!!!\n You are using limraa version:%s\n On Board:%s\n",mraa_get_version(),mraa_get_platform_name());
++mraa_deinit();
++return MRAA_SUCCESS;
++}
+diff --git a/examples/c/initio.c b/examples/c/initio.c
+index 1968a2d..2af349f 100644
+--- a/examples/c/initio.c
++++ b/examples/c/initio.c
+@@ -46,4 +46,4 @@ main()
+     }
+ 
+     printf("Done\n");
+-}
+\ No newline at end of file
++}
+diff --git a/examples/c/pwm.c b/examples/c/pwm.c
+index 7dd305c..a6c08ca 100644
+--- a/examples/c/pwm.c
++++ b/examples/c/pwm.c
+@@ -35,7 +35,7 @@
+ #include "mraa/pwm.h"
+ 
+ /* PWM declaration */
+-#define PWM 3
++#define PWM 20
+ 
+ /* PWM period in us */
+ #define PWM_FREQ 200
+@@ -65,6 +65,7 @@ main(void)
+     //! [Interesting]
+     pwm = mraa_pwm_init(PWM);
+     if (pwm == NULL) {
++        printf("pwm=%d\n",pwm);
+         fprintf(stderr, "Failed to initialize PWM\n");
+         mraa_deinit();
+         return EXIT_FAILURE;
+diff --git a/examples/c/uart.c b/examples/c/uart.c
+index 3b9ae95..8f1a090 100644
+--- a/examples/c/uart.c
++++ b/examples/c/uart.c
+@@ -1,8 +1,6 @@
+ /*
+- * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
+- * Author: Brendan Le Foll <brendan.le.foll@intel.com>
+- * Contributors: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+- * Copyright (c) 2014, 2015 Intel Corporation.
++ * Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
++ * Copyright (c) 2018, Linaro Ltd.
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining
+  * a copy of this software and associated documentation files (the
+@@ -36,7 +34,13 @@
+ /* mraa header */
+ #include "mraa/uart.h"
+ 
+-#define UART 0
++#ifndef FALSE
++#define FALSE 0
++#define TRUE (!FALSE)
++#endif
++
++/* UART port name */
++const char* dev_path = "/dev/ttymxc1";
+ 
+ volatile sig_atomic_t flag = 1;
+ 
+@@ -52,40 +56,58 @@ sig_handler(int signum)
+ int
+ main(int argc, char** argv)
+ {
++    mraa_result_t status = MRAA_SUCCESS;
+     mraa_uart_context uart;
+     char buffer[] = "Hello Mraa!";
+ 
++    int baudrate = 9600, stopbits = 1, databits = 8;
++    mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
++    unsigned int ctsrts = FALSE, xonxoff = FALSE;
++    const char* name = NULL;
++
+     /* install signal handler */
+     signal(SIGINT, sig_handler);
+ 
+-    /* initialize mraa for the platform (not needed most of the times) */
++    /* initialize mraa for the platform (not needed most of the time) */
+     mraa_init();
+ 
+     //! [Interesting]
+-    /* initialize UART */
+-    uart = mraa_uart_init(UART);
++    /* initialize uart */
++    uart = mraa_uart_init_raw(dev_path);
+     if (uart == NULL) {
+         fprintf(stderr, "Failed to initialize UART\n");
++        return EXIT_FAILURE;
++    }
++
++    /* set serial port parameters */
++    status =
++    mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
++    if (status != MRAA_SUCCESS) {
+         goto err_exit;
+     }
+ 
+     while (flag) {
+-        /* send data through UART */
++        /* send data through uart */
+         mraa_uart_write(uart, buffer, sizeof(buffer));
+ 
+         sleep(1);
+     }
+ 
+-    /* stop UART */
++    /* stop uart */
+     mraa_uart_stop(uart);
+ 
+     //! [Interesting]
+-    /* deinitialize mraa for the platform (not needed most of the times) */
++    /* deinitialize mraa for the platform (not needed most of the time) */
+     mraa_deinit();
+ 
+     return EXIT_SUCCESS;
+ 
+ err_exit:
++    mraa_result_print(status);
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
+     /* deinitialize mraa for the platform (not needed most of the times) */
+     mraa_deinit();
+ 
+diff --git a/examples/c/uart_RB.c b/examples/c/uart_RB.c
+new file mode 100644
+index 0000000..5709d9f
+--- /dev/null
++++ b/examples/c/uart_RB.c
+@@ -0,0 +1,66 @@
++#include<stdio.h>
++#include<signal.h>
++#include<unistd.h>
++#include<stdlib.h>
++
++#include "mraa/uart.h"
++
++const char* dev_uart="/dev/ttymxc1";
++volatile sig_atomic_t loop=1;
++
++void sig_handler(int signum)
++{
++	if(signum==SIGINT)
++	{
++		printf("Interrupt Occured Exiting.....\n");
++		loop=0;
++	}
++
++}
++
++int main(int argc,char** argv)
++{
++	char buffer[100];
++	mraa_uart_context uart;
++	mraa_result_t status = MRAA_SUCCESS;
++	int baudrate =9600,databits=8,stopbits=1;
++	mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
++	unsigned int ctsrts = 0, xonxoff = 0;
++	const char* name=NULL;
++
++	signal(SIGINT,sig_handler);
++
++	mraa_init();
++
++	uart=mraa_uart_init_raw(dev_uart);
++	if(uart==NULL)
++	{
++		fprintf(stderr,"Failed to initilized uart:%s\n",dev_uart);
++		return EXIT_FAILURE;
++	}
++
++	status=mraa_uart_settings(-1,&dev_uart,&name,&baudrate,&databits,&stopbits,&parity,&ctsrts,&xonxoff);
++	if(status!=MRAA_SUCCESS)
++	{
++		goto error_exit;
++	}
++
++	while(loop)
++	{
++		printf("Enter Message:");
++		scanf("%s",buffer);
++		mraa_uart_write(uart,buffer,sizeof(buffer));
++		sleep(1);
++	}
++
++	mraa_uart_stop(uart);
++	mraa_deinit();
++	return EXIT_SUCCESS;
++error_exit:
++	mraa_result_print(status);
++	mraa_uart_stop(uart);
++	mraa_deinit();
++
++	return EXIT_FAILURE;
++
++}
+diff --git a/examples/c/uart_a.c b/examples/c/uart_a.c
+new file mode 100644
+index 0000000..8f1a090
+--- /dev/null
++++ b/examples/c/uart_a.c
+@@ -0,0 +1,115 @@
++/*
++ * Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
++ * Copyright (c) 2018, Linaro Ltd.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining
++ * a copy of this software and associated documentation files (the
++ * "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish,
++ * distribute, sublicense, and/or sell copies of the Software, and to
++ * permit persons to whom the Software is furnished to do so, subject to
++ * the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be
++ * included in all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
++ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
++ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
++ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ * Example usage: Prints "Hello Mraa!" recursively. Press Ctrl+C to exit
++ *
++ */
++
++/* standard headers */
++#include <signal.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++
++/* mraa header */
++#include "mraa/uart.h"
++
++#ifndef FALSE
++#define FALSE 0
++#define TRUE (!FALSE)
++#endif
++
++/* UART port name */
++const char* dev_path = "/dev/ttymxc1";
++
++volatile sig_atomic_t flag = 1;
++
++void
++sig_handler(int signum)
++{
++    if (signum == SIGINT) {
++        fprintf(stdout, "Exiting...\n");
++        flag = 0;
++    }
++}
++
++int
++main(int argc, char** argv)
++{
++    mraa_result_t status = MRAA_SUCCESS;
++    mraa_uart_context uart;
++    char buffer[] = "Hello Mraa!";
++
++    int baudrate = 9600, stopbits = 1, databits = 8;
++    mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
++    unsigned int ctsrts = FALSE, xonxoff = FALSE;
++    const char* name = NULL;
++
++    /* install signal handler */
++    signal(SIGINT, sig_handler);
++
++    /* initialize mraa for the platform (not needed most of the time) */
++    mraa_init();
++
++    //! [Interesting]
++    /* initialize uart */
++    uart = mraa_uart_init_raw(dev_path);
++    if (uart == NULL) {
++        fprintf(stderr, "Failed to initialize UART\n");
++        return EXIT_FAILURE;
++    }
++
++    /* set serial port parameters */
++    status =
++    mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
++    if (status != MRAA_SUCCESS) {
++        goto err_exit;
++    }
++
++    while (flag) {
++        /* send data through uart */
++        mraa_uart_write(uart, buffer, sizeof(buffer));
++
++        sleep(1);
++    }
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
++    //! [Interesting]
++    /* deinitialize mraa for the platform (not needed most of the time) */
++    mraa_deinit();
++
++    return EXIT_SUCCESS;
++
++err_exit:
++    mraa_result_print(status);
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
++    /* deinitialize mraa for the platform (not needed most of the times) */
++    mraa_deinit();
++
++    return EXIT_FAILURE;
++}
+diff --git a/examples/c/uart_r.c b/examples/c/uart_r.c
+new file mode 100644
+index 0000000..e5a84ad
+--- /dev/null
++++ b/examples/c/uart_r.c
+@@ -0,0 +1,119 @@
++/*
++ * Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
++ * Copyright (c) 2018, Linaro Ltd.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining
++ * a copy of this software and associated documentation files (the
++ * "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish,
++ * distribute, sublicense, and/or sell copies of the Software, and to
++ * permit persons to whom the Software is furnished to do so, subject to
++ * the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be
++ * included in all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
++ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
++ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
++ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ * Example usage: Prints "Hello Mraa!" recursively. Press Ctrl+C to exit
++ *
++ */
++
++/* standard headers */
++#include <signal.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++
++/* mraa header */
++#include "mraa/uart.h"
++
++#ifndef FALSE
++#define FALSE 0
++#define TRUE (!FALSE)
++#endif
++
++/* UART port name */
++const char* dev_path = "/dev/ttymxc1";
++
++volatile sig_atomic_t flag = 1;
++
++void
++sig_handler(int signum)
++{
++    if (signum == SIGINT) {
++        fprintf(stdout, "Exiting...\n");
++        flag = 0;
++    }
++}
++
++int
++main(int argc, char** argv)
++{
++    mraa_result_t status = MRAA_SUCCESS;
++    mraa_uart_context uart;
++//    char buffer[] = "Hello Mraa!";
++   char buffer1[20];	
++
++    int baudrate = 9600, stopbits = 1, databits = 8;
++    mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
++    unsigned int ctsrts = FALSE, xonxoff = FALSE;
++    const char* name = NULL;
++
++    /* install signal handler */
++    signal(SIGINT, sig_handler);
++
++    /* initialize mraa for the platform (not needed most of the time) */
++    mraa_init();
++
++    //! [Interesting]
++    /* initialize uart */
++    uart = mraa_uart_init_raw(dev_path);
++    if (uart == NULL) {
++        fprintf(stderr, "Failed to initialize UART\n");
++        return EXIT_FAILURE;
++    }
++
++    /* set serial port parameters */
++    status = mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
++    if (status != MRAA_SUCCESS) {
++        goto err_exit;
++    }
++
++    while (flag) {
++        /* send data through uart */
++//        mraa_uart_write(uart, buffer, sizeof(buffer));
++//        sleep(50);
++	mraa_uart_read(uart,buffer1,sizeof(buffer1));
++
++            printf("Data REad %s\n",buffer1);
++	      
++	
++    }
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
++    //! [Interesting]
++    /* deinitialize mraa for the platform (not needed most of the time) */
++    mraa_deinit();
++
++    return EXIT_SUCCESS;
++
++err_exit:
++    mraa_result_print(status);
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
++    /* deinitialize mraa for the platform (not needed most of the times) */
++    mraa_deinit();
++
++    return EXIT_FAILURE;
++}
+diff --git a/examples/c/uart_r_dy.c b/examples/c/uart_r_dy.c
+new file mode 100644
+index 0000000..6a16c31
+--- /dev/null
++++ b/examples/c/uart_r_dy.c
+@@ -0,0 +1,125 @@
++/*
++ * Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
++ * Copyright (c) 2018, Linaro Ltd.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining
++ * a copy of this software and associated documentation files (the
++ * "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish,
++ * distribute, sublicense, and/or sell copies of the Software, and to
++ * permit persons to whom the Software is furnished to do so, subject to
++ * the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be
++ * included in all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
++ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
++ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
++ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ * Example usage: Prints "Hello Mraa!" recursively. Press Ctrl+C to exit
++ *
++ */
++
++/* standard headers */
++#include <signal.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <string.h>
++
++/* mraa header */
++#include "mraa/uart.h"
++
++#ifndef FALSE
++#define FALSE 0
++#define TRUE (!FALSE)
++#endif
++
++/* UART port name */
++const char* dev_path = "/dev/ttymxc1";
++
++volatile sig_atomic_t flag = 1;
++
++void
++sig_handler(int signum)
++{
++    if (signum == SIGINT) {
++        fprintf(stdout, "Exiting...\n");
++        flag = 0;
++    }
++}
++
++int
++main(int argc, char** argv)
++{
++    mraa_result_t status = MRAA_SUCCESS;
++    mraa_uart_context uart;
++//    char buffer[] = "Hello Mraa!";
++char buf[20];   
++char buffer1[20];	
++	int rec=0,i=0;
++    int baudrate = 9600, stopbits = 1, databits = 8;
++    mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
++    unsigned int ctsrts = FALSE, xonxoff = FALSE;
++    const char* name = NULL;
++
++    /* install signal handler */
++    signal(SIGINT, sig_handler);
++
++    /* initialize mraa for the platform (not needed most of the time) */
++    mraa_init();
++
++    //! [Interesting]
++    /* initialize uart */
++    uart = mraa_uart_init_raw(dev_path);
++    if (uart == NULL) {
++        fprintf(stderr, "Failed to initialize UART\n");
++        return EXIT_FAILURE;
++    }
++
++    /* set serial port parameters */
++    status = mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
++    if (status != MRAA_SUCCESS) {
++        goto err_exit;
++    }
++
++    while (flag) 
++    {
++	//printf("while start\n");
++	rec=mraa_uart_read(uart,buffer1,sizeof(buffer1));
++	//sleep(1);
++	for(i=0;i<20;i++)
++        buf[i] = buffer1[i];
++//	printf("Recv:%d:",rec);
++//	printf("Message Received:" );	
++	printf("%s\n",buf);
++	memset(buffer1,0,sizeof(buffer1));
++	memset(buf,0,sizeof(buf));	
++//	printf("while end\n");   
++ }	
++
++	
++    /* stop uart */
++    mraa_uart_stop(uart);
++    //! [Interesting]
++    /* deinitialize mraa for the platform (not needed most of the time) */
++    mraa_deinit();
++
++    return EXIT_SUCCESS;
++
++err_exit:
++    mraa_result_print(status);
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
++    /* deinitialize mraa for the platform (not needed most of the times) */
++    mraa_deinit();
++
++    return EXIT_FAILURE;
++}
+diff --git a/examples/c/uart_rdy_relay.c b/examples/c/uart_rdy_relay.c
+new file mode 100644
+index 0000000..0856d66
+--- /dev/null
++++ b/examples/c/uart_rdy_relay.c
+@@ -0,0 +1,167 @@
++/*
++ * Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
++ * Copyright (c) 2018, Linaro Ltd.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining
++ * a copy of this software and associated documentation files (the
++ * "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish,
++ * distribute, sublicense, and/or sell copies of the Software, and to
++ * permit persons to whom the Software is furnished to do so, subject to
++ * the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be
++ * included in all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
++ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
++ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
++ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ * Example usage: Prints "Hello Mraa!" recursively. Press Ctrl+C to exit
++ *
++ */
++
++/* standard headers */
++#include <signal.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <string.h>
++
++#include "mraa/uart.h"
++#include "mraa/gpio.h"
++
++/* gpio declaration */
++#define GPIO_PIN_1 10
++
++#ifndef FALSE
++#define FALSE 0
++#define TRUE (!FALSE)
++#endif
++
++/* UART port name */
++const char* dev_path = "/dev/ttymxc1";
++
++volatile sig_atomic_t flag = 1;
++
++void
++sig_handler(int signum)
++{
++    if (signum == SIGINT) {
++        fprintf(stdout, "Exiting...\n");
++        flag = 0;
++    }
++}
++
++int
++main(int argc, char** argv)
++{
++    mraa_gpio_context gpio_1;
++    mraa_result_t status = MRAA_SUCCESS;
++    mraa_uart_context uart;
++//    char buffer[] = "Hello Mraa!";
++//char buf[20];   
++char buffer1[1];	
++char recv[1];
++	int rec=0;
++    int baudrate = 9600, stopbits = 1, databits = 8;
++    mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
++    unsigned int ctsrts = FALSE, xonxoff = FALSE;
++    const char* name = NULL;
++
++    /* install signal handler */
++    signal(SIGINT, sig_handler);
++
++    /* initialize mraa for the platform (not needed most of the time) */
++    mraa_init();
++
++//! [Interesting]
++    /* initialize GPIO pin */
++    gpio_1 = mraa_gpio_init(GPIO_PIN_1);
++    if (gpio_1 == NULL) {
++        fprintf(stderr, "Failed to initialize GPIO %d\n", GPIO_PIN_1);
++        mraa_deinit();
++        return EXIT_FAILURE;
++    }
++
++/* set GPIO to output */
++    status = mraa_gpio_dir(gpio_1, MRAA_GPIO_OUT);
++    if (status != MRAA_SUCCESS) {
++        goto err_exit;
++    }
++
++    //! [Interesting]
++    /* initialize uart */
++    uart = mraa_uart_init_raw(dev_path);
++    if (uart == NULL) {
++        fprintf(stderr, "Failed to initialize UART\n");
++        return EXIT_FAILURE;
++    }
++
++    /* set serial port parameters */
++    status = mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
++    if (status != MRAA_SUCCESS) {
++        goto err_exit;
++    }
++
++    while (flag) 
++    {
++	//printf("while start\n");
++	rec=mraa_uart_read(uart,buffer1,sizeof(buffer1));
++	sleep(1);
++//	for(i=0;i<20;i++)
++//        buf[i] = buffer1[i];
++//	printf("Recv:%d:",rec);
++//	printf("Message Received:" );	
++	printf("%s\n",buffer1);
++//	memset(buffer1,0,sizeof(buffer1));
++	strcpy(recv,buffer1);
++	printf("received message:%s",recv);
++	if(strcmp(recv,"1")==0)
++	{
++	status = mraa_gpio_write(gpio_1, 0);
++	printf("Gpio on\n");
++	if (status != MRAA_SUCCESS) 
++	{
++            goto err_exit;
++	}
++	}
++else if(strcmp(recv,"0")==0)
++        {
++        status = mraa_gpio_write(gpio_1, 1);
++        printf("Gpio on\n");
++        if (status != MRAA_SUCCESS)
++        {
++            goto err_exit;
++        }
++        }
++else
++	goto err_exit;
++//memset(buf,0,sizeof(buf));	
++//	printf("while end\n");   
++	}	
++
++	
++    /* stop uart */
++    mraa_uart_stop(uart);
++    //! [Interesting]
++    /* deinitialize mraa for the platform (not needed most of the time) */
++    mraa_deinit();
++
++    return EXIT_SUCCESS;
++
++err_exit:
++    mraa_result_print(status);
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
++    /* deinitialize mraa for the platform (not needed most of the times) */
++    mraa_deinit();
++
++    return EXIT_FAILURE;
++}
+diff --git a/examples/c/uart_w.c b/examples/c/uart_w.c
+new file mode 100644
+index 0000000..2ef0f09
+--- /dev/null
++++ b/examples/c/uart_w.c
+@@ -0,0 +1,119 @@
++/*
++ * Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
++ * Copyright (c) 2018, Linaro Ltd.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining
++ * a copy of this software and associated documentation files (the
++ * "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish,
++ * distribute, sublicense, and/or sell copies of the Software, and to
++ * permit persons to whom the Software is furnished to do so, subject to
++ * the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be
++ * included in all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
++ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
++ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
++ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ * Example usage: Prints "Hello Mraa!" recursively. Press Ctrl+C to exit
++ *
++ */
++
++/* standard headers */
++#include <signal.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++
++/* mraa header */
++#include "mraa/uart.h"
++
++#ifndef FALSE
++#define FALSE 0
++#define TRUE (!FALSE)
++#endif
++
++/* UART port name */
++const char* dev_path = "/dev/ttymxc1";
++
++volatile sig_atomic_t flag = 1;
++
++void
++sig_handler(int signum)
++{
++    if (signum == SIGINT) {
++        fprintf(stdout, "Exiting...\n");
++        flag = 0;
++    }
++}
++
++int
++main(int argc, char** argv)
++{
++    mraa_result_t status = MRAA_SUCCESS;
++    mraa_uart_context uart;
++    char buffer[] = "Hello Mraa!";
++   char buffer1[20];	
++
++    int baudrate = 9600, stopbits = 1, databits = 8;
++    mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
++    unsigned int ctsrts = FALSE, xonxoff = FALSE;
++    const char* name = NULL;
++
++    /* install signal handler */
++    signal(SIGINT, sig_handler);
++
++    /* initialize mraa for the platform (not needed most of the time) */
++    mraa_init();
++
++    //! [Interesting]
++    /* initialize uart */
++    uart = mraa_uart_init_raw(dev_path);
++    if (uart == NULL) {
++        fprintf(stderr, "Failed to initialize UART\n");
++        return EXIT_FAILURE;
++    }
++
++    /* set serial port parameters */
++    status = mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
++    if (status != MRAA_SUCCESS) {
++        goto err_exit;
++    }
++
++    while (flag) {
++        /* send data through uart */
++        mraa_uart_write(uart, buffer, sizeof(buffer));
++        sleep(50);
++//	mraa_uart_read(uart,buffer1,sizeof(buffer1));
++
++  //          printf("Data REad %s\n",buffer1);
++	      
++	
++    }
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
++    //! [Interesting]
++    /* deinitialize mraa for the platform (not needed most of the time) */
++    mraa_deinit();
++
++    return EXIT_SUCCESS;
++
++err_exit:
++    mraa_result_print(status);
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
++    /* deinitialize mraa for the platform (not needed most of the times) */
++    mraa_deinit();
++
++    return EXIT_FAILURE;
++}
+diff --git a/examples/c/uart_w_dy.c b/examples/c/uart_w_dy.c
+new file mode 100644
+index 0000000..adb95a8
+--- /dev/null
++++ b/examples/c/uart_w_dy.c
+@@ -0,0 +1,123 @@
++/*
++ * Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
++ * Copyright (c) 2018, Linaro Ltd.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining
++ * a copy of this software and associated documentation files (the
++ * "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish,
++ * distribute, sublicense, and/or sell copies of the Software, and to
++ * permit persons to whom the Software is furnished to do so, subject to
++ * the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be
++ * included in all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
++ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
++ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
++ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ * Example usage: Prints "Hello Mraa!" recursively. Press Ctrl+C to exit
++ *
++ */
++
++/* standard headers */
++#include <signal.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++
++/* mraa header */
++#include "mraa/uart.h"
++
++#ifndef FALSE
++#define FALSE 0
++#define TRUE (!FALSE)
++#endif
++
++/* UART port name */
++const char* dev_path = "/dev/ttymxc1";
++
++volatile sig_atomic_t flag = 1;
++
++void
++sig_handler(int signum)
++{
++    if (signum == SIGINT) {
++        fprintf(stdout, "Exiting...\n");
++        flag = 0;
++    }
++}
++
++int
++main(int argc, char** argv)
++{
++    mraa_result_t status = MRAA_SUCCESS;
++    mraa_uart_context uart;
++//    char buffer[] = "Hello Mraa!";
++   char buffer1[20];	
++	int w=0;
++
++    int baudrate = 9600, stopbits = 1, databits = 8;
++    mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
++    unsigned int ctsrts = FALSE, xonxoff = FALSE;
++    const char* name = NULL;
++
++    /* install signal handler */
++    signal(SIGINT, sig_handler);
++
++    /* initialize mraa for the platform (not needed most of the time) */
++    mraa_init();
++
++    //! [Interesting]
++    /* initialize uart */
++    uart = mraa_uart_init_raw(dev_path);
++    if (uart == NULL) {
++        fprintf(stderr, "Failed to initialize UART\n");
++        return EXIT_FAILURE;
++    }
++
++    /* set serial port parameters */
++    status = mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
++    if (status != MRAA_SUCCESS) {
++        goto err_exit;
++    }
++
++    while (flag) {
++        /* send data through uart */
++printf("Enter Message:");
++scanf("%s",buffer1);
++       w= mraa_uart_write(uart, buffer1, sizeof(buffer1));
++        printf("Written:%d bytes\n",w);
++	sleep(10);
++//	mraa_uart_read(uart,buffer1,sizeof(buffer1));
++
++  //          printf("Data REad %s\n",buffer1);
++	      
++	
++    }
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
++    //! [Interesting]
++    /* deinitialize mraa for the platform (not needed most of the time) */
++    mraa_deinit();
++
++    return EXIT_SUCCESS;
++
++err_exit:
++    mraa_result_print(status);
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
++    /* deinitialize mraa for the platform (not needed most of the times) */
++    mraa_deinit();
++
++    return EXIT_FAILURE;
++}
+diff --git a/examples/c/uart_wdy_relay.c b/examples/c/uart_wdy_relay.c
+new file mode 100644
+index 0000000..e59e612
+--- /dev/null
++++ b/examples/c/uart_wdy_relay.c
+@@ -0,0 +1,140 @@
++/*
++ * Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
++ * Copyright (c) 2018, Linaro Ltd.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining
++ * a copy of this software and associated documentation files (the
++ * "Software"), to deal in the Software without restriction, including
++ * without limitation the rights to use, copy, modify, merge, publish,
++ * distribute, sublicense, and/or sell copies of the Software, and to
++ * permit persons to whom the Software is furnished to do so, subject to
++ * the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be
++ * included in all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
++ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
++ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
++ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
++ *
++ * Example usage: Prints "Hello Mraa!" recursively. Press Ctrl+C to exit
++ *
++ */
++
++/* standard headers */
++#include <signal.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <string.h>
++
++/* mraa header */
++#include "mraa/uart.h"
++
++#ifndef FALSE
++#define FALSE 0
++#define TRUE (!FALSE)
++#endif
++
++/* UART port name */
++const char* dev_path = "/dev/ttymxc1";
++
++volatile sig_atomic_t flag = 1;
++
++void
++sig_handler(int signum)
++{
++    if (signum == SIGINT) {
++        fprintf(stdout, "Exiting...\n");
++        flag = 0;
++    }
++}
++
++int
++main(int argc, char** argv)
++{
++    mraa_result_t status = MRAA_SUCCESS;
++    mraa_uart_context uart;
++//    char buffer[] = "Hello Mraa!";
++   char buffer1[20];	
++	int w=0;
++char send[1];
++    int baudrate = 9600, stopbits = 1, databits = 8;
++    mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
++    unsigned int ctsrts = FALSE, xonxoff = FALSE;
++    const char* name = NULL;
++
++    /* install signal handler */
++    signal(SIGINT, sig_handler);
++
++    /* initialize mraa for the platform (not needed most of the time) */
++    mraa_init();
++
++    //! [Interesting]
++    /* initialize uart */
++    uart = mraa_uart_init_raw(dev_path);
++    if (uart == NULL) {
++        fprintf(stderr, "Failed to initialize UART\n");
++        return EXIT_FAILURE;
++    }
++
++    /* set serial port parameters */
++    status = mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
++    if (status != MRAA_SUCCESS) {
++        goto err_exit;
++    }
++
++    while (flag) {
++        /* send data through uart */
++	printf("\nEnter Message:");
++	scanf("%s",buffer1);
++	printf("message is:%s\n",buffer1);
++	if(strcmp(buffer1,"on")==0)
++	{
++	send[0]='1';
++	printf("send_on:%s,%d",send,sizeof(send));
++	w=mraa_uart_write(uart,send,sizeof(send));
++	printf("written:%d bytes\n",w);
++	}
++	else if(strcmp(buffer1,"off")==0)
++	{
++	send[0]='0';
++	printf("send_off:%s,%d",send,sizeof(send));
++	w=mraa_uart_write(uart,send,sizeof(send));	
++	printf("written:%d bytes\n",w);
++	}
++	else
++	printf("Wrong command Try again\n");
++//        mraa_uart_write(uart, buffer1, sizeof(buffer1));
++        sleep(2);
++//	mraa_uart_read(uart,buffer1,sizeof(buffer1));
++
++  //          printf("Data REad %s\n",buffer1);
++	      
++	
++    }
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
++    //! [Interesting]
++    /* deinitialize mraa for the platform (not needed most of the time) */
++    mraa_deinit();
++
++    return EXIT_SUCCESS;
++
++err_exit:
++    mraa_result_print(status);
++
++    /* stop uart */
++    mraa_uart_stop(uart);
++
++    /* deinitialize mraa for the platform (not needed most of the times) */
++    mraa_deinit();
++
++    return EXIT_FAILURE;
++}
+diff --git a/examples/python/gpio.py b/examples/python/gpio.py
+index 3ee1e59..a94966e 100644
+--- a/examples/python/gpio.py
++++ b/examples/python/gpio.py
+@@ -28,10 +28,10 @@ import mraa
+ import time
+ 
+ # initialise gpio 23
+-gpio_1 = mraa.Gpio(23)
++gpio_1 = mraa.Gpio(10)
+ 
+ # initialise gpio 24
+-gpio_2 = mraa.Gpio(24)
++#gpio_2 = mraa.Gpio(24)
+ 
+ # set gpio 23 to output
+ gpio_1.dir(mraa.DIR_OUT)
+@@ -42,11 +42,11 @@ gpio_2.dir(mraa.DIR_OUT)
+ # toggle both gpio's
+ while True:
+     gpio_1.write(1)
+-    gpio_2.write(0)
++ #   gpio_2.write(0)
+ 
+     time.sleep(1)
+ 
+     gpio_1.write(0)
+-    gpio_2.write(1)
++#    gpio_2.write(1)
+ 
+     time.sleep(1)
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 6f80eab..9fa13a0 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -99,9 +99,9 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
+   ${PROJECT_SOURCE_DIR}/src/arm/raspberry_pi.c
+   ${PROJECT_SOURCE_DIR}/src/arm/beaglebone.c
+   ${PROJECT_SOURCE_DIR}/src/arm/phyboard.c
++  ${PROJECT_SOURCE_DIR}/src/arm/phyboard_pico.c
+   ${PROJECT_SOURCE_DIR}/src/arm/banana.c
+   ${PROJECT_SOURCE_DIR}/src/arm/de_nano_soc.c
+-  ${PROJECT_SOURCE_DIR}/src/arm/rockpi4.c
+ )
+ 
+ set (mraa_LIB_MIPS_SRCS_NOAUTO
+diff --git a/src/aio/aio.c b/src/aio/aio.c
+index 48a390b..4dc427c 100644
+--- a/src/aio/aio.c
++++ b/src/aio/aio.c
+@@ -97,6 +97,7 @@ mraa_aio_init(unsigned int aio)
+     int pin;
+     if (board == NULL) {
+         syslog(LOG_ERR, "aio: Platform not initialised");
++        printf("aio: Platform not initialised---100\n");
+         return NULL;
+     }
+     if (mraa_is_sub_platform_id(aio)) {
+@@ -104,6 +105,7 @@ mraa_aio_init(unsigned int aio)
+         board = board->sub_platform;
+         if (board == NULL) {
+             syslog(LOG_ERR, "aio: Sub platform Not Initialised");
++            printf("aio: Sub platform Not Initialised-----108\n");
+             return NULL;
+         }
+         aio = mraa_get_sub_platform_index(aio);
+@@ -120,27 +122,36 @@ mraa_aio_init(unsigned int aio)
+ 
+     if (pin < 0 || pin >= board->phy_pin_count) {
+         syslog(LOG_ERR, "aio: pin %i beyond platform definition", pin);
++        printf("aio: pin beyond platform definition----125\n");
+         return NULL;
+     }
++    printf("he.................4.........phy-pin-count=%d pin=%d\n",board->phy_pin_count,pin);
+     if (aio >= board->aio_count) {
+         syslog(LOG_ERR, "aio: requested channel out of range");
++        printf("aio: requested channel out of range----131");
+         return NULL;
+     }
++    printf("he..........................5...%d\n",board->aio_count);
+     if (board->pins[pin].capabilities.aio != 1) {
+         syslog(LOG_ERR, "aio: pin %i not capable of aio", pin);
++        printf("aio: pin not capable of aio----137\n");
++        printf("he.................6....board->pins[pin].capabilities.aio=%d\n",board->pins[pin].capabilities.aio);
+         return NULL;
+     }
+     if (board->pins[pin].aio.mux_total > 0) {
+         if (mraa_setup_mux_mapped(board->pins[pin].aio) != MRAA_SUCCESS) {
+             syslog(LOG_ERR, "aio: unable to setup multiplexers for pin");
++            printf("aio: unable to setup multiplexers for pin----144\n");
+             return NULL;
+         }
+     }
++    printf("he.............................4\n");
+ 
+     // Create ADC device connected to specified channel
+     mraa_aio_context dev = mraa_aio_init_internal(board->adv_func, aio, board->pins[pin].aio.pinmap);
+     if (dev == NULL) {
+         syslog(LOG_ERR, "aio: Insufficient memory for specified input channel %d", aio);
++        printf("aio: Insufficient memory for specified input channel -----154\n");
+         return NULL;
+     }
+     dev->value_bit = DEFAULT_BITS;
+@@ -148,7 +159,8 @@ mraa_aio_init(unsigned int aio)
+     if (IS_FUNC_DEFINED(dev, aio_init_pre)) {
+         mraa_result_t pre_ret = (dev->advance_func->aio_init_pre(aio));
+         if (pre_ret != MRAA_SUCCESS) {
+-            free(dev);
++        	printf("=----162\n"); 
++	   free(dev);
+             return NULL;
+         }
+     }
+@@ -156,6 +168,7 @@ mraa_aio_init(unsigned int aio)
+     if (IS_FUNC_DEFINED(dev, aio_init_post)) {
+         mraa_result_t ret = dev->advance_func->aio_init_post(dev);
+         if (ret != MRAA_SUCCESS) {
++        	printf("=----171\n"); 
+             free(dev);
+             return NULL;
+         }
+diff --git a/src/arm/96boards.c b/src/arm/96boards.c
+index b558a74..c744f44 100644
+--- a/src/arm/96boards.c
++++ b/src/arm/96boards.c
+@@ -64,8 +64,7 @@ int db410c_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
+ };
+ 
+ const char* db410c_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyMSM0", "/dev/ttyMSM1" };
+-const char* db410c_led[MRAA_96BOARDS_LED_COUNT] = { "user1", "user2", "user3",
+-                                                    "user4", "bt", "wlan" };
++const char* db410c_led[MRAA_96BOARDS_LED_COUNT] = { "user1", "user2", "user3", "user4", "bt", "wlan" };
+ 
+ // Dragonboard820c
+ int db820c_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
+@@ -100,12 +99,8 @@ int hikey960_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
+ const char* hikey960_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyAMA3", "/dev/ttyAMA6" };
+ 
+ // Rock960
+-int rock960_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = { 1006, 1002, 1041, 1042, 1121, 1128,
+-                                                          1124, 1131, 1125, 1132, 1050, 1055 };
+-
+-int rock960_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
+-    { 0, 6 },  { 0, 2 }, { 1, 9 },  { 1, 10 }, { 3, 25 }, { 4, 0 },
+-    { 3, 28 }, { 4, 3 }, { 3, 29 }, { 4, 4 },  { 1, 18 }, { 1, 23 },
++int rock960_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = { 
++    1006, 1002, 1041, 1042, 1121, 1128, 1124, 1131, 1125, 1132, 1050, 1055 
+ };
+ 
+ const char* rock960_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyS3", "/dev/ttyS4" };
+@@ -307,12 +302,9 @@ mraa_96boards()
+         } else if (mraa_file_contains(DT_BASE "/model", "ROCK960")) {
+             b->platform_name = PLATFORM_NAME_ROCK960;
+             ls_gpio_pins = rock960_ls_gpio_pins;
+-            chardev_map = &rock960_chardev_map;
+             b->uart_dev[0].device_path = (char*) rock960_serialdev[0];
+             b->uart_dev[1].device_path = (char*) rock960_serialdev[1];
+-            b->chardev_capable = 1;
+-        } else if ((mraa_file_contains(DT_BASE "/model", "ZynqMP ZCU100 RevC")) ||
+-                   (mraa_file_contains(DT_BASE "/model", "Avnet Ultra96 Rev1"))) {
++        } else if (mraa_file_contains(DT_BASE "/model", "ZynqMP ZCU100 RevC")) {
+             b->platform_name = PLATFORM_NAME_ULTRA96;
+             chardev_map = &ultra96_chardev_map;
+             b->uart_dev[0].device_path = (char*) ultra96_serialdev[0];
+diff --git a/src/arm/arm.c b/src/arm/arm.c
+index 12514db..ea1846e 100644
+--- a/src/arm/arm.c
++++ b/src/arm/arm.c
+@@ -27,14 +27,13 @@
+ #include <string.h>
+ 
+ #include "arm/96boards.h"
+-#include "arm/rockpi4.h"
+ #include "arm/de_nano_soc.h"
+ #include "arm/banana.h"
+ #include "arm/beaglebone.h"
+ #include "arm/phyboard.h"
+ #include "arm/raspberry_pi.h"
+ #include "mraa_internal.h"
+-
++#include "arm/phyboard_pico.h"
+ 
+ mraa_platform_t
+ mraa_arm_platform()
+@@ -59,6 +58,12 @@ mraa_arm_platform()
+                     } else {
+                         platform_type = MRAA_BEAGLEBONE;
+                     }
++                } else if (strstr(line, "Freescale i.MX6 Ultralite")) {
++                    if(mraa_file_contains("/proc/device-tree/model", "phyBOARD-Segin")) {
++                        platform_type = MRAA_PHYBOARD_RUGGED_IMX6UL;
++                    } else {
++                        platform_type = MRAA_PHYBOARD_WEGA;
++                    }
+                 } else if (strstr(line, "HiKey Development Board")) {
+                     platform_type = MRAA_96BOARDS;
+                 } else if (strstr(line, "s900")) {
+@@ -76,9 +81,6 @@ mraa_arm_platform()
+                     }
+                 } else if (strstr(line, "DE0/DE10-Nano-SoC")) {
+                         platform_type = MRAA_DE_NANO_SOC;
+-                // For different kernel version(s) of DE10-Nano
+-                } else if (strstr(line, "Altera SOCFPGA")) {
+-                        platform_type = MRAA_DE_NANO_SOC;
+                 }
+             }
+         }
+@@ -104,10 +106,6 @@ mraa_arm_platform()
+             platform_type = MRAA_96BOARDS;
+         else if (mraa_file_contains("/proc/device-tree/model", "ZynqMP ZCU100 RevC"))
+             platform_type = MRAA_96BOARDS;
+-        else if (mraa_file_contains("/proc/device-tree/model", "Avnet Ultra96 Rev1"))
+-            platform_type = MRAA_96BOARDS;
+-        else if (mraa_file_contains("/proc/device-tree/model", "ROCK PI 4"))
+-            platform_type = MRAA_ROCKPI4;
+         else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
+             platform_type = MRAA_RASPBERRY_PI;
+     }
+@@ -122,14 +120,14 @@ mraa_arm_platform()
+         case MRAA_PHYBOARD_WEGA:
+             plat = mraa_phyboard();
+             break;
++        case MRAA_PHYBOARD_RUGGED_IMX6UL:
++            plat = mraa_phyboard_pico();
++            break;
+         case MRAA_BANANA:
+             plat = mraa_banana();
+             break;
+         case MRAA_96BOARDS:
+             plat = mraa_96boards();
+-	    break;
+-        case MRAA_ROCKPI4:
+-	    plat = mraa_rockpi4();
+             break;
+         case MRAA_DE_NANO_SOC:
+             plat = mraa_de_nano_soc();
+diff --git a/src/arm/beaglebone.c b/src/arm/beaglebone.c
+index cfd68c0..b5ae2ba 100644
+--- a/src/arm/beaglebone.c
++++ b/src/arm/beaglebone.c
+@@ -370,7 +370,6 @@ mraa_beaglebone()
+ {
+     unsigned int emmc_enabled = 1;
+     unsigned int hdmi_enabled = 1;
+-    unsigned int pcm0_enabled = 1;
+     unsigned int i2c0_enabled = 1;
+     unsigned int i2c1_enabled = 1;
+     unsigned int spi0_enabled = 0;
+@@ -410,11 +409,6 @@ mraa_beaglebone()
+     else
+         hdmi_enabled = 0;
+ 
+-    if (mraa_file_exist("/sys/class/sound/pcmC0D0p"))
+-        pcm0_enabled = 1;
+-    else
+-        pcm0_enabled = 0;
+-
+     if (mraa_file_exist("/sys/class/i2c-dev/i2c-0"))
+         i2c0_enabled = 1;
+     else
+@@ -1262,7 +1256,7 @@ mraa_beaglebone()
+     b->pins[BUILD_PIN(P9, 27)].gpio.parent_id = 0;
+     b->pins[BUILD_PIN(P9, 27)].gpio.mux_total = 0;
+ 
+-    if (pcm0_enabled != 1) {
++    if (emmc_enabled != 1) {
+         if (spi1_enabled == 1) {
+             strncpy(b->pins[BUILD_PIN(P9, 28)].name, "SPI1CS0", MRAA_PIN_NAME_SIZE);
+             b->pins[BUILD_PIN(P9, 28)].capabilities =
+@@ -1281,7 +1275,7 @@ mraa_beaglebone()
+     b->pins[BUILD_PIN(P9, 28)].gpio.mux_total = 0;
+     b->pins[BUILD_PIN(P9, 28)].spi.mux_total = 0;
+ 
+-    if (pcm0_enabled != 1) {
++    if (emmc_enabled != 1) {
+         if (spi1_enabled == 1) {
+             strncpy(b->pins[BUILD_PIN(P9, 29)].name, "SPI1D0", MRAA_PIN_NAME_SIZE);
+             b->pins[BUILD_PIN(P9, 29)].capabilities =
+@@ -1300,7 +1294,7 @@ mraa_beaglebone()
+     b->pins[BUILD_PIN(P9, 29)].gpio.mux_total = 0;
+     b->pins[BUILD_PIN(P9, 29)].spi.mux_total = 0;
+ 
+-    if (pcm0_enabled != 1) {
++    if (emmc_enabled != 1) {
+         if (spi1_enabled == 1) {
+             strncpy(b->pins[BUILD_PIN(P9, 30)].name, "SPI1D1", MRAA_PIN_NAME_SIZE);
+             b->pins[BUILD_PIN(P9, 30)].capabilities =
+@@ -1319,7 +1313,7 @@ mraa_beaglebone()
+     b->pins[BUILD_PIN(P9, 30)].gpio.mux_total = 0;
+     b->pins[BUILD_PIN(P9, 30)].spi.mux_total = 0;
+ 
+-    if (pcm0_enabled != 1) {
++    if (emmc_enabled != 1) {
+         if (spi1_enabled == 1) {
+             strncpy(b->pins[BUILD_PIN(P9, 31)].name, "SPI1CLK", MRAA_PIN_NAME_SIZE);
+             b->pins[BUILD_PIN(P9, 31)].capabilities =
+diff --git a/src/arm/phyboard_pico.c b/src/arm/phyboard_pico.c
+new file mode 100644
+index 0000000..cab0084
+--- /dev/null
++++ b/src/arm/phyboard_pico.c
+@@ -0,0 +1,426 @@
++#include <stdlib.h>
++#include <string.h>
++#include <sys/mman.h>
++#include <mraa/types.h>
++
++#include "common.h"
++#include "arm/phyboard.h"
++#include "arm/phyboard_pico.h"
++#include "arm/am335x.h"
++
++#define PLATFORM_NAME_PHYBOARD_PICO "phyBOARD-pico"
++
++mraa_result_t
++mraa_phyboard_segin_uart_init_pre(int index)
++{
++    char devpath[MAX_SIZE];
++    snprintf(devpath, MAX_SIZE, "/dev/ttymxc%u", index);
++    if (!mraa_file_exist(devpath)) {
++        syslog(LOG_ERR, "uart: Device not initialized");
++    } else {
++        plat->uart_dev[index].device_path = devpath;
++        return MRAA_SUCCESS;
++    }
++
++    return MRAA_ERROR_INVALID_PARAMETER;
++}
++
++/* NOT DONE / TESTED YET */
++mraa_result_t
++mraa_phyboard_segin_spi_init_pre(int index)
++{
++    mraa_result_t ret = MRAA_ERROR_NO_RESOURCES;
++    char devpath[MAX_SIZE];
++    int deviceindex = 0;
++
++    if ((index == 0) && mraa_link_targets("/sys/class/spidev/spidev1.0", "48030000"))
++        deviceindex = 1;
++    if (deviceindex == 0)
++        deviceindex = 1;
++
++    sprintf(devpath, "/dev/spidev%u.0", deviceindex);
++    if (mraa_file_exist(devpath)) {
++        plat->spi_bus[index].bus_id = deviceindex;
++        ret = MRAA_SUCCESS;
++
++    } else {
++        syslog(LOG_NOTICE, "spi: Device not initialized");
++    }
++    return ret;
++}
++
++/* NOT DONE / TESTED YET */
++mraa_result_t
++mraa_phyboard_segin_i2c_init_pre(unsigned int bus)
++{
++    mraa_result_t ret = MRAA_ERROR_NO_RESOURCES;
++    char devpath[MAX_SIZE];
++
++    sprintf(devpath, "/dev/i2c-%u", plat->i2c_bus[bus].bus_id);
++    if (!mraa_file_exist(devpath)) {
++        syslog(LOG_INFO, "i2c: %s doesn't exist ", devpath);
++        syslog(LOG_ERR, "i2c: Device not initialized");
++
++        return ret;
++    }
++    return MRAA_SUCCESS;
++}
++
++/* NOT DONE / TESTED YET */
++mraa_pwm_context
++mraa_phyboard_segin_pwm_init_replace(int pin)
++{
++    char devpath[MAX_SIZE];
++
++    if (plat == NULL) {
++        syslog(LOG_ERR, "pwm: Platform Not Initialised");
++        return NULL;
++    }
++    if (plat->pins[pin].capabilities.pwm != 1) {
++        syslog(LOG_ERR, "pwm: pin not capable of pwm");
++        return NULL;
++    }
++    if (!mraa_file_exist(SYSFS_CLASS_PWM "pwmchip0")) {
++        syslog(LOG_ERR, "pwm: pwmchip0 not found");
++        return NULL;
++    }
++
++    sprintf(devpath, SYSFS_CLASS_PWM "pwm%u", plat->pins[pin].pwm.pinmap);
++    if (!mraa_file_exist(devpath)) {
++        FILE* fh;
++        fh = fopen(SYSFS_CLASS_PWM "export", "w");
++        if (fh == NULL) {
++            syslog(LOG_ERR, "pwm: Failed to open /sys/class/pwm/export for writing, check access "
++                            "rights for user");
++            return NULL;
++        }
++        if (fprintf(fh, "%d", plat->pins[pin].pwm.pinmap) < 0) {
++            syslog(LOG_ERR, "pwm: Failed to write to sysfs-pwm-export");
++        }
++        fclose(fh);
++    }
++
++    if (mraa_file_exist(devpath)) {
++        mraa_pwm_context dev = (mraa_pwm_context) calloc(1, sizeof(struct _pwm));
++        if (dev == NULL)
++            return NULL;
++        dev->duty_fp = -1;
++        dev->chipid = -1;
++        dev->pin = plat->pins[pin].pwm.pinmap;
++        dev->period = -1;
++        return dev;
++    } else
++        syslog(LOG_ERR, "pwm: pin not initialized");
++    return NULL;
++}
++
++
++mraa_board_t*
++mraa_phyboard_pico()
++{
++    unsigned int uart2_enabled = 0;
++    unsigned int uart3_enabled = 0;
++
++    if (mraa_file_exist("/sys/class/tty/ttymxc1"))
++        uart2_enabled = 1;
++    else
++        uart2_enabled = 0;
++
++    if (mraa_file_exist("/sys/class/tty/ttymxc2"))
++        uart3_enabled = 1;
++    else
++        uart3_enabled = 0;
++
++    mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
++    if (b == NULL)
++        return NULL;
++    b->platform_name = PLATFORM_NAME_PHYBOARD_PICO;
++    b->phy_pin_count = MRAA_PHYBOARD_PICO_PINCOUNT;
++
++    if (b->platform_name == NULL) {
++        goto error;
++    }
++
++    b->aio_count = 4;
++    b->adc_raw = 8;
++    b->adc_supported = 8;
++
++    b->pwm_default_period = 500;
++    b->pwm_max_period = 2147483;
++    b->pwm_min_period = 1;
++
++    b->pins = (mraa_pininfo_t*) calloc(b->phy_pin_count,sizeof(mraa_pininfo_t));
++    if (b->pins == NULL) {
++        goto error;
++    }
++
++    b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
++    if (b->adv_func == NULL) {
++        free(b->pins);
++        goto error;
++    }
++
++    b->adv_func->uart_init_pre = &mraa_phyboard_segin_uart_init_pre;
++    b->adv_func->spi_init_pre = &mraa_phyboard_segin_spi_init_pre;
++    b->adv_func->i2c_init_pre = &mraa_phyboard_segin_i2c_init_pre;
++    b->adv_func->pwm_init_replace = &mraa_phyboard_segin_pwm_init_replace;
++
++    strncpy(b->pins[0].name, "INVALID", MRAA_PIN_NAME_SIZE);
++    b->pins[0].capabilities = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
++
++    // X69 connector
++    strncpy(b->pins[1].name, "VCC3V3", MRAA_PIN_NAME_SIZE);
++    b->pins[1].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[2].name, "VCC5V", MRAA_PIN_NAME_SIZE);
++    b->pins[2].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[3].name, "VCC3V3", MRAA_PIN_NAME_SIZE);
++    b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[4].name, "VCC5V", MRAA_PIN_NAME_SIZE);
++    b->pins[4].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++    
++    strncpy(b->pins[5].name, "X_JTAG_TDI", MRAA_PIN_NAME_SIZE);
++    b->pins[5].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[6].name, "VCC5V", MRAA_PIN_NAME_SIZE);
++    b->pins[6].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[7].name, "X_JTAG_TDO", MRAA_PIN_NAME_SIZE);
++    b->pins[7].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++  
++    strncpy(b->pins[8].name, "VCC5V", MRAA_PIN_NAME_SIZE);
++    b->pins[8].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[9].name, "X_nJTAG_TRST", MRAA_PIN_NAME_SIZE);
++    b->pins[9].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++   // strncpy(b->pins[10].name, "nRESET_IN", MRAA_PIN_NAME_SIZE);
++   // b->pins[10].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[11].name, "X_JTAG_TCK", MRAA_PIN_NAME_SIZE);
++    b->pins[11].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[12].name, "nRESET_OUT", MRAA_PIN_NAME_SIZE);
++    b->pins[12].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[13].name, "GND", MRAA_PIN_NAME_SIZE);
++    b->pins[13].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[14].name, "X_SPI2_MISO", MRAA_PIN_NAME_SIZE);
++    b->pins[14].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
++    b->pins[14].spi.mux_total = 0;
++
++    strncpy(b->pins[16].name, "X_SPI2_MOSI", MRAA_PIN_NAME_SIZE);
++    b->pins[16].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
++    b->pins[16].spi.mux_total = 0;
++
++    strncpy(b->pins[17].name, "X_USB_DM_EXP", MRAA_PIN_NAME_SIZE);
++    b->pins[17].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[18].name, "X_SPI2_CLK", MRAA_PIN_NAME_SIZE);
++    b->pins[18].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
++    b->pins[18].spi.mux_total = 0;
++
++    strncpy(b->pins[19].name, "X_USB_DP_EXP", MRAA_PIN_NAME_SIZE);
++    b->pins[19].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[20].name, "X_PWM3_OUT", MRAA_PIN_NAME_SIZE);
++    b->pins[20].capabilities = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
++    b->pins[20].pwm.pinmap = 0;
++    b->pins[20].pwm.mux_total = 0;
++
++
++    strncpy(b->pins[21].name, "X_USB_ID_EXP", MRAA_PIN_NAME_SIZE);
++    b->pins[21].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[22].name, "X_SPI1_CLK", MRAA_PIN_NAME_SIZE);
++    b->pins[22].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
++    b->pins[22].spi.mux_total = 0;
++
++    strncpy(b->pins[23].name, "X_UART3_TX", MRAA_PIN_NAME_SIZE);
++    b->pins[23].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
++
++    strncpy(b->pins[24].name, "X_SPI1_MISO", MRAA_PIN_NAME_SIZE);
++    b->pins[24].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
++    b->pins[24].spi.mux_total = 0;
++
++    strncpy(b->pins[25].name, "X_UART3_RX", MRAA_PIN_NAME_SIZE);
++    b->pins[25].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
++
++    strncpy(b->pins[26].name, "X_SPI1_MOSI", MRAA_PIN_NAME_SIZE);
++    b->pins[26].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
++    b->pins[26].spi.mux_total = 0;
++
++    /* PIN-Number "4" with name "X_GPIO1_IO01__ADC1_IN" */
++    strncpy(b->pins[27].name, "X_ADC1_IN1", MRAA_PIN_NAME_SIZE);
++    //b->pins[27].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 1, 0, 0, 0, 0 };
++    b->pins[27].capabilities.aio = 1;
++    b->pins[27].aio.pinmap = 1;
++    b->pins[27].aio.mux_total = 0;
++
++    strncpy(b->pins[28].name, "X_I2C1_SCL", MRAA_PIN_NAME_SIZE);
++    b->pins[28].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
++    b->pins[28].i2c.mux_total = 0;
++
++/*    strncpy(b->pins[29].name, "X_GPIO1_IO1", MRAA_PIN_NAME_SIZE);
++    b->pins[29].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
++    b->pins[29].gpio.pinmap = ((1-1)*32 + 4);
++    b->pins[29].gpio.parent_id = 0;
++    b->pins[29].gpio.mux_total = 0;
++    b->pins[29].uart.mux_total = 0; */
++    
++    strncpy(b->pins[30].name, "X_I2C1_SDA", MRAA_PIN_NAME_SIZE);
++    b->pins[30].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
++    b->pins[30].i2c.mux_total = 0;
++
++    strncpy(b->pins[31].name, "X_JTAG_TMS", MRAA_PIN_NAME_SIZE);
++    b->pins[31].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++    
++    strncpy(b->pins[32].name, "X_I2C2_SCL", MRAA_PIN_NAME_SIZE);
++    b->pins[32].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
++    b->pins[32].i2c.mux_total = 0;
++
++    strncpy(b->pins[33].name, "GND", MRAA_PIN_NAME_SIZE);
++    b->pins[33].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++    
++    strncpy(b->pins[34].name, "X_I2C2_SDA", MRAA_PIN_NAME_SIZE);
++    b->pins[34].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
++    b->pins[34].i2c.mux_total = 0;
++
++    strncpy(b->pins[35].name, "X_JTAG_MOD", MRAA_PIN_NAME_SIZE);
++    b->pins[35].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[36].name, "GND", MRAA_PIN_NAME_SIZE);
++    b->pins[36].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[37].name, "X_GPIO1_IO3", MRAA_PIN_NAME_SIZE);
++    b->pins[37].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
++    b->pins[37].gpio.pinmap = ((1-1)*32 + 3);
++    b->pins[37].gpio.parent_id = 0;
++    b->pins[37].gpio.mux_total = 0;
++    b->pins[37].uart.mux_total = 0;
++
++    strncpy(b->pins[38].name, "nRESET_OUT", MRAA_PIN_NAME_SIZE);
++    b->pins[38].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++   
++    strncpy(b->pins[39].name, "X_GPIO4_IO28", MRAA_PIN_NAME_SIZE);
++    b->pins[39].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
++    b->pins[39].gpio.pinmap = ((4-1)*32 + 28);
++    b->pins[39].gpio.parent_id = 0;
++    b->pins[39].gpio.mux_total = 0;
++    b->pins[39].uart.mux_total = 0;
++
++    strncpy(b->pins[40].name, "X_SPI1_CLK", MRAA_PIN_NAME_SIZE);
++    b->pins[40].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
++    b->pins[40].spi.mux_total = 0;
++
++    strncpy(b->pins[41].name, "X_SPI1_MISO", MRAA_PIN_NAME_SIZE);
++    b->pins[41].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
++    b->pins[41].spi.mux_total = 0;
++
++    strncpy(b->pins[42].name, "X_SPI1_MOSI", MRAA_PIN_NAME_SIZE);
++    b->pins[42].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
++    b->pins[42].spi.mux_total = 0;
++
++    strncpy(b->pins[43].name, "VCC3V3", MRAA_PIN_NAME_SIZE);
++    b->pins[43].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[44].name, "GND", MRAA_PIN_NAME_SIZE);
++    b->pins[44].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[45].name, "GND", MRAA_PIN_NAME_SIZE);
++    b->pins[45].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++  
++    strncpy(b->pins[46].name, "VCC5V", MRAA_PIN_NAME_SIZE);
++    b->pins[46].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
++
++    strncpy(b->pins[47].name, "X_I2C0_SDA", MRAA_PIN_NAME_SIZE);
++    b->pins[47].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
++    b->pins[47].i2c.mux_total = 0;
++
++    strncpy(b->pins[48].name, "X_I2C0_SCL", MRAA_PIN_NAME_SIZE);
++    b->pins[48].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
++    b->pins[48].i2c.mux_total = 0;
++
++
++    strncpy(b->pins[49].name, "X_GPIO2_IO11", MRAA_PIN_NAME_SIZE);
++    b->pins[49].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
++    b->pins[49].gpio.pinmap = ((2-1)*32 + 11);
++    b->pins[49].gpio.parent_id = 0;
++    b->pins[49].gpio.mux_total = 0;
++
++
++/* P4-Serial Port RS232 X_UART2_CTS_B= tx X_UART2_TX=rx   */
++    strncpy(b->pins[50].name, "X_UART2_TX", MRAA_PIN_NAME_SIZE);
++    b->pins[50].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
++    b->pins[50].uart.mux_total = 0;
++
++    strncpy(b->pins[51].name, "X_UART2_CTS_B", MRAA_PIN_NAME_SIZE);
++    b->pins[51].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
++    b->pins[51].uart.mux_total = 0;
++
++    /*User  button*/
++    strncpy(b->pins[52].name, "X_GPIO2_IO8_INT_SW", MRAA_PIN_NAME_SIZE);
++    b->pins[52].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
++    b->pins[52].gpio.pinmap = ((2-1)*32 + 8);
++    b->pins[52].gpio.parent_id = 0;
++    b->pins[52].gpio.mux_total = 0;
++    
++    strncpy(b->pins[53].name, "X_GPIO2_IO12", MRAA_PIN_NAME_SIZE);
++    b->pins[53].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
++    b->pins[53].gpio.pinmap = ((2-1)*32 + 12);
++    b->pins[53].gpio.parent_id = 0;
++    b->pins[53].gpio.mux_total = 0;
++ 
++    strncpy(b->pins[54].name, "X_GPIO2_IO13", MRAA_PIN_NAME_SIZE);
++    b->pins[54].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
++    b->pins[54].gpio.pinmap = ((2-1)*32 + 13);
++    b->pins[54].gpio.parent_id = 0;
++    b->pins[54].gpio.mux_total = 0;	
++
++ strncpy(b->pins[10].name, "X_GPIO1_IO10", MRAA_PIN_NAME_SIZE);
++    b->pins[10].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
++    b->pins[10].gpio.pinmap = ((1-1)*32 + 10);
++    b->pins[10].gpio.parent_id = 0;
++    b->pins[10].gpio.mux_total = 0;
++
++
++
++    // BUS DEFINITIONS
++    b->i2c_bus_count=1;
++	b->i2c_bus[0].bus_id = 0;
++    b->i2c_bus[0].sda = 30;
++    b->i2c_bus[0].scl = 28;
++
++    b->spi_bus_count = 3;
++    b->def_spi_bus = 0;
++    b->spi_bus[1].bus_id = 1;
++    b->spi_bus[1].slave_s = 0;
++    b->spi_bus[1].cs = 39;
++    b->spi_bus[1].mosi = 42;
++    b->spi_bus[1].miso = 41;
++    b->spi_bus[1].sclk = 40;
++
++    b->uart_dev_count = 4;
++    b->def_uart_dev = 3;
++    b->uart_dev[3].rx = 25;
++    b->uart_dev[3].tx = 23;
++//    b->uart_dev[3].device_path = "/dev/ttymxc2";
++    b->uart_dev[2].rx = 50;
++    b->uart_dev[2].tx = 51;
++    b->uart_dev[2].device_path = "/dev/ttymxc1";
++
++    b->gpio_count = 0;
++    int i;
++    for (i = 0; i < b->phy_pin_count; i++)
++        if (b->pins[i].capabilities.gpio)
++            b->gpio_count++;
++    return b;
++error:
++    syslog(LOG_CRIT, "phyboard_pico: failed to initialize");
++    free(b);
++
++    return NULL;
++};
+diff --git a/src/arm/raspberry_pi.c b/src/arm/raspberry_pi.c
+index 3d27f7c..d713321 100644
+--- a/src/arm/raspberry_pi.c
++++ b/src/arm/raspberry_pi.c
+@@ -43,8 +43,6 @@
+ #define PLATFORM_NAME_RASPBERRY_PI_ZERO "Raspberry Pi Zero"
+ #define PLATFORM_NAME_RASPBERRY_PI3_B "Raspberry Pi 3 Model B"
+ #define PLATFORM_NAME_RASPBERRY_PI_ZERO_W "Raspberry Pi Zero W"
+-#define PLATFORM_NAME_RASPBERRY_PI3_B_PLUS "Raspberry Pi 3 Model B+"
+-#define PLATFORM_NAME_RASPBERRY_PI3_A_PLUS "Raspberry Pi 3 Model A+"
+ #define PLATFORM_RASPBERRY_PI_B_REV_1 1
+ #define PLATFORM_RASPBERRY_PI_A_REV_2 2
+ #define PLATFORM_RASPBERRY_PI_B_REV_2 3
+@@ -55,8 +53,6 @@
+ #define PLATFORM_RASPBERRY_PI_ZERO 8
+ #define PLATFORM_RASPBERRY_PI3_B 9
+ #define PLATFORM_RASPBERRY_PI_ZERO_W 10
+-#define PLATFORM_RASPBERRY_PI3_B_PLUS 11
+-#define PLATFORM_RASPBERRY_PI3_A_PLUS 12
+ #define MMAP_PATH "/dev/mem"
+ #define BCM2835_PERI_BASE 0x20000000
+ #define BCM2836_PERI_BASE 0x3f000000
+@@ -507,18 +503,6 @@ mraa_raspberry_pi()
+                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_ZERO_W;
+                     platform_detected = PLATFORM_RASPBERRY_PI_ZERO_W;
+                     b->phy_pin_count = MRAA_RASPBERRY_PI_ZERO_W_PINCOUNT;
+-                } else if (strstr(line, "a020d3")) {
+-                    b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_B_PLUS;
+-                    platform_detected = PLATFORM_RASPBERRY_PI3_B_PLUS;
+-                    b->phy_pin_count = MRAA_RASPBERRY_PI3_B_PLUS_PINCOUNT;
+-                    peripheral_base = BCM2837_PERI_BASE;
+-                    block_size = BCM2837_BLOCK_SIZE; 
+-                } else if (strstr(line, "9020e0")) {
+-                    b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_A_PLUS;
+-                    platform_detected = PLATFORM_RASPBERRY_PI3_A_PLUS;
+-                    b->phy_pin_count = MRAA_RASPBERRY_PI3_A_PLUS_PINCOUNT;
+-                    peripheral_base = BCM2837_PERI_BASE;
+-                    block_size = BCM2837_BLOCK_SIZE;
+                 } else {
+                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
+                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
+@@ -581,14 +565,6 @@ mraa_raspberry_pi()
+             b->platform_name = PLATFORM_NAME_RASPBERRY_PI_ZERO_W;
+             platform_detected = PLATFORM_RASPBERRY_PI_ZERO_W;
+             b->phy_pin_count = MRAA_RASPBERRY_PI_ZERO_W_PINCOUNT;
+-        } else if (mraa_file_contains(compatible_path, "raspberrypi,3-model-b-plus")) {
+-            b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_B_PLUS;
+-            platform_detected = PLATFORM_RASPBERRY_PI3_B_PLUS;
+-            b->phy_pin_count = MRAA_RASPBERRY_PI3_B_PLUS_PINCOUNT;
+-        } else if (mraa_file_contains(compatible_path, "raspberrypi,3-model-a-plus")) {
+-            b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_A_PLUS;
+-            platform_detected = PLATFORM_RASPBERRY_PI3_A_PLUS;
+-            b->phy_pin_count = MRAA_RASPBERRY_PI3_A_PLUS_PINCOUNT;
+         }
+     }
+ 
+@@ -855,9 +831,7 @@ mraa_raspberry_pi()
+         (platform_detected == PLATFORM_RASPBERRY_PI2_B_REV_1) ||
+         (platform_detected == PLATFORM_RASPBERRY_PI3_B) ||
+         (platform_detected == PLATFORM_RASPBERRY_PI_ZERO) ||
+-        (platform_detected == PLATFORM_RASPBERRY_PI_ZERO_W) ||
+-        (platform_detected == PLATFORM_RASPBERRY_PI3_B_PLUS) ||
+-        (platform_detected == PLATFORM_RASPBERRY_PI3_A_PLUS)) {
++        (platform_detected == PLATFORM_RASPBERRY_PI_ZERO_W)) {
+ 
+         strncpy(b->pins[27].name, "ID_SD", MRAA_PIN_NAME_SIZE);
+         b->pins[27].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+diff --git a/src/arm/rockpi4.c b/src/arm/rockpi4.c
+deleted file mode 100644
+index 114e000..0000000
+--- a/src/arm/rockpi4.c
++++ /dev/null
+@@ -1,184 +0,0 @@
+-/*
+- * Author: Brian <brian@vamrs.com>
+- * Copyright (c) 2019 Vamrs Corporation.
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining
+- * a copy of this software and associated documentation files (the
+- * "Software"), to deal in the Software without restriction, including
+- * without limitation the rights to use, copy, modify, merge, publish,
+- * distribute, sublicense, and/or sell copies of the Software, and to
+- * permit persons to whom the Software is furnished to do so, subject to
+- * the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be
+- * included in all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+- */
+-
+-#include <mraa/common.h>
+-#include <stdarg.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <sys/mman.h>
+-
+-#include "arm/rockpi4.h"
+-#include "common.h"
+-
+-#define DT_BASE "/proc/device-tree"
+-#define PLATFORM_NAME_ROCK_PI_4A "ROCK PI 4A"
+-#define PLATFORM_NAME_ROCK_PI_4B "ROCK PI 4B"
+-
+-#define MAX_SIZE 64
+-
+-const char* rockpi4a_serialdev[MRAA_ROCKPI4_UART_COUNT] = { "/dev/ttyS2","/dev/ttyS4"};
+-const char* rockpi4b_serialdev[MRAA_ROCKPI4_UART_COUNT] = { "/dev/ttyS2","/dev/ttyS4"};
+-
+-void
+-mraa_rockpi4_pininfo(mraa_board_t* board, int index, int sysfs_pin, mraa_pincapabilities_t pincapabilities_t, char* fmt, ...)
+-{
+-    va_list arg_ptr;
+-    if (index > board->phy_pin_count)
+-        return;
+-
+-    mraa_pininfo_t* pininfo = &board->pins[index];
+-    va_start(arg_ptr, fmt);
+-    vsnprintf(pininfo->name, MRAA_PIN_NAME_SIZE, fmt, arg_ptr);
+-
+-    if( pincapabilities_t.gpio == 1 ) {
+-	va_arg(arg_ptr, int);
+-	pininfo->gpio.gpio_chip = va_arg(arg_ptr, int);
+-	pininfo->gpio.gpio_line = va_arg(arg_ptr, int);
+-    }
+-
+-    pininfo->capabilities = pincapabilities_t;
+-
+-    va_end(arg_ptr);
+-    pininfo->gpio.pinmap = sysfs_pin;
+-    pininfo->gpio.mux_total = 0;
+-}
+-
+-mraa_board_t*
+-mraa_rockpi4()
+-{
+-    mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
+-    if (b == NULL) {
+-        return NULL;
+-    }
+-
+-    b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+-    if (b->adv_func == NULL) {
+-        free(b);
+-        return NULL;
+-    }
+-
+-    // pin mux for buses are setup by default by kernel so tell mraa to ignore them
+-    b->no_bus_mux = 1;
+-    b->phy_pin_count = MRAA_ROCKPI4_PIN_COUNT + 1;
+-
+-    if (mraa_file_exist(DT_BASE "/model")) {
+-        // We are on a modern kernel, great!!!!
+-        if (mraa_file_contains(DT_BASE "/model", "ROCK PI 4A")) {
+-            b->platform_name = PLATFORM_NAME_ROCK_PI_4A;
+-            b->uart_dev[0].device_path = (char*) rockpi4a_serialdev[0];
+-            b->uart_dev[1].device_path = (char*) rockpi4a_serialdev[1];
+-        } else if (mraa_file_contains(DT_BASE "/model", "ROCK PI 4B")) {
+-            b->platform_name = PLATFORM_NAME_ROCK_PI_4B;
+-            b->uart_dev[0].device_path = (char*) rockpi4b_serialdev[0];
+-            b->uart_dev[1].device_path = (char*) rockpi4b_serialdev[1];
+-        }
+-    }
+-
+-    // UART
+-    b->uart_dev_count = MRAA_ROCKPI4_UART_COUNT;
+-    b->def_uart_dev = 0;
+-    b->uart_dev[0].index = 2;
+-    b->uart_dev[1].index = 4;
+-
+-    // I2C
+-    if ((strncmp(b->platform_name, PLATFORM_NAME_ROCK_PI_4B, MAX_SIZE) == 0)
+-	|| (strncmp(b->platform_name, PLATFORM_NAME_ROCK_PI_4B, MAX_SIZE) == 0)) {
+-        b->i2c_bus_count = MRAA_ROCKPI4_I2C_COUNT;
+-        b->def_i2c_bus = 0;
+-        b->i2c_bus[0].bus_id = 7;
+-        b->i2c_bus[1].bus_id = 2;
+-        b->i2c_bus[2].bus_id = 6;
+-    }
+-
+-    // SPI
+-    b->spi_bus_count = MRAA_ROCKPI4_SPI_COUNT;
+-    b->def_spi_bus = 0;
+-    b->spi_bus[0].bus_id = 32766;
+-    b->spi_bus[1].bus_id = 32765;
+-
+-    b->pwm_dev_count = MRAA_ROCKPI4_PWM_COUNT;
+-    b->pwm_default_period = 500;
+-    b->pwm_max_period = 2147483;
+-    b->pwm_min_period = 1;
+-
+-    b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * b->phy_pin_count);
+-    if (b->pins == NULL) {
+-        free(b->adv_func);
+-        free(b);
+-        return NULL;
+-    }
+-
+-    b->pins[11].pwm.parent_id = 0;
+-    b->pins[13].pwm.parent_id = 1;
+-
+-    b->aio_count = MRAA_ROCKPI4_AIO_COUNT;
+-    b->adc_raw = 10;
+-    b->adc_supported = 10;
+-    b->aio_dev[0].pin = 26;
+-    b->aio_non_seq = 1;
+-
+-    mraa_rockpi4_pininfo(b, 0,   -1, (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, "INVALID");
+-    mraa_rockpi4_pininfo(b, 1,   -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "3V3");
+-    mraa_rockpi4_pininfo(b, 2,   -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "5V");
+-    mraa_rockpi4_pininfo(b, 3,   71, (mraa_pincapabilities_t){1,1,0,0,0,1,0,0}, "SDA7");
+-    mraa_rockpi4_pininfo(b, 4,   -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "5V");
+-    mraa_rockpi4_pininfo(b, 5,   72, (mraa_pincapabilities_t){1,1,0,0,0,1,0,0}, "SCL7");
+-    mraa_rockpi4_pininfo(b, 6,   -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "GND");
+-    mraa_rockpi4_pininfo(b, 7,   75, (mraa_pincapabilities_t){1,1,0,0,1,0,0,0}, "SPI2_CLK");
+-    mraa_rockpi4_pininfo(b, 8,  148, (mraa_pincapabilities_t){1,1,0,0,0,0,0,1}, "TXD2");
+-    mraa_rockpi4_pininfo(b, 9,   -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "GND");
+-    mraa_rockpi4_pininfo(b, 10, 147, (mraa_pincapabilities_t){1,1,0,0,0,0,0,1}, "RXD2");
+-    mraa_rockpi4_pininfo(b, 11, 146, (mraa_pincapabilities_t){1,1,1,0,0,0,0,0}, "PWM0");
+-    mraa_rockpi4_pininfo(b, 12, 131, (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, "GPIO4_A3");
+-    mraa_rockpi4_pininfo(b, 13, 150, (mraa_pincapabilities_t){1,1,1,0,0,0,0,0}, "PWM1");
+-    mraa_rockpi4_pininfo(b, 14,  -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "GND");
+-    mraa_rockpi4_pininfo(b, 15, 149, (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, "GPIO4_C5");
+-    mraa_rockpi4_pininfo(b, 16, 154, (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, "GPIO4_D2");
+-    mraa_rockpi4_pininfo(b, 17,  -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "3V3");
+-    mraa_rockpi4_pininfo(b, 18, 156, (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, "GPIO4_D4");
+-    mraa_rockpi4_pininfo(b, 19,  40, (mraa_pincapabilities_t){1,1,0,0,1,0,0,1}, "SPI1TX,TXD4");
+-    mraa_rockpi4_pininfo(b, 20,  -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "GND");
+-    mraa_rockpi4_pininfo(b, 21,  39, (mraa_pincapabilities_t){1,1,0,0,1,0,0,1}, "SPI1RX,RXD4");
+-    mraa_rockpi4_pininfo(b, 22, 157, (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, "GPIO4_D5");
+-    mraa_rockpi4_pininfo(b, 23,  41, (mraa_pincapabilities_t){1,1,0,0,1,0,0,0}, "SPI1CLK");
+-    mraa_rockpi4_pininfo(b, 24,  42, (mraa_pincapabilities_t){1,1,0,0,1,0,0,0}, "SPI1CS");
+-    mraa_rockpi4_pininfo(b, 25,  -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "GND");
+-    mraa_rockpi4_pininfo(b, 26,  -1, (mraa_pincapabilities_t){1,0,0,0,0,0,1,0}, "ADC_IN0");
+-    mraa_rockpi4_pininfo(b, 27,  64, (mraa_pincapabilities_t){1,1,0,0,0,1,0,0}, "SDA2");
+-    mraa_rockpi4_pininfo(b, 28,  65, (mraa_pincapabilities_t){1,1,0,0,0,1,0,0}, "SCL2");
+-    mraa_rockpi4_pininfo(b, 29,  74, (mraa_pincapabilities_t){1,1,0,0,1,1,0,0}, "SCL6,SPI2RX");
+-    mraa_rockpi4_pininfo(b, 30,  -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "GND");
+-    mraa_rockpi4_pininfo(b, 31,  73, (mraa_pincapabilities_t){1,1,0,0,1,1,0,0}, "SDA6,SPI2TX");
+-    mraa_rockpi4_pininfo(b, 32, 112, (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, "GPIO3_C0");
+-    mraa_rockpi4_pininfo(b, 33,  76, (mraa_pincapabilities_t){1,1,0,0,1,0,0,0}, "SPI2CS");
+-    mraa_rockpi4_pininfo(b, 34,  -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "GND");
+-    mraa_rockpi4_pininfo(b, 35, 133, (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, "GPIO4_A5");
+-    mraa_rockpi4_pininfo(b, 36, 132, (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, "GPIO4_A4");
+-    mraa_rockpi4_pininfo(b, 37, 158, (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, "GPIO4_D6");
+-    mraa_rockpi4_pininfo(b, 38, 134, (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, "GPIO4_A6");
+-    mraa_rockpi4_pininfo(b, 39,  -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "GND");
+-    mraa_rockpi4_pininfo(b, 40, 135, (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, "GPIO4_A7");
+-
+-    return b;
+-}
+diff --git a/src/doxy2swig.py b/src/doxy2swig.py
+old mode 100755
+new mode 100644
+diff --git a/src/gpio/gpio.c b/src/gpio/gpio.c
+index 6b44474..2734609 100644
+--- a/src/gpio/gpio.c
++++ b/src/gpio/gpio.c
+@@ -23,9 +23,9 @@
+  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+ #include "gpio.h"
+-#include "gpio/gpio_chardev.h"
+ #include "linux/gpio.h"
+ #include "mraa_internal.h"
++#include "gpio/gpio_chardev.h"
+ 
+ #include <dirent.h>
+ #include <errno.h>
+@@ -38,8 +38,8 @@
+ #include <sys/ioctl.h>
+ #include <sys/mman.h>
+ #include <sys/stat.h>
+-#include <sys/time.h>
+ #include <unistd.h>
++#include <sys/time.h>
+ 
+ #define SYSFS_CLASS_GPIO "/sys/class/gpio"
+ #define MAX_SIZE 64
+@@ -68,10 +68,7 @@ mraa_gpio_close_event_handles_sysfs(int fds[], int num_fds)
+     }
+ 
+     for (int i = 0; i < num_fds; ++i) {
+-        // Check required to avoid closing stdin and of an uninitialized fd
+-        if (fds[i] != 0) {
+-            close(fds[i]);
+-        }
++        close(fds[i]);
+     }
+ 
+     free(fds);
+@@ -117,7 +114,7 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
+     dev->isr_thread_terminating = 0;
+     dev->phy_pin = -1;
+ 
+-    if ((plat != NULL) && (!plat->chardev_capable)) {
++    if (!plat->chardev_capable) {
+         char bu[MAX_SIZE];
+         int length;
+ 
+@@ -130,13 +127,15 @@ mraa_gpio_init_internal(mraa_adv_func_t* func_table, int pin)
+         } else {
+             int export = open(SYSFS_CLASS_GPIO "/export", O_WRONLY);
+             if (export == -1) {
+-                syslog(LOG_ERR, "gpio%i: init: Failed to open 'export' for writing: %s", pin, strerror(errno));
++                syslog(LOG_ERR, "gpio%i: init: Failed to open 'export' for writing: %s",
++                       pin, strerror(errno));
+                 status = MRAA_ERROR_INVALID_RESOURCE;
+                 goto init_internal_cleanup;
+             }
+             length = snprintf(bu, sizeof(bu), "%d", dev->pin);
+             if (write(export, bu, length * sizeof(char)) == -1) {
+-                syslog(LOG_ERR, "gpio%i: init: Failed to write to 'export': %s", pin, strerror(errno));
++                syslog(LOG_ERR, "gpio%i: init: Failed to write to 'export': %s",
++                       pin, strerror(errno));
+                 close(export);
+                 status = MRAA_ERROR_INVALID_RESOURCE;
+                 goto init_internal_cleanup;
+@@ -164,122 +163,6 @@ init_internal_cleanup:
+ }
+ 
+ mraa_gpio_context
+-mraa_gpio_init_by_name(char* name)
+-{
+-    mraa_board_t* board = plat;
+-    mraa_gpio_context dev;
+-    mraa_gpiod_group_t gpio_group;
+-    mraa_gpiod_line_info* linfo = NULL;
+-    mraa_gpiod_chip_info* cinfo;
+-    mraa_gpiod_chip_info** cinfos;
+-    int i, line_found, line_offset;
+-
+-    if (name == NULL) {
+-        syslog(LOG_ERR, "[GPIOD_INTERFACE]: Gpio name not valid");
+-        return NULL;
+-    }
+-
+-    if (!board->chardev_capable) {
+-        syslog(LOG_ERR, "[GPIOD_INTERFACE]: gpio_init_by_name not available for this platform!");
+-        return NULL;
+-    }
+-
+-    dev = (mraa_gpio_context) calloc(1, sizeof(struct _gpio));
+-    if (dev == NULL) {
+-        syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for context");
+-        return NULL;
+-    }
+-
+-    dev->pin_to_gpio_table = malloc(sizeof(int));
+-    if (dev->pin_to_gpio_table == NULL) {
+-        syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+-        mraa_gpio_close(dev);
+-        return NULL;
+-    }
+-
+-    dev->num_chips = mraa_get_chip_infos(&cinfos);
+-    if (dev->num_chips <= 0) {
+-        mraa_gpio_close(dev);
+-        return NULL;
+-    }
+-
+-    /* We are dealing with a single GPIO */
+-    dev->num_pins = 1;
+-
+-    gpio_group = calloc(dev->num_chips, sizeof(struct _gpio_group));
+-    if (gpio_group == NULL) {
+-        syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+-        mraa_gpio_close(dev);
+-        return NULL;
+-    }
+-
+-    dev->gpio_group = gpio_group;
+-    for (i = 0; i < dev->num_chips; ++i) {
+-        gpio_group[i].gpio_chip = i;
+-        gpio_group[i].gpio_lines = NULL;
+-    }
+-
+-    /* Iterate over all gpiochips in the platform to find the requested line */
+-    for_each_gpio_chip(cinfo, cinfos, dev->num_chips)
+-    {
+-        for (i = 0; i < cinfo->chip_info.lines; i++) {
+-            linfo = mraa_get_line_info_by_chip_name(cinfo->chip_info.name, i);
+-            if (!strncmp(linfo->name, name, 32)) {
+-                /* idx is coming from `for_each_gpio_chip` definition */
+-                syslog(LOG_DEBUG, "[GPIOD_INTERFACE]: Chip: %d Line: %d", idx, i);
+-                if (!gpio_group[idx].is_required) {
+-                    gpio_group[idx].dev_fd = cinfo->chip_fd;
+-                    gpio_group[idx].is_required = 1;
+-                    gpio_group[idx].gpiod_handle = -1;
+-                }
+-
+-                /* Map pin to _gpio_group structure. */
+-                dev->pin_to_gpio_table[0] = idx;
+-                gpio_group[idx].gpio_lines = realloc(gpio_group[idx].gpio_lines, sizeof(unsigned int));
+-                gpio_group[idx].gpio_lines[0] = i;
+-                gpio_group[idx].num_gpio_lines++;
+-
+-                line_found = 1;
+-                line_offset = i;
+-
+-                break;
+-            }
+-        }
+-    }
+-
+-    if (!line_found) {
+-        syslog(LOG_ERR, "[GPIOD_INTERFACE]: Gpio not found!");
+-        return NULL;
+-    }
+-
+-    /* Initialize rw_values for read / write multiple functions */
+-    for (i = 0; i < dev->num_chips; ++i) {
+-        gpio_group[i].rw_values = calloc(gpio_group[i].num_gpio_lines, sizeof(unsigned char));
+-        if (gpio_group[i].rw_values == NULL) {
+-            syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+-            mraa_gpio_close(dev);
+-            return NULL;
+-        }
+-
+-        gpio_group[i].event_handles = NULL;
+-    }
+-
+-    /* Save the provided array from the user to our internal structure. */
+-    dev->provided_pins = malloc(dev->num_pins * sizeof(int));
+-    if (dev->provided_pins == NULL) {
+-        syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+-        mraa_gpio_close(dev);
+-        return NULL;
+-    }
+-
+-    memcpy(dev->provided_pins, &line_offset, dev->num_pins * sizeof(int));
+-
+-    dev->events = NULL;
+-
+-    return dev;
+-}
+-
+-mraa_gpio_context
+ mraa_gpio_init(int pin)
+ {
+     mraa_board_t* board = plat;
+@@ -295,9 +178,11 @@ mraa_gpio_init(int pin)
+      *      example:  pin 515, dev->pin = 515, dev->phy_pin = 3
+      */
+     if (mraa_is_sub_platform_id(pin) && (board->sub_platform != NULL)) {
+-        syslog(LOG_NOTICE, "gpio%i: initialised on sub platform '%s' physical pin: %i", pin,
+-               board->sub_platform->platform_name != NULL ? board->sub_platform->platform_name : "",
+-               mraa_get_sub_platform_index(pin));
++        syslog(LOG_NOTICE, "gpio%i: initialised on sub platform '%s' physical pin: %i",
++                pin,
++                board->sub_platform->platform_name != NULL ?
++                board->sub_platform->platform_name : "",
++                mraa_get_sub_platform_index(pin));
+ 
+         board = board->sub_platform;
+         if (board == NULL) {
+@@ -313,7 +198,8 @@ mraa_gpio_init(int pin)
+     }
+ 
+     if (pin < 0 || pin >= board->phy_pin_count) {
+-        syslog(LOG_ERR, "gpio: init: pin %i beyond platform pin count (%i)", pin, board->phy_pin_count);
++        syslog(LOG_ERR, "gpio: init: pin %i beyond platform pin count (%i)",
++               pin, board->phy_pin_count);
+         return NULL;
+     }
+     if (board->pins[pin].capabilities.gpio != 1) {
+@@ -384,8 +270,6 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
+         return NULL;
+     }
+ 
+-    dev->gpio_group = gpio_group;
+-
+     for (int i = 0; i < dev->num_chips; ++i) {
+         gpio_group[i].gpio_chip = i;
+         /* Just to be sure realloc has the desired behaviour. */
+@@ -448,8 +332,8 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
+ 
+         int line_in_group;
+         line_in_group = gpio_group[chip_id].num_gpio_lines;
+-        gpio_group[chip_id].gpio_lines =
+-        realloc(gpio_group[chip_id].gpio_lines, (line_in_group + 1) * sizeof(unsigned int));
++        gpio_group[chip_id].gpio_lines = realloc(gpio_group[chip_id].gpio_lines,
++                                                 (line_in_group + 1) * sizeof(unsigned int));
+         if (gpio_group[chip_id].gpio_lines == NULL) {
+             syslog(LOG_CRIT, "[GPIOD_INTERFACE]: Failed to allocate memory for internal member");
+             mraa_gpio_close(dev);
+@@ -497,6 +381,8 @@ mraa_gpio_chardev_init(int pins[], int num_pins)
+     }
+     free(counters);
+ 
++    dev->gpio_group = gpio_group;
++
+     /* Save the provided array from the user to our internal structure. */
+     dev->provided_pins = malloc(dev->num_pins * sizeof(int));
+     if (dev->provided_pins == NULL) {
+@@ -576,8 +462,9 @@ mraa_gpio_wait_interrupt(int fds[],
+                          ,
+                          int control_fd
+ #endif
+-                         ,
+-                         mraa_gpio_events_t events)
++                        ,
++                         mraa_gpio_events_t events
++)
+ {
+     unsigned char c;
+ #ifdef HAVE_PTHREAD_CANCEL
+@@ -674,8 +561,7 @@ mraa_gpio_get_events(mraa_gpio_context dev)
+         unsigned int pin_idx;
+         mraa_gpiod_group_t gpio_iter;
+ 
+-        for_each_gpio_group(gpio_iter, dev)
+-        {
++        for_each_gpio_group(gpio_iter, dev) {
+             for (int i = 0; i < gpio_iter->num_gpio_lines; ++i) {
+                 if (dev->events[event_idx].id != -1) {
+                     pin_idx = gpio_iter->gpio_group_to_pins_table[i];
+@@ -717,21 +603,19 @@ mraa_gpio_interrupt_handler(void* arg)
+             return NULL;
+     }
+ 
+-    int* fps = calloc(dev->num_pins, sizeof(int));
++    int *fps = malloc(dev->num_pins * sizeof(int));
+     if (!fps) {
+         syslog(LOG_ERR, "mraa_gpio_interrupt_handler_multiple() malloc error");
+         return NULL;
+     }
+ 
+     /* Is this pin on a subplatform? Do nothing... */
+-    if (mraa_is_sub_platform_id(dev->pin)) {
+-    }
++    if (mraa_is_sub_platform_id(dev->pin)) {}
+     /* Is the platform chardev_capable? */
+     else if (plat->chardev_capable) {
+         mraa_gpiod_group_t gpio_group;
+ 
+-        for_each_gpio_group(gpio_group, dev)
+-        {
++        for_each_gpio_group(gpio_group, dev) {
+             for (int i = 0; i < gpio_group->num_gpio_lines; ++i) {
+                 fps[idx++] = gpio_group->event_handles[i];
+             }
+@@ -785,11 +669,12 @@ mraa_gpio_interrupt_handler(void* arg)
+             } else {
+                 ret = mraa_gpio_wait_interrupt(fps, idx
+ #ifndef HAVE_PTHREAD_CANCEL
+-                                               ,
+-                                               dev->isr_control_pipe[0]
++                                                ,
++                                                dev->isr_control_pipe[0]
+ #endif
+-                                               ,
+-                                               dev->events);
++                                                ,
++                                                dev->events
++                );
+             }
+         }
+ 
+@@ -806,7 +691,7 @@ mraa_gpio_interrupt_handler(void* arg)
+             pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+ #endif
+         } else {
+-            // we must have got an error code or exit request so die nicely
++        // we must have got an error code or exit request so die nicely
+ #ifdef HAVE_PTHREAD_CANCEL
+             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+ #endif
+@@ -901,7 +786,7 @@ mraa_gpio_edge_mode(mraa_gpio_context dev, mraa_gpio_edge_t mode)
+ 
+     /* Initialize events array. */
+     if (dev->events == NULL && mode != MRAA_GPIO_EDGE_NONE) {
+-        dev->events = malloc(dev->num_pins * sizeof(mraa_gpio_event));
++        dev->events = malloc(dev->num_pins * sizeof (mraa_gpio_event));
+         if (dev->events == NULL) {
+             syslog(LOG_ERR, "mraa_gpio_edge_mode() malloc error");
+             return MRAA_ERROR_NO_RESOURCES;
+@@ -1057,8 +942,8 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
+     dev->isr_thread_terminating = 0;
+ 
+     if (dev->events) {
+-        free(dev->events);
+-        dev->events = NULL;
++      free(dev->events);
++      dev->events = NULL;
+     }
+ 
+     return ret;
+@@ -1089,10 +974,8 @@ mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
+         _mraa_close_gpio_desc(dev);
+ 
+         /* We save flag values from the first valid line. */
+-        for_each_gpio_group(gpio_iter, dev)
+-        {
+-            mraa_gpiod_line_info* linfo =
+-            mraa_get_line_info_by_chip_number(gpio_iter->gpio_chip, gpio_iter->gpio_lines[0]);
++        for_each_gpio_group(gpio_iter, dev) {
++            mraa_gpiod_line_info* linfo = mraa_get_line_info_by_chip_number(gpio_iter->gpio_chip, gpio_iter->gpio_lines[0]);
+             if (!linfo) {
+                 syslog(LOG_ERR, "[GPIOD_INTERFACE]: error getting line info");
+                 return MRAA_ERROR_UNSPECIFIED;
+@@ -1119,10 +1002,8 @@ mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
+                 return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+         }
+ 
+-        for_each_gpio_group(gpio_iter, dev)
+-        {
+-            line_handle = mraa_get_lines_handle(gpio_iter->dev_fd, gpio_iter->gpio_lines,
+-                                                gpio_iter->num_gpio_lines, flags, 0);
++        for_each_gpio_group(gpio_iter, dev) {
++            line_handle = mraa_get_lines_handle(gpio_iter->dev_fd, gpio_iter->gpio_lines, gpio_iter->num_gpio_lines, flags, 0);
+             if (line_handle <= 0) {
+                 syslog(LOG_ERR, "[GPIOD_INTERFACE]: error getting line handle");
+                 return MRAA_ERROR_INVALID_RESOURCE;
+@@ -1187,10 +1068,8 @@ mraa_gpio_chardev_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
+     unsigned flags = 0;
+     mraa_gpiod_group_t gpio_iter;
+ 
+-    for_each_gpio_group(gpio_iter, dev)
+-    {
+-        mraa_gpiod_line_info* linfo =
+-        mraa_get_line_info_by_chip_number(gpio_iter->gpio_chip, gpio_iter->gpio_lines[0]);
++    for_each_gpio_group(gpio_iter, dev) {
++        mraa_gpiod_line_info* linfo = mraa_get_line_info_by_chip_number(gpio_iter->gpio_chip, gpio_iter->gpio_lines[0]);
+         if (!linfo) {
+             syslog(LOG_ERR, "[GPIOD_INTERFACE]: error getting line info");
+             return MRAA_ERROR_UNSPECIFIED;
+@@ -1215,8 +1094,7 @@ mraa_gpio_chardev_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
+             return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+     }
+ 
+-    for_each_gpio_group(gpio_iter, dev)
+-    {
++    for_each_gpio_group(gpio_iter, dev) {
+         if (gpio_iter->gpiod_handle != -1) {
+             close(gpio_iter->gpiod_handle);
+             gpio_iter->gpiod_handle = -1;
+@@ -1244,7 +1122,7 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
+     }
+ 
+     if (IS_FUNC_DEFINED(dev, gpio_dir_replace)) {
+-        return dev->advance_func->gpio_dir_replace(dev, dir);
++            return dev->advance_func->gpio_dir_replace(dev, dir);
+     }
+ 
+     if (IS_FUNC_DEFINED(dev, gpio_dir_pre)) {
+@@ -1279,7 +1157,7 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
+                     return mraa_gpio_write(it, 0);
+                 default:
+                     syslog(LOG_ERR, "gpio%i: dir: Failed to open 'direction' for writing: %s",
+-                           it->pin, strerror(errno));
++                        it->pin, strerror(errno));
+                     return MRAA_ERROR_INVALID_RESOURCE;
+             }
+         }
+@@ -1321,7 +1199,7 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
+ }
+ 
+ mraa_result_t
+-mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t* dir)
++mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
+ {
+     mraa_result_t result = MRAA_SUCCESS;
+ 
+@@ -1335,10 +1213,8 @@ mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t* dir)
+     if (plat->chardev_capable) {
+         mraa_gpiod_group_t gpio_iter;
+ 
+-        for_each_gpio_group(gpio_iter, dev)
+-        {
+-            mraa_gpiod_line_info* linfo =
+-            mraa_get_line_info_by_chip_number(gpio_iter->gpio_chip, gpio_iter->gpio_lines[0]);
++        for_each_gpio_group(gpio_iter, dev) {
++            mraa_gpiod_line_info* linfo = mraa_get_line_info_by_chip_number(gpio_iter->gpio_chip, gpio_iter->gpio_lines[0]);
+             if (!linfo) {
+                 syslog(LOG_ERR, "[GPIOD_INTERFACE]: error getting line info");
+                 return MRAA_ERROR_UNSPECIFIED;
+@@ -1416,7 +1292,7 @@ mraa_gpio_read(mraa_gpio_context dev)
+         int output_values[1] = { 0 };
+ 
+         if (mraa_gpio_read_multi(dev, output_values) != MRAA_SUCCESS)
+-            return -1;
++                return -1;
+ 
+         return output_values[0];
+     }
+@@ -1435,8 +1311,8 @@ mraa_gpio_read(mraa_gpio_context dev)
+     }
+     char bu[2];
+     if (read(dev->value_fp, bu, 2 * sizeof(char)) != 2) {
+-        syslog(LOG_ERR, "gpio%i: read: Failed to read a sensible value from sysfs: %s", dev->pin,
+-               strerror(errno));
++        syslog(LOG_ERR, "gpio%i: read: Failed to read a sensible value from sysfs: %s",
++                dev->pin, strerror(errno));
+         return -1;
+     }
+     lseek(dev->value_fp, 0, SEEK_SET);
+@@ -1457,22 +1333,21 @@ mraa_gpio_read_multi(mraa_gpio_context dev, int output_values[])
+ 
+         mraa_gpiod_group_t gpio_iter;
+ 
+-        for_each_gpio_group(gpio_iter, dev)
+-        {
++        for_each_gpio_group(gpio_iter, dev) {
+             int status;
+             unsigned flags = GPIOHANDLE_REQUEST_INPUT;
+ 
+             if (gpio_iter->gpiod_handle <= 0) {
+                 gpio_iter->gpiod_handle = mraa_get_lines_handle(gpio_iter->dev_fd, gpio_iter->gpio_lines,
+-                                                                gpio_iter->num_gpio_lines, flags, 0);
++                                                                 gpio_iter->num_gpio_lines, flags, 0);
+                 if (gpio_iter->gpiod_handle <= 0) {
+                     syslog(LOG_ERR, "[GPIOD_INTERFACE]: error getting gpio line handle");
+                     return MRAA_ERROR_INVALID_HANDLE;
+                 }
+             }
+ 
+-            status =
+-            mraa_get_line_values(gpio_iter->gpiod_handle, gpio_iter->num_gpio_lines, gpio_iter->rw_values);
++            status = mraa_get_line_values(gpio_iter->gpiod_handle, gpio_iter->num_gpio_lines,
++                                          gpio_iter->rw_values);
+             if (status < 0) {
+                 syslog(LOG_ERR, "[GPIOD_INTERFACE]: error writing gpio");
+                 return MRAA_ERROR_INVALID_RESOURCE;
+@@ -1582,8 +1457,7 @@ mraa_gpio_write_multi(mraa_gpio_context dev, int input_values[])
+         }
+         free(counters);
+ 
+-        for_each_gpio_group(gpio_iter, dev)
+-        {
++        for_each_gpio_group(gpio_iter, dev) {
+             int status;
+             unsigned flags = GPIOHANDLE_REQUEST_OUTPUT;
+ 
+@@ -1596,8 +1470,8 @@ mraa_gpio_write_multi(mraa_gpio_context dev, int input_values[])
+                 }
+             }
+ 
+-            status =
+-            mraa_set_line_values(gpio_iter->gpiod_handle, gpio_iter->num_gpio_lines, gpio_iter->rw_values);
++            status = mraa_set_line_values(gpio_iter->gpiod_handle, gpio_iter->num_gpio_lines,
++                                          gpio_iter->rw_values);
+             if (status < 0) {
+                 syslog(LOG_ERR, "[GPIOD_INTERFACE]: error writing gpio");
+                 return MRAA_ERROR_INVALID_RESOURCE;
+diff --git a/src/gpio/gpio_chardev.c b/src/gpio/gpio_chardev.c
+index 003b24b..f3893cb 100644
+--- a/src/gpio/gpio_chardev.c
++++ b/src/gpio/gpio_chardev.c
+@@ -22,9 +22,9 @@
+  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  */
+ 
+-#include "gpio/gpio_chardev.h"
+ #include "linux/gpio.h"
+ #include "mraa_internal.h"
++#include "gpio/gpio_chardev.h"
+ 
+ #include <dirent.h>
+ #include <errno.h>
+@@ -52,8 +52,7 @@ _mraa_free_gpio_groups(mraa_gpio_context dev)
+ {
+     mraa_gpiod_group_t gpio_iter;
+ 
+-    for_each_gpio_group(gpio_iter, dev)
+-    {
++    for_each_gpio_group(gpio_iter, dev) {
+         if (gpio_iter->gpio_lines) {
+             free(gpio_iter->gpio_lines);
+         }
+@@ -106,8 +105,7 @@ _mraa_close_gpio_event_handles(mraa_gpio_context dev)
+ {
+     mraa_gpiod_group_t gpio_iter;
+ 
+-    for_each_gpio_group(gpio_iter, dev)
+-    {
++    for_each_gpio_group(gpio_iter, dev) {
+         if (gpio_iter->event_handles != NULL) {
+             for (int j = 0; j < gpio_iter->num_gpio_lines; ++j) {
+                 close(gpio_iter->event_handles[j]);
+@@ -126,8 +124,7 @@ _mraa_close_gpio_desc(mraa_gpio_context dev)
+ {
+     mraa_gpiod_group_t gpio_iter;
+ 
+-    for_each_gpio_group(gpio_iter, dev)
+-    {
++    for_each_gpio_group(gpio_iter, dev) {
+         if (gpio_iter->gpiod_handle != -1) {
+             close(gpio_iter->gpiod_handle);
+             gpio_iter->gpiod_handle = -1;
+@@ -379,85 +376,56 @@ mraa_get_line_values(int line_handle, unsigned int num_lines, unsigned char outp
+ 
+ 
+ mraa_boolean_t
+-mraa_is_gpio_line_kernel_owned(mraa_gpiod_line_info* linfo)
++mraa_is_gpio_line_kernel_owned(mraa_gpiod_line_info *linfo)
+ {
+     return (linfo->flags & GPIOLINE_FLAG_KERNEL);
+ }
+ 
+ mraa_boolean_t
+-mraa_is_gpio_line_dir_out(mraa_gpiod_line_info* linfo)
++mraa_is_gpio_line_dir_out(mraa_gpiod_line_info *linfo)
+ {
+     return (linfo->flags & GPIOLINE_FLAG_IS_OUT);
+ }
+ 
+ mraa_boolean_t
+-mraa_is_gpio_line_active_low(mraa_gpiod_line_info* linfo)
++mraa_is_gpio_line_active_low(mraa_gpiod_line_info *linfo)
+ {
+     return (linfo->flags & GPIOLINE_FLAG_ACTIVE_LOW);
+ }
+ 
+ mraa_boolean_t
+-mraa_is_gpio_line_open_drain(mraa_gpiod_line_info* linfo)
++mraa_is_gpio_line_open_drain(mraa_gpiod_line_info *linfo)
+ {
+     return (linfo->flags & GPIOLINE_FLAG_OPEN_DRAIN);
+ }
+ 
+ mraa_boolean_t
+-mraa_is_gpio_line_open_source(mraa_gpiod_line_info* linfo)
++mraa_is_gpio_line_open_source(mraa_gpiod_line_info *linfo)
+ {
+     return (linfo->flags & GPIOLINE_FLAG_OPEN_SOURCE);
+ }
+ 
+-static int
+-dir_filter(const struct dirent* dir)
+-{
+-    return !strncmp(dir->d_name, CHIP_DEV_PREFIX, strlen(CHIP_DEV_PREFIX));
+-}
+-
+ int
+ mraa_get_number_of_gpio_chips()
+ {
+-    int num_chips;
+-    struct dirent** dirs;
+-
+-    num_chips = scandir("/dev", &dirs, dir_filter, alphasort);
+-    if (num_chips < 0) {
+-        syslog(LOG_ERR, "[GPIOD_INTERFACE]: scandir() error");
+-        return -1;
+-    }
+-
+-    return num_chips;
+-}
+-
+-int
+-mraa_get_chip_infos(mraa_gpiod_chip_info*** cinfos)
+-{
+-    int num_chips, i;
+-    struct dirent** dirs;
+-    mraa_gpiod_chip_info** cinfo;
+-
+-    num_chips = scandir("/dev", &dirs, dir_filter, alphasort);
+-    if (num_chips < 0) {
+-        syslog(LOG_ERR, "[GPIOD_INTERFACE]: scandir() error");
+-        return -1;
+-    }
+-
+-    cinfo = (mraa_gpiod_chip_info**) calloc(num_chips, sizeof(mraa_gpiod_chip_info*));
+-    if (!cinfo) {
+-        syslog(LOG_ERR, "[GPIOD_INTERFACE]: Failed to allocate memory for chip info");
+-        return -1;
+-    }
+-
+-    /* Get chip info for all gpiochips present in the platform */
+-    for (i = 0; i < num_chips; i++) {
+-        cinfo[i] = mraa_get_chip_info_by_name(dirs[i]->d_name);
+-        if (!cinfo[i]) {
+-            syslog(LOG_ERR, "[GPIOD_INTERFACE]: invalid chip %s", dirs[i]->d_name);
+-            return 0;
++    int num_chips = 0;
++    DIR* dev_dir;
++    struct dirent* dir;
++    const unsigned int len = strlen(CHIP_DEV_PREFIX);
++
++    dev_dir = opendir(DEV_DIR);
++    if (dev_dir) {
++        while ((dir = readdir(dev_dir)) != NULL) {
++            if (!strncmp(dir->d_name, CHIP_DEV_PREFIX, len)) {
++                num_chips++;
++            }
+         }
++        closedir(dev_dir);
++    } else {
++        syslog(LOG_ERR, "[GPIOD_INTERFACE]: opendir() error");
++        return -1;
+     }
+ 
+-    *cinfos = cinfo;
+-
++    /* Assume opendir() error. */
+     return num_chips;
+ }
+diff --git a/src/iio/iio.c b/src/iio/iio.c
+index c03dc57..80184cc 100644
+--- a/src/iio/iio.c
++++ b/src/iio/iio.c
+@@ -131,6 +131,7 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
+                     read(fd, readbuf, 31 * sizeof(char));
+                     ret = sscanf(readbuf, "%ce:%c%u/%u>>%u", &shortbuf, &signchar, &chan->bits_used,
+                                  &padint, &chan->shift);
++                    chan->bytes = padint / 8;
+                     // probably should be 5?
+                     if (ret < 0) {
+                         // cleanup
+@@ -138,7 +139,6 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
+                         close(fd);
+                         return MRAA_IO_SETUP_FAILURE;
+                     }
+-                    chan->bytes = padint / 8;
+                     chan->signedd = (signchar == 's');
+                     chan->lendian = (shortbuf == 'l');
+                     if (chan->bits_used == 64) {
+@@ -172,17 +172,10 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
+     }
+     closedir(dir);
+ 
+-    // channel location has to be done in channel index order so do it after we
++    // channel location has to be done in channel index order so do it afetr we
+     // have grabbed all the correct info
+     for (i = 0; i < dev->chan_num; i++) {
+-        chan = &dev->channels[i];
+-
+-        if(chan->bytes <= 0)
+-        {
+-            syslog(LOG_ERR, "iio: Channel %d with channel bytes value <= 0");
+-            return MRAA_IO_SETUP_FAILURE;
+-        }
+-
++	chan = &dev->channels[i];
+         if (curr_bytes % chan->bytes == 0) {
+             chan->location = curr_bytes;
+         } else {
+diff --git a/src/initio/initio.c b/src/initio/initio.c
+index d932c79..ea0cf72 100644
+--- a/src/initio/initio.c
++++ b/src/initio/initio.c
+@@ -171,16 +171,12 @@ parse_uart(char** proto, size_t n, const char* proto_full)
+ 
+     /* Check for bytesize. */
+     int bytesize = -1;
+-    if (proto[idx] != NULL && mraa_atoi_x(proto[idx], &end, &bytesize, 0) != MRAA_SUCCESS) {
++    if (mraa_atoi_x(proto[idx], &end, &bytesize, 0) != MRAA_SUCCESS) {
+         syslog(LOG_ERR, "parse_uart: error reading uart bytesize '%d' from '%s'", bytesize, proto_full);
+         mraa_uart_stop(dev);
+         return NULL;
+     }
+ 
+-    if (end == NULL) {
+-        return NULL;
+-    }
+-
+     int parity = -1;
+     if (strncmp(end, U_PARITY_NONE, strlen(U_PARITY_NONE)) == 0) {
+         parity = MRAA_UART_PARITY_NONE;
+@@ -374,11 +370,11 @@ parse_i2c(char** proto, size_t n, const char* proto_full)
+     }
+ 
+     int mode = -1;
+-    if (proto[idx] && strncmp(proto[idx], I_MODE_STD, strlen(I_MODE_STD)) == 0) {
++    if (strncmp(proto[idx], I_MODE_STD, strlen(I_MODE_STD)) == 0) {
+         mode = MRAA_I2C_STD;
+-    } else if (proto[idx] && strncmp(proto[idx], I_MODE_FAST, strlen(I_MODE_FAST)) == 0) {
++    } else if (strncmp(proto[idx], I_MODE_FAST, strlen(I_MODE_FAST)) == 0) {
+         mode = MRAA_I2C_FAST;
+-    } else if (proto[idx] && strncmp(proto[idx], I_MODE_HIGH, strlen(I_MODE_HIGH)) == 0) {
++    } else if (strncmp(proto[idx], I_MODE_HIGH, strlen(I_MODE_HIGH)) == 0) {
+         mode = MRAA_GPIO_PULLDOWN;
+     }
+ 
+@@ -705,7 +701,6 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
+             if (!dev) {
+                 syslog(LOG_ERR, "mraa_io_init: error parsing pwm init string '%s'", str_descs[i]);
+                 status = MRAA_ERROR_INVALID_HANDLE;
+-                free(new_desc);
+             }
+ 
+             if (status == MRAA_SUCCESS) {
+@@ -792,6 +787,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
+                     strncat(new_desc->leftover_str, str_descs[i], strlen(str_descs[i]));
+                 }
+ 
++                strncat(new_desc->leftover_str, str_descs[i], strlen(str_descs[i]));
+                 leftover_str_len += strlen(str_descs[i]) + 1;
+                 new_desc->leftover_str[leftover_str_len - 1] = ',';
+                 new_desc->leftover_str[leftover_str_len] = '\0';
+diff --git a/src/json/jsonplatform.c b/src/json/jsonplatform.c
+index 0442ea2..3be8cfe 100644
+--- a/src/json/jsonplatform.c
++++ b/src/json/jsonplatform.c
+@@ -23,14 +23,14 @@
+  */
+ 
+ #include <stddef.h>
+-#include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <stdio.h>
+ 
+ 
+ #include <json-c/json.h>
+-#include <sys/mman.h>
+ #include <sys/stat.h>
++#include <sys/mman.h>
+ 
+ #include "mraa_internal.h"
+ 
+@@ -64,8 +64,9 @@ mraa_init_json_platform_get_index(json_object* jobj, const char* io, const char*
+ 
+         *pos = (int) json_object_get_int(jobj_temp);
+         if (*pos < 0 || *pos > upper) {
+-            syslog(LOG_ERR, "init_json_platform: %s %s at position: %d, gave: %d which was out of range",
+-                   io, key, index, *pos);
++            syslog(LOG_ERR,
++                   "init_json_platform: %s %s at position: %d, gave: %d which was out of range", io,
++                   key, index, *pos);
+             return MRAA_ERROR_INVALID_RESOURCE;
+         }
+         return MRAA_SUCCESS;
+@@ -290,11 +291,7 @@ mraa_init_json_platform_i2c(json_object* jobj_i2c, mraa_board_t* board, int inde
+     json_object* jobj_temp = NULL;
+ 
+     // Default to no mux pins defined
+-    if (board->pins != NULL) {
+-        board->pins[pin].i2c.mux_total = 0;
+-    } else {
+-        return MRAA_ERROR_NO_DATA_AVAILABLE;
+-    }
++    board->pins[pin].i2c.mux_total = 0;
+ 
+     // Get the I2C bus array index
+     ret = mraa_init_json_platform_get_index(jobj_i2c, I2C_KEY, INDEX_KEY, index, &pos, board->i2c_bus_count - 1);
+@@ -558,9 +555,8 @@ mraa_init_json_platform_loop(json_object* jobj_platform, const char* obj_key, mr
+             jobj_io = json_object_array_get_idx(jobj_temp, i);
+             // Check to see it's the right type
+             if (!json_object_is_type(jobj_io, json_type_object)) {
+-                syslog(LOG_ERR,
+-                       "init_json_platform: One of more of the elements in the \"%s\" "
+-                       "array where not JSON objects",
++                syslog(LOG_ERR, "init_json_platform: One of more of the elements in the \"%s\" "
++                                "array where not JSON objects",
+                        obj_key);
+                 return MRAA_ERROR_INVALID_RESOURCE;
+             }
+@@ -595,7 +591,8 @@ mraa_init_json_platform_size_check(json_object* jobj_platform,
+         // make sure we don't have more than our range
+         array_length = json_object_array_length(jobj_temp);
+         if (array_length > range) {
+-            syslog(LOG_ERR, "init_json_platform: The size of the %s array given was %d, max was: %d",
++            syslog(LOG_ERR,
++                   "init_json_platform: The size of the %s array given was %d, max was: %d",
+                    obj_key, array_length, range);
+             return MRAA_ERROR_INVALID_RESOURCE;
+         }
+@@ -616,7 +613,7 @@ mraa_init_json_platform(const char* platform_json)
+     char* buffer = NULL;
+     struct stat st;
+     int file_lock = 0, i = 0;
+-    json_object* jobj_platform = NULL;
++    json_object *jobj_platform = NULL;
+     mraa_board_t* board = NULL;
+ 
+     // Try to lock the file for use
+@@ -716,13 +713,7 @@ mraa_init_json_platform(const char* platform_json)
+     // This one was allocated and assigned an "Unknown platform" value by now,
+     // so we need to reallocate it.
+     free(platform_name);
+-
+-    if (!plat->platform_name) {
+-        goto unsuccessful;
+-    } else {
+-        platform_name = calloc(strlen(plat->platform_name) + 1, sizeof(char));
+-    }
+-
++    platform_name = calloc(strlen(plat->platform_name) + 1, sizeof(char));
+     if (platform_name == NULL) {
+         syslog(LOG_ERR, "init_json_platform: Could not allocate memory for platform_name");
+         goto unsuccessful;
+diff --git a/src/mraa.c b/src/mraa.c
+index 039d96a..d568238 100644
+--- a/src/mraa.c
++++ b/src/mraa.c
+@@ -28,43 +28,43 @@
+ #define _XOPEN_SOURCE 600 /* Get nftw() and S_IFSOCK declarations */
+ #endif
+ 
+-#include <dlfcn.h>
+-#include <pwd.h>
+-#include <sched.h>
+ #include <stddef.h>
++#include <dlfcn.h>
+ #include <stdlib.h>
++#include <sched.h>
+ #include <string.h>
++#include <pwd.h>
+ #if !defined(PERIPHERALMAN)
+-#include <ftw.h>
+ #include <glob.h>
++#include <ftw.h>
+ #endif
+-#include <ctype.h>
+ #include <dirent.h>
+-#include <errno.h>
+ #include <fcntl.h>
+-#include <limits.h>
+-#include <stdbool.h>
+ #include <stdio.h>
+-#include <sys/utsname.h>
++#include <stdbool.h>
++#include <errno.h>
+ #include <unistd.h>
++#include <ctype.h>
++#include <limits.h>
++#include <sys/utsname.h>
+ 
+ #if defined(IMRAA)
+ #include <json-c/json.h>
+-#include <sys/mman.h>
+ #include <sys/stat.h>
++#include <sys/mman.h>
+ #endif
+ 
+-#include "aio.h"
++#include "mraa_internal.h"
+ #include "firmata/firmata_mraa.h"
++#include "grovepi/grovepi.h"
+ #include "gpio.h"
+ #include "gpio/gpio_chardev.h"
+-#include "grovepi/grovepi.h"
++#include "version.h"
+ #include "i2c.h"
+-#include "mraa_internal.h"
+ #include "pwm.h"
++#include "aio.h"
+ #include "spi.h"
+ #include "uart.h"
+-#include "version.h"
+ 
+ #if defined(PERIPHERALMAN)
+ #include "peripheralmanager/peripheralman.h"
+@@ -100,22 +100,19 @@ mraa_set_log_level(int level)
+     return MRAA_ERROR_INVALID_PARAMETER;
+ }
+ 
+-mraa_boolean_t
+-mraa_is_kernel_chardev_interface_compatible()
++mraa_boolean_t mraa_is_kernel_chardev_interface_compatible()
+ {
+     if (mraa_get_number_of_gpio_chips() <= 0) {
+-        syslog(LOG_NOTICE,
+-               "gpio: platform supports chardev but kernel doesn't, falling back to sysfs");
++        syslog(LOG_NOTICE, "gpio: platform supports chardev but kernel doesn't, falling back to sysfs");
+         return 0;
+     }
+ 
+     return 1;
+ }
+ 
+-mraa_boolean_t
+-mraa_is_platform_chardev_interface_capable()
++mraa_boolean_t mraa_is_platform_chardev_interface_capable()
+ {
+-    if ((plat != NULL) && (plat->chardev_capable)) {
++    if (plat->chardev_capable) {
+         return mraa_is_kernel_chardev_interface_compatible();
+     }
+ 
+@@ -195,8 +192,6 @@ imraa_init()
+         if (plat != NULL) {
+             plat->platform_type = MRAA_NULL_PLATFORM;
+             plat->platform_name = "Unknown platform";
+-        } else {
+-            return MRAA_ERROR_NO_RESOURCES;
+         }
+     }
+ 
+@@ -205,15 +200,17 @@ imraa_init()
+     /* If a usb platform lib is present, attempt to load and look for
+      * necessary symbols for adding extended I/O */
+     void* usblib = dlopen("libmraa-platform-ft4222.so", RTLD_LAZY);
+-    if (usblib) {
++    if (usblib)
++    {
+         syslog(LOG_NOTICE, "Found USB platform extender library: libmraa-platform-ft4222.so");
+         syslog(LOG_NOTICE, "Detecting FT4222 subplatforms...");
+         fptr_add_platform_extender add_ft4222_platform =
+-        (fptr_add_platform_extender) dlsym(usblib, "mraa_usb_platform_extender");
++            (fptr_add_platform_extender)dlsym(usblib, "mraa_usb_platform_extender");
+ 
+         /* If this method exists, call it to add a subplatform */
+         syslog(LOG_NOTICE, "Detecting FT4222 subplatforms complete, found %i subplatform/s",
+-               ((add_ft4222_platform != NULL) && (add_ft4222_platform(plat) == MRAA_SUCCESS)) ? 1 : 0);
++                ((add_ft4222_platform != NULL) && (add_ft4222_platform(plat) == MRAA_SUCCESS))
++                ? 1 : 0);
+     }
+ #endif
+ 
+@@ -251,8 +248,7 @@ imraa_init()
+         syslog(LOG_NOTICE, "gpio: support for chardev interface is activated");
+     }
+ 
+-    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(),
+-           mraa_get_platform_type());
++    syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
+     return MRAA_SUCCESS;
+ }
+ 
+@@ -302,8 +298,9 @@ mraa_deinit()
+          * allocate space for device_path, others use #defines or consts,
+          * which means this has to be handled differently per platform
+          */
+-        if ((plat->platform_type == MRAA_JSON_PLATFORM) || (plat->platform_type == MRAA_UP2) ||
+-            (plat->platform_type == MRAA_IEI_TANK)) {
++        if ((plat->platform_type == MRAA_JSON_PLATFORM) ||
++                (plat->platform_type == MRAA_UP2) ||
++                (plat->platform_type == MRAA_IEI_TANK)) {
+             for (i = 0; i < plat->uart_dev_count; i++) {
+                 if (plat->uart_dev[i].device_path != NULL) {
+                     free(plat->uart_dev[i].device_path);
+@@ -378,7 +375,7 @@ mraa_iio_detect()
+     plat_iio->iio_device_count = num_iio_devices;
+     plat_iio->iio_devices = calloc(num_iio_devices, sizeof(struct _iio));
+     struct _iio* device;
+-    for (i = 0; i < num_iio_devices; i++) {
++    for (i=0; i < num_iio_devices; i++) {
+         device = &plat_iio->iio_devices[i];
+         device->num = i;
+         snprintf(filepath, 64, "/sys/bus/iio/devices/iio:device%d/name", i);
+@@ -391,7 +388,7 @@ mraa_iio_detect()
+                 len = strlen(name);
+                 // use strndup
+                 device->name = malloc((sizeof(char) * len) + sizeof(char));
+-                strncpy(device->name, name, len + 1);
++                strncpy(device->name, name, len+1);
+             }
+             close(fd);
+         }
+@@ -410,23 +407,22 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
+ 
+     for (mi = 0; mi < meta.mux_total; mi++) {
+ 
+-        switch (meta.mux[mi].pincmd) {
+-            case PINCMD_UNDEFINED: // used for backward compatibility
+-                if (meta.mux[mi].pin != last_pin) {
++        switch(meta.mux[mi].pincmd) {
++            case PINCMD_UNDEFINED:              // used for backward compatibility
++                if(meta.mux[mi].pin != last_pin) {
+                     if (mux_i != NULL) {
+                         mraa_gpio_owner(mux_i, 0);
+                         mraa_gpio_close(mux_i);
+                     }
+                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
+-                    if (mux_i == NULL)
+-                        return MRAA_ERROR_INVALID_HANDLE;
++                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                     last_pin = meta.mux[mi].pin;
+                 }
+                 // this function will sometimes fail, however this is not critical as
+                 // long as the write succeeds - Test case galileo gen2 pin2
+                 mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
+                 ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
+-                if (ret != MRAA_SUCCESS) {
++                if(ret != MRAA_SUCCESS) {
+                     if (mux_i != NULL) {
+                         mraa_gpio_owner(mux_i, 0);
+                         mraa_gpio_close(mux_i);
+@@ -436,20 +432,19 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
+                 break;
+ 
+             case PINCMD_SET_VALUE:
+-                if (meta.mux[mi].pin != last_pin) {
++                if(meta.mux[mi].pin != last_pin) {
+                     if (mux_i != NULL) {
+                         mraa_gpio_owner(mux_i, 0);
+                         mraa_gpio_close(mux_i);
+                     }
+                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
+-                    if (mux_i == NULL)
+-                        return MRAA_ERROR_INVALID_HANDLE;
++                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                     last_pin = meta.mux[mi].pin;
+                 }
+ 
+                 ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
+ 
+-                if (ret != MRAA_SUCCESS) {
++                if(ret != MRAA_SUCCESS) {
+                     if (mux_i != NULL) {
+                         mraa_gpio_owner(mux_i, 0);
+                         mraa_gpio_close(mux_i);
+@@ -459,20 +454,19 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
+                 break;
+ 
+             case PINCMD_SET_DIRECTION:
+-                if (meta.mux[mi].pin != last_pin) {
++                if(meta.mux[mi].pin != last_pin) {
+                     if (mux_i != NULL) {
+                         mraa_gpio_owner(mux_i, 0);
+                         mraa_gpio_close(mux_i);
+                     }
+                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
+-                    if (mux_i == NULL)
+-                        return MRAA_ERROR_INVALID_HANDLE;
++                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                     last_pin = meta.mux[mi].pin;
+                 }
+ 
+                 ret = mraa_gpio_dir(mux_i, meta.mux[mi].value);
+ 
+-                if (ret != MRAA_SUCCESS) {
++                if(ret != MRAA_SUCCESS) {
+                     if (mux_i != NULL) {
+                         mraa_gpio_owner(mux_i, 0);
+                         mraa_gpio_close(mux_i);
+@@ -482,23 +476,22 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
+                 break;
+ 
+             case PINCMD_SET_IN_VALUE:
+-                if (meta.mux[mi].pin != last_pin) {
++                if(meta.mux[mi].pin != last_pin) {
+                     if (mux_i != NULL) {
+                         mraa_gpio_owner(mux_i, 0);
+                         mraa_gpio_close(mux_i);
+                     }
+                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
+-                    if (mux_i == NULL)
+-                        return MRAA_ERROR_INVALID_HANDLE;
++                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                     last_pin = meta.mux[mi].pin;
+                 }
+ 
+                 ret = mraa_gpio_dir(mux_i, MRAA_GPIO_IN);
+ 
+-                if (ret == MRAA_SUCCESS)
++                if(ret == MRAA_SUCCESS)
+                     ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
+ 
+-                if (ret != MRAA_SUCCESS) {
++                if(ret != MRAA_SUCCESS) {
+                     if (mux_i != NULL) {
+                         mraa_gpio_owner(mux_i, 0);
+                         mraa_gpio_close(mux_i);
+@@ -508,23 +501,22 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
+                 break;
+ 
+             case PINCMD_SET_OUT_VALUE:
+-                if (meta.mux[mi].pin != last_pin) {
++                if(meta.mux[mi].pin != last_pin) {
+                     if (mux_i != NULL) {
+                         mraa_gpio_owner(mux_i, 0);
+                         mraa_gpio_close(mux_i);
+                     }
+                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
+-                    if (mux_i == NULL)
+-                        return MRAA_ERROR_INVALID_HANDLE;
++                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                     last_pin = meta.mux[mi].pin;
+                 }
+ 
+                 ret = mraa_gpio_dir(mux_i, MRAA_GPIO_OUT);
+ 
+-                if (ret == MRAA_SUCCESS)
++                if(ret == MRAA_SUCCESS)
+                     ret = mraa_gpio_write(mux_i, meta.mux[mi].value);
+ 
+-                if (ret != MRAA_SUCCESS) {
++                if(ret != MRAA_SUCCESS) {
+                     if (mux_i != NULL) {
+                         mraa_gpio_owner(mux_i, 0);
+                         mraa_gpio_close(mux_i);
+@@ -534,20 +526,19 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
+                 break;
+ 
+             case PINCMD_SET_MODE:
+-                if (meta.mux[mi].pin != last_pin) {
++                if(meta.mux[mi].pin != last_pin) {
+                     if (mux_i != NULL) {
+                         mraa_gpio_owner(mux_i, 0);
+                         mraa_gpio_close(mux_i);
+                     }
+                     mux_i = mraa_gpio_init_raw(meta.mux[mi].pin);
+-                    if (mux_i == NULL)
+-                        return MRAA_ERROR_INVALID_HANDLE;
++                    if (mux_i == NULL) return MRAA_ERROR_INVALID_HANDLE;
+                     last_pin = meta.mux[mi].pin;
+                 }
+ 
+                 ret = mraa_gpio_mode(mux_i, meta.mux[mi].value);
+ 
+-                if (ret != MRAA_SUCCESS) {
++                if(ret != MRAA_SUCCESS) {
+                     if (mux_i != NULL) {
+                         mraa_gpio_owner(mux_i, 0);
+                         mraa_gpio_close(mux_i);
+@@ -560,8 +551,7 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
+                 break;
+ 
+             default:
+-                syslog(LOG_NOTICE, "mraa_setup_mux_mapped: wrong command %d on pin %d with value %d",
+-                       meta.mux[mi].pincmd, meta.mux[mi].pin, meta.mux[mi].value);
++                syslog(LOG_NOTICE, "mraa_setup_mux_mapped: wrong command %d on pin %d with value %d", meta.mux[mi].pincmd, meta.mux[mi].pin, meta.mux[mi].value);
+                 break;
+         }
+     }
+@@ -662,8 +652,7 @@ mraa_pin_mode_test(int pin, mraa_pinmodes_t mode)
+         pin = mraa_get_sub_platform_index(pin);
+     }
+ 
+-    if (current_plat == NULL || current_plat->platform_type == MRAA_UNKNOWN_PLATFORM ||
+-        current_plat->platform_type == MRAA_NULL_PLATFORM) {
++    if (current_plat == NULL || current_plat->platform_type == MRAA_UNKNOWN_PLATFORM || current_plat->platform_type == MRAA_NULL_PLATFORM) {
+         return 0;
+     }
+     if (pin > (current_plat->phy_pin_count - 1) || pin < 0)
+@@ -885,9 +874,9 @@ mraa_get_platform_pin_count(uint8_t platform_offset)
+         return mraa_get_pin_count();
+     else {
+         if (mraa_has_sub_platform())
+-            return plat->sub_platform->phy_pin_count;
++           return plat->sub_platform->phy_pin_count;
+         else
+-            return 0;
++           return 0;
+     }
+ }
+ 
+@@ -929,14 +918,14 @@ mraa_gpio_lookup(const char* pin_name)
+     }
+ 
+     for (i = 0; i < plat->phy_pin_count; i++) {
+-        // Skip non GPIO pins
+-        if (!(plat->pins[i].capabilities.gpio))
+-            continue;
++         // Skip non GPIO pins
++         if (!(plat->pins[i].capabilities.gpio))
++             continue;
+ 
+-        if (plat->pins[i].name != NULL &&
+-            strncmp(pin_name, plat->pins[i].name, strlen(plat->pins[i].name) + 1) == 0) {
+-            return i;
+-        }
++         if (plat->pins[i].name != NULL &&
++             strncmp(pin_name, plat->pins[i].name, strlen(plat->pins[i].name) + 1) == 0) {
++             return i;
++         }
+     }
+     return -1;
+ }
+@@ -955,10 +944,10 @@ mraa_i2c_lookup(const char* i2c_name)
+     }
+ 
+     for (i = 0; i < plat->i2c_bus_count; i++) {
+-        if (plat->i2c_bus[i].name != NULL &&
+-            strncmp(i2c_name, plat->i2c_bus[i].name, strlen(plat->i2c_bus[i].name) + 1) == 0) {
+-            return plat->i2c_bus[i].bus_id;
+-        }
++         if (plat->i2c_bus[i].name != NULL &&
++             strncmp(i2c_name, plat->i2c_bus[i].name, strlen(plat->i2c_bus[i].name) + 1) == 0) {
++             return plat->i2c_bus[i].bus_id;
++         }
+     }
+     return -1;
+ }
+@@ -977,10 +966,10 @@ mraa_spi_lookup(const char* spi_name)
+     }
+ 
+     for (i = 0; i < plat->spi_bus_count; i++) {
+-        if (plat->spi_bus[i].name != NULL &&
+-            strncmp(spi_name, plat->spi_bus[i].name, strlen(plat->spi_bus[i].name) + 1) == 0) {
+-            return plat->spi_bus[i].bus_id;
+-        }
++         if (plat->spi_bus[i].name != NULL &&
++             strncmp(spi_name, plat->spi_bus[i].name, strlen(plat->spi_bus[i].name) + 1) == 0) {
++             return plat->spi_bus[i].bus_id;
++         }
+     }
+     return -1;
+ }
+@@ -999,10 +988,10 @@ mraa_pwm_lookup(const char* pwm_name)
+     }
+ 
+     for (i = 0; i < plat->pwm_dev_count; i++) {
+-        if (plat->pwm_dev[i].name != NULL &&
+-            strncmp(pwm_name, plat->pwm_dev[i].name, strlen(plat->pwm_dev[i].name) + 1) == 0) {
+-            return plat->pwm_dev[i].index;
+-        }
++         if (plat->pwm_dev[i].name != NULL &&
++             strncmp(pwm_name, plat->pwm_dev[i].name, strlen(plat->pwm_dev[i].name) + 1) == 0) {
++             return plat->pwm_dev[i].index;
++         }
+     }
+     return -1;
+ }
+@@ -1021,10 +1010,10 @@ mraa_uart_lookup(const char* uart_name)
+     }
+ 
+     for (i = 0; i < plat->uart_dev_count; i++) {
+-        if (plat->uart_dev[i].name != NULL &&
+-            strncmp(uart_name, plat->uart_dev[i].name, strlen(plat->uart_dev[i].name) + 1) == 0) {
+-            return plat->uart_dev[i].index;
+-        }
++         if (plat->uart_dev[i].name != NULL &&
++             strncmp(uart_name, plat->uart_dev[i].name, strlen(plat->uart_dev[i].name) + 1) == 0) {
++             return plat->uart_dev[i].index;
++         }
+     }
+     return -1;
+ }
+@@ -1038,9 +1027,9 @@ mraa_get_default_i2c_bus(uint8_t platform_offset)
+         return plat->def_i2c_bus;
+     } else {
+         if (mraa_has_sub_platform())
+-            return plat->sub_platform->def_i2c_bus;
++           return plat->sub_platform->def_i2c_bus;
+         else
+-            return -1;
++           return -1;
+     }
+ }
+ 
+@@ -1137,12 +1126,9 @@ mraa_link_targets(const char* filename, const char* targetname)
+     int nchars = 0;
+     char* buffer = NULL;
+     while (nchars == 0) {
+-        char* old_buffer = buffer;
+         buffer = (char*) realloc(buffer, size);
+-        if (buffer == NULL) {
+-            free(old_buffer);
++        if (buffer == NULL)
+             return 0;
+-        }
+         nchars = readlink(filename, buffer, size);
+         if (nchars < 0) {
+             free(buffer);
+@@ -1204,22 +1190,23 @@ mraa_count_i2c_files(const char* path, const struct stat* sb, int flag, struct F
+ }
+ 
+ int
+-mraa_find_i2c_bus_pci(const char* pci_device, const char* pci_id, const char* adapter_name)
++mraa_find_i2c_bus_pci(const char* pci_device, const char *pci_id, const char* adapter_name)
+ {
+     /**
+      * For example we'd get something like:
+      * pci0000:00/0000:00:16.3/i2c_desiignware.3
+      */
+     char path[1024];
+-    snprintf(path, 1024 - 1, "/sys/devices/pci%s/%s/%s/", pci_device, pci_id, adapter_name);
++    snprintf(path, 1024-1, "/sys/devices/pci%s/%s/%s/", pci_device, pci_id, adapter_name);
+     if (mraa_file_exist(path)) {
+-        struct dirent** namelist;
++        struct dirent **namelist;
+         int n;
+         n = scandir(path, &namelist, NULL, alphasort);
+         if (n < 0) {
+             syslog(LOG_ERR, "Failed to get information on i2c");
+             return -1;
+-        } else {
++        }
++        else {
+             while (n--) {
+                 char* dup = strdup(namelist[n]->d_name);
+                 char* orig_dup = dup;
+@@ -1278,7 +1265,7 @@ mraa_find_i2c_bus(const char* devname, int startfrom)
+     // i2c devices are numbered numerically so 0 must exist otherwise there is
+     // no i2c-dev loaded
+     if (mraa_file_exist("/sys/class/i2c-dev/i2c-0")) {
+-        for (; i < num_i2c_devices; i++) {
++        for (;i < num_i2c_devices; i++) {
+             off_t size, err;
+             snprintf(path, 64, "/sys/class/i2c-dev/i2c-%u/name", i);
+             fd = open(path, O_RDONLY);
+@@ -1387,13 +1374,10 @@ mraa_add_subplatform(mraa_platform_t subplatformtype, const char* dev)
+             return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
+         }
+         int i2c_bus;
+-        char* dev_dup = strdup(dev);
+-        if (mraa_atoi(dev_dup, &i2c_bus) != MRAA_SUCCESS && i2c_bus < plat->i2c_bus_count) {
++        if(mraa_atoi(strdup(dev), &i2c_bus) != MRAA_SUCCESS && i2c_bus < plat->i2c_bus_count) {
+             syslog(LOG_NOTICE, "mraa: Cannot add GrovePi subplatform, invalid i2c bus specified");
+-            free(dev_dup);
+             return MRAA_ERROR_INVALID_PARAMETER;
+         }
+-        free(dev_dup);
+         if (mraa_grovepi_platform(plat, i2c_bus) == MRAA_GROVEPI) {
+             syslog(LOG_NOTICE, "mraa: Added GrovePi subplatform");
+             return MRAA_SUCCESS;
+@@ -1451,9 +1435,8 @@ mraa_add_from_lockfile(const char* imraa_lock_file)
+         int id = -1;
+         const char* uartdev = NULL;
+         for (i = 0; i < subplat_num; i++) {
+-            struct json_object* ioobj = json_object_array_get_idx(ioarray, i);
+-            json_object_object_foreach(ioobj, key, val)
+-            {
++            struct json_object *ioobj = json_object_array_get_idx(ioarray, i);
++            json_object_object_foreach(ioobj, key, val) {
+                 if (strncmp(key, "id", strlen("id") + 1) == 0) {
+                     if (mraa_atoi(json_object_get_string(val), &id) != MRAA_SUCCESS) {
+                         id = -1;
+@@ -1474,12 +1457,13 @@ mraa_add_from_lockfile(const char* imraa_lock_file)
+         }
+         if (json_object_object_get_ex(jobj_lock, "IO", &ioarray) == true &&
+             json_object_is_type(ioarray, json_type_array)) {
+-            /* assume we have declared IO so we are preinitialised and wipe the
+-             * advance func array
++	    /* assume we have declared IO so we are preinitialised and wipe the
++	     * advance func array
+              */
+             memset(plat->adv_func, 0, sizeof(mraa_adv_func_t));
+         }
+-    } else {
++    }
++    else {
+         ret = MRAA_ERROR_INVALID_RESOURCE;
+     }
+     json_object_put(jobj_lock);
+@@ -1606,13 +1590,11 @@ mraa_init_io(const char* desc)
+     } else if (strncmp(type, PWM_KEY, strlen(PWM_KEY) + 1) == 0) {
+         if (raw) {
+             if (mraa_init_io_helper(&str, &id, delim) != MRAA_SUCCESS) {
+-                syslog(LOG_ERR, "mraa_init_io: Pwm, unable to convert the chip id string into a "
+-                                "useable Int");
++                syslog(LOG_ERR, "mraa_init_io: Pwm, unable to convert the chip id string into a useable Int");
+                 return NULL;
+             }
+             if (mraa_init_io_helper(&str, &pin, delim) != MRAA_SUCCESS) {
+-                syslog(LOG_ERR,
+-                       "mraa_init_io: Pwm, unable to convert the pin string into a useable Int");
++                syslog(LOG_ERR, "mraa_init_io: Pwm, unable to convert the pin string into a useable Int");
+                 return NULL;
+             }
+             return (void*) mraa_pwm_init_raw(id, pin);
+@@ -1621,13 +1603,11 @@ mraa_init_io(const char* desc)
+     } else if (strncmp(type, SPI_KEY, strlen(SPI_KEY) + 1) == 0) {
+         if (raw) {
+             if (mraa_init_io_helper(&str, &id, delim) != MRAA_SUCCESS) {
+-                syslog(LOG_ERR,
+-                       "mraa_init_io: Spi, unable to convert the bus string into a useable Int");
++                syslog(LOG_ERR, "mraa_init_io: Spi, unable to convert the bus string into a useable Int");
+                 return NULL;
+             }
+             if (mraa_init_io_helper(&str, &pin, delim) != MRAA_SUCCESS) {
+-                syslog(LOG_ERR,
+-                       "mraa_init_io: Spi, unable to convert the cs string into a useable Int");
++                syslog(LOG_ERR, "mraa_init_io: Spi, unable to convert the cs string into a useable Int");
+                 return NULL;
+             }
+             return (void*) mraa_spi_init_raw(id, pin);
+diff --git a/src/pwm/pwm.c b/src/pwm/pwm.c
+index e3be80e..65b9db2 100644
+--- a/src/pwm/pwm.c
++++ b/src/pwm/pwm.c
+@@ -239,9 +239,9 @@ mraa_pwm_init(int pin)
+         return NULL;
+     }
+ 
+-    if (board->adv_func->pwm_init_replace != NULL) {
++/*    if (board->adv_func->pwm_init_replace != NULL) {
+         return board->adv_func->pwm_init_replace(pin);
+-    }
++    }*/
+     if (board->adv_func->pwm_init_internal_replace != NULL) {
+         return board->adv_func->pwm_init_internal_replace(board->adv_func, pin);
+     }
+diff --git a/src/x86/intel_galileo_rev_g.c b/src/x86/intel_galileo_rev_g.c
+index f5c84d1..35533c0 100644
+--- a/src/x86/intel_galileo_rev_g.c
++++ b/src/x86/intel_galileo_rev_g.c
+@@ -158,6 +158,7 @@ mraa_intel_galileo_gen2_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_
+         case MRAA_GPIO_HIZ:
+             close(drive);
+             return MRAA_SUCCESS;
++            break;
+         default:
+             close(drive);
+             return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+diff --git a/src/x86/x86.c b/src/x86/x86.c
+index f2e0e1c..4c7285f 100644
+--- a/src/x86/x86.c
++++ b/src/x86/x86.c
+@@ -150,8 +150,6 @@ mraa_x86_platform()
+     plat = mraa_up2_board();
+     #elif defined(xMRAA_INTEL_JOULE_EXPANSION)
+     plat = mraa_joule_expansion_board();
+-    #elif defined(xMRAA_IEI_TANK)
+-    plat = mraa_iei_tank();
+     #else
+         #error "Not using a valid platform value from mraa_platform_t - cannot compile"
+     #endif
+-- 
+2.7.4
+

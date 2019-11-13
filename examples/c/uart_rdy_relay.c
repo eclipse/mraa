@@ -30,9 +30,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
-/* mraa header */
 #include "mraa/uart.h"
+#include "mraa/gpio.h"
+
+/* gpio declaration */
+#define GPIO_PIN_1 10
 
 #ifndef FALSE
 #define FALSE 0
@@ -56,10 +60,14 @@ sig_handler(int signum)
 int
 main(int argc, char** argv)
 {
+    mraa_gpio_context gpio_1;
     mraa_result_t status = MRAA_SUCCESS;
     mraa_uart_context uart;
-    char buffer[] = "Hello Mraa!";
-
+//    char buffer[] = "Hello Mraa!";
+//char buf[20];   
+char buffer1[1];	
+char recv[1];
+	int rec=0;
     int baudrate = 9600, stopbits = 1, databits = 8;
     mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
     unsigned int ctsrts = FALSE, xonxoff = FALSE;
@@ -71,6 +79,21 @@ main(int argc, char** argv)
     /* initialize mraa for the platform (not needed most of the time) */
     mraa_init();
 
+//! [Interesting]
+    /* initialize GPIO pin */
+    gpio_1 = mraa_gpio_init(GPIO_PIN_1);
+    if (gpio_1 == NULL) {
+        fprintf(stderr, "Failed to initialize GPIO %d\n", GPIO_PIN_1);
+        mraa_deinit();
+        return EXIT_FAILURE;
+    }
+
+/* set GPIO to output */
+    status = mraa_gpio_dir(gpio_1, MRAA_GPIO_OUT);
+    if (status != MRAA_SUCCESS) {
+        goto err_exit;
+    }
+
     //! [Interesting]
     /* initialize uart */
     uart = mraa_uart_init_raw(dev_path);
@@ -80,22 +103,51 @@ main(int argc, char** argv)
     }
 
     /* set serial port parameters */
-    status =
-    mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
+    status = mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
     if (status != MRAA_SUCCESS) {
         goto err_exit;
     }
 
-    while (flag) {
-        /* send data through uart */
-        mraa_uart_write(uart, buffer, sizeof(buffer));
+    while (flag) 
+    {
+	//printf("while start\n");
+	rec=mraa_uart_read(uart,buffer1,sizeof(buffer1));
+	sleep(1);
+//	for(i=0;i<20;i++)
+//        buf[i] = buffer1[i];
+//	printf("Recv:%d:",rec);
+//	printf("Message Received:" );	
+	printf("%s\n",buffer1);
+//	memset(buffer1,0,sizeof(buffer1));
+	strcpy(recv,buffer1);
+	printf("received message:%s",recv);
+	if(strcmp(recv,"1")==0)
+	{
+	status = mraa_gpio_write(gpio_1, 0);
+	printf("Gpio on\n");
+	if (status != MRAA_SUCCESS) 
+	{
+            goto err_exit;
+	}
+	}
+else if(strcmp(recv,"0")==0)
+        {
+        status = mraa_gpio_write(gpio_1, 1);
+        printf("Gpio on\n");
+        if (status != MRAA_SUCCESS)
+        {
+            goto err_exit;
+        }
+        }
+else
+	goto err_exit;
+//memset(buf,0,sizeof(buf));	
+//	printf("while end\n");   
+	}	
 
-        sleep(1);
-    }
-
+	
     /* stop uart */
     mraa_uart_stop(uart);
-
     //! [Interesting]
     /* deinitialize mraa for the platform (not needed most of the time) */
     mraa_deinit();

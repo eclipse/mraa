@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 /* mraa header */
 #include "mraa/uart.h"
@@ -58,8 +59,10 @@ main(int argc, char** argv)
 {
     mraa_result_t status = MRAA_SUCCESS;
     mraa_uart_context uart;
-    char buffer[] = "Hello Mraa!";
-
+//    char buffer[] = "Hello Mraa!";
+   char buffer1[20];	
+	int w=0;
+char send[1];
     int baudrate = 9600, stopbits = 1, databits = 8;
     mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
     unsigned int ctsrts = FALSE, xonxoff = FALSE;
@@ -80,17 +83,39 @@ main(int argc, char** argv)
     }
 
     /* set serial port parameters */
-    status =
-    mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
+    status = mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
     if (status != MRAA_SUCCESS) {
         goto err_exit;
     }
 
     while (flag) {
         /* send data through uart */
-        mraa_uart_write(uart, buffer, sizeof(buffer));
+	printf("\nEnter Message:");
+	scanf("%s",buffer1);
+	printf("message is:%s\n",buffer1);
+	if(strcmp(buffer1,"on")==0)
+	{
+	send[0]='1';
+	printf("send_on:%s,%d",send,sizeof(send));
+	w=mraa_uart_write(uart,send,sizeof(send));
+	printf("written:%d bytes\n",w);
+	}
+	else if(strcmp(buffer1,"off")==0)
+	{
+	send[0]='0';
+	printf("send_off:%s,%d",send,sizeof(send));
+	w=mraa_uart_write(uart,send,sizeof(send));	
+	printf("written:%d bytes\n",w);
+	}
+	else
+	printf("Wrong command Try again\n");
+//        mraa_uart_write(uart, buffer1, sizeof(buffer1));
+        sleep(2);
+//	mraa_uart_read(uart,buffer1,sizeof(buffer1));
 
-        sleep(1);
+  //          printf("Data REad %s\n",buffer1);
+	      
+	
     }
 
     /* stop uart */

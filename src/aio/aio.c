@@ -97,6 +97,7 @@ mraa_aio_init(unsigned int aio)
     int pin;
     if (board == NULL) {
         syslog(LOG_ERR, "aio: Platform not initialised");
+        printf("aio: Platform not initialised---100\n");
         return NULL;
     }
     if (mraa_is_sub_platform_id(aio)) {
@@ -104,6 +105,7 @@ mraa_aio_init(unsigned int aio)
         board = board->sub_platform;
         if (board == NULL) {
             syslog(LOG_ERR, "aio: Sub platform Not Initialised");
+            printf("aio: Sub platform Not Initialised-----108\n");
             return NULL;
         }
         aio = mraa_get_sub_platform_index(aio);
@@ -120,27 +122,36 @@ mraa_aio_init(unsigned int aio)
 
     if (pin < 0 || pin >= board->phy_pin_count) {
         syslog(LOG_ERR, "aio: pin %i beyond platform definition", pin);
+        printf("aio: pin beyond platform definition----125\n");
         return NULL;
     }
+    printf("he.................4.........phy-pin-count=%d pin=%d\n",board->phy_pin_count,pin);
     if (aio >= board->aio_count) {
         syslog(LOG_ERR, "aio: requested channel out of range");
+        printf("aio: requested channel out of range----131");
         return NULL;
     }
+    printf("he..........................5...%d\n",board->aio_count);
     if (board->pins[pin].capabilities.aio != 1) {
         syslog(LOG_ERR, "aio: pin %i not capable of aio", pin);
+        printf("aio: pin not capable of aio----137\n");
+        printf("he.................6....board->pins[pin].capabilities.aio=%d\n",board->pins[pin].capabilities.aio);
         return NULL;
     }
     if (board->pins[pin].aio.mux_total > 0) {
         if (mraa_setup_mux_mapped(board->pins[pin].aio) != MRAA_SUCCESS) {
             syslog(LOG_ERR, "aio: unable to setup multiplexers for pin");
+            printf("aio: unable to setup multiplexers for pin----144\n");
             return NULL;
         }
     }
+    printf("he.............................4\n");
 
     // Create ADC device connected to specified channel
     mraa_aio_context dev = mraa_aio_init_internal(board->adv_func, aio, board->pins[pin].aio.pinmap);
     if (dev == NULL) {
         syslog(LOG_ERR, "aio: Insufficient memory for specified input channel %d", aio);
+        printf("aio: Insufficient memory for specified input channel -----154\n");
         return NULL;
     }
     dev->value_bit = DEFAULT_BITS;
@@ -148,7 +159,8 @@ mraa_aio_init(unsigned int aio)
     if (IS_FUNC_DEFINED(dev, aio_init_pre)) {
         mraa_result_t pre_ret = (dev->advance_func->aio_init_pre(aio));
         if (pre_ret != MRAA_SUCCESS) {
-            free(dev);
+        	printf("=----162\n"); 
+	   free(dev);
             return NULL;
         }
     }
@@ -156,6 +168,7 @@ mraa_aio_init(unsigned int aio)
     if (IS_FUNC_DEFINED(dev, aio_init_post)) {
         mraa_result_t ret = dev->advance_func->aio_init_post(dev);
         if (ret != MRAA_SUCCESS) {
+        	printf("=----171\n"); 
             free(dev);
             return NULL;
         }

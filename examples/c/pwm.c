@@ -35,7 +35,7 @@
 #include "mraa/pwm.h"
 
 /* PWM declaration */
-#define PWM 3
+#define PWM 20
 
 /* PWM period in us */
 #define PWM_FREQ 200
@@ -65,6 +65,7 @@ main(void)
     //! [Interesting]
     pwm = mraa_pwm_init(PWM);
     if (pwm == NULL) {
+        printf("pwm=%d\n",pwm);
         fprintf(stderr, "Failed to initialize PWM\n");
         mraa_deinit();
         return EXIT_FAILURE;

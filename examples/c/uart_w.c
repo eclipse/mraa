@@ -59,6 +59,7 @@ main(int argc, char** argv)
     mraa_result_t status = MRAA_SUCCESS;
     mraa_uart_context uart;
     char buffer[] = "Hello Mraa!";
+   char buffer1[20];	
 
     int baudrate = 9600, stopbits = 1, databits = 8;
     mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
@@ -80,8 +81,7 @@ main(int argc, char** argv)
     }
 
     /* set serial port parameters */
-    status =
-    mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
+    status = mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
     if (status != MRAA_SUCCESS) {
         goto err_exit;
     }
@@ -89,8 +89,12 @@ main(int argc, char** argv)
     while (flag) {
         /* send data through uart */
         mraa_uart_write(uart, buffer, sizeof(buffer));
+        sleep(50);
+//	mraa_uart_read(uart,buffer1,sizeof(buffer1));
 
-        sleep(1);
+  //          printf("Data REad %s\n",buffer1);
+	      
+	
     }
 
     /* stop uart */
