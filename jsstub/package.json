@@ -25,6 +25,9 @@
     "url": "https://github.com/intel-iot-devkit/mraa/issues"
   },
   "homepage": "https://github.com/intel-iot-devkit/mraa#readme",
+  "dependencies": {
+    "winston": "0.8.3"
+  },
   "devDependencies": {
     "expect.js": "^0.3.1",
     "grunt": "^1.0.1",
