@@ -1,0 +1,4 @@
+usr/include/mraa.*
+usr/include/mraa/*
+usr/lib/*/libmraa.so
+usr/lib/*/pkgconfig/mraa.pc

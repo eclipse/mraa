@@ -1,0 +1,142 @@
+mraa (2.0.0-3) buster; urgency=medium
+
+  * fixed Rock Pi 4 on recent 5.x kernels
+  * added function file_contains_case_sensitive
+  * nodejs-dev is no longer available
+  * switched to clang as compiler
+  * added mraa-uart to mraa-tools
+  * fixed build as patch seems not to patch CMakeList.txt anymore, so as 
+    temporary solution disabled the building of docs
+
+ -- Carsten Menke <cm@p-i-u.de>  Tue, 27 Sep 2019 23:47:37 +0000
+
+mraa (2.0.0-2) xenial; urgency=medium
+
+  * fixup, missing some mraa1 to mraa2 changes
+
+ -- Tom Ingleby <tom@ewsting.org>  Tue, 11 Sep 2018 11:47:37 +0000
+
+mraa (2.0.0-1) xenial; urgency=medium
+
+  * mraa 2.0.0
+
+ -- Tom Ingleby <tom@ewsting.org>  Tue, 11 Sep 2018 10:31:43 +0000
+
+mraa (1.9.0-2) xenial; urgency=medium
+
+  * Move Nodejs assets from node-mraa to right place...
+
+ -- Tom Ingleby <tom@ewsting.org>  Wed, 04 Apr 2018 14:50:36 +0000
+
+mraa (1.9.0-1) xenial; urgency=medium
+
+  * Update to mraa 1.9.0!
+
+ -- Tom Ingleby <tom@ewsting.org>  Fri, 16 Feb 2018 13:11:30 +0000
+
+mraa (1.8.0-1) xenial; urgency=medium
+
+  * Update to mraa 1.8.0!
+
+ -- Tom Ingleby <tom@ewsting.org>  Fri, 15 Sep 2017 09:50:09 +0000
+
+mraa (1.7.0-4) xenial; urgency=medium
+
+  * Adds Node Module with thanks to Flavian Manea
+
+ -- Tom Ingleby <tom@ewsting.org>  Tue, 25 Jul 2017 09:39:38 +0000
+
+mraa (1.7.0-3) xenial; urgency=medium
+
+  * Add udev rule for imraa for Arduino 101 in USB mode
+
+ -- Tom Ingleby <tom@ewsting.org>  Thu, 01 Jun 2017 12:12:35 +0000
+
+mraa (1.7.0-2.1) xenial; urgency=medium
+
+  * Fix control and jar install path
+
+ -- Tom Ingleby <tom@ewsting.org>  Thu, 18 May 2017 13:18:59 +0000
+
+mraa (1.7.0-2) xenial; urgency=medium
+
+  * Enabled java bindings, with thanks to Flavian Manea
+
+ -- Tom Ingleby <tom@ewsting.org>  Wed, 17 May 2017 18:10:00 +0000
+
+mraa (1.7.0-1) xenial; urgency=medium
+
+  * Upgrade to mraa 1.7.0
+
+ -- Tom Ingleby <tom@ewsting.org>  Fri, 12 May 2017 14:16:49 +0000
+
+mraa (1.6.1-1) xenial; urgency=medium
+
+  * Upgrade to mraa 1.6.1
+  * Add udev rule to ignore Arduino/Genino 101 for modem manager
+
+ -- Tom Ingleby <tom@ewsting.org>  Fri, 07 Apr 2017 08:58:08 +0000
+
+mraa (1.5.1-2) xenial; urgency=medium
+
+  * Fixup on imraa service.
+
+ -- Tom Ingleby <tom@ewsting.org>  Tue, 08 Nov 2016 15:27:33 +0000
+
+mraa (1.5.1-1) xenial; urgency=medium
+
+  * Update to mraa 1.5.1
+  * Enable imraa support "mraa-imraa". 
+
+ -- Tom Ingleby <tom@ewsting.org>  Fri, 04 Nov 2016 12:38:18 +0000
+
+mraa (1.4.0-1.1) xenial; urgency=medium
+
+  * Apply patch to fix Python doc.
+
+ -- Tom Ingleby <tom@ewsting.org>  Tue, 11 Oct 2016 14:52:12 +0000
+
+mraa (1.4.0-1) xenial; urgency=medium
+
+  * Update to mraa 1.4.0
+  * Enable Firmata support
+
+ --  <tom@ewsting.org>  Tue, 11 Oct 2016 13:48:39 +0000
+
+mraa (1.3.0-2) xenial; urgency=medium
+
+  * Add Python Doc Patch
+
+ --  <tom@ewsting.org>  Tue, 30 Aug 2016 13:00:12 +0000
+
+mraa (1.3.0-1) xenial; urgency=medium
+
+  * Update to mraa 1.3.0
+  * Add JSON platform support
+
+ --  <tom@ewsting.org>  Tue, 30 Aug 2016 12:18:28 +0000
+
+mraa (1.2.3.1-1) xenial; urgency=medium
+
+  * Fix package error
+
+ -- Tom Ingleby <tom@luna.ewsting.org>  Sat, 13 Aug 2016 11:43:51 +0000
+
+mraa (1.2.3-2.1) xenial; urgency=medium
+
+  * Fixes for pydocs
+
+ -- Tom Ingleby <tom@ewsting.org>  Sat, 13 Aug 2016 11:31:32 +0000
+
+mraa (1.2.3-2) xenial; urgency=medium
+
+  * Add Python3 packages
+  * move mraa-gpio to mraa-tools and include i2c tool 
+
+ -- Tom Ingleby <tom@ewsting.org>  Sat, 13 Aug 2016 10:44:48 +0000
+
+mraa (1.2.3-1) xenial; urgency=medium
+
+  * Initial release
+
+ -- Tom Ingleby <tom@ewsting.org>  Fri, 12 Aug 2016 22:31:02 +0000

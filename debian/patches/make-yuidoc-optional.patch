@@ -1,0 +1,20 @@
+--- a/src/javascript/CMakeLists.txt
++++ b/src/javascript/CMakeLists.txt
+@@ -109,7 +109,7 @@
+ add_dependencies (npmpkg mraajs)
+ 
+ if (BUILDDOC)
+-  find_package (Yuidoc 0.10 REQUIRED)
++  find_package (Yuidoc 0.10)
+   if (YUIDOC_FOUND AND YUIDOC_VERSION VERSION_GREATER "0.10")
+     add_custom_target (jsdoc ALL
+       COMMAND ${CMAKE_SOURCE_DIR}/doxygen2jsdoc/docgen.js -m mraa -i xml/ -o jsdoc -c ${CMAKE_CURRENT_SOURCE_DIR}/doxygen2jsdoc_custom.json --strict
+@@ -120,7 +120,7 @@
+       COMMENT "Generating API documentation with Yuidoc" VERBATIM
+   )
+   else ()
+-    message (SEND_ERROR "ERROR - Failed to find a compatible version of Yuidoc. Node.js API doc will not be generated")
++          message (INFO "ERROR - Failed to find a compatible version of Yuidoc. Node.js API doc will not be generated")
+   endif ()
+ endif ()
+ 

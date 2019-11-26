@@ -1,0 +1,6 @@
+# Arduino 101 in DFU Mode
+SUBSYSTEM=="tty", ENV{ID_REVISION}=="8087", ENV{ID_MODEL_ID}=="0ab6", MODE="0666", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
+SUBSYSTEM=="usb", ATTR{idVendor}=="8087", ATTR{idProduct}=="0aba", MODE="666", ENV{ID_MM_DEVICE_IGNORE}="1"
+# Arduino 101 in USB Mode
+SUBSYSTEM=="usb", ATTR{idVendor}=="8087", ATTR{idProduct}=="0ab6", ENV{ID_MM_DEVICE_IGNORE}="1"
+
