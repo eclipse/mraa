@@ -28,6 +28,7 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
 #include <syslog.h>
 #include <fnmatch.h>
 
@@ -113,6 +114,17 @@ char* mraa_file_unglob(const char* filename);
 mraa_boolean_t mraa_file_contains(const char* filename, const char* content);
 
 /**
+ * helper function to check if file contains a given text being case sensitive or not,
+ * if not case sensitive than content and the content of the file get's converted to uppercase before 
+ *
+ * @param filename to check
+ * @param content to check in file
+ * @param true if the match should be case sensitive, false if the match should ignore case
+ * @return mraa_boolean_t boolean result.
+ */
+mraa_boolean_t mraa_file_contains_case_sensitive(const char* filename, const char* content, bool case_sensitive);
+
+/**
  * helper function to check if file contains a given text
  *
  * @param filename to check
@@ -141,6 +153,13 @@ mraa_boolean_t mraa_link_targets(const char* filename, const char* targetname);
  * @return the matching i2c-dev bus id or -1
  */
 int mraa_find_i2c_bus(const char* devname, int startfrom);
+
+/**
+ * helper function to convert to upper case for our basic usage
+ *
+ * @param string representing char
+ */
+void mraa_to_upper(char* s);
 
 /**
  * helper function to wrap strtol for our basic usage

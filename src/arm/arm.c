@@ -106,7 +106,7 @@ mraa_arm_platform()
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/model", "Avnet Ultra96 Rev1"))
             platform_type = MRAA_96BOARDS;
-        else if (mraa_file_contains("/proc/device-tree/model", "ROCK PI 4"))
+        else if (mraa_file_contains_case_sensitive("/proc/device-tree/model", "ROCK PI 4", false))
             platform_type = MRAA_ROCKPI4;
         else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
             platform_type = MRAA_RASPBERRY_PI;

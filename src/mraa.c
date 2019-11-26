@@ -1060,6 +1060,13 @@ mraa_file_exist(const char* filename)
 mraa_boolean_t
 mraa_file_contains(const char* filename, const char* content)
 {
+    return mraa_file_contains_case_sensitive(filename, content, true);
+}
+
+mraa_boolean_t
+mraa_file_contains_case_sensitive(const char* filename, const char* content, bool case_sensitive)
+{
+    char* tmp_content = strdup(content);
     mraa_boolean_t found = 0;
     if ((filename == NULL) || (content == NULL)) {
         return 0;
@@ -1074,8 +1081,14 @@ mraa_file_contains(const char* filename, const char* content)
             free(file);
             return 0;
         }
+        if (!case_sensitive) {
+            mraa_to_upper(tmp_content);
+        }
         while ((getline(&line, &len, fh) != -1) && (found == 0)) {
-            if (strstr(line, content)) {
+           if (!case_sensitive) {
+               mraa_to_upper(line);
+            }
+            if (strstr(line, tmp_content)) {
                 found = 1;
                 break;
             }
@@ -1083,9 +1096,11 @@ mraa_file_contains(const char* filename, const char* content)
         fclose(fh);
         free(file);
         free(line);
+        free(tmp_content);
     }
     return found;
 }
+
 
 mraa_boolean_t
 mraa_file_contains_both(const char* filename, const char* content, const char* content2)
