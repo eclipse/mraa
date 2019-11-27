@@ -51,7 +51,7 @@ PROCK Pi 4 has a 40-pin expansion header. Each pin is distinguished by color.
 |                    |      I2S1_LRCK_TX|   35  |   36  |    I2S1_LRCK_RX    |                     |
 |                    |      GPIO4_D6    |   37  |   38  |    I2S1_SDI	     |                     |
 |                    |      GND         |   39  |   40  |    I2S1_SDO        |                     |
-|--------------------------------------------------------------------------------------------------|
+
 
 Resources
 ---------
