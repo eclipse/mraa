@@ -44,6 +44,7 @@ ARM
 * [Beaglebone Black](../master/docs/beaglebone.md)
 * [phyBOARD-Wega](../master/docs/phyboard-wega.md)
 * [96Boards](../master/docs/96boards.md)
+* [Rock Pi 4](../master/docs/rockpi.md)
 
 MIPS
 ---
