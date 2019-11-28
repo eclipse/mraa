@@ -23,6 +23,7 @@
 #include "x86/up2.h"
 #include "x86/intel_joule_expansion.h"
 #include "x86/iei_tank.h"
+#include "x86/intel_adlink_lec_al.h"
 
 mraa_platform_t
 mraa_x86_platform()
@@ -30,10 +31,12 @@ mraa_x86_platform()
 #ifndef MRAA_PLATFORM_FORCE
     mraa_platform_t platform_type = MRAA_UNKNOWN_PLATFORM;
 
-    char* line = NULL;
+    char* line = NULL, buffer[20] = {0};
     // let getline allocate memory for *line
     size_t len = 0;
     FILE* fh = fopen("/sys/devices/virtual/dmi/id/board_name", "r");
+    int fd;
+
     if (fh != NULL) {
         if (getline(&line, &len, fh) != -1) {
             // Sanitize input by terminating at any of possible end of line chars
@@ -89,6 +92,12 @@ mraa_x86_platform()
             } else if ((strncasecmp(line, "SAF3", strlen("SAF3") + 1) == 0) ) {
                 platform_type = MRAA_IEI_TANK;
                 plat = mraa_iei_tank();
+            } else if ((strncasecmp(line, "LEC-ALAI", strlen("LEC-ALAI") + 1) == 0) ) {
+                platform_type = MRAA_ADLINK_LEC_AL;
+                plat = mraa_lec_al_board();
+	    } else if ((strncasecmp(line, "LEC-AL", strlen("LEC-AL") + 1) == 0) ) {
+                platform_type = MRAA_ADLINK_LEC_AL;
+                plat = mraa_lec_al_board();
             } else {
                 syslog(LOG_ERR, "Platform not supported, not initialising");
                 platform_type = MRAA_UNKNOWN_PLATFORM;
@@ -109,6 +118,24 @@ mraa_x86_platform()
             fclose(fh);
         }
     }
+
+    if( (fd = open("/sys/devices/virtual/dmi/id/product_name", O_RDONLY)) != -1) {
+	    syslog(LOG_ERR, "Checking additional Platform support for LEC-AL iPI");
+	    if(read(fd, buffer, 10) > 0) {
+		    if ((strncasecmp(buffer, "LEC-ALAI", strlen("LEC-ALAI")) == 0)) {
+			    syslog(LOG_ERR, "LEC-AL AI IPi found. starting MRAA");
+			    platform_type = MRAA_ADLINK_LEC_AL_AI;
+			    plat = mraa_lec_al_board();
+		    }
+		    else if ((strncasecmp(buffer, "LEC-AL", strlen("LEC-AL")) == 0)) {
+			    syslog(LOG_ERR, "LEC-AL IPi found. starting MRAA");
+			    platform_type = MRAA_ADLINK_LEC_AL;
+			    plat = mraa_lec_al_board();
+		    }
+		    close(fd);
+	    }
+    }
+
     return platform_type;
 #else
     #if defined(xMRAA_INTEL_GALILEO_GEN2)

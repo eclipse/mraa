@@ -36,6 +36,7 @@ X86
 * [UP Squared](../master/docs/up2.md)
 * [Intel Joule](../master/docs/joule.md)
 * [IEI Tank](../master/docs/iei-tank.md)
+* [ADLINK IPi-SMARC X86](../master/docs/adlink_ipi_x86.md)
 
 ARM
 ---
@@ -44,6 +45,7 @@ ARM
 * [Beaglebone Black](../master/docs/beaglebone.md)
 * [phyBOARD-Wega](../master/docs/phyboard-wega.md)
 * [96Boards](../master/docs/96boards.md)
+* [ADLINK IPi-SMARC ARM](../master/docs/adlink_ipi_arm.md)
 
 MIPS
 ---

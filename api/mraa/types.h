@@ -63,6 +63,9 @@ typedef enum {
     MRAA_MTK_OMEGA2 = 18,           /**< MT7688 based Onion Omega2 board */
     MRAA_IEI_TANK = 19,             /**< IEI Tank System*/
     MRAA_ROCKPI4 = 20,              /**< Radxa ROCK PI 4 Models A/B */
+    MRAA_ADLINK_IPI = 21,           /**< Adlink Industrial PI */
+    MRAA_ADLINK_LEC_AL = 22,        /**< Adlink LEC-AL*/
+    MRAA_ADLINK_LEC_AL_AI = 23,        /**< Adlink LEC-AL*/
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 

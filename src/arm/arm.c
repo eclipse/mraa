@@ -16,6 +16,7 @@
 #include "arm/beaglebone.h"
 #include "arm/phyboard.h"
 #include "arm/raspberry_pi.h"
+#include "arm/adlink_ipi.h"
 #include "mraa_internal.h"
 
 
@@ -93,6 +94,8 @@ mraa_arm_platform()
             platform_type = MRAA_ROCKPI4;
         else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
             platform_type = MRAA_RASPBERRY_PI;
+        else if (mraa_file_contains("/proc/device-tree/model", "ADLINK ARM, LEC-PX30"))
+            platform_type = MRAA_ADLINK_IPI;
     }
 
     switch (platform_type) {
@@ -117,6 +120,9 @@ mraa_arm_platform()
         case MRAA_DE_NANO_SOC:
             plat = mraa_de_nano_soc();
             break;
+	case MRAA_ADLINK_IPI:
+	    plat = mraa_adlink_ipi();
+	    break;
         default:
             plat = NULL;
             syslog(LOG_ERR, "Unknown Platform, currently not supported by MRAA");
