@@ -1,3 +1,6 @@
+# Copyright (c) 2014 Intel Corporation
+# SPDX-License-Identifier: MIT
+
 find_program (SPHINX_EXECUTABLE NAMES sphinx-build
     HINTS
     $ENV{SPHINX_DIR}

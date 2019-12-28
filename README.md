@@ -2,10 +2,10 @@
   <img src="http://iotdk.intel.com/misc/logos/mraa.png" height="150px" width="auto" algt="Mraa Logo"/>
 </p>
 
-libmraa - Low Level Skeleton Library for Communication on GNU/Linux platforms
+Eclipse Mraa - Low Level Skeleton Library for Communication on GNU/Linux platforms
 =============================================================================
 
-Libmraa is a C/C++ library with bindings to Java, Python and JavaScript to
+Eclipse Mraa (Libmraa) is a C/C++ library with bindings to Java, Python and JavaScript to
 interface with the IO on Galileo, Edison & other platforms, with a structured
 and sane API where port names/numbering matches the board that you are on. Use
 of libmraa does not tie you to specific hardware with board detection done at
@@ -36,6 +36,7 @@ X86
 * [UP Squared](../master/docs/up2.md)
 * [Intel Joule](../master/docs/joule.md)
 * [IEI Tank](../master/docs/iei-tank.md)
+* [ADLINK IPi-SMARC X86](../master/docs/adlink_ipi_x86.md)
 
 ARM
 ---
@@ -44,6 +45,7 @@ ARM
 * [Beaglebone Black](../master/docs/beaglebone.md)
 * [phyBOARD-Wega](../master/docs/phyboard-wega.md)
 * [96Boards](../master/docs/96boards.md)
+* [ADLINK IPi-SMARC ARM](../master/docs/adlink_ipi_arm.md)
 * [Rock Pi 4](../master/docs/rockpi.md)
 
 MIPS

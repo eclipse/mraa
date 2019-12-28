@@ -55,6 +55,7 @@ set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/up2.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_joule_expansion.c
   ${PROJECT_SOURCE_DIR}/src/x86/iei_tank.c
+  ${PROJECT_SOURCE_DIR}/src/x86/adlink-ipi.c
 )
 
 message (STATUS "INFO - Adding support for platform ${MRAAPLATFORMFORCE}")
@@ -102,6 +103,7 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/arm/banana.c
   ${PROJECT_SOURCE_DIR}/src/arm/de_nano_soc.c
   ${PROJECT_SOURCE_DIR}/src/arm/rockpi4.c
+  ${PROJECT_SOURCE_DIR}/src/arm/adlink_ipi.c
 )
 
 set (mraa_LIB_MIPS_SRCS_NOAUTO

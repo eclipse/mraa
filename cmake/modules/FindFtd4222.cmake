@@ -15,6 +15,8 @@
 #
 # Redistribution and use is allowed according to the terms of the New BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+#
+# SPDX-License-Identifier: BSD-3-Clause
 
 if (LIBFT4222_LIBRARIES AND LIBFT4222_INCLUDE_DIRS)
   # in cache already
