@@ -7,7 +7,6 @@
 
 #include <mraa/common.h>
 #include <stdarg.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
@@ -70,7 +69,7 @@ mraa_rockpi4()
 
     if (mraa_file_exist(DT_BASE "/model")) {
         // We are on a modern kernel, great!!!!
-        if (mraa_file_contains_case_sensitive(DT_BASE "/model", PLATFORM_NAME_ROCK_PI_4, false)) {
+        if (mraa_file_contains_case_sensitive(DT_BASE "/model", PLATFORM_NAME_ROCK_PI_4, 0)) {
             b->platform_name = PLATFORM_NAME_ROCK_PI_4;
             b->uart_dev[0].device_path = (char*) rockpi4_serialdev[0];
             b->uart_dev[1].device_path = (char*) rockpi4_serialdev[1];

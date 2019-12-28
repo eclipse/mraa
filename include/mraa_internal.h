@@ -11,7 +11,6 @@
 extern "C" {
 #endif
 
-#include <stdbool.h>
 #include <syslog.h>
 #include <fnmatch.h>
 
@@ -105,7 +104,7 @@ mraa_boolean_t mraa_file_contains(const char* filename, const char* content);
  * @param true if the match should be case sensitive, false if the match should ignore case
  * @return mraa_boolean_t boolean result.
  */
-mraa_boolean_t mraa_file_contains_case_sensitive(const char* filename, const char* content, bool case_sensitive);
+mraa_boolean_t mraa_file_contains_case_sensitive(const char* filename, const char* content, mraa_boolean_t case_sensitive);
 
 /**
  * helper function to check if file contains a given text

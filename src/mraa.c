@@ -1043,11 +1043,11 @@ mraa_file_exist(const char* filename)
 mraa_boolean_t
 mraa_file_contains(const char* filename, const char* content)
 {
-    return mraa_file_contains_case_sensitive(filename, content, true);
+    return mraa_file_contains_case_sensitive(filename, content, 1);
 }
 
 mraa_boolean_t
-mraa_file_contains_case_sensitive(const char* filename, const char* content, bool case_sensitive)
+mraa_file_contains_case_sensitive(const char* filename, const char* content, mraa_boolean_t case_sensitive)
 {
     char* tmp_content = strdup(content);
     mraa_boolean_t found = 0;
