@@ -64,6 +64,8 @@ struct intr_list {
 
 static unsigned char regIon[16]   = {0x2A, 0x2D, 0x30, 0x33, 0x36, 0x3B, 0x40, 0x45, 0x4A, 0x4D, 0x50, 0x53, 0x56, 0x5B, 0x60, 0x65};
 
+static unsigned int  IonValue[16]   = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
 static struct intr_list *list;
 mraa_result_t gpio_intr_init_pre(int pin);
 static int sx150x_pwm_init(int pin);
@@ -113,51 +115,51 @@ static mraa_result_t pwm_period_replace(mraa_pwm_context dev, int period)
 
 static float pwm_read_replace(mraa_pwm_context dev)
 {
-	unsigned char rx_tx_buf[3] = {0};
+        unsigned char rx_tx_buf[3] = {0};
 
-	if(dev->pin < 9)
-	{
-		if(_fd == -1)
-		{
-			return 0;
-		}
+        if(dev->pin < 9)
+        {
+                if(_fd == -1)
+                {
+                        return 0;
+                }
 
-		rx_tx_buf[0] = regIon[dev->pin];
-		if(write(_fd, &(rx_tx_buf[0]), 1) == 1)
-		{
-			if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
-			{
-				return ((rx_tx_buf[1] / 2.55)* 2000);
-			}
-		}	
-	}
-	return 0;
+                rx_tx_buf[0] = regIon[dev->pin];
+                if(write(_fd, &(rx_tx_buf[0]), 1) == 1)
+                {
+                        if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
+                        {
+                                return (rx_tx_buf[1] / 2.55);
+                        }
+                }
+        }
+        return 0;
 }
+
 
 static mraa_result_t pwm_write_replace(mraa_pwm_context dev, float duty)
 {
-	unsigned char rx_tx_buf[3] = {0};
+        unsigned char rx_tx_buf[3] = {0};
 
-	duty = duty / 2000;
+        IonValue[dev->pin] = ((duty /m_period) * 255);
 
-	if(dev->pin < 9)
-	{
-		duty = duty * 2.55;
-		if(_fd == -1)
-		{
-			return MRAA_ERROR_INVALID_RESOURCE;
-		}
+        if(dev->pin < 9)
+        {
+                if(_fd == -1)
+                {
+                        return MRAA_ERROR_INVALID_RESOURCE;
+                }
 
-		rx_tx_buf[0] = regIon[dev->pin];
-		rx_tx_buf[1] = duty;
+                rx_tx_buf[0] = regIon[dev->pin];
+                rx_tx_buf[1] = IonValue[dev->pin];
 
-		if(write(_fd, &(rx_tx_buf[0]), 2) != 2)
-		{
-			return MRAA_ERROR_NO_RESOURCES;
-		}
-		return MRAA_SUCCESS;
-	}
-	return MRAA_ERROR_NO_RESOURCES;
+                if(write(_fd, &(rx_tx_buf[0]), 2) != 2)
+                {
+                        return MRAA_ERROR_NO_RESOURCES;
+                }
+                return MRAA_SUCCESS;
+        }
+        return MRAA_ERROR_NO_RESOURCES;
 }
 
 static mraa_result_t pwm_enable_replace(mraa_pwm_context dev, int enable)
@@ -828,6 +830,7 @@ static mraa_result_t gpio_init_pre(int pin)
 mraa_board_t* mraa_lec_al_board()
 {
 	int i, fd, i2c_bus_num;
+	int lecalai  = -1;
 	char buffer[60] = {0}, *line = NULL;
 	FILE *fh;
 	size_t len;
@@ -841,11 +844,13 @@ mraa_board_t* mraa_lec_al_board()
 	if((fh = fopen("/sys/devices/virtual/dmi/id/product_name", "r")) != NULL) {
 		if (getline(&line, &len, fh) != -1) {
 			line[strcspn(line, "\r\n")] = 0;
-			if ((strncasecmp(line, "LEC-ALAI", strlen("LEC-ALAI") + 1) == 0)) {
+			if ((strncasecmp(line, "LEC-AL-AI", strlen("LEC-AL-AI") + 1) == 0)) {
 				b->platform_name = PLATFORM_NAME_AI;
+				lecalai = 1;
 			}
 			else
 			{
+				lecalai = 0;
 				b->platform_name = PLATFORM_NAME;
 			}
 		}
@@ -1024,7 +1029,14 @@ mraa_board_t* mraa_lec_al_board()
 		b->i2c_bus_count++;
 	}
 
-	i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:1f.1", ".");
+	if(lecalai == 1)
+	{
+		i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:16.3", "i2c_designware.3");
+	}
+	else if(lecalai == 0)
+	{
+		i2c_bus_num = mraa_find_i2c_bus_pci("0000:00", "0000:00:1f.1", ".");
+	}
 	if (i2c_bus_num != -1) {
 		b->i2c_bus[1].bus_id = i2c_bus_num;
 		mraa_lec_al_get_pin_index(b, "I2C0_DAT", (int*) &(b->i2c_bus[0].sda));

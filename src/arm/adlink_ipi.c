@@ -157,54 +157,9 @@ static mraa_result_t pwm_init_raw_replace(mraa_pwm_context dev, int pin)
 {
 	char buffer[100] = {0};
 	int i, fd;
-	syslog(LOG_WARNING, "pwm_init: pwm%i. chip info %d.", pin, dev->chipid);
 
-	if(dev->chipid == 1 || dev->chipid == 2)
+	if(dev->chipid == 3)
 	{
-		dev->advance_func->pwm_period_replace = NULL;
-		dev->advance_func->pwm_read_replace = NULL;
-		dev->advance_func->pwm_write_replace = NULL;
-		dev->advance_func->pwm_enable_replace = NULL;
-
-		char directory[MAX_SIZE];
-		snprintf(directory, MAX_SIZE, SYSFS_PWM "/pwmchip%d/pwm%d", dev->chipid, dev->pin);
-		struct stat dir;
-		if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
-			syslog(LOG_NOTICE, "pwm_init: pwm%i already exported, continuing", pin);
-			dev->owner = 0; // Not Owner
-		} else {
-			char buffer[MAX_SIZE];
-			snprintf(buffer, MAX_SIZE, "/sys/class/pwm/pwmchip%d/export", dev->chipid);
-			int export_f = open(buffer, O_WRONLY);
-			if (export_f == -1) {
-				syslog(LOG_ERR, "pwm_init: pwm%i. Failed to open export for writing: %s", pin, strerror(errno));
-				free(dev);
-				return MRAA_ERROR_INVALID_RESOURCE;
-			}
-
-			char out[MAX_SIZE];
-			int size = snprintf(out, MAX_SIZE, "%d", dev->pin);
-			if (write(export_f, out, size * sizeof(char)) == -1) {
-				syslog(LOG_WARNING, "pwm_init: pwm%i. Failed to write to export! (%s) Potentially already in use.", pin, strerror(errno));
-				close(export_f);
-				free(dev);
-				return MRAA_ERROR_INVALID_RESOURCE;
-			}
-			dev->owner = 1;
-			mraa_pwm_period_us(dev, 0xFF);
-			close(export_f);
-		}
-
-		mraa_pwm_setup_duty_fp(dev);
-
-		return MRAA_SUCCESS;
-	}else if(dev->chipid == 3)
-	{
-		dev->advance_func->pwm_period_replace = pwm_period_replace;
-		dev->advance_func->pwm_read_replace = pwm_read_replace;
-		dev->advance_func->pwm_write_replace = pwm_write_replace;
-		dev->advance_func->pwm_enable_replace = pwm_enable_replace;
-
 		if(pin < 9)
 		{
 			if(sx150x_pwm_init(pin))
@@ -534,61 +489,41 @@ mraa_adlink_ipi()
     b->pins[2].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[3].name, "I2C1_SDA", MRAA_PIN_NAME_SIZE); // GPIO0_C3 
-    b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
+    b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[3].gpio.pinmap = 19;
 
     strncpy(b->pins[4].name, "5V", MRAA_PIN_NAME_SIZE);
     b->pins[4].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[5].name, "I2C1_SCL", MRAA_PIN_NAME_SIZE); // GPIO0_C2
-    b->pins[5].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
+    b->pins[5].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[5].gpio.pinmap = 18;
 
     strncpy(b->pins[6].name, "GND", MRAA_PIN_NAME_SIZE);
     b->pins[6].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
-    if (pwm0 == 0) {
-	    strncpy(b->pins[7].name, "PWM6", MRAA_PIN_NAME_SIZE); // PWM6
-	    b->pins[7].capabilities = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
-    } else {
-	    strncpy(b->pins[7].name, "GPIO3_C4", MRAA_PIN_NAME_SIZE); // GPIO3_C4
-	    b->pins[7].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
-    }
+    strncpy(b->pins[7].name, "GPIO3_C4", MRAA_PIN_NAME_SIZE); // GPIO3_C4
+    b->pins[7].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[7].gpio.pinmap = 116;
 
-    b->pins[7].pwm.pinmap = 0;
-    b->pins[7].pwm.parent_id = 1;
-    b->pins[7].pwm.mux_total = 0;
-    b->pwm_dev_count++;
-
     strncpy(b->pins[8].name, "UART0_TX", MRAA_PIN_NAME_SIZE); // GPIO0_B2
-    b->pins[8].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[8].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
     b->pins[8].gpio.pinmap = 10;
 
     strncpy(b->pins[9].name, "GND", MRAA_PIN_NAME_SIZE);
     b->pins[9].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[10].name, "UART0_RX", MRAA_PIN_NAME_SIZE); // GPIO0_B3
-    b->pins[10].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 1 };
+    b->pins[10].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
     b->pins[10].gpio.pinmap = 11;
 
     strncpy(b->pins[11].name, "GPIO3_C6", MRAA_PIN_NAME_SIZE); // GPIO3_C6
     b->pins[11].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[11].gpio.pinmap = 118;
 
-    if (pwm1 == 1) {
-	    strncpy(b->pins[12].name, "PWM7", MRAA_PIN_NAME_SIZE); // PWM7
-	    b->pins[12].capabilities = (mraa_pincapabilities_t){ 1, 0, 1, 0, 0, 0, 0, 0 };
-    } else {
-	    strncpy(b->pins[12].name, "GPIO3_C5", MRAA_PIN_NAME_SIZE); // GPIO3_C5
-	    b->pins[12].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
-    }
+    strncpy(b->pins[12].name, "GPIO3_C5", MRAA_PIN_NAME_SIZE); // GPIO3_C5
+    b->pins[12].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[12].gpio.pinmap = 117;
-
-    b->pins[12].pwm.pinmap = 0;
-    b->pins[12].pwm.parent_id = 2;
-    b->pins[12].pwm.mux_total = 0;
-    b->pwm_dev_count++;
 
     strncpy(b->pins[13].name, "GPIO3_B3", MRAA_PIN_NAME_SIZE); // GPIO3_B3
     b->pins[13].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
@@ -613,14 +548,14 @@ mraa_adlink_ipi()
     b->pins[18].gpio.pinmap = 121;
 
     strncpy(b->pins[19].name, "SPI0_MOSI", MRAA_PIN_NAME_SIZE); // GPIO1_B4
-    b->pins[19].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+    b->pins[19].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     b->pins[19].gpio.pinmap = 44;
 
     strncpy(b->pins[20].name, "GND", MRAA_PIN_NAME_SIZE);
     b->pins[20].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[21].name, "SPI0_MISO", MRAA_PIN_NAME_SIZE); // GPIO1_B5
-    b->pins[21].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+    b->pins[21].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     b->pins[21].gpio.pinmap = 45;
 
     strncpy(b->pins[22].name, "GPIO3_D2", MRAA_PIN_NAME_SIZE); // GPIO3_D2
@@ -628,11 +563,11 @@ mraa_adlink_ipi()
     b->pins[22].gpio.pinmap = 122;
 
     strncpy(b->pins[23].name, "SPI0_CLK", MRAA_PIN_NAME_SIZE); // GPIO1_B7
-    b->pins[23].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+    b->pins[23].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     b->pins[23].gpio.pinmap = 47;
 
     strncpy(b->pins[24].name, "SPI0_CSN", MRAA_PIN_NAME_SIZE); // GPIO1_B6
-    b->pins[24].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 1, 0, 0, 0 };
+    b->pins[24].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     b->pins[24].gpio.pinmap = 46;
 
     strncpy(b->pins[25].name, "GND", MRAA_PIN_NAME_SIZE);
@@ -642,11 +577,11 @@ mraa_adlink_ipi()
     b->pins[26].capabilities = (mraa_pincapabilities_t){ 0, 0, 0, 0, 0, 0, 0, 0 };
 
     strncpy(b->pins[27].name, "I2C0_SDA", MRAA_PIN_NAME_SIZE); // GPIO0_B1
-    b->pins[27].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
+    b->pins[27].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[27].gpio.pinmap = 9;
 
     strncpy(b->pins[28].name, "I2C0_SCL", MRAA_PIN_NAME_SIZE); // GPIO0_B0
-    b->pins[28].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
+    b->pins[28].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[28].gpio.pinmap = 8;
 
     strncpy(b->pins[29].name, "EGPIO1_0", MRAA_PIN_NAME_SIZE); // Expander GPIO

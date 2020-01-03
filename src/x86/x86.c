@@ -126,7 +126,7 @@ mraa_x86_platform()
     if( (fd = open("/sys/devices/virtual/dmi/id/product_name", O_RDONLY)) != -1) {
 	    syslog(LOG_ERR, "Checking additional Platform support for LEC-AL iPI");
 	    if(read(fd, buffer, 10) > 0) {
-		    if ((strncasecmp(buffer, "LEC-ALAI", strlen("LEC-ALAI")) == 0)) {
+		    if ((strncasecmp(buffer, "LEC-AL-AI", strlen("LEC-AL-AI")) == 0)) {
 			    syslog(LOG_ERR, "LEC-AL AI IPi found. starting MRAA");
 			    platform_type = MRAA_ADLINK_LEC_AL_AI;
 			    plat = mraa_lec_al_board();
