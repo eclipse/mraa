@@ -35,4 +35,4 @@ Up to 4GB DDR3L at 1066/1333 MHz,  32 GB eMMC
 |             502              | GPIO/PWM  |     37      |     38      | GPIO/PWM  |             503              |
 |                              |    GND    |     39      |     40      | GPIO/PWM  |             504              |
 
-**Note**: N/A: FUnciton is Not support 
+**Note**: N/A: Funciton is not supported
