@@ -121,27 +121,12 @@ separate packages.
 sudo dnf install mraa nodejs-mraa python3-mraa
 ```
 
-Installing for Node.js only
+Installing for Red Hat Enterprise Linux, CentOS and Other Linux Distributions
 ---------------------------
 
-> Note: Node.js 7.0.0+ is not currently supported unless compiling with a patched
-vesion of SWIG. See the corresponding section and document below.
-
-You can also install just the node.js mraa module by using npm. You will need a
-C++ compiler and the node development headers, however it's not required to
-have SWIG installed. This works for node versions 6.x.x and prior.
-
-```bash
-npm install mraa
-```
-
-Note that installing mraa in this way builds mraa without json-c so you cannot
-use mraa_init_json_platform(). Also building this way means the mraa.node
-includes a static version of libmraa rather than relying on a dynamic library
-in /usr/lib.
-
-Subplatforms (i.e. Firmata) have to be added manually with this kind of install
-from your application, as shown in [this example](examples/javascript/firmata.js).
+The MRAA project does not currently distribute official binaries for RHEL
+or CentOS so developers will have to compiler the project from sources as
+described in the next section.
 
 Compiling
 =========
