@@ -125,8 +125,11 @@ Installing for Red Hat Enterprise Linux, CentOS and Other Linux Distributions
 ---------------------------
 
 The MRAA project does not currently distribute official binaries for RHEL
-or CentOS so developers will have to compiler the project from sources as
+or CentOS so developers will have to compile the project from sources as
 described in the next section.
+
+For testing and development purposes it may be possible to share and install
+.deb and .rpm packages across similar Linux builds.
 
 Compiling
 =========
