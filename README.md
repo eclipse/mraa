@@ -98,8 +98,17 @@ Install on Arch Linux
 
 There is an AUR package for mraa here: https://aur.archlinux.org/packages/mraa
 
-Install on openSUSE
--------------------
+Install on openSUSE or SLE
+---------------------------
+
+For the latest versions of openSUSE and SLE the project is distributed via
+native repositories and can be installed by developers with:
+
+```bash
+sudo zypper install mraa mraa-devel
+```
+
+For ARM boards use:
 
 ```bash
 REPO="openSUSE_Tumbleweed"
@@ -109,6 +118,9 @@ fi
 sudo zypper ar http://download.opensuse.org/repositories/hardware/$REPO/hardware.repo
 sudo zypper in mraa
 ```
+
+A full list of packages and instructions for installing MRAA for various openSUSE releases
+can be found [here](https://software.opensuse.org/package/mraa).
 
 Install on Fedora Linux
 -----------------------
