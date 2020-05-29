@@ -77,7 +77,6 @@ elif [ "${TRAVIS_PULL_REQUEST}" != "false" -a "${TRAVIS_PULL_REQUEST_SLUG}" == "
 
     echo "Performing internal pull request scan"
     sonar_cmd="${sonar_cmd_base} \
-               -Dsonar.analysis.mode=preview \
                -Dsonar.github.pullRequest=${TRAVIS_PULL_REQUEST} \
                -Dsonar.github.repository=${TRAVIS_REPO_SLUG} \
                -Dsonar.github.oauth=${GITHUB_TOKEN} \
