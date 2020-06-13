@@ -16,7 +16,9 @@ include_directories (
 set_source_files_properties (mraajava.i PROPERTIES SWIG_FLAGS ";-package;mraa;-I${CMAKE_BINARY_DIR}/src")
 set_source_files_properties (mraajava.i PROPERTIES CPLUSPLUS ON)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -DJAVACALLBACK")
+if (BUILDCPP)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -DJAVACALLBACK")
+endif()
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DJAVACALLBACK")
 
 if (NOT DEFINED ENV{JAVA_HOME_NATIVE})
