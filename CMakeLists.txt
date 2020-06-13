@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8.11)
-project (mraa C CXX)
+project (mraa C)
 
 FIND_PACKAGE (Threads REQUIRED)
 
@@ -10,6 +10,8 @@ if (CMAKE_VERSION VERSION_LESS "3.1")
 else ()
   set (CMAKE_C_STANDARD 99)
 endif ()
+
+option (BUILDCPP "Enable C++ (needed by FTDI4222 and tests)" ON)
 
 ###############################################################################
 # Detect supported warning flags
@@ -33,15 +35,18 @@ set (MRAA_C_WARNING_FLAGS
   -Werror=missing-parameter-type
 )
 
-# Warning flags for the C++ compiler only
-set (MRAA_CXX_WARNING_FLAGS
-  -Wnon-virtual-dtor
-  -Woverloaded-virtual
-  -Wreorder
-)
-
 include (CheckCCompilerFlag)
-include (CheckCXXCompilerFlag)
+if (BUILDCPP)
+  # Warning flags for the C++ compiler only
+  set (MRAA_CXX_WARNING_FLAGS
+    -Wnon-virtual-dtor
+    -Woverloaded-virtual
+    -Wreorder
+  )
+
+  enable_language (CXX)
+  include (CheckCXXCompilerFlag)
+endif ()
 function (MRAA_SANITIZE_FLAG_NAME OUTPUT_VAR FLAG)
   string (REPLACE "-" "_" SANITIZED_FLAG_NAME "${FLAG}")
   string (REPLACE "/" "_" SANITIZED_FLAG_NAME "${SANITIZED_FLAG_NAME}")
@@ -62,28 +67,30 @@ foreach (flag ${MRAA_BOTH_WARNING_FLAGS} ${MRAA_C_WARNING_FLAGS})
   endif ()
 endforeach ()
 
-# Globally set C++ compiler warning flags that are supported and emit
-# a warning about unsupported flags
-foreach (flag ${MRAA_BOTH_WARNING_FLAGS} ${MRAA_CXX_WARNING_FLAGS})
-  MRAA_SANITIZE_FLAG_NAME (SANITIZED_FLAG_NAME "${flag}")
-  CHECK_CXX_COMPILER_FLAG ("${flag}" HAS_CXX_${SANITIZED_FLAG_NAME})
-  if (HAS_CXX_${SANITIZED_FLAG_NAME})
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
-  else ()
-    message (WARNING "C++ compiler does not support flag \"${flag}\"")
-  endif ()
-endforeach ()
+if (BUILDCPP)
+  # Globally set C++ compiler warning flags that are supported and emit
+  # a warning about unsupported flags
+  foreach (flag ${MRAA_BOTH_WARNING_FLAGS} ${MRAA_CXX_WARNING_FLAGS})
+    MRAA_SANITIZE_FLAG_NAME (SANITIZED_FLAG_NAME "${flag}")
+    CHECK_CXX_COMPILER_FLAG ("${flag}" HAS_CXX_${SANITIZED_FLAG_NAME})
+    if (HAS_CXX_${SANITIZED_FLAG_NAME})
+      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
+    else ()
+      message (WARNING "C++ compiler does not support flag \"${flag}\"")
+    endif ()
+  endforeach ()
 
-# This function adds the c++11 flag to a c++ target (if supported)
-function(use_cxx_11 targetname)
-  include(CheckCXXCompilerFlag)
-  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-  if (COMPILER_SUPPORTS_CXX11)
-    set_target_properties(${targetname} PROPERTIES COMPILE_FLAGS "-std=c++11")
-  else()
-    message(FATAL_ERROR "Target '${targetname}' requires c++11 which is not supported by this compiler")
-  endif()
-endfunction()
+  # This function adds the c++11 flag to a c++ target (if supported)
+  function(use_cxx_11 targetname)
+    include(CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+    if (COMPILER_SUPPORTS_CXX11)
+      set_target_properties(${targetname} PROPERTIES COMPILE_FLAGS "-std=c++11")
+    else()
+      message(FATAL_ERROR "Target '${targetname}' requires c++11 which is not supported by this compiler")
+    endif()
+  endfunction()
+endif()
 
 # Set CMAKE_INSTALL_LIBDIR if not defined
 include(GNUInstallDirs)
