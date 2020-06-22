@@ -237,16 +237,19 @@ mraa_spi_frequency(mraa_spi_context dev, int hz)
     }
 
     int speed = 0;
-    dev->clock = hz;
-    if (ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) != -1) {
-	if (speed < hz) {
-            // We wanted to never go higher than SPI_IOC_RD_MAX_SPEED_HZ but it
-            // seems a bunch of drivers don't have this set to the actual max
-            // so we only complain about it
-            // dev->clock = speed;
-            syslog(LOG_NOTICE, "spi: Selected speed (%d Hz) is higher than the kernel max allowed speed (%lu Hz)", hz, SPI_IOC_RD_MAX_SPEED_HZ);
-        }
+    if (ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) == 0) {
+        dev->clock = speed; // if setting the clock fails, at least we 
+                            // will be able to known what the real
+                            // clock of the device is
     }
+    else
+        syslog(LOG_NOTICE, "spi: unable to read SPI clock. Error %d %s", errno, strerror(errno));
+
+    if (ioctl(dev->devfd, SPI_IOC_WR_MAX_SPEED_HZ, &hz) != 0) {
+        syslog(LOG_ERR, "spi: failed to set SPI clock. Original value remains (%d). Error %d %s", speed, errno, strerror(errno));
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    dev->clock = hz;        // store the actual clock now that we succeeded changing it
     return MRAA_SUCCESS;
 }
 
