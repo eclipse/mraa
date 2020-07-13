@@ -62,7 +62,7 @@ typedef enum {
     MRAA_MTK_LINKIT = 17,           /**< Mediatek MT7688 based Linkit boards */
     MRAA_MTK_OMEGA2 = 18,           /**< MT7688 based Onion Omega2 board */
     MRAA_IEI_TANK = 19,             /**< IEI Tank System*/
-    MRAA_ROCKPI4 = 20,              /**< Radxa ROCK PI 4 Models A/B */
+    MRAA_ROCKPI4 = 20,              /**< Radxa ROCK PI 4 Models A/B/C */
     MRAA_ADLINK_IPI = 21,           /**< Adlink Industrial PI */
     MRAA_ADLINK_LEC_AL = 22,        /**< Adlink LEC-AL*/
     MRAA_ADLINK_LEC_AL_AI = 23,        /**< Adlink LEC-AL*/

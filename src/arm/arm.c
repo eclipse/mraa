@@ -90,9 +90,8 @@ mraa_arm_platform()
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/model", "Avnet Ultra96 Rev1"))
             platform_type = MRAA_96BOARDS;
-        else if (mraa_file_contains("/proc/device-tree/model", "ROCK Pi 4")  ||
-                 mraa_file_contains("/proc/device-tree/model", "ROCK PI 4A") ||
-                 mraa_file_contains("/proc/device-tree/model", "ROCK PI 4B")
+        else if (mraa_file_contains("/proc/device-tree/model", "ROCK Pi 4") ||
+                 mraa_file_contains("/proc/device-tree/model", "ROCK PI 4")
                  )
             platform_type = MRAA_ROCKPI4;
         else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
@@ -116,16 +115,16 @@ mraa_arm_platform()
             break;
         case MRAA_96BOARDS:
             plat = mraa_96boards();
-	    break;
+            break;
         case MRAA_ROCKPI4:
-	    plat = mraa_rockpi4();
+            plat = mraa_rockpi4();
             break;
         case MRAA_DE_NANO_SOC:
             plat = mraa_de_nano_soc();
             break;
-	case MRAA_ADLINK_IPI:
-	    plat = mraa_adlink_ipi();
-	    break;
+        case MRAA_ADLINK_IPI:
+            plat = mraa_adlink_ipi();
+            break;
         default:
             plat = NULL;
             syslog(LOG_ERR, "Unknown Platform, currently not supported by MRAA");
