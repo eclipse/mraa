@@ -1,3 +1,6 @@
+# From OpenCV Project
+# SPDX-License-Identifier: BSD-3-Clause
+#
 # Find specified Python version
 # Arguments:
 #   preferred_version (value): Version to check for first

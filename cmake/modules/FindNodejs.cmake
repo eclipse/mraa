@@ -1,3 +1,6 @@
+# Copyright (c) 2015 Intel Corporation
+# SPDX-License-Identifier: MIT
+
 # Macro to add directory to NODEJS_INCLUDE_DIRS if it exists and is not /usr/include
 macro(add_include_dir dir)
     if (IS_DIRECTORY ${dir} AND NOT ${dir} STREQUAL "/usr/include")

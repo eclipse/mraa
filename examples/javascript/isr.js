@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+/*
+ * Copyright (c) 2015 Intel Corporation.
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 "use strict";
 

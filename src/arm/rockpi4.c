@@ -2,24 +2,7 @@
  * Author: Brian <brian@vamrs.com>
  * Copyright (c) 2019 Vamrs Corporation.
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  */
 
 #include <mraa/common.h>
@@ -32,13 +15,17 @@
 #include "common.h"
 
 #define DT_BASE "/proc/device-tree"
+/* 
+* "Radxa ROCK Pi 4" is the model name on stock 5.x kernels
+* "ROCK PI 4A", "ROCK PI 4B" is used on Radxa 4.4 kernel
+* so we search for the string below by ignoring case
+*/
+#define PLATFORM_NAME_ROCK_PI_4 "ROCK Pi 4"
 #define PLATFORM_NAME_ROCK_PI_4A "ROCK PI 4A"
 #define PLATFORM_NAME_ROCK_PI_4B "ROCK PI 4B"
-
 #define MAX_SIZE 64
 
-const char* rockpi4a_serialdev[MRAA_ROCKPI4_UART_COUNT] = { "/dev/ttyS2","/dev/ttyS4"};
-const char* rockpi4b_serialdev[MRAA_ROCKPI4_UART_COUNT] = { "/dev/ttyS2","/dev/ttyS4"};
+const char* rockpi4_serialdev[MRAA_ROCKPI4_UART_COUNT] = { "/dev/ttyS2","/dev/ttyS4"};
 
 void
 mraa_rockpi4_pininfo(mraa_board_t* board, int index, int sysfs_pin, mraa_pincapabilities_t pincapabilities_t, char* fmt, ...)
@@ -84,14 +71,13 @@ mraa_rockpi4()
 
     if (mraa_file_exist(DT_BASE "/model")) {
         // We are on a modern kernel, great!!!!
-        if (mraa_file_contains(DT_BASE "/model", "ROCK PI 4A")) {
-            b->platform_name = PLATFORM_NAME_ROCK_PI_4A;
-            b->uart_dev[0].device_path = (char*) rockpi4a_serialdev[0];
-            b->uart_dev[1].device_path = (char*) rockpi4a_serialdev[1];
-        } else if (mraa_file_contains(DT_BASE "/model", "ROCK PI 4B")) {
-            b->platform_name = PLATFORM_NAME_ROCK_PI_4B;
-            b->uart_dev[0].device_path = (char*) rockpi4b_serialdev[0];
-            b->uart_dev[1].device_path = (char*) rockpi4b_serialdev[1];
+        if (mraa_file_contains(DT_BASE "/model", PLATFORM_NAME_ROCK_PI_4)  ||
+            mraa_file_contains(DT_BASE "/model", PLATFORM_NAME_ROCK_PI_4A) ||
+            mraa_file_contains(DT_BASE "/model", PLATFORM_NAME_ROCK_PI_4B)
+            ) {
+            b->platform_name = PLATFORM_NAME_ROCK_PI_4;
+            b->uart_dev[0].device_path = (char*) rockpi4_serialdev[0];
+            b->uart_dev[1].device_path = (char*) rockpi4_serialdev[1];
         }
     }
 
@@ -102,8 +88,7 @@ mraa_rockpi4()
     b->uart_dev[1].index = 4;
 
     // I2C
-    if ((strncmp(b->platform_name, PLATFORM_NAME_ROCK_PI_4B, MAX_SIZE) == 0)
-	|| (strncmp(b->platform_name, PLATFORM_NAME_ROCK_PI_4B, MAX_SIZE) == 0)) {
+    if (strncmp(b->platform_name, PLATFORM_NAME_ROCK_PI_4, MAX_SIZE) == 0) {
         b->i2c_bus_count = MRAA_ROCKPI4_I2C_COUNT;
         b->def_i2c_bus = 0;
         b->i2c_bus[0].bus_id = 7;
@@ -130,7 +115,11 @@ mraa_rockpi4()
     }
 
     b->pins[11].pwm.parent_id = 0;
+    b->pins[11].pwm.mux_total = 0;
+    b->pins[11].pwm.pinmap = 0;
     b->pins[13].pwm.parent_id = 1;
+    b->pins[13].pwm.mux_total = 0;
+    b->pins[13].pwm.pinmap = 0;
 
     b->aio_count = MRAA_ROCKPI4_AIO_COUNT;
     b->adc_raw = 10;

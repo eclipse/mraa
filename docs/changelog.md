@@ -5,6 +5,14 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**2.1.0**
+  * New platforms UP Xtreme, IPi SMARC, ROCK PI 4, Raspberry Pi 4, Ultra96
+  * Added support for chardev GPIO devices on Rock960
+  * Introduced APIs to initialize GPIOs by name
+  * Multiple fixes to address static tool scans and user submitted bug reports
+  * Revised documentation to reflect project transfer to the Eclipse Foundation
+  * Updated installation instructions for multiple distribution channels
+
 **2.0.0**
   * New platforms IEI Tank, Ultra-96, Rock960, Hikey960, Dragonboard 820c
   * Added support for chardev GPIO devices with implementation on several boards

@@ -1,4 +1,6 @@
 #!/usr/bin/python
+# Copyright (c) 2016 Intel Corporation.
+# SPDX-License-Identifier: MIT
 
 import unittest as u
 import re, fnmatch, os, sys

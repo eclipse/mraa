@@ -32,6 +32,8 @@
  * SUCH DAMAGE.
  *
  *	@(#)glob.h	8.1 (Berkeley) 6/2/93
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef _GLOB_H_

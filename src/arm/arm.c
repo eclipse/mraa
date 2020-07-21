@@ -3,24 +3,7 @@
  * Author: Michael Ring <mail@michael-ring.org>
  * Copyright (c) 2014 Intel Corporation.
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  */
 
 #include <stdlib.h>
@@ -33,6 +16,7 @@
 #include "arm/beaglebone.h"
 #include "arm/phyboard.h"
 #include "arm/raspberry_pi.h"
+#include "arm/adlink_ipi.h"
 #include "mraa_internal.h"
 
 
@@ -106,10 +90,15 @@ mraa_arm_platform()
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/model", "Avnet Ultra96 Rev1"))
             platform_type = MRAA_96BOARDS;
-        else if (mraa_file_contains("/proc/device-tree/model", "ROCK PI 4"))
+        else if (mraa_file_contains("/proc/device-tree/model", "ROCK Pi 4")  ||
+                 mraa_file_contains("/proc/device-tree/model", "ROCK PI 4A") ||
+                 mraa_file_contains("/proc/device-tree/model", "ROCK PI 4B")
+                 )
             platform_type = MRAA_ROCKPI4;
         else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
             platform_type = MRAA_RASPBERRY_PI;
+        else if (mraa_file_contains("/proc/device-tree/model", "ADLINK ARM, LEC-PX30"))
+            platform_type = MRAA_ADLINK_IPI;
     }
 
     switch (platform_type) {
@@ -134,6 +123,9 @@ mraa_arm_platform()
         case MRAA_DE_NANO_SOC:
             plat = mraa_de_nano_soc();
             break;
+	case MRAA_ADLINK_IPI:
+	    plat = mraa_adlink_ipi();
+	    break;
         default:
             plat = NULL;
             syslog(LOG_ERR, "Unknown Platform, currently not supported by MRAA");
