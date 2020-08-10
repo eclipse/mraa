@@ -36,9 +36,6 @@ static const char* spilink[] = { "/sys/class/spidev/spidev0.0",
 static const char* i2clink[] = {
     "/sys/class/i2c-dev/i2c-0", "/sys/class/i2c-dev/i2c-1" };
 
-static const char* pwmlink[] = {
-    "/sys/class/pwm/pwmchip1", "/sys/class/pwm/pwmchip2" };
-
 static unsigned char regIon[16]   = {0x2A, 0x2D, 0x30, 0x33, 0x36, 0x3B, 0x40, 0x45, 0x4A, 0x4D, 0x50, 0x53, 0x56, 0x5B, 0x60, 0x65};
 
 static unsigned int  IonValue[16]   = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
@@ -49,20 +46,6 @@ static int base2, _fd;
 #define SYSFS_PWM "/sys/class/pwm"
 
 static int sx150x_pwm_init(int);
-
-static int
-mraa_pwm_setup_duty_fp(mraa_pwm_context dev)
-{
-    char bu[MAX_SIZE];
-    snprintf(bu, MAX_SIZE, "/sys/class/pwm/pwmchip%d/pwm%d/duty_cycle", dev->chipid, dev->pin);
-
-    dev->duty_fp = open(bu, O_RDWR);
-    if (dev->duty_fp == -1) {
-        return 1;
-    }
-    return 0;
-}
-
 
 int _tperiod;
 
@@ -168,21 +151,21 @@ static mraa_result_t pwm_init_raw_replace(mraa_pwm_context dev, int pin)
 			}
 			if((fd = open("/sys/class/gpio/unexport", O_WRONLY)) != -1)
 			{
-				i = sprintf(buffer,"%d",base2 + pin);
+				i = snprintf(buffer, sizeof(buffer), "%d",base2 + pin);
 				write(fd, buffer, i);
 				close(fd);
 			}
 			if((fd = open("/sys/class/gpio/export", O_WRONLY)) != -1)
 			{
-				i = sprintf(buffer,"%d",base2 + pin);
+				i = snprintf(buffer, sizeof(buffer), "%d",base2 + pin);
 				write(fd, buffer, i);
 				close(fd);
-				sprintf(buffer,"/sys/class/gpio/gpio%d/direction",base2 + pin);
+				snprintf(buffer, sizeof(buffer), "/sys/class/gpio/gpio%d/direction",base2 + pin);
 				if((fd = open(buffer, O_WRONLY)) != -1)
 				{
 					write(fd, "out", 3);
 					close(fd);
-					sprintf(buffer,"/sys/class/gpio/gpio%d/value",base2 + pin);
+					snprintf(buffer, sizeof(buffer), "/sys/class/gpio/gpio%d/value",base2 + pin);
 					if((fd = open(buffer, O_WRONLY)) != -1)
 					{
 						write(fd, "0", 1);
@@ -272,7 +255,7 @@ static mraa_result_t gpio_init_pre(int pin)
                 {
                         if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
                         {
-                                rx_tx_buf[1] &= ~(1 < (pin % 8));
+                                rx_tx_buf[1] &= ~(1 << (pin % 8));
                                 write(_fd, &rx_tx_buf[0], 2);
                         }
                 }
@@ -282,11 +265,11 @@ static mraa_result_t gpio_init_pre(int pin)
                 {
                         if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
                         {
-                                rx_tx_buf[1] &= ~(1 < (pin % 8));
+                                rx_tx_buf[1] &= ~(1 << (pin % 8));
                                 write(_fd, &rx_tx_buf[0], 2);
                                 if((fd = open("/sys/class/gpio/unexport", O_WRONLY)) != -1)
                                 {
-                                        i = sprintf(buffer,"%d",base2 + pin);
+                                        i = snprintf(buffer, sizeof(buffer), "%d",base2 + pin);
                                         write(fd, buffer, i);
                                         close(fd);
                                 }
@@ -306,7 +289,7 @@ static int sx150x_init()
 
         for(i = 0; i < 999; i++)
 	{
-		sprintf(rx_tx_buf,"/sys/class/gpio/gpiochip%d/device/name",i);
+		snprintf(rx_tx_buf, sizeof(rx_tx_buf), "/sys/class/gpio/gpiochip%d/device/name",i);
 		if((fd = open(rx_tx_buf, O_RDONLY)) != -1)
 		{
 			int count = read(fd, rx_tx_buf, 7);
@@ -324,7 +307,7 @@ static int sx150x_init()
 
 	for(i = 0; i < 999;i++)
 	{
-		sprintf(rx_tx_buf,"/sys/bus/i2c/devices/%x-003e/name",i);
+		snprintf(rx_tx_buf, sizeof(rx_tx_buf), "/sys/bus/i2c/devices/%x-003e/name",i);
 		if((fd = open(rx_tx_buf, O_RDONLY)) != -1)
 		{
 			int count = read(fd, rx_tx_buf, 7);
@@ -340,7 +323,7 @@ static int sx150x_init()
 		}
 	}
 
-        sprintf(rx_tx_buf, "/dev/i2c-%d",bus_num);
+        snprintf(rx_tx_buf, sizeof(rx_tx_buf), "/dev/i2c-%d",bus_num);
         if((_fd = open(rx_tx_buf, O_RDWR)) < 0)
         {
                 return -1;
@@ -401,8 +384,6 @@ mraa_adlink_ipi()
     int i2c1 = -1;
     int spi0 = -1;
     int uart0 = -1;
-    int pwm0 = -1;
-    int pwm1 = -1;
 
     //TODO: Handle different Adlink arm variants eg. IMX6, IMX8M
     b->platform_name = PLATFORM_NAME_ADLINK_IPI;
@@ -417,7 +398,7 @@ mraa_adlink_ipi()
 */
     int devnum;
     for (devnum = 0; devnum < 2; devnum++) {
-        if (mraa_link_targets(seriallink[devnum], "ff030000")) {
+        if (mraa_link_targets(seriallink[devnum], "ff160000")) {
             uart0 = devnum;
         }
     }
@@ -434,15 +415,6 @@ mraa_adlink_ipi()
         }
         if (mraa_link_targets(i2clink[devnum], "ff190000")) {
             i2c1 = devnum;
-        }
-    }
-
-    for (devnum = 0; devnum < 2; devnum++) {
-        if (mraa_link_targets(pwmlink[devnum], "ff208020")) {
-            pwm0 = devnum;
-        }
-        if (mraa_link_targets(pwmlink[devnum], "ff208030")) {
-            pwm1 = devnum;
         }
     }
 
