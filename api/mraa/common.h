@@ -191,6 +191,13 @@ int mraa_set_priority(const int priority);
 const char* mraa_get_version();
 
 /**
+ * Returns a textual representation of the mraa_result_t
+ *
+ * @param result the result to stringify
+ */
+const char* mraa_strresult(mraa_result_t result);
+
+/**
  * Print a textual representation of the mraa_result_t
  *
  * @param result the result to print
