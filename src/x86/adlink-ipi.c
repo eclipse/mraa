@@ -844,7 +844,8 @@ mraa_board_t* mraa_lec_al_board()
 	if((fh = fopen("/sys/devices/virtual/dmi/id/product_name", "r")) != NULL) {
 		if (getline(&line, &len, fh) != -1) {
 			line[strcspn(line, "\r\n")] = 0;
-			if ((strncasecmp(line, "LEC-AL-AI", strlen("LEC-AL-AI") + 1) == 0)) {
+			if ((strncasecmp(line, "LEC-AL-AI", strlen("LEC-AL-AI") + 1) == 0)\
+				       || (strncasecmp(line, "LEC-ALAI", strlen("LEC-ALAI") + 1) == 0)) {
 				b->platform_name = PLATFORM_NAME_AI;
 				lecalai = 1;
 			}
