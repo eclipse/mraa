@@ -56,7 +56,7 @@ static mraa_gpio_context gpio;
 struct intr_list {
 	volatile int pin;
 	unsigned char curr;
-	char valuepath[50];
+	char valuepath[MAX_SIZE];
 	void (*fptr)(void*);
 	void* args;
 	struct intr_list *next;
