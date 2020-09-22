@@ -18,9 +18,9 @@ target_include_directories(${SWIG_MODULE_python2-mraa_REAL_NAME}
 
 if (DOXYGEN_FOUND AND PYTHON2_EXECUTABLE)
   foreach (_file ${DOCCLASSES})
-	add_dependencies (${SWIG_MODULE_python2-mraa_REAL_NAME} ${_file}class_doc_i)
+    add_dependencies (gen_python2-mraa_mraa2PYTHON_wrap ${_file}class_doc_i)
   endforeach ()
-  add_dependencies (${SWIG_MODULE_python2-mraa_REAL_NAME} common_hpp_doc_i)
+  add_dependencies (gen_python2-mraa_mraa2PYTHON_wrap common_hpp_doc_i)
 endif ()
 
 set_target_properties (${SWIG_MODULE_python2-mraa_REAL_NAME} PROPERTIES
