@@ -36,7 +36,7 @@ if (DOXYGEN_FOUND)
       COMMENT "Building HTML documentation with Sphinx"
     )
 
-    add_dependencies (sphinx ${SWIG_MODULE_python2-mraa_REAL_NAME})
+    add_dependencies (sphinx ${SWIG_MODULE_python3-mraa_REAL_NAME})
   else ()
     message (SEND_ERROR "ERROR - Failed to find a compatible version of Sphinx. Python API doc will not be generated")
   endif (SPHINX_FOUND AND SPHINX_VERSION VERSION_GREATER "1.3")

@@ -16,6 +16,13 @@ target_include_directories(${SWIG_MODULE_python3-mraa_REAL_NAME}
   "${PYTHON3_INCLUDE_DIR}"
 )
 
+if (DOXYGEN_FOUND AND PYTHON3_EXECUTABLE)
+  foreach (_file ${DOCCLASSES})
+	add_dependencies (${SWIG_MODULE_python3-mraa_REAL_NAME} ${_file}class_doc_i)
+  endforeach ()
+  add_dependencies (${SWIG_MODULE_python3-mraa_REAL_NAME} common_hpp_doc_i)
+endif ()
+
 set_target_properties (${SWIG_MODULE_python3-mraa_REAL_NAME} PROPERTIES
   OUTPUT_NAME _mraa
   COMPILE_FLAGS "${CMAKE_C_FLAGS} -DSWIGPYTHON=${SWIG_FOUND} -DSWIGPYTHON3=${SWIG_FOUND}"
@@ -28,3 +35,5 @@ install (TARGETS ${SWIG_MODULE_python3-mraa_REAL_NAME}
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/mraa.py
   DESTINATION ${CMAKE_INSTALL_PREFIX}/${PYTHON3_PACKAGES_PATH}
 )
+
+add_subdirectory (docs)

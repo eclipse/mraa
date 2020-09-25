@@ -1,6 +1,6 @@
 /*
  * Author: Henry Bruce <henry.bruce@intel.com>
- * Copyright (c) 2016 Intel Corporation.
+ * Copyright (c) 2016-2020 Intel Corporation
  *
  * SPDX-License-Identifier: MIT
  */
@@ -30,27 +30,18 @@ mraa_python_isr(void (*isr)(void*), void* isr_args)
             syslog(LOG_ERR, "gpio: PyEval_CallObject failed");
             PyObject *pvalue, *ptype, *ptraceback;
             PyObject *pvalue_pystr, *ptype_pystr, *ptraceback_pystr;
+            PyObject *pvalue_ustr, *ptype_ustr, *ptraceback_ustr;
             char *pvalue_cstr, *ptype_cstr, *ptraceback_cstr;
             PyErr_Fetch(&pvalue, &ptype, &ptraceback);
             pvalue_pystr = PyObject_Str(pvalue);
             ptype_pystr = PyObject_Str(ptype);
             ptraceback_pystr = PyObject_Str(ptraceback);
-// Python2
-#if PY_VERSION_HEX < 0x03000000
-            pvalue_cstr = PyString_AsString(pvalue_pystr);
-            ptype_cstr = PyString_AsString(ptype_pystr);
-            ptraceback_cstr = PyString_AsString(ptraceback_pystr);
-// Python 3 and up
-#elif PY_VERSION_HEX >= 0x03000000
-            // In Python 3 we need one extra conversion
-            PyObject *pvalue_ustr, *ptype_ustr, *ptraceback_ustr;
             pvalue_ustr = PyUnicode_AsUTF8String(pvalue_pystr);
             pvalue_cstr = PyBytes_AsString(pvalue_ustr);
             ptype_ustr = PyUnicode_AsUTF8String(ptype_pystr);
             ptype_cstr = PyBytes_AsString(ptype_ustr);
             ptraceback_ustr = PyUnicode_AsUTF8String(ptraceback_pystr);
             ptraceback_cstr = PyBytes_AsString(ptraceback_ustr);
-#endif // PY_VERSION_HEX
             syslog(LOG_ERR, "gpio: the error was %s:%s:%s", pvalue_cstr, ptype_cstr, ptraceback_cstr);
             Py_XDECREF(pvalue);
             Py_XDECREF(ptype);
@@ -58,12 +49,9 @@ mraa_python_isr(void (*isr)(void*), void* isr_args)
             Py_XDECREF(pvalue_pystr);
             Py_XDECREF(ptype_pystr);
             Py_XDECREF(ptraceback_pystr);
-// Python 3 and up
-#if PY_VERSION_HEX >= 0x03000000
             Py_XDECREF(pvalue_ustr);
             Py_XDECREF(ptype_ustr);
             Py_XDECREF(ptraceback_ustr);
-#endif // PY_VERSION_HEX
         } else {
             Py_DECREF(ret);
         }
