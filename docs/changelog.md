@@ -5,6 +5,14 @@ This changelog is meant as a quick & rough guide to what has changed between
 versions. The API is now fairly stable but when new calls/features are added
 they are listed here. Anything pre 0.2.x is ignored.
 
+**2.2.0**
+  * Multiple fixes to improve project security and reliability on newly added platforms
+  * Removed Python 2 bindings and old node.js versions from CI
+  * Added detection for latest RPi board versions
+  * Fix for SPI frequency function not writing to file
+  * Common mraa API can now return C error strings from MRAA error codes
+  * Updated and extended installation instructions for some Linux distributions
+
 **2.1.0**
   * New platforms UP Xtreme, IPi SMARC, ROCK PI 4, Raspberry Pi 4, Ultra96
   * Added support for chardev GPIO devices on Rock960
