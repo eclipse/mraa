@@ -8,14 +8,10 @@ with:
 - People to extend the functionality, API with useful functions
 - Anything we haven't thought about :) Ideas always welcome!
 
-The recommended method to contribute is to fork on github, and then send pull
-requests to the main project. You can open issues if you find any bugs/have
+The accepted method to contribute is to fork the project on Github and open
+pull requests with your changes. You can open issues if you find any bugs/have
 questions. If you want to work on a large feature then we suggest you file an
-issue first so we can avoid dissapointments come merging time!
-
-If you'd rather not use github you are more than welcome to send git formatted
-patches to our mailing list mraa@lists.01.org which you can register for access
-on: https://lists.01.org/mailman/listinfo/mraa
+issue first so we can avoid disappointments come merging time!
 
 Basic rules
 -----------
