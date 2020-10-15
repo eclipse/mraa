@@ -2,22 +2,20 @@
   <img src="http://iotdk.intel.com/misc/logos/mraa.png" height="150px" width="auto" algt="Mraa Logo"/>
 </p>
 
-Eclipse Mraa - Low Level Skeleton Library for Communication on GNU/Linux platforms
-=============================================================================
+Eclipse Mraa - Low Level I/O Communications Library for GNU/Linux platforms
+===========================================================================
 
-Eclipse Mraa (Libmraa) is a C/C++ library with bindings to Java, Python and JavaScript to
-interface with the IO on Galileo, Edison & other platforms, with a structured
-and sane API where port names/numbering matches the board that you are on. Use
-of libmraa does not tie you to specific hardware with board detection done at
-runtime you can create portable code that will work across the supported
-platforms.
+Eclipse Mraa (Libmraa) is a C/C++ library with bindings to Java, Python and JavaScript
+to interface with the I/O pins and buses on various IoT and Edge platforms, with a
+structured and sane API where port names/numbering match the board that you are on.
+Use of libmraa does not tie you to specific hardware. Since board detection done at
+runtime you can create portable code that will work across the supported platforms.
 
 The intent is to make it easier for developers and sensor manufacturers to map
 their sensors & actuators on top of supported hardware and to allow control of
 low level communication protocol by high level languages & constructs.
 
-The MRAA project is joining the Eclipse Foundation as an Eclipse IoT project.
-You can read more about this [here](https://projects.eclipse.org/proposals/eclipse-mraa).
+The MRAA project is an Eclipse IoT project. A detailed project description can be found [here](https://projects.eclipse.org/proposals/eclipse-mraa).
 
 [![Build Status](https://travis-ci.org/intel-iot-devkit/mraa.svg?branch=master)](https://travis-ci.org/intel-iot-devkit/mraa) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=mraa-master&metric=alert_status)](https://sonarcloud.io/dashboard?id=mraa-master)
 
@@ -172,9 +170,10 @@ API Documentation
 Contact Us
 ==========
 
-To ask questions either file issues in github or send emails on our [mailing
-list](https://lists.01.org/mailman/listinfo/mraa). You might also catch us on
-the mraa channel on freenode IRC.
+To ask questions either file an issue on Github or send an email to our
+[mailing list](https://accounts.eclipse.org/mailing-list/mraa-dev).
+You must be subscribed to the list before you can post.
+You might also catch us on the mraa channel on freenode IRC.
 
 See the [Contribution](CONTRIBUTING.md) documentation for more details.
 
