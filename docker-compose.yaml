@@ -136,18 +136,10 @@ services:
       - BUILDARCH=PERIPHERALMAN
     command: bash -c "./scripts/build-android.sh"
 
-  node4:
+  node6:
     extends: base
-    image: inteliotdevkit/mraa-node4
+    image: inteliotdevkit/mraa-node6
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGNODE=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild npmpkg && node-gyp configure && node-gyp build && npm test"
-
-  node5:
-    extends: node4
-    image: inteliotdevkit/mraa-node5
-
-  node6:
-    extends: node4
-    image: inteliotdevkit/mraa-node6
