@@ -32,10 +32,6 @@ jobs:
         - BUILDARCH=MOCK docker-compose run ${TARGET}
         - if [[ ${TARGET} != *"node"* ]]; then JSONPLAT=ON docker-compose run ${TARGET}; fi
     - <<: *run-with-clang
-      env: TARGET=node4
-    - <<: *run-with-clang
-      env: TARGET=node5
-    - <<: *run-with-clang
       env: TARGET=node6
     - <<: *run-with-clang
       env: TARGET=java
@@ -49,10 +45,6 @@ jobs:
         - BUILDARCH=MOCK docker-compose run ${TARGET}
         - if [[ ${TARGET} != *"node"* ]]; then JSONPLAT=ON docker-compose run ${TARGET}; fi
     - <<: *run-with-gcc-5
-      env: TARGET=node4
-    - <<: *run-with-gcc-5
-      env: TARGET=node5
-    - <<: *run-with-gcc-5
       env: TARGET=node6
     - <<: *run-with-gcc-5
       env: TARGET=java
@@ -65,10 +57,6 @@ jobs:
         - docker-compose run ${TARGET}
         - BUILDARCH=MOCK docker-compose run ${TARGET}
         - if [[ ${TARGET} != *"node"* ]]; then JSONPLAT=ON docker-compose run ${TARGET}; fi
-    - <<: *run-with-gcc-6
-      env: TARGET=node4
-    - <<: *run-with-gcc-6
-      env: TARGET=node5
     - <<: *run-with-gcc-6
       env: TARGET=node6
     - <<: *run-with-gcc-6
