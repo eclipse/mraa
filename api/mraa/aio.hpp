@@ -76,7 +76,18 @@ class Aio
      */
     ~Aio()
     {
+        if (m_aio != NULL) {
+            mraa_aio_close(m_aio);
+        }
+    }
+    /**
+     * Closes AIO explicitly, prior to implicit closing on object destruction
+     */
+    void
+    close()
+    {
         mraa_aio_close(m_aio);
+        m_aio = NULL;
     }
     /**
      * Read a value from the AIO pin. By default mraa will shift

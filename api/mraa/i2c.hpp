@@ -84,7 +84,19 @@ class I2c
      */
     ~I2c()
     {
+        if (m_i2c != NULL) {
+            mraa_i2c_stop(m_i2c);
+        }
+    }
+
+    /**
+     * Closes I2c explicitly, prior to implicit closing on object destruction
+     */
+    void
+    close()
+    {
         mraa_i2c_stop(m_i2c);
+        m_i2c = NULL;
     }
 
     /**

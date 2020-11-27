@@ -131,9 +131,20 @@ class Iio
      */
     ~Iio()
     {
-        mraa_iio_close(m_iio);
+        if (m_iio != NULL) {
+            mraa_iio_close(m_iio);
+        }
     }
 
+    /**
+     * Closes Iio explicitly, prior to implicit closing on object destruction
+     */
+    void
+    close()
+    {
+        mraa_iio_close(m_iio);
+        m_iio = NULL;
+    }
 
     /**
      * Get device name

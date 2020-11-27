@@ -96,7 +96,19 @@ class UartOW
      */
     ~UartOW()
     {
+        if (m_uart != NULL) {
+            mraa_uart_ow_stop(m_uart);
+        }
+    }
+
+    /*
+     * Closes UartOW explicitly, prior to implicit closing on object destruction
+     */
+    void
+    close()
+    {
         mraa_uart_ow_stop(m_uart);
+        m_uart = NULL;
     }
 
     /**
