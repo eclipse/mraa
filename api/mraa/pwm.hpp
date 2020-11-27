@@ -87,7 +87,18 @@ class Pwm
      */
     ~Pwm()
     {
+        if (m_pwm != NULL) {
+            mraa_pwm_close(m_pwm);
+        }
+    }
+    /*
+     * Closes Pwm explicitly, prior to implicit closing on object destruction
+     */
+    void
+    close()
+    {
         mraa_pwm_close(m_pwm);
+        m_pwm = NULL;
     }
     /**
      * Set the output duty-cycle percentage, as a float

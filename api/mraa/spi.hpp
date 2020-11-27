@@ -106,7 +106,19 @@ class Spi
      */
     ~Spi()
     {
+        if (m_spi != NULL) {
+            mraa_spi_stop(m_spi);
+        }
+    }
+
+    /**
+     * Closes Spi explicitly, prior to implicit closing on object destruction
+     */
+    void
+    close()
+    {
         mraa_spi_stop(m_spi);
+        m_spi = NULL;
     }
 
     /**
