@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: MIT
  *
  * Example usage: Generates PWM signal of period 200us with variable dutycyle
- *                repeately. Press Ctrl+C to exit
+ *                repeatedly. Press Ctrl+C to exit
  */
 
 /* standard headers */

@@ -6,7 +6,7 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Example usage: Display set of patterns on MAX7219 repeately.
+ * Example usage: Display set of patterns on MAX7219 repeatedly.
  *                Press Ctrl+C to exit
  */
 
