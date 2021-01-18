@@ -154,6 +154,11 @@ iot2050_gpio_mode_replace(mraa_gpio_context dev, mraa_gpio_mode_t mode)
         ret = MRAA_ERROR_INVALID_RESOURCE;
         goto failed;
     }
+    /* Handle mode changes for interface pins without pull pin */
+    if (pull_en_pins[dev->phy_pin] == -1) {
+        return (mode == MRAA_GPIO_STRONG || mode == MRAA_GPIO_HIZ) ?
+            MRAA_SUCCESS : MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+    }
     info = iot2050_get_regmux_by_pinmap(dev->pin);
     pull_en_pin = mraa_gpio_init_raw(pull_en_pins[dev->phy_pin]);
     if(pull_en_pin == NULL) {
@@ -1205,6 +1210,25 @@ mraa_siemens_iot2050()
     mux_info[4].pincmd = PINCMD_SET_DIRECTION;
     mux_info[4].value = MRAA_GPIO_IN;
     iot2050_pin_add_aio(b, pin_index, 5, mux_info, 5);
+    pin_index++;
+
+    iot2050_setup_pins(b, pin_index, "USER",
+                        (mraa_pincapabilities_t) {
+                            1,  /*valid*/
+                            1,  /*gpio*/
+                            0,  /*pwm*/
+                            0,  /*fast gpio*/
+                            0,  /*spi*/
+                            0,  /*i2c*/
+                            0,  /*aio*/
+                            0}, /*uart*/
+                        (regmux_info_t) {
+                            -1,
+                            -1,
+                            wkup_gpio0_base+25,
+                            {}
+                        });
+    iot2050_pin_add_gpio(b, pin_index, wkup_gpio0_chip, 25, -1, -1, NULL, 0);
     pin_index++;
 
     /* UART */

@@ -30,7 +30,7 @@ extern "C" {
 #include "mraa_internal.h"
 
 #define PLATFORM_NAME                   "SIMATIC IOT2050"
-#define MRAA_IOT2050_PINCOUNT          (20)
+#define MRAA_IOT2050_PINCOUNT          21
 
 mraa_board_t *
         mraa_siemens_iot2050();
