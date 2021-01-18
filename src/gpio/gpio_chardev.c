@@ -244,6 +244,43 @@ mraa_get_chip_info_by_number(unsigned number)
     return cinfo;
 }
 
+int
+mraa_get_chip_base_by_number(unsigned number)
+{
+#if defined(PERIPHERALMAN)
+    return -1;
+#else
+    char* glob;
+    char* path;
+    FILE* fh;
+    int res;
+
+    glob = malloc(PATH_MAX);
+    if (!glob) {
+        syslog(LOG_ERR, "[GPIOD_INTERFACE]: malloc() fail");
+        return -1;
+    }
+
+    snprintf(glob, PATH_MAX, "/sys/bus/gpio/devices/gpiochip%d/../gpio/*/base", number);
+
+    path = mraa_file_unglob(glob);
+    free(glob);
+    if (!path) {
+        syslog(LOG_ERR, "[GPIOD_INTERFACE]: invalid chip number");
+        res = -1;
+    } else {
+        fh = fopen(path, "r");
+        if (!fh || fscanf(fh, "%d", &res) != 1) {
+            syslog(LOG_ERR, "[GPIOD_INTERFACE]: could not read from %s", path);
+            res = -1;
+        }
+    }
+
+    free(path);
+    return res;
+#endif
+}
+
 mraa_gpiod_line_info*
 mraa_get_line_info_from_descriptor(int chip_fd, unsigned line_number)
 {

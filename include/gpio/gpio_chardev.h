@@ -30,6 +30,7 @@ mraa_gpiod_chip_info* mraa_get_chip_info_by_path(const char* path);
 mraa_gpiod_chip_info* mraa_get_chip_info_by_name(const char* name);
 mraa_gpiod_chip_info* mraa_get_chip_info_by_label(const char* label);
 mraa_gpiod_chip_info* mraa_get_chip_info_by_number(unsigned number);
+int mraa_get_chip_base_by_number(unsigned number);
 
 mraa_gpiod_line_info* mraa_get_line_info_from_descriptor(int chip_fd, unsigned line_number);
 mraa_gpiod_line_info* mraa_get_line_info_by_chip_number(unsigned chip_number, unsigned line_number);
