@@ -69,6 +69,10 @@ mraa_led_get_maxbrightfd(mraa_led_context dev)
 static mraa_led_context
 mraa_led_init_internal(const char* led)
 {
+    char brightness_path[MAX_SIZE];
+    const char *led_name = NULL;
+    char *led_path;
+    size_t led_path_len;
     DIR* dir;
     struct dirent* entry;
     int cnt = 0;
@@ -79,7 +83,6 @@ mraa_led_init_internal(const char* led)
         return NULL;
     }
 
-    dev->led_name = NULL;
     dev->trig_fd = -1;
     dev->bright_fd = -1;
     dev->max_bright_fd = -1;
@@ -88,13 +91,14 @@ mraa_led_init_internal(const char* led)
         /* get the led name from sysfs path */
         while ((entry = readdir(dir)) != NULL) {
             if (strstr((const char*) entry->d_name, led)) {
-                dev->led_name = (char*) entry->d_name;
+                led_name = entry->d_name;
+                break;
             }
             cnt++;
         }
     }
     dev->count = cnt;
-    if (dev->led_name == NULL) {
+    if (led_name == NULL) {
         syslog(LOG_CRIT, "led: init: unknown device specified");
         if (dir != NULL) {
             closedir(dir);
@@ -103,19 +107,28 @@ mraa_led_init_internal(const char* led)
         return NULL;
     }
 
-    if (dir != NULL) {
+    led_path_len = strlen(SYSFS_CLASS_LED) + strlen(led_name) + 3;
+    led_path = calloc(led_path_len, sizeof(char));
+    if (led_path == NULL) {
+        syslog(LOG_CRIT, "led: init: Failed to allocate memory for LED path");
         closedir(dir);
+        return NULL;
     }
+    snprintf(led_path, led_path_len, "%s/%s", SYSFS_CLASS_LED, led_name);
+    dev->led_path = led_path;
+
+    snprintf(brightness_path, sizeof(brightness_path), "%s/%s", led_path, "brightness");
+    if (access(brightness_path, R_OK | W_OK) != 0) {
+        syslog(LOG_NOTICE, "led: init: current user doesn't have access rights for using LED %s", led_name);
+    }
+
+    closedir(dir);
     return dev;
 }
 
 mraa_led_context
 mraa_led_init(int index)
 {
-    mraa_led_context dev = NULL;
-    char directory[MAX_SIZE];
-    struct stat dir;
-
     if (plat == NULL) {
         syslog(LOG_ERR, "led: init: platform not initialised");
         return NULL;
@@ -136,27 +149,12 @@ mraa_led_init(int index)
         return NULL;
     }
 
-    dev = mraa_led_init_internal((char*) plat->led_dev[index].name);
-    if (dev == NULL) {
-        return NULL;
-    }
-
-    snprintf(directory, MAX_SIZE, "%s/%s", SYSFS_CLASS_LED, dev->led_name);
-    if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
-        syslog(LOG_NOTICE, "led: init: current user doesn't have access rights for using LED %s", dev->led_name);
-    }
-    strncpy(dev->led_path, (const char*) directory, sizeof(directory));
-
-    return dev;
+    return mraa_led_init_internal((char*) plat->led_dev[index].name);
 }
 
 mraa_led_context
 mraa_led_init_raw(const char* led)
 {
-    mraa_led_context dev = NULL;
-    char directory[MAX_SIZE];
-    struct stat dir;
-
     if (plat == NULL) {
         syslog(LOG_ERR, "led: init: platform not initialised");
         return NULL;
@@ -167,18 +165,7 @@ mraa_led_init_raw(const char* led)
         return NULL;
     }
 
-    dev = mraa_led_init_internal(led);
-    if (dev == NULL) {
-        return NULL;
-    }
-
-    snprintf(directory, MAX_SIZE, "%s/%s", SYSFS_CLASS_LED, dev->led_name);
-    if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
-        syslog(LOG_NOTICE, "led: init: current user don't have access rights for using LED %s", dev->led_name);
-    }
-    strncpy(dev->led_path, (const char*) directory, sizeof(directory));
-
-    return dev;
+    return mraa_led_init_internal(led);
 }
 
 mraa_result_t
@@ -402,6 +389,7 @@ mraa_led_close(mraa_led_context dev)
         close(dev->max_bright_fd);
     }
 
+    free((void *)dev->led_path);
     free(dev);
 
     return MRAA_SUCCESS;

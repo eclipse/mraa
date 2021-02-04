@@ -273,8 +273,7 @@ struct _iio {
 struct _led {
     /*@{*/
     int count; /**< total LED count in a platform */
-    char *led_name; /**< LED name */
-    char led_path[64]; /**< sysfs path of the LED */
+    const char *led_path; /**< sysfs path of the LED */
     int trig_fd; /**< trigger file descriptor */
     int bright_fd; /**< brightness file descriptor */
     int max_bright_fd; /**< maximum brightness file descriptor */
