@@ -19,6 +19,7 @@
 #include "x86/intel_minnow_byt_compatible.h"
 #include "x86/intel_sofia_3gr.h"
 #include "x86/intel_cherryhills.h"
+#include "x86/intel_ilk.h"
 #include "x86/up.h"
 #include "x86/up2.h"
 #include "x86/intel_joule_expansion.h"
@@ -78,6 +79,9 @@ mraa_x86_platform()
             } else if (strncasecmp(line, "Braswell Cherry Hill", strlen("Braswell Cherry Hill") + 1) == 0) {
                 platform_type = MRAA_INTEL_CHERRYHILLS;
                 plat = mraa_intel_cherryhills();
+            } else if (strncasecmp(line, "Intel Learning Kit", strlen("Intel Learning Kit") + 1) == 0) {
+                platform_type = MRAA_INTEL_ILK;
+                plat = mraa_intel_ilk();
             } else if (strncasecmp(line, "UP-CHT01", strlen("UP-CHT01") + 1) == 0) {
                 platform_type = MRAA_UP;
                 plat = mraa_up_board();
