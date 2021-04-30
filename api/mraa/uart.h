@@ -171,8 +171,8 @@ const char* mraa_uart_get_dev_path(mraa_uart_context dev);
  * @param databits pointer to an integer to contain the number databits (5--8)
  * @param stopbits pointer to an integer to contain the number stopbits (1--2)
  * @param parity will contain the current parity mode
- * @param rtscts will point to non-zero if CTS/RTS flow control is enabled, zero otherwise
- * @param xonxoff will point to a non-zero value if xon/xoff flow control is enabled
+ * @param rtscts will point to true if CTS/RTS flow control is enabled
+ * @param xonxoff will point to a true if xon/xoff flow control is enabled
  * @return result
  */
 mraa_result_t
@@ -183,8 +183,8 @@ mraa_uart_settings(int index,
     int* databits,
     int* stopbits,
     mraa_uart_parity_t* parity,
-    unsigned int* rtscts,
-    unsigned int* xonxoff);
+    mraa_boolean_t* rtscts,
+    mraa_boolean_t* xonxoff);
 
 /**
  * Destroy a mraa_uart_context
