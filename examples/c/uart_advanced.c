@@ -46,7 +46,6 @@ main(int argc, char** argv)
     int baudrate = 9600, stopbits = 1, databits = 8;
     mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
     unsigned int ctsrts = FALSE, xonxoff = FALSE;
-    const char* name = NULL;
 
     /* install signal handler */
     signal(SIGINT, sig_handler);
@@ -63,8 +62,15 @@ main(int argc, char** argv)
     }
 
     /* set serial port parameters */
-    status =
-    mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
+    status = mraa_uart_set_baudrate(uart, baudrate);
+    if (status != MRAA_SUCCESS) {
+        goto err_exit;
+    }
+    status = mraa_uart_set_mode(uart, databits, parity, stopbits);
+    if (status != MRAA_SUCCESS) {
+        goto err_exit;
+    }
+    status = mraa_uart_set_flowcontrol(uart, xonxoff, ctsrts);
     if (status != MRAA_SUCCESS) {
         goto err_exit;
     }
