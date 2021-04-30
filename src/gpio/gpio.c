@@ -1218,6 +1218,31 @@ mraa_gpio_chardev_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
     return MRAA_SUCCESS;
 }
 
+static mraa_result_t
+gpio_sysfs_read_dir(mraa_gpio_context dev, int dir_fd, mraa_gpio_dir_t *dir)
+{
+    char value[5];
+    int rc;
+
+    memset(value, '\0', sizeof(value));
+    rc = read(dir_fd, value, sizeof(value));
+    if (rc <= 0) {
+        syslog(LOG_ERR, "gpio%i: read_dir: Failed to read 'direction': %s", dev->pin, strerror(errno));
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    if (strcmp(value, "out\n") == 0) {
+        *dir = MRAA_GPIO_OUT;
+    } else if (strcmp(value, "in\n") == 0) {
+        *dir = MRAA_GPIO_IN;
+    } else {
+        syslog(LOG_ERR, "gpio%i: read_dir: unknown direction: %s", dev->pin, value);
+        return MRAA_ERROR_UNSPECIFIED;
+    }
+
+    return MRAA_SUCCESS;
+}
+
 mraa_result_t
 mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
 {
@@ -1267,30 +1292,38 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
             }
         }
 
-        char bu[MAX_SIZE];
-        int length;
-        switch (dir) {
-            case MRAA_GPIO_OUT:
-                length = snprintf(bu, sizeof(bu), "out");
-                break;
-            case MRAA_GPIO_IN:
-                length = snprintf(bu, sizeof(bu), "in");
-                break;
-            case MRAA_GPIO_OUT_HIGH:
-                length = snprintf(bu, sizeof(bu), "high");
-                break;
-            case MRAA_GPIO_OUT_LOW:
-                length = snprintf(bu, sizeof(bu), "low");
-                break;
-            default:
-                close(direction);
-                return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+        mraa_gpio_dir_t cur_dir;
+        mraa_result_t result = gpio_sysfs_read_dir(dev, direction, &cur_dir);
+        if (result != MRAA_SUCCESS) {
+            return result;
         }
 
-        if (write(direction, bu, length * sizeof(char)) == -1) {
-            close(direction);
-            syslog(LOG_ERR, "gpio%i: dir: Failed to write to 'direction': %s", it->pin, strerror(errno));
-            return MRAA_ERROR_UNSPECIFIED;
+        if (cur_dir != dir) {
+            char bu[MAX_SIZE];
+            int length;
+            switch (dir) {
+                case MRAA_GPIO_OUT:
+                    length = snprintf(bu, sizeof(bu), "out");
+                    break;
+                case MRAA_GPIO_IN:
+                    length = snprintf(bu, sizeof(bu), "in");
+                    break;
+                case MRAA_GPIO_OUT_HIGH:
+                    length = snprintf(bu, sizeof(bu), "high");
+                    break;
+                case MRAA_GPIO_OUT_LOW:
+                    length = snprintf(bu, sizeof(bu), "low");
+                    break;
+                default:
+                    close(direction);
+                    return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
+            }
+
+            if (write(direction, bu, length * sizeof(char)) == -1) {
+                close(direction);
+                syslog(LOG_ERR, "gpio%i: dir: Failed to write to 'direction': %s", it->pin, strerror(errno));
+                return MRAA_ERROR_UNSPECIFIED;
+            }
         }
 
         close(direction);
@@ -1340,9 +1373,8 @@ mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t* dir)
 
         *dir = flags & GPIOLINE_FLAG_IS_OUT ? MRAA_GPIO_OUT : MRAA_GPIO_IN;
     } else {
-        char value[5];
         char filepath[MAX_SIZE];
-        int fd, rc;
+        int fd;
 
         if (dev == NULL) {
             syslog(LOG_ERR, "gpio: read_dir: context is invalid");
@@ -1362,22 +1394,8 @@ mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t* dir)
             return MRAA_ERROR_INVALID_RESOURCE;
         }
 
-        memset(value, '\0', sizeof(value));
-        rc = read(fd, value, sizeof(value));
+        result = gpio_sysfs_read_dir(dev, fd, dir);
         close(fd);
-        if (rc <= 0) {
-            syslog(LOG_ERR, "gpio%i: read_dir: Failed to read 'direction': %s", dev->pin, strerror(errno));
-            return MRAA_ERROR_INVALID_RESOURCE;
-        }
-
-        if (strcmp(value, "out\n") == 0) {
-            *dir = MRAA_GPIO_OUT;
-        } else if (strcmp(value, "in\n") == 0) {
-            *dir = MRAA_GPIO_IN;
-        } else {
-            syslog(LOG_ERR, "gpio%i: read_dir: unknown direction: %s", dev->pin, value);
-            result = MRAA_ERROR_UNSPECIFIED;
-        }
     }
 
     return result;
