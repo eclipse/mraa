@@ -616,22 +616,18 @@ mraa_uart_set_flowcontrol(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_bo
         }
     }
 
-    // hardware flow control
-    int action = TCIOFF;
-    if (xonxoff) {
-        action = TCION;
-    }
-    if (tcflow(dev->fd, action)) {
-        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
-    }
-
-    // rtscts
     struct termios termio;
 
     // get current modes
     if (tcgetattr(dev->fd, &termio)) {
         syslog(LOG_ERR, "uart%i: set_flowcontrol: tcgetattr() failed: %s", dev->index, strerror(errno));
          return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    if (xonxoff) {
+        termio.c_iflag |= IXON|IXOFF;
+    } else {
+        termio.c_iflag &= ~(IXON|IXOFF);
     }
 
     if (rtscts) {
