@@ -106,7 +106,7 @@ main(int argc, const char** argv) {
 
     int baudrate = 115200, stopbits = 1, databits = 8;
     mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
-    unsigned int ctsrts = FALSE, xonxoff = FALSE;
+    mraa_boolean_t ctsrts = FALSE, xonxoff = FALSE;
     const char *name = NULL, *dev = NULL;
 
     double recieve_timeout = 0.0;
