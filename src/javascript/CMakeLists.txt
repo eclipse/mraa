@@ -43,7 +43,12 @@ if (BUILDCPP)
     message (STATUS "INFO - Using V8 version > 3 so requiring C++11 compiler")
     # Node 0.12.x V8 engine major version is '3'.
     # Node 2.1.0  V8 engine major version is '4'.
-    set_property (TARGET mraajs PROPERTY CXX_STANDARD 11)
+    # Node 16.0.0  V8 engine major version is '9'.
+    if (${V8_VERSION_MAJOR} GREATER 8)
+      set_property (TARGET mraajs PROPERTY CXX_STANDARD 14)
+    else ()
+      set_property (TARGET mraajs PROPERTY CXX_STANDARD 11)
+    endif ()
     set_property (TARGET mraajs PROPERTY CXX_STANDARD_REQUIRED ON)
     if (CMAKE_VERSION VERSION_LESS "3.1")
       message (WARNING "Need to use CMAKE version 3.1+, but it is ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}, using a workaround.")
