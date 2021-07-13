@@ -126,7 +126,9 @@ mraa_aio_init(unsigned int aio)
         syslog(LOG_ERR, "aio: Insufficient memory for specified input channel %d", aio);
         return NULL;
     }
-    dev->value_bit = DEFAULT_BITS;
+
+    raw_bits = mraa_adc_raw_bits();
+    mraa_aio_set_bit(dev, DEFAULT_BITS);
 
     if (IS_FUNC_DEFINED(dev, aio_init_pre)) {
         mraa_result_t pre_ret = (dev->advance_func->aio_init_pre(aio));
@@ -142,16 +144,6 @@ mraa_aio_init(unsigned int aio)
             free(dev);
             return NULL;
         }
-    }
-
-    raw_bits = mraa_adc_raw_bits();
-
-    if (raw_bits < dev->value_bit) {
-        shifter_value = dev->value_bit - raw_bits;
-        max_analog_value = ((1 << raw_bits) - 1) << shifter_value;
-    } else {
-        shifter_value = raw_bits - dev->value_bit;
-        max_analog_value = ((1 << raw_bits) - 1) >> shifter_value;
     }
 
     return dev;
@@ -247,7 +239,17 @@ mraa_aio_set_bit(mraa_aio_context dev, int bits)
         syslog(LOG_ERR, "aio: Device not valid");
         return MRAA_ERROR_INVALID_RESOURCE;
     }
+
     dev->value_bit = bits;
+
+    if (raw_bits < dev->value_bit) {
+        shifter_value = dev->value_bit - raw_bits;
+        max_analog_value = ((1 << raw_bits) - 1) << shifter_value;
+    } else {
+        shifter_value = raw_bits - dev->value_bit;
+        max_analog_value = ((1 << raw_bits) - 1) >> shifter_value;
+    }
+
     return MRAA_SUCCESS;
 }
 
