@@ -162,7 +162,7 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
 
         if(chan->bytes <= 0)
         {
-            syslog(LOG_ERR, "iio: Channel %d with channel bytes value <= 0");
+            syslog(LOG_ERR, "iio: Channel %d with channel bytes value <= 0", i);
             return MRAA_IO_SETUP_FAILURE;
         }
 
