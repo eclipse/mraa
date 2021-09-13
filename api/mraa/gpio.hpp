@@ -327,7 +327,7 @@ class Gpio
     Result
     useMmap(bool enable)
     {
-        return (Result) mraa_gpio_use_mmaped(m_gpio, (mraa_boolean_t) enable);
+        return (Result) mraa_gpio_use_mmaped_internal(m_gpio, (mraa_boolean_t) enable);
     }
     /**
      * Get pin number of Gpio. If raw param is True will return the
