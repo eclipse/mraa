@@ -96,7 +96,7 @@ gpio_set(int pin, int level, mraa_boolean_t raw)
     if (gpio != NULL) {
         mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
         if (raw != 0) {
-            if (mraa_gpio_use_mmaped(gpio, 1) != MRAA_SUCCESS) {
+            if (mraa_gpio_use_mmaped_internal(gpio, 1) != MRAA_SUCCESS) {
                 fprintf(stdout,
                         "mmapped access to gpio %d not supported, falling back to normal mode\n", pin);
             }
@@ -114,7 +114,7 @@ gpio_get(int pin, int* level, mraa_boolean_t raw)
     if (gpio != NULL) {
         mraa_gpio_dir(gpio, MRAA_GPIO_IN);
         if (raw != 0) {
-            if (mraa_gpio_use_mmaped(gpio, 1) != MRAA_SUCCESS) {
+            if (mraa_gpio_use_mmaped_internal(gpio, 1) != MRAA_SUCCESS) {
                 fprintf(stdout,
                         "mmapped access to gpio %d not supported, falling back to normal mode\n", pin);
             }

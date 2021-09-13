@@ -288,6 +288,9 @@ mraa_result_t mraa_gpio_owner(mraa_gpio_context dev, mraa_boolean_t owner);
  */
 DEPRECATED mraa_result_t mraa_gpio_use_mmaped(mraa_gpio_context dev, mraa_boolean_t mmap);
 
+/* remaining internal use only */
+mraa_result_t mraa_gpio_use_mmaped_internal(mraa_gpio_context dev, mraa_boolean_t mmap);
+
 /**
  * Get a pin number of the gpio, invalid will return -1
  *
