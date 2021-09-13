@@ -39,6 +39,7 @@ if (NOT PERIPHERALMAN)
     ${mraa_LIB_SRCS_NOAUTO}
     ${PROJECT_SOURCE_DIR}/src/iio/iio.c
   )
+  set_source_files_properties(${PROJECT_SOURCE_DIR}/src/iio/iio.c PROPERTIES COMPILE_OPTIONS "-Wno-format-truncation")
 endif ()
 
 set (mraa_LIB_X86_SRCS_NOAUTO
