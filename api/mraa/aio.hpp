@@ -20,6 +20,8 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 #pragma once
@@ -74,7 +76,18 @@ class Aio
      */
     ~Aio()
     {
+        if (m_aio != NULL) {
+            mraa_aio_close(m_aio);
+        }
+    }
+    /**
+     * Closes AIO explicitly, prior to implicit closing on object destruction
+     */
+    void
+    close()
+    {
         mraa_aio_close(m_aio);
+        m_aio = NULL;
     }
     /**
      * Read a value from the AIO pin. By default mraa will shift

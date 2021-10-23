@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Author: Nicolas Oliver <dario.n.oliver@intel.com>
+# Copyright (c) 2017 Intel Corporation.
+# SPDX-License-Identifier: MIT
+
 set -x
 set -e
 
@@ -24,6 +28,6 @@ cd build/src/java && echo ../../../src/mraa.i > mraa.i.list && \
 doxygen Doxyfile && cd ../../../
 
 # Copy output to build/html/ directory
-cp -r build/src/python/python2/docs/html build/html/python && \
+cp -r build/src/python/python3/docs/html build/html/python && \
 cp -r build/src/java/html build/html/java && \
 cp build/jsdoc/ternjs/mraa/doc.js build/html/node/mraa_tern.js

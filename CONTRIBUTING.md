@@ -1,21 +1,17 @@
-Contributing to libmraa                           {#contributing}
+Contributing to Eclipse Mraa (libmraa)                   {#contributing}
 ======================
 
-libmraa is an opensource project and we are actively looking for people to help
+Eclipse Mraa is an opensource project and we are actively looking for people to help
 with:
 
 - Writing platform supports for all types of boards running linux
 - People to extend the functionality, API with useful functions
 - Anything we haven't thought about :) Ideas always welcome!
 
-The recommended method to contribute is to fork on github, and then send pull
-requests to the main project. You can open issues if you find any bugs/have
+The accepted method to contribute is to fork the project on Github and open
+pull requests with your changes. You can open issues if you find any bugs/have
 questions. If you want to work on a large feature then we suggest you file an
-issue first so we can avoid dissapointments come merging time!
-
-If you'd rather not use github you are more than welcome to send git formatted
-patches to our mailing list mraa@lists.01.org which you can register for access
-on: https://lists.01.org/mailman/listinfo/mraa
+issue first so we can avoid disappointments come merging time!
 
 Basic rules
 -----------
@@ -53,45 +49,24 @@ statement to the file but cannot add a license of your own. If you're borrowing
 code that comes from a project with another license, make sure to explicitly
 note this in your PR.
 
-Code signing
+Eclipse Contributor Agreement
 ------------
 
-The sign-off is a simple line at the end of the explanation for the
-patch, which certifies that you wrote it or otherwise have the right to pass it
-on as an open-source patch.  The rules are pretty simple: if you can certify
-the below:
+Your contribution cannot be accepted unless you have a signed [ECA - Eclipse Foundation Contributor Agreement](http://www.eclipse.org/legal/ECA.php) in place.
 
-        Developer's Certificate of Origin 1.1
+Here is the checklist for contributions to be _acceptable_:
 
-        By making a contribution to this project, I certify that:
+1. [Create an account at Eclipse](https://dev.eclipse.org/site_login/createaccount.php).
+2. Add your GitHub user name in your account settings.
+3. [Log into the project's portal](https://projects.eclipse.org/) and sign the ["Eclipse ECA"](https://projects.eclipse.org/user/sign/cla).
+4. Ensure that you [_sign-off_](https://wiki.eclipse.org/Development_Resources/Contributing_via_Git#Signing_off_on_a_commit) your Git commits.
+5. Ensure that you use the _same_ email address as your Eclipse account in commits.
+6. Include the appropriate copyright notice and license at the top of each file.
 
-        (a) The contribution was created in whole or in part by me and I
-            have the right to submit it under the open source license
-            indicated in the file; or
-
-        (b) The contribution is based upon previous work that, to the best
-            of my knowledge, is covered under an appropriate open source
-            license and I have the right under that license to submit that
-            work with modifications, whether created in whole or in part
-            by me, under the same open source license (unless I am
-            permitted to submit under a different license), as indicated
-            in the file; or
-
-        (c) The contribution was provided directly to me by some other
-            person who certified (a), (b) or (c) and I have not modified
-            it.
-
-        (d) I understand and agree that this project and the contribution
-            are public and that a record of the contribution (including all
-            personal information I submit with it, including my sign-off) is
-            maintained indefinitely and may be redistributed consistent with
-            this project or the open source license(s) involved.
-
-then you just add a line saying
-
-	Signed-off-by: Random J Developer <random@developer.example.org>
-
-Using your real name (sorry, no pseudonyms or anonymous contributions.)
+Your signing of the ECA will be verified by a webservice called 'ip-validation'
+that checks the email address that signed-off on your commits has signed the
+ECA. **Note**: This service is case-sensitive, so ensure the email that signed
+the ECA and that signed-off on your commits is the same, down to the case.
 
 Where to find us
 ----------------

@@ -1,3 +1,4 @@
+// Auto-Generated file
 #include "version.h"
 
 const char* gVERSION = "@VERSION@";

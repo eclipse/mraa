@@ -22,6 +22,8 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 #pragma once
@@ -94,7 +96,19 @@ class Uart
      */
     ~Uart()
     {
+        if (m_uart != NULL) {
+            mraa_uart_stop(m_uart);
+        }
+    }
+
+    /*
+     * Closes Uart explicitly, prior to implicit closing on object destruction
+     */
+    void
+    close()
+    {
         mraa_uart_stop(m_uart);
+        m_uart = NULL;
     }
 
     /**

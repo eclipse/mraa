@@ -2,19 +2,20 @@
   <img src="http://iotdk.intel.com/misc/logos/mraa.png" height="150px" width="auto" algt="Mraa Logo"/>
 </p>
 
-libmraa - Low Level Skeleton Library for Communication on GNU/Linux platforms
-=============================================================================
+Eclipse Mraa - Low Level I/O Communications Library for GNU/Linux platforms
+===========================================================================
 
-Libmraa is a C/C++ library with bindings to Java, Python and JavaScript to
-interface with the IO on Galileo, Edison & other platforms, with a structured
-and sane API where port names/numbering matches the board that you are on. Use
-of libmraa does not tie you to specific hardware with board detection done at
-runtime you can create portable code that will work across the supported
-platforms.
+Eclipse Mraa (Libmraa) is a C/C++ library with bindings to Java, Python and JavaScript
+to interface with the I/O pins and buses on various IoT and Edge platforms, with a
+structured and sane API where port names/numbering match the board that you are on.
+Use of libmraa does not tie you to specific hardware. Since board detection done at
+runtime you can create portable code that will work across the supported platforms.
 
 The intent is to make it easier for developers and sensor manufacturers to map
 their sensors & actuators on top of supported hardware and to allow control of
 low level communication protocol by high level languages & constructs.
+
+The MRAA project is an Eclipse IoT project. A detailed project description can be found [here](https://projects.eclipse.org/proposals/eclipse-mraa).
 
 [![Build Status](https://travis-ci.org/intel-iot-devkit/mraa.svg?branch=master)](https://travis-ci.org/intel-iot-devkit/mraa) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=mraa-master&metric=alert_status)](https://sonarcloud.io/dashboard?id=mraa-master)
 
@@ -33,6 +34,8 @@ X86
 * [UP Squared](../master/docs/up2.md)
 * [Intel Joule](../master/docs/joule.md)
 * [IEI Tank](../master/docs/iei-tank.md)
+* [ADLINK IPi-SMARC X86](../master/docs/adlink_ipi_x86.md)
+* [UP Xtreme](../master/docs/up_xtreme.md)
 
 ARM
 ---
@@ -41,6 +44,8 @@ ARM
 * [Beaglebone Black](../master/docs/beaglebone.md)
 * [phyBOARD-Wega](../master/docs/phyboard-wega.md)
 * [96Boards](../master/docs/96boards.md)
+* [ADLINK IPi-SMARC ARM](../master/docs/adlink_ipi_arm.md)
+* [Rock Pi 4](../master/docs/rockpi4.md)
 
 MIPS
 ---
@@ -91,8 +96,17 @@ Install on Arch Linux
 
 There is an AUR package for mraa here: https://aur.archlinux.org/packages/mraa
 
-Install on openSUSE
--------------------
+Install on openSUSE or SLE
+---------------------------
+
+For the latest versions of openSUSE and SLE the project is distributed via
+native repositories and can be installed by developers with:
+
+```bash
+sudo zypper install mraa mraa-devel
+```
+
+For ARM boards use:
 
 ```bash
 REPO="openSUSE_Tumbleweed"
@@ -102,6 +116,9 @@ fi
 sudo zypper ar http://download.opensuse.org/repositories/hardware/$REPO/hardware.repo
 sudo zypper in mraa
 ```
+
+A full list of packages and instructions for installing MRAA for various openSUSE releases
+can be found [here](https://software.opensuse.org/package/mraa).
 
 Install on Fedora Linux
 -----------------------
@@ -114,27 +131,15 @@ separate packages.
 sudo dnf install mraa nodejs-mraa python3-mraa
 ```
 
-Installing for Node.js only
+Installing for Red Hat Enterprise Linux, CentOS and Other Linux Distributions
 ---------------------------
 
-> Note: Node.js 7.0.0+ is not currently supported unless compiling with a patched
-vesion of SWIG. See the corresponding section and document below.
+The MRAA project does not currently distribute official binaries for RHEL
+or CentOS so developers will have to compile the project from sources as
+described in the next section.
 
-You can also install just the node.js mraa module by using npm. You will need a
-C++ compiler and the node development headers, however it's not required to
-have SWIG installed. This works for node versions 6.x.x and prior.
-
-```bash
-npm install mraa
-```
-
-Note that installing mraa in this way builds mraa without json-c so you cannot
-use mraa_init_json_platform(). Also building this way means the mraa.node
-includes a static version of libmraa rather than relying on a dynamic library
-in /usr/lib.
-
-Subplatforms (i.e. Firmata) have to be added manually with this kind of install
-from your application, as shown in [this example](examples/javascript/firmata.js).
+For testing and development purposes it may be possible to share and install
+.deb and .rpm packages across similar Linux builds.
 
 Compiling
 =========
@@ -165,9 +170,10 @@ API Documentation
 Contact Us
 ==========
 
-To ask questions either file issues in github or send emails on our [mailing
-list](https://lists.01.org/mailman/listinfo/mraa). You might also catch us on
-the mraa channel on freenode IRC.
+To ask questions either file an issue on Github or send an email to our
+[mailing list](https://accounts.eclipse.org/mailing-list/mraa-dev).
+You must be subscribed to the list before you can post.
+You might also catch us on the mraa channel on freenode IRC.
 
 See the [Contribution](CONTRIBUTING.md) documentation for more details.
 

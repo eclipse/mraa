@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8.11)
-project (mraa C CXX)
+project (mraa C)
 
 FIND_PACKAGE (Threads REQUIRED)
 
@@ -10,6 +10,8 @@ if (CMAKE_VERSION VERSION_LESS "3.1")
 else ()
   set (CMAKE_C_STANDARD 99)
 endif ()
+
+option (BUILDCPP "Enable C++ (needed by FTDI4222 and tests)" ON)
 
 ###############################################################################
 # Detect supported warning flags
@@ -33,15 +35,18 @@ set (MRAA_C_WARNING_FLAGS
   -Werror=missing-parameter-type
 )
 
-# Warning flags for the C++ compiler only
-set (MRAA_CXX_WARNING_FLAGS
-  -Wnon-virtual-dtor
-  -Woverloaded-virtual
-  -Wreorder
-)
-
 include (CheckCCompilerFlag)
-include (CheckCXXCompilerFlag)
+if (BUILDCPP)
+  # Warning flags for the C++ compiler only
+  set (MRAA_CXX_WARNING_FLAGS
+    -Wnon-virtual-dtor
+    -Woverloaded-virtual
+    -Wreorder
+  )
+
+  enable_language (CXX)
+  include (CheckCXXCompilerFlag)
+endif ()
 function (MRAA_SANITIZE_FLAG_NAME OUTPUT_VAR FLAG)
   string (REPLACE "-" "_" SANITIZED_FLAG_NAME "${FLAG}")
   string (REPLACE "/" "_" SANITIZED_FLAG_NAME "${SANITIZED_FLAG_NAME}")
@@ -62,28 +67,30 @@ foreach (flag ${MRAA_BOTH_WARNING_FLAGS} ${MRAA_C_WARNING_FLAGS})
   endif ()
 endforeach ()
 
-# Globally set C++ compiler warning flags that are supported and emit
-# a warning about unsupported flags
-foreach (flag ${MRAA_BOTH_WARNING_FLAGS} ${MRAA_CXX_WARNING_FLAGS})
-  MRAA_SANITIZE_FLAG_NAME (SANITIZED_FLAG_NAME "${flag}")
-  CHECK_CXX_COMPILER_FLAG ("${flag}" HAS_CXX_${SANITIZED_FLAG_NAME})
-  if (HAS_CXX_${SANITIZED_FLAG_NAME})
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
-  else ()
-    message (WARNING "C++ compiler does not support flag \"${flag}\"")
-  endif ()
-endforeach ()
+if (BUILDCPP)
+  # Globally set C++ compiler warning flags that are supported and emit
+  # a warning about unsupported flags
+  foreach (flag ${MRAA_BOTH_WARNING_FLAGS} ${MRAA_CXX_WARNING_FLAGS})
+    MRAA_SANITIZE_FLAG_NAME (SANITIZED_FLAG_NAME "${flag}")
+    CHECK_CXX_COMPILER_FLAG ("${flag}" HAS_CXX_${SANITIZED_FLAG_NAME})
+    if (HAS_CXX_${SANITIZED_FLAG_NAME})
+      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flag}")
+    else ()
+      message (WARNING "C++ compiler does not support flag \"${flag}\"")
+    endif ()
+  endforeach ()
 
-# This function adds the c++11 flag to a c++ target (if supported)
-function(use_cxx_11 targetname)
-  include(CheckCXXCompilerFlag)
-  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-  if (COMPILER_SUPPORTS_CXX11)
-    set_target_properties(${targetname} PROPERTIES COMPILE_FLAGS "-std=c++11")
-  else()
-    message(FATAL_ERROR "Target '${targetname}' requires c++11 which is not supported by this compiler")
-  endif()
-endfunction()
+  # This function adds the c++11 flag to a c++ target (if supported)
+  function(use_cxx_11 targetname)
+    include(CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+    if (COMPILER_SUPPORTS_CXX11)
+      set_target_properties(${targetname} PROPERTIES COMPILE_FLAGS "-std=c++11")
+    else()
+      message(FATAL_ERROR "Target '${targetname}' requires c++11 which is not supported by this compiler")
+    endif()
+  endfunction()
+endif()
 
 # Set CMAKE_INSTALL_LIBDIR if not defined
 include(GNUInstallDirs)
@@ -110,7 +117,7 @@ include (GetGitRevisionDescription)
 git_describe (VERSION "--tags")
 if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND" OR "x_${VERSION}" STREQUAL "x_HEAD-HASH-NOTFOUND" OR "x_${VERSION}" STREQUAL "x_-128-NOTFOUND")
   message (WARNING " - Install git to compile a production libmraa!")
-  set (VERSION "v2.0.0")
+  set (VERSION "v2.2.0")
 endif ()
 
 message (STATUS "INFO - libmraa Version ${VERSION}")
@@ -145,7 +152,7 @@ include_directories (${SYSTEM_USR_DIR})
 option (BUILDDOC "Build all doc." OFF)
 option (BUILDSWIG "Build swig modules." ON)
 option (BUILDSWIGPYTHON "Build swig python modules." ON)
-option (BUILDSWIGNODE "Build swig node modules." ON)
+option (BUILDSWIGNODE "Build swig node modules." OFF)
 option (BUILDSWIGJAVA "Build Java API." OFF)
 option (USBPLAT "Detection USB platform." OFF)
 option (FIRMATA "Add Firmata support to mraa." OFF)
@@ -169,8 +176,7 @@ if (NOT BUILDSWIG)
 endif()
 
 if (NOT BUILDARCH)
-  include (TargetArch)
-  target_architecture (DETECTED_ARCH)
+  set (DETECTED_ARCH ${CMAKE_SYSTEM_PROCESSOR})
   message (STATUS "INFO - Target arch is ${DETECTED_ARCH}")
 else ()
   set (DETECTED_ARCH ${BUILDARCH})
@@ -180,7 +186,7 @@ endif()
 if (DETECTED_ARCH STREQUAL "i586" OR DETECTED_ARCH STREQUAL "x86_64"
     OR DETECTED_ARCH STREQUAL "i386")
   set (X86PLAT ON)
-elseif (DETECTED_ARCH MATCHES "arm.*")
+elseif (DETECTED_ARCH MATCHES "arm.*" OR DETECTED_ARCH MATCHES "aarch64")
   set (ARMPLAT ON)
 elseif (DETECTED_ARCH MATCHES "mips")
   set (MIPSPLAT ON)

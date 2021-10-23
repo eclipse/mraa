@@ -24,7 +24,7 @@ jobs:
         - BUILDARCH=MOCK docker-compose run ${TARGET}
     - &run-with-clang
       stage: Clang 3.8
-      env: TARGET=python2
+      env: TARGET=python3
       before_script: docker-compose pull ${TARGET}
       script:
         - export CC=clang-3.8 CXX=clang++-3.8
@@ -32,18 +32,12 @@ jobs:
         - BUILDARCH=MOCK docker-compose run ${TARGET}
         - if [[ ${TARGET} != *"node"* ]]; then JSONPLAT=ON docker-compose run ${TARGET}; fi
     - <<: *run-with-clang
-      env: TARGET=python3
-    - <<: *run-with-clang
-      env: TARGET=node4
-    - <<: *run-with-clang
-      env: TARGET=node5
-    - <<: *run-with-clang
       env: TARGET=node6
     - <<: *run-with-clang
       env: TARGET=java
     - &run-with-gcc-5
       stage: Gcc 5
-      env: TARGET=python2
+      env: TARGET=python3
       before_script: docker-compose pull ${TARGET}
       script:
         - export CC=gcc-5 CXX=g++-5
@@ -51,30 +45,18 @@ jobs:
         - BUILDARCH=MOCK docker-compose run ${TARGET}
         - if [[ ${TARGET} != *"node"* ]]; then JSONPLAT=ON docker-compose run ${TARGET}; fi
     - <<: *run-with-gcc-5
-      env: TARGET=python3
-    - <<: *run-with-gcc-5
-      env: TARGET=node4
-    - <<: *run-with-gcc-5
-      env: TARGET=node5
-    - <<: *run-with-gcc-5
       env: TARGET=node6
     - <<: *run-with-gcc-5
       env: TARGET=java
     - &run-with-gcc-6
       stage: Gcc 6
-      env: TARGET=python2
+      env: TARGET=python3
       before_script: docker-compose pull ${TARGET}
       script:
         - export CC=gcc-6 CXX=g++-6
         - docker-compose run ${TARGET}
         - BUILDARCH=MOCK docker-compose run ${TARGET}
         - if [[ ${TARGET} != *"node"* ]]; then JSONPLAT=ON docker-compose run ${TARGET}; fi
-    - <<: *run-with-gcc-6
-      env: TARGET=python3
-    - <<: *run-with-gcc-6
-      env: TARGET=node4
-    - <<: *run-with-gcc-6
-      env: TARGET=node5
     - <<: *run-with-gcc-6
       env: TARGET=node6
     - <<: *run-with-gcc-6

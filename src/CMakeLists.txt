@@ -51,10 +51,13 @@ set (mraa_LIB_X86_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/x86/intel_minnow_byt_compatible.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_sofia_3gr.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_cherryhills.c
+  ${PROJECT_SOURCE_DIR}/src/x86/intel_ilk.c
   ${PROJECT_SOURCE_DIR}/src/x86/up.c
   ${PROJECT_SOURCE_DIR}/src/x86/up2.c
   ${PROJECT_SOURCE_DIR}/src/x86/intel_joule_expansion.c
   ${PROJECT_SOURCE_DIR}/src/x86/iei_tank.c
+  ${PROJECT_SOURCE_DIR}/src/x86/adlink-ipi.c
+  ${PROJECT_SOURCE_DIR}/src/x86/up_xtreme.c
 )
 
 message (STATUS "INFO - Adding support for platform ${MRAAPLATFORMFORCE}")
@@ -86,6 +89,8 @@ if (NOT ${MRAAPLATFORMFORCE} STREQUAL "ALL")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/intel_joule_expansion.c)
   elseif( ${MRAAPLATFORMFORCE} STREQUAL "MRAA_IEI_TANK")
     set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/iei_tank.c)
+  elseif (${MRAAPLATFORMFORCE} STREQUAL "MRAA_UPXTREME")
+    set (mraa_LIB_X86_SRCS_NOAUTO ${PROJECT_SOURCE_DIR}/src/x86/x86.c ${PROJECT_SOURCE_DIR}/src/x86/up_xtreme.c)
   else ()
     message (FATAL_ERROR "Unknown x86 platform enabled!")
   endif ()
@@ -102,6 +107,7 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/arm/banana.c
   ${PROJECT_SOURCE_DIR}/src/arm/de_nano_soc.c
   ${PROJECT_SOURCE_DIR}/src/arm/rockpi4.c
+  ${PROJECT_SOURCE_DIR}/src/arm/adlink_ipi.c
 )
 
 set (mraa_LIB_MIPS_SRCS_NOAUTO

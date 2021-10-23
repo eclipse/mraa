@@ -5,24 +5,7 @@
  *                Nicola Lunghi <nicola.lunghi@emutex.com>
  * Copyright (c) 2014 - 2015 Intel Corporation.
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  */
 
 #include <stdlib.h>
@@ -354,7 +337,7 @@ mraa_uart_stop(mraa_uart_context dev)
 }
 
 mraa_result_t
-mraa_uart_settings(int index, const char **devpath, const char **name, int* baudrate, int* databits, int* stopbits, mraa_uart_parity_t* parity, unsigned int* ctsrts, unsigned int* xonxoff) {
+mraa_uart_settings(int index, const char **devpath, const char **name, int* baudrate, int* databits, int* stopbits, mraa_uart_parity_t* parity, mraa_boolean_t* ctsrts, mraa_boolean_t* xonxoff) {
     struct termios term;
     int fd;
 
@@ -432,11 +415,11 @@ mraa_uart_settings(int index, const char **devpath, const char **name, int* baud
        }
 
        if (ctsrts != NULL) {
-           *ctsrts = term.c_cflag & CRTSCTS;
+           *ctsrts = (term.c_cflag & CRTSCTS) != 0;
        }
 
        if (xonxoff != NULL) {
-           *xonxoff = term.c_cflag & (IXON|IXOFF);
+           *xonxoff = (term.c_iflag & (IXON|IXOFF)) != 0;
        }
 
        close(fd);
@@ -633,22 +616,18 @@ mraa_uart_set_flowcontrol(mraa_uart_context dev, mraa_boolean_t xonxoff, mraa_bo
         }
     }
 
-    // hardware flow control
-    int action = TCIOFF;
-    if (xonxoff) {
-        action = TCION;
-    }
-    if (tcflow(dev->fd, action)) {
-        return MRAA_ERROR_FEATURE_NOT_SUPPORTED;
-    }
-
-    // rtscts
     struct termios termio;
 
     // get current modes
     if (tcgetattr(dev->fd, &termio)) {
         syslog(LOG_ERR, "uart%i: set_flowcontrol: tcgetattr() failed: %s", dev->index, strerror(errno));
          return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    if (xonxoff) {
+        termio.c_iflag |= IXON|IXOFF;
+    } else {
+        termio.c_iflag &= ~(IXON|IXOFF);
     }
 
     if (rtscts) {

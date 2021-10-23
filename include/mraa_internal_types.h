@@ -3,24 +3,7 @@
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014-2016 Intel Corporation.
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  */
 
 #pragma once
@@ -174,6 +157,11 @@ struct _gpio {
         ++k) \
             if (dev->gpio_group[k].is_required)
 
+#define for_each_gpio_chip(cinfo, cinfos, num_chips) \
+    for (int idx = 0; \
+        idx < num_chips && (cinfo = cinfos[idx]); \
+        (idx++))
+
 /**
  * A structure representing a I2C bus
  */
@@ -285,8 +273,7 @@ struct _iio {
 struct _led {
     /*@{*/
     int count; /**< total LED count in a platform */
-    char *led_name; /**< LED name */
-    char led_path[64]; /**< sysfs path of the LED */
+    const char *led_path; /**< sysfs path of the LED */
     int trig_fd; /**< trigger file descriptor */
     int bright_fd; /**< brightness file descriptor */
     int max_bright_fd; /**< maximum brightness file descriptor */

@@ -20,6 +20,8 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 #pragma once
@@ -104,7 +106,19 @@ class Spi
      */
     ~Spi()
     {
+        if (m_spi != NULL) {
+            mraa_spi_stop(m_spi);
+        }
+    }
+
+    /**
+     * Closes Spi explicitly, prior to implicit closing on object destruction
+     */
+    void
+    close()
+    {
         mraa_spi_stop(m_spi);
+        m_spi = NULL;
     }
 
     /**

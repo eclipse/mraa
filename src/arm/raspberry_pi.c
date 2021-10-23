@@ -3,24 +3,7 @@
  * Author: Michael Ring <mail@michael-ring.org>
  * Copyright (c) 2014 Intel Corporation.
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  */
 
 #include <dirent.h>
@@ -45,6 +28,8 @@
 #define PLATFORM_NAME_RASPBERRY_PI_ZERO_W "Raspberry Pi Zero W"
 #define PLATFORM_NAME_RASPBERRY_PI3_B_PLUS "Raspberry Pi 3 Model B+"
 #define PLATFORM_NAME_RASPBERRY_PI3_A_PLUS "Raspberry Pi 3 Model A+"
+#define PLATFORM_NAME_RASPBERRY_PI4_B "Raspberry Pi 4 Model B"
+#define PLATFORM_NAME_RASPBERRY_PI_400 "Raspberry Pi 400"
 #define PLATFORM_RASPBERRY_PI_B_REV_1 1
 #define PLATFORM_RASPBERRY_PI_A_REV_2 2
 #define PLATFORM_RASPBERRY_PI_B_REV_2 3
@@ -57,6 +42,8 @@
 #define PLATFORM_RASPBERRY_PI_ZERO_W 10
 #define PLATFORM_RASPBERRY_PI3_B_PLUS 11
 #define PLATFORM_RASPBERRY_PI3_A_PLUS 12
+#define PLATFORM_RASPBERRY_PI4_B 13
+#define PLATFORM_RASPBERRY_PI_400 14
 #define MMAP_PATH "/dev/mem"
 #define BCM2835_PERI_BASE 0x20000000
 #define BCM2836_PERI_BASE 0x3f000000
@@ -519,6 +506,21 @@ mraa_raspberry_pi()
                     b->phy_pin_count = MRAA_RASPBERRY_PI3_A_PLUS_PINCOUNT;
                     peripheral_base = BCM2837_PERI_BASE;
                     block_size = BCM2837_BLOCK_SIZE;
+                } else if (strstr(line, "a03111") || 
+                    strstr(line, "b03111") || strstr(line, "b03112") ||
+                    strstr(line, "c03111") || strstr(line, "c03112") ||
+                    strstr(line, "d03114")) {
+                    b->platform_name = PLATFORM_NAME_RASPBERRY_PI4_B;
+                    platform_detected = PLATFORM_RASPBERRY_PI4_B;
+                    b->phy_pin_count = MRAA_RASPBERRY_PI4_B_PINCOUNT;
+                    peripheral_base = BCM2837_PERI_BASE;
+                    block_size = BCM2837_BLOCK_SIZE;
+                } else if (strstr(line, "c03130")) {
+                    b->platform_name = PLATFORM_NAME_RASPBERRY_PI_400;
+                    platform_detected = PLATFORM_RASPBERRY_PI_400;
+                    b->phy_pin_count = MRAA_RASPBERRY_PI_400_PINCOUNT;
+                    peripheral_base = BCM2837_PERI_BASE;
+                    block_size = BCM2837_BLOCK_SIZE;
                 } else {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
                     platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
@@ -589,6 +591,14 @@ mraa_raspberry_pi()
             b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_A_PLUS;
             platform_detected = PLATFORM_RASPBERRY_PI3_A_PLUS;
             b->phy_pin_count = MRAA_RASPBERRY_PI3_A_PLUS_PINCOUNT;
+        } else if (mraa_file_contains(compatible_path, "raspberrypi,4-model-b")) {
+            b->platform_name = PLATFORM_NAME_RASPBERRY_PI4_B;
+            platform_detected = PLATFORM_RASPBERRY_PI4_B;
+            b->phy_pin_count = MRAA_RASPBERRY_PI4_B_PINCOUNT;
+        } else if (mraa_file_contains(compatible_path, "raspberrypi,4-model-bbrcm")) {
+            b->platform_name = PLATFORM_NAME_RASPBERRY_PI_400;
+            platform_detected = PLATFORM_RASPBERRY_PI_400;
+            b->phy_pin_count = MRAA_RASPBERRY_PI_400_PINCOUNT;
         }
     }
 
@@ -857,7 +867,9 @@ mraa_raspberry_pi()
         (platform_detected == PLATFORM_RASPBERRY_PI_ZERO) ||
         (platform_detected == PLATFORM_RASPBERRY_PI_ZERO_W) ||
         (platform_detected == PLATFORM_RASPBERRY_PI3_B_PLUS) ||
-        (platform_detected == PLATFORM_RASPBERRY_PI3_A_PLUS)) {
+        (platform_detected == PLATFORM_RASPBERRY_PI3_A_PLUS) ||
+        (platform_detected == PLATFORM_RASPBERRY_PI4_B) ||
+        (platform_detected == PLATFORM_RASPBERRY_PI_400)) {
 
         strncpy(b->pins[27].name, "ID_SD", MRAA_PIN_NAME_SIZE);
         b->pins[27].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };

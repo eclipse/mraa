@@ -20,6 +20,8 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 #pragma once
@@ -88,7 +90,19 @@ class Led
      */
     ~Led()
     {
+        if (m_led != NULL) {
+            mraa_led_close(m_led);
+        }
+    }
+
+    /*
+     * Closes LED explicitly, prior to implicit closing on object destruction
+     */
+    void
+    close()
+    {
         mraa_led_close(m_led);
+        m_led = NULL;
     }
 
     /**

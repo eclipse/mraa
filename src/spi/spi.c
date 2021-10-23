@@ -3,24 +3,7 @@
  * Author: Brendan Le Foll <brendan.le.foll@intel.com>
  * Copyright (c) 2014, 2015 Intel Corporation.
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  */
 
 #include <stdlib.h>
@@ -254,16 +237,19 @@ mraa_spi_frequency(mraa_spi_context dev, int hz)
     }
 
     int speed = 0;
-    dev->clock = hz;
-    if (ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) != -1) {
-	if (speed < hz) {
-            // We wanted to never go higher than SPI_IOC_RD_MAX_SPEED_HZ but it
-            // seems a bunch of drivers don't have this set to the actual max
-            // so we only complain about it
-            // dev->clock = speed;
-            syslog(LOG_NOTICE, "spi: Selected speed (%d Hz) is higher than the kernel max allowed speed (%lu Hz)", hz, SPI_IOC_RD_MAX_SPEED_HZ);
-        }
+    if (ioctl(dev->devfd, SPI_IOC_RD_MAX_SPEED_HZ, &speed) == 0) {
+        dev->clock = speed; // if setting the clock fails, at least we 
+                            // will be able to known what the real
+                            // clock of the device is
     }
+    else
+        syslog(LOG_NOTICE, "spi: unable to read SPI clock. Error %d %s", errno, strerror(errno));
+
+    if (ioctl(dev->devfd, SPI_IOC_WR_MAX_SPEED_HZ, &hz) != 0) {
+        syslog(LOG_ERR, "spi: failed to set SPI clock. Original value remains (%d). Error %d %s", speed, errno, strerror(errno));
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    dev->clock = hz;        // store the actual clock now that we succeeded changing it
     return MRAA_SUCCESS;
 }
 

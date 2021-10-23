@@ -2,24 +2,7 @@
  * Author: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
  * Copyright (c) 2018, Linaro Ltd.
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  *
  * Example usage: Prints "Hello Mraa!" recursively. Press Ctrl+C to exit
  *
@@ -63,7 +46,6 @@ main(int argc, char** argv)
     int baudrate = 9600, stopbits = 1, databits = 8;
     mraa_uart_parity_t parity = MRAA_UART_PARITY_NONE;
     unsigned int ctsrts = FALSE, xonxoff = FALSE;
-    const char* name = NULL;
 
     /* install signal handler */
     signal(SIGINT, sig_handler);
@@ -80,8 +62,15 @@ main(int argc, char** argv)
     }
 
     /* set serial port parameters */
-    status =
-    mraa_uart_settings(-1, &dev_path, &name, &baudrate, &databits, &stopbits, &parity, &ctsrts, &xonxoff);
+    status = mraa_uart_set_baudrate(uart, baudrate);
+    if (status != MRAA_SUCCESS) {
+        goto err_exit;
+    }
+    status = mraa_uart_set_mode(uart, databits, parity, stopbits);
+    if (status != MRAA_SUCCESS) {
+        goto err_exit;
+    }
+    status = mraa_uart_set_flowcontrol(uart, xonxoff, ctsrts);
     if (status != MRAA_SUCCESS) {
         goto err_exit;
     }

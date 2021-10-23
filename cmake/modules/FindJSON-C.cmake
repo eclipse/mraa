@@ -1,3 +1,6 @@
+# Copyright (c) 2016 Intel Corporation
+# SPDX-License-Identifier: MIT
+
 # JSON-C_FOUND - true if library and headers were found
 # JSON-C_INCLUDE_DIRS - include directories
 # JSON-C_LIBRARIES - library directories

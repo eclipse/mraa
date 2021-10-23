@@ -20,6 +20,8 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 #pragma once
@@ -187,6 +189,13 @@ int mraa_set_priority(const int priority);
  * @return version string from version.h
  */
 const char* mraa_get_version();
+
+/**
+ * Returns a textual representation of the mraa_result_t
+ *
+ * @param result the result to stringify
+ */
+const char* mraa_strresult(mraa_result_t result);
 
 /**
  * Print a textual representation of the mraa_result_t

@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Author: Nicolas Oliver <dario.n.oliver@intel.com>
+# Copyright (c) 2017 Intel Corporation.
+# SPDX-License-Identifier: MIT
+
 set -x
 set -e
 

@@ -20,6 +20,8 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 #pragma once
@@ -142,7 +144,18 @@ class Gpio
      */
     ~Gpio()
     {
+        if (m_gpio != NULL) {
+            mraa_gpio_close(m_gpio);
+        }
+    }
+    /**
+     * Closes Gpio explicitly, prior to implicit closing on object destruction
+     */
+    void
+    close()
+    {
         mraa_gpio_close(m_gpio);
+        m_gpio = NULL;
     }
     /**
      * Set the edge mode for ISR

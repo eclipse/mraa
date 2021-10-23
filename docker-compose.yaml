@@ -112,17 +112,12 @@ services:
       - FTDI4222=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
 
-  python2:
+  python3:
     extends: base
     image: inteliotdevkit/mraa-python
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
-    command: bash -c "./scripts/run-cmake.sh && cd build && make _python2-mraa test_unit_all && ctest --output-on-failure"
-
-  python3:
-    extends: python2
-    environment:
       - USEPYTHON3TESTS=ON
     command: bash -c "./scripts/run-cmake.sh && cd build && make _python3-mraa test_unit_all && ctest --output-on-failure"
 
@@ -141,18 +136,10 @@ services:
       - BUILDARCH=PERIPHERALMAN
     command: bash -c "./scripts/build-android.sh"
 
-  node4:
+  node6:
     extends: base
-    image: inteliotdevkit/mraa-node4
+    image: inteliotdevkit/mraa-node6
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGNODE=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild npmpkg && node-gyp configure && node-gyp build && npm test"
-
-  node5:
-    extends: node4
-    image: inteliotdevkit/mraa-node5
-
-  node6:
-    extends: node4
-    image: inteliotdevkit/mraa-node6

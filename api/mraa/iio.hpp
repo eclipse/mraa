@@ -20,6 +20,8 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 #pragma once
@@ -129,9 +131,20 @@ class Iio
      */
     ~Iio()
     {
-        mraa_iio_close(m_iio);
+        if (m_iio != NULL) {
+            mraa_iio_close(m_iio);
+        }
     }
 
+    /**
+     * Closes Iio explicitly, prior to implicit closing on object destruction
+     */
+    void
+    close()
+    {
+        mraa_iio_close(m_iio);
+        m_iio = NULL;
+    }
 
     /**
      * Get device name

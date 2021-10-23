@@ -3,24 +3,7 @@
  * Author: Thomas Ingleby <thomas.c.ingleby@intel.com>
  * Copyright (c) 2014-2016 Intel Corporation.
  *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * SPDX-License-Identifier: MIT
  */
 
 #define _GNU_SOURCE
@@ -303,7 +286,7 @@ mraa_deinit()
          * which means this has to be handled differently per platform
          */
         if ((plat->platform_type == MRAA_JSON_PLATFORM) || (plat->platform_type == MRAA_UP2) ||
-            (plat->platform_type == MRAA_IEI_TANK)) {
+            (plat->platform_type == MRAA_IEI_TANK) || (plat->platform_type == MRAA_UPXTREME)) {
             for (i = 0; i < plat->uart_dev_count; i++) {
                 if (plat->uart_dev[i].device_path != NULL) {
                     free(plat->uart_dev[i].device_path);
@@ -581,64 +564,52 @@ mraa_setup_mux_mapped(mraa_pin_t meta)
 }
 #endif
 
-void
-mraa_result_print(mraa_result_t result)
+const char*
+mraa_strresult(mraa_result_t result)
 {
     switch (result) {
         case MRAA_SUCCESS:
-            fprintf(stdout, "MRAA: SUCCESS\n");
-            break;
+            return "SUCCESS";
         case MRAA_ERROR_FEATURE_NOT_IMPLEMENTED:
-            fprintf(stdout, "MRAA: Feature not implemented.\n");
-            break;
+            return "Feature not implemented";
         case MRAA_ERROR_FEATURE_NOT_SUPPORTED:
-            fprintf(stdout, "MRAA: Feature not supported by Hardware.\n");
-            break;
+            return "Feature not supported by Hardware";
         case MRAA_ERROR_INVALID_VERBOSITY_LEVEL:
-            fprintf(stdout, "MRAA: Invalid verbosity level.\n");
-            break;
+            return "Invalid verbosity level";
         case MRAA_ERROR_INVALID_PARAMETER:
-            fprintf(stdout, "MRAA: Invalid parameter.\n");
-            break;
+            return "Invalid parameter";
         case MRAA_ERROR_INVALID_HANDLE:
-            fprintf(stdout, "MRAA: Invalid Handle.\n");
-            break;
+            return "Invalid Handle";
         case MRAA_ERROR_NO_RESOURCES:
-            fprintf(stdout, "MRAA: No resources.\n");
-            break;
+            return "No resources";
         case MRAA_ERROR_INVALID_RESOURCE:
-            fprintf(stdout, "MRAA: Invalid resource.\n");
-            break;
+            return "Invalid resource";
         case MRAA_ERROR_INVALID_QUEUE_TYPE:
-            fprintf(stdout, "MRAA: Invalid Queue Type.\n");
-            break;
+            return "Invalid Queue Type";
         case MRAA_ERROR_NO_DATA_AVAILABLE:
-            fprintf(stdout, "MRAA: No Data available.\n");
-            break;
+            return "No Data available";
         case MRAA_ERROR_INVALID_PLATFORM:
-            fprintf(stdout, "MRAA: Platform not recognised.\n");
-            break;
+            return "Platform not recognised";
         case MRAA_ERROR_PLATFORM_NOT_INITIALISED:
-            fprintf(stdout, "MRAA: Platform not initialised.\n");
-            break;
+            return "Platform not initialised";
         case MRAA_ERROR_UART_OW_SHORTED:
-            fprintf(stdout, "MRAA: UART OW: Bus short detected.\n");
-            break;
+            return "UART OW: Bus short detected";
         case MRAA_ERROR_UART_OW_NO_DEVICES:
-            fprintf(stdout, "MRAA: UART OW: No devices detected on bus.\n");
-            break;
+            return "UART OW: No devices detected on bus";
         case MRAA_ERROR_UART_OW_DATA_ERROR:
-            fprintf(stdout, "MRAA: UART OW: Data or Bus error detected.\n");
-            break;
+            return "UART OW: Data or Bus error detected";
         case MRAA_ERROR_UNSPECIFIED:
-            fprintf(stdout, "MRAA: Unspecified Error.\n");
-            break;
+            return "Unspecified Error";
         default:
-            fprintf(stdout, "MRAA: Unrecognised error.\n");
-            break;
+            return "Unrecognised error";
     }
 }
 
+void
+mraa_result_print(mraa_result_t result)
+{
+    fprintf(stdout, "MRAA: %s.\n", mraa_strresult(result));
+}
 
 mraa_boolean_t
 mraa_has_sub_platform()
