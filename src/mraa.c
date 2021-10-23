@@ -1248,7 +1248,7 @@ mraa_find_i2c_bus(const char* devname, int startfrom)
 
     // i2c devices are numbered numerically so 0 must exist otherwise there is
     // no i2c-dev loaded
-    if (mraa_file_exist("/sys/class/i2c-dev/i2c-0")) {
+    if (mraa_file_exist("/sys/class/i2c-dev/i2c-0") || mraa_file_exist("/sys/class/i2c-dev/i2c-1")) {
         for (; i < num_i2c_devices; i++) {
             off_t size, err;
             snprintf(path, 64, "/sys/class/i2c-dev/i2c-%u/name", i);
