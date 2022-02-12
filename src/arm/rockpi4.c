@@ -38,9 +38,8 @@ mraa_rockpi4_pininfo(mraa_board_t* board, int index, int sysfs_pin, mraa_pincapa
     vsnprintf(pininfo->name, MRAA_PIN_NAME_SIZE, fmt, arg_ptr);
 
     if( pincapabilities_t.gpio == 1 ) {
-        va_arg(arg_ptr, int);
-        pininfo->gpio.gpio_chip = va_arg(arg_ptr, int);
-        pininfo->gpio.gpio_line = va_arg(arg_ptr, int);
+        pininfo->gpio.gpio_chip = sysfs_pin / 32;
+        pininfo->gpio.gpio_line = sysfs_pin % 32;
     }
 
     pininfo->capabilities = pincapabilities_t;
@@ -124,6 +123,7 @@ mraa_rockpi4()
     b->adc_supported = 10;
     b->aio_dev[0].pin = 26;
     b->aio_non_seq = 1;
+    b->chardev_capable = 1;
 
     mraa_rockpi4_pininfo(b, 0,   -1, (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, "INVALID");
     mraa_rockpi4_pininfo(b, 1,   -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "3V3");
