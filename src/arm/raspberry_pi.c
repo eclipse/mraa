@@ -507,9 +507,12 @@ mraa_raspberry_pi()
                     peripheral_base = BCM2837_PERI_BASE;
                     block_size = BCM2837_BLOCK_SIZE;
                 } else if (strstr(line, "a03111") || 
+                    strstr(line, "a03112") || strstr(line, "a03115") ||
                     strstr(line, "b03111") || strstr(line, "b03112") ||
+                    strstr(line, "b03114") || strstr(line, "b03115") ||
                     strstr(line, "c03111") || strstr(line, "c03112") ||
-                    strstr(line, "d03114")) {
+                    strstr(line, "c03114") || strstr(line, "c03115") ||
+                    strstr(line, "d03114") || strstr(line, "d03115")) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI4_B;
                     platform_detected = PLATFORM_RASPBERRY_PI4_B;
                     b->phy_pin_count = MRAA_RASPBERRY_PI4_B_PINCOUNT;
