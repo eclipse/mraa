@@ -431,6 +431,8 @@ mraa_get_chip_infos(mraa_gpiod_chip_info*** cinfos)
         return -1;
     }
 
+    *cinfos = cinfo;
+
     /* Get chip info for all gpiochips present in the platform */
     for (i = 0; i < num_chips; i++) {
         cinfo[i] = mraa_get_chip_info_by_name(dirs[i]->d_name);
@@ -439,8 +441,6 @@ mraa_get_chip_infos(mraa_gpiod_chip_info*** cinfos)
             return 0;
         }
     }
-
-    *cinfos = cinfo;
 
     return num_chips;
 }
