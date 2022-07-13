@@ -119,7 +119,12 @@ mraa_aio_init(unsigned int aio)
             return NULL;
         }
     }
-
+    if (board->adv_func->mux_init_reg) {
+        if(board->adv_func->mux_init_reg(pin, MUX_REGISTER_MODE_AIO) != MRAA_SUCCESS) {
+            syslog(LOG_ERR, "aio: unable to setup multiplex register for pin");
+            return NULL;
+        }
+    }
     // Create ADC device connected to specified channel
     mraa_aio_context dev = mraa_aio_init_internal(board->adv_func, aio, board->pins[pin].aio.pinmap);
     if (dev == NULL) {

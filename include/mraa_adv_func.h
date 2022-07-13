@@ -106,4 +106,6 @@ typedef struct {
     int (*uart_read_replace) (mraa_uart_context dev, char* buf, size_t len);
     int (*uart_write_replace)(mraa_uart_context dev, const char* buf, size_t len);
     mraa_boolean_t (*uart_data_available_replace) (mraa_uart_context dev, unsigned int millis);
+
+    mraa_result_t (*mux_init_reg) (int phy_pin, int mode);
 } mraa_adv_func_t;

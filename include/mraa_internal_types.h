@@ -313,6 +313,19 @@ typedef enum {
 
 
 /**
+ * Enum representing different mux register mode
+ */
+ typedef enum {
+     MUX_REGISTER_MODE_GPIO = 0,    /**< GPIO mode */
+     MUX_REGISTER_MODE_UART = 1,    /**< UART mode */
+     MUX_REGISTER_MODE_I2C = 2,     /**< I2C mode */
+     MUX_REGISTER_MODE_SPI = 3,     /**< SPI mode */
+     MUX_REGISTER_MODE_PWM = 4,     /**< PWM mode */
+     MUX_REGISTER_MODE_AIO = 5,     /**< AIO mode */
+     MAX_MUX_REGISTER_MODE
+ } mux_register_mode_t;
+
+/**
  * A Structure representing a multiplexer and the required value
  */
 typedef struct {
