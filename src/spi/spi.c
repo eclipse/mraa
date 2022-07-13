@@ -81,10 +81,24 @@ mraa_spi_init(int bus)
             }
         }
 
+        if (pos >= 0 && plat->adv_func->mux_init_reg) {
+            if(plat->adv_func->mux_init_reg(pos, MUX_REGISTER_MODE_SPI) != MRAA_SUCCESS) {
+                syslog(LOG_ERR, "spi: failed to set-up spi sclk multiplex register");
+                return NULL;
+            }
+        }
+
         pos = plat->spi_bus[bus].mosi;
         if (pos >= 0 && plat->pins[pos].spi.mux_total > 0) {
             if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
                 syslog(LOG_ERR, "spi: failed to set-up spi mosi multiplexer");
+                return NULL;
+            }
+        }
+
+        if (pos >= 0 && plat->adv_func->mux_init_reg) {
+            if(plat->adv_func->mux_init_reg(pos, MUX_REGISTER_MODE_SPI) != MRAA_SUCCESS) {
+                syslog(LOG_ERR, "spi: failed to set-up spi mosi multiplex register");
                 return NULL;
             }
         }
@@ -97,10 +111,24 @@ mraa_spi_init(int bus)
             }
         }
 
+        if (pos >= 0 && plat->adv_func->mux_init_reg) {
+            if(plat->adv_func->mux_init_reg(pos, MUX_REGISTER_MODE_SPI) != MRAA_SUCCESS) {
+                syslog(LOG_ERR, "spi: failed to set-up spi miso multiplex register");
+                return NULL;
+            }
+        }
+
         pos = plat->spi_bus[bus].cs;
         if (pos >= 0 && plat->pins[pos].spi.mux_total > 0) {
             if (mraa_setup_mux_mapped(plat->pins[pos].spi) != MRAA_SUCCESS) {
                 syslog(LOG_ERR, "spi: failed to set-up spi cs multiplexer");
+                return NULL;
+            }
+        }
+
+        if (pos >= 0 && plat->adv_func->mux_init_reg) {
+            if(plat->adv_func->mux_init_reg(pos, MUX_REGISTER_MODE_SPI) != MRAA_SUCCESS) {
+                syslog(LOG_ERR, "spi: failed to set-up spi cs multiplex register");
                 return NULL;
             }
         }
