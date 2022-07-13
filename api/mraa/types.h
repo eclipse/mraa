@@ -68,6 +68,7 @@ typedef enum {
     MRAA_ADLINK_LEC_AL_AI = 23,        /**< Adlink LEC-AL*/
     MRAA_UPXTREME = 24,             /**< The UPXTREME Board */
     MRAA_INTEL_ILK = 25,            /**< Intel Learning Kit */
+    MRAA_SIEMENS_IOT2050 = 26,      /**< Siemens IOT2050 board */
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 
