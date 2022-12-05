@@ -31,10 +31,10 @@
 #include <stdexcept>
 
 #if defined(SWIGJAVASCRIPT)
-#if NODE_MODULE_VERSION >= 0x000D
 #include <uv.h>
 #endif
-#endif
+
+#define container_of(ptr, type, member) ((type*) ((char*) (ptr) - offsetof(type, member)))
 
 namespace mraa
 {
@@ -124,6 +124,10 @@ class Gpio
         if (!owner) {
             mraa_gpio_owner(m_gpio, 0);
         }
+
+#if defined(SWIGJAVASCRIPT)
+        uv_async_init(uv_default_loop(), &m_async, v8isr);
+#endif
     }
     /**
      * Gpio Constructor, takes a pointer to the GPIO context and initialises
@@ -137,6 +141,9 @@ class Gpio
         if (m_gpio == NULL) {
             throw std::invalid_argument("Invalid GPIO context");
         }
+#if defined(SWIGJAVASCRIPT)
+        uv_async_init(uv_default_loop(), &m_async, v8isr);
+#endif
     }
     /**
      * Gpio object destructor, this will only unexport the gpio if we where
@@ -146,6 +153,9 @@ class Gpio
     {
         if (m_gpio != NULL) {
             mraa_gpio_close(m_gpio);
+#if defined(SWIGJAVASCRIPT)
+            uv_close((uv_handle_t*) &m_async, NULL);
+#endif
         }
     }
     /**
@@ -156,6 +166,9 @@ class Gpio
     {
         mraa_gpio_close(m_gpio);
         m_gpio = NULL;
+#if defined(SWIGJAVASCRIPT)
+        uv_close((uv_handle_t*) &m_async, NULL);
+#endif
     }
     /**
      * Set the edge mode for ISR
@@ -176,12 +189,12 @@ class Gpio
     }
 #elif defined(SWIGJAVASCRIPT)
     static void
-    v8isr(uv_work_t* req, int status)
+    v8isr(uv_async_t* async)
     {
 #if NODE_MODULE_VERSION >= 0x000D
         v8::HandleScope scope(v8::Isolate::GetCurrent());
 #endif
-        mraa::Gpio* This = (mraa::Gpio*) req->data;
+        mraa::Gpio* This = container_of(async, mraa::Gpio, m_async);
         int argc = 1;
         v8::Local<v8::Value> argv[] = { SWIGV8_INTEGER_NEW(-1) };
 #if NODE_MODULE_VERSION >= 0x000D
@@ -194,21 +207,12 @@ class Gpio
 #else
         This->m_v8isr->Call(SWIGV8_CURRENT_CONTEXT()->Global(), argc, argv);
 #endif
-        delete req;
     }
 
     static void
-    nop(uv_work_t* req)
+    trigger_async(void* async)
     {
-        // Do nothing.
-    }
-
-    static void
-    uvwork(void* ctx)
-    {
-        uv_work_t* req = new uv_work_t;
-        req->data = ctx;
-        uv_queue_work(uv_default_loop(), req, nop, v8isr);
+        uv_async_send((uv_async_t*) async);
     }
 
     Result
@@ -219,7 +223,7 @@ class Gpio
 #else
         m_v8isr = v8::Persistent<v8::Function>::New(func);
 #endif
-        return (Result) mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, &uvwork, this);
+        return (Result) mraa_gpio_isr(m_gpio, (mraa_gpio_edge_t) mode, trigger_async, &m_async);
     }
 #elif defined(SWIGJAVA) || defined(JAVACALLBACK)
     Result
@@ -376,6 +380,7 @@ class Gpio
   private:
     mraa_gpio_context m_gpio;
 #if defined(SWIGJAVASCRIPT)
+    uv_async_t m_async;
     v8::Persistent<v8::Function> m_v8isr;
 #endif
 };
