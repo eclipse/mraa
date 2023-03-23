@@ -35,7 +35,9 @@ platfrom_pinmux_get_instance(char *platform)
     if((instance) && (instance->initialized == false) && (instance->ops.init)) {
         return instance->ops.init()?instance:NULL;
     }
-    else {
+    else if((instance) && (instance->initialized == true)) {
+        return instance;
+    } else {
         return NULL;
     }
 }
