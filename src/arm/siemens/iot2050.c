@@ -1786,3 +1786,68 @@ error:
     free(b);
     return NULL;
 }
+
+mraa_board_t*
+mraa_siemens_iot2050_sm()
+{
+    int pin_index = 0;
+    unsigned wkup_gpio0_chip, wkup_gpio0_base;
+    unsigned line_offset;
+    mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
+
+    if (NULL == b) {
+        goto error_board;
+    }
+
+    if (mraa_find_gpio_line_by_name("wkup_gpio0-base", &wkup_gpio0_chip, &line_offset) < 0 || line_offset != 0) {
+        goto error;
+    }
+    wkup_gpio0_base = mraa_get_chip_base_by_number(wkup_gpio0_chip);
+    if (wkup_gpio0_base < 0) {
+        goto error;
+    }
+
+    b->adv_func = (mraa_adv_func_t*) calloc(1, sizeof(mraa_adv_func_t));
+    if(b->adv_func == NULL) {
+        goto error;
+    }
+    b->platform_name = PLATFORM_NAME;
+    b->phy_pin_count = MRAA_IOT2050_SM_PINCOUNT;
+    b->pins = (mraa_pininfo_t*) calloc(MRAA_IOT2050_SM_PINCOUNT, sizeof(mraa_pininfo_t));
+    if(b->pins == NULL) {
+        free(b->adv_func);
+        goto error;
+    }
+
+    /* USER BUTTON */
+    iot2050_setup_pins(b, pin_index, "USER",
+                        (mraa_pincapabilities_t) {
+                            .valid = 1,
+                            .gpio = 1,
+                            .pwm = 0,
+                            .fast_gpio = 0,
+                            .spi = 0,
+                            .i2c = 0,
+                            .aio = 0,
+                            .uart = 0},
+                        (regmux_info_t) {
+                            .group = -1,
+                            .index = -1,
+                            .pinmap = wkup_gpio0_base+25,
+                            .mode = {}
+                        });
+    iot2050_pin_add_gpio(b, pin_index, wkup_gpio0_chip, 25, -1, -1, NULL, 0);
+
+    /* LED */
+    iot2050_setup_led(b, "user-led1-green");
+    iot2050_setup_led(b, "user-led1-red");
+    iot2050_setup_led(b, "user-led2-green");
+    iot2050_setup_led(b, "user-led2-red");
+
+    return b;
+error:
+    free(b);
+error_board:
+    syslog(LOG_CRIT, "iot2050: Platform failed to initialise");
+    return NULL;
+}

@@ -31,9 +31,13 @@ extern "C" {
 
 #define PLATFORM_NAME                   "SIMATIC IOT2050"
 #define MRAA_IOT2050_PINCOUNT          21
+#define MRAA_IOT2050_SM_PINCOUNT       1
 
 mraa_board_t *
         mraa_siemens_iot2050();
+
+mraa_board_t *
+        mraa_siemens_iot2050_sm();
 
 #ifdef __cplusplus
 }
