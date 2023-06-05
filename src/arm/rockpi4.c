@@ -98,8 +98,8 @@ mraa_rockpi4()
     // SPI
     b->spi_bus_count = MRAA_ROCKPI4_SPI_COUNT;
     b->def_spi_bus = 0;
-    b->spi_bus[0].bus_id = 32766;
-    b->spi_bus[1].bus_id = 32765;
+    b->spi_bus[0].bus_id = 1;
+    b->spi_bus[1].bus_id = 2;
 
     b->pwm_dev_count = MRAA_ROCKPI4_PWM_COUNT;
     b->pwm_default_period = 500;
