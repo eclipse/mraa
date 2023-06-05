@@ -176,6 +176,39 @@ typedef enum {
 } mraa_intel_edison_t;
 
 /**
+ *  ROCKPI4 GPIO numbering enum
+ */
+typedef enum {
+    MRAA_ROCKPI4_PIN3 = 3,
+    MRAA_ROCKPI4_PIN5 = 5,
+    MRAA_ROCKPI4_PIN7 = 7,
+    MRAA_ROCKPI4_PIN8 = 8,
+    MRAA_ROCKPI4_PIN10 = 10,
+    MRAA_ROCKPI4_PIN11 = 11,
+    MRAA_ROCKPI4_PIN12 = 12,
+    MRAA_ROCKPI4_PIN13 = 13,
+    MRAA_ROCKPI4_PIN15 = 15,
+    MRAA_ROCKPI4_PIN16 = 16,
+    MRAA_ROCKPI4_PIN18 = 18,
+    MRAA_ROCKPI4_PIN19 = 19,
+    MRAA_ROCKPI4_PIN21 = 21,
+    MRAA_ROCKPI4_PIN22 = 22,
+    MRAA_ROCKPI4_PIN23 = 23,
+    MRAA_ROCKPI4_PIN24 = 24,
+    MRAA_ROCKPI4_PIN27 = 27,
+    MRAA_ROCKPI4_PIN28 = 28,
+    MRAA_ROCKPI4_PIN29 = 29,
+    MRAA_ROCKPI4_PIN31 = 31,
+    MRAA_ROCKPI4_PIN32 = 32,
+    MRAA_ROCKPI4_PIN33 = 33,
+    MRAA_ROCKPI4_PIN35 = 35,
+    MRAA_ROCKPI4_PIN36 = 36,
+    MRAA_ROCKPI4_PIN37 = 37,
+    MRAA_ROCKPI4_PIN38 = 38,
+    MRAA_ROCKPI4_PIN40 = 40
+} mraa_rockpi4_wiring_t;
+
+/**
 * Raspberry PI Wiring compatible numbering enum
 */
 typedef enum {
