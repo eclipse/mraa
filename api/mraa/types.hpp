@@ -60,6 +60,7 @@ typedef enum {
     MTK_LINKIT = 17,           /**< Mediatek MT7688 based Linkit boards */
     MTK_OMEGA2 = 18,           /**< MT7688 based Onion Omega2 board */
     IEI_TANK = 19,             /**< IEI Tank System*/
+    ROCKPI4 = 20,              /**< Radxa ROCK PI 4 Models A/B/C */
     INTEL_UPXTREME = 24,        /**< The UPXTREME Board */
     SIEMENS_IOT2050 = 26,      /**< Siemens IOT2050 board */
 
@@ -165,6 +166,39 @@ typedef enum {
     INTEL_EDISON_GP80 = 54,
     INTEL_EDISON_GP81 = 55
 } IntelEdison;
+
+/**
+ *  ROCKPI4 GPIO numbering enum
+ */
+typedef enum {
+    ROCKPI4_PIN3 = 3,
+    ROCKPI4_PIN5 = 5,
+    ROCKPI4_PIN7 = 7,
+    ROCKPI4_PIN8 = 8,
+    ROCKPI4_PIN10 = 10,
+    ROCKPI4_PIN11 = 11,
+    ROCKPI4_PIN12 = 12,
+    ROCKPI4_PIN13 = 13,
+    ROCKPI4_PIN15 = 15,
+    ROCKPI4_PIN16 = 16,
+    ROCKPI4_PIN18 = 18,
+    ROCKPI4_PIN19 = 19,
+    ROCKPI4_PIN21 = 21,
+    ROCKPI4_PIN22 = 22,
+    ROCKPI4_PIN23 = 23,
+    ROCKPI4_PIN24 = 24,
+    ROCKPI4_PIN27 = 27,
+    ROCKPI4_PIN28 = 28,
+    ROCKPI4_PIN29 = 29,
+    ROCKPI4_PIN31 = 31,
+    ROCKPI4_PIN32 = 32,
+    ROCKPI4_PIN33 = 33,
+    ROCKPI4_PIN35 = 35,
+    ROCKPI4_PIN36 = 36,
+    ROCKPI4_PIN37 = 37,
+    ROCKPI4_PIN38 = 38,
+    ROCKPI4_PIN40 = 40
+} RockPi4Wiring;
 
 /**
 * Raspberry PI Wiring compatible numbering enum
