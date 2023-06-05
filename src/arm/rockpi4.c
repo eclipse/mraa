@@ -22,6 +22,7 @@
 */
 #define PLATFORM_NAME_ROCK_PI4 "ROCK Pi 4"
 #define PLATFORM_NAME_ROCK_PI4_2 "ROCK PI 4"
+#define PLATFORM_NAME_ROCK_PI4_3 "ROCK 4"
 #define MAX_SIZE 64
 
 const char* rockpi4_serialdev[MRAA_ROCKPI4_UART_COUNT] = { "/dev/ttyS2", "/dev/ttyS4" };
@@ -70,7 +71,8 @@ mraa_rockpi4()
     if (mraa_file_exist(DT_BASE "/model")) {
         // We are on a modern kernel, great!!!!
         if (mraa_file_contains(DT_BASE "/model", PLATFORM_NAME_ROCK_PI4)  ||
-            mraa_file_contains(DT_BASE "/model", PLATFORM_NAME_ROCK_PI4_2)
+            mraa_file_contains(DT_BASE "/model", PLATFORM_NAME_ROCK_PI4_2) ||
+            mraa_file_contains(DT_BASE "/model", PLATFORM_NAME_ROCK_PI4_3)
             ) {
             b->platform_name = PLATFORM_NAME_ROCK_PI4;
             b->uart_dev[0].device_path = (char*) rockpi4_serialdev[0];
