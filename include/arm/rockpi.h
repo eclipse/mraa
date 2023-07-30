@@ -44,7 +44,7 @@ extern "C" {
 #define MRAA_ROCKPIS_PIN_COUNT  52
 
 mraa_board_t *
-        mraa_rockpi4();
+        mraa_rockpi();
 
 #ifdef __cplusplus
 }

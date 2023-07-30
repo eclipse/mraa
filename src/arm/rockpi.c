@@ -12,7 +12,7 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#include "arm/rockpi4.h"
+#include "arm/rockpi.h"
 #include "common.h"
 
 #define DT_BASE "/proc/device-tree"
@@ -188,7 +188,7 @@ rockpiS_pins(mraa_board_t* b)
 }
 
 mraa_board_t*
-mraa_rockpi4()
+mraa_rockpi()
 {
     int i, model_index;
     char *serialdev_path;
@@ -296,5 +296,3 @@ mraa_rockpi4()
 
     return b;
 }
-
-
