@@ -115,6 +115,7 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/arm/siemens/iot2050.c
   ${PROJECT_SOURCE_DIR}/src/arm/siemens/platform.c
   ${PROJECT_SOURCE_DIR}/src/arm/siemens/platform_iot2050.c
+  ${PROJECT_SOURCE_DIR}/src/arm/orange_pi_prime.c
 )
 
 set (mraa_LIB_MIPS_SRCS_NOAUTO
