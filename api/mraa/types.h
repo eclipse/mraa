@@ -73,6 +73,7 @@ typedef enum {
     MRAA_VISIONFIVE = 28,           /**< StarFive VisionFive board */
     MRAA_RADXA_ROCK_5A = 29,        /**< Radxa ROCK 5 Model A */
     MRAA_RADXA_ROCK_5B = 30,        /**< Radxa ROCK 5 Model B */
+    MRAA_ORANGE_PI_PRIME = 31,      /**< Orange Pi Prime board */
 
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
@@ -349,6 +350,40 @@ typedef enum {
     MRAA_RASPBERRY_WIRING_PIN28 = 38,
     MRAA_RASPBERRY_WIRING_PIN29 = 40
 } mraa_raspberry_wiring_t;
+
+/**
+ *  Orange Pi Prime GPIO numbering enum
+ */
+typedef enum {
+    MRAA_ORANGE_PI_PRIME_PIN3 = 3,
+    MRAA_ORANGE_PI_PRIME_PIN5 = 5,
+    MRAA_ORANGE_PI_PRIME_PIN7 = 7,
+    MRAA_ORANGE_PI_PRIME_PIN8 = 8,
+    MRAA_ORANGE_PI_PRIME_PIN10 = 10,
+    MRAA_ORANGE_PI_PRIME_PIN11 = 11,
+    MRAA_ORANGE_PI_PRIME_PIN12 = 12,
+    MRAA_ORANGE_PI_PRIME_PIN13 = 13,
+    MRAA_ORANGE_PI_PRIME_PIN15 = 15,
+    MRAA_ORANGE_PI_PRIME_PIN16 = 16,
+    MRAA_ORANGE_PI_PRIME_PIN18 = 18,
+    MRAA_ORANGE_PI_PRIME_PIN19 = 19,
+    MRAA_ORANGE_PI_PRIME_PIN21 = 21,
+    MRAA_ORANGE_PI_PRIME_PIN22 = 22,
+    MRAA_ORANGE_PI_PRIME_PIN23 = 23,
+    MRAA_ORANGE_PI_PRIME_PIN24 = 24,
+    MRAA_ORANGE_PI_PRIME_PIN26 = 26,
+    MRAA_ORANGE_PI_PRIME_PIN27 = 27,
+    MRAA_ORANGE_PI_PRIME_PIN28 = 28,
+    MRAA_ORANGE_PI_PRIME_PIN29 = 29,
+    MRAA_ORANGE_PI_PRIME_PIN31 = 31,
+    MRAA_ORANGE_PI_PRIME_PIN32 = 32,
+    MRAA_ORANGE_PI_PRIME_PIN33 = 33,
+    MRAA_ORANGE_PI_PRIME_PIN35 = 35,
+    MRAA_ORANGE_PI_PRIME_PIN36 = 36,
+    MRAA_ORANGE_PI_PRIME_PIN37 = 37,
+    MRAA_ORANGE_PI_PRIME_PIN38 = 38,
+    MRAA_ORANGE_PI_PRIME_PIN40 = 40
+} mraa_orange_pi_prime_wiring_t;
 
 /**
  * MRAA return codes

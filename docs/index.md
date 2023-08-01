@@ -61,6 +61,7 @@ Specific platform information for supported platforms is documented here:
 - @ref omega2
 - @ref iei-tank
 - @ref upXtreme
+- @ref _orange_pi_prime
 
 ## DEBUGGING
 
