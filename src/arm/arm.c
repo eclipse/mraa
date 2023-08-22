@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "arm/96boards.h"
+#include "arm/rock3.h"
 #include "arm/rockpi4.h"
 #include "arm/de_nano_soc.h"
 #include "arm/banana.h"
@@ -91,6 +92,10 @@ mraa_arm_platform()
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/model", "Avnet Ultra96 Rev1"))
             platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/model", "Radxa ROCK3 Model A") ||
+                 mraa_file_contains("/proc/device-tree/model", "Radxa ROCK3 Model B") ||
+                 mraa_file_contains("/proc/device-tree/model", "Radxa ROCK3 Model C"))
+            platform_type = MRAA_ROCK3;
         else if (mraa_file_contains("/proc/device-tree/model", "ROCK Pi 4") ||
                  mraa_file_contains("/proc/device-tree/model", "ROCK PI 4") ||
                  mraa_file_contains("/proc/device-tree/model", "ROCK 4")
@@ -119,6 +124,9 @@ mraa_arm_platform()
             break;
         case MRAA_96BOARDS:
             plat = mraa_96boards();
+            break;
+        case MRAA_ROCK3:
+            plat = mraa_rock3();
             break;
         case MRAA_ROCKPI4:
             plat = mraa_rockpi4();
