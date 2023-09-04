@@ -71,7 +71,8 @@ typedef enum {
     MRAA_SIEMENS_IOT2050 = 26,      /**< Siemens IOT2050 board */
     MRAA_RADXA_ROCK_3C = 27,        /**< Radxa ROCK 3 Model C */
     MRAA_VISIONFIVE = 28,           /**< StarFive VisionFive board */
-    MRAA_RADXA_ROCK_5A = 29,         /**< Radxa ROCK 5 Model A */
+    MRAA_RADXA_ROCK_5A = 29,        /**< Radxa ROCK 5 Model A */
+    MRAA_RADXA_ROCK_5B = 30,        /**< Radxa ROCK 5 Model B */
 
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
@@ -212,6 +213,40 @@ typedef enum {
     MRAA_RADXA_ROCK_5A_PIN38 = 38,
     MRAA_RADXA_ROCK_5A_PIN40 = 40
 } mraa_radxa_rock_5a_wiring_t;
+
+/**
+ * Radxa ROCK 5 Model B GPIO numbering enum
+ */
+typedef enum {
+    MRAA_RADXA_ROCK_5B_PIN3 = 3,
+    MRAA_RADXA_ROCK_5B_PIN5 = 5,
+    MRAA_RADXA_ROCK_5B_PIN7 = 7,
+    MRAA_RADXA_ROCK_5B_PIN8 = 8,
+    MRAA_RADXA_ROCK_5B_PIN10 = 10,
+    MRAA_RADXA_ROCK_5B_PIN11 = 11,
+    MRAA_RADXA_ROCK_5B_PIN12 = 12,
+    MRAA_RADXA_ROCK_5B_PIN13 = 13,
+    MRAA_RADXA_ROCK_5B_PIN15 = 15,
+    MRAA_RADXA_ROCK_5B_PIN16 = 16,
+    MRAA_RADXA_ROCK_5B_PIN18 = 18,
+    MRAA_RADXA_ROCK_5B_PIN19 = 19,
+    MRAA_RADXA_ROCK_5B_PIN21 = 21,
+    MRAA_RADXA_ROCK_5B_PIN22 = 22,
+    MRAA_RADXA_ROCK_5B_PIN23 = 23,
+    MRAA_RADXA_ROCK_5B_PIN24 = 24,
+    MRAA_RADXA_ROCK_5B_PIN26 = 26,
+    MRAA_RADXA_ROCK_5B_PIN27 = 27,
+    MRAA_RADXA_ROCK_5B_PIN28 = 28,
+    MRAA_RADXA_ROCK_5B_PIN29 = 29,
+    MRAA_RADXA_ROCK_5B_PIN31 = 31,
+    MRAA_RADXA_ROCK_5B_PIN32 = 32,
+    MRAA_RADXA_ROCK_5B_PIN33 = 33,
+    MRAA_RADXA_ROCK_5B_PIN35 = 35,
+    MRAA_RADXA_ROCK_5B_PIN36 = 36,
+    MRAA_RADXA_ROCK_5B_PIN37 = 37,
+    MRAA_RADXA_ROCK_5B_PIN38 = 38,
+    MRAA_RADXA_ROCK_5B_PIN40 = 40
+} mraa_radxa_rock_5b_wiring_t;
 
 /**
  *  Radxa ROCK 3 Model C GPIO numbering enum

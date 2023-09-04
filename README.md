@@ -47,6 +47,7 @@ ARM
 * [ADLINK IPi-SMARC ARM](../master/docs/adlink_ipi_arm.md)
 * [Radxa ROCK 3C](../master/docs/radxa_rock_3c.md)
 * [Radxa ROCK 5A](../master/docs/radxa_rock_5a.md)
+* [Radxa ROCK 5B](../master/docs/radxa_rock_5b.md)
 * [Rock Pi 4](../master/docs/rockpi4.md)
 
 MIPS
