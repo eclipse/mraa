@@ -61,6 +61,13 @@ mraa_platform_t mraa_mips_platform();
  * @return mraa_platform_t of the init'ed platform
  */
 mraa_platform_t mraa_mock_platform();
+  
+/**
+ * runtime detect running risc-v platforms
+ *
+ * @return mraa_platform_t of the init'ed platform
+ */
+mraa_platform_t mraa_riscv_platform();
 
 /**
  * runtime detect iio subsystem

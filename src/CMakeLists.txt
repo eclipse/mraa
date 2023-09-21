@@ -130,6 +130,11 @@ set (mraa_LIB_MOCK_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board_uart.c
 )
 
+set (mraa_LIB_RISCV_SRCS_NOAUTO
+  ${PROJECT_SOURCE_DIR}/src/riscv/riscv.c
+  ${PROJECT_SOURCE_DIR}/src/riscv/visionfive.c
+)
+
 set (mraa_LIB_PERIPHERALMAN_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/peripheralman/peripheralman.c
 )
@@ -168,6 +173,11 @@ if (MOCKPLAT)
   if (MSYS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMSYS=1")
   endif ()
+endif()
+
+if (RISCVPLAT)
+  add_subdirectory(riscv)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DRISCVPLAT=1")
 endif()
 
 if (PERIPHERALMAN)
