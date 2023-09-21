@@ -73,6 +73,10 @@ JSON platform
 ----
 * [Platform loading](../master/docs/jsonplatform.md)
 
+RISC-V
+----
+* [VisionFive](../master/docs/visionfive.md)
+
 Installing on your board
 ========================
 

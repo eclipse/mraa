@@ -70,6 +70,8 @@ typedef enum {
     MRAA_INTEL_ILK = 25,            /**< Intel Learning Kit */
     MRAA_SIEMENS_IOT2050 = 26,      /**< Siemens IOT2050 board */
     MRAA_RADXA_ROCK_3C = 27,        /**< Radxa ROCK 3 Model C */
+    MRAA_VISIONFIVE = 28,           /**< StarFive VisionFive board */
+
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 

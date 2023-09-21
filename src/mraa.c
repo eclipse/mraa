@@ -153,7 +153,7 @@ imraa_init()
         // Use runtime ARM platform detection
         platform_type = mraa_arm_platform();
 #elif defined(MIPSPLAT)
-        // Use runtime ARM platform detection
+        // Use runtime MIPS platform detection
         platform_type = mraa_mips_platform();
 #elif defined(MOCKPLAT)
         // Use mock platform
@@ -161,6 +161,9 @@ imraa_init()
 #elif defined(PERIPHERALMAN)
         // Use peripheralmanager
         platform_type = mraa_peripheralman_platform();
+#elif defined(RISCVPLAT)
+        // Use runtime RISC-V platform detection
+        platform_type = mraa_riscv_platform();
 #else
 #error mraa_ARCH NOTHING
 #endif

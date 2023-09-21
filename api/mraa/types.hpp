@@ -64,6 +64,7 @@ typedef enum {
     INTEL_UPXTREME = 24,        /**< The UPXTREME Board */
     SIEMENS_IOT2050 = 26,      /**< Siemens IOT2050 board */
     RADXA_ROCK_3C = 27,        /**< Radxa ROCK 3 Model C */
+    VISIONFIVE = 28,           /**< StarFive VisionFive board */
 
     FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 
