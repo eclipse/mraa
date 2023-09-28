@@ -108,6 +108,7 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/arm/banana.c
   ${PROJECT_SOURCE_DIR}/src/arm/de_nano_soc.c
   ${PROJECT_SOURCE_DIR}/src/arm/radxa_rock_3c.c
+  ${PROJECT_SOURCE_DIR}/src/arm/radxa_rock_5a.c
   ${PROJECT_SOURCE_DIR}/src/arm/rockpi4.c
   ${PROJECT_SOURCE_DIR}/src/arm/rockpi.c
   ${PROJECT_SOURCE_DIR}/src/arm/adlink_ipi.c
@@ -129,6 +130,11 @@ set (mraa_LIB_MOCK_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board_i2c.c
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board_spi.c
   ${PROJECT_SOURCE_DIR}/src/mock/mock_board_uart.c
+)
+
+set (mraa_LIB_RISCV_SRCS_NOAUTO
+  ${PROJECT_SOURCE_DIR}/src/riscv/riscv.c
+  ${PROJECT_SOURCE_DIR}/src/riscv/visionfive.c
 )
 
 set (mraa_LIB_PERIPHERALMAN_SRCS_NOAUTO
@@ -169,6 +175,11 @@ if (MOCKPLAT)
   if (MSYS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMSYS=1")
   endif ()
+endif()
+
+if (RISCVPLAT)
+  add_subdirectory(riscv)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DRISCVPLAT=1")
 endif()
 
 if (PERIPHERALMAN)

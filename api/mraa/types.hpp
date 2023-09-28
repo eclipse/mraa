@@ -65,6 +65,8 @@ typedef enum {
     INTEL_UPXTREME = 24,        /**< The UPXTREME Board */
     SIEMENS_IOT2050 = 26,      /**< Siemens IOT2050 board */
     RADXA_ROCK_3C = 27,        /**< Radxa ROCK 3 Model C */
+    VISIONFIVE = 28,           /**< StarFive VisionFive board */
+    RADXA_ROCK_5A = 29,        /**< Radxa ROCK 5 Model A */
 
     FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 
@@ -168,6 +170,40 @@ typedef enum {
     INTEL_EDISON_GP80 = 54,
     INTEL_EDISON_GP81 = 55
 } IntelEdison;
+
+/**
+ * Radxa ROCK 5 Model A GPIO numbering enum
+ */
+typedef enum {
+    RADXA_ROCK_5A_PIN3 = 3,
+    RADXA_ROCK_5A_PIN5 = 5,
+    RADXA_ROCK_5A_PIN7 = 7,
+    RADXA_ROCK_5A_PIN8 = 8,
+    RADXA_ROCK_5A_PIN10 = 10,
+    RADXA_ROCK_5A_PIN11 = 11,
+    RADXA_ROCK_5A_PIN12 = 12,
+    RADXA_ROCK_5A_PIN13 = 13,
+    RADXA_ROCK_5A_PIN15 = 15,
+    RADXA_ROCK_5A_PIN16 = 16,
+    RADXA_ROCK_5A_PIN18 = 18,
+    RADXA_ROCK_5A_PIN19 = 19,
+    RADXA_ROCK_5A_PIN21 = 21,
+    RADXA_ROCK_5A_PIN22 = 22,
+    RADXA_ROCK_5A_PIN23 = 23,
+    RADXA_ROCK_5A_PIN24 = 24,
+    RADXA_ROCK_5A_PIN26 = 26,
+    RADXA_ROCK_5A_PIN27 = 27,
+    RADXA_ROCK_5A_PIN28 = 28,
+    RADXA_ROCK_5A_PIN29 = 29,
+    RADXA_ROCK_5A_PIN31 = 31,
+    RADXA_ROCK_5A_PIN32 = 32,
+    RADXA_ROCK_5A_PIN33 = 33,
+    RADXA_ROCK_5A_PIN35 = 35,
+    RADXA_ROCK_5A_PIN36 = 36,
+    RADXA_ROCK_5A_PIN37 = 37,
+    RADXA_ROCK_5A_PIN38 = 38,
+    RADXA_ROCK_5A_PIN40 = 40
+} RadxaRock5AWiring;
 
 /**
  *  Radxa ROCK 3 Model C GPIO numbering enum
