@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "arm/96boards.h"
+#include "arm/radxa_rock_3b.h"
 #include "arm/radxa_rock_3c.h"
 #include "arm/radxa_rock_5a.h"
 #include "arm/radxa_rock_5b.h"
@@ -95,6 +96,8 @@ mraa_arm_platform()
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/model", "Avnet Ultra96 Rev1"))
             platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/model", PLATFORM_NAME_RADXA_ROCK_3B))
+            platform_type = MRAA_RADXA_ROCK_3B;
         else if (mraa_file_contains("/proc/device-tree/model", PLATFORM_NAME_RADXA_ROCK_3C))
             platform_type = MRAA_RADXA_ROCK_3C;
         else if (mraa_file_contains("/proc/device-tree/model", PLATFORM_NAME_RADXA_ROCK_5A))
@@ -131,6 +134,9 @@ mraa_arm_platform()
             break;
         case MRAA_96BOARDS:
             plat = mraa_96boards();
+            break;
+        case MRAA_RADXA_ROCK_3B:
+            plat = mraa_radxa_rock_3b();
             break;
         case MRAA_RADXA_ROCK_3C:
             plat = mraa_radxa_rock_3c();
