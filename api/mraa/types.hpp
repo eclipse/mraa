@@ -68,6 +68,7 @@ typedef enum {
     RADXA_ROCK_5A = 29,        /**< Radxa ROCK 5 Model A */
     RADXA_ROCK_5B = 30,        /**< Radxa ROCK 5 Model B */
     ORANGE_PI_PRIME = 31,      /**< Orange Pi Prime board */
+    RADXA_ROCK_3B = 32,        /**< Radxa ROCK 3 Model B */
 
     FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 
@@ -239,6 +240,38 @@ typedef enum {
     RADXA_ROCK_5B_PIN38 = 38,
     RADXA_ROCK_5B_PIN40 = 40
 } RadxaRock5BWiring;
+
+/**
+ *  Radxa ROCK 3 Model B GPIO numbering enum
+ */
+typedef enum {
+    RADXA_ROCK_3B_PIN3 = 3,
+    RADXA_ROCK_3B_PIN5 = 5,
+    RADXA_ROCK_3B_PIN7 = 7,
+    RADXA_ROCK_3B_PIN8 = 8,
+    RADXA_ROCK_3B_PIN10 = 10,
+    RADXA_ROCK_3B_PIN11 = 11,
+    RADXA_ROCK_3B_PIN12 = 12,
+    RADXA_ROCK_3B_PIN13 = 13,
+    RADXA_ROCK_3B_PIN15 = 15,
+    RADXA_ROCK_3B_PIN16 = 16,
+    RADXA_ROCK_3B_PIN18 = 18,
+    RADXA_ROCK_3B_PIN19 = 19,
+    RADXA_ROCK_3B_PIN21 = 21,
+    RADXA_ROCK_3B_PIN22 = 22,
+    RADXA_ROCK_3B_PIN23 = 23,
+    RADXA_ROCK_3B_PIN24 = 24,
+    RADXA_ROCK_3B_PIN27 = 27,
+    RADXA_ROCK_3B_PIN28 = 28,
+    RADXA_ROCK_3B_PIN29 = 29,
+    RADXA_ROCK_3B_PIN31 = 31,
+    RADXA_ROCK_3B_PIN32 = 32,
+    RADXA_ROCK_3B_PIN33 = 33,
+    RADXA_ROCK_3B_PIN35 = 35,
+    RADXA_ROCK_3B_PIN36 = 36,
+    RADXA_ROCK_3B_PIN38 = 38,
+    RADXA_ROCK_3B_PIN40 = 40
+} RadxaRock3BWiring;
 
 /**
  *  Radxa ROCK 3 Model C GPIO numbering enum
