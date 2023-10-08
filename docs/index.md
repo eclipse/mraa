@@ -62,6 +62,12 @@ Specific platform information for supported platforms is documented here:
 - @ref iei-tank
 - @ref upXtreme
 - @ref _orange_pi_prime
+- @ref radxa_cm3
+- @ref radxa_rock_3b
+- @ref radxa_rock_3c
+- @ref radxa_rock_5a
+- @ref radxa_rock_5b
+- @ref rockpi4
 
 ## DEBUGGING
 

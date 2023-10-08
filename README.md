@@ -45,6 +45,7 @@ ARM
 * [phyBOARD-Wega](../master/docs/phyboard-wega.md)
 * [96Boards](../master/docs/96boards.md)
 * [ADLINK IPi-SMARC ARM](../master/docs/adlink_ipi_arm.md)
+* [Radxa CM3](../master/docs/radxa_cm3.md)
 * [Radxa ROCK 3B](../master/docs/radxa_rock_3b.md)
 * [Radxa ROCK 3C](../master/docs/radxa_rock_3c.md)
 * [Radxa ROCK 5A](../master/docs/radxa_rock_5a.md)

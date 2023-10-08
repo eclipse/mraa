@@ -74,7 +74,8 @@ typedef enum {
     MRAA_RADXA_ROCK_5A = 29,        /**< Radxa ROCK 5 Model A */
     MRAA_RADXA_ROCK_5B = 30,        /**< Radxa ROCK 5 Model B */
     MRAA_ORANGE_PI_PRIME = 31,      /**< Orange Pi Prime board */
-    MRAA_RADXA_ROCK_3B = 32,         /**< Radxa ROCK 3 Model B */
+    MRAA_RADXA_ROCK_3B = 32,        /**< Radxa ROCK 3 Model B */
+    MRAA_RADXA_CM3 = 33,            /**< Radxa CM3 */
 
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
@@ -315,6 +316,39 @@ typedef enum {
     MRAA_RADXA_ROCK_3C_PIN38 = 38,
     MRAA_RADXA_ROCK_3C_PIN40 = 40
 } mraa_radxa_rock_3c_wiring_t;
+
+/**
+ *  Radxa CM3 IO GPIO numbering enum
+ */
+typedef enum {
+    MRAA_RADXA_CM3_IO_PIN3 = 3,
+    MRAA_RADXA_CM3_IO_PIN5 = 5,
+    MRAA_RADXA_CM3_IO_PIN7 = 7,
+    MRAA_RADXA_CM3_IO_PIN8 = 8,
+    MRAA_RADXA_CM3_IO_PIN10 = 10,
+    MRAA_RADXA_CM3_IO_PIN11 = 11,
+    MRAA_RADXA_CM3_IO_PIN12 = 12,
+    MRAA_RADXA_CM3_IO_PIN13 = 13,
+    MRAA_RADXA_CM3_IO_PIN15 = 15,
+    MRAA_RADXA_CM3_IO_PIN16 = 16,
+    MRAA_RADXA_CM3_IO_PIN18 = 18,
+    MRAA_RADXA_CM3_IO_PIN19 = 19,
+    MRAA_RADXA_CM3_IO_PIN21 = 21,
+    MRAA_RADXA_CM3_IO_PIN22 = 22,
+    MRAA_RADXA_CM3_IO_PIN23 = 23,
+    MRAA_RADXA_CM3_IO_PIN24 = 24,
+    MRAA_RADXA_CM3_IO_PIN27 = 27,
+    MRAA_RADXA_CM3_IO_PIN28 = 28,
+    MRAA_RADXA_CM3_IO_PIN29 = 29,
+    MRAA_RADXA_CM3_IO_PIN31 = 31,
+    MRAA_RADXA_CM3_IO_PIN32 = 32,
+    MRAA_RADXA_CM3_IO_PIN33 = 33,
+    MRAA_RADXA_CM3_IO_PIN35 = 35,
+    MRAA_RADXA_CM3_IO_PIN36 = 36,
+    MRAA_RADXA_CM3_IO_PIN37 = 37,
+    MRAA_RADXA_CM3_IO_PIN38 = 38,
+    MRAA_RADXA_CM3_IO_PIN40 = 40
+} mraa_radxa_cm3_io_wiring_t;
 
 /**
  *  ROCKPI4 GPIO numbering enum
