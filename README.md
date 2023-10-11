@@ -50,6 +50,7 @@ ARM
 * [Radxa ROCK 3C](../master/docs/radxa_rock_3c.md)
 * [Radxa ROCK 5A](../master/docs/radxa_rock_5a.md)
 * [Radxa ROCK 5B](../master/docs/radxa_rock_5b.md)
+* [Radxa CM5 IO](../master/docs/radxa_cm5_io.md)
 * [Rock Pi 4](../master/docs/rockpi4.md)
 * [Orange Pi Prime](../master/docs/orange_pi_prime.md)
 
