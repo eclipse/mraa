@@ -10,9 +10,9 @@
 #include <string.h>
 
 #include "arm/96boards.h"
+#include "arm/rockpi.h"
 #include "arm/radxa_rock_3c.h"
 #include "arm/radxa_rock_5a.h"
-#include "arm/rockpi4.h"
 #include "arm/de_nano_soc.h"
 #include "arm/banana.h"
 #include "arm/beaglebone.h"
@@ -102,6 +102,8 @@ mraa_arm_platform()
                  mraa_file_contains("/proc/device-tree/model", "ROCK 4")
                  )
             platform_type = MRAA_ROCKPI4;
+        else if (mraa_file_contains("/proc/device-tree/model", "ROCK Pi S"))
+            platform_type = MRAA_ROCKPIS;
         else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
             platform_type = MRAA_RASPBERRY_PI;
         else if (mraa_file_contains("/proc/device-tree/model", "ADLINK ARM, LEC-PX30"))
@@ -133,7 +135,10 @@ mraa_arm_platform()
             plat = mraa_radxa_rock_5a();
             break;
         case MRAA_ROCKPI4:
-            plat = mraa_rockpi4();
+            plat = mraa_rockpi();
+            break;
+        case MRAA_ROCKPIS:
+            plat = mraa_rockpi();
             break;
         case MRAA_DE_NANO_SOC:
             plat = mraa_de_nano_soc();

@@ -48,6 +48,7 @@ ARM
 * [Radxa ROCK 3C](../master/docs/radxa_rock_3c.md)
 * [Radxa ROCK 5A](../master/docs/radxa_rock_5a.md)
 * [Rock Pi 4](../master/docs/rockpi4.md)
+* [Rock Pi S](../master/docs/rockpiS.md)
 
 MIPS
 ---

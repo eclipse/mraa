@@ -65,13 +65,14 @@ typedef enum {
     MRAA_ROCKPI4 = 20,              /**< Radxa ROCK PI 4 Models A/B/C */
     MRAA_ADLINK_IPI = 21,           /**< Adlink Industrial PI */
     MRAA_ADLINK_LEC_AL = 22,        /**< Adlink LEC-AL*/
-    MRAA_ADLINK_LEC_AL_AI = 23,        /**< Adlink LEC-AL*/
+    MRAA_ADLINK_LEC_AL_AI = 23,     /**< Adlink LEC-AL*/
     MRAA_UPXTREME = 24,             /**< The UPXTREME Board */
     MRAA_INTEL_ILK = 25,            /**< Intel Learning Kit */
     MRAA_SIEMENS_IOT2050 = 26,      /**< Siemens IOT2050 board */
     MRAA_RADXA_ROCK_3C = 27,        /**< Radxa ROCK 3 Model C */
     MRAA_VISIONFIVE = 28,           /**< StarFive VisionFive board */
     MRAA_RADXA_ROCK_5A = 29,         /**< Radxa ROCK 5 Model A */
+    MRAA_ROCKPIS = 30,              /**< Radxa ROCK PI S */
 
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
@@ -278,6 +279,40 @@ typedef enum {
     MRAA_ROCKPI4_PIN38 = 38,
     MRAA_ROCKPI4_PIN40 = 40
 } mraa_rockpi4_wiring_t;
+
+/**
+ *  ROCKPIS GPIO numbering enum
+ */
+typedef enum {
+    MRAA_ROCKPIS_PIN3 = 3,
+    MRAA_ROCKPIS_PIN5 = 5,
+    MRAA_ROCKPIS_PIN7 = 7,
+    MRAA_ROCKPIS_PIN8 = 8,
+    MRAA_ROCKPIS_PIN10 = 10,
+    MRAA_ROCKPIS_PIN11 = 11,
+    MRAA_ROCKPIS_PIN12 = 12,
+    MRAA_ROCKPIS_PIN13 = 13,
+    MRAA_ROCKPIS_PIN15 = 15,
+    MRAA_ROCKPIS_PIN16 = 16,
+    MRAA_ROCKPIS_PIN18 = 18,
+    MRAA_ROCKPIS_PIN19 = 19,
+    MRAA_ROCKPIS_PIN21 = 21,
+    MRAA_ROCKPIS_PIN22 = 22,
+    MRAA_ROCKPIS_PIN23 = 23,
+    MRAA_ROCKPIS_PIN24 = 24,
+    MRAA_ROCKPIS_PIN28 = 28,
+    MRAA_ROCKPIS_PIN30 = 30,
+    MRAA_ROCKPIS_PIN32 = 32,
+    MRAA_ROCKPIS_PIN34 = 34,
+    MRAA_ROCKPIS_PIN39 = 39,
+    MRAA_ROCKPIS_PIN40 = 40,
+    MRAA_ROCKPIS_PIN41 = 41,
+    MRAA_ROCKPIS_PIN42 = 42,
+    MRAA_ROCKPIS_PIN43 = 43,
+    MRAA_ROCKPIS_PIN44 = 44,
+    MRAA_ROCKPIS_PIN45 = 45,
+    MRAA_ROCKPIS_PIN46 = 46
+} mraa_rockpis_wiring_t;
 
 /**
 * Raspberry PI Wiring compatible numbering enum
