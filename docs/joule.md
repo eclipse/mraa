@@ -36,6 +36,9 @@ so only available UART is on the FTDI header. Disable the getty on ttyS2 and
 use mraa's uart raw mode to initialise on ttyS2. The Jumper J8 can be used to
 switch between using the FTDI 6 pin header and the micro USB output.
 
+**Interrupt** The following GPIO Pins are interrupt configurable: 1, 23, 25, 27, 
+29, 31, 33, 35, 51, 53, 55  
+
 Pin Mapping
 -----------
 
