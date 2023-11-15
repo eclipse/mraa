@@ -11,6 +11,7 @@
 
 #include "arm/96boards.h"
 #include "arm/radxa_cm3.h"
+#include "arm/radxa_rock_3a.h"
 #include "arm/radxa_rock_3b.h"
 #include "arm/radxa_rock_3c.h"
 #include "arm/radxa_rock_5a.h"
@@ -102,6 +103,8 @@ mraa_arm_platform()
                  mraa_file_contains("/proc/device-tree/model", PLATFORM_NAME_RADXA_CM3_IO_2) ||
                  mraa_file_contains("/proc/device-tree/model", PLATFORM_NAME_RADXA_CM3_RPI_CM4_IO))
             platform_type = MRAA_RADXA_CM3;
+        else if (mraa_file_contains("/proc/device-tree/model", PLATFORM_NAME_RADXA_ROCK_3A))
+            platform_type = MRAA_RADXA_ROCK_3A;
         else if (mraa_file_contains("/proc/device-tree/model", PLATFORM_NAME_RADXA_ROCK_3B))
             platform_type = MRAA_RADXA_ROCK_3B;
         else if (mraa_file_contains("/proc/device-tree/model", PLATFORM_NAME_RADXA_ROCK_3C))
@@ -145,6 +148,9 @@ mraa_arm_platform()
             break;
         case MRAA_RADXA_CM3:
             plat = mraa_radxa_cm3();
+            break;
+        case MRAA_RADXA_ROCK_3A:
+            plat = mraa_radxa_rock_3a();
             break;
         case MRAA_RADXA_ROCK_3B:
             plat = mraa_radxa_rock_3b();
