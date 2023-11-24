@@ -26,7 +26,7 @@ extern "C" {
 #define MRAA_RASPBERRY_PI3_A_PLUS_PINCOUNT 41
 #define MRAA_RASPBERRY_PI4_B_PINCOUNT 41
 #define MRAA_RASPBERRY_PI_400_PINCOUNT 41
-
+#define MRAA_RASPBERRY_PI5_B_PINCOUNT 41
 mraa_board_t *
         mraa_raspberry_pi();
 
