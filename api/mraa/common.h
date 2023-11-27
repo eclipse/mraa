@@ -32,7 +32,7 @@
 /** Max size off Mraa Platform name */
 #define MRAA_PLATFORM_NAME_MAX_SIZE 64
 /** Size off Mraa pin name */
-#define MRAA_PIN_NAME_SIZE 12
+#define MRAA_PIN_NAME_SIZE 32
 
 /** Bit Shift for Mraa sub platform */
 #define MRAA_SUB_PLATFORM_BIT_SHIFT 9
