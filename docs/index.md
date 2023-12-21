@@ -63,6 +63,7 @@ Specific platform information for supported platforms is documented here:
 - @ref upXtreme
 - @ref _orange_pi_prime
 - @ref radxa_cm3
+- @ref radxa_e25
 - @ref radxa_cm5_io
 - @ref radxa_rock_3a
 - @ref radxa_rock_3b
