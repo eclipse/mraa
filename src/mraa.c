@@ -12,6 +12,7 @@
 #endif
 
 #include <dlfcn.h>
+#include <libgen.h>
 #include <pwd.h>
 #include <sched.h>
 #include <stddef.h>
@@ -341,9 +342,11 @@ static int
 mraa_count_iio_devices(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
 {
     // we are only interested in files with specific names
-    if (fnmatch(IIO_DEVICE_WILDCARD, basename(path), 0) == 0) {
+    char* tmp = strdup(path);
+    if (fnmatch(IIO_DEVICE_WILDCARD, basename(tmp), 0) == 0) {
         num_iio_devices++;
     }
+    free(tmp);
     return 0;
 }
 
