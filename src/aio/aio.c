@@ -13,8 +13,6 @@
 #include "aio.h"
 #include "mraa_internal.h"
 
-#define DEFAULT_BITS 10
-
 static int raw_bits;
 static unsigned int shifter_value;
 static float max_analog_value;
@@ -133,7 +131,7 @@ mraa_aio_init(unsigned int aio)
     }
 
     raw_bits = mraa_adc_raw_bits();
-    mraa_aio_set_bit(dev, DEFAULT_BITS);
+    mraa_aio_set_bit(dev, raw_bits);
 
     if (IS_FUNC_DEFINED(dev, aio_init_pre)) {
         mraa_result_t pre_ret = (dev->advance_func->aio_init_pre(aio));
