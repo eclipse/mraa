@@ -90,27 +90,27 @@ mraa_radxa_cm5_io()
         return NULL;
     }
 
-    b->pins[38].pwm.parent_id = 0;    // PWM0-M1
-    b->pins[38].pwm.mux_total = 0;
-    b->pins[38].pwm.pinmap = 0;
-    b->pins[31].pwm.parent_id = 6;    // PWM6-M0
-    b->pins[31].pwm.mux_total = 0;
-    b->pins[31].pwm.pinmap = 0;
-    b->pins[29].pwm.parent_id = 7;   // PWM7-M0
-    b->pins[29].pwm.mux_total = 0;
-    b->pins[29].pwm.pinmap = 0;
     b->pins[16].pwm.parent_id = 11;   // PWM11-M0
     b->pins[16].pwm.mux_total = 0;
     b->pins[16].pwm.pinmap = 0;
-    b->pins[32].pwm.parent_id = 13;  // PWM13-M2
-    b->pins[32].pwm.mux_total = 0;
-    b->pins[32].pwm.pinmap = 0;
     b->pins[24].pwm.parent_id = 11;   // PWM14-M1
     b->pins[24].pwm.mux_total = 0;
     b->pins[24].pwm.pinmap = 0;
+    b->pins[29].pwm.parent_id = 7;   // PWM7-M0
+    b->pins[29].pwm.mux_total = 0;
+    b->pins[29].pwm.pinmap = 0;
+    b->pins[31].pwm.parent_id = 6;    // PWM6-M0
+    b->pins[31].pwm.mux_total = 0;
+    b->pins[31].pwm.pinmap = 0;
+    b->pins[32].pwm.parent_id = 13;  // PWM13-M2
+    b->pins[32].pwm.mux_total = 0;
+    b->pins[32].pwm.pinmap = 0;
     b->pins[36].pwm.parent_id = 15;   // PWM15-M2
     b->pins[36].pwm.mux_total = 0;
     b->pins[36].pwm.pinmap = 0;
+    b->pins[38].pwm.parent_id = 0;    // PWM0-M1
+    b->pins[38].pwm.mux_total = 0;
+    b->pins[38].pwm.pinmap = 0;
 
     // AIO
     b->aio_count = MRAA_RADXA_CM5_IO_AIO_COUNT;
