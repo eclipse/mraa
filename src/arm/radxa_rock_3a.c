@@ -101,12 +101,18 @@ mraa_radxa_rock_3a()
 
     b->pins[7].pwm.parent_id = 12;  // PWM12_M0
     b->pins[7].pwm.mux_total = 0;
+    b->pins[7].pwm.parent_id = 1; // PWM1_M1
+    b->pins[7].pwm.mux_total = 0;
     b->pins[11].pwm.parent_id = 14;  // PWM14_M0
     b->pins[11].pwm.mux_total = 0;
     b->pins[13].pwm.parent_id = 15; // PWM15_IR_M0
     b->pins[13].pwm.mux_total = 0;
     b->pins[15].pwm.parent_id = 1; // PWM1_M0
     b->pins[15].pwm.mux_total = 0;
+    b->pins[16].pwm.parent_id = 2; // PWM2_M1
+    b->pins[16].pwm.mux_total = 0;
+    b->pins[18].pwm.parent_id = 9; // PWM9_M0
+    b->pins[18].pwm.mux_total = 0;
     b->pins[19].pwm.parent_id = 15; // PWM15_IR_M1
     b->pins[19].pwm.mux_total = 0;
     b->pins[21].pwm.parent_id = 12; // PWM12_M1
@@ -115,12 +121,6 @@ mraa_radxa_rock_3a()
     b->pins[23].pwm.mux_total = 0;
     b->pins[24].pwm.parent_id = 13; // PWM13_M1
     b->pins[24].pwm.mux_total = 0;
-    b->pins[18].pwm.parent_id = 9; // PWM9_M0
-    b->pins[18].pwm.mux_total = 0;
-    b->pins[16].pwm.parent_id = 2; // PWM2_M1
-    b->pins[16].pwm.mux_total = 0;
-    b->pins[7].pwm.parent_id = 1; // PWM1_M1
-    b->pins[7].pwm.mux_total = 0;
 
     // hardware V1.3/V1.31
     mraa_radxa_rock_3a_pininfo(b, 0, -1, -1, (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, "INVALID");
