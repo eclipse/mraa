@@ -96,16 +96,22 @@ mraa_radxa_rock_3c()
 
     b->pins[7].pwm.parent_id = 14;  // pwm14-m0
     b->pins[7].pwm.mux_total = 0;
+    b->pins[7].pwm.pinmap = 0;
     b->pins[16].pwm.parent_id = 8;  // pwm8-m0
     b->pins[16].pwm.mux_total = 0;
+    b->pins[16].pwm.pinmap = 0;
     b->pins[18].pwm.parent_id = 9;  // pwm9-m0
     b->pins[18].pwm.mux_total = 0;
+    b->pins[18].pwm.pinmap = 0;
     b->pins[21].pwm.parent_id = 12; // pwm12-m1
     b->pins[21].pwm.mux_total = 0;
+    b->pins[21].pwm.pinmap = 0;
     b->pins[23].pwm.parent_id = 14; // pwm14-m1
     b->pins[23].pwm.mux_total = 0;
+    b->pins[23].pwm.pinmap = 0;
     b->pins[24].pwm.parent_id = 13; // pwm13-m1
     b->pins[24].pwm.mux_total = 0;
+    b->pins[24].pwm.pinmap = 0;
 
     mraa_radxa_rock_3c_pininfo(b, 0,  -1, -1, (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, "INVALID");
     mraa_radxa_rock_3c_pininfo(b, 1,  -1, -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "3V3");
