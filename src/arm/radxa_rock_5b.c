@@ -108,7 +108,7 @@ mraa_radxa_rock_5b()
     b->pins[28].pwm.parent_id = 6;   // PWM6_M2
     b->pins[28].pwm.mux_total = 0;
     b->pins[28].pwm.pinmap = 0;
-    b->pins[29].pwm.parent_id = 7;   // PWM15_M3
+    b->pins[29].pwm.parent_id = 15;   // PWM15_M3
     b->pins[29].pwm.mux_total = 0;
     b->pins[29].pwm.pinmap = 0;
     b->pins[31].pwm.parent_id = 13;   // PWM13_M2

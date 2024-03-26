@@ -99,8 +99,6 @@ mraa_radxa_rock_3a()
         return NULL;
     }
 
-    b->pins[7].pwm.parent_id = 12;  // PWM12_M0
-    b->pins[7].pwm.mux_total = 0;
     b->pins[7].pwm.parent_id = 1; // PWM1_M1
     b->pins[7].pwm.mux_total = 0;
     b->pins[11].pwm.parent_id = 14;  // PWM14_M0
@@ -117,6 +115,8 @@ mraa_radxa_rock_3a()
     b->pins[19].pwm.mux_total = 0;
     b->pins[21].pwm.parent_id = 12; // PWM12_M1
     b->pins[21].pwm.mux_total = 0;
+    b->pins[22].pwm.parent_id = 2;  // PWM2_M0
+    b->pins[22].pwm.mux_total = 0;
     b->pins[23].pwm.parent_id = 14; // PWM14_M1
     b->pins[23].pwm.mux_total = 0;
     b->pins[24].pwm.parent_id = 13; // PWM13_M1

@@ -110,7 +110,8 @@ mraa_radxa_cm3()
     b->pins[31].pwm.mux_total = 0;
     b->pins[32].pwm.parent_id = 11; // pwm11-m1
     b->pins[32].pwm.mux_total = 0;
-    b->pins[33].pwm.parent_id = 15; // pwm7
+    b->pins[32].pwm.pinmap = 0;
+    b->pins[33].pwm.parent_id = 7; // pwm7
     b->pins[33].pwm.mux_total = 0;
     b->pins[37].pwm.parent_id = 3; // pwm3
     b->pins[37].pwm.mux_total = 0;
