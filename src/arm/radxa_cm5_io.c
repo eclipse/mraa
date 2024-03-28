@@ -93,15 +93,9 @@ mraa_radxa_cm5_io()
     b->pins[3].pwm.parent_id = 10;   // PWM10-M2
     b->pins[3].pwm.mux_total = 0;
     b->pins[3].pwm.pinmap = 0;
-    b->pins[16].pwm.parent_id = 11;   // PWM11-M0
-    b->pins[16].pwm.mux_total = 0;
-    b->pins[16].pwm.pinmap = 0;
     b->pins[24].pwm.parent_id = 14;   // PWM14-M1
     b->pins[24].pwm.mux_total = 0;
     b->pins[24].pwm.pinmap = 0;
-    b->pins[28].pwm.parent_id = 14;   // PWM14-M2
-    b->pins[28].pwm.mux_total = 0;
-    b->pins[28].pwm.pinmap = 0;
     b->pins[29].pwm.parent_id = 7;   // PWM7-M0
     b->pins[29].pwm.mux_total = 0;
     b->pins[29].pwm.pinmap = 0;
@@ -142,7 +136,7 @@ mraa_radxa_cm5_io()
     mraa_radxa_cm5_io_pininfo(b, 13, 4, 5, (mraa_pincapabilities_t){1,1,0,0,0,1,0,1}, "GPIO4_A5");
     mraa_radxa_cm5_io_pininfo(b, 14, -1, -1, (mraa_pincapabilities_t){1,0,0,0, 0,0,0,0}, "GND");
     mraa_radxa_cm5_io_pininfo(b, 15, 4, 4, (mraa_pincapabilities_t){1,1,0,0,0,1,0,0}, "GPIO4_A4");
-    mraa_radxa_cm5_io_pininfo(b, 16, 1, 20, (mraa_pincapabilities_t){1,1,1,0,1,1,0,0}, "GPIO1_C4");
+    mraa_radxa_cm5_io_pininfo(b, 16, 1, 20, (mraa_pincapabilities_t){1,1,0,0,1,1,0,0}, "GPIO1_C4"); // Conflict with the fan's pwm11-m3
     mraa_radxa_cm5_io_pininfo(b, 17, -1, -1, (mraa_pincapabilities_t){1,0,0,0, 0,0,0,0}, "3V3");
     mraa_radxa_cm5_io_pininfo(b, 18, 1, 29, (mraa_pincapabilities_t){1,1,0,0,1,0,0,0}, "GPIO1_D5");
     mraa_radxa_cm5_io_pininfo(b, 19, 4, 1, (mraa_pincapabilities_t){1,1,0,0,1,0,0,0}, "GPIO4_A1");
