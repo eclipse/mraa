@@ -12,6 +12,7 @@
 #endif
 
 #include <dlfcn.h>
+#include <libgen.h>
 #include <pwd.h>
 #include <sched.h>
 #include <stddef.h>
@@ -153,7 +154,7 @@ imraa_init()
         // Use runtime ARM platform detection
         platform_type = mraa_arm_platform();
 #elif defined(MIPSPLAT)
-        // Use runtime ARM platform detection
+        // Use runtime MIPS platform detection
         platform_type = mraa_mips_platform();
 #elif defined(MOCKPLAT)
         // Use mock platform
@@ -161,6 +162,9 @@ imraa_init()
 #elif defined(PERIPHERALMAN)
         // Use peripheralmanager
         platform_type = mraa_peripheralman_platform();
+#elif defined(RISCVPLAT)
+        // Use runtime RISC-V platform detection
+        platform_type = mraa_riscv_platform();
 #else
 #error mraa_ARCH NOTHING
 #endif
@@ -338,9 +342,11 @@ static int
 mraa_count_iio_devices(const char* path, const struct stat* sb, int flag, struct FTW* ftwb)
 {
     // we are only interested in files with specific names
-    if (fnmatch(IIO_DEVICE_WILDCARD, basename(path), 0) == 0) {
+    char* tmp = strdup(path);
+    if (fnmatch(IIO_DEVICE_WILDCARD, basename(tmp), 0) == 0) {
         num_iio_devices++;
     }
+    free(tmp);
     return 0;
 }
 

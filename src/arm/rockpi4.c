@@ -22,6 +22,7 @@
 */
 #define PLATFORM_NAME_ROCK_PI4 "ROCK Pi 4"
 #define PLATFORM_NAME_ROCK_PI4_2 "ROCK PI 4"
+#define PLATFORM_NAME_ROCK_PI4_3 "ROCK 4"
 #define MAX_SIZE 64
 
 const char* rockpi4_serialdev[MRAA_ROCKPI4_UART_COUNT] = { "/dev/ttyS2", "/dev/ttyS4" };
@@ -70,7 +71,8 @@ mraa_rockpi4()
     if (mraa_file_exist(DT_BASE "/model")) {
         // We are on a modern kernel, great!!!!
         if (mraa_file_contains(DT_BASE "/model", PLATFORM_NAME_ROCK_PI4)  ||
-            mraa_file_contains(DT_BASE "/model", PLATFORM_NAME_ROCK_PI4_2)
+            mraa_file_contains(DT_BASE "/model", PLATFORM_NAME_ROCK_PI4_2) ||
+            mraa_file_contains(DT_BASE "/model", PLATFORM_NAME_ROCK_PI4_3)
             ) {
             b->platform_name = PLATFORM_NAME_ROCK_PI4;
             b->uart_dev[0].device_path = (char*) rockpi4_serialdev[0];
@@ -96,8 +98,8 @@ mraa_rockpi4()
     // SPI
     b->spi_bus_count = MRAA_ROCKPI4_SPI_COUNT;
     b->def_spi_bus = 0;
-    b->spi_bus[0].bus_id = 32766;
-    b->spi_bus[1].bus_id = 32765;
+    b->spi_bus[0].bus_id = 1;
+    b->spi_bus[1].bus_id = 2;
 
     b->pwm_dev_count = MRAA_ROCKPI4_PWM_COUNT;
     b->pwm_default_period = 500;
