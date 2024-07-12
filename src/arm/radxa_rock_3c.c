@@ -49,11 +49,19 @@ mraa_radxa_rock_3c()
         return NULL;
     }
 
+    if (mraa_file_contains("/proc/device-tree/model", PLATFORM_NAME_RADXA_ROCK_3C)) {
+        b->platform_name = PLATFORM_NAME_RADXA_ROCK_3C;
+    } else if (mraa_file_contains("/proc/device-tree/model", PLATFORM_NAME_RADXA_ZERO3)) {
+        b->platform_name = PLATFORM_NAME_RADXA_ZERO3;
+    } else {
+        syslog(LOG_ERR, "An unknown product detected. Fail early...");
+        free(b);
+        return NULL;
+    }
+
     // pin mux for buses are setup by default by kernel so tell mraa to ignore them
     b->no_bus_mux = 1;
     b->phy_pin_count = MRAA_RADXA_ROCK_3C_PIN_COUNT + 1;
-
-    b->platform_name = PLATFORM_NAME_RADXA_ROCK_3C;
     b->chardev_capable = 1;
 
     // UART

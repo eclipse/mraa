@@ -21,6 +21,7 @@ extern "C" {
 #define MRAA_RADXA_ROCK_3C_AIO_COUNT  0
 #define MRAA_RADXA_ROCK_3C_PIN_COUNT  40
 #define PLATFORM_NAME_RADXA_ROCK_3C   "Radxa ROCK3 Model C"
+#define PLATFORM_NAME_RADXA_ZERO3     "Radxa ZERO 3"
 
 mraa_board_t *
         mraa_radxa_rock_3c();

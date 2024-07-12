@@ -70,6 +70,7 @@ Specific platform information for supported platforms is documented here:
 - @ref radxa_rock_3c
 - @ref radxa_rock_5a
 - @ref radxa_rock_5b
+- @ref radxa_zero3
 - @ref rockpi4
 
 ## DEBUGGING
