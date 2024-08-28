@@ -44,7 +44,7 @@ mraa_led_get_brightfd(mraa_led_context dev)
     snprintf(buf, MAX_SIZE, "%s/%s", dev->led_path, "brightness");
     dev->bright_fd = open(buf, O_RDWR);
     if (dev->bright_fd == -1) {
-        syslog(LOG_ERR, "led: brightness: Failed to open 'brightness': %s", strerror(errno));
+        syslog(LOG_ERR, "led: brightness: Failed to open %s: %s", buf, strerror(errno));
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -59,7 +59,7 @@ mraa_led_get_maxbrightfd(mraa_led_context dev)
     snprintf(buf, MAX_SIZE, "%s/%s", dev->led_path, "max_brightness");
     dev->max_bright_fd = open(buf, O_RDONLY);
     if (dev->max_bright_fd == -1) {
-        syslog(LOG_ERR, "led: max_brightness: Failed to open 'max_brightness': %s", strerror(errno));
+        syslog(LOG_ERR, "led: max_brightness: Failed to open %s: %s", buf, strerror(errno));
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -119,7 +119,7 @@ mraa_led_init_internal(const char* led)
 
     snprintf(brightness_path, sizeof(brightness_path), "%s/%s", led_path, "brightness");
     if (access(brightness_path, R_OK | W_OK) != 0) {
-        syslog(LOG_NOTICE, "led: init: current user doesn't have access rights for using LED %s", led_name);
+        syslog(LOG_NOTICE, "led: init: current user doesn't have access rights for %s", brightness_path);
     }
 
     closedir(dir);
