@@ -1110,6 +1110,15 @@ mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
             case MRAA_GPIOD_OPEN_SOURCE:
                 flags |= GPIOHANDLE_REQUEST_OPEN_SOURCE;
                 break;
+            case MRAA_GPIO_PULLUP:
+                flags |= GPIOHANDLE_REQUEST_BIAS_PULL_UP;
+                break;
+            case MRAA_GPIO_PULLDOWN:
+                flags |= GPIOHANDLE_REQUEST_BIAS_PULL_DOWN;
+                break;
+            case MRAA_GPIOD_BIAS_DISABLE:
+                flags |= GPIOHANDLE_REQUEST_BIAS_DISABLE;
+                break;
             default:
                 return MRAA_ERROR_FEATURE_NOT_IMPLEMENTED;
         }
