@@ -212,7 +212,9 @@ main(int argc, char** argv)
                     char aux = 0;
                     do {
                         fflush(stdin);
-                        fscanf(stdin, "%c", &aux);
+                        int ret = fscanf(stdin, "%c", &aux);
+                        if (ret == EOF)
+                            perror("fscanf");
                     } while (aux != '\n');
                     gpio_isr_stop(&gpio_info);
                 } else {
