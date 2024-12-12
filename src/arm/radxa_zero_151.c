@@ -64,9 +64,9 @@ mraa_radxa_zero()
     // UART
     b->uart_dev_count = MRAA_RADXA_ZERO_151_UART_COUNT;
     b->def_uart_dev = 0;
-    b->uart_dev[0].index = 0;
-    b->uart_dev[1].index = 1;
-    b->uart_dev[2].index = 2;
+    b->uart_dev[0].index = 0;       // GPIOAO-0, GPIOAO-1
+    b->uart_dev[1].index = 1;       // GPIOAO-2, GPIOAO-3 / GPIOAO-8, GPIOAO-9
+    b->uart_dev[2].index = 4;       // GPIOH_6, GPIOH_7, GPIOH_4, GPIOH_5
     b->uart_dev[0].device_path = (char*) radxa_zero_151_serialdev[0];
     b->uart_dev[1].device_path = (char*) radxa_zero_151_serialdev[1];
     b->uart_dev[2].device_path = (char*) radxa_zero_151_serialdev[2];
@@ -74,15 +74,15 @@ mraa_radxa_zero()
     // I2C
     b->i2c_bus_count = MRAA_RADXA_ZERO_151_I2C_COUNT;
     b->def_i2c_bus = 0;
-    b->i2c_bus[0].bus_id = 3;
-    b->i2c_bus[1].bus_id = 5;
-    // b->i2c_bus[2].bus_id = 1;
+    b->i2c_bus[0].bus_id = 1;       // GPIOH-6, GPIOH-7 / GPIOX-10, GPIOX-11
+    b->i2c_bus[1].bus_id = 3;       // GPIOA-14, GPIOA-15
+    b->i2c_bus[2].bus_id = 4;       // GPIOAO-2, GPIOAO-3
 
     // SPI
     b->spi_bus_count = MRAA_RADXA_ZERO_151_SPI_COUNT;
     b->def_spi_bus = 0;
-    b->spi_bus[0].bus_id = 0;
-    b->spi_bus[1].bus_id = 1;
+    b->spi_bus[0].bus_id = 0;       // GPIOX_10, GPIOX_11, GPIOX_8, GPIOX_9
+    b->spi_bus[1].bus_id = 1;       // GPIOH_6, GPIOH_7, GPIOH_4, GPIOH_5
 
     // PWM
     b->pwm_dev_count = MRAA_RADXA_ZERO_151_PWM_COUNT;
@@ -97,12 +97,12 @@ mraa_radxa_zero()
         return NULL;
     }
 
-    b->pins[18].pwm.parent_id = 6; // PWM18
+    b->pins[18].pwm.parent_id = 0; // GPIOX_8
     b->pins[18].pwm.mux_total = 0;
     b->pins[18].pwm.pinmap = 0;
-    b->pins[40].pwm.parent_id = 2; // PWM40
+    b->pins[40].pwm.parent_id = 2; // GPIOAO_11
     b->pins[40].pwm.mux_total = 0;
-    b->pins[40].pwm.pinmap = 0;
+    b->pins[40].pwm.pinmap = 1;
 
     mraa_radxa_zero_pininfo(b,  0, -1, -1, (mraa_pincapabilities_t) { 0, 0, 0, 0, 0, 0, 0, 0 }, "INVALID");
     mraa_radxa_zero_pininfo(b,  1, -1, -1, (mraa_pincapabilities_t) { 1, 0, 0, 0, 0, 0, 0, 0 }, "3V3");
