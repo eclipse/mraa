@@ -74,9 +74,10 @@ mraa_radxa_zero()
     // I2C
     b->i2c_bus_count = MRAA_RADXA_ZERO_151_I2C_COUNT;
     b->def_i2c_bus = 0;
-    b->i2c_bus[0].bus_id = 1;       // GPIOH-6, GPIOH-7 / GPIOX-10, GPIOX-11
-    b->i2c_bus[1].bus_id = 3;       // GPIOA-14, GPIOA-15
-    b->i2c_bus[2].bus_id = 4;       // GPIOAO-2, GPIOAO-3
+    b->i2c_bus[0].bus_id = 1;       // GPIOAO-2, GPIOAO-3
+    b->i2c_bus[1].bus_id = 3;       // GPIOX-10, GPIOX-11
+    b->i2c_bus[2].bus_id = 4;       // GPIOH-6, GPIOH-7
+    b->i2c_bus[3].bus_id = 5;       // GPIOA-14, GPIOA-15
 
     // SPI
     b->spi_bus_count = MRAA_RADXA_ZERO_151_SPI_COUNT;
@@ -97,10 +98,10 @@ mraa_radxa_zero()
         return NULL;
     }
 
-    b->pins[18].pwm.parent_id = 0; // GPIOX_8
+    b->pins[18].pwm.parent_id = 0;  // GPIOX_8
     b->pins[18].pwm.mux_total = 0;
     b->pins[18].pwm.pinmap = 0;
-    b->pins[40].pwm.parent_id = 2; // GPIOAO_11
+    b->pins[40].pwm.parent_id = 2;  // GPIOAO_11
     b->pins[40].pwm.mux_total = 0;
     b->pins[40].pwm.pinmap = 1;
 
