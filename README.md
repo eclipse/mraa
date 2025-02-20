@@ -17,7 +17,8 @@ low level communication protocol by high level languages & constructs.
 
 The MRAA project is an Eclipse IoT project. A detailed project description can be found [here](https://projects.eclipse.org/proposals/eclipse-mraa).
 
-[![Build Status](https://travis-ci.org/intel-iot-devkit/mraa.svg?branch=master)](https://travis-ci.org/intel-iot-devkit/mraa) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=mraa-master&metric=alert_status)](https://sonarcloud.io/dashboard?id=mraa-master)
+[![Build Status](https://travis-ci.org/intel-iot-devkit/mraa.svg?branch=master)](https://travis-ci.org/eclipse/mraa) 
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=mraa-master&metric=alert_status)](https://sonarcloud.io/dashboard?id=mraa-master)
 
 Supported Boards
 ================
