@@ -43,6 +43,7 @@ Supports
 
 You can find additional product support in the following channels:
 
+- [Wiki](https://wiki.radxa.com/Home)
 - [Product Info](https://docs.radxa.com/en/rock3/rock3b)
 - [Forums](https://forum.radxa.com/c/rock3)
 - [Github](https://github.com/radxa)
