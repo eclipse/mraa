@@ -49,11 +49,19 @@ mraa_radxa_rock_3c()
         return NULL;
     }
 
+    if (mraa_file_contains("/proc/device-tree/model", PLATFORM_NAME_RADXA_ROCK_3C)) {
+        b->platform_name = PLATFORM_NAME_RADXA_ROCK_3C;
+    } else if (mraa_file_contains("/proc/device-tree/model", PLATFORM_NAME_RADXA_ZERO3)) {
+        b->platform_name = PLATFORM_NAME_RADXA_ZERO3;
+    } else {
+        syslog(LOG_ERR, "An unknown product detected. Fail early...");
+        free(b);
+        return NULL;
+    }
+
     // pin mux for buses are setup by default by kernel so tell mraa to ignore them
     b->no_bus_mux = 1;
     b->phy_pin_count = MRAA_RADXA_ROCK_3C_PIN_COUNT + 1;
-
-    b->platform_name = PLATFORM_NAME_RADXA_ROCK_3C;
     b->chardev_capable = 1;
 
     // UART
@@ -94,22 +102,24 @@ mraa_radxa_rock_3c()
         return NULL;
     }
 
-    b->pins[16].pwm.parent_id = 8;  // pwm8-m0
-    b->pins[16].pwm.mux_total = 0;
-    b->pins[18].pwm.parent_id = 9;  // pwm9-m0
-    b->pins[18].pwm.mux_total = 0;
-    b->pins[21].pwm.parent_id = 12; // pwm12-m1
-    b->pins[21].pwm.mux_total = 0;
-    b->pins[24].pwm.parent_id = 13; // pwm13-m1
-    b->pins[24].pwm.mux_total = 0;
     b->pins[7].pwm.parent_id = 14;  // pwm14-m0
     b->pins[7].pwm.mux_total = 0;
+    b->pins[7].pwm.pinmap = 0;
+    b->pins[16].pwm.parent_id = 8;  // pwm8-m0
+    b->pins[16].pwm.mux_total = 0;
+    b->pins[16].pwm.pinmap = 0;
+    b->pins[18].pwm.parent_id = 9;  // pwm9-m0
+    b->pins[18].pwm.mux_total = 0;
+    b->pins[18].pwm.pinmap = 0;
+    b->pins[21].pwm.parent_id = 12; // pwm12-m1
+    b->pins[21].pwm.mux_total = 0;
+    b->pins[21].pwm.pinmap = 0;
     b->pins[23].pwm.parent_id = 14; // pwm14-m1
     b->pins[23].pwm.mux_total = 0;
-    b->pins[13].pwm.parent_id = 15; // pwm15-m0
-    b->pins[13].pwm.mux_total = 0;
-    b->pins[19].pwm.parent_id = 15; // pwm15-m1
-    b->pins[19].pwm.mux_total = 0;
+    b->pins[23].pwm.pinmap = 0;
+    b->pins[24].pwm.parent_id = 13; // pwm13-m1
+    b->pins[24].pwm.mux_total = 0;
+    b->pins[24].pwm.pinmap = 0;
 
     mraa_radxa_rock_3c_pininfo(b, 0,  -1, -1, (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, "INVALID");
     mraa_radxa_rock_3c_pininfo(b, 1,  -1, -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "3V3");
@@ -130,7 +140,7 @@ mraa_radxa_rock_3c()
     mraa_radxa_rock_3c_pininfo(b, 16,  3,  9, (mraa_pincapabilities_t){1,1,1,0,0,0,0,1}, "GPIO03_B1");
     mraa_radxa_rock_3c_pininfo(b, 17, -1, -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "3V3");
     mraa_radxa_rock_3c_pininfo(b, 18,  3, 10, (mraa_pincapabilities_t){1,1,1,0,0,0,0,1}, "GPIO3_B2");
-    mraa_radxa_rock_3c_pininfo(b, 19,  4, 19, (mraa_pincapabilities_t){1,1,1,0,1,0,0,0}, "GPIO4_C3");
+    mraa_radxa_rock_3c_pininfo(b, 19,  4, 19, (mraa_pincapabilities_t){1,1,0,0,1,0,0,0}, "GPIO4_C3"); // Pwm 15 channel 0 used by fan0
     mraa_radxa_rock_3c_pininfo(b, 20, -1, -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "GND");
     mraa_radxa_rock_3c_pininfo(b, 21,  4, 21, (mraa_pincapabilities_t){1,1,1,0,1,0,0,1}, "GPIO4_C5");
     mraa_radxa_rock_3c_pininfo(b, 22,  3, 17, (mraa_pincapabilities_t){1,1,0,0,0,0,0,0}, "GPIO3_C1");

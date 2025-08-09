@@ -98,16 +98,22 @@ mraa_radxa_e25()
 
     b->pins[7].pwm.parent_id = 12;  // pwm12-m0
     b->pins[7].pwm.mux_total = 0;
+    b->pins[7].pwm.pinmap = 0;
     b->pins[11].pwm.parent_id = 14;  // pwm14-m0
     b->pins[11].pwm.mux_total = 0;
+    b->pins[7].pwm.pinmap = 0;
     b->pins[13].pwm.parent_id = 1; // pwm15-m0
     b->pins[13].pwm.mux_total = 0;
+    b->pins[13].pwm.pinmap = 0;
     b->pins[18].pwm.parent_id = 7; // pwm7-m0
     b->pins[18].pwm.mux_total = 0;
+    b->pins[18].pwm.pinmap = 0;
     b->pins[24].pwm.parent_id = 13; // pwm13-m1
     b->pins[24].pwm.mux_total = 0;
+    b->pins[24].pwm.pinmap = 0;
     b->pins[26].pwm.parent_id = 4;  // pwm13-m0
     b->pins[26].pwm.mux_total = 0;
+    b->pins[26].pwm.pinmap = 0;
 
     mraa_radxa_e25_pininfo(b, 0, -1, -1, (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, "INVALID");
     mraa_radxa_e25_pininfo(b, 1, -1, -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "3.3V");

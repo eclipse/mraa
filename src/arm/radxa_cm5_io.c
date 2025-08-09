@@ -90,27 +90,27 @@ mraa_radxa_cm5_io()
         return NULL;
     }
 
-    b->pins[38].pwm.parent_id = 0;    // PWM0-M1
-    b->pins[38].pwm.mux_total = 0;
-    b->pins[38].pwm.pinmap = 0;
-    b->pins[31].pwm.parent_id = 6;    // PWM6-M0
-    b->pins[31].pwm.mux_total = 0;
-    b->pins[31].pwm.pinmap = 0;
+    b->pins[3].pwm.parent_id = 10;   // PWM10-M2
+    b->pins[3].pwm.mux_total = 0;
+    b->pins[3].pwm.pinmap = 0;
+    b->pins[24].pwm.parent_id = 14;   // PWM14-M1
+    b->pins[24].pwm.mux_total = 0;
+    b->pins[24].pwm.pinmap = 0;
     b->pins[29].pwm.parent_id = 7;   // PWM7-M0
     b->pins[29].pwm.mux_total = 0;
     b->pins[29].pwm.pinmap = 0;
-    b->pins[16].pwm.parent_id = 11;   // PWM11-M0
-    b->pins[16].pwm.mux_total = 0;
-    b->pins[16].pwm.pinmap = 0;
+    b->pins[31].pwm.parent_id = 6;    // PWM6-M0
+    b->pins[31].pwm.mux_total = 0;
+    b->pins[31].pwm.pinmap = 0;
     b->pins[32].pwm.parent_id = 13;  // PWM13-M2
     b->pins[32].pwm.mux_total = 0;
     b->pins[32].pwm.pinmap = 0;
-    b->pins[24].pwm.parent_id = 11;   // PWM14-M1
-    b->pins[24].pwm.mux_total = 0;
-    b->pins[24].pwm.pinmap = 0;
     b->pins[36].pwm.parent_id = 15;   // PWM15-M2
     b->pins[36].pwm.mux_total = 0;
     b->pins[36].pwm.pinmap = 0;
+    b->pins[38].pwm.parent_id = 0;    // PWM0-M1
+    b->pins[38].pwm.mux_total = 0;
+    b->pins[38].pwm.pinmap = 0;
 
     // AIO
     b->aio_count = MRAA_RADXA_CM5_IO_AIO_COUNT;
@@ -123,7 +123,7 @@ mraa_radxa_cm5_io()
     mraa_radxa_cm5_io_pininfo(b, 0, -1, -1, (mraa_pincapabilities_t){0,0,0,0,0,0,0,0}, "INVALID");
     mraa_radxa_cm5_io_pininfo(b, 1, -1, -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "3V3");
     mraa_radxa_cm5_io_pininfo(b, 2, -1, -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "5V");
-    mraa_radxa_cm5_io_pininfo(b, 3, 3, 27, (mraa_pincapabilities_t){1,1,0,0,1,1,0,0}, "GPIO3_D3");
+    mraa_radxa_cm5_io_pininfo(b, 3, 3, 27, (mraa_pincapabilities_t){1,1,1,0,1,1,0,0}, "GPIO3_D3");
     mraa_radxa_cm5_io_pininfo(b, 4, -1, -1, (mraa_pincapabilities_t){1,0,0,0, 0,0,0,0}, "5V");
     mraa_radxa_cm5_io_pininfo(b, 5, 3, 26, (mraa_pincapabilities_t){1,1,0,0,1,1,0,0}, "GPIO3_D2");
     mraa_radxa_cm5_io_pininfo(b, 6, -1, -1, (mraa_pincapabilities_t){1,0,0,0,0,0,0,0}, "GND");
@@ -136,7 +136,7 @@ mraa_radxa_cm5_io()
     mraa_radxa_cm5_io_pininfo(b, 13, 4, 5, (mraa_pincapabilities_t){1,1,0,0,0,1,0,1}, "GPIO4_A5");
     mraa_radxa_cm5_io_pininfo(b, 14, -1, -1, (mraa_pincapabilities_t){1,0,0,0, 0,0,0,0}, "GND");
     mraa_radxa_cm5_io_pininfo(b, 15, 4, 4, (mraa_pincapabilities_t){1,1,0,0,0,1,0,0}, "GPIO4_A4");
-    mraa_radxa_cm5_io_pininfo(b, 16, 1, 20, (mraa_pincapabilities_t){1,1,1,0,1,1,0,0}, "GPIO1_C4");
+    mraa_radxa_cm5_io_pininfo(b, 16, 1, 20, (mraa_pincapabilities_t){1,1,0,0,1,1,0,0}, "GPIO1_C4"); // Conflict with the fan's pwm11-m3
     mraa_radxa_cm5_io_pininfo(b, 17, -1, -1, (mraa_pincapabilities_t){1,0,0,0, 0,0,0,0}, "3V3");
     mraa_radxa_cm5_io_pininfo(b, 18, 1, 29, (mraa_pincapabilities_t){1,1,0,0,1,0,0,0}, "GPIO1_D5");
     mraa_radxa_cm5_io_pininfo(b, 19, 4, 1, (mraa_pincapabilities_t){1,1,0,0,1,0,0,0}, "GPIO4_A1");
