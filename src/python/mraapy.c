@@ -25,9 +25,13 @@ mraa_python_isr(void (*isr)(void*), void* isr_args)
     if (arglist == NULL) {
         syslog(LOG_ERR, "gpio: Py_BuildValue NULL");
     } else {
+#if PY_VERSION_HEX >= 0x03090000
+        ret = PyObject_CallObject((PyObject*) isr, arglist);
+#else
         ret = PyEval_CallObject((PyObject*) isr, arglist);
+#endif
         if (ret == NULL) {
-            syslog(LOG_ERR, "gpio: PyEval_CallObject failed");
+            syslog(LOG_ERR, "gpio: Python call failed");
             PyObject *pvalue, *ptype, *ptraceback;
             PyObject *pvalue_pystr, *ptype_pystr, *ptraceback_pystr;
             PyObject *pvalue_ustr, *ptype_ustr, *ptraceback_ustr;
