@@ -151,7 +151,13 @@ class Spi;
     // Initialise python threads, this allows use to grab the GIL when we are
     // required to do so
     Py_InitializeEx(0);
+#if PY_VERSION_HEX < 0x03090000
+    // PyEval_InitThreads() is deprecated since Python 3.9 and removed in Python 3.12
+    // In Python 3.7+, the GIL is initialized automatically by Py_Initialize()
+    // Only call PyEval_InitThreads() for Python < 3.9
+    // Reference: https://docs.python.org/3/c-api/init.html#c.PyEval_InitThreads
     PyEval_InitThreads();
+#endif
     // Add mraa_init() to the module initialisation process and set isr function
     mraa_result_t res = mraa_init();
     if (res == MRAA_SUCCESS) {
