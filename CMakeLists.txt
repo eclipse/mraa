@@ -90,6 +90,17 @@ if (BUILDCPP)
       message(FATAL_ERROR "Target '${targetname}' requires c++11 which is not supported by this compiler")
     endif()
   endfunction()
+
+  # This function adds the c++17 flag to a c++ target (if supported)
+  function(use_cxx_17 targetname)
+    include(CheckCXXCompilerFlag)
+    CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
+    if (COMPILER_SUPPORTS_CXX17)
+      set_target_properties(${targetname} PROPERTIES COMPILE_FLAGS "-std=c++17")
+    else()
+      message(FATAL_ERROR "Target '${targetname}' requires c++17 which is not supported by this compiler")
+    endif()
+  endfunction()
 endif()
 
 # Set CMAKE_INSTALL_LIBDIR if not defined
