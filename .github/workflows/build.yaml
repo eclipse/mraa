@@ -2,7 +2,15 @@ name: Build
 on: [push]
 jobs:
   Build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runs_on: ubuntu-latest
+          - arch: arm64
+            runs_on: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runs_on }}
     steps:
       - uses: actions/checkout@v5
       - name: Install depdencies.
@@ -13,5 +21,5 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G Ninja ../
+          cmake -G Ninja -DBUILDSWIGNODE=on ../
           ninja
