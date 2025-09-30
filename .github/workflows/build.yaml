@@ -8,10 +8,10 @@ jobs:
       - name: Install depdencies.
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build build-essential python3-dev libnode-dev swig libjson-c-dev
+          sudo apt-get install -y cmake ninja-build build-essential python3-dev libnode-dev swig libjson-c-dev git
       - name: Build
         run: |
           mkdir build
           cd build
           cmake -G Ninja ../
-          cmake --build
+          ninja
