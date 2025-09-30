@@ -1,0 +1,17 @@
+name: Build
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install depdencies.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja build-essential
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake -G Ninja ../
+          cmake --build
