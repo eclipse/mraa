@@ -123,62 +123,62 @@ mraa_mock_board()
     // Pin definitions
     int pos = 0;
 
-    strncpy(b->pins[pos].name, "GPIO0", 8);
+    strncpy(b->pins[pos].name, "GPIO0", MRAA_PIN_NAME_SIZE);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
     b->pins[pos].gpio.pinmap = 0;
     b->pins[pos].gpio.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "ADC0", 8);
+    strncpy(b->pins[pos].name, "ADC0", MRAA_PIN_NAME_SIZE);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 1, 0 };
     b->pins[pos].aio.pinmap = 0;
     b->pins[pos].aio.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2C0SDA", 8);
+    strncpy(b->pins[pos].name, "I2C0SDA", MRAA_PIN_NAME_SIZE);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[pos].i2c.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "I2C0SCL", 8);
+    strncpy(b->pins[pos].name, "I2C0SCL", MRAA_PIN_NAME_SIZE);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 1, 0, 0 };
     b->pins[pos].i2c.mux_total = 0;
     b->pins[pos].i2c.pinmap = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "SPI0CS", 8);
+    strncpy(b->pins[pos].name, "SPI0CS", MRAA_PIN_NAME_SIZE);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     b->pins[pos].spi.mux_total = 0;
     b->pins[pos].spi.pinmap = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "SPI0MOSI", 8);
+    strncpy(b->pins[pos].name, "SPI0MOSI", MRAA_PIN_NAME_SIZE);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     b->pins[pos].spi.mux_total = 0;
     b->pins[pos].spi.pinmap = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "SPI0MISO", 8);
+    strncpy(b->pins[pos].name, "SPI0MISO", MRAA_PIN_NAME_SIZE);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     b->pins[pos].spi.mux_total = 0;
     b->pins[pos].spi.pinmap = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "SPI0SCLK", 8);
+    strncpy(b->pins[pos].name, "SPI0SCLK", MRAA_PIN_NAME_SIZE);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 1, 0, 0, 0 };
     b->pins[pos].spi.mux_total = 0;
     b->pins[pos].spi.pinmap = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "UART0RX", 8);
+    strncpy(b->pins[pos].name, "UART0RX", MRAA_PIN_NAME_SIZE);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
     b->pins[pos].uart.mux_total = 0;
     pos++;
 
-    strncpy(b->pins[pos].name, "UART0TX", 8);
+    strncpy(b->pins[pos].name, "UART0TX", MRAA_PIN_NAME_SIZE);
     b->pins[pos].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 1 };
     b->pins[pos].uart.pinmap = 0;
     b->pins[pos].uart.parent_id = 0;
