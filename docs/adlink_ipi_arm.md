@@ -3,7 +3,7 @@ ADLINK IPi-SMARC ARM
 
 Based on Rockchip PX30 with Quad-core ARM Cortex-A35 CPU  
 
-Up to 4GB DDR3L at 1066/1333 MHz,  32 GB eMMC  
+Up to 4GB DDR3L at 1066/1333 MHz,  32 GB eMMC (other eMMC sizes upon request available) 
 
 4x USB 2.0, 1x USB 2.0 OTG port, 2x 10/100M Ethernet Ports, DSI to HDMI converter board, RTC and a 40-pin I/O header
 
@@ -26,7 +26,7 @@ Up to 4GB DDR3L at 1066/1333 MHz,  32 GB eMMC
 |                              | SPI MOSI  |     19      |     20      |    GND    |                              |
 |                              | SPI MISO  |     21      |     22      |   GPIO    |             122              |
 |                              | SPI SCLK  |     23      |     24      |  SPI CS0  |                              |
-|                              |    GND    |     25      |     26      |      N/A  |                              |
+|                              |    GND    |     25      |     26      |    N/A    |                              |
 |                              | I2C_1 SDA |     27      |     28      | I2C_1 SCL |                              |
 |             496              | GPIO/PWM  |     29      |     30      |    GND    |                              |
 |             497              | GPIO/PWM  |     31      |     32      | GPIO/PWM  |             498              |
@@ -35,4 +35,4 @@ Up to 4GB DDR3L at 1066/1333 MHz,  32 GB eMMC
 |             502              | GPIO/PWM  |     37      |     38      | GPIO/PWM  |             503              |
 |                              |    GND    |     39      |     40      | GPIO/PWM  |             504              |
 
-**Note**: N/A: Funciton is not supported
+**Note**: N/A: Function is not supported
