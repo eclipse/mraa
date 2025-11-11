@@ -40,7 +40,7 @@ mraa_up2_set_pininfo(mraa_board_t* board, int mraa_index, char* name,
 {
     if (mraa_index < board->phy_pin_count) {
         mraa_pininfo_t* pin_info = &board->pins[mraa_index];
-        strncpy(pin_info->name, name, MRAA_PIN_NAME_SIZE);
+        strncpy(pin_info->name, name, MRAA_PIN_NAME_SIZE-1);
         pin_info->capabilities = caps;
         if (caps.gpio) {
             pin_info->gpio.pinmap = sysfs_pin;

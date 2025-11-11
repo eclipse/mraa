@@ -596,7 +596,11 @@ mraa_gpio_wait_interrupt(int fds[],
 
         // do an initial read to clear interrupt
         lseek(fds[i], 0, SEEK_SET);
-        read(fds[i], &c, 1);
+        ssize_t nbytes = read(fds[i], &c, 1);
+        if (nbytes < 0) {
+            syslog(LOG_ERR, "mraa_gpio_wait_interrupt: Failed to read from poll fd");
+            return MRAA_ERROR_NO_DATA_AVAILABLE;
+        }
     }
 
 #ifdef HAVE_PTHREAD_CANCEL
@@ -614,7 +618,11 @@ mraa_gpio_wait_interrupt(int fds[],
 
     for (int i = 0; i < num_fds; ++i) {
         if (pfd[i].revents & POLLPRI) {
-            read(fds[i], &c, 1);
+            ssize_t nbytes = read(fds[i], &c, 1);
+            if (nbytes < 0) {
+                syslog(LOG_ERR, "mraa_gpio_wait_interrupt: Failed to read from poll fd");
+                return MRAA_ERROR_NO_DATA_AVAILABLE;
+            }
             events[i].id = i;
             events[i].timestamp = _mraa_gpio_get_timestamp_sysfs();
         } else
@@ -645,7 +653,11 @@ mraa_gpio_chardev_wait_interrupt(int fds[], int num_fds, mraa_gpio_events_t even
 
     for (int i = 0; i < num_fds; ++i) {
         if (pfd[i].revents & POLLIN) {
-            read(fds[i], &event_data, sizeof(event_data));
+            ssize_t nbytes = read(fds[i], &event_data, sizeof(event_data));
+            if (nbytes < 0) {
+                syslog(LOG_ERR, "mraa_gpio_chardev_wait_interrupt: Failed to read from poll fd");
+                return MRAA_ERROR_NO_DATA_AVAILABLE;
+            }
             events[i].id = i;
             events[i].timestamp = event_data.timestamp;
         } else

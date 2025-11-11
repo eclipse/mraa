@@ -228,7 +228,9 @@ run_interactive_mode()
         char* arg;
         argv[0] = "mraa-i2c";
         fprintf(stdout, "Command: ");
-        fgets(command, 80, stdin);
+        char *p = fgets(command, 80, stdin);
+        if (!p || !*p)
+            return;
         command[strlen(command) - 1] = 0;
         if (strncmp(command, "q", strlen("q") + 1) == 0)
             return;

@@ -84,17 +84,32 @@ static mraa_result_t pwm_init_raw_replace(mraa_pwm_context dev, int pin)
 		if((fd = open("/sys/class/gpio/export", O_WRONLY)) != -1)
 		{
 			i = snprintf(buffer, sizeof(buffer), "%d",base2 + pin);
-			write(fd, buffer, i);
+			if (write(fd, buffer, i) < 1) {
+				syslog(LOG_ERR,
+				       "pwm_init_raw_replace: Failed to write %d to /sys/class/gpio/export",
+				       base2 + pin);
+				return MRAA_ERROR_INVALID_RESOURCE;
+			}
 			close(fd);
 			snprintf(buffer, sizeof(buffer), "/sys/class/gpio/gpio%d/direction",base2 + pin);
 			if((fd = open(buffer, O_WRONLY)) != -1)
 			{
-				write(fd, "out", 3);
+				if (write(fd, "out", 3) < 3) {
+					syslog(LOG_ERR,
+					       "pwm_init_raw_replace: Failed to write 'out' to %s",
+					       buffer);
+					return MRAA_ERROR_INVALID_RESOURCE;
+				}
 				close(fd);
 				snprintf(buffer, sizeof(buffer), "/sys/class/gpio/gpio%d/value",base2 + pin);
 				if((fd = open(buffer, O_WRONLY)) != -1)
 				{
-					write(fd, "0", 1);
+					if (write(fd, "0", 1) != 1) {
+						syslog(LOG_ERR,
+						       "pwm_init_raw_replace: Failed to write '0' to %s",
+						       buffer);
+						return MRAA_ERROR_INVALID_RESOURCE;
+					}
 					close(fd);
 				}
 			}
@@ -227,7 +242,9 @@ void clear_sx1509x_intr(void)
 	rx_tx_buf[0] = 0x18;
 	rx_tx_buf[1] = 0xFF;
 	rx_tx_buf[2] = 0xFF;
-	write(_fd, rx_tx_buf, 3);
+	if (write(_fd, rx_tx_buf, 3) != 3) {
+		syslog(LOG_ERR, "clear_sx1509x_intr: Failed to write");
+	}
 }
 
 
@@ -235,6 +252,7 @@ static mraa_result_t gpio_wait_interrupt(int fds[], int num_fds, mraa_gpio_event
 {
 	unsigned char c;
 	struct pollfd pfd[num_fds];
+	ssize_t nbytes;
 
 	pfd[0].fd = fds[0];
 	// setup poll on POLLPRI
@@ -242,7 +260,11 @@ static mraa_result_t gpio_wait_interrupt(int fds[], int num_fds, mraa_gpio_event
 
 	// do an initial read to clear interrupt
 	lseek(fds[0], 0, SEEK_SET);
-	read(fds[0], &c, 1);
+	nbytes = read(fds[0], &c, 1);
+	if (nbytes < 0) {
+		syslog(LOG_ERR, "gpio_wait_interrupt: Failed to read from poll fd");
+		return MRAA_ERROR_NO_DATA_AVAILABLE;
+	}
 
 	clear_sx1509x_intr();
 
@@ -253,7 +275,11 @@ static mraa_result_t gpio_wait_interrupt(int fds[], int num_fds, mraa_gpio_event
 	clear_sx1509x_intr();
 
 	if (pfd[0].revents & POLLPRI) {
-		read(fds[0], &c, 1);
+		nbytes = read(fds[0], &c, 1);
+		if (nbytes < 0) {
+			syslog(LOG_ERR, "gpio_wait_interrupt: Failed to read from poll fd");
+			return MRAA_ERROR_NO_DATA_AVAILABLE;
+		}
 		events[0].id = 0;
 		events[0].timestamp = gpio_get_timestamp_sysfs();
 	} else
@@ -319,8 +345,10 @@ static void internal_isr(void*args)
 		// open gpio value with open(3)
 		fps = open(it->valuepath, O_RDONLY);
 		if (fps > 0) {
-			read(fps, &c, 1);
+			ssize_t nbytes = read(fps, &c, 1);
 			close(fps);
+			if (nbytes < 0)
+				continue;
 			if(it->curr != c)
 			{
 				(it->fptr)(it->args);
@@ -360,9 +388,16 @@ static mraa_result_t intr_init()
 
 	if((fd = open("/sys/class/gpio/export", O_WRONLY)) != -1)
 	{
-		write(fd,"456",3);
+		ssize_t nbytes = write(fd,"456",3);
+		if (nbytes < 0) {
+			syslog(LOG_ERR, "intr_init: Failed to write to /sys/class/gpio/export");
+			return MRAA_ERROR_INVALID_RESOURCE;
+		}
 		snprintf(bu, sizeof(bu), "%d",base1 + 12);
-		write(fd,bu,3);
+		if (write(fd,bu,3) != 3) {
+			syslog(LOG_ERR, "intr_init: Failed to write %s", bu);
+			return MRAA_ERROR_INVALID_RESOURCE;
+		}
 		close(fd);
 	}
 	else
@@ -370,10 +405,15 @@ static mraa_result_t intr_init()
 		return MRAA_ERROR_INVALID_RESOURCE;
 	}
 
-	snprintf(bu, sizeof(bu), "/sys/class/gpio/gpio%d/direction",456);
+	snprintf(bu, sizeof(bu), "/sys/class/gpio/gpio%d/direction", 456);
 	if((fd = open(bu, O_WRONLY)) != -1)
 	{
-		write(fd, "in", 2);
+		ssize_t nbytes = write(fd, "in", 2);
+		if (nbytes < 0) {
+			syslog(LOG_ERR, "intr_init: Failed to write to /sys/class/gpio%d/direction",
+			       456);
+			return MRAA_ERROR_INVALID_RESOURCE;
+		}
 		close(fd);
 	}
 	else
@@ -381,10 +421,16 @@ static mraa_result_t intr_init()
 		return MRAA_ERROR_INVALID_RESOURCE;
 	}
 
-	snprintf(bu, sizeof(bu), "/sys/class/gpio/gpio%d/direction",base1 + 12);
+	snprintf(bu, sizeof(bu), "/sys/class/gpio/gpio%d/direction", base1 + 12);
 	if((fd = open(bu, O_WRONLY)) != -1)
 	{
-		write(fd, "in", 2);
+		ssize_t nbytes = write(fd, "in", 2);
+		if (nbytes < 0) {
+			syslog(LOG_ERR,
+			       "intr_init: Failed to write to /sys/class/gpio%d/direction",
+			       base1 + 12);
+			return MRAA_ERROR_INVALID_RESOURCE;
+        }
 		close(fd);
 	}
 	else
@@ -472,10 +518,17 @@ static mraa_result_t gpio_close_pre(mraa_gpio_context dev)
 		mraa_gpio_isr_exit(gpio);
 		if((fd = open("/sys/class/gpio/unexport", O_WRONLY)) != -1)
 		{
-			length = snprintf(gpio_path, sizeof(gpio_path), "%d",gpio->pin);
-			write(fd, gpio_path, length);
+			length = snprintf(gpio_path, sizeof(gpio_path), "%d", gpio->pin);
+			if (write(fd, gpio_path, length) != length) {
+				syslog(LOG_ERR, "gpio_init_pre: Failed to write %d to /sys/class/gpio/unexport",
+				       gpio->pin);
+				return MRAA_ERROR_NO_RESOURCES;
+			}
 			length = snprintf(gpio_path, sizeof(gpio_path), "%d",base1 + 12);
-			write(fd, gpio_path, length);
+			if (write(fd, gpio_path, length) != length) {
+				syslog(LOG_ERR, "gpio_init_pre: Failed to write %s", gpio_path);
+				return MRAA_ERROR_NO_RESOURCES;
+			}
 			close(fd);
 		}
 
@@ -525,7 +578,13 @@ static mraa_result_t gpio_isr_replace(mraa_gpio_context dev, mraa_gpio_edge_t mo
 	snprintf(list->valuepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/value", list->pin);
 	fps = open(list->valuepath, O_RDONLY);
 	if (fps > 0) {
-		read(fps, &(list->curr), 1);
+		ssize_t nbytes = read(fps, &(list->curr), 1);
+		if (nbytes < 0) {
+			syslog(LOG_ERR,
+			       "mraa_gpio_wait_interrupt: Failed to read from %s",
+			       list->valuepath);
+			return MRAA_ERROR_NO_DATA_AVAILABLE;
+		}
 		close(fps);
 	}
 
@@ -714,7 +773,7 @@ static mraa_result_t mraa_lec_al_set_pininfo(mraa_board_t* board, int mraa_index
 {
 	if (mraa_index < board->phy_pin_count) {
 		mraa_pininfo_t* pin_info = &board->pins[mraa_index];
-		strncpy(pin_info->name, name, MRAA_PIN_NAME_SIZE);
+		strncpy(pin_info->name, name, MRAA_PIN_NAME_SIZE-1);
 		pin_info->capabilities = caps;
 		if (caps.gpio) {
 			pin_info->gpio.pinmap = sysfs_pin;
@@ -802,7 +861,10 @@ static mraa_result_t gpio_init_pre(int pin)
 			if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
 			{
 				rx_tx_buf[1] &= ~(1 << (pin % 8));
-				write(_fd, &rx_tx_buf[0], 2);
+				if (write(_fd, &rx_tx_buf[0], 2) != 2) {
+					syslog(LOG_ERR, "gpio_init_pre: Failed to write");
+					return MRAA_ERROR_NO_RESOURCES;
+				}
 			}
 		}
 
@@ -812,11 +874,17 @@ static mraa_result_t gpio_init_pre(int pin)
 			if(read(_fd, &(rx_tx_buf[1]), 1) == 1)
 			{
 				rx_tx_buf[1] &= ~(1 << (pin % 8));
-				write(_fd, &rx_tx_buf[0], 2);
+				if (write(_fd, &rx_tx_buf[0], 2) != 2) {
+					syslog(LOG_ERR, "gpio_init_pre: Failed to write for pin %d", pin);
+				}
 				if((fd = open("/sys/class/gpio/unexport", O_WRONLY)) != -1)
 				{
-					i = snprintf(buffer, sizeof(buffer), "%d",base2 + pin);
-					write(fd, buffer, i);
+					i = snprintf(buffer, sizeof(buffer), "%d", base2 + pin);
+					if (write(fd, buffer, i) != i) {
+						syslog(LOG_ERR,
+						       "gpio_init_pre: Failed to write %s to /sys/class/gpio/unexport",
+						       buffer);
+					}
 					close(fd);
 				}
 				return MRAA_SUCCESS;

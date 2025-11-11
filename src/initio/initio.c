@@ -57,9 +57,10 @@ mraa_tokenize_string(const char* str, const char* delims, int* num_tokens)
         if (tok == NULL) {
             break;
         }
+        size_t tok_len = strlen(tok);
         output = realloc(output, (++output_size) * sizeof(char*));
-        output[output_size - 1] = calloc(strlen(tok) + 1, sizeof(char));
-        strncpy(output[output_size - 1], tok, strlen(tok));
+        output[output_size - 1] = calloc(tok_len + 1, sizeof(char));
+        strncpy(output[output_size - 1], tok, tok_len + 1);
     }
     *num_tokens = output_size;
 
@@ -762,20 +763,21 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             }
         } else {
             /* Here we build the leftover string. */
+            size_t descs_len = strlen(str_descs[i]);
             new_desc->leftover_str =
-            realloc(new_desc->leftover_str, sizeof(char) * (leftover_str_len + strlen(str_descs[i]) + 2));
+              realloc(new_desc->leftover_str, sizeof(char) * (leftover_str_len + descs_len) + 2);
             if (!new_desc->leftover_str) {
                 syslog(LOG_ERR, "mraa_io_init: error allocating memory for leftover string");
                 status = MRAA_ERROR_NO_RESOURCES;
                 free(new_desc);
             } else {
                 if (leftover_str_len == 0) {
-                    strncpy(new_desc->leftover_str, str_descs[i], strlen(str_descs[i]));
+                    strncpy(new_desc->leftover_str, str_descs[i], descs_len);
                 } else {
-                    strncat(new_desc->leftover_str, str_descs[i], strlen(str_descs[i]));
+                    strncat(new_desc->leftover_str, str_descs[i], leftover_str_len + descs_len);
                 }
 
-                leftover_str_len += strlen(str_descs[i]) + 1;
+                leftover_str_len += descs_len + 1;
                 new_desc->leftover_str[leftover_str_len - 1] = ',';
                 new_desc->leftover_str[leftover_str_len] = '\0';
             }

@@ -378,9 +378,8 @@ mraa_iio_detect()
                 // remove any trailing CR/LF symbols
                 name[strcspn(name, "\r\n")] = '\0';
                 len = strlen(name);
-                // use strndup
                 device->name = malloc((sizeof(char) * len) + sizeof(char));
-                strncpy(device->name, name, len + 1);
+                memcpy(device->name, name, len + 1);
             }
             close(fd);
         }
@@ -910,7 +909,7 @@ mraa_gpio_lookup(const char* pin_name)
         if (!(plat->pins[i].capabilities.gpio))
             continue;
 
-        if (plat->pins[i].name != NULL &&
+        if (*plat->pins[i].name &&
             strncmp(pin_name, plat->pins[i].name, strlen(plat->pins[i].name) + 1) == 0) {
             return i;
         }
@@ -1158,9 +1157,15 @@ mraa_find_uart_bus_pci(const char* pci_dev_path, char** dev_name)
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
-    *dev_name = (char*) malloc(sizeof(char) * max_allowable_len);
+    size_t len = strlen(namelist[n - 1]->d_name);
+    if (len > max_allowable_len)
+    if (n <= 0) {
+        syslog(LOG_ERR, "device name too long: %s", namelist[n - 1]->d_name);
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+    *dev_name = (char*) malloc(sizeof(char) * len + 6);
 
-    snprintf(*dev_name, max_allowable_len, "/dev/%s", namelist[n - 1]->d_name);
+    snprintf(*dev_name, len + 5, "/dev/%s", namelist[n - 1]->d_name);
     while (n--) {
         free(namelist[n]);
     }
@@ -1523,7 +1528,7 @@ mraa_init_io(const char* desc)
     if (length > 255 || length == 0) {
         return NULL;
     }
-    strncpy(buffer, desc, length);
+    strncpy(buffer, desc, sizeof(buffer) - 1);
 
     str = buffer;
     token = strsep(&str, delim);
@@ -1534,7 +1539,7 @@ mraa_init_io(const char* desc)
         syslog(LOG_ERR, "mraa_init_io: An invalid IO type was provided");
         return NULL;
     }
-    strncpy(type, token, length);
+    strncpy(type, token, sizeof(type) - 1);
     mraa_to_upper(type);
     token = strsep(&str, delim);
     // Check that they've given us more information than just the type
