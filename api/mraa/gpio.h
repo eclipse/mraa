@@ -67,6 +67,7 @@ typedef enum {
     MRAA_GPIOD_ACTIVE_LOW = 4,
     MRAA_GPIOD_OPEN_DRAIN = 5,
     MRAA_GPIOD_OPEN_SOURCE = 6,
+    MRAA_GPIOD_BIAS_DISABLE = 7,
 } mraa_gpio_mode_t;
 
 /**
