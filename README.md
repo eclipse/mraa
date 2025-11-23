@@ -106,7 +106,7 @@ Running MRAA tools or applications on Ubuntu systems requires elevated permissio
 Install on Arch Linux
 ---------------------
 
-There is an AUR package for mraa here: https://aur.archlinux.org/packages/mraa
+There is an AUR package for MRAA here: https://aur.archlinux.org/packages/mraa
 
 Install on openSUSE or SLE
 ---------------------------
