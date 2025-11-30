@@ -2,7 +2,7 @@
   <img src="http://iotdk.intel.com/misc/logos/mraa.png" height="150px" width="auto" algt="MRAA Logo"/>
 </p>
 
-Eclipse MRAA - Low Level I/O Communications Library for GNU/Linux Platforms
+Eclipse MRAA™ - Low Level I/O Communications Library for GNU/Linux Platforms
 ===========================================================================
 
 Eclipse MRAA (Libmraa) is a C/C++ library with bindings to Java, Python and JavaScript
