@@ -1,0 +1,48 @@
+name: Build and test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  Build_and_test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runs_on: ubuntu-latest
+            run_tests: true
+          - arch: arm
+            runs_on: ubuntu-24.04-arm
+            run_tests: true
+          - arch: MOCK
+            runs_on: ubuntu-latest
+            run_tests: true
+    runs-on: ${{ matrix.runs_on }}
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build build-essential python3-dev libnode-dev swig libjson-c-dev git libgtest-dev
+
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake -G Ninja -DBUILDSWIGNODE=on -DBUILDARCH=${{ matrix.arch }} ../
+          ninja
+
+      - name: Run tests
+        if: matrix.run_tests
+        run: |
+          cd build
+          ninja test
