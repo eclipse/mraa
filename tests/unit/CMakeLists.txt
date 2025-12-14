@@ -51,9 +51,6 @@ if (DETECTED_ARCH STREQUAL "MOCK")
     target_include_directories(test_unit_ioinit_hpp PRIVATE "${CMAKE_SOURCE_DIR}/api")
     gtest_add_tests(test_unit_ioinit_hpp "" api/mraa_initio_hpp_unit.cxx)
     list(APPEND GTEST_UNIT_TEST_TARGETS test_unit_ioinit_hpp)
-
-    # The initio C++ header requires c++11
-    use_cxx_11(test_unit_ioinit_hpp)
 endif()
 
 # Add a target for all unit tests
