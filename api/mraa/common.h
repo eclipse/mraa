@@ -35,7 +35,7 @@
 #define MRAA_PIN_NAME_SIZE 12
 
 /** Bit Shift for Mraa sub platform */
-#define MRAA_SUB_PLATFORM_BIT_SHIFT 9
+#define MRAA_SUB_PLATFORM_BIT_SHIFT 12
 /** Mask for Mraa sub platform */
 #define MRAA_SUB_PLATFORM_MASK (1<<MRAA_SUB_PLATFORM_BIT_SHIFT)
 
