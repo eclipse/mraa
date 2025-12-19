@@ -52,14 +52,14 @@ mraa_pwm_write_period(mraa_pwm_context dev, int period)
 
     int period_f = open(bu, O_RDWR);
     if (period_f == -1) {
-        syslog(LOG_ERR, "pwm%i write_period: Failed to open period for writing: %s", dev->pin, strerror(errno));
+        syslog(LOG_ERR, "pwmchip%i/pwm%i write_period: Failed to open period for writing: %s", dev->chipid, dev->pin, strerror(errno));
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     char out[MAX_SIZE];
     int length = snprintf(out, MAX_SIZE, "%d", period);
     if (write(period_f, out, length * sizeof(char)) == -1) {
         close(period_f);
-        syslog(LOG_ERR, "pwm%i write_period: Failed to write to period: %s", dev->pin, strerror(errno));
+        syslog(LOG_ERR, "pwmchip%i/pwm%i write_period: Failed to write to period: %s", dev->chipid, dev->pin, strerror(errno));
         return MRAA_ERROR_INVALID_RESOURCE;
     }
 
@@ -81,7 +81,7 @@ mraa_pwm_write_duty(mraa_pwm_context dev, int duty)
     }
     if (dev->duty_fp == -1) {
         if (mraa_pwm_setup_duty_fp(dev) == 1) {
-            syslog(LOG_ERR, "pwm%i write_duty: Failed to open duty_cycle for writing: %s", dev->pin, strerror(errno));
+            syslog(LOG_ERR, "pwmchip%i/pwm%i write_duty: Failed to open duty_cycle for writing: %s", dev->chipid, dev->pin, strerror(errno));
             return MRAA_ERROR_INVALID_RESOURCE;
         }
     }
@@ -89,7 +89,7 @@ mraa_pwm_write_duty(mraa_pwm_context dev, int duty)
     int length = snprintf(bu, MAX_SIZE, "%d", duty);
     if (write(dev->duty_fp, bu, length * sizeof(char)) == -1)
     {
-        syslog(LOG_ERR, "pwm%i write_duty: Failed to write to duty_cycle: %s", dev->pin, strerror(errno));
+        syslog(LOG_ERR, "pwmchip%i/pwm%i write_duty: Failed to write to duty_cycle: %s", dev->chipid, dev->pin, strerror(errno));
         return MRAA_ERROR_INVALID_RESOURCE;
     }
     return MRAA_SUCCESS;
@@ -113,7 +113,7 @@ mraa_pwm_read_period(mraa_pwm_context dev)
 
     int period_f = open(bu, O_RDWR);
     if (period_f == -1) {
-        syslog(LOG_ERR, "pwm%i read_period: Failed to open period for reading: %s", dev->pin, strerror(errno));
+        syslog(LOG_ERR, "pwmchip%i/pwm%i read_period: Failed to open period for reading: %s", dev->chipid, dev->pin, strerror(errno));
         return 0;
     }
 
@@ -121,17 +121,17 @@ mraa_pwm_read_period(mraa_pwm_context dev)
     close(period_f);
 
     if (rb < 0) {
-        syslog(LOG_ERR, "pwm%i read_period: Failed to read period: %s", dev->pin, strerror(errno));
+        syslog(LOG_ERR, "pwmchip%i/pwm%i read_period: Failed to read period: %s", dev->chipid, dev->pin, strerror(errno));
         return -1;
     }
 
     char* endptr;
     long int ret = strtol(output, &endptr, 10);
     if ('\0' != *endptr && '\n' != *endptr) {
-        syslog(LOG_ERR, "pwm%i read_period: Error in string conversion", dev->pin);
+        syslog(LOG_ERR, "pwmchip%i/pwm%i read_period: Error in string conversion", dev->chipid, dev->pin);
         return -1;
     } else if (ret > INT_MAX || ret < INT_MIN) {
-        syslog(LOG_ERR, "pwm%i read_period: Number is invalid", dev->pin);
+        syslog(LOG_ERR, "pwmchip%i/pwm%i read_period: Number is invalid", dev->chipid, dev->pin);
         return -1;
     }
     dev->period = (int) ret;
@@ -152,8 +152,8 @@ mraa_pwm_read_duty(mraa_pwm_context dev)
 
     if (dev->duty_fp == -1) {
         if (mraa_pwm_setup_duty_fp(dev) == 1) {
-            syslog(LOG_ERR, "pwm%i read_duty: Failed to open duty_cycle for reading: %s",
-                    dev->pin, strerror(errno));
+            syslog(LOG_ERR, "pwmchip%i/pwm%i read_duty: Failed to open duty_cycle for reading: %s",
+                    dev->chipid, dev->pin, strerror(errno));
             return -1;
         }
     } else {
@@ -163,17 +163,17 @@ mraa_pwm_read_duty(mraa_pwm_context dev)
     char output[MAX_SIZE];
     ssize_t rb = read(dev->duty_fp, output, MAX_SIZE);
     if (rb < 0) {
-        syslog(LOG_ERR, "pwm%i read_duty: Failed to read duty_cycle: %s", dev->pin, strerror(errno));
+        syslog(LOG_ERR, "pwmchip%i/pwm%i read_duty: Failed to read duty_cycle: %s", dev->chipid, dev->pin, strerror(errno));
         return -1;
     }
 
     char* endptr;
     long int ret = strtol(output, &endptr, 10);
     if ('\0' != *endptr && '\n' != *endptr) {
-        syslog(LOG_ERR, "pwm%i read_duty: Error in string conversion", dev->pin);
+        syslog(LOG_ERR, "pwmchip%i/pwm%i read_duty: Error in string conversion", dev->chipid, dev->pin);
         return -1;
     } else if (ret > INT_MAX || ret < INT_MIN) {
-        syslog(LOG_ERR, "pwm%i read_duty: Number is invalid", dev->pin);
+        syslog(LOG_ERR, "pwmchip%i/pwm%i read_duty: Number is invalid", dev->chipid, dev->pin);
         return -1;
     }
     return (int) ret;
@@ -289,14 +289,14 @@ mraa_pwm_init_raw(int chipin, int pin)
     snprintf(directory, MAX_SIZE, SYSFS_PWM "/pwmchip%d/pwm%d", dev->chipid, dev->pin);
     struct stat dir;
     if (stat(directory, &dir) == 0 && S_ISDIR(dir.st_mode)) {
-        syslog(LOG_NOTICE, "pwm_init: pwm%i already exported, continuing", pin);
+        syslog(LOG_NOTICE, "pwm_init: pwmchip%i/pwm%i already exported, continuing", dev->chipid, dev->pin);
         dev->owner = 0; // Not Owner
     } else {
         char buffer[MAX_SIZE];
         snprintf(buffer, MAX_SIZE, "/sys/class/pwm/pwmchip%d/export", dev->chipid);
         int export_f = open(buffer, O_WRONLY);
         if (export_f == -1) {
-            syslog(LOG_ERR, "pwm_init: pwm%i. Failed to open export for writing: %s", pin, strerror(errno));
+            syslog(LOG_ERR, "pwm_init: pwmchip%i/pwm%i. Failed to open export for writing: %s", dev->chipid, dev->pin, strerror(errno));
             free(dev);
             return NULL;
         }
@@ -304,7 +304,7 @@ mraa_pwm_init_raw(int chipin, int pin)
         char out[MAX_SIZE];
         int size = snprintf(out, MAX_SIZE, "%d", dev->pin);
         if (write(export_f, out, size * sizeof(char)) == -1) {
-            syslog(LOG_WARNING, "pwm_init: pwm%i. Failed to write to export! (%s) Potentially already in use.", pin, strerror(errno));
+            syslog(LOG_WARNING, "pwm_init: pwmchip%i/pwm%i. Failed to write to export! (%s) Potentially already in use.", dev->chipid, dev->pin, strerror(errno));
             close(export_f);
             free(dev);
             return NULL;
@@ -329,7 +329,7 @@ mraa_pwm_write(mraa_pwm_context dev, float percentage)
 
     if (IS_FUNC_DEFINED(dev, pwm_write_pre)) {
         if (dev->advance_func->pwm_write_pre(dev, percentage) != MRAA_SUCCESS) {
-            syslog(LOG_ERR, "mraa_pwm_write (pwm%i): pwm_write_pre failed, see syslog", dev->pin);
+            syslog(LOG_ERR, "mraa_pwm_write (pwmchip%i/pwm%i): pwm_write_pre failed, see syslog", dev->chipid, dev->pin);
             return MRAA_ERROR_UNSPECIFIED;
         }
     }

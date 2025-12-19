@@ -68,6 +68,11 @@ main(void)
     while (flag) {
         value = value + 0.01f;
 
+        /* avoid syslog warnings: pwm_write: 100%% entered, defaulting to 100% */
+        if (value >= 1.0f) {
+            value = 0.0f;
+        }
+
         /* write PWM duty cyle */
         status = mraa_pwm_write(pwm, value);
         if (status != MRAA_SUCCESS) {
@@ -75,10 +80,6 @@ main(void)
         }
 
         usleep(50000);
-
-        if (value >= 1.0f) {
-            value = 0.0f;
-        }
 
         /* read PWM duty cyle */
         output = mraa_pwm_read(pwm);
