@@ -182,6 +182,7 @@ mraa_arm_platform()
             break;
         case MRAA_ADLINK_IPI:
             plat = mraa_adlink_ipi();
+            break;
         case MRAA_SIEMENS_IOT2050:
             plat = mraa_siemens_iot2050();
             break;
