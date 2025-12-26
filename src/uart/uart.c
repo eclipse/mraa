@@ -262,13 +262,14 @@ mraa_uart_init_raw(const char* path)
         status = MRAA_ERROR_NO_RESOURCES;
         goto init_raw_cleanup;
     }
-    dev->path = (char*) calloc(strlen(path)+1, sizeof(char));
+    size_t path_len = strlen(path);
+    dev->path = (char*) calloc(path_len+1, sizeof(char));
     if (dev->path == NULL) {
         syslog(LOG_ERR, "uart: Failed to allocate memory for path");
         status =  MRAA_ERROR_NO_RESOURCES;
         goto init_raw_cleanup;
     }
-    strncpy((char *) dev->path, path, strlen(path));
+    memcpy((char*) dev->path, path, path_len + 1);
 
     if (IS_FUNC_DEFINED(dev, uart_init_raw_replace)) {
         status = dev->advance_func->uart_init_raw_replace(dev, path);

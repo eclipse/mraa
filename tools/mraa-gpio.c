@@ -162,6 +162,7 @@ gpio_isr_stop(struct gpio_source* gpio_info)
 int
 main(int argc, char** argv)
 {
+    int retval = 0;
     if (argc == 1) {
         print_command_error();
     }
@@ -177,10 +178,13 @@ main(int argc, char** argv)
             if (argc == 4) {
                 int pin = atoi(argv[2]);
                 mraa_boolean_t rawmode = strcmp(argv[1], "setraw") == 0;
-                if (gpio_set(pin, atoi(argv[3]), rawmode) != MRAA_SUCCESS)
+                if (gpio_set(pin, atoi(argv[3]), rawmode) != MRAA_SUCCESS) {
                     fprintf(stdout, "Could not initialize gpio %d\n", pin);
+                    retval = 1;
+                }
             } else {
                 print_command_error();
+                retval = 2;
             }
         } else if ((strcmp(argv[1], "get") == 0) || (strcmp(argv[1], "getraw") == 0)) {
             if (argc == 3) {
@@ -191,9 +195,11 @@ main(int argc, char** argv)
                     fprintf(stdout, "Pin %d = %d\n", pin, level);
                 } else {
                     fprintf(stdout, "Could not initialize gpio %d\n", pin);
+                    retval = 1;
                 }
             } else {
                 print_command_error();
+                retval = 2;
             }
         } else if (strcmp(argv[1], "monitor") == 0) {
             if (argc == 3) {
@@ -206,18 +212,23 @@ main(int argc, char** argv)
                     char aux = 0;
                     do {
                         fflush(stdin);
-                        fscanf(stdin, "%c", &aux);
+                        int ret = fscanf(stdin, "%c", &aux);
+                        if (ret == EOF)
+                            perror("fscanf");
                     } while (aux != '\n');
                     gpio_isr_stop(&gpio_info);
                 } else {
                     fprintf(stdout, "Failed to register ISR for pin %d\n", pin);
+                    retval = 3;
                 }
             } else {
                 print_command_error();
+                retval = 2;
             }
         } else {
             print_command_error();
+            retval = 2;
         }
     }
-    return 0;
+    return retval;
 }

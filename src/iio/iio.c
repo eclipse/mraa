@@ -111,7 +111,13 @@ mraa_iio_get_channel_data(mraa_iio_context dev)
                 snprintf(buf, MAX_SIZE, "%stype", str);
                 fd = open(buf, O_RDONLY);
                 if (fd != -1) {
-                    read(fd, readbuf, 31 * sizeof(char));
+                    ssize_t nbytes = read(fd, readbuf, 31 * sizeof(char));
+                    if (nbytes < 0) {
+                        // cleanup
+                        free(str);
+                        close(fd);
+                        return MRAA_IO_SETUP_FAILURE;
+                    }
                     ret = sscanf(readbuf, "%ce:%c%u/%u>>%u", &shortbuf, &signchar, &chan->bits_used,
                                  &padint, &chan->shift);
                     // probably should be 5?
@@ -303,8 +309,12 @@ mraa_iio_wait_event(int fd, char* data, int* read_size)
 
     memset(data, 0, 100);
     *read_size = read(fd, data, 100);
-
-    return MRAA_SUCCESS;
+    if (*read_size >= 0)
+        return MRAA_SUCCESS;
+    else {
+        syslog(LOG_ERR, "mraa_iio_wait_event: Failed to read from poll fd");
+        return MRAA_ERROR_NO_DATA_AVAILABLE;
+    }
 }
 
 static void*
@@ -431,7 +441,11 @@ mraa_iio_event_poll_nonblock(int fd, struct iio_event_data* data)
     // poll is a cancelable point like sleep()
     poll(&pfd, 1, -1);
 
-    read(fd, data, sizeof(struct iio_event_data));
+    ssize_t nbytes = read(fd, data, sizeof(struct iio_event_data));
+    if (nbytes < 0) {
+        syslog(LOG_ERR, "mraa_iio_event_poll_nonblock: Failed to read iio_event_data");
+        return MRAA_ERROR_NO_DATA_AVAILABLE;
+    }
 
     return MRAA_SUCCESS;
 }
@@ -456,7 +470,11 @@ mraa_iio_event_poll(mraa_iio_context dev, struct iio_event_data* data)
     if (ret == -1 || event_fd == -1)
         return MRAA_ERROR_UNSPECIFIED;
 
-    read(event_fd, data, sizeof(struct iio_event_data));
+    ssize_t nbytes = read(event_fd, data, sizeof(struct iio_event_data));
+    if (nbytes < 0) {
+        syslog(LOG_ERR, "mraa_iio_event_poll: Failed to read iio_event_data");
+        return MRAA_ERROR_NO_DATA_AVAILABLE;
+    }
 
     close(event_fd);
     return MRAA_SUCCESS;

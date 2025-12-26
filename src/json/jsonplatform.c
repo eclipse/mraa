@@ -601,6 +601,7 @@ mraa_init_json_platform(const char* platform_json)
     int file_lock = 0, i = 0;
     json_object* jobj_platform = NULL;
     mraa_board_t* board = NULL;
+    size_t len;
 
     // Try to lock the file for use
     if ((file_lock = open(platform_json, O_RDONLY)) == -1) {
@@ -703,14 +704,15 @@ mraa_init_json_platform(const char* platform_json)
     if (!plat->platform_name) {
         goto unsuccessful;
     } else {
-        platform_name = calloc(strlen(plat->platform_name) + 1, sizeof(char));
+        len = strlen(plat->platform_name);
+        platform_name = calloc(len + 1, sizeof(char));
     }
 
     if (platform_name == NULL) {
         syslog(LOG_ERR, "init_json_platform: Could not allocate memory for platform_name");
         goto unsuccessful;
     }
-    strncpy(platform_name, plat->platform_name, strlen(plat->platform_name) + 1);
+    strncpy(platform_name, plat->platform_name, len + 1);
 
     // We made it to the end without anything going wrong, just cleanup
     ret = MRAA_SUCCESS;
