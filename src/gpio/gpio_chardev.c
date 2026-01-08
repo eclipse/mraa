@@ -429,6 +429,24 @@ mraa_is_gpio_line_open_source(mraa_gpiod_line_info* linfo)
     return (linfo->flags & GPIOLINE_FLAG_OPEN_SOURCE);
 }
 
+mraa_boolean_t
+mraa_is_gpio_line_bias_pull_up(mraa_gpiod_line_info* linfo)
+{
+    return (linfo->flags & GPIOLINE_FLAG_BIAS_PULL_UP);
+}
+
+mraa_boolean_t
+mraa_is_gpio_line_bias_pull_down(mraa_gpiod_line_info* linfo)
+{
+    return (linfo->flags & GPIOLINE_FLAG_BIAS_PULL_DOWN);
+}
+
+mraa_boolean_t
+mraa_is_gpio_line_bias_disable(mraa_gpiod_line_info* linfo)
+{
+    return (linfo->flags & GPIOLINE_FLAG_BIAS_DISABLE);
+}
+
 static int
 dir_filter(const struct dirent* dir)
 {
