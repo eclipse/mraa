@@ -101,7 +101,7 @@ mraa_up2_board()
     b->platform_version = PLATFORM_VERSION;
     b->phy_pin_count = MRAA_UP2_PINCOUNT;
     b->gpio_count = MRAA_UP2_GPIOCOUNT;
-    b->chardev_capable = 1;
+    b->chardev_capable = 0;
 
     b->pins = (mraa_pininfo_t*) malloc(sizeof(mraa_pininfo_t) * MRAA_UP2_PINCOUNT);
     if (b->pins == NULL) {
